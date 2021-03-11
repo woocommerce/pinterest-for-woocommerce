@@ -37,11 +37,7 @@ class Pinterest4WooCommerce_Frontend_Assets extends Pinterest4WooCommerce_Assets
 	public function get_styles() {
 		return apply_filters(
 			'pinterest_for_woocommerce_enqueue_styles',
-			array(
-				'pinterest-for-woocommerce-general' => array(
-					'src' => $this->localize_asset( 'css/frontend/pinterest-for-woocommerce.css' ),
-				),
-			)
+			array()
 		);
 	}
 
@@ -53,14 +49,7 @@ class Pinterest4WooCommerce_Frontend_Assets extends Pinterest4WooCommerce_Assets
 	public function get_scripts() {
 		return apply_filters(
 			'pinterest_for_woocommerce_enqueue_scripts',
-			array(
-				'pinterest-for-woocommerce-general' => array(
-					'src'  => $this->localize_asset( 'js/frontend/pinterest-for-woocommerce.js' ),
-					'data' => array(
-						'ajax_url' => Pinterest4WooCommerce()->ajax_url(),
-					),
-				),
-			)
+			array()
 		);
 	}
 

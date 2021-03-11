@@ -137,21 +137,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			if ( $this->is_request( 'frontend' ) ) {
 				include_once 'includes/class-pinterest4woocommerce-frontend-assets.php'; // Frontend Scripts
 			}
-
-			$this->customizations_includes();
-		}
-
-		/**
-		 * Include required customizations files.
-		 */
-		private function customizations_includes() {
-			$customizations = array(
-				'acf',
-			);
-
-			foreach ( $customizations as $customization ) {
-				include_once 'includes/customizations/class-pinterest4woocommerce-' . $customization . '-hooks.php';
-			}
 		}
 
 		/**

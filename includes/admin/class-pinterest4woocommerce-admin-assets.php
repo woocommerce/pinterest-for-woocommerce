@@ -36,11 +36,7 @@ class Pinterest4WooCommerce_Admin_Assets extends Pinterest4WooCommerce_Assets {
 	public function get_styles() {
 		return apply_filters(
 			'pinterest_for_woocommerce_enqueue_admin_styles',
-			array(
-				'pinterest-for-woocommerce-admin' => array(
-					'src' => $this->localize_asset( 'css/admin/pinterest-for-woocommerce-admin.css' ),
-				),
-			)
+			array()
 		);
 	}
 
@@ -52,14 +48,7 @@ class Pinterest4WooCommerce_Admin_Assets extends Pinterest4WooCommerce_Assets {
 	public function get_scripts() {
 		return apply_filters(
 			'pinterest_for_woocommerce_enqueue_admin_scripts',
-			array(
-				'pinterest-for-woocommerce-admin' => array(
-					'src'  => $this->localize_asset( 'js/admin/pinterest-for-woocommerce-admin.js' ),
-					'data' => array(
-						'ajax_url' => Pinterest4WooCommerce()->ajax_url(),
-					),
-				),
-			)
+			array()
 		);
 	}
 
