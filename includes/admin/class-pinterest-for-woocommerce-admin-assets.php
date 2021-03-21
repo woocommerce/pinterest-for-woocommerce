@@ -12,12 +12,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once Pinterest4WooCommerce()->plugin_path() . '/includes/class-pinterest4woocommerce-assets.php';
+require_once Pinterest4WooCommerce()->plugin_path() . '/includes/class-pinterest-for-woocommerce-assets.php';
 
 /**
  * Pinterest4WooCommerce_Admin_Assets Class.
  */
-class Pinterest4WooCommerce_Admin_Assets extends Pinterest4WooCommerce_Assets {
+class Pinterest_For_Woocommerce_Admin_Assets extends Pinterest_For_Woocommerce_Assets {
 
 	/**
 	 * Hook in methods.

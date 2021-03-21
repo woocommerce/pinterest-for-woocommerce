@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Pinterest4WooCommerce_Frontend_Scripts Class.
  */
-abstract class Pinterest4WooCommerce_Assets {
+abstract class Pinterest_For_Woocommerce_Assets {
 
 	/**
 	 * Contains an array of script handles registered by WC.

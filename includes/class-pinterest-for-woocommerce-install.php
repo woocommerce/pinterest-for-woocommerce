@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Pinterest4WooCommerce_Install Class.
  */
-class Pinterest4WooCommerce_Install {
+class Pinterest_For_Woocommerce_Install {
 
 	/**
 	 * Install Pinterest4WooCommerce.

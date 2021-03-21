@@ -11,9 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @version     1.0.0
  * @package     Pinterest_For_Woocommerce/Classes
  * @category    Class
- * @author      Saucal Inc.
+ * @author      WooCommerce
  */
-class Pinterest4WooCommerce_Autoloader {
+class Pinterest_For_Woocommerce_Autoloader {
 
 	/**
 	 * Path to the includes directory.
