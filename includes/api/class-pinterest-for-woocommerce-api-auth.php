@@ -4,7 +4,7 @@
  *
  * @author      WooCommerce
  * @category    API
- * @package     Pinterest4WooCommerce/API
+ * @package     Pinterest_For_Woocommerce/API
  * @version     1.0.0
  */
 
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce_API_Auth' ) ) :
 
-	require_once Pinterest4WooCommerce()->plugin_path() . '/includes/api/class-pinterest-for-woocommerce-vendor-api.php';
+	require_once Pinterest_For_Woocommerce()->plugin_path() . '/includes/api/class-pinterest-for-woocommerce-vendor-api.php';
 
 	class Pinterest_For_Woocommerce_API_Auth extends Pinterest_For_Woocommerce_Vendor_API {
 
@@ -63,13 +63,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_API_Auth' ) ) :
 
 			if ( ! empty( $error ) ) {
 				$error_args = '&error=' . $error;
-				Pinterest4WooCommerceAPI()::log( 'error', wp_json_encode( $error ) );
+				Pinterest_For_WoocommerceAPI()::log( 'error', wp_json_encode( $error ) );
 			}
 
 			// Save token information
 			if ( empty( $error ) ) {
 
-				Pinterest4WooCommerce()::save_token(
+				Pinterest_For_Woocommerce()::save_token(
 					array(
 						'access_token' => $_GET['pinterestv3_access_token'], // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					)
@@ -77,7 +77,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_API_Auth' ) ) :
 			}
 
 			$redirect_url      = admin_url( 'options-general.php?page=' . PINTEREST4WOOCOMMERCE_PREFIX );
-			$is_setup_complete = Pinterest4WooCommerce()::get_setting( 'is_setup_complete', true );
+			$is_setup_complete = Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete', true );
 
 			if ( empty( $is_setup_complete ) || 'no' === $is_setup_complete ) {
 				$step         = empty( $error ) ? 'setup' : 'connect';
@@ -92,7 +92,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_API_Auth' ) ) :
 
 			// Set setup as completed
 			if ( empty( $error ) ) {
-				Pinterest4WooCommerce()::save_setting( 'is_setup_complete', 'yes' );
+				Pinterest_For_Woocommerce()::save_setting( 'is_setup_complete', 'yes' );
 			}
 
 			wp_safe_redirect( $redirect_url . $error_args );

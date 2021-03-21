@@ -2,7 +2,7 @@
 /**
  * WordPress Plugin Boilerplate Admin
  *
- * @class    Pinterest4WooCommerce_Admin
+ * @class    Pinterest_For_Woocommerce_Admin
  * @author   WooCommece
  * @category Admin
  * @package  Pinterest_For_Woocommerce/Admin
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Pinterest4WooCommerce_Admin class.
+ * Pinterest_For_Woocommerce_Admin class.
  */
 class Pinterest_For_Woocommerce_Admin {
 
@@ -55,4 +55,4 @@ class Pinterest_For_Woocommerce_Admin {
 	}
 }
 
-return new Pinterest4WooCommerce_Admin();
+return new Pinterest_For_Woocommerce_Admin();

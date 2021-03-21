@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Pinterest_For_Woocommerce Autoloader.
  *
- * @class       Pinterest4WooCommerce_Autoloader
+ * @class       Pinterest_For_Woocommerce_Autoloader
  * @version     1.0.0
  * @package     Pinterest_For_Woocommerce/Classes
  * @category    Class
@@ -84,4 +84,4 @@ class Pinterest_For_Woocommerce_Autoloader {
 	}
 }
 
-new Pinterest4WooCommerce_Autoloader();
+new Pinterest_For_Woocommerce_Autoloader();

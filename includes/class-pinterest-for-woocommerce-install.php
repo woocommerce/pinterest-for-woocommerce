@@ -13,12 +13,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Pinterest4WooCommerce_Install Class.
+ * Pinterest_For_Woocommerce_Install Class.
  */
 class Pinterest_For_Woocommerce_Install {
 
 	/**
-	 * Install Pinterest4WooCommerce.
+	 * Install Pinterest_For_Woocommerce.
 	 */
 	public static function install() {
 		// PERFORM INSTALL ACTIONS HERE
@@ -28,4 +28,4 @@ class Pinterest_For_Woocommerce_Install {
 	}
 }
 
-register_activation_hook( PINTEREST4WOOCOMMERCE_PLUGIN_FILE, array( 'Pinterest4WooCommerce_Install', 'install' ) );
+register_activation_hook( PINTEREST4WOOCOMMERCE_PLUGIN_FILE, array( 'Pinterest_For_Woocommerce_Install', 'install' ) );

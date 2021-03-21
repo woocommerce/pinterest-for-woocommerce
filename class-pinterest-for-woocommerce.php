@@ -36,7 +36,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 * @static
-		 * @see Pinterest4WooCommerce()
+		 * @see Pinterest_For_Woocommerce()
 		 * @return Pinterest_For_Woocommerce - Main instance.
 		 */
 		public static function instance() {
@@ -82,7 +82,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Define Pinterest4WooCommerce Constants.
+		 * Define Pinterest_For_Woocommerce Constants.
 		 */
 		private function define_constants() {
 			$upload_dir = wp_upload_dir();

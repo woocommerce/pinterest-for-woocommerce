@@ -4,7 +4,7 @@
  *
  * @author      WooCommerce
  * @category    API
- * @package     Pinterest4WooCommerce/API
+ * @package     Pinterest_For_Woocommerce/API
  * @version     1.0.0
  */
 

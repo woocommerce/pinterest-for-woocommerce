@@ -58,7 +58,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 					<p><?php echo esc_html__( 'Login to connect with Pinterest APP.', 'pinterest-for-woocommerce' ); ?></p>
 
-					<a href="<?php echo esc_url( Pinterest4WooCommerce()::get_service_login_url() ); ?>" class="button">
+					<a href="<?php echo esc_url( Pinterest_For_Woocommerce()::get_service_login_url() ); ?>" class="button">
 						<span class="dashicons dashicons-admin-network"></span>
 						<?php echo esc_html__( 'Login to Pinterest', 'pinterest-for-woocommerce' ); ?>
 					</a>

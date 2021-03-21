@@ -36,16 +36,16 @@ require_once 'class-pinterest-for-woocommerce.php';
 /**
  * Main instance of Pinterest_For_Woocommerce.
  *
- * Returns the main instance of Pinterest4WooCommerce to prevent the need to use globals.
+ * Returns the main instance of Pinterest_For_Woocommerce to prevent the need to use globals.
  *
  * @since  1.0.0
  * @return Pinterest_For_Woocommerce
  */
 
 // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
-function Pinterest4WooCommerce() {
+function Pinterest_For_Woocommerce() {
 	return Pinterest_For_Woocommerce::instance();
 }
 
 // Global for backwards compatibility.
-$GLOBALS['pinterest_for_woocommerce'] = Pinterest4WooCommerce();
+$GLOBALS['pinterest_for_woocommerce'] = Pinterest_For_Woocommerce();

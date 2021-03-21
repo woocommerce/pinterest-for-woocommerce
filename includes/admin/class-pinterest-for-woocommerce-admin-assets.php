@@ -4,7 +4,7 @@
  *
  * @author      WooCommece
  * @category    Admin
- * @package     Pinterest4WooCommerce/Admin
+ * @package     Pinterest_For_Woocommerce/Admin
  * @version     1.0.0
  */
 
@@ -12,10 +12,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once Pinterest4WooCommerce()->plugin_path() . '/includes/class-pinterest-for-woocommerce-assets.php';
+require_once Pinterest_For_Woocommerce()->plugin_path() . '/includes/class-pinterest-for-woocommerce-assets.php';
 
 /**
- * Pinterest4WooCommerce_Admin_Assets Class.
+ * Pinterest_For_Woocommerce_Admin_Assets Class.
  */
 class Pinterest_For_Woocommerce_Admin_Assets extends Pinterest_For_Woocommerce_Assets {
 
@@ -54,4 +54,4 @@ class Pinterest_For_Woocommerce_Admin_Assets extends Pinterest_For_Woocommerce_A
 
 }
 
-return new Pinterest4WooCommerce_Admin_Assets();
+return new Pinterest_For_Woocommerce_Admin_Assets();

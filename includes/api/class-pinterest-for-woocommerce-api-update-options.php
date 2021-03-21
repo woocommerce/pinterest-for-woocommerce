@@ -4,7 +4,7 @@
  *
  * @author      WooCommerce
  * @category    API
- * @package     Pinterest4WooCommerce/API
+ * @package     Pinterest_For_Woocommerce/API
  * @version     1.0.0
  */
 
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce_API_Update_Options' ) ) :
 
-	require_once Pinterest4WooCommerce()->plugin_path() . '/includes/api/class-pinterest-for-woocommerce-vendor-api.php';
+	require_once Pinterest_For_Woocommerce()->plugin_path() . '/includes/api/class-pinterest-for-woocommerce-vendor-api.php';
 
 	class Pinterest_For_Woocommerce_API_Update_Options extends Pinterest_For_Woocommerce_Vendor_API {
 

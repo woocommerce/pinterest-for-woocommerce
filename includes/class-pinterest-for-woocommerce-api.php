@@ -2,7 +2,7 @@
 /**
  * Pinterest API
  *
- * @class       Pinterest4WooCommerce_API
+ * @class       Pinterest_For_Woocommerce_API
  * @version     1.0.0
  * @package     Pinterest_For_WordPress/Classes/
  * @category    Class
@@ -32,7 +32,7 @@ class Pinterest_For_Woocommerce_API {
 	}
 
 	public static function set_token() {
-		self::$token = Pinterest4WooCommerce()::get_token();
+		self::$token = Pinterest_For_Woocommerce()::get_token();
 	}
 
 	/**
@@ -224,9 +224,9 @@ class Pinterest_For_Woocommerce_API {
 }
 
 // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
-function Pinterest4WooCommerceAPI() {
+function Pinterest_For_WoocommerceAPI() {
 	return Pinterest_For_Woocommerce_API::instance();
 }
 
 // Global for backwards compatibility.
-$GLOBALS['pinterest_for_woocommerce_api'] = Pinterest4WooCommerceAPI();
+$GLOBALS['pinterest_for_woocommerce_api'] = Pinterest_For_WoocommerceAPI();
