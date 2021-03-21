@@ -23,6 +23,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 		public function __construct() {
 			add_action( 'admin_menu', array( $this, 'register_menu_item' ) );
+			add_action( 'admin_init', array( $this, 'maybe_go_to_service_login_url' ) );
 		}
 
 
@@ -41,6 +42,22 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			add_action( 'load-' . $hook, array( $this, 'save' ) );
 		}
 
+		public function maybe_go_to_service_login_url() {
+
+			if ( ! isset( $_GET[ PINTEREST4WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) || empty( $_REQUEST['page'] ) || PINTEREST4WOOCOMMERCE_PREFIX !== $_REQUEST['page'] ) {
+				return;
+			}
+
+			if ( ! current_user_can( 'manage_options' ) ) {
+				self::add_error( esc_html__( 'Cheatin&#8217; huh?', 'pinterest-for-woocommerce' ) );
+				return false;
+			}
+
+			wp_redirect( Pinterest_For_Woocommerce()::get_service_login_url() );
+			exit;
+
+		}
+
 
 		/**
 		 * Settings HTML output
@@ -49,58 +66,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 */
 		public function submenu_output() {
 
-			?>
-			<h2><?php echo esc_html__( 'Connection', 'pinterest-for-woocommerce' ); ?></h2>
-
-			<div class="pin4wc-login-wrapper">
-
-				<?php if ( empty( $args['token']['access_token'] ) ) : ?>
-
-					<p><?php echo esc_html__( 'Login to connect with Pinterest APP.', 'pinterest-for-woocommerce' ); ?></p>
-
-					<a href="<?php echo esc_url( Pinterest_For_Woocommerce()::get_service_login_url() ); ?>" class="button">
-						<span class="dashicons dashicons-admin-network"></span>
-						<?php echo esc_html__( 'Login to Pinterest', 'pinterest-for-woocommerce' ); ?>
-					</a>
-
-				<?php else : ?>
-
-					<p class="pin4wc-success-text">
-						<strong>
-							<span class="dashicons dashicons-saved"></span>
-							<?php
-							// translators: Date
-							echo esc_attr( sprintf( __( 'Connected to Pinterest APP on %s', 'pinterest-for-woocommerce' ), gmdate( 'M j, Y - H:i', ( $args['token']['issued_at'] / 1000 ) ) ) );
-							?>
-						</strong>
-					</p>
-
-					<div class="pin4wc-actions">
-
-						<button type="button" class="button" data-action="revoke">
-							<span class="dashicons dashicons-migrate"></span>
-							<?php echo esc_html__( 'Revoke Permission', 'pinterest-for-woocommerce' ); ?>
-						</button>
-
-						<button type="button" class="button" data-action="refresh">
-							<span class="dashicons dashicons-update-alt"></span>
-							<?php echo esc_html__( 'Refresh Token', 'pinterest-for-woocommerce' ); ?>
-						</button>
-
-						<span id="pin4wcTokenResponse"></span>
-
-					</div>
-
-				<?php endif; ?>
-
-				<hr/>
-
-			</div>
-			<p><button type="submit" class="button button-primary"><?php echo esc_html__( 'Save changes', 'pinterest-for-woocommerce' ); ?></button></p>
-
-			<?php
+			pinterest_for_woocommerce_get_template_part( 'admin/settings' );
 			wp_nonce_field( $this->nonce_save_key, $this->nonce_save_key );
-			submit_button( esc_html__( 'Save changes', 'pinterest-for-woocommerce' ) );
 
 		}
 
