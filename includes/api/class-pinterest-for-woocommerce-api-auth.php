@@ -76,7 +76,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_API_Auth' ) ) :
 				);
 			}
 
-			$redirect_url      = admin_url( 'options-general.php?page=' . PINTEREST4WOOCOMMERCE_PREFIX );
+			$redirect_url      = admin_url( 'admin.php?page=' . PINTEREST4WOOCOMMERCE_PREFIX );
 			$is_setup_complete = Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete', true );
 
 			if ( empty( $is_setup_complete ) || 'no' === $is_setup_complete ) {

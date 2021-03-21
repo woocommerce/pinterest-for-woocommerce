@@ -344,7 +344,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$settings = self::get_settings();
 
 			$token['access_token']  = empty( $token['access_token'] ) ? '' : $token['access_token'];
-			$token['refresh_token'] = empty( $token['refresh_token'] ) ? '' : $token['refresh_token'];
 
 			$settings['token'] = $token;
 
@@ -396,12 +395,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$control_key = uniqid();
 			$state       = http_build_query(
 				array(
-					'control'      => $control_key,
-					'redirect_uri' => get_rest_url( null, PINTEREST4WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST4WOOCOMMERCE_API_VERSION . '/' . PINTEREST4WOOCOMMERCE_API_AUTH_ENDPOINT ),
+					'redirect' => get_rest_url( null, PINTEREST4WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST4WOOCOMMERCE_API_VERSION . '/' . PINTEREST4WOOCOMMERCE_API_AUTH_ENDPOINT ) . '?control=' . $control_key,
 				)
 			);
 
-			set_transient( PINTEREST4WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 ); // TODO: create this transient when the attempt is initiated.
+			set_transient( PINTEREST4WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
 
 			return self::get_connection_proxy_url() . 'login/pinterestv3?' . $state;
 		}
