@@ -21,29 +21,29 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param mixed $slug
  * @param string $name (default: '')
  */
-function pinterest_for_woocommerce_get_template_part( $slug, $name = '' ) {
+function pinterest_for_woocommerce_get_template_part( $slug, $name = '', $args = array() ) {
 	$template = '';
 
-	// Look in yourtheme/slug-name.php and yourtheme/pinterest-for-woocommerce/slug-name.php
+	$name = empty( $name ) ? '' : '-' . $name;
+
 	if ( $name ) {
-		$template = locate_template( array( "{$slug}-{$name}.php", Pinterest4WooCommerce()->template_path() . "{$slug}-{$name}.php" ) );
+		$template = locate_template( array( "{$slug}{$name}.php", Pinterest_For_Woocommerce()->template_path() . "{$slug}{$name}.php" ) );
 	}
 
 	// Get default slug-name.php
-	if ( ! $template && $name && file_exists( Pinterest4WooCommerce()->plugin_path() . "/templates/{$slug}-{$name}.php" ) ) {
-		$template = Pinterest4WooCommerce()->plugin_path() . "/templates/{$slug}-{$name}.php";
+	if ( ! $template && file_exists( Pinterest_For_Woocommerce()->plugin_path() . "/templates/{$slug}{$name}.php" ) ) {
+		$template = Pinterest_For_Woocommerce()->plugin_path() . "/templates/{$slug}{$name}.php";
 	}
 
-	// If template file doesn't exist, look in yourtheme/slug.php and yourtheme/pinterest-for-woocommerce/slug.php
 	if ( ! $template ) {
-		$template = locate_template( array( "{$slug}.php", Pinterest4WooCommerce()->template_path() . "{$slug}.php" ) );
+		$template = locate_template( array( "{$slug}.php", Pinterest_For_Woocommerce()->template_path() . "{$slug}.php" ) );
 	}
 
 	// Allow 3rd party plugins to filter template file from their plugin.
-	$template = apply_filters( 'pinterest_for_woocommerce_get_template_part', $template, $slug, $name );
+	$template = apply_filters( 'pinterest_for_woocommerce_get_template_part', $template, $slug, str_replace( '-', '', $name ) );
 
 	if ( $template ) {
-		load_template( $template, false );
+		load_template( $template, false, $args );
 	}
 }
 
@@ -108,11 +108,11 @@ function pinterest_for_woocommerce_get_template_html( $template_name, $args = ar
  */
 function pinterest_for_woocommerce_locate_template( $template_name, $template_path = '', $default_path = '' ) {
 	if ( ! $template_path ) {
-		$template_path = Pinterest4WooCommerce()->template_path();
+		$template_path = Pinterest_For_Woocommerce()->template_path();
 	}
 
 	if ( ! $default_path ) {
-		$default_path = Pinterest4WooCommerce()->plugin_path() . '/templates/';
+		$default_path = Pinterest_For_Woocommerce()->plugin_path() . '/templates/';
 	}
 
 	// Look within passed path within the theme - this is priority.

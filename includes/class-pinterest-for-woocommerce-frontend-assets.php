@@ -2,7 +2,7 @@
 /**
  * Handle frontend scripts
  *
- * @class       Pinterest4WooCommerce_Frontend_Scripts
+ * @class       Pinterest_For_Woocommerce_Frontend_Scripts
  * @version     1.0.0
  * @package     Pinterest_For_Woocommerce/Classes/
  * @category    Class
@@ -13,12 +13,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once Pinterest4WooCommerce()->plugin_path() . '/includes/class-pinterest4woocommerce-assets.php';
+require_once Pinterest_For_Woocommerce()->plugin_path() . '/includes/class-pinterest-for-woocommerce-assets.php';
 
 /**
- * Pinterest4WooCommerce_Frontend_Scripts Class.
+ * Pinterest_For_Woocommerce_Frontend_Scripts Class.
  */
-class Pinterest4WooCommerce_Frontend_Assets extends Pinterest4WooCommerce_Assets {
+class Pinterest_For_Woocommerce_Frontend_Assets extends Pinterest_For_Woocommerce_Assets {
 
 	/**
 	 * Hook in methods.
@@ -55,4 +55,4 @@ class Pinterest4WooCommerce_Frontend_Assets extends Pinterest4WooCommerce_Assets
 
 }
 
-new Pinterest4WooCommerce_Frontend_Assets();
+new Pinterest_For_Woocommerce_Frontend_Assets();

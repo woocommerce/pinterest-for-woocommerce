@@ -2,7 +2,7 @@
 /**
  * WordPress Plugin Boilerplate Admin
  *
- * @class    Pinterest4WooCommerce_Admin
+ * @class    Pinterest_For_Woocommerce_Admin
  * @author   WooCommece
  * @category Admin
  * @package  Pinterest_For_Woocommerce/Admin
@@ -14,9 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Pinterest4WooCommerce_Admin class.
+ * Pinterest_For_Woocommerce_Admin class.
  */
-class Pinterest4WooCommerce_Admin {
+class Pinterest_For_Woocommerce_Admin {
 
 	/**
 	 * Constructor.
@@ -31,7 +31,8 @@ class Pinterest4WooCommerce_Admin {
 	 */
 	public function includes() {
 		include_once 'pinterest-for-woocommerce-admin-functions.php';
-		include_once 'class-pinterest4woocommerce-admin-assets.php';
+		include_once 'class-pinterest-for-woocommerce-admin-assets.php';
+		include_once 'class-pinterest-for-woocommerce-admin-settings-page.php';
 	}
 
 	/**
@@ -54,4 +55,4 @@ class Pinterest4WooCommerce_Admin {
 	}
 }
 
-return new Pinterest4WooCommerce_Admin();
+return new Pinterest_For_Woocommerce_Admin();

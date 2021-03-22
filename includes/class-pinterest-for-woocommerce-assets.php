@@ -2,7 +2,7 @@
 /**
  * Handle frontend scripts
  *
- * @class       Pinterest4WooCommerce_Frontend_Scripts
+ * @class       Pinterest_For_Woocommerce_Frontend_Scripts
  * @version     1.0.0
  * @package     Pinterest_For_Woocommerce/Classes/
  * @category    Class
@@ -14,9 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Pinterest4WooCommerce_Frontend_Scripts Class.
+ * Pinterest_For_Woocommerce_Frontend_Scripts Class.
  */
-abstract class Pinterest4WooCommerce_Assets {
+abstract class Pinterest_For_Woocommerce_Assets {
 
 	/**
 	 * Contains an array of script handles registered by WC.
@@ -43,8 +43,8 @@ abstract class Pinterest4WooCommerce_Assets {
 	 * @return string
 	 */
 	protected function localize_asset( $path ) {
-		$assets_path     = Pinterest4WooCommerce()->plugin_path() . '/assets/';
-		$assets_path_url = str_replace( array( 'http:', 'https:' ), '', Pinterest4WooCommerce()->plugin_url() ) . '/assets/';
+		$assets_path     = Pinterest_For_Woocommerce()->plugin_path() . '/assets/';
+		$assets_path_url = str_replace( array( 'http:', 'https:' ), '', Pinterest_For_Woocommerce()->plugin_url() ) . '/assets/';
 
 		if ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ) {
 			$ext_pos    = strrpos( $path, '.' );
@@ -156,7 +156,7 @@ abstract class Pinterest4WooCommerce_Assets {
 		}
 
 		$suffix               = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$assets_path          = str_replace( array( 'http:', 'https:' ), '', Pinterest4WooCommerce()->plugin_url() ) . '/assets/';
+		$assets_path          = str_replace( array( 'http:', 'https:' ), '', Pinterest_For_Woocommerce()->plugin_url() ) . '/assets/';
 		$frontend_script_path = $assets_path . 'js/frontend/';
 
 		// JS Scripts
