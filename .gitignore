@@ -17,3 +17,6 @@ assets/*
 
 #ignore maps
 assets/source/_maps
+
+# Composer
+/vendor/
