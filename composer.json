@@ -13,7 +13,8 @@
 	"require": {
 		"composer/installers": "^1.7.0",
 		"automattic/jetpack-autoloader": "^2.10.1",
-		"defuse/php-encryption": "^2.2"
+		"defuse/php-encryption": "^2.2",
+		"woocommerce/woocommerce-sniffs": "^0.1.0"
 	},
 	"autoload": {
 		"psr-4": {
