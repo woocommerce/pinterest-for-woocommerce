@@ -1,0 +1,36 @@
+{
+	"name": "woocommerce/pinterest-for-woocommerce",
+	"description": "",
+	"homepage": "https://woocommerce.com/",
+	"type": "wordpress-plugin",
+	"keywords": [
+		"pinterest",
+		"woocommerce"
+	],
+	"license": "GPL-3.0-or-later",
+	"prefer-stable": true,
+	"minimum-stability": "dev",
+	"require": {
+		"composer/installers": "^1.7.0",
+		"automattic/jetpack-autoloader": "^2.10.1"
+	},
+	"autoload": {
+		"psr-4": {
+			"Automattic\\WooCommerce\\Pinterest\\": "src/"
+		}
+	},
+	"scripts": {
+		"phpcs": [
+			"phpcs --extensions=php -s -p"
+		],
+		"phpcbf": [
+			"phpcbf -p"
+		]
+	},
+	"extra": {
+		"scripts-description": {
+			"phpcs": "Analyze code against the WordPress coding standards with PHP_CodeSniffer",
+			"phpcbf": "Fix coding standards warnings/errors automatically with PHP Code Beautifier"
+		}
+	}
+}

@@ -8,6 +8,8 @@
  * @version  1.0.0
  */
 
+use Automattic\WooCommerce\Pinterest as Pinterest;
+
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 	final class Pinterest_For_Woocommerce {
@@ -139,7 +141,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			include_once 'includes/class-pinterest-for-woocommerce-autoloader.php';
 			include_once 'includes/pinterest-for-woocommerce-core-functions.php';
 			include_once 'includes/class-pinterest-for-woocommerce-install.php'; // TODO: rename
-			include_once 'includes/class-pinterest-for-woocommerce-api.php';
+
+			Pinterest\API\Base::instance();
 
 			if ( $this->is_request( 'admin' ) ) {
 				include_once 'includes/admin/class-pinterest-for-woocommerce-admin.php';
@@ -300,10 +303,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.0.0
 		 */
 		public function init_api_endpoints() {
-
-			include_once 'includes/api/class-pinterest-for-woocommerce-api-auth.php';
-			$api_auth = new Pinterest_For_Woocommerce_API_Auth();
-			$api_auth->register_routes();
+			new Pinterest\API\Auth();
+			new Pinterest\API\Options\Get();
+			new Pinterest\API\Options\Update();
 		}
 
 		/**
