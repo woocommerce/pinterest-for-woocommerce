@@ -1,0 +1,22 @@
+# local files
+.DS_Store
+package-lock.json
+
+# Ignore node_modules and oter local dev files
+*.lessc.css
+config.codekit
+node_modules
+.vscode
+
+# Ignore assets except source files
+assets/*    
+!assets/source
+!assets/images
+!assets/fonts
+!assets/lib
+
+#ignore maps
+assets/source/_maps
+
+# Composer
+/vendor/

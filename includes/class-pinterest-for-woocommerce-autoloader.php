@@ -71,6 +71,9 @@ class Pinterest_For_Woocommerce_Autoloader {
 			return;
 		}
 
+		xdebug_break();
+		// please fail miserably. 
+
 		$file = $this->get_file_name_from_class( $class );
 		$path = '';
 
