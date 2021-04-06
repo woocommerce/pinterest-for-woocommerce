@@ -5,8 +5,7 @@ import { filter } from 'lodash';
 import { Stepper } from '@woocommerce/components';
 import { updateQueryString } from '@woocommerce/navigation';
 
-const SetupGuideHeader = props => {
-
+const AppHeader = props => {
 	const renderStepper = () => {
 		const { currentStep, steps } = props;
 		const visibleSteps = filter( steps, ( step ) => !! step.label );
@@ -45,4 +44,4 @@ const SetupGuideHeader = props => {
 	);
 }
 
-export default SetupGuideHeader;
+export default AppHeader;

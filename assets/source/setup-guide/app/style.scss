@@ -41,12 +41,12 @@ $root: ".woocommerce-setup-guide";
 		#{$root} {
 
 			&__header {
-				height: 56px;
+				align-items: center;
+				background: #fff;
 				border-bottom: 1px solid #dcdcde;
 				display: flex;
-				align-items: center;
+				height: 60px;
 				justify-content: center;
-				background: #fff;
 
 				.woocommerce-stepper {
 					margin: 0 16px;
@@ -54,33 +54,53 @@ $root: ".woocommerce-setup-guide";
 
 					&__steps {
 						margin: 0 auto;
-						max-width: 515px;
+						max-width: 768px;
+					}
+
+					&__step {
+						padding-left: 12px;
+						padding-right: 12px;
 					}
 				}
 			}
 
 			&__container {
-				margin-top: 36px;
-				margin-left: auto;
-				margin-right: auto;
-				text-align: left;
+				margin: var(--large-gap) auto;
+				max-width: 1032px;
+			}
 
-				> * {
-					max-width: 504px;
-					margin-left: auto;
-					margin-right: auto;
+			&__step {
+
+				&-header {
+					margin: 0 auto var(--large-gap);
+					max-width: 490px;
+					min-height: 120px;
+					text-align: center;
+
+					&__subtitle,
+					&__title,
+					&__description {
+						margin: 12px 0;
+					}
+
+					&__subtitle,
+					&__title {
+						color: #000;
+					}
+
+					&__subtitle {
+						text-transform: uppercase;
+					}
+
+					&__description {
+						color: #191E23;
+					}
 				}
-			}
 
-			&__step-header {
-				text-align: center;
-				margin: 16px 0 24px;
-			}
-
-			&__footer {
-				margin: 34px auto;
-				display: flex;
-				justify-content: center;
+				&-columns {
+					display: flex;
+					justify-content: space-between;
+				}
 			}
 		}
 	}

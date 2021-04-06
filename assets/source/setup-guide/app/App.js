@@ -17,11 +17,10 @@ import {
 /**
  * Internal dependencies
  */
-import SetupGuideHeader from './header';
-import Connect from './steps/connect.js';
-import Setup from './steps/setup.js';
-import VerifyDomain from './steps/verifydomain.js';
-import Ready from './steps/ready.js';
+import AppHeader from './AppHeader';
+import SetupAccount from './steps/SetupAccount.js';
+import VerifyDomain from './steps/VerifyDomain.js';
+import ConfigureSettings from './steps/ConfigureSettings.js';
 import TransientNotices from './transient-notices';
 import './style.scss';
 
@@ -55,24 +54,19 @@ const App = ( { createNotice } ) => {
 		const steps = [];
 
 		steps.push( {
-			key: 'connect',
-			container: Connect,
-			label: __( 'Connect', 'pinterest-for-woocommerce' ),
+			key: 'setup-account',
+			container: SetupAccount,
+			label: __( 'Set up your account', 'pinterest-for-woocommerce' ),
 		} );
 		steps.push( {
-			key: 'verifydomain',
+			key: 'verify-domain',
 			container: VerifyDomain,
-			label: __( 'Domain Verification', 'pinterest-for-woocommerce' ),
+			label: __( 'Verify your domain', 'pinterest-for-woocommerce' ),
 		} );
 		steps.push( {
-			key: 'setup',
-			container: Setup,
-			label: __( 'Setup', 'pinterest-for-woocommerce' ),
-		} );
-		steps.push( {
-			key: 'ready',
-			container: Ready,
-			label: __( 'Ready!', 'pinterest-for-woocommerce' ),
+			key: 'configure-settings',
+			container: ConfigureSettings,
+			label: __( 'Configure your settings', 'pinterest-for-woocommerce' ),
 		} );
 
 		return steps;
@@ -133,7 +127,7 @@ const App = ( { createNotice } ) => {
 		<div className="woocommerce-layout">
 			<Spinner />
 			<div className="woocommerce-layout__main">
-				<SetupGuideHeader currentStep={ stepKey } steps={ steps } />
+				<AppHeader currentStep={ stepKey } steps={ steps } />
 				<TransientNotices />
 				<div className={ classNames }>{ container }</div>
 			</div>
