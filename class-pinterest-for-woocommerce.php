@@ -94,7 +94,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', $this->version );
 			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest-for-woocommerce' );
 			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
-			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide' );
+			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide-app' );
 			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.com/' );
 
 			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE', 'pinterest' );
@@ -138,9 +138,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Include required core files used in admin and on the frontend.
 		 */
 		private function includes() {
-			include_once 'includes/class-pinterest-for-woocommerce-autoloader.php';
 			include_once 'includes/pinterest-for-woocommerce-core-functions.php';
-			include_once 'includes/class-pinterest-for-woocommerce-install.php'; // TODO: rename
+			include_once 'includes/class-pinterest-for-woocommerce-install.php';
 
 			Pinterest\API\Base::instance();
 
@@ -149,7 +148,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 
 			if ( $this->is_request( 'frontend' ) ) {
-				include_once 'includes/class-pinterest-for-woocommerce-frontend-assets.php'; // Frontend Scripts
+				include_once 'includes/class-pinterest-for-woocommerce-frontend-assets.php';
 			}
 		}
 
@@ -348,7 +347,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$settings = self::get_settings();
 
-			$token['access_token']  = empty( $token['access_token'] ) ? '' : $token['access_token'];
+			$token['access_token'] = empty( $token['access_token'] ) ? '' : $token['access_token'];
 
 			$settings['token'] = $token;
 

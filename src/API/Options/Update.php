@@ -44,12 +44,12 @@ class Update extends VendorAPI {
 
 		$params = $request->get_json_params();
 		if ( ! is_array( $params ) ) {
-			return new WP_Error( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_rest_cannot_view', __( 'You must supply an array of options and values.', 'pinterest-for-woocommerce' ), 500 );
+			return new WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_rest_cannot_view', __( 'You must supply an array of options and values.', 'pinterest-for-woocommerce' ), 500 );
 		}
 
 		foreach ( $params as $option_name => $option_value ) {
 			if ( ! $this->user_has_option_permission( $option_name, $request ) ) {
-				return new \WP_Error( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_rest_cannot_view', __( 'Sorry, you cannot manage these options.', 'pinterest-for-woocommerce' ), array( 'status' => rest_authorization_required_code() ) );
+				return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_rest_cannot_view', __( 'Sorry, you cannot manage these options.', 'pinterest-for-woocommerce' ), array( 'status' => rest_authorization_required_code() ) );
 			}
 		}
 

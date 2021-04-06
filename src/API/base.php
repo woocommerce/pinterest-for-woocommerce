@@ -21,7 +21,7 @@ class Base {
 	const API_VERSION = 3;
 
 	protected static $instance      = null;
-	protected static $log_file_name = PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX;
+	protected static $log_file_name = \PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX;
 	protected static $log_prefix    = '';
 	protected static $token;
 	protected static $init;
@@ -229,7 +229,7 @@ class Base {
 		return $body;
 	}
 
-	
+
 	public static function domain_verification_data() {
 		$response = self::make_request( 'domains/verification', 'GET' );
 		return $response;

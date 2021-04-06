@@ -32,8 +32,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE', __FILE__ );
 
-
-
 /**
  * Autoload packages.
  *
@@ -44,6 +42,7 @@ define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE', __FILE__ );
  * If the autoloader is not present, let's log the failure and display a nice admin notice.
  */
 $autoloader = __DIR__ . '/vendor/autoload_packages.php';
+
 if ( is_readable( $autoloader ) ) {
 	require $autoloader;
 } else {
@@ -79,22 +78,8 @@ if ( is_readable( $autoloader ) ) {
 			<?php
 		}
 	);
-	// return; // TODO: ddd
+	return;
 }
-
-// add_action( 'plugins_loaded', array( '\Automattic\WooCommerce\Pinterest\Base', 'instance' ) );
-
-
-
-
-
-
-
-
-
-
-
-
 
 require_once 'class-pinterest-for-woocommerce.php';
 

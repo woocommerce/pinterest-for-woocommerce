@@ -44,12 +44,12 @@ class Get extends VendorAPI {
 
 		$params = explode( ',', $request['options'] );
 		if ( ! isset( $request['options'] ) || ! is_array( $params ) ) {
-			return new WP_Error( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_rest_cannot_view', __( 'You must supply an array of options.', 'pinterest-for-woocommerce' ), 500 );
+			return new WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_rest_cannot_view', esc_html__( 'You must supply an array of options.', 'pinterest-for-woocommerce' ), 500 );
 		}
 
 		foreach ( $params as $option ) {
 			if ( ! $this->user_has_option_permission( $option, $request ) ) {
-				return new \WP_Error( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_rest_cannot_view', __( 'Sorry, you cannot view these options.', 'pinterest-for-woocommerce' ), array( 'status' => rest_authorization_required_code() ) );
+				return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_rest_cannot_view', esc_html__( 'Sorry, you cannot view these options.', 'pinterest-for-woocommerce' ), array( 'status' => rest_authorization_required_code() ) );
 			}
 		}
 

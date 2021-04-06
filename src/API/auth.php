@@ -19,7 +19,7 @@ class Auth extends VendorAPI {
 
 	public function __construct() {
 
-		$this->base              = PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT;
+		$this->base              = \PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT;
 		$this->endpoint_callback = 'oauth_callback';
 		$this->methods           = 'GET';
 
@@ -38,12 +38,12 @@ class Auth extends VendorAPI {
 	 */
 	public function permissions_check( WP_REST_Request $request ) {
 
-		$control = get_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH );
+		$control = get_transient( \PINTEREST_FOR_WOOCOMMERCE_AUTH );
 		if ( empty( $_GET['control'] ) || empty( $control ) || $control !== $_GET['control'] ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return false;
 		}
 
-		delete_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH );
+		delete_transient( \PINTEREST_FOR_WOOCOMMERCE_AUTH );
 
 		return true;
 	}
@@ -77,14 +77,14 @@ class Auth extends VendorAPI {
 			);
 		}
 
-		$redirect_url      = admin_url( 'admin.php?page=' . PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		$redirect_url      = admin_url( 'admin.php?page=' . \PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		$is_setup_complete = Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete', true );
 
 		if ( empty( $is_setup_complete ) || 'no' === $is_setup_complete ) {
-			$step         = empty( $error ) ? 'verifydomain' : 'connect';
+			$step         = empty( $error ) ? 'setup' : 'connect';
 			$redirect_url = add_query_arg(
 				array(
-					'page' => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
+					'page' => \PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
 					'step' => $step,
 				),
 				admin_url( 'admin.php' )

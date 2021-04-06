@@ -20,7 +20,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		public static $messages = array();
 		public $nonce_save_key  = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-save-settings';
 
-		
+
 		public function __construct() {
 			add_action( 'admin_menu', array( $this, 'register_menu_item' ) );
 			add_action( 'admin_init', array( $this, 'maybe_go_to_service_login_url' ) );
