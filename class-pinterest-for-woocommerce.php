@@ -87,33 +87,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Define Pinterest_For_Woocommerce Constants.
 		 */
 		private function define_constants() {
-			$upload_dir = wp_upload_dir();
-
-			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_PREFIX', 'pinterest-for-woocommerce' );
-			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME', plugin_basename( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE ) );
-			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', $this->version );
-			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest-for-woocommerce' );
-			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
-			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide-app' );
-			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.com/' );
-
-			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE', 'pinterest' );
-			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_API_VERSION', '1' );
-			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT', 'oauth/callback' );
-			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_AUTH', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_auth_key' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_PREFIX', 'pinterest-for-woocommerce' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME', plugin_basename( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE ) );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', $this->version );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest-for-woocommerce' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide-app' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.com/' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE', 'pinterest' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_API_VERSION', '1' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT', 'oauth/callback' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_AUTH', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_auth_key' );
 		}
 
-		/**
-		 * Define constant if not already set.
-		 *
-		 * @param  string $name
-		 * @param  string|bool $value
-		 */
-		private function define( $name, $value ) {
-			if ( ! defined( $name ) ) {
-				define( $name, $value );
-			}
-		}
 
 		/**
 		 * What type of request is this?
