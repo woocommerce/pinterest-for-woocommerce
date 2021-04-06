@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'PINTEREST4WOOCOMMERCE_PLUGIN_FILE', __FILE__ );
+define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE', __FILE__ );
 
 /**
  * Autoload packages.

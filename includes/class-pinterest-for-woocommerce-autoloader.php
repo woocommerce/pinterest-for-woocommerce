@@ -32,7 +32,7 @@ class Pinterest_For_Woocommerce_Autoloader {
 
 		spl_autoload_register( array( $this, 'autoload' ) );
 
-		$this->include_path = untrailingslashit( plugin_dir_path( PINTEREST4WOOCOMMERCE_PLUGIN_FILE ) ) . '/includes/';
+		$this->include_path = untrailingslashit( plugin_dir_path( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE ) ) . '/includes/';
 	}
 
 	/**
