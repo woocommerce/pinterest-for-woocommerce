@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Base {
 
 	protected static $instance      = null;
-	protected static $log_file_name = PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX;
+	protected static $log_file_name = \PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX;
 	protected static $log_prefix    = '';
 	protected static $token;
 	protected static $init;

@@ -345,7 +345,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$settings = self::get_settings();
 
-			$token['access_token']  = empty( $token['access_token'] ) ? '' : $token['access_token'];
+			$token['access_token'] = empty( $token['access_token'] ) ? '' : $token['access_token'];
 
 			$settings['token'] = $token;
 

@@ -18,8 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class VendorAPI {
 
-	private $api_namespace = PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v';
-	private $api_version   = PINTEREST_FOR_WOOCOMMERCE_API_VERSION;
+	private $api_namespace = \PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v';
+	private $api_version   = \PINTEREST_FOR_WOOCOMMERCE_API_VERSION;
 
 	public $base;
 	public $methods = 'POST';
