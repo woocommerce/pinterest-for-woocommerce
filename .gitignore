@@ -9,7 +9,7 @@ node_modules
 .vscode
 
 # Ignore assets except source files
-assets/*
+assets/*    
 !assets/source
 !assets/images
 !assets/fonts
