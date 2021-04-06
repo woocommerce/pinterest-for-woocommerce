@@ -138,9 +138,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Include required core files used in admin and on the frontend.
 		 */
 		private function includes() {
-			include_once 'includes/class-pinterest-for-woocommerce-autoloader.php';
 			include_once 'includes/pinterest-for-woocommerce-core-functions.php';
-			include_once 'includes/class-pinterest-for-woocommerce-install.php'; // TODO: rename
+			include_once 'includes/class-pinterest-for-woocommerce-install.php';
 
 			Pinterest\API\Base::instance();
 
@@ -149,7 +148,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 
 			if ( $this->is_request( 'frontend' ) ) {
-				include_once 'includes/class-pinterest-for-woocommerce-frontend-assets.php'; // Frontend Scripts
+				include_once 'includes/class-pinterest-for-woocommerce-frontend-assets.php';
 			}
 		}
 
