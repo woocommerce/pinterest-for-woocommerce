@@ -17,6 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Base {
 
+	const API_DOMAIN  = 'https://api.pinterest.com';
+	const API_VERSION = 3;
+
 	protected static $instance      = null;
 	protected static $log_file_name = PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX;
 	protected static $log_prefix    = '';
@@ -46,20 +49,22 @@ class Base {
 	 * @since 1.0.0
 	 *
 	 * Request parameter:
-	 * array['url']               string
-	 * array['method']            string    Default: POST
-	 * array['auth_header']       boolean   Defines if must send the token in the header. Default: true
-	 * array['args']              array
-	 * array['headers']           array
-	 *          ['content-type']  string    Default: application/json
+	 * $endpoint
 	 *
 	 * @param array $request (See above)
 	 *
 	 * @return array
 	 */
-	public static function make_request( $request ) {
+	public static function make_request( $endpoint, $method = 'POST', $payload = array() ) {
 
 		try {
+
+			$request = array(
+				'url'    => self::API_DOMAIN . '/v' . self::API_VERSION . '/' . $endpoint,
+				'method' => $method,
+				'args'   => $payload,
+			);
+
 			return self::handle_request( $request );
 		} catch ( \Exception $e ) {
 
@@ -222,5 +227,25 @@ class Base {
 		$body = (array) json_decode( $response['body'] );
 
 		return $body;
+	}
+
+	
+	public static function domain_verification_data() {
+		$response = self::make_request( 'domains/verification', 'GET' );
+		return $response;
+	}
+
+
+	public static function trigger_verification( $allow_multiple = true ) {
+
+		$domain      = wp_parse_url( site_url(), PHP_URL_HOST );
+		$request_url = 'domains/' . $domain . '/verification/metatag/realtime/';
+
+		if ( $allow_multiple ) {
+			$request_url = add_query_arg( 'can_claim_multiple', 'true', $request_url );
+		}
+
+		$response = self::make_request( $request_url, 'POST' );
+		return $response;
 	}
 }

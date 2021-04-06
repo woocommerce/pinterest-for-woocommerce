@@ -33,6 +33,7 @@ class Pinterest_For_Woocommerce_Admin {
 		include_once 'pinterest-for-woocommerce-admin-functions.php';
 		include_once 'class-pinterest-for-woocommerce-admin-assets.php';
 		include_once 'class-pinterest-for-woocommerce-admin-settings-page.php';
+		include_once 'class-pinterest-for-woocommerce-admin-setup-guide.php';
 	}
 
 	/**

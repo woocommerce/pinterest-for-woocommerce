@@ -60,7 +60,7 @@ class Pinterest_For_Woocommerce_Autoloader {
 	}
 
 	/**
-	 * Auto-load PINTEREST4WOOCOMMERCE classes on demand to reduce memory consumption.
+	 * Auto-load PINTEREST_FOR_WOOCOMMERCE classes on demand to reduce memory consumption.
 	 *
 	 * @param string $class
 	 */

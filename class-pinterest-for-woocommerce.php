@@ -94,7 +94,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', $this->version );
 			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest-for-woocommerce' );
 			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
-			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide-app' );
+			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide' );
 			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.com/' );
 
 			$this->define( 'PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE', 'pinterest' );
@@ -159,7 +159,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		private function init_hooks() {
 			add_action( 'init', array( $this, 'init' ), 0 );
+			add_action( 'activated_plugin', array( $this, 'maybe_redirect_setup_guide' ) );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
+			add_action( 'wp_head', array( $this, 'inject_verification_code' ) );
 		}
 
 		/**
@@ -304,6 +306,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public function init_api_endpoints() {
 			new Pinterest\API\Auth();
+			new Pinterest\API\DomainVerification();
 			new Pinterest\API\Options\Get();
 			new Pinterest\API\Options\Update();
 		}
@@ -404,6 +407,42 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			set_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
 
 			return self::get_connection_proxy_url() . 'login/pinterestv3?' . $state;
+		}
+
+
+		/**
+		 * If Setup Guide is not complete, redirects to Settings page
+		 *
+		 * @since 1.0.0
+		 */
+		public function maybe_redirect_setup_guide( $plugin ) {
+
+			return;
+
+			if ( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME !== $plugin ) {
+				return;
+			}
+
+			$settings = self::get_settings( true );
+
+			if ( 'no' === $settings['is_setup_complete'] ) {
+				$setup_guide_url = add_query_arg(
+					array(
+						'page' => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
+					),
+					get_admin_url( null, 'admin.php' )
+				);
+				wp_safe_redirect( $setup_guide_url );
+				exit;
+			}
+		}
+
+
+		public function inject_verification_code() {
+
+			if ( self::get_setting( 'verfication_code' ) ) {
+				printf( '<meta name="p:domain_verify" content="%s"/>', esc_attr( self::get_setting( 'verfication_code' ) ) );
+			}
 		}
 	}
 
