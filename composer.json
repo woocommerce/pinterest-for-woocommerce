@@ -12,7 +12,8 @@
 	"minimum-stability": "dev",
 	"require": {
 		"composer/installers": "^1.7.0",
-		"automattic/jetpack-autoloader": "^2.10.1"
+		"automattic/jetpack-autoloader": "^2.10.1",
+		"defuse/php-encryption": "^2.2"
 	},
 	"autoload": {
 		"psr-4": {

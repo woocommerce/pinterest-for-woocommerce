@@ -173,6 +173,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Init action.
 			do_action( 'pinterest_for_woocommerce_init' );
+
 		}
 
 		/**
@@ -319,11 +320,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$token = self::get_setting( 'token', true );
 
 			try {
-				$token['access_token']  = empty( $token['access_token'] ) ? '' : $token['access_token'];
-				$token['refresh_token'] = empty( $token['refresh_token'] ) ? '' : $token['refresh_token'];
-
+				$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::decrypt( $token['access_token'] );
 			} catch ( \Exception $e ) {
-
 				$token = array();
 			}
 
@@ -344,7 +342,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$settings = self::get_settings();
 
-			$token['access_token'] = empty( $token['access_token'] ) ? '' : $token['access_token'];
+			$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['access_token'] );
 
 			$settings['token'] = $token;
 

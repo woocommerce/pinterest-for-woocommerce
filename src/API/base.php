@@ -40,8 +40,6 @@ class Base {
 
 	/**
 	 * API requests wrapper
-	 * If the response code is 401 and refresh_token exists,
-	 * will try to refresh the token and make the request again.
 	 *
 	 * @since 1.0.0
 	 *
@@ -174,10 +172,8 @@ class Base {
 	public static function log_token( $token ) {
 
 		// Log response without exposing the sensitive data
-		$obody                  = $token;
-		$obody['access_token']  = empty( $obody['access_token'] ) ? '' : '--HIDDEN(' . strlen( $obody['access_token'] ) . ')--';
-		$obody['refresh_token'] = empty( $obody['refresh_token'] ) ? '' : '--HIDDEN(' . strlen( $obody['refresh_token'] ) . ')--';
-		$obody['signature']     = empty( $obody['refresh_token'] ) ? '' : '--HIDDEN(' . strlen( $obody['signature'] ) . ')--';
+		$obody                 = $token;
+		$obody['access_token'] = empty( $obody['access_token'] ) ? '' : '--HIDDEN(' . strlen( $obody['access_token'] ) . ')--';
 		self::log( 'response', wp_json_encode( $obody ) );
 	}
 
