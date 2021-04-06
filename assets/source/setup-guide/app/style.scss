@@ -72,20 +72,14 @@ $root: ".woocommerce-setup-guide";
 			&__step {
 
 				&-header {
+					color: #000;
 					margin: 0 auto var(--large-gap);
 					max-width: 490px;
 					min-height: 120px;
 					text-align: center;
 
-					&__subtitle,
-					&__title,
-					&__description {
+					> div {
 						margin: 12px 0;
-					}
-
-					&__subtitle,
-					&__title {
-						color: #000;
 					}
 
 					&__subtitle {
@@ -97,9 +91,38 @@ $root: ".woocommerce-setup-guide";
 					}
 				}
 
+				&-overview {
+					color: #000;
+					margin-top: var(--large-gap);
+
+					> div {
+						margin: 8px 0;
+					}
+
+					&__description {
+						color: #191E23;
+					}
+
+					&__link {
+
+						a {
+							text-decoration: none;
+
+							&:hover {
+								text-decoration: underline;
+							}
+						}
+
+						svg {
+							display: none;
+						}
+					}
+				}
+
 				&-columns {
-					display: flex;
-					justify-content: space-between;
+					column-gap: 24px;
+					display: grid;
+					grid-template-columns: 328px auto;
 				}
 			}
 		}

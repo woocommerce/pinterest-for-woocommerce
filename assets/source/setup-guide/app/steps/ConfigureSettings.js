@@ -15,19 +15,30 @@ import {
  * Internal dependencies
  */
  import StepHeader from '../StepHeader';
+ import StepOverview from '../StepOverview';
 
 const ConfigureSettings = () => {
-	 return (
+	return (
 		<div className="woocommerce-setup-guide__configure-settings">
 			<StepHeader
 				title={ __( 'Configure your settings' ) }
 				subtitle={ __( 'Step Three' ) }
 			/>
-			<div class="woocommerce-setup-guide__step-columns">
-				...
+
+			<div className="woocommerce-setup-guide__step-columns">
+				<div className="woocommerce-setup-guide__step-column">
+					<StepOverview
+						title={ __( 'Setup tracking and Rich Pins' ) }
+						description={ __( 'Use description text to help users understand more' ) }
+						link='#'
+					/>
+				</div>
+				<div className="woocommerce-setup-guide__step-column">
+					Column B
+				</div>
 			</div>
 		</div>
-	)
+	);
 }
 
 export default ConfigureSettings;
