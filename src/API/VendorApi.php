@@ -18,8 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class VendorAPI {
 
-	private $api_namespace = PINTEREST4WOOCOMMERCE_API_NAMESPACE . '/v';
-	private $api_version   = PINTEREST4WOOCOMMERCE_API_VERSION;
+	private $api_namespace = PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v';
+	private $api_version   = PINTEREST_FOR_WOOCOMMERCE_API_VERSION;
 
 	public $base;
 	public $methods = 'POST';
@@ -80,7 +80,7 @@ class VendorAPI {
 	 */
 	public function user_has_option_permission( $option, $request ) {
 
-		$permissions = apply_filters( PINTEREST4WOOCOMMERCE_PREFIX . '_rest_api_option_permissions', array(), $option, $request );
+		$permissions = apply_filters( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_rest_api_option_permissions', array(), $option, $request );
 		if ( isset( $permissions[ $option ] ) ) {
 			return $permissions[ $option ];
 		}

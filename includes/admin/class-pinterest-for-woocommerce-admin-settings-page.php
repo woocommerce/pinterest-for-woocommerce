@@ -18,9 +18,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 		public static $errors   = array();
 		public static $messages = array();
-		public $nonce_save_key  = PINTEREST4WOOCOMMERCE_PREFIX . '-save-settings';
-		public $label           = 'Pinterest4wc';
+		public $nonce_save_key  = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-save-settings';
 
+		
 		public function __construct() {
 			add_action( 'admin_menu', array( $this, 'register_menu_item' ) );
 			add_action( 'admin_init', array( $this, 'maybe_go_to_service_login_url' ) );
@@ -34,7 +34,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				esc_html__( 'Pinterest for WooCommerce', 'pinterest-for-wordpress' ),
 				esc_html__( 'Pinterest', 'pinterest-for-wordpress' ),
 				'manage_woocommerce',
-				PINTEREST4WOOCOMMERCE_PREFIX,
+				PINTEREST_FOR_WOOCOMMERCE_PREFIX,
 				array( $this, 'submenu_output' ),
 				6
 			);
@@ -44,7 +44,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 		public function maybe_go_to_service_login_url() {
 
-			if ( ! isset( $_GET[ PINTEREST4WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) || empty( $_REQUEST['page'] ) || PINTEREST4WOOCOMMERCE_PREFIX !== $_REQUEST['page'] ) {
+			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) || empty( $_REQUEST['page'] ) || PINTEREST_FOR_WOOCOMMERCE_PREFIX !== $_REQUEST['page'] ) {
 				return;
 			}
 
@@ -88,7 +88,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				return;
 			}
 
-			if ( empty( $_REQUEST['page'] ) || PINTEREST4WOOCOMMERCE_PREFIX !== $_REQUEST['page'] ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( empty( $_REQUEST['page'] ) || PINTEREST_FOR_WOOCOMMERCE_PREFIX !== $_REQUEST['page'] ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				return;
 			}
 
