@@ -67,6 +67,15 @@ $root: ".woocommerce-setup-guide";
 			&__container {
 				margin: var(--large-gap) auto;
 				max-width: 1032px;
+
+				.components-card__body.is-size-large {
+					padding: var(--large-gap);
+				}
+
+				.components-card__footer {
+					padding-left: calc(var(--large-gap) - 6px);
+					padding-right: calc(var(--large-gap) - 6px);
+				}
 			}
 
 			&__step {
@@ -124,6 +133,12 @@ $root: ".woocommerce-setup-guide";
 					display: grid;
 					grid-template-columns: 328px auto;
 				}
+			}
+
+			&__footer-button {
+				display: block;
+				margin-left: auto;
+				margin-top: var(--large-gap);
 			}
 		}
 	}
