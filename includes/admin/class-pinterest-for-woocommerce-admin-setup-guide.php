@@ -72,8 +72,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Setup_Guide' ) ) :
 				array(
 					'adminUrl'        => esc_url( admin_url() ),
 					'serviceLoginUrl' => esc_url( Pinterest_For_Woocommerce()::get_service_login_url() ), // TODO:
-					'reviewFieldsUrl' => esc_url( admin_url( 'options-general.php?page=' . PINTEREST_FOR_WOOCOMMERCE_PREFIX . '&tab=relationships' ) ),
-					'settingsUrl'     => esc_url( admin_url( 'options-general.php?page=' . PINTEREST_FOR_WOOCOMMERCE_PREFIX . '&tab=general' ) ),
+					'domainToVerify'  => wp_parse_url( site_url(), PHP_URL_HOST ),
 					'apiRoute'        => PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION,
 					'pageSlug'        => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
 					'optionsName'     => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,

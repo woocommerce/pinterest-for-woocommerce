@@ -76,7 +76,7 @@ const VerifyDomain = ({ goToNextStep, pin4wc, createNotice }) => {
 					<Card>
 						<CardBody size="large">
 							<StepStatus
-								label='https://www.pinterest.com'
+								label={ pin4wcSetupGuide.domainToVerify }
 								status={ status }
 							/>
 						</CardBody>
@@ -85,7 +85,6 @@ const VerifyDomain = ({ goToNextStep, pin4wc, createNotice }) => {
 					<div className="woocommerce-setup-guide__footer-button">
 						<Button
 							isPrimary
-							className="woocommerce-setup-guide__footer-button"
 							disabled={ 'pending' === status }
 							onClick={ 'success' === status ? goToNextStep : handleVerifyDomain }
 						>
