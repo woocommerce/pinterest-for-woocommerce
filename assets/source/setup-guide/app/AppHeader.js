@@ -2,6 +2,10 @@
  * External dependencies
  */
 import { filter } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
 import { Stepper } from '@woocommerce/components';
 import { updateQueryString } from '@woocommerce/navigation';
 

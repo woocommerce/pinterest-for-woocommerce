@@ -2,22 +2,61 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { compose } from '@wordpress/compose';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
 import {
 	Button,
 	Card,
-	CardBody,
-	CardFooter,
-	FlexItem,
-	__experimentalText as Text
+	CardBody
  } from '@wordpress/components';
+import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 
 /**
- * Internal dependencies
- */
+  * Internal dependencies
+  */
 import StepHeader from '../StepHeader';
 import StepOverview from '../StepOverview';
+import StepStatus from '../StepStatus';
 
-const VerifyDomain = () => {
+const VerifyDomain = ({ goToNextStep, pin4wc, createNotice }) => {
+	const [ status, setStatus ] = useState( 'idle' );
+
+	useEffect(() => {
+		if ( pin4wc.verfication_code && 'success' !== status ) {
+			setDebugEmails( 'success' );
+		}
+	}, [pin4wc.verfication_code])
+
+	const buttonLabels = {
+		idle: __( 'Start Verification', 'pinterest-for-woocommerce' ),
+		pending: __( 'Verifying Domain', 'pinterest-for-woocommerce' ),
+		error: __( 'Try Again', 'pinterest-for-woocommerce' ),
+		success: __( 'Continue', 'pinterest-for-woocommerce' )
+	}
+
+	const handleVerifyDomain = () => {
+		setStatus( 'pending' );
+
+		apiFetch( {
+			path: pin4wcSetupGuide.apiRoute + '/domain_verification',
+			method: 'POST',
+		} ).then( () => {
+			setStatus( 'success' );
+		} ).catch( () => {
+			setStatus( 'error' );
+
+			createNotice(
+				'error',
+				__(
+					'Couldn’t verify your domain.',
+					'pinterest-for-woocommerce'
+				)
+			);
+		} );
+	}
+
 	return (
 		<div className="woocommerce-setup-guide__verify-domain">
 			<StepHeader
@@ -34,11 +73,42 @@ const VerifyDomain = () => {
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
-					Column B
+					<Card>
+						<CardBody size="large">
+							<StepStatus
+								label='https://www.pinterest.com'
+								status={ status }
+							/>
+						</CardBody>
+					</Card>
+
+					<Button
+						isPrimary
+						className="woocommerce-setup-guide__footer-button"
+						disabled={ 'pending' === status }
+						onClick={ 'success' === status ? goToNextStep : handleVerifyDomain }
+					>
+						{ buttonLabels[ status ] }
+					</Button>
 				</div>
 			</div>
 		</div>
 	);
 }
 
-export default VerifyDomain;
+export default compose(
+	withSelect( select => {
+		const { getOption } = select( OPTIONS_STORE_NAME );
+
+		return {
+			pin4wc: getOption( pin4wcSetupGuide.optionsName ) || [],
+		}
+	}),
+	withDispatch( dispatch => {
+		const { createNotice } = dispatch( 'core/notices' );
+
+		return {
+			createNotice,
+		};
+	})
+)(VerifyDomain);
