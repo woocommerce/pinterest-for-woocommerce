@@ -21,10 +21,10 @@ const StepStatus = ({ label, status }) => {
 	}
 	return (
 		<div className={ `woocommerce-setup-guide__step-status has-${status}` }>
-			<div class="woocommerce-setup-guide__step-status__icon">
+			<div className="woocommerce-setup-guide__step-status__icon">
 				{ icons[ status ] }
 			</div>
-			<div class="woocommerce-setup-guide__step-status__label">
+			<div className="woocommerce-setup-guide__step-status__label">
 				<Text variant="body">{ label }</Text>
 			</div>
 		</div>
