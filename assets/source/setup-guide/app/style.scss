@@ -179,10 +179,43 @@ $root: ".woocommerce-setup-guide";
 				}
 			}
 
+			&__checkbox {
+
+				&-heading {
+					margin: 24px 0;
+
+					&:first-child {
+						margin-top: 0;
+					}
+				}
+
+				&-group {
+					align-items: center;
+					display: flex;
+					margin-bottom: 16px;
+
+					&:last-child {
+						margin-bottom: 0;
+					}
+
+					.components-base-control {
+
+						&__field,
+						&__help {
+							margin: 0;
+						}
+
+						&__help {
+							margin-left: 12px;
+						}
+					}
+				}
+			}
+
 			&__footer-button {
 				display: block;
-				margin-left: auto;
 				margin-top: var(--large-gap);
+				text-align: right;
 			}
 		}
 	}
