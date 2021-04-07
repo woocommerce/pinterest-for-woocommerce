@@ -66,8 +66,13 @@ $root: ".woocommerce-setup-guide";
 
 			&__container {
 				color: #000;
-				margin: var(--large-gap) auto;
 				max-width: 1032px;
+				padding-left: 16px;
+				padding-right: 16px;
+
+				@media (min-width: 783px) {
+					margin: var(--large-gap) auto;
+				}
 
 				.components-card__body.is-size-large {
 					padding: var(--large-gap);
@@ -82,10 +87,14 @@ $root: ".woocommerce-setup-guide";
 			&__step {
 
 				&-header {
-					margin: 0 auto var(--large-gap);
+					margin: 16px auto 40px;
 					max-width: 490px;
-					min-height: 120px;
 					text-align: center;
+
+					@media (min-width: 783px) {
+						margin: 0 auto var(--large-gap);
+						min-height: 120px;
+					}
 
 					> div {
 						margin: 12px 0;
@@ -173,9 +182,11 @@ $root: ".woocommerce-setup-guide";
 				}
 
 				&-columns {
-					column-gap: 24px;
-					display: grid;
-					grid-template-columns: 328px auto;
+					@media (min-width: 783px) {
+						column-gap: 24px;
+						display: grid;
+						grid-template-columns: 328px auto;
+					}
 				}
 			}
 
