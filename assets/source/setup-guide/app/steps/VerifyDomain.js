@@ -82,14 +82,16 @@ const VerifyDomain = ({ goToNextStep, pin4wc, createNotice }) => {
 						</CardBody>
 					</Card>
 
-					<Button
-						isPrimary
-						className="woocommerce-setup-guide__footer-button"
-						disabled={ 'pending' === status }
-						onClick={ 'success' === status ? goToNextStep : handleVerifyDomain }
-					>
-						{ buttonLabels[ status ] }
-					</Button>
+					<div className="woocommerce-setup-guide__footer-button">
+						<Button
+							isPrimary
+							className="woocommerce-setup-guide__footer-button"
+							disabled={ 'pending' === status }
+							onClick={ 'success' === status ? goToNextStep : handleVerifyDomain }
+						>
+							{ buttonLabels[ status ] }
+						</Button>
+					</div>
 				</div>
 			</div>
 		</div>

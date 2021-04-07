@@ -53,17 +53,18 @@ const SetupAccount = ({ goToNextStep }) => {
 						</CardFooter>
 					</Card>
 
-					<Button
-						isPrimary
-						disabled={ true }
-						className="woocommerce-setup-guide__footer-button"
-						onClick={ goToNextStep }
-					>
-						{ __(
-							'Continue',
-							'pinterest-for-woocommerce'
-						) }
-					</Button>
+					<div className="woocommerce-setup-guide__footer-button">
+						<Button
+							isPrimary
+							disabled={ true }
+							onClick={ goToNextStep }
+						>
+							{ __(
+								'Continue',
+								'pinterest-for-woocommerce'
+							) }
+						</Button>
+					</div>
 				</div>
 			</div>
 		</div>
