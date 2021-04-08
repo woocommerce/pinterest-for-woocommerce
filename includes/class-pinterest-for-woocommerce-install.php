@@ -28,4 +28,4 @@ class Pinterest_For_Woocommerce_Install {
 	}
 }
 
-register_activation_hook( PINTEREST4WOOCOMMERCE_PLUGIN_FILE, array( 'Pinterest_For_Woocommerce_Install', 'install' ) );
+register_activation_hook( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE, array( 'Pinterest_For_Woocommerce_Install', 'install' ) );

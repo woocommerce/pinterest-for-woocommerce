@@ -5,8 +5,8 @@ $args = array(
 	'settings'          => Pinterest_For_Woocommerce()::get_settings(),
 	'service_login_url' => add_query_arg(
 		array(
-			'page' => PINTEREST4WOOCOMMERCE_PREFIX,
-			PINTEREST4WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
+			'page' => PINTEREST_FOR_WOOCOMMERCE_PREFIX,
+			PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
 		),
 		admin_url( 'admin.php' )
 	),

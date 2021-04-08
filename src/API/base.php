@@ -9,16 +9,19 @@
  * @author      WooCommerce
  */
 
+namespace Automattic\WooCommerce\Pinterest\API;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Pinterest_For_Woocommerce_API {
+class Base {
 
 	protected static $instance      = null;
-	protected static $log_file_name = PINTEREST4WOOCOMMERCE_LOG_PREFIX;
+	protected static $log_file_name = \PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX;
 	protected static $log_prefix    = '';
 	protected static $token;
+	protected static $init;
 
 	public function __construct() {
 		self::set_token();
@@ -37,8 +40,6 @@ class Pinterest_For_Woocommerce_API {
 
 	/**
 	 * API requests wrapper
-	 * If the response code is 401 and refresh_token exists,
-	 * will try to refresh the token and make the request again.
 	 *
 	 * @since 1.0.0
 	 *
@@ -56,7 +57,6 @@ class Pinterest_For_Woocommerce_API {
 	 */
 	public static function make_request( $request ) {
 
-		// 1º Request
 		try {
 			return self::handle_request( $request );
 		} catch ( \Exception $e ) {
@@ -172,10 +172,8 @@ class Pinterest_For_Woocommerce_API {
 	public static function log_token( $token ) {
 
 		// Log response without exposing the sensitive data
-		$obody                  = $token;
-		$obody['access_token']  = empty( $obody['access_token'] ) ? '' : '--HIDDEN(' . strlen( $obody['access_token'] ) . ')--';
-		$obody['refresh_token'] = empty( $obody['refresh_token'] ) ? '' : '--HIDDEN(' . strlen( $obody['refresh_token'] ) . ')--';
-		$obody['signature']     = empty( $obody['refresh_token'] ) ? '' : '--HIDDEN(' . strlen( $obody['signature'] ) . ')--';
+		$obody                 = $token;
+		$obody['access_token'] = empty( $obody['access_token'] ) ? '' : '--HIDDEN(' . strlen( $obody['access_token'] ) . ')--';
 		self::log( 'response', wp_json_encode( $obody ) );
 	}
 
@@ -222,11 +220,3 @@ class Pinterest_For_Woocommerce_API {
 		return $body;
 	}
 }
-
-// phpcs:ignore WordPress.NamingConventions.ValidFunctionName
-function Pinterest_For_WoocommerceAPI() {
-	return Pinterest_For_Woocommerce_API::instance();
-}
-
-// Global for backwards compatibility.
-$GLOBALS['pinterest_for_woocommerce_api'] = Pinterest_For_WoocommerceAPI();

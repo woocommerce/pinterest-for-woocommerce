@@ -88,7 +88,7 @@ abstract class Pinterest_For_Woocommerce_Assets {
 	 * @param  string   $version
 	 * @param  boolean  $in_footer
 	 */
-	private function register_script( $handle, $path, $deps = array( 'jquery' ), $version = PINTEREST4WOOCOMMERCE_VERSION, $in_footer = true ) {
+	private function register_script( $handle, $path, $deps = array( 'jquery' ), $version = PINTEREST_FOR_WOOCOMMERCE_VERSION, $in_footer = true ) {
 		$this->scripts[] = $handle;
 		wp_register_script( $handle, $path, $deps, $version, $in_footer );
 	}
@@ -104,7 +104,7 @@ abstract class Pinterest_For_Woocommerce_Assets {
 	 * @param  string   $version
 	 * @param  boolean  $in_footer
 	 */
-	private function enqueue_script( $handle, $path = '', $deps = array( 'jquery' ), $version = PINTEREST4WOOCOMMERCE_VERSION, $in_footer = true ) {
+	private function enqueue_script( $handle, $path = '', $deps = array( 'jquery' ), $version = PINTEREST_FOR_WOOCOMMERCE_VERSION, $in_footer = true ) {
 		if ( ! in_array( $handle, $this->scripts, true ) && $path ) {
 			$this->register_script( $handle, $path, $deps, $version, $in_footer );
 		}
@@ -122,7 +122,7 @@ abstract class Pinterest_For_Woocommerce_Assets {
 	 * @param  string   $version
 	 * @param  string   $media
 	 */
-	private function register_style( $handle, $path, $deps = array(), $version = PINTEREST4WOOCOMMERCE_VERSION, $media = 'all' ) {
+	private function register_style( $handle, $path, $deps = array(), $version = PINTEREST_FOR_WOOCOMMERCE_VERSION, $media = 'all' ) {
 		$this->styles[] = $handle;
 		wp_register_style( $handle, $path, $deps, $version, $media );
 	}
@@ -138,7 +138,7 @@ abstract class Pinterest_For_Woocommerce_Assets {
 	 * @param  string   $version
 	 * @param  string   $media
 	 */
-	private function enqueue_style( $handle, $path = '', $deps = array(), $version = PINTEREST4WOOCOMMERCE_VERSION, $media = 'all' ) {
+	private function enqueue_style( $handle, $path = '', $deps = array(), $version = PINTEREST_FOR_WOOCOMMERCE_VERSION, $media = 'all' ) {
 		if ( ! in_array( $handle, $this->styles, true ) && $path ) {
 			$this->register_style( $handle, $path, $deps, $version, $media );
 		}
@@ -168,7 +168,7 @@ abstract class Pinterest_For_Woocommerce_Assets {
 					array(
 						'src'       => '',
 						'deps'      => array( 'jquery' ),
-						'version'   => PINTEREST4WOOCOMMERCE_VERSION,
+						'version'   => PINTEREST_FOR_WOOCOMMERCE_VERSION,
 						'in_footer' => true,
 					)
 				);
@@ -185,7 +185,7 @@ abstract class Pinterest_For_Woocommerce_Assets {
 					array(
 						'src'     => '',
 						'deps'    => '',
-						'version' => PINTEREST4WOOCOMMERCE_VERSION,
+						'version' => PINTEREST_FOR_WOOCOMMERCE_VERSION,
 						'media'   => 'all',
 					)
 				);

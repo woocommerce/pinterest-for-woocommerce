@@ -8,6 +8,8 @@
  * @version  1.0.0
  */
 
+use Automattic\WooCommerce\Pinterest as Pinterest;
+
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 	final class Pinterest_For_Woocommerce {
@@ -85,33 +87,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Define Pinterest_For_Woocommerce Constants.
 		 */
 		private function define_constants() {
-			$upload_dir = wp_upload_dir();
-
-			$this->define( 'PINTEREST4WOOCOMMERCE_PREFIX', 'pinterest-for-woocommerce' );
-			$this->define( 'PINTEREST4WOOCOMMERCE_PLUGIN_BASENAME', plugin_basename( PINTEREST4WOOCOMMERCE_PLUGIN_FILE ) );
-			$this->define( 'PINTEREST4WOOCOMMERCE_VERSION', $this->version );
-			$this->define( 'PINTEREST4WOOCOMMERCE_OPTION_NAME', 'pinterest-for-woocommerce' );
-			$this->define( 'PINTEREST4WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
-			$this->define( 'PINTEREST4WOOCOMMERCE_SETUP_GUIDE', PINTEREST4WOOCOMMERCE_PREFIX . '-setup-guide-app' );
-			$this->define( 'PINTEREST4WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.com/' );
-
-			$this->define( 'PINTEREST4WOOCOMMERCE_API_NAMESPACE', 'pinterest' );
-			$this->define( 'PINTEREST4WOOCOMMERCE_API_VERSION', '1' );
-			$this->define( 'PINTEREST4WOOCOMMERCE_API_AUTH_ENDPOINT', 'oauth/callback' );
-			$this->define( 'PINTEREST4WOOCOMMERCE_AUTH', PINTEREST4WOOCOMMERCE_PREFIX . '_auth_key' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_PREFIX', 'pinterest-for-woocommerce' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME', plugin_basename( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE ) );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', $this->version );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest-for-woocommerce' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide-app' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.com/' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE', 'pinterest' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_API_VERSION', '1' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT', 'oauth/callback' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_AUTH', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_auth_key' );
 		}
 
-		/**
-		 * Define constant if not already set.
-		 *
-		 * @param  string $name
-		 * @param  string|bool $value
-		 */
-		private function define( $name, $value ) {
-			if ( ! defined( $name ) ) {
-				define( $name, $value );
-			}
-		}
 
 		/**
 		 * What type of request is this?
@@ -136,17 +124,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Include required core files used in admin and on the frontend.
 		 */
 		private function includes() {
-			include_once 'includes/class-pinterest-for-woocommerce-autoloader.php';
 			include_once 'includes/pinterest-for-woocommerce-core-functions.php';
-			include_once 'includes/class-pinterest-for-woocommerce-install.php'; // TODO: rename
-			include_once 'includes/class-pinterest-for-woocommerce-api.php';
+			include_once 'includes/class-pinterest-for-woocommerce-install.php';
+
+			Pinterest\API\Base::instance();
 
 			if ( $this->is_request( 'admin' ) ) {
 				include_once 'includes/admin/class-pinterest-for-woocommerce-admin.php';
 			}
 
 			if ( $this->is_request( 'frontend' ) ) {
-				include_once 'includes/class-pinterest-for-woocommerce-frontend-assets.php'; // Frontend Scripts
+				include_once 'includes/class-pinterest-for-woocommerce-frontend-assets.php';
 			}
 		}
 
@@ -171,6 +159,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Init action.
 			do_action( 'pinterest_for_woocommerce_init' );
+
 		}
 
 		/**
@@ -236,7 +225,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			static $settings;
 
 			if ( is_null( $settings ) || $force ) {
-				$settings = get_option( PINTEREST4WOOCOMMERCE_OPTION_NAME );
+				$settings = get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME );
 			}
 
 			return $settings;
@@ -291,7 +280,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function save_settings( $settings ) {
-			return update_option( PINTEREST4WOOCOMMERCE_OPTION_NAME, $settings );
+			return update_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME, $settings );
 		}
 
 		/**
@@ -300,10 +289,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.0.0
 		 */
 		public function init_api_endpoints() {
-
-			include_once 'includes/api/class-pinterest-for-woocommerce-api-auth.php';
-			$api_auth = new Pinterest_For_Woocommerce_API_Auth();
-			$api_auth->register_routes();
+			new Pinterest\API\Auth();
+			new Pinterest\API\Options\Get();
+			new Pinterest\API\Options\Update();
 		}
 
 		/**
@@ -318,11 +306,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$token = self::get_setting( 'token', true );
 
 			try {
-				$token['access_token']  = empty( $token['access_token'] ) ? '' : $token['access_token'];
-				$token['refresh_token'] = empty( $token['refresh_token'] ) ? '' : $token['refresh_token'];
-
+				$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::decrypt( $token['access_token'] );
 			} catch ( \Exception $e ) {
-
 				$token = array();
 			}
 
@@ -343,7 +328,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$settings = self::get_settings();
 
-			$token['access_token']  = empty( $token['access_token'] ) ? '' : $token['access_token'];
+			$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['access_token'] );
 
 			$settings['token'] = $token;
 
@@ -379,7 +364,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			 *
 			 * @param string $proxy_url the connection proxy URL
 			 */
-			return (string) trailingslashit( apply_filters( 'pinterest_for_woocommerce_connection_proxy_url', PINTEREST4WOOCOMMERCE_WOO_CONNECT_URL ) );
+			return (string) trailingslashit( apply_filters( 'pinterest_for_woocommerce_connection_proxy_url', PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL ) );
 		}
 
 
@@ -395,11 +380,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$control_key = uniqid();
 			$state       = http_build_query(
 				array(
-					'redirect' => get_rest_url( null, PINTEREST4WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST4WOOCOMMERCE_API_VERSION . '/' . PINTEREST4WOOCOMMERCE_API_AUTH_ENDPOINT ) . '?control=' . $control_key,
+					'redirect' => get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT ) . '?control=' . $control_key,
 				)
 			);
 
-			set_transient( PINTEREST4WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
+			set_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
 
 			return self::get_connection_proxy_url() . 'login/pinterestv3?' . $state;
 		}
