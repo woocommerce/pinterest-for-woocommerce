@@ -90,7 +90,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			define( 'PINTEREST_FOR_WOOCOMMERCE_PREFIX', 'pinterest-for-woocommerce' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME', plugin_basename( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE ) );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', $this->version );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest-for-woocommerce' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest_for_woocommerce' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide-app' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.com/' );
@@ -293,8 +293,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public function init_api_endpoints() {
 			new Pinterest\API\Auth();
 			new Pinterest\API\DomainVerification();
-			new Pinterest\API\Options\Get();
-			new Pinterest\API\Options\Update();
 		}
 
 		/**
