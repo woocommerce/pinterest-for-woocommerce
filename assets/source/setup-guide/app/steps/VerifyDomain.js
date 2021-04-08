@@ -25,7 +25,7 @@ const VerifyDomain = ({ goToNextStep, pin4wc, createNotice }) => {
 
 	useEffect(() => {
 		if ( pin4wc.verfication_code && 'success' !== status ) {
-			setDebugEmails( 'success' );
+			setStatus( 'success' );
 		}
 	}, [pin4wc.verfication_code])
 
