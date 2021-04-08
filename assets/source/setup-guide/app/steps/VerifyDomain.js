@@ -69,7 +69,7 @@ const VerifyDomain = ({ goToNextStep, pin4wc, createNotice }) => {
 					<StepOverview
 						title={ __( 'Verify your domain' ) }
 						description={ __( 'Claim your website yo get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of you content.' ) }
-						link='#'
+						link={ pin4wcSetupGuide.pinterestLinks.verifyDomain }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">

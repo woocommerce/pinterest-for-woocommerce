@@ -77,6 +77,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Setup_Guide' ) ) :
 					'pageSlug'        => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
 					'optionsName'     => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,
 					'error'           => isset( $_GET['error'] ) ? esc_html( $_GET['error'] ) : '', //phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification,
+					'pinterestLinks'  => array(
+						'newAccount'    => 'https://business.pinterest.com/',
+						'verifyDomain'  => 'https://help.pinterest.com/en/business/article/claim-your-website',
+						'richPins'      => 'https://help.pinterest.com/en/business/article/rich-pins',
+						'enhancedMatch' => 'https://help.pinterest.com/en/business/article/enhanced-match',
+					)
 				)
 			);
 

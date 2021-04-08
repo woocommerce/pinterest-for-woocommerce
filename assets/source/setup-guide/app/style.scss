@@ -79,8 +79,8 @@ $root: ".woocommerce-setup-guide";
 				}
 
 				.components-card__footer {
-					padding-left: calc(var(--large-gap) - 6px);
-					padding-right: calc(var(--large-gap) - 6px);
+					padding-left: var(--large-gap);
+					padding-right: var(--large-gap);
 				}
 			}
 
@@ -128,10 +128,6 @@ $root: ".woocommerce-setup-guide";
 							&:hover {
 								text-decoration: underline;
 							}
-						}
-
-						svg {
-							display: none;
 						}
 					}
 				}
@@ -218,6 +214,15 @@ $root: ".woocommerce-setup-guide";
 
 						&__help {
 							margin-left: 12px;
+
+							.components-button {
+								display: inline-block;
+								text-decoration: none;
+
+								&:not(:hover) {
+									color: inherit;
+								}
+							}
 						}
 					}
 				}

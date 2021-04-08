@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	ExternalLink,
+	Button,
 	__experimentalText as Text
 } from '@wordpress/components';
 
@@ -23,8 +23,8 @@ const StepOverview = ({ title, description, link }) => {
 			}
 
 			{ link &&
-				<div className="woocommerce-setup-guide__step-overview__link">
-					<ExternalLink href={ link }>{ __( 'Read more' ) }</ExternalLink>
+				<div class="woocommerce-setup-guide__step-overview__link">
+					<Button isLink href={ link } target="_blank">{ __( 'Read more' ) }</Button>
 				</div>
 			}
 		</div>

@@ -49,22 +49,9 @@ const SetupAccount = ({ goToNextStep }) => {
 						</CardBody>
 
 						<CardFooter>
-							<Button isTertiary href={ pin4wcSetupGuide.serviceLoginUrl }>{ __( 'Or, create a new Pinterest account', 'pinterest-for-woocommerce' ) }</Button>
+							<Button isLink href={ pin4wcSetupGuide.pinterestLinks.newAccount } target="_blank">{ __( 'Or, create a new Pinterest account', 'pinterest-for-woocommerce' ) }</Button>
 						</CardFooter>
 					</Card>
-
-					<div className="woocommerce-setup-guide__footer-button">
-						<Button
-							isPrimary
-							disabled={ true }
-							onClick={ goToNextStep }
-						>
-							{ __(
-								'Continue',
-								'pinterest-for-woocommerce'
-							) }
-						</Button>
-					</div>
 				</div>
 			</div>
 		</div>

@@ -89,7 +89,6 @@ const ConfigureSettings = ({ pin4wc, createNotice, updateOptions }) => {
 					<StepOverview
 						title={ __( 'Setup tracking and Rich Pins' ) }
 						description={ __( 'Use description text to help users understand more' ) }
-						link='#'
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
@@ -98,28 +97,13 @@ const ConfigureSettings = ({ pin4wc, createNotice, updateOptions }) => {
 							<Text className="woocommerce-setup-guide__checkbox-heading" variant="subtitle">{ __( 'Tracking', 'pinterest-for-woocommerce' ) }</Text>
 							<CheckboxControl
 								label={ __( 'Track conversions', 'pinterest-for-woocommerce' ) }
-								help={
-									<Tooltip
-										text={ __( 'Here goes the help text', 'pinterest-for-woocommerce' ) }
-										position="center right"
-									>
-										<span><Icon icon="editor-help" /></span>
-									</Tooltip>
-								}
 								checked={ options.track_conversions }
 								className="woocommerce-setup-guide__checkbox-group"
 								onChange={ () => handleOptionChange( 'track_conversions' ) }
 							/>
 							<CheckboxControl
 								label={ __( 'Enhanced Match support', 'pinterest-for-woocommerce' ) }
-								help={
-									<Tooltip
-										text={ __( 'Here goes the help text', 'pinterest-for-woocommerce' ) }
-										position="center right"
-									>
-										<span><Icon icon="editor-help" /></span>
-									</Tooltip>
-								}
+								help={ <Button isLink href={ pin4wcSetupGuide.pinterestLinks.enhancedMatch } target="_blank"><Icon icon="editor-help" /></Button> }
 								checked={ options.enhanced_match_support }
 								className="woocommerce-setup-guide__checkbox-group"
 								onChange={ () => handleOptionChange( 'enhanced_match_support' ) }
@@ -127,14 +111,7 @@ const ConfigureSettings = ({ pin4wc, createNotice, updateOptions }) => {
 							<Text className="woocommerce-setup-guide__checkbox-heading" variant="subtitle">{ __( 'Rich Pins', 'pinterest-for-woocommerce' ) }</Text>
 							<CheckboxControl
 								label={ __( 'Save to Pinterest', 'pinterest-for-woocommerce' ) }
-								help={
-									<Tooltip
-										text={ __( 'Here goes the help text', 'pinterest-for-woocommerce' ) }
-										position="center right"
-									>
-										<span><Icon icon="editor-help" /></span>
-									</Tooltip>
-								}
+								help={ <Button isLink href={ pin4wcSetupGuide.pinterestLinks.richPins } target="_blank"><Icon icon="editor-help" /></Button> }
 								checked={ options.save_to_pinterest }
 								className="woocommerce-setup-guide__checkbox-group"
 								onChange={ () => handleOptionChange( 'save_to_pinterest' ) }
