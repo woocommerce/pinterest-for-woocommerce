@@ -74,6 +74,13 @@ $root: ".woocommerce-setup-guide";
 					margin: var(--large-gap) auto;
 				}
 
+				> div {
+
+					&:not(:first-child) {
+						margin-top: var(--large-gap);
+					}
+				}
+
 				.components-card__body.is-size-large {
 					padding: var(--large-gap);
 				}
@@ -186,6 +193,15 @@ $root: ".woocommerce-setup-guide";
 				}
 			}
 
+			&__verify-domain {
+
+				.components-card__body {
+					align-items: center;
+					display: flex;
+					justify-content: space-between;
+				}
+			}
+
 			&__checkbox {
 
 				&-heading {
@@ -233,6 +249,13 @@ $root: ".woocommerce-setup-guide";
 				margin-top: var(--large-gap);
 				text-align: right;
 			}
+		}
+	}
+
+	&--wizard {
+
+		.woocommerce-layout__primary {
+			display: none;
 		}
 	}
 }

@@ -16,11 +16,11 @@ import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 /**
   * Internal dependencies
   */
-import StepHeader from '../StepHeader';
-import StepOverview from '../StepOverview';
-import StepStatus from '../StepStatus';
+import StepHeader from '../components/StepHeader';
+import StepOverview from '../components/StepOverview';
+import StepStatus from '../components/StepStatus';
 
-const VerifyDomain = ({ goToNextStep, pin4wc, createNotice }) => {
+const VerifyDomain = ({ goToNextStep, pin4wc, createNotice, view }) => {
 	const [ status, setStatus ] = useState( 'idle' );
 
 	useEffect(() => {
@@ -59,10 +59,12 @@ const VerifyDomain = ({ goToNextStep, pin4wc, createNotice }) => {
 
 	return (
 		<div className="woocommerce-setup-guide__verify-domain">
-			<StepHeader
-				title={ __( 'Verify your domain' ) }
-				subtitle={ __( 'Step Two' ) }
-			/>
+			{ 'wizard' === view &&
+				<StepHeader
+					title={ __( 'Verify your domain' ) }
+					subtitle={ __( 'Step Two' ) }
+				/>
+			}
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
@@ -79,18 +81,30 @@ const VerifyDomain = ({ goToNextStep, pin4wc, createNotice }) => {
 								label={ pin4wcSetupGuide.domainToVerify }
 								status={ status }
 							/>
+
+						{ 'settings' === view &&
+							<Button
+								isPrimary
+								disabled={ 'pending' === status }
+								onClick={ 'success' === status ? goToNextStep : handleVerifyDomain }
+							>
+								{ buttonLabels[ status ] }
+							</Button>
+						}
 						</CardBody>
 					</Card>
 
-					<div className="woocommerce-setup-guide__footer-button">
-						<Button
-							isPrimary
-							disabled={ 'pending' === status }
-							onClick={ 'success' === status ? goToNextStep : handleVerifyDomain }
-						>
-							{ buttonLabels[ status ] }
-						</Button>
-					</div>
+					{ 'wizard' === view &&
+						<div className="woocommerce-setup-guide__footer-button">
+							<Button
+								isPrimary
+								disabled={ 'pending' === status }
+								onClick={ 'success' === status ? goToNextStep : handleVerifyDomain }
+							>
+								{ buttonLabels[ status ] }
+							</Button>
+						</div>
+					}
 				</div>
 			</div>
 		</div>

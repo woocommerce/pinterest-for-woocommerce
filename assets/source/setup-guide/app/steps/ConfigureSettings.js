@@ -11,7 +11,6 @@ import {
 	CardBody,
 	CheckboxControl,
 	Icon,
-	Tooltip,
 	__experimentalText as Text
 } from '@wordpress/components';
 import { OPTIONS_STORE_NAME } from '@woocommerce/data';
@@ -19,8 +18,8 @@ import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 /**
  * Internal dependencies
  */
- import StepHeader from '../StepHeader';
- import StepOverview from '../StepOverview';
+import StepHeader from '../components/StepHeader';
+import StepOverview from '../components/StepOverview';
 
 const ALLOWED_OPTIONS = [
 	'track_conversions',
@@ -29,7 +28,7 @@ const ALLOWED_OPTIONS = [
 	'is_setup_complete'
 ];
 
-const ConfigureSettings = ({ pin4wc, createNotice, updateOptions }) => {
+const ConfigureSettings = ({ pin4wc, createNotice, updateOptions, view }) => {
 	const [ options, setOptions ] = useState( {} );
 
 	useEffect(() => {
@@ -79,10 +78,12 @@ const ConfigureSettings = ({ pin4wc, createNotice, updateOptions }) => {
 
 	return (
 		<div className="woocommerce-setup-guide__configure-settings">
-			<StepHeader
-				title={ __( 'Configure your settings' ) }
-				subtitle={ __( 'Step Three' ) }
-			/>
+			{ 'wizard' === view &&
+				<StepHeader
+					title={ __( 'Configure your settings' ) }
+					subtitle={ __( 'Step Three' ) }
+				/>
+			}
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
@@ -119,18 +120,20 @@ const ConfigureSettings = ({ pin4wc, createNotice, updateOptions }) => {
 						</CardBody>
 					</Card>
 
-					<div className="woocommerce-setup-guide__footer-button">
-						<Button
-							isPrimary
-							href={ pin4wcSetupGuide.adminUrl }
-							onClick={ handleCompleteSetup }
-						>
-							{ __(
-								'Complete Setup',
-								'pinterest-for-woocommerce'
-							) }
-						</Button>
-					</div>
+					{ 'wizard' === view &&
+						<div className="woocommerce-setup-guide__footer-button">
+							<Button
+								isPrimary
+								href={ pin4wcSetupGuide.adminUrl }
+								onClick={ handleCompleteSetup }
+							>
+								{ __(
+									'Complete Setup',
+									'pinterest-for-woocommerce'
+								) }
+							</Button>
+						</div>
+					}
 				</div>
 			</div>
 		</div>

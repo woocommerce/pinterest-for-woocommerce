@@ -11,7 +11,7 @@ import { Spinner } from '@woocommerce/components';
 /**
  * Internal dependencies
  */
-import CheckIcon from './helpers/check-icon';
+import CheckIcon from '../helpers/check-icon';
 
 const StepStatus = ({ label, status }) => {
 	const icons = {

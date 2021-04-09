@@ -8,6 +8,11 @@
  * @version     1.0.0
  */
 
+use Automattic\WooCommerce\Admin\Features\Features;
+use Automattic\WooCommerce\Admin\Features\Navigation\Menu;
+use Automattic\WooCommerce\Admin\Features\Navigation\Screen;
+use Automattic\WooCommerce\Admin\Features\Onboarding;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -16,34 +21,66 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Setup_Guide' ) ) :
 
 	class Pinterest_For_Woocommerce_Admin_Setup_Guide {
 
-		public $page_slug = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE;
-
 		public function __construct() {
 			add_action( 'admin_menu', array( $this, 'register_guide_page' ), 20 );
-			add_action( 'admin_enqueue_scripts', array( $this, 'load_scripts' ), 20 );
+			add_action( 'admin_enqueue_scripts', array( $this, 'load_setup_guide_scripts' ), 20 );
+			//add_action( 'admin_enqueue_scripts', array( $this, 'add_task_register_script' ) );
 		}
 
-
 		public function register_guide_page() {
+			function pin4wc_setup_guide_page(){
+				echo '<div class="wrap">
+					<div id="pin4wc-setup-guide-app"></div>
+				</div>';
+			}
+
 			add_submenu_page(
 				null,
 				__( 'Pinterest Setup Guide', 'pinterest-for-woocommerce' ),
 				__( 'Pinterest Setup Guide', 'pinterest-for-woocommerce' ),
 				'manage_options',
-				$this->page_slug,
-				array( $this, 'page_wrapper' )
+				PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
+				'pin4wc_setup_guide_page'
+			);
+
+			add_menu_page(
+				__( 'Pinterest Settings', 'pinterest-for-woocommerce' ),
+				__( 'Pinterest Settings', 'pinterest-for-woocommerce' ),
+				'manage_woocommerce',
+				PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
+				'pin4wc_setup_guide_page'
+			);
+
+			if (
+				! method_exists( Screen::class, 'register_post_type' ) ||
+				! method_exists( Menu::class, 'add_plugin_item' ) ||
+				! method_exists( Menu::class, 'add_plugin_category' ) ||
+				//! class_exists( 'Features' ) ||
+				! Features::is_enabled( 'navigation' )
+			) {
+				return;
+			}
+
+			Menu::add_plugin_category(
+				array(
+					'id'     => 'pinterest-for-woocommerce',
+					'title'  => __( 'Pinterest', 'pinterest-for-woocommerce' ),
+					'parent' => 'woocommerce',
+				)
+			);
+
+			Menu::add_plugin_item(
+				array(
+					'id'         => 'pin4wcSettings',
+					'title'      => __( 'Settings', 'pin4wc' ),
+					'capability' => 'manage_woocommerce',
+					'url'        => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
+					'parent'     => 'pinterest-for-woocommerce',
+				)
 			);
 		}
 
-		public function page_wrapper() {
-			?>
-			<div class="wrap">
-				<div id="pin4wc-setup-guide-app"></div>
-			</div>
-			<?php
-		}
-
-		public function load_scripts() {
+		public function load_setup_guide_scripts() {
 			if ( ! $this->is_setup_guide_page() ) {
 				return;
 			}
@@ -106,7 +143,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Setup_Guide' ) ) :
 		 */
 		protected function is_setup_guide_page() {
 
-			return ( is_admin() && $this->page_slug === $this->get_request( 'page', true ) );
+			return ( is_admin() && PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE === $this->get_request( 'page', true ) );
 		}
 
 		/**

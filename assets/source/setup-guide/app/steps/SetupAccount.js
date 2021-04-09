@@ -16,17 +16,19 @@ import {
 /**
  * Internal dependencies
  */
-import StepHeader from '../StepHeader';
-import StepOverview from '../StepOverview';
+import StepHeader from '../components/StepHeader';
+import StepOverview from '../components/StepOverview';
 
-const SetupAccount = ({ goToNextStep }) => {
+const SetupAccount = ({ view }) => {
 	return (
 		<div className="woocommerce-setup-guide__setup-account">
-			<StepHeader
-				title={ __( 'Set up your account', 'pinterest-for-woocommerce' ) }
-				subtitle={ __( 'Step One', 'pinterest-for-woocommerce' ) }
-				description={ __( 'Use description text to help users understand what accounts they need to connect, and why they need to connect it.', 'pinterest-for-woocommerce' ) }
-			/>
+			{ 'wizard' === view &&
+				<StepHeader
+					title={ __( 'Set up your account', 'pinterest-for-woocommerce' ) }
+					subtitle={ __( 'Step One', 'pinterest-for-woocommerce' ) }
+					description={ __( 'Use description text to help users understand what accounts they need to connect, and why they need to connect it.', 'pinterest-for-woocommerce' ) }
+				/>
+			}
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">

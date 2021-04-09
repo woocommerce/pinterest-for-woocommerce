@@ -17,22 +17,23 @@ import {
 /**
  * Internal dependencies
  */
-import AppHeader from './AppHeader';
-import SetupAccount from './steps/SetupAccount.js';
-import VerifyDomain from './steps/VerifyDomain.js';
-import ConfigureSettings from './steps/ConfigureSettings.js';
-import TransientNotices from './transient-notices';
-import './style.scss';
+import AppHeader from '../components/AppHeader';
+import SetupAccount from '../steps/SetupAccount';
+import VerifyDomain from '../steps/VerifyDomain';
+import ConfigureSettings from '../steps/ConfigureSettings';
+import TransientNotices from '../transient-notices';
 
-const App = ( { createNotice } ) => {
+const WizardApp = ( { createNotice } ) => {
 
 	const [step, setStep] = useState( {} );
 
 	useEffect(() => {
 		document.body.parentNode.classList.remove( 'wp-toolbar' );
 		document.body.classList.remove( 'woocommerce-admin-is-loading' );
+		document.body.classList.remove( 'woocommerce-embed-page' );
 		document.body.classList.add( 'woocommerce-onboarding' );
 		document.body.classList.add( 'woocommerce-setup-guide__body' );
+		document.body.classList.add( 'woocommerce-setup-guide--wizard' );
 		document.body.classList.add( 'woocommerce-admin-full-screen' );
 
 		if ( pin4wcSetupGuide.error ) {
@@ -44,7 +45,9 @@ const App = ( { createNotice } ) => {
 
 		return () => {
 			document.body.classList.remove( 'woocommerce-onboarding' );
+			document.body.classList.remove( 'woocommerce-setup-guide--wizard' );
 			document.body.classList.remove( 'woocommerce-setup-guide__body' );
+			document.body.classList.add( 'woocommerce-embed-page' );
 			document.body.classList.remove( 'woocommerce-admin-full-screen' );
 			document.body.parentNode.classList.add( 'wp-toolbar' );
 		}
@@ -115,6 +118,7 @@ const App = ( { createNotice } ) => {
 		query: getQuery(),
 		step,
 		goToNextStep,
+		view: 'wizard'
 	} );
 
 	const steps = getSteps().map( ( _step ) =>
@@ -143,4 +147,4 @@ export default compose(
 			createNotice,
 		};
 	})
-)(App);
+)(WizardApp);
