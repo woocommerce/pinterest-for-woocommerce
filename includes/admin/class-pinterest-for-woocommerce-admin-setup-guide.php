@@ -108,7 +108,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Setup_Guide' ) ) :
 				'pin4wcSetupGuide',
 				array(
 					'adminUrl'        => esc_url( admin_url() ),
-					'serviceLoginUrl' => esc_url( Pinterest_For_Woocommerce()::get_service_login_url() ), // TODO:
+					'serviceLoginUrl' => esc_url( add_query_arg(
+						array(
+							'page' => PINTEREST_FOR_WOOCOMMERCE_PREFIX,
+							PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
+						),
+						admin_url( 'admin.php' )
+					) ),
 					'domainToVerify'  => wp_parse_url( site_url(), PHP_URL_HOST ),
 					'apiRoute'        => PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION,
 					'pageSlug'        => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
