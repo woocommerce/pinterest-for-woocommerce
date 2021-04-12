@@ -1,5 +1,5 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
@@ -11,7 +11,7 @@ import {
 	CardBody,
 	CheckboxControl,
 	Icon,
-	__experimentalText as Text
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 
@@ -25,30 +25,30 @@ const ALLOWED_OPTIONS = [
 	'track_conversions',
 	'enhanced_match_support',
 	'save_to_pinterest',
-	'is_setup_complete'
+	'is_setup_complete',
 ];
 
-const ConfigureSettings = ({ pin4wc, createNotice, updateOptions, view }) => {
+const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	const [ options, setOptions ] = useState( {} );
 
-	useEffect(() => {
+	useEffect( () => {
 		if ( options !== pin4wc ) {
 			setOptions( pin4wc );
 		}
-	}, [pin4wc])
+	}, [ pin4wc, options ] );
 
-	const handleOptionChange = async name => {
+	const handleOptionChange = async ( name ) => {
 		if ( ALLOWED_OPTIONS.includes( name ) ) {
 			const oldOptions = Object.assign( {}, options );
 			const newOptions = {
 				...options,
-				[name]: ! options[ name ]
+				[ name ]: ! options[ name ],
 			};
 
 			setOptions( newOptions );
 
 			const update = await updateOptions( {
-				[pin4wcSetupGuide.optionsName]: newOptions
+				[ pin4wcSetupGuide.optionsName ]: newOptions,
 			} );
 
 			if ( update.success ) {
@@ -70,57 +70,114 @@ const ConfigureSettings = ({ pin4wc, createNotice, updateOptions, view }) => {
 				);
 			}
 		}
-	}
+	};
 
 	const handleCompleteSetup = async () => {
 		handleOptionChange( 'is_setup_complete', true );
-	}
+	};
 
 	return (
 		<div className="woocommerce-setup-guide__configure-settings">
-			{ 'wizard' === view &&
+			{ view === 'wizard' && (
 				<StepHeader
 					title={ __( 'Configure your settings' ) }
 					subtitle={ __( 'Step Three' ) }
 				/>
-			}
+			) }
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
 						title={ __( 'Setup tracking and Rich Pins' ) }
-						description={ __( 'Use description text to help users understand more' ) }
+						description={ __(
+							'Use description text to help users understand more'
+						) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							<Text className="woocommerce-setup-guide__checkbox-heading" variant="subtitle">{ __( 'Tracking', 'pinterest-for-woocommerce' ) }</Text>
+							<Text
+								className="woocommerce-setup-guide__checkbox-heading"
+								variant="subtitle"
+							>
+								{ __(
+									'Tracking',
+									'pinterest-for-woocommerce'
+								) }
+							</Text>
 							<CheckboxControl
-								label={ __( 'Track conversions', 'pinterest-for-woocommerce' ) }
+								label={ __(
+									'Track conversions',
+									'pinterest-for-woocommerce'
+								) }
 								checked={ options.track_conversions }
 								className="woocommerce-setup-guide__checkbox-group"
-								onChange={ () => handleOptionChange( 'track_conversions' ) }
+								onChange={ () =>
+									handleOptionChange( 'track_conversions' )
+								}
 							/>
 							<CheckboxControl
-								label={ __( 'Enhanced Match support', 'pinterest-for-woocommerce' ) }
-								help={ <Button isLink href={ pin4wcSetupGuide.pinterestLinks.enhancedMatch } target="_blank"><Icon icon="editor-help" /></Button> }
+								label={ __(
+									'Enhanced Match support',
+									'pinterest-for-woocommerce'
+								) }
+								help={
+									<Button
+										isLink
+										href={
+											pin4wcSetupGuide.pinterestLinks
+												.enhancedMatch
+										}
+										target="_blank"
+									>
+										<Icon icon="editor-help" />
+									</Button>
+								}
 								checked={ options.enhanced_match_support }
 								className="woocommerce-setup-guide__checkbox-group"
-								onChange={ () => handleOptionChange( 'enhanced_match_support' ) }
+								onChange={ () =>
+									handleOptionChange(
+										'enhanced_match_support'
+									)
+								}
 							/>
-							<Text className="woocommerce-setup-guide__checkbox-heading" variant="subtitle">{ __( 'Rich Pins', 'pinterest-for-woocommerce' ) }</Text>
+							<Text
+								className="woocommerce-setup-guide__checkbox-heading"
+								variant="subtitle"
+							>
+								{ __(
+									'Rich Pins',
+									'pinterest-for-woocommerce'
+								) }
+							</Text>
 							<CheckboxControl
-								label={ __( 'Save to Pinterest', 'pinterest-for-woocommerce' ) }
-								help={ <Button isLink href={ pin4wcSetupGuide.pinterestLinks.richPins } target="_blank"><Icon icon="editor-help" /></Button> }
+								label={ __(
+									'Save to Pinterest',
+									'pinterest-for-woocommerce'
+								) }
+								help={
+									<Button
+										isLink
+										href={
+											pin4wcSetupGuide.pinterestLinks
+												.richPins
+										}
+										target="_blank"
+									>
+										<Icon icon="editor-help" />
+									</Button>
+								}
 								checked={ options.save_to_pinterest }
 								className="woocommerce-setup-guide__checkbox-group"
-								onChange={ () => handleOptionChange( 'save_to_pinterest' ) }
+								onChange={ () =>
+									handleOptionChange( 'save_to_pinterest' )
+								}
 							/>
 						</CardBody>
 					</Card>
 
-					{ 'wizard' === view &&
+					{ view === 'wizard' && (
 						<div className="woocommerce-setup-guide__footer-button">
 							<Button
 								isPrimary
@@ -133,28 +190,28 @@ const ConfigureSettings = ({ pin4wc, createNotice, updateOptions, view }) => {
 								) }
 							</Button>
 						</div>
-					}
+					) }
 				</div>
 			</div>
 		</div>
 	);
-}
+};
 
 export default compose(
-	withSelect( select => {
+	withSelect( ( select ) => {
 		const { getOption } = select( OPTIONS_STORE_NAME );
 
 		return {
 			pin4wc: getOption( pin4wcSetupGuide.optionsName ) || [],
-		}
-	}),
-	withDispatch( dispatch => {
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
 		const { createNotice } = dispatch( 'core/notices' );
 		const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
 
 		return {
 			createNotice,
-			updateOptions
+			updateOptions,
 		};
-	})
-)(ConfigureSettings);
+	} )
+)( ConfigureSettings );

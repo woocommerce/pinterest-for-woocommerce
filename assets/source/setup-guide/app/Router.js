@@ -1,9 +1,7 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import {
-	getQuery,
-} from '@woocommerce/navigation';
+import { getQuery } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
@@ -16,7 +14,7 @@ import './style.scss';
 const Router = () => {
 	const query = getQuery();
 
-	return 'wizard' === query?.view ? <WizardApp /> : <SettingsApp />;
+	return query?.view === 'wizard' ? <WizardApp /> : <SettingsApp />;
 };
 
 export default Router;

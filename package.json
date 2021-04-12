@@ -5,13 +5,24 @@
   "main": "gulpfile.js",
   "dependencies": {
     "@woocommerce/components": "^5.1.2",
-    "@woocommerce/eslint-plugin": "^1.0.0-beta.0",
+    "@woocommerce/data": "^1.1.1",
     "@woocommerce/navigation": "^5.2.0",
+    "@wordpress/api-fetch": "^3.23.0",
+    "@wordpress/components": "^10.0.0",
+    "@wordpress/compose": "^3.13.1",
+    "@wordpress/data": "^4.27.1",
+    "@wordpress/element": "^2.13.1",
+    "@wordpress/i18n": "^3.11.0",
     "@wordpress/notices": "^2.12.7",
-    "@wordpress/scripts": "^12.5.0",
+    "classnames": "^2.2.6",
+    "lodash": "^4.17.15",
+    "prop-types": "^15.7.2"
+  },
+  "devDependencies": {
+    "@woocommerce/eslint-plugin": "^1.1.0",
+    "@wordpress/eslint-plugin": "^9.0.2",
+    "@wordpress/scripts": "^14.1.0",
     "browser-sync": "^2.26.3",
-    "eslint": "^5.15.1",
-    "eslint-config-wordpress": "^2.0.0",
     "gulp": ">=4.0.0",
     "gulp-add-src": "^1.0.0",
     "gulp-autoprefixer": ">=6.0.0",
@@ -44,12 +55,12 @@
     "stylelint-config-wordpress": "^15.0.0",
     "underscore": "^1.9.1"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "wp-scripts build && gulp build",
     "start": "wp-scripts start",
-    "lint:js": "wp-scripts lint-js assets/source/setup-guide"
+    "lint:js": "wp-scripts lint-js assets/source/setup-guide",
+    "lint:js:fix": "wp-scripts lint-js assets/source/setup-guide --fix"
   },
   "keywords": [
     "pinterest for wordpress",

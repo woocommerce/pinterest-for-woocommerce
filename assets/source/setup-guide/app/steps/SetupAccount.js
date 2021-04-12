@@ -1,5 +1,5 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
@@ -13,7 +13,7 @@ import {
 	Flex,
 	FlexItem,
 	FlexBlock,
-	__experimentalText as Text
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 import { Spinner } from '@woocommerce/components';
@@ -24,18 +24,26 @@ import { Spinner } from '@woocommerce/components';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 
-const SetupAccount = ({ pin4wc, updateOptions, createNotice, view, goToNextStep }) => {
+const SetupAccount = ( {
+	pin4wc,
+	updateOptions,
+	createNotice,
+	view,
+	goToNextStep,
+} ) => {
 	const [ options, setOptions ] = useState( undefined );
 
-	useEffect(() => {
+	useEffect( () => {
 		if ( options !== pin4wc ) {
 			setOptions( pin4wc );
 		}
-	}, [pin4wc])
+	}, [ pin4wc, options ] );
 
 	const isConnected = () => {
-		return undefined === options ? undefined : !! options?.token?.access_token
-	}
+		return undefined === options
+			? undefined
+			: !! options?.token?.access_token;
+	};
 
 	const handleDisconnectAccount = async () => {
 		const oldOptions = Object.assign( {}, options );
@@ -46,7 +54,7 @@ const SetupAccount = ({ pin4wc, updateOptions, createNotice, view, goToNextStep 
 		setOptions( newOptions );
 
 		const update = await updateOptions( {
-			[pin4wcSetupGuide.optionsName]: newOptions
+			[ pin4wcSetupGuide.optionsName ]: newOptions,
 		} );
 
 		if ( update.success ) {
@@ -67,87 +75,143 @@ const SetupAccount = ({ pin4wc, updateOptions, createNotice, view, goToNextStep 
 				)
 			);
 		}
-	}
+	};
 
 	return (
 		<div className="woocommerce-setup-guide__setup-account">
-			{ 'wizard' === view &&
+			{ view === 'wizard' && (
 				<StepHeader
-					title={ __( 'Set up your account', 'pinterest-for-woocommerce' ) }
+					title={ __(
+						'Set up your account',
+						'pinterest-for-woocommerce'
+					) }
 					subtitle={ __( 'Step One', 'pinterest-for-woocommerce' ) }
-					description={ __( 'Use description text to help users understand what accounts they need to connect, and why they need to connect it.', 'pinterest-for-woocommerce' ) }
+					description={ __(
+						'Use description text to help users understand what accounts they need to connect, and why they need to connect it.',
+						'pinterest-for-woocommerce'
+					) }
 				/>
-			}
+			) }
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={ __( 'Pinterest Account', 'pinterest-for-woocommerce' ) }
-						description={ __( 'Use description text to help users understand more', 'pinterest-for-woocommerce' ) }
+						title={ __(
+							'Pinterest Account',
+							'pinterest-for-woocommerce'
+						) }
+						description={ __(
+							'Use description text to help users understand more',
+							'pinterest-for-woocommerce'
+						) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{
-								true === isConnected()
-								? <Flex>
+							{ isConnected() === true ? (
+								<Flex>
 									<FlexBlock className="is-connected">
-										<Text variant="subtitle">{ __( 'Pinterest Account', 'pinterest-for-woocommerce' ) }</Text>
-										{ options?.account_data?.id &&
-											<Text variant="body">{ `${__( 'Account', 'pinterest-for-woocommerce' )} ${options.account_data.id}` }</Text>
-										}
-										<Button isLink isDestructive onClick={ handleDisconnectAccount } className="red-link">{ __( 'Disconnect Pinterest Account', 'pinterest-for-woocommerce' ) }</Button>
+										<Text variant="subtitle">
+											{ __(
+												'Pinterest Account',
+												'pinterest-for-woocommerce'
+											) }
+										</Text>
+										{ options?.account_data?.id && (
+											<Text variant="body">{ `${ __(
+												'Account',
+												'pinterest-for-woocommerce'
+											) } ${
+												options.account_data.id
+											}` }</Text>
+										) }
+										<Button
+											isLink
+											isDestructive
+											onClick={ handleDisconnectAccount }
+											className="red-link"
+										>
+											{ __(
+												'Disconnect Pinterest Account',
+												'pinterest-for-woocommerce'
+											) }
+										</Button>
 									</FlexBlock>
 								</Flex>
-								: false === isConnected()
-									? <Flex>
-										<FlexBlock>
-											<Text variant="subtitle">{ __( 'Connect your Pinterest Account', 'pinterest-for-woocommerce' ) }</Text>
-										</FlexBlock>
-										<FlexItem>
-											<Button isSecondary href={ pin4wcSetupGuide.serviceLoginUrl }>{ __( 'Connect', 'pinterest-for-woocommerce' ) }</Button>
-										</FlexItem>
-									</Flex>
-									: <Spinner />
-							}
+							) : isConnected() === false ? (
+								<Flex>
+									<FlexBlock>
+										<Text variant="subtitle">
+											{ __(
+												'Connect your Pinterest Account',
+												'pinterest-for-woocommerce'
+											) }
+										</Text>
+									</FlexBlock>
+									<FlexItem>
+										<Button
+											isSecondary
+											href={
+												pin4wcSetupGuide.serviceLoginUrl
+											}
+										>
+											{ __(
+												'Connect',
+												'pinterest-for-woocommerce'
+											) }
+										</Button>
+									</FlexItem>
+								</Flex>
+							) : (
+								<Spinner />
+							) }
 						</CardBody>
 
-						{ false === isConnected() &&
+						{ isConnected() === false && (
 							<CardFooter>
-								<Button isLink href={ pin4wcSetupGuide.pinterestLinks.newAccount } target="_blank">{ __( 'Or, create a new Pinterest account', 'pinterest-for-woocommerce' ) }</Button>
+								<Button
+									isLink
+									href={
+										pin4wcSetupGuide.pinterestLinks
+											.newAccount
+									}
+									target="_blank"
+								>
+									{ __(
+										'Or, create a new Pinterest account',
+										'pinterest-for-woocommerce'
+									) }
+								</Button>
 							</CardFooter>
-						}
+						) }
 					</Card>
 
-					{ 'wizard' === view && true === isConnected() &&
+					{ view === 'wizard' && isConnected() === true && (
 						<div className="woocommerce-setup-guide__footer-button">
-							<Button
-								isPrimary
-								onClick={ goToNextStep }
-							>
+							<Button isPrimary onClick={ goToNextStep }>
 								{ __(
 									'Continue',
 									'pinterest-for-woocommerce'
 								) }
 							</Button>
 						</div>
-					}
+					) }
 				</div>
 			</div>
 		</div>
 	);
-}
+};
 
 export default compose(
-	withSelect( select => {
+	withSelect( ( select ) => {
 		const { getOption } = select( OPTIONS_STORE_NAME );
 
 		return {
 			pin4wc: getOption( pin4wcSetupGuide.optionsName ),
-		}
-	}),
-	withDispatch( dispatch => {
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
 		const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
 		const { createNotice } = dispatch( 'core/notices' );
 
@@ -155,5 +219,5 @@ export default compose(
 			updateOptions,
 			createNotice,
 		};
-	})
-)(SetupAccount);
+	} )
+)( SetupAccount );

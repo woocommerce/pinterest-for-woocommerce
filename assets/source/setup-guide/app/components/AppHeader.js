@@ -2,14 +2,10 @@
  * External dependencies
  */
 import { filter } from 'lodash';
-
-/**
- * WordPress dependencies
- */
 import { Stepper } from '@woocommerce/components';
 import { updateQueryString } from '@woocommerce/navigation';
 
-const AppHeader = props => {
+const AppHeader = ( props ) => {
 	const renderStepper = () => {
 		const { currentStep, steps } = props;
 		const visibleSteps = filter( steps, ( step ) => !! step.label );
@@ -31,7 +27,7 @@ const AppHeader = props => {
 		} );
 
 		return <Stepper steps={ visibleSteps } currentStep={ currentStep } />;
-	}
+	};
 
 	const currentStep = props.steps.find(
 		( s ) => s.key === props.currentStep
@@ -46,6 +42,6 @@ const AppHeader = props => {
 			{ renderStepper() }
 		</div>
 	);
-}
+};
 
 export default AppHeader;
