@@ -13,7 +13,7 @@ import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 import SetupAccount from '../steps/SetupAccount';
 import VerifyDomain from '../steps/VerifyDomain';
 import ConfigureSettings from '../steps/ConfigureSettings';
-import TransientNotices from '../transient-notices';
+import TransientNotices from '../components/TransientNotices';
 
 const SettingsApp = ( { pin4wc, createNotice } ) => {
 	useEffect( () => {
