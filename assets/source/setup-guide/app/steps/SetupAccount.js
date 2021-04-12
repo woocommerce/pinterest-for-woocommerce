@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { compose } from '@wordpress/compose';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	Button,
 	Card,
@@ -12,6 +15,8 @@ import {
 	FlexBlock,
 	__experimentalText as Text
 } from '@wordpress/components';
+import { OPTIONS_STORE_NAME } from '@woocommerce/data';
+import { Spinner} from '@woocommerce/components';
 
 /**
  * Internal dependencies
@@ -19,7 +24,51 @@ import {
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 
-const SetupAccount = ({ view }) => {
+const SetupAccount = ({ pin4wc, updateOptions, createNotice, view, goToNextStep }) => {
+	const [ options, setOptions ] = useState( undefined );
+
+	useEffect(() => {
+		if ( options !== pin4wc ) {
+			setOptions( pin4wc );
+		}
+	}, [pin4wc])
+
+	const hasToken = () => {
+		return undefined === options ? undefined : !! options?.token?.access_token
+	}
+
+	const handleDisconnectAccount = async () => {
+		const oldOptions = Object.assign( {}, options );
+		const newOptions = Object.assign( {}, options );
+
+		delete newOptions.token;
+
+		setOptions( newOptions );
+
+		const update = await updateOptions( {
+			[pin4wcSetupGuide.optionsName]: newOptions
+		} );
+
+		if ( update.success ) {
+			createNotice(
+				'success',
+				__(
+					'Settings were saved successfully.',
+					'pinterest-for-woocommerce'
+				)
+			);
+		} else {
+			setOptions( oldOptions );
+			createNotice(
+				'error',
+				__(
+					'There was a problem saving your settings.',
+					'pinterest-for-woocommerce'
+				)
+			);
+		}
+	}
+
 	return (
 		<div className="woocommerce-setup-guide__setup-account">
 			{ 'wizard' === view &&
@@ -40,24 +89,71 @@ const SetupAccount = ({ view }) => {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							<Flex>
-								<FlexBlock>
-									<Text variant="subtitle">{ __( 'Connect your Pinterest Account', 'pinterest-for-woocommerce' ) }</Text>
-								</FlexBlock>
-								<FlexItem>
-									<Button isSecondary href={ pin4wcSetupGuide.serviceLoginUrl }>{ __( 'Connect', 'pinterest-for-woocommerce' ) }</Button>
-								</FlexItem>
-							</Flex>
+							{
+								true === hasToken()
+								? <Flex>
+									<FlexBlock className="is-connected">
+										<Text variant="subtitle">{ __( 'Pinterest Account', 'pinterest-for-woocommerce' ) }</Text>
+										{ options?.account_data?.id &&
+											<Text>{ `${__( 'Account', 'pinterest-for-woocommerce' )} ${options.account_data.id}` }</Text>
+										}
+										<Button isLink isDestructive onClick={ handleDisconnectAccount } className="red-link">{ __( 'Disconnect Pinterest Account', 'pinterest-for-woocommerce' ) }</Button>
+									</FlexBlock>
+								</Flex>
+								: false === hasToken()
+									? <Flex>
+										<FlexBlock>
+											<Text variant="subtitle">{ __( 'Connect your Pinterest Account', 'pinterest-for-woocommerce' ) }</Text>
+										</FlexBlock>
+										<FlexItem>
+											<Button isSecondary href={ pin4wcSetupGuide.serviceLoginUrl }>{ __( 'Connect', 'pinterest-for-woocommerce' ) }</Button>
+										</FlexItem>
+									</Flex>
+									: <Spinner />
+							}
 						</CardBody>
 
-						<CardFooter>
-							<Button isLink href={ pin4wcSetupGuide.pinterestLinks.newAccount } target="_blank">{ __( 'Or, create a new Pinterest account', 'pinterest-for-woocommerce' ) }</Button>
-						</CardFooter>
+						{ false === hasToken() &&
+							<CardFooter>
+								<Button isLink href={ pin4wcSetupGuide.pinterestLinks.newAccount } target="_blank">{ __( 'Or, create a new Pinterest account', 'pinterest-for-woocommerce' ) }</Button>
+							</CardFooter>
+						}
 					</Card>
+
+					{ true === hasToken() &&
+						<div className="woocommerce-setup-guide__footer-button">
+							<Button
+								isPrimary
+								onClick={ goToNextStep }
+							>
+								{ __(
+									'Continue',
+									'pinterest-for-woocommerce'
+								) }
+							</Button>
+						</div>
+					}
 				</div>
 			</div>
 		</div>
 	);
 }
 
-export default SetupAccount;
+export default compose(
+	withSelect( select => {
+		const { getOption } = select( OPTIONS_STORE_NAME );
+
+		return {
+			pin4wc: getOption( pin4wcSetupGuide.optionsName ),
+		}
+	}),
+	withDispatch( dispatch => {
+		const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
+		const { createNotice } = dispatch( 'core/notices' );
+
+		return {
+			updateOptions,
+			createNotice,
+		};
+	})
+)(SetupAccount);

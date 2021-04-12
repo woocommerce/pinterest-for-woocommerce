@@ -383,7 +383,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$control_key = uniqid();
 			$state       = http_build_query(
 				array(
-					'redirect' => get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT ) . '?control=' . $control_key,
+					'redirect' => get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT ) . '?control=' . $control_key . '&view=' . ( isset( $_GET['view'] ) && 'wizard' === $_GET['view'] ?: 'settings' ),
 				)
 			);
 
@@ -435,7 +435,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			if ( 'success' === $account_data['status'] ) {
 
 				$data = array_intersect_key(
-					$account_data['data'],
+					(array) $account_data['data'],
 					array(
 						'verified_domains' => '',
 						'domain_verified'  => '',

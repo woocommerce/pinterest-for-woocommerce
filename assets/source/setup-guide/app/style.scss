@@ -77,7 +77,7 @@ $root: ".woocommerce-setup-guide";
 				> div {
 
 					&:not(:first-child) {
-						margin-top: var(--large-gap);
+						margin-top: calc(var(--large-gap) + (var(--main-gap) / 2));
 					}
 				}
 
@@ -118,6 +118,7 @@ $root: ".woocommerce-setup-guide";
 
 				&-overview {
 					margin-top: var(--large-gap);
+					position: absolute;
 
 					> div {
 						margin: 8px 0;
@@ -190,6 +191,28 @@ $root: ".woocommerce-setup-guide";
 						display: grid;
 						grid-template-columns: 328px auto;
 					}
+				}
+
+				&-column {
+					position: relative;
+
+					.woocommerce-spinner {
+						display: block;
+					}
+				}
+			}
+
+			&__setup-account {
+
+				.is-connected {
+
+					> * {
+						margin: 8px 0;
+					}
+				}
+
+				.red-link {
+					color: var(--wc-red);
 				}
 			}
 

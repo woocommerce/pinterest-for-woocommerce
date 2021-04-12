@@ -110,8 +110,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Setup_Guide' ) ) :
 					'adminUrl'        => esc_url( admin_url() ),
 					'serviceLoginUrl' => esc_url( add_query_arg(
 						array(
-							'page' => PINTEREST_FOR_WOOCOMMERCE_PREFIX,
+							'page'                                                    => PINTEREST_FOR_WOOCOMMERCE_PREFIX,
 							PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
+							'view'                                                    => ( isset( $_GET['view'] ) && 'wizard' === $_GET['view'] ?: 'settings' ),
 						),
 						admin_url( 'admin.php' )
 					) ),
