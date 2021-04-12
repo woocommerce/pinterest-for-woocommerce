@@ -16,7 +16,7 @@ import {
 	__experimentalText as Text
 } from '@wordpress/components';
 import { OPTIONS_STORE_NAME } from '@woocommerce/data';
-import { Spinner} from '@woocommerce/components';
+import { Spinner } from '@woocommerce/components';
 
 /**
  * Internal dependencies
@@ -33,7 +33,7 @@ const SetupAccount = ({ pin4wc, updateOptions, createNotice, view, goToNextStep 
 		}
 	}, [pin4wc])
 
-	const hasToken = () => {
+	const isConnected = () => {
 		return undefined === options ? undefined : !! options?.token?.access_token
 	}
 
@@ -90,17 +90,17 @@ const SetupAccount = ({ pin4wc, updateOptions, createNotice, view, goToNextStep 
 					<Card>
 						<CardBody size="large">
 							{
-								true === hasToken()
+								true === isConnected()
 								? <Flex>
 									<FlexBlock className="is-connected">
 										<Text variant="subtitle">{ __( 'Pinterest Account', 'pinterest-for-woocommerce' ) }</Text>
 										{ options?.account_data?.id &&
-											<Text>{ `${__( 'Account', 'pinterest-for-woocommerce' )} ${options.account_data.id}` }</Text>
+											<Text variant="body">{ `${__( 'Account', 'pinterest-for-woocommerce' )} ${options.account_data.id}` }</Text>
 										}
 										<Button isLink isDestructive onClick={ handleDisconnectAccount } className="red-link">{ __( 'Disconnect Pinterest Account', 'pinterest-for-woocommerce' ) }</Button>
 									</FlexBlock>
 								</Flex>
-								: false === hasToken()
+								: false === isConnected()
 									? <Flex>
 										<FlexBlock>
 											<Text variant="subtitle">{ __( 'Connect your Pinterest Account', 'pinterest-for-woocommerce' ) }</Text>
@@ -113,14 +113,14 @@ const SetupAccount = ({ pin4wc, updateOptions, createNotice, view, goToNextStep 
 							}
 						</CardBody>
 
-						{ false === hasToken() &&
+						{ false === isConnected() &&
 							<CardFooter>
 								<Button isLink href={ pin4wcSetupGuide.pinterestLinks.newAccount } target="_blank">{ __( 'Or, create a new Pinterest account', 'pinterest-for-woocommerce' ) }</Button>
 							</CardFooter>
 						}
 					</Card>
 
-					{ true === hasToken() &&
+					{ 'wizard' === view && true === isConnected() &&
 						<div className="woocommerce-setup-guide__footer-button">
 							<Button
 								isPrimary

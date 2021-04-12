@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import {
 	Button,
@@ -12,6 +12,7 @@ import {
 	CardBody
  } from '@wordpress/components';
 import { OPTIONS_STORE_NAME } from '@woocommerce/data';
+import { Spinner } from '@woocommerce/components';
 
 /**
   * Internal dependencies
@@ -23,11 +24,15 @@ import StepStatus from '../components/StepStatus';
 const VerifyDomain = ({ goToNextStep, pin4wc, createNotice, view }) => {
 	const [ status, setStatus ] = useState( 'idle' );
 
-	useEffect(() => {
-		if ( pin4wc.verfication_code && 'success' !== status ) {
+	const isDomainVerified = () => {
+		const isDomainVerified = undefined === pin4wc ? undefined : pin4wcSetupGuide.domainToVerify in pin4wc?.account_data?.verified_domains;
+
+		if ( true === isDomainVerified && 'success' !== status ) {
 			setStatus( 'success' );
 		}
-	}, [pin4wc.verfication_code])
+
+		return isDomainVerified;
+	}
 
 	const buttonLabels = {
 		idle: __( 'Start Verification', 'pinterest-for-woocommerce' ),
@@ -76,25 +81,29 @@ const VerifyDomain = ({ goToNextStep, pin4wc, createNotice, view }) => {
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
-						<CardBody size="large">
-							<StepStatus
-								label={ pin4wcSetupGuide.domainToVerify }
-								status={ status }
-							/>
+						{ undefined !== isDomainVerified()
+							? <CardBody size="large">
+								<StepStatus
+									label={ pin4wcSetupGuide.domainToVerify }
+									status={ status }
+									options={ pin4wc }
+								/>
 
-						{ 'settings' === view &&
-							<Button
-								isPrimary
-								disabled={ 'pending' === status }
-								onClick={ 'success' === status ? goToNextStep : handleVerifyDomain }
-							>
-								{ buttonLabels[ status ] }
-							</Button>
+							{ 'settings' === view && ! isDomainVerified() &&
+								<Button
+									isPrimary
+									disabled={ 'pending' === status }
+									onClick={ 'success' === status ? goToNextStep : handleVerifyDomain }
+								>
+									{ buttonLabels[ status ] }
+								</Button>
+							}
+							</CardBody>
+							: <Spinner />
 						}
-						</CardBody>
 					</Card>
 
-					{ 'wizard' === view &&
+					{ 'wizard' === view && isDomainVerified() &&
 						<div className="woocommerce-setup-guide__footer-button">
 							<Button
 								isPrimary
@@ -116,7 +125,7 @@ export default compose(
 		const { getOption } = select( OPTIONS_STORE_NAME );
 
 		return {
-			pin4wc: getOption( pin4wcSetupGuide.optionsName ) || [],
+			pin4wc: getOption( pin4wcSetupGuide.optionsName ),
 		}
 	}),
 	withDispatch( dispatch => {

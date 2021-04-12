@@ -223,6 +223,17 @@ $root: ".woocommerce-setup-guide";
 					display: flex;
 					justify-content: space-between;
 				}
+
+				.is-verified {
+
+					> * {
+						margin: 8px 0;
+					}
+				}
+
+				.verified-note {
+					color: var(--wc-green);
+				}
 			}
 
 			&__checkbox {

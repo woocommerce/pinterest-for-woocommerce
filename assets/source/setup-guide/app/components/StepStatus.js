@@ -19,13 +19,14 @@ const StepStatus = ({ label, status }) => {
 		error: <Icon icon='no-alt' />,
 		success: <CheckIcon />
 	}
+
 	return (
 		<div className={ `woocommerce-setup-guide__step-status has-${status}` }>
 			<div className="woocommerce-setup-guide__step-status__icon">
 				{ icons[ status ] }
 			</div>
 			<div className="woocommerce-setup-guide__step-status__label">
-				<Text variant="body">{ label }</Text>
+				<Text variant={ 'success' === status ? 'subtitle' : 'body'}>{ label }</Text>
 			</div>
 		</div>
 	);
