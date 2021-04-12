@@ -244,4 +244,10 @@ class Base {
 		$response = self::make_request( $request_url, 'POST' );
 		return $response;
 	}
+
+
+	public static function get_account_info() {
+		$response = self::make_request( 'users/me', 'GET' );
+		return $response;
+	}
 }

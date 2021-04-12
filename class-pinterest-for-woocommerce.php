@@ -147,6 +147,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'activated_plugin', array( $this, 'maybe_redirect_setup_guide' ) );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'inject_verification_code' ) );
+
+			add_action( 'pinterest_for_woocommerce_account_updated', array( $this, 'update_account_data' ) );
 		}
 
 		/**
@@ -424,6 +426,45 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			if ( self::get_setting( 'verfication_code' ) ) {
 				printf( '<meta name="p:domain_verify" content="%s"/>', esc_attr( self::get_setting( 'verfication_code' ) ) );
 			}
+		}
+
+		public function update_account_data() {
+
+			$account_data = Pinterest\API\Base::get_account_info();
+
+			if ( 'success' === $account_data['status'] ) {
+
+				$data = array_intersect_key(
+					$account_data['data'],
+					array(
+						'verified_domains' => '',
+						'domain_verified'  => '',
+						'username'         => '',
+						'id'               => '',
+						'image_medium_url' => '',
+					)
+				);
+
+				Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
+			}
+
+		}
+
+
+		public static function is_connected() {
+
+			$token = self::get_setting( 'token' );
+
+			return (bool) ! empty( $token['access_token'] );
+
+		}
+
+		public static function is_domain_verified() {
+
+			$account_data = self::get_setting( 'account_data' );
+			$domain       = wp_parse_url( site_url(), PHP_URL_HOST );
+
+			return (bool) ! empty( $account_data ) && isset( $account_data['verified_domains'][ $domain ] );
 		}
 	}
 

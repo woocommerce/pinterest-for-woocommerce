@@ -75,6 +75,8 @@ class Auth extends VendorAPI {
 					'access_token' => $_GET['pinterestv3_access_token'], // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				)
 			);
+
+			do_action( 'pinterest_for_woocommerce_account_updated' );
 		}
 
 		$redirect_url      = admin_url( 'admin.php?page=' . \PINTEREST_FOR_WOOCOMMERCE_PREFIX );

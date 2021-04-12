@@ -55,6 +55,8 @@ class DomainVerification extends VendorAPI {
 
 				$result = Base::trigger_verification();
 
+				do_action( 'pinterest_for_woocommerce_account_updated' );
+
 				if ( 'success' === $result['status'] ) {
 					return $result['data'];
 				}
