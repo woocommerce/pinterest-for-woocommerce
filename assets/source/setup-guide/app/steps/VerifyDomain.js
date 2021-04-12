@@ -108,7 +108,9 @@ const VerifyDomain = ( { goToNextStep, pin4wc, createNotice, view } ) => {
 								) }
 							</CardBody>
 						) : (
-							<Spinner />
+							<CardBody size="large">
+								<Spinner />
+							</CardBody>
 						) }
 					</Card>
 
