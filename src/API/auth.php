@@ -94,10 +94,6 @@ class Auth extends VendorAPI {
 				admin_url( 'admin.php' )
 			);
 		}
-
-		// Set setup as completed
-		if ( empty( $error ) ) {
-			Pinterest_For_Woocommerce()::save_setting( 'is_setup_complete', 'yes' );
 		}
 
 		wp_safe_redirect( $redirect_url . $error_args );
