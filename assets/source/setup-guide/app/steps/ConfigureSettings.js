@@ -14,6 +14,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { OPTIONS_STORE_NAME } from '@woocommerce/data';
+import { getHistory, getNewPath } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
@@ -73,7 +74,11 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	};
 
 	const handleCompleteSetup = async () => {
+		pin4wcSetupGuide.isSetupComplete = true;
 		handleOptionChange( 'is_setup_complete', true );
+
+		// Redirect back to the root WooCommerce Admin page.
+		getHistory().push( getNewPath( {}, '/', {} ) );
 	};
 
 	return (
