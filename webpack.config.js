@@ -2,7 +2,7 @@
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 
 // Use the defaultConfig but replace the entry and output properties
-module.exports = {
+const SetupGuide = {    
     ...defaultConfig,
     entry: {
         index: './assets/source/setup-guide/index.js',
@@ -12,3 +12,19 @@ module.exports = {
         path: __dirname + '/assets/setup-guide',
     },
 };
+
+const AddSetupTask = {
+    ...defaultConfig,
+    entry: {
+        index: './assets/source/setup-task/index.js',
+    },
+    output: {
+        filename: '[name].js',
+        path: __dirname + '/assets/setup-task',
+    },
+};
+
+module.exports = [
+    SetupGuide,
+    AddSetupTask
+];

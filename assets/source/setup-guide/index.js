@@ -8,7 +8,7 @@ import { render } from '@wordpress/element';
  */
 import Router from './app/Router';
 
-const appRoot = document.getElementById( 'pin4wc-setup-guide-app' );
+const appRoot = document.getElementById( 'pin4wc-setup-guide' );
 
 if ( appRoot ) {
 	render( <Router />, appRoot );
