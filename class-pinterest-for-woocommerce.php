@@ -144,7 +144,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		private function init_hooks() {
 			add_action( 'init', array( $this, 'init' ), 0 );
-			add_action( 'activated_plugin', array( $this, 'maybe_redirect_setup_guide' ) );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'inject_verification_code' ) );
 
@@ -393,34 +392,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 
-		/**
-		 * If Setup Guide is not complete, redirects to Settings page
-		 *
-		 * @since 1.0.0
-		 */
-		public function maybe_redirect_setup_guide( $plugin ) {
-
-			return;
-
-			if ( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME !== $plugin ) {
-				return;
-			}
-
-			$settings = self::get_settings( true );
-
-			if ( 'no' === $settings['is_setup_complete'] ) {
-				$setup_guide_url = add_query_arg(
-					array(
-						'page' => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
-					),
-					get_admin_url( null, 'admin.php' )
-				);
-				wp_safe_redirect( $setup_guide_url );
-				exit;
-			}
-		}
-
-
 		public function inject_verification_code() {
 
 			if ( self::get_setting( 'verfication_code' ) ) {
@@ -450,22 +421,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		}
 
-
-		public static function is_connected() {
-
-			$token = self::get_setting( 'token' );
-
-			return (bool) ! empty( $token['access_token'] );
-
-		}
-
-		public static function is_domain_verified() {
-
-			$account_data = self::get_setting( 'account_data' );
-			$domain       = wp_parse_url( site_url(), PHP_URL_HOST );
-
-			return (bool) ! empty( $account_data ) && isset( $account_data['verified_domains'][ $domain ] );
-		}
 	}
 
 endif;
