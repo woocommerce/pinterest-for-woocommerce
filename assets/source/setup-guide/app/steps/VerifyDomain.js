@@ -114,7 +114,7 @@ const VerifyDomain = ( { goToNextStep, pin4wc, createNotice, view } ) => {
 						) }
 					</Card>
 
-					{ view === 'wizard' && isDomainVerified() && (
+					{ view === 'wizard' && (
 						<div className="woocommerce-setup-guide__footer-button">
 							<Button
 								isPrimary
