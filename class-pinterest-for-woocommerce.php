@@ -377,12 +377,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @return string
 		 */
-		public static function get_service_login_url() {
+		public static function get_service_login_url( $view = null ) {
 
 			$control_key = uniqid();
+			$view        = is_null( $view ) ? 'settings' : $view;
 			$state       = http_build_query(
 				array(
-					'redirect' => get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT ) . '?control=' . $control_key . '&view=' . ( isset( $_GET['view'] ) && 'wizard' === $_GET['view'] ?: 'settings' ),
+					'redirect' => get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT ) . '?control=' . $control_key . '&view=' . $view,
 				)
 			);
 

@@ -33,13 +33,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		public function load_common_scripts() {
 
 			if ( $this->is_setup_guide_page() ) {
-				$handle = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE;
+				$handle       = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE;
+				$default_view = 'settings';
 			} elseif ( 
 				class_exists( 'Automattic\WooCommerce\Admin\Loader' ) &&
 				\Automattic\WooCommerce\Admin\Loader::is_admin_page() &&
 				Onboarding::should_show_tasks()
 				) {
-				$handle = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE . '-setup-task';	
+				$handle       = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE . '-setup-task';
+				$default_view = 'wizard';
 			} else {
 				return;
 			}
@@ -53,7 +55,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 						array(
 							'page'                                                    => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
 							PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
-							'view'                                                    => ( isset( $_GET['view'] ) && 'wizard' === $_GET['view'] ?: 'settings' ),
+							'view'                                                    => ( isset( $_GET['view'] ) ? sanitize_key( $_GET['view']) : $default_view ),
 						),
 						admin_url( 'admin.php' )
 					) ),
@@ -264,7 +266,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				return false;
 			}
 
-			wp_redirect( Pinterest_For_Woocommerce()::get_service_login_url() );
+			$view = ! empty( $_REQUEST['view'] ) ? sanitize_key( $_REQUEST['view'] ) : null;
+
+			wp_redirect( Pinterest_For_Woocommerce()::get_service_login_url( $view ) );
 			exit;
 
 		}

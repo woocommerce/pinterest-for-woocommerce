@@ -81,7 +81,7 @@ class Auth extends VendorAPI {
 			do_action( 'pinterest_for_woocommerce_account_updated' );
 		}
 
-		$redirect_url      = admin_url( 'admin.php?page=' . \PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		$redirect_url      = admin_url( 'admin.php?page=' . \PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE );
 		$is_setup_complete = Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete', true );
 
 		if ( empty( $is_setup_complete ) || 'no' === $is_setup_complete ) {
@@ -93,7 +93,15 @@ class Auth extends VendorAPI {
 				),
 				admin_url( 'admin.php' )
 			);
-		}
+
+			if ( ! empty( $_GET['view'] ) ) {
+				$redirect_url = add_query_arg(
+					array(
+						'view' => sanitize_key( $_GET['view'] ),
+					),
+					$redirect_url
+				);
+			}
 		}
 
 		wp_safe_redirect( $redirect_url . $error_args );
