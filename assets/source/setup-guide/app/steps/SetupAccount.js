@@ -122,9 +122,13 @@ const SetupAccount = ( {
 											<Text variant="body">{ `${ __(
 												'Account',
 												'pinterest-for-woocommerce'
-											) } ${
+											) }: ${
+												options.account_data.username
+											}
+											- ${
 												options.account_data.id
-											}` }</Text>
+											}
+											` }</Text>
 										) }
 										<Button
 											isLink
