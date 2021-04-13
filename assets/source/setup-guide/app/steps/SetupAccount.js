@@ -134,7 +134,6 @@ const SetupAccount = ( {
 											isLink
 											isDestructive
 											onClick={ handleDisconnectAccount }
-											className="red-link"
 										>
 											{ __(
 												'Disconnect Pinterest Account',

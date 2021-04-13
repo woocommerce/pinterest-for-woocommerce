@@ -14,7 +14,6 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { OPTIONS_STORE_NAME } from '@woocommerce/data';
-import { getHistory, getNewPath } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
@@ -38,12 +37,12 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 		}
 	}, [ pin4wc, options ] );
 
-	const handleOptionChange = async ( name ) => {
+	const handleOptionChange = async ( name, value ) => {
 		if ( ALLOWED_OPTIONS.includes( name ) ) {
 			const oldOptions = Object.assign( {}, options );
 			const newOptions = {
 				...options,
-				[ name ]: ! options[ name ],
+				[ name ]: value ?? ! options[ name ],
 			};
 
 			setOptions( newOptions );
@@ -74,11 +73,7 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	};
 
 	const handleCompleteSetup = async () => {
-		pin4wcSetupGuide.isSetupComplete = true;
 		handleOptionChange( 'is_setup_complete', true );
-
-		// Redirect back to the root WooCommerce Admin page.
-		getHistory().push( getNewPath( {}, '/', {} ) );
 	};
 
 	return (

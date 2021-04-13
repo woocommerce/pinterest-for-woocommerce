@@ -210,10 +210,6 @@ $root: ".woocommerce-setup-guide";
 						margin: 8px 0;
 					}
 				}
-
-				.red-link {
-					color: var(--wc-red);
-				}
 			}
 
 			&__verify-domain {
@@ -229,10 +225,6 @@ $root: ".woocommerce-setup-guide";
 					> * {
 						margin: 8px 0;
 					}
-				}
-
-				.verified-note {
-					color: var(--wc-green);
 				}
 			}
 
@@ -291,7 +283,7 @@ $root: ".woocommerce-setup-guide";
 			.woocommerce-layout__primary {
 				margin: 0;
 			}
-	
+
 			.woocommerce-homescreen {
 				max-width: 100%;
 			}

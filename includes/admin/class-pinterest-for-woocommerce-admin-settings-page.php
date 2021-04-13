@@ -35,7 +35,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			if ( $this->is_setup_guide_page() ) {
 				$handle       = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE;
 				$default_view = 'settings';
-			} elseif ( 
+			} elseif (
 				class_exists( 'Automattic\WooCommerce\Admin\Loader' ) &&
 				\Automattic\WooCommerce\Admin\Loader::is_admin_page() &&
 				Onboarding::should_show_tasks()
@@ -50,14 +50,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				$handle,
 				'pin4wcSetupGuide',
 				array(
-					'adminUrl'        => esc_url( admin_url() ),
+					'adminUrl'        => esc_url( add_query_arg(
+						array(
+							'page' => 'wc-admin',
+						),
+						get_admin_url( null, 'admin.php' )
+					) ),
 					'serviceLoginUrl' => esc_url( add_query_arg(
 						array(
 							'page'                                                    => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
 							PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
 							'view'                                                    => ( isset( $_GET['view'] ) ? sanitize_key( $_GET['view']) : $default_view ),
 						),
-						admin_url( 'admin.php' )
+						get_admin_url( null, 'admin.php' )
 					) ),
 					'domainToVerify'  => wp_parse_url( site_url(), PHP_URL_HOST ),
 					'apiRoute'        => PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION,
@@ -229,7 +234,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				true
 			);
 
-	
+
 
 			wp_enqueue_script( $handle );
 
