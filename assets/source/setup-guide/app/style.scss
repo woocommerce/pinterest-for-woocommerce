@@ -1,18 +1,18 @@
 $root: ".woocommerce-setup-guide";
 
-.woocommerce-admin-full-screen {
-	margin-top: 0;
-}
-
-@media screen and (max-width: 600px) {
-	#wpbody {
-		padding-top: 0;
-	}
-}
-
 #{$root} {
 
 	&__body {
+
+		&.woocommerce-admin-full-screen {
+			margin-top: 0;
+		}
+
+		@media screen and (max-width: 600px) {
+			#wpbody {
+				padding-top: 0;
+			}
+		}
 
 		.wrap {
 			margin: 0;
@@ -284,19 +284,18 @@ $root: ".woocommerce-setup-guide";
 				text-align: right;
 			}
 		}
-	}
 
-	&--wizard {
 
-		.woocommerce-layout__primary {
-			display: none;
+
+		&.woocommerce-task-dashboard__body {
+			.woocommerce-layout__primary {
+				margin: 0;
+			}
+	
+			.woocommerce-homescreen {
+				max-width: 100%;
+			}
 		}
 	}
 }
 
-.woocommerce-layout {
-
-	&__main {
-		display: none;
-	}
-}
