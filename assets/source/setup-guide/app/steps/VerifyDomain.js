@@ -17,7 +17,7 @@ import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import StepStatus from '../components/StepStatus';
 
-const VerifyDomain = ( { goToNextStep, pin4wc, createNotice, view } ) => {
+const VerifyDomain = ( { goToNextStep, pin4wc, updateOptions, createNotice, view } ) => {
 	const [ status, setStatus ] = useState( 'idle' );
 
 	const isDomainVerified = () => {
@@ -62,6 +62,18 @@ const VerifyDomain = ( { goToNextStep, pin4wc, createNotice, view } ) => {
 					)
 				);
 			} );
+
+        const oldOptions = Object.assign( {}, pin4wc );
+		const newOptions = {
+			...pin4wc,
+			is_domain_verified: 'success' === status,
+		};
+
+		setOptions( newOptions );
+
+		const update = updateOptions( {
+			[ pin4wcSetupGuide.optionsName ]: newOptions,
+		} );
 	};
 
 	return (
@@ -144,6 +156,7 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
+        const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
 		const { createNotice } = dispatch( 'core/notices' );
 
 		return {
