@@ -51,12 +51,13 @@ const VerifyDomain = ( { goToNextStep, pin4wc, updateOptions, createNotice, view
 			.then( () => {
 				setStatus( 'success' );
 			} )
-			.catch( () => {
+			.catch( ( error ) => {
 				setStatus( 'error' );
 
 				createNotice(
 					'error',
-					__(
+					error.message ||
+						__(
 						'Couldn’t verify your domain.',
 						'pinterest-for-woocommerce'
 					)

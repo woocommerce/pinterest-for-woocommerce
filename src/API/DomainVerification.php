@@ -66,7 +66,9 @@ class DomainVerification extends VendorAPI {
 
 		} catch ( \Throwable $th ) {
 
-			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_verification_error', esc_html__( 'Your domain could not be automatically verified. Please checks the logs for additional information.', 'pinterest-for-woocommerce' ) );
+			$error_message = sprintf( esc_html__( 'Your domain could not be automatically verified. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
+
+			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_verification_error', $error_message );
 
 		}
 	}
