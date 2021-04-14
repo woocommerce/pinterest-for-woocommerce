@@ -88,10 +88,11 @@ class Auth extends VendorAPI {
 			$step         = empty( $error ) ? 'verify-domain' : 'setup-account';
 			$redirect_url = add_query_arg(
 				array(
-					'page' => \PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
+					'page' => 'wc-admin',
+					'task' => 'setup-pinterest',
 					'step' => $step,
 				),
-				admin_url( 'admin.php' )
+				get_admin_url( null, 'admin.php' )
 			);
 
 			if ( ! empty( $_GET['view'] ) ) {

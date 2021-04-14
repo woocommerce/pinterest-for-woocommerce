@@ -24,7 +24,6 @@ addFilter(
 				additionalInfo: __( 'Configure the connection to Pinterest and any additional settings like tracking, product sync, etc.', 'pinterest-for-woocommerce' ),
 				time: __( '5 minutes', 'woocommerce-admin' ),
 				isDismissable: true,
-				onDismiss: () => console.log( 'The task was dismissed' ),
 			},
 		];
 	}
