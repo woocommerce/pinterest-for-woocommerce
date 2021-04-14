@@ -277,11 +277,23 @@ $root: ".woocommerce-setup-guide";
 			}
 		}
 
-
+		.woocommerce-layout__primary {
+			display: none;
+		}
 
 		&.woocommerce-task-dashboard__body {
 			.woocommerce-layout__primary {
-				margin: 0;
+				display: block;
+				margin: 60px 0 0 0;
+			}
+
+			.woocommerce-layout__header {
+				display: block;
+				border-bottom: 1px solid #dcdcde;
+			}
+
+			.woocommerce-navigation {
+				display: none;
 			}
 
 			.woocommerce-homescreen {
