@@ -17,15 +17,22 @@ import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import StepStatus from '../components/StepStatus';
 
-const VerifyDomain = ( { goToNextStep, pin4wc, updateOptions, createNotice, view } ) => {
+const VerifyDomain = ( {
+    goToNextStep,
+    pin4wc,
+    updateOptions,
+    createNotice,
+    view
+} ) => {
 	const [ status, setStatus ] = useState( 'idle' );
 
 	const isDomainVerified = () => {
 		const result =
 			undefined === pin4wc
 				? undefined
-				: pin4wcSetupGuide.domainToVerify in
-				  pin4wc?.account_data?.verified_domains;
+				: undefined === pin4wc?.account_data?.verified_domains
+                    ? false
+                    : pin4wcSetupGuide.domainToVerify in pin4wc?.account_data?.verified_domains;
 
 		if ( result === true && status !== 'success' ) {
 			setStatus( 'success' );
@@ -48,10 +55,19 @@ const VerifyDomain = ( { goToNextStep, pin4wc, updateOptions, createNotice, view
 			path: pin4wcSetupGuide.apiRoute + '/domain_verification',
 			method: 'POST',
 		} )
-			.then( () => {
+			.then( account_data => {
 				setStatus( 'success' );
+
+        		const newOptions = {
+        			...pin4wc,
+        			account_data
+        		};
+
+        		updateOptions( {
+        			[ pin4wcSetupGuide.optionsName ]: newOptions,
+        		} );
 			} )
-			.catch( ( error ) => {
+			.catch( error => {
 				setStatus( 'error' );
 
 				createNotice(
@@ -63,18 +79,6 @@ const VerifyDomain = ( { goToNextStep, pin4wc, updateOptions, createNotice, view
 					)
 				);
 			} );
-
-        const oldOptions = Object.assign( {}, pin4wc );
-		const newOptions = {
-			...pin4wc,
-			is_domain_verified: 'success' === status,
-		};
-
-		setOptions( newOptions );
-
-		const update = updateOptions( {
-			[ pin4wcSetupGuide.optionsName ]: newOptions,
-		} );
 	};
 
 	return (
@@ -157,11 +161,12 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-        const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
 		const { createNotice } = dispatch( 'core/notices' );
+		const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
 
 		return {
 			createNotice,
+			updateOptions,
 		};
 	} )
 )( VerifyDomain );
