@@ -39,8 +39,9 @@ const SettingsApp = ( { pin4wc, createNotice } ) => {
 	const isDomainVerified = () => {
 		return undefined === pin4wc
 			? undefined
-			: pin4wcSetupGuide.domainToVerify in
-					pin4wc?.account_data?.verified_domains;
+			: undefined === pin4wc?.account_data?.verified_domains
+                ? false
+				: pin4wc?.account_data?.verified_domains.includes( pin4wcSetupGuide.domainToVerify );
 	};
 
 	return (

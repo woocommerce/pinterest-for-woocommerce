@@ -32,7 +32,7 @@ const VerifyDomain = ( {
 				? undefined
 				: undefined === pin4wc?.account_data?.verified_domains
                     ? false
-                    : pin4wcSetupGuide.domainToVerify in pin4wc?.account_data?.verified_domains;
+                    : pin4wc?.account_data?.verified_domains.includes( pin4wcSetupGuide.domainToVerify );
 
 		if ( result === true && status !== 'success' ) {
 			setStatus( 'success' );
