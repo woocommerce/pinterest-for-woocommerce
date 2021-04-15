@@ -226,6 +226,15 @@ $root: ".woocommerce-setup-guide";
 						margin: 8px 0;
 					}
 				}
+
+				.has-idle {
+
+					#{$root} {
+						&__step-status__icon {
+							display: none;
+						}
+					}
+				}
 			}
 
 			&__checkbox {
