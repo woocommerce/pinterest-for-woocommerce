@@ -6,6 +6,12 @@ $root: ".woocommerce-setup-guide";
 
 		&.woocommerce-admin-full-screen {
 			margin-top: 0;
+
+			.woocommerce-layout__header {
+				top: 0;
+				left: 0;
+				width: 100%;
+			}
 		}
 
 		@media screen and (max-width: 600px) {
