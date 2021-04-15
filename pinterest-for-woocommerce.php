@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The plugin bootstrap file
  *
@@ -91,9 +90,7 @@ require_once 'class-pinterest-for-woocommerce.php';
  * @since  1.0.0
  * @return Pinterest_For_Woocommerce
  */
-
-// phpcs:ignore WordPress.NamingConventions.ValidFunctionName
-function Pinterest_For_Woocommerce() {
+function Pinterest_For_Woocommerce() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
 	return Pinterest_For_Woocommerce::instance();
 }
 

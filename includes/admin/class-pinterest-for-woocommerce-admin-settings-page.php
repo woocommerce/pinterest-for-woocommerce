@@ -2,8 +2,6 @@
 /**
  * Settings Page
  *
- * @author      WooCommerce
- * @category    Admin
  * @package     Pinterest/Admin
  * @version     1.0.0
  */
@@ -19,8 +17,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
+	/**
+	 * Class handling the settings page and onboarding Wizard registration and rendering.
+	 */
 	class Pinterest_For_Woocommerce_Admin_Settings_Page {
 
+		/**
+		 * Initialize class
+		 */
 		public function __construct() {
 			add_action( 'admin_menu', array( $this, 'register_guide_page' ), 20 );
 			add_action( 'admin_enqueue_scripts', array( $this, 'load_setup_guide_scripts' ), 20 );
@@ -30,7 +34,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			add_filter( 'woocommerce_get_registered_extended_tasks', array( $this, 'register_task_list_item' ), 10, 1 );
 		}
 
-
+		/**
+		 * Load scripts needed for both the Wizard and the settings view.
+		 */
 		public function load_common_scripts() {
 
 			if ( $this->is_setup_guide_page() ) {
@@ -51,31 +57,35 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				$handle,
 				'pin4wcSetupGuide',
 				array(
-					'adminUrl'        => esc_url( add_query_arg(
-						array(
-							'page' => 'wc-admin',
-						),
-						get_admin_url( null, 'admin.php' )
-					) ),
-					'serviceLoginUrl' => esc_url( add_query_arg(
-						array(
-							'page'                                                    => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
-							PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
-							'view'                                                    => ( isset( $_GET['view'] ) ? sanitize_key( $_GET['view']) : $default_view ),
-						),
-						get_admin_url( null, 'admin.php' )
-					) ),
+					'adminUrl'        => esc_url(
+						add_query_arg(
+							array(
+								'page' => 'wc-admin',
+							),
+							get_admin_url( null, 'admin.php' )
+						)
+					),
+					'serviceLoginUrl' => esc_url(
+						add_query_arg(
+							array(
+								'page' => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
+								PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
+								'view' => ( isset( $_GET['view'] ) ? sanitize_key( $_GET['view'] ) : $default_view ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
+							),
+							get_admin_url( null, 'admin.php' )
+						)
+					),
 					'domainToVerify'  => wp_parse_url( site_url(), PHP_URL_HOST ),
 					'apiRoute'        => PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION,
 					'pageSlug'        => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
 					'optionsName'     => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,
-					'error'           => isset( $_GET['error'] ) ? esc_html( $_GET['error'] ) : '', //phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification,
+					'error'           => isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 					'pinterestLinks'  => array(
 						'newAccount'    => 'https://business.pinterest.com/',
 						'verifyDomain'  => 'https://help.pinterest.com/en/business/article/claim-your-website',
 						'richPins'      => 'https://help.pinterest.com/en/business/article/rich-pins',
 						'enhancedMatch' => 'https://help.pinterest.com/en/business/article/enhanced-match',
-						),
+					),
 					'isSetupComplete' => Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete' ),
 				)
 			);
@@ -91,12 +101,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 			wp_enqueue_style( $handle );
 
-
 		}
 
+
+		/**
+		 * Register the Onboarding Guide + Settings page
+		 */
 		public function register_guide_page() {
 
-			$page_title = ( isset( $_GET['view'] ) && 'wizard' === $_GET['view'] ? __( 'Pinterest Setup Guide', 'pinterest-for-woocommerce' ) : __( 'Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
+			$page_title = ( isset( $_GET['view'] ) && 'wizard' === $_GET['view'] ? __( 'Pinterest Setup Guide', 'pinterest-for-woocommerce' ) : __( 'Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 
 			add_submenu_page(
 				'woocommerce-marketing',
@@ -128,7 +141,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			Menu::add_plugin_item(
 				array(
 					'id'         => 'pin4wcSettings',
-					'title'      => esc_html__( 'Settings', 'pin4wc' ),
+					'title'      => esc_html__( 'Settings', 'pinterest-for-woocommerce' ),
 					'capability' => 'manage_woocommerce',
 					'url'        => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
 					'parent'     => 'pinterest-for-woocommerce',
@@ -140,12 +153,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		/**
 		 * Render the placeholder HTML for the React components
 		 */
-		public function render_settings_page(){
+		public function render_settings_page() {
 			echo '<div class="wrap">
 				<div id="pin4wc-setup-guide"></div>
 			</div>';
 		}
 
+
+		/**
+		 * Load the scripts needed for the setup guide / settings page.
+		 */
 		public function load_setup_guide_scripts() {
 			if ( ! $this->is_setup_guide_page() ) {
 				return;
@@ -181,7 +198,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 */
 		protected function is_setup_guide_page() {
 
-			return ( is_admin() && PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE === $this->get_request( 'page', true ) );
+			return ( is_admin() && PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE === $this->get_request( 'page' ) );
 		}
 
 		/**
@@ -189,16 +206,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param string $key
-		 * @param bollean $sanitize If must sanitize the value as a key
+		 * @param string $key the key of the request parameter we need.
 		 *
 		 * @return string
 		 */
-		protected function get_request( $key, $sanitize = false ) {
+		protected function get_request( $key ) {
 
-			$request = ! empty( $_REQUEST[ $key ] ) ? trim( $_REQUEST[ $key ] ) : ''; // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			return ! empty( $_REQUEST[ $key ] ) ? trim( sanitize_key( wp_unslash( $_REQUEST[ $key ] ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-			return $sanitize ? sanitize_key( $request ) : $request;
 		}
 
 
@@ -235,11 +250,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				true
 			);
 
-
 			wp_enqueue_script( $handle );
 		}
 
 
+		/**
+		 * Register the Task List item for WC-Admin.
+		 *
+		 * @param array $registered_tasks_list_items the list of tasks to be filtered.
+		 */
 		public function register_task_list_item( $registered_tasks_list_items ) {
 
 			if (
@@ -260,18 +279,21 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		}
 
 
+		/**
+		 * Handles redirection to the service login URL.
+		 */
 		public function maybe_go_to_service_login_url() {
 
-			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) || empty( $_REQUEST['page'] ) || PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE !== $_REQUEST['page'] ) {
+			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) || empty( $_REQUEST['page'] ) || PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE !== $_REQUEST['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				return;
 			}
 
 			if ( ! current_user_can( 'manage_options' ) ) {
-				self::add_error( esc_html__( 'Cheatin&#8217; huh?', 'pinterest-for-woocommerce' ) );
+				wp_die( esc_html__( 'Cheatin&#8217; huh?', 'pinterest-for-woocommerce' ) );
 				return false;
 			}
 
-			$view = ! empty( $_REQUEST['view'] ) ? sanitize_key( $_REQUEST['view'] ) : null;
+			$view = ! empty( $_REQUEST['view'] ) ? sanitize_key( $_REQUEST['view'] ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 
 			wp_redirect( Pinterest_For_Woocommerce()::get_service_login_url( $view ) );
 			exit;

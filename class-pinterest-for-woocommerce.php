@@ -2,8 +2,6 @@
 /**
  * Installation related functions and actions.
  *
- * @author   WooCommece
- * @category Core
  * @package  Pinterest_For_Woocommerce
  * @version  1.0.0
  */
@@ -12,6 +10,9 @@ use Automattic\WooCommerce\Pinterest as Pinterest;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
+	/**
+	 * Base Plugin class holding generic functionality
+	 */
 	final class Pinterest_For_Woocommerce {
 
 		/**
@@ -29,6 +30,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		protected static $instance = null;
 
+		/**
+		 * The initialized state of the class.
+		 *
+		 * @var Pinterest_For_Woocommerce
+		 * @since 1.0.0
+		 */
 		protected static $initialized = false;
 
 		/**
@@ -51,6 +58,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Cloning is forbidden.
+		 *
 		 * @since 1.0.0
 		 */
 		public function __clone() {
@@ -59,6 +67,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Unserializing instances of this class is forbidden.
+		 *
 		 * @since 1.0.0
 		 */
 		public function __wakeup() {
@@ -140,6 +149,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Hook into actions and filters.
+		 *
 		 * @since  1.0.0
 		 */
 		private function init_hooks() {
@@ -183,6 +193,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Get the plugin url.
+		 *
 		 * @return string
 		 */
 		public function plugin_url() {
@@ -191,6 +202,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Get the plugin path.
+		 *
 		 * @return string
 		 */
 		public function plugin_path() {
@@ -199,6 +211,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Get the template path.
+		 *
 		 * @return string
 		 */
 		public function template_path() {
@@ -207,6 +220,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Get Ajax URL.
+		 *
 		 * @return string
 		 */
 		public function ajax_url() {
@@ -220,7 +234,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param boolean $force
+		 * @param boolean $force Controls whether to force getting a fresh value instead of one from the runtime cache.
 		 * @return array
 		 */
 		public static function get_settings( $force = false ) {
@@ -240,8 +254,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param string $key
-		 * @param boolean $force
+		 * @param string  $key The key of specific option to retrieve.
+		 * @param boolean $force Controls whether to force getting a fresh value instead of one from the runtime cache.
 		 *
 		 * @return mixed
 		 */
@@ -258,8 +272,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param string $key
-		 * @param mixed $data
+		 * @param string $key The key of specific option to retrieve.
+		 * @param mixed  $data The data to save for this option key.
 		 *
 		 * @return boolean
 		 */
@@ -278,7 +292,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array $settings
+		 * @param array $settings The array of settings to save.
 		 *
 		 * @return boolean
 		 */
@@ -322,7 +336,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array $token
+		 * @param array $token The array containing the token values to save.
 		 *
 		 * @return boolean
 		 */
@@ -375,6 +389,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
+		 * @param string $view The context view parameter.
+		 *
 		 * @return string
 		 */
 		public static function get_service_login_url( $view = null ) {
@@ -393,6 +409,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 
+		/**
+		 * Injects needed meta tags to the site's header
+		 *
+		 * @since 1.0.0
+		 */
 		public function inject_verification_code() {
 
 			if ( self::get_setting( 'verfication_code' ) ) {
@@ -400,6 +421,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 		}
 
+
+		/**
+		 * Fetches the account_data parameters from Pinterest's API
+		 * Saves it to the plugin options and returns it.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @return array() account_data from Pinterest
+		 */
 		public static function update_account_data() {
 
 			$account_data = Pinterest\API\Base::get_account_info();

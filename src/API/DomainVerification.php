@@ -2,8 +2,6 @@
 /**
  * API Options
  *
- * @author      WooCommerce
- * @category    API
  * @package     Pinterest_For_Woocommerce/API
  * @version     1.0.0
  */
@@ -17,8 +15,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Endpoint handing Domain verification.
+ */
 class DomainVerification extends VendorAPI {
 
+	/**
+	 * Initialize class
+	 */
 	public function __construct() {
 
 		$this->base              = 'domain_verification';
@@ -34,7 +38,7 @@ class DomainVerification extends VendorAPI {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param WP_REST_Request $request
+	 * @param WP_REST_Request $request The request.
 	 *
 	 * @return boolean
 	 */
@@ -43,6 +47,14 @@ class DomainVerification extends VendorAPI {
 	}
 
 
+	/**
+	 * Handle domain verification by triggering the realtime verification process
+	 * using the Pinterst API.
+	 *
+	 * @return mixed
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
 	public function handle_verification() {
 
 		try {

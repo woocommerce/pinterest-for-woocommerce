@@ -5,8 +5,6 @@
  * @class       Pinterest_For_Woocommerce_Frontend_Scripts
  * @version     1.0.0
  * @package     Pinterest_For_Woocommerce/Classes/
- * @category    Class
- * @author      WooCommece
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,7 +29,7 @@ class Pinterest_For_Woocommerce_Frontend_Assets extends Pinterest_For_Woocommerc
 
 	/**
 	 * Get styles for the frontend.
-	 * @access private
+	 *
 	 * @return array
 	 */
 	public function get_styles() {
@@ -43,7 +41,7 @@ class Pinterest_For_Woocommerce_Frontend_Assets extends Pinterest_For_Woocommerc
 
 	/**
 	 * Get styles for the frontend.
-	 * @access private
+	 *
 	 * @return array
 	 */
 	public function get_scripts() {

@@ -2,8 +2,6 @@
 /**
  * API Auth
  *
- * @author      WooCommerce
- * @category    API
  * @package     Pinterest_For_Woocommerce/API
  * @version     1.0.0
  */
@@ -15,8 +13,15 @@ use \WP_REST_Request;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+/**
+ * Registers the endpoint to which we are returned to, after being authorized by Pinterest.
+ */
 class Auth extends VendorAPI {
 
+	/**
+	 * Initiate class.
+	 */
 	public function __construct() {
 
 		$this->base              = \PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT;
@@ -32,7 +37,7 @@ class Auth extends VendorAPI {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param WP_REST_Request $request
+	 * @param WP_REST_Request $request The request.
 	 *
 	 * @return boolean
 	 */
@@ -51,14 +56,17 @@ class Auth extends VendorAPI {
 
 	/**
 	 * REST Route callback function for POST requests.
-	 * @since 1.0.2
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param WP_REST_Request $request The request.
 	 */
 	public function oauth_callback( WP_REST_Request $request ) {
 
-		$error      = empty( $_GET['error'] ) ? '' : $_GET['error']; //phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		$error      = empty( $_GET['error'] ) ? '' : sanitize_text_field( wp_unslash( $_GET['error'] ) ); //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$error_args = '';
 
-		if ( empty( $_GET['pinterestv3_access_token'] ) || empty( $_GET['control'] ) ) { //phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		if ( empty( $_GET['pinterestv3_access_token'] ) || empty( $_GET['control'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$error = esc_html__( 'Empty response, please try again later.', 'pinterest-for-woocommerce' );
 		}
 
@@ -67,12 +75,12 @@ class Auth extends VendorAPI {
 			Base::log( 'error', wp_json_encode( $error ) );
 		}
 
-		// Save token information
+		// Save token information.
 		if ( empty( $error ) ) {
 
 			Pinterest_For_Woocommerce()::save_token(
 				array(
-					'access_token' => $_GET['pinterestv3_access_token'], // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					'access_token' => sanitize_text_field( wp_unslash( $_GET['pinterestv3_access_token'] ) ), //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				)
 			);
 
@@ -95,10 +103,10 @@ class Auth extends VendorAPI {
 				get_admin_url( null, 'admin.php' )
 			);
 
-			if ( ! empty( $_GET['view'] ) ) {
+			if ( ! empty( $_GET['view'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				$redirect_url = add_query_arg(
 					array(
-						'view' => sanitize_key( $_GET['view'] ),
+						'view' => sanitize_key( $_GET['view'] ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 					),
 					$redirect_url
 				);

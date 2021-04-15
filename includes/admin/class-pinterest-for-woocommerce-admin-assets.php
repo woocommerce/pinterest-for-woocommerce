@@ -2,8 +2,6 @@
 /**
  * Load assets
  *
- * @author      WooCommece
- * @category    Admin
  * @package     Pinterest_For_Woocommerce/Admin
  * @version     1.0.0
  */
@@ -30,7 +28,7 @@ class Pinterest_For_Woocommerce_Admin_Assets extends Pinterest_For_Woocommerce_A
 
 	/**
 	 * Get styles for the frontend.
-	 * @access private
+	 *
 	 * @return array
 	 */
 	public function get_styles() {
@@ -42,7 +40,7 @@ class Pinterest_For_Woocommerce_Admin_Assets extends Pinterest_For_Woocommerce_A
 
 	/**
 	 * Get styles for the frontend.
-	 * @access private
+	 *
 	 * @return array
 	 */
 	public function get_scripts() {
