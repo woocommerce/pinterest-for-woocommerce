@@ -55,10 +55,9 @@ class DomainVerification extends VendorAPI {
 
 				$result = Base::trigger_verification();
 
-				do_action( 'pinterest_for_woocommerce_account_updated' );
-
 				if ( 'success' === $result['status'] ) {
-					return $result['data'];
+					$account_data = Pinterest_For_Woocommerce()::update_account_data();
+					return array_merge( (array) $result['data'], array( 'account_data' => $account_data ) );
 				}
 			}
 
@@ -66,6 +65,7 @@ class DomainVerification extends VendorAPI {
 
 		} catch ( \Throwable $th ) {
 
+			/* Translators: The error description as returned from the API */
 			$error_message = sprintf( esc_html__( 'Your domain could not be automatically verified. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
 
 			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_verification_error', $error_message );

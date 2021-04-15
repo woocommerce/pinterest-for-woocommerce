@@ -400,7 +400,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 		}
 
-		public function update_account_data() {
+		public static function update_account_data() {
 
 			$account_data = Pinterest\API\Base::get_account_info();
 
@@ -418,7 +418,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				);
 
 				Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
+				return $data;
 			}
+
+			return array();
 
 		}
 
