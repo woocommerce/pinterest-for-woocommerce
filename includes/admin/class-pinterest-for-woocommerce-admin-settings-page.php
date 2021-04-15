@@ -295,9 +295,26 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 			$view = ! empty( $_REQUEST['view'] ) ? sanitize_key( $_REQUEST['view'] ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 
-			wp_redirect( Pinterest_For_Woocommerce()::get_service_login_url( $view ) );
+			add_filter( 'allowed_redirect_hosts', array( $this, 'allow_service_login' ) );
+
+			wp_safe_redirect( Pinterest_For_Woocommerce()::get_service_login_url( $view ) );
 			exit;
 
+		}
+
+		/**
+		 * Add the domain of API/Bridge service to the list of allowed redirect hosts.
+		 *
+		 * @param array $allowed_hosts the array of allowed hosts.
+		 *
+		 * @return array
+		 */
+		public function allow_service_login( $allowed_hosts ) {
+
+			$service_domain  = Pinterest_For_Woocommerce()::get_connection_proxy_url();
+			$allowed_hosts[] = wp_parse_url( $service_domain, PHP_URL_HOST );
+
+			return $allowed_hosts;
 		}
 
 	}
