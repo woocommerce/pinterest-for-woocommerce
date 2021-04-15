@@ -27,6 +27,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			add_action( 'admin_enqueue_scripts', array( $this, 'add_task_register_script' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'load_common_scripts' ), 20 );
 			add_action( 'admin_init', array( $this, 'maybe_go_to_service_login_url' ) );
+			add_filter( 'woocommerce_get_registered_extended_tasks', array( $this, 'register_task_list_item' ), 10, 1 );
 		}
 
 
@@ -235,28 +236,27 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			);
 
 
-
 			wp_enqueue_script( $handle );
+		}
 
 
+		public function register_task_list_item( $registered_tasks_list_items ) {
 
-			// TODO: move outta here
-			add_filter(
-				'woocommerce_get_registered_extended_tasks',
-				function ( $registered_tasks_list_items ) {
+			if (
+				! class_exists( 'Automattic\WooCommerce\Admin\Loader' ) ||
+				! \Automattic\WooCommerce\Admin\Loader::is_admin_page() ||
+				! Onboarding::should_show_tasks()
+			) {
+				return;
+			}
 
-					$new_task_name = 'woocommerce_admin_add_task_pinterest_setup';
+			$new_task_name = 'woocommerce_admin_add_task_pinterest_setup';
 
-					if ( ! in_array( $new_task_name, $registered_tasks_list_items, true ) ) {
-						array_push( $registered_tasks_list_items, $new_task_name );
-					}
+			if ( ! in_array( $new_task_name, $registered_tasks_list_items, true ) ) {
+				array_push( $registered_tasks_list_items, $new_task_name );
+			}
 
-					return $registered_tasks_list_items;
-				},
-				10,
-				1
-			);
-
+			return $registered_tasks_list_items;
 		}
 
 
