@@ -2,8 +2,6 @@
 /**
  * Pinterest For WooCommerce Rich Pins
  *
- * @author      WooCommerce
- * @category    API
  * @package     Pinterest_For_WooCommerce/Classes/
  * @version     1.0.0
  */
@@ -14,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Class adding RichPins support.
+ */
 class RichPins {
 
 	/**
@@ -93,12 +94,13 @@ class RichPins {
 
 	/**
 	 * Return WC Product's tags
+	 *
 	 * @see Product's Rich Pins : https://developers.pinterest.com/docs/rich-pins/products/
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $tags Tags
-	 * @param array $setup Rich Pins Setup
+	 * @param array $tags Tags.
+	 * @param array $setup Rich Pins Setup.
 	 *
 	 * @return array
 	 */
@@ -108,15 +110,15 @@ class RichPins {
 			return $tags;
 		}
 
-		// get product object
+		// get product object.
 		$product_id = get_queried_object()->ID;
 		$product    = new \WC_Product( $product_id );
 
-		// mandatory tags
+		// mandatory tags.
 		$tags['product:price:currency'] = get_woocommerce_currency();
 		$tags['product:price:amount']   = $product->get_price();
 
-		// tags enabled by setup
+		// tags enabled by setup.
 		if ( $product->is_on_sale() ) {
 			$tags['og:price:standard_amount'] = $product->get_regular_price();
 		}
@@ -150,12 +152,13 @@ class RichPins {
 
 	/**
 	 * Return WP Post's tags
+	 *
 	 * @see Article's Rich Pins: https://developers.pinterest.com/docs/rich-pins/articles/
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $tags OG tags
-	 * @param array $setup Rich Pins Setup
+	 * @param array $tags OG tags.
+	 * @param array $setup Rich Pins Setup.
 	 *
 	 * @return array
 	 */
@@ -165,10 +168,10 @@ class RichPins {
 			return $tags;
 		}
 
-		// mandatory tags
+		// mandatory tags.
 		$tags['og:description'] = get_the_excerpt();
 
-		// tags enabled by setup
+		// tags enabled by setup.
 		if ( ! empty( $setup['posts']['enable_publish_time'] ) ) {
 			$tags['article:published_time'] = get_the_date( 'c' );
 		}
@@ -187,7 +190,8 @@ class RichPins {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int $post_id Post ID
+	 * @param int    $post_id Post ID.
+	 * @param string $size Image size.
 	 * @return string
 	 */
 	protected static function get_post_featured_image_src( $post_id, $size = 'large' ) {
