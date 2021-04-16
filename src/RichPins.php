@@ -53,7 +53,7 @@ class RichPins {
 	protected static function get_tags() {
 
 		$setup = wp_parse_args(
-			Pinterest_For_Woocommerce()::get_setting( 'rich_pins', true ),
+			Pinterest_For_Woocommerce()::get_setting( 'rich_pins' ),
 			array(
 				'products' => array(
 					'enabled'             => true,
