@@ -125,6 +125,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				! method_exists( Screen::class, 'register_post_type' ) ||
 				! method_exists( Menu::class, 'add_plugin_item' ) ||
 				! method_exists( Menu::class, 'add_plugin_category' ) ||
+				! method_exists( Features::class, 'is_enabled' ) ||
 				! Features::is_enabled( 'navigation' )
 			) {
 				return;
