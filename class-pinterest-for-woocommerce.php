@@ -146,7 +146,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		private function init_hooks() {
 			add_action( 'init', array( $this, 'init' ), 0 );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
-			add_action( 'wp_head', array( $this, 'inject_meta_tags' ) );
+			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
+			add_action( 'wp_head', array( 'Automattic\WooCommerce\Pinterest\RichPins', 'maybe_inject_rich_pins_opengraph_tags' ) );
 
 			add_action( 'pinterest_for_woocommerce_account_updated', array( $this, 'update_account_data' ) );
 		}
@@ -394,13 +395,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 
-		public function inject_meta_tags() {
-
+		public function maybe_inject_verification_code() {
 			if ( self::get_setting( 'verfication_code' ) ) {
 				printf( '<meta name="p:domain_verify" content="%s"/>', esc_attr( self::get_setting( 'verfication_code' ) ) );
 			}
-
-			Pinterest\RichPins::output();
 		}
 
 		public function update_account_data() {
