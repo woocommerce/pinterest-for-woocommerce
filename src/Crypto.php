@@ -12,6 +12,7 @@ namespace Automattic\WooCommerce\Pinterest;
 use Defuse\Crypto\KeyProtectedByPassword;
 use Defuse\Crypto\Crypto as DefuseCrypto;
 use Defuse\Crypto\Key;
+use Defuse\Crypto\Exception as DefuseException;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -59,8 +60,10 @@ class Crypto {
 
 	/**
 	 * Get the encoded user key.
+	 *
+	 * @param string $retry The retry attempt #.
 	 */
-	private static function get_key() {
+	private static function get_key( $retry = null ) {
 
 		static $user_key_encoded;
 
@@ -82,7 +85,13 @@ class Crypto {
 			$protected_key    = KeyProtectedByPassword::loadFromAsciiSafeString( $protected_key_encoded );
 			$user_key         = $protected_key->unlockKey( self::$key );
 			$user_key_encoded = $user_key->saveToAsciiSafeString();
-		} catch ( Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException $ex ) {
+		} catch ( DefuseException\WrongKeyOrModifiedCiphertextException | DefuseException\BadFormatException $ex ) {
+
+			if ( is_null( $retry ) ) {
+				Pinterest_For_Woocommerce()::save_setting( 'crypto_encoded_key', null );
+				return self::get_key( 1 );
+			}
+
 			API\Base::log( 'error', esc_html__( 'Could not decrypt Key value. Try reconnecting to Pinterest.', 'pinterest-for-woocommerce' ) );
 			Pinterest_For_Woocommerce()::save_setting( 'crypto_encoded_key', false ); // Reset base key.
 			return false;
@@ -122,7 +131,7 @@ class Crypto {
 
 		try {
 			$value = DefuseCrypto::decrypt( $encrypted_value, $user_key );
-		} catch ( Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException $ex ) {
+		} catch ( DefuseException\WrongKeyOrModifiedCiphertextException $ex ) {
 			// Either there's a bug in our code, we're trying to decrypt with the
 			// wrong key, or the encrypted credit card number was corrupted in the
 			// database.
