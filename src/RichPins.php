@@ -20,16 +20,35 @@ class RichPins {
 	/**
 	 * Output Pinterest Rich Pins metatags based on post_type and site setup.
 	 *
+	 * Rich Pins show metadata right on the Pin itself, giving Pinners a richer experience and increasing engagement.
+	 * It works by displaying metadata from marked up pages on the website.
+	 * Pinterest supports Open Graph and Schema.org markup for Rich Pins.
+	 * Adding OpenGraph or Schema.org markup to the site lets Pinterest sync that information from the site to the Pins.
+	 * Since WooCommerce is already adding Schema.org markup, this method inject OpenGraph metatag for Products and Posts based on site's setup.
+	 *
 	 * @since 1.0.0
 	 */
-	public static function output() {
+	public static function maybe_inject_rich_pins_opengraph_tags() {
 
 		if ( ! is_singular( 'product' ) && ! is_singular( 'post' ) ) {
 			return;
 		}
 
-		$tags = self::get_tags();
-		if ( empty( $tags ) || apply_filters( 'pinterest_for_woocommerce_disable_tags', false ) ) {
+		/**
+		 * Allow 3rd parties to disable Rich Pins content.
+		 * @see https://developers.pinterest.com/docs/rich-pins/overview/?#opt-out
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param bool $is_disable If true, the content won't be shown as a Rich Pin. Default: false.
+		 */
+		$disable_rich_pins = apply_filters( 'pinterest_for_woocommerce_disable_rich_pins', false );
+
+		if ( ! $disable_rich_pins ) {
+			$tags = self::get_opengraph_tags();
+		}
+
+		if ( empty( $tags ) || $disable_rich_pins ) {
 			echo '<meta name="pinterest-rich-pin" content="false" />';
 			return;
 		}
@@ -45,13 +64,13 @@ class RichPins {
 
 
 	/**
-	 * Return tags that must be output to header
+	 * Return OpenGraph tags that must be render in the header
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return array
 	 */
-	protected static function get_tags() {
+	protected static function get_opengraph_tags() {
 
 		$setup = wp_parse_args(
 			Pinterest_For_Woocommerce()::get_setting( 'rich_pins' ),
@@ -73,8 +92,8 @@ class RichPins {
 			return array();
 		}
 
-		add_filter( 'pinterest_for_woocommerce_tags', array( __CLASS__, 'add_product_tags' ), 10, 2 );
-		add_filter( 'pinterest_for_woocommerce_tags', array( __CLASS__, 'add_post_tags' ), 10, 2 );
+		add_filter( 'pinterest_for_woocommerce_opengraph_tags', array( __CLASS__, 'add_product_opengraph_tags' ), 10, 2 );
+		add_filter( 'pinterest_for_woocommerce_opengraph_tags', array( __CLASS__, 'add_post_opengraph_tags' ), 10, 2 );
 
 		$tags = array(
 			'og:url'       => esc_url( get_the_permalink() ),
@@ -88,23 +107,31 @@ class RichPins {
 			$tags['og:image'] = $image;
 		}
 
-		return apply_filters( 'pinterest_for_woocommerce_tags', $tags, $setup );
+		/**
+		 * Filter OpenGraph tags.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $is_disable OpenGraph tags.
+		 * @param array $setup      Rich Pins setup.
+		 */
+		return apply_filters( 'pinterest_for_woocommerce_opengraph_tags', $tags, $setup );
 	}
 
 
 	/**
-	 * Return WC Product's tags
+	 * Return WC Product's OpenGraph tags
 	 *
 	 * @see Product's Rich Pins : https://developers.pinterest.com/docs/rich-pins/products/
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $tags Tags.
+	 * @param array $tags  Open Graph Tags.
 	 * @param array $setup Rich Pins Setup.
 	 *
 	 * @return array
 	 */
-	public static function add_product_tags( $tags, $setup ) {
+	public static function add_product_opengraph_tags( $tags, $setup ) {
 
 		if ( ! is_singular( 'product' ) || empty( $setup['products']['enabled'] ) ) {
 			return $tags;
@@ -151,18 +178,18 @@ class RichPins {
 
 
 	/**
-	 * Return WP Post's tags
+	 * Return WP Post's OpenGraph tags
 	 *
 	 * @see Article's Rich Pins: https://developers.pinterest.com/docs/rich-pins/articles/
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $tags OG tags.
+	 * @param array $tags  OpenGraph tags.
 	 * @param array $setup Rich Pins Setup.
 	 *
 	 * @return array
 	 */
-	public static function add_post_tags( $tags, $setup ) {
+	public static function add_post_opengraph_tags( $tags, $setup ) {
 
 		if ( ! is_singular( 'post' ) || empty( $setup['posts']['enabled'] ) ) {
 			return $tags;
