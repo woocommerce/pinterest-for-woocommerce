@@ -128,6 +128,7 @@ class Crypto {
 
 		$user_key_encoded = self::get_key();
 		$user_key         = Key::loadFromAsciiSafeString( $user_key_encoded );
+		$value            = false;
 
 		try {
 			$value = DefuseCrypto::decrypt( $encrypted_value, $user_key );
