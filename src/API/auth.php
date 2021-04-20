@@ -45,6 +45,7 @@ class Auth extends VendorAPI {
 
 		$control = get_transient( \PINTEREST_FOR_WOOCOMMERCE_AUTH );
 		if ( empty( $_GET['control'] ) || empty( $control ) || $control !== $_GET['control'] ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			add_filter( 'rest_pre_serve_request', array( $this, 'redirect_to_settings_page' ), 10, 2 );
 			return false;
 		}
 
@@ -53,6 +54,26 @@ class Auth extends VendorAPI {
 		return true;
 	}
 
+
+
+	/**
+	 * When we got a permissions check failure, Hijack the rest_pre_serve_request filter
+	 * to sent the user to the settings page instead of showing a white page with the printed REST response
+	 *
+	 * @param bool             $served  Whether the request has already been served. Default false.
+	 * @param WP_HTTP_Response $result  Result to send to the client. Usually a `WP_REST_Response`.
+	 * @return bool
+	 */
+	public function redirect_to_settings_page( $served, $result ) {
+
+		if ( 401 === $result->get_status() ) {
+			$error_message = esc_html__( 'Something went wrong with your attempt to authorize this App. Please try agagin.', 'pinterest-for-woocommerce' );
+			wp_safe_redirect( add_query_arg( 'error', rawurlencode( $error_message ), $this->get_redirect_url() ) );
+			exit;
+		}
+
+		return $served;
+	}
 
 	/**
 	 * REST Route callback function for POST requests.
@@ -89,6 +110,17 @@ class Auth extends VendorAPI {
 			do_action( 'pinterest_for_woocommerce_account_updated' );
 		}
 
+		wp_safe_redirect( $this->get_redirect_url() . $error_args );
+		exit;
+	}
+
+	/**
+	 * Returns the redirect URI based on the current request's parameters and plugin settings.
+	 *
+	 * @return string
+	 */
+	private function get_redirect_url() {
+
 		$redirect_url      = admin_url( 'admin.php?page=' . \PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE );
 		$is_setup_complete = Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete', true );
 
@@ -113,7 +145,7 @@ class Auth extends VendorAPI {
 			}
 		}
 
-		wp_safe_redirect( $redirect_url . $error_args );
-		exit;
+		return $redirect_url;
+
 	}
 }
