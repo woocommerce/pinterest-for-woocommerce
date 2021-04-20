@@ -50,6 +50,7 @@ const SetupAccount = ( {
 		const newOptions = Object.assign( {}, options );
 
 		delete newOptions.token;
+		delete newOptions.crypto_encoded_key;
 
 		setOptions( newOptions );
 
