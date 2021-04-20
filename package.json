@@ -60,7 +60,8 @@
     "build": "wp-scripts build && gulp build",
     "start": "wp-scripts start",
     "lint:js": "wp-scripts lint-js assets/source/setup-guide",
-    "lint:js:fix": "wp-scripts lint-js assets/source/setup-guide --fix"
+    "lint:js:fix": "wp-scripts lint-js assets/source/setup-guide --fix",
+    "build:zip": "composer install && wp-scripts build && gulp build && gulp package"
   },
   "keywords": [
     "pinterest for wordpress",
