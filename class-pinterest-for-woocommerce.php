@@ -39,6 +39,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		protected static $initialized = false;
 
 		/**
+		 * When set to true, the settings have been 
+		 * changed and the runtime cached must be flushed
+		 * 
+		 * @var Pinterest_For_Woocommerce
+		 * @since 1.0.0
+		 */
+		protected static $dirty_settings = false;
+
+		/**
 		 * Main Pinterest_For_Woocommerce Instance.
 		 *
 		 * Ensures only one instance of Pinterest_For_Woocommerce is loaded or can be loaded.
@@ -241,7 +250,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			static $settings;
 
-			if ( is_null( $settings ) || $force ) {
+			if ( is_null( $settings ) || $force || self::$dirty_settings ) {
 				$settings = get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME );
 			}
 
@@ -297,6 +306,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function save_settings( $settings ) {
+			self::$dirty_settings = true;
 			return update_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME, $settings );
 		}
 
