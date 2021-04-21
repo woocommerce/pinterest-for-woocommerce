@@ -10,6 +10,7 @@
  */
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Pinterest\RichPins;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -147,7 +148,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'init', array( $this, 'init' ), 0 );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
-			add_action( 'wp_head', array( 'Automattic\WooCommerce\Pinterest\RichPins', 'maybe_inject_rich_pins_opengraph_tags' ) );
+			add_action( 'wp_head', array( RichPins::class, 'maybe_inject_rich_pins_opengraph_tags' ) );
 
 			add_action( 'pinterest_for_woocommerce_account_updated', array( $this, 'update_account_data' ) );
 		}

@@ -115,7 +115,7 @@ class RichPins {
 		 * @param array $is_disable OpenGraph tags.
 		 * @param array $setup      Rich Pins setup.
 		 */
-		return apply_filters( 'pinterest_for_woocommerce_opengraph_tags', $tags, $setup );
+		return (array) apply_filters( 'pinterest_for_woocommerce_opengraph_tags', $tags, $setup );
 	}
 
 
@@ -139,7 +139,11 @@ class RichPins {
 
 		// get product object.
 		$product_id = get_queried_object()->ID;
-		$product    = new \WC_Product( $product_id );
+		$product    = wc_get_product( $product_id );
+
+		if ( ! is_object( $product ) ) {
+			return $tags;
+		}
 
 		// mandatory tags.
 		$tags['product:price:currency'] = get_woocommerce_currency();
@@ -158,7 +162,7 @@ class RichPins {
 			$tags['og:description'] = $description;
 		}
 
-		if ( ! empty( $setup['products']['enable_availability'] ) ) {
+		if ( ! array_key_exists( $setup['products']['enable_availability'] ) ) {
 
 			$status_map = array(
 				'instock'     => 'instock',
@@ -168,7 +172,7 @@ class RichPins {
 
 			$stock_status = $product->get_stock_status();
 
-			if ( ! empty( $status_map[ $stock_status ] ) ) {
+			if ( ! array_key_exists( $status_map[ $stock_status ] ) ) {
 				$tags['og:availability'] = $status_map[ $stock_status ];
 			}
 		}
