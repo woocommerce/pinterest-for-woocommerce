@@ -28,3 +28,6 @@ _tbc_
 _tbc_
 
 
+## Miscellaneous
+
+- Pinterest settings work well in all supported WooCommerce Admin navigation variations (legacy and [new unified nav](https://developer.woocommerce.com/2021/01/15/call-to-action-create-access-for-your-extension-in-the-new-woocommerce-navigation/)).
