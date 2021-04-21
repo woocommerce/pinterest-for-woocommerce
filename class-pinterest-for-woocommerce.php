@@ -39,9 +39,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		protected static $initialized = false;
 
 		/**
-		 * When set to true, the settings have been 
+		 * When set to true, the settings have been
 		 * changed and the runtime cached must be flushed
-		 * 
+		 *
 		 * @var Pinterest_For_Woocommerce
 		 * @since 1.0.0
 		 */
@@ -352,13 +352,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function save_token( $token ) {
 
-			$settings = self::get_settings();
-
 			$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['access_token'] );
-
-			$settings['token'] = $token;
-
-			return self::save_settings( $settings );
+			return self::save_setting( 'token', $token );
 		}
 
 
