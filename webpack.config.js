@@ -13,7 +13,7 @@ const SetupGuide = {
     },
 };
 
-const AddSetupTask = {
+const SetupTask = {
     ...defaultConfig,
     entry: {
         index: './assets/source/setup-task/index.js',
@@ -26,5 +26,5 @@ const AddSetupTask = {
 
 module.exports = [
     SetupGuide,
-    AddSetupTask
+    SetupTask
 ];
