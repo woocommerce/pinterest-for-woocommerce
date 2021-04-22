@@ -1,0 +1,33 @@
+.woocommerce-product-gallery__image,
+.products .product,
+.pin4wc-image-wrapper {
+    position: relative;
+}
+
+.pin4wc-image-wrapper {
+    display: flex;
+}
+
+[class*="PIN_"][class*="_button_pin"] {
+	left: 10px;
+	position: absolute;
+	top: 10px;
+	z-index: 50;
+}
+
+.product,
+.woocommerce-product-gallery__image,
+.pin4wc-image-wrapper {
+
+	&>[class*="_button_pin"] {
+		opacity: 0;
+		visibility: hidden;
+	}
+
+	&:hover {
+		&>[class*="_button_pin"] {
+		    opacity: 1;
+		    visibility: visible;
+		}
+	}
+}
