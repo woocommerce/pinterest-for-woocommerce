@@ -38,37 +38,39 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	}, [ pin4wc, options ] );
 
 	const handleOptionChange = async ( name, value ) => {
-		if ( ALLOWED_OPTIONS.includes( name ) ) {
-			const oldOptions = Object.assign( {}, options );
-			const newOptions = {
-				...options,
-				[ name ]: value ?? ! options[ name ],
-			};
+		if ( ! ALLOWED_OPTIONS.includes( name ) ) {
+			return;
+		}
 
-			setOptions( newOptions );
+		const oldOptions = Object.assign( {}, options );
+		const newOptions = {
+			...options,
+			[ name ]: value ?? ! options[ name ],
+		};
 
-			const update = await updateOptions( {
-				[ pin4wcSetupGuide.optionsName ]: newOptions,
-			} );
+		setOptions( newOptions );
 
-			if ( update.success ) {
-				createNotice(
-					'success',
-					__(
-						'Settings were saved successfully.',
-						'pinterest-for-woocommerce'
-					)
-				);
-			} else {
-				setOptions( oldOptions );
-				createNotice(
-					'error',
-					__(
-						'There was a problem saving your settings.',
-						'pinterest-for-woocommerce'
-					)
-				);
-			}
+		const update = await updateOptions( {
+			[ wcSettings.pin4wc.optionsName ]: newOptions,
+		} );
+
+		if ( update.success ) {
+			createNotice(
+				'success',
+				__(
+					'Settings were saved successfully.',
+					'pinterest-for-woocommerce'
+				)
+			);
+		} else {
+			setOptions( oldOptions );
+			createNotice(
+				'error',
+				__(
+					'There was a problem saving your settings.',
+					'pinterest-for-woocommerce'
+				)
+			);
 		}
 	};
 
