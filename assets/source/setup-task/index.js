@@ -22,7 +22,7 @@ addFilter(
 				completed: pin4wcSetupGuide.isSetupComplete,
 				visible: true,
 				additionalInfo: __( 'Configure the connection to Pinterest and any additional settings like tracking, product sync, etc.', 'pinterest-for-woocommerce' ),
-				time: __( '5 minutes', 'woocommerce-admin' ),
+				time: __( '5 minutes', 'pinterest-for-woocommerce' ),
 				isDismissable: true,
 			},
 		];
