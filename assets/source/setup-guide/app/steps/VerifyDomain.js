@@ -41,13 +41,6 @@
 		 return result;
 	 };
  
-	 const buttonLabels = {
-		 idle: __( 'Start Verification', 'pinterest-for-woocommerce' ),
-		 pending: __( 'Verifying Domain', 'pinterest-for-woocommerce' ),
-		 error: __( 'Try Again', 'pinterest-for-woocommerce' ),
-		 success: __( 'Continue', 'pinterest-for-woocommerce' ),
-	 };
- 
 	 const handleVerifyDomain = () => {
 		 setStatus( 'pending' );
  
@@ -81,6 +74,29 @@
 			 } );
 	 };
  
+	const StepButton = () => {
+		const buttonLabels = {
+			idle: __( 'Start Verification', 'pinterest-for-woocommerce' ),
+			pending: __( 'Verifying Domain', 'pinterest-for-woocommerce' ),
+			error: __( 'Try Again', 'pinterest-for-woocommerce' ),
+			success: __( 'Continue', 'pinterest-for-woocommerce' ),
+		};
+
+		return (
+			<Button
+				isPrimary
+				disabled={ status === 'pending' }
+				onClick={
+					status === 'success'
+						? goToNextStep
+						: handleVerifyDomain
+				}
+			>
+				{ buttonLabels[ status ] }
+			</Button>
+		);
+	}
+
 	 return (
 		 <div className="woocommerce-setup-guide__verify-domain">
 			 { view === 'wizard' && (
@@ -111,17 +127,17 @@
 								 />
  
 								 { view === 'settings' && ! isDomainVerified() && (
-									 <Button
-										 isPrimary
-										 disabled={ status === 'pending' }
-										 onClick={
-											 status === 'success'
-												 ? goToNextStep
-												 : handleVerifyDomain
-										 }
-									 >
-										 { buttonLabels[ status ] }
-									 </Button>
+									<StepButton />
+								) }
+							</CardBody>
+						) : (
+							<CardBody size="large">
+								<Spinner />
+							</CardBody>
+						) }
+					</Card>
+
+					{ view === 'wizard' && (
 								 ) }
 							 </CardBody>
 						 ) : (
@@ -133,17 +149,7 @@
  
 					 { view === 'wizard' && (
 						 <div className="woocommerce-setup-guide__footer-button">
-							 <Button
-								 isPrimary
-								 disabled={ status === 'pending' }
-								 onClick={
-									 status === 'success'
-										 ? goToNextStep
-										 : handleVerifyDomain
-								 }
-							 >
-								 { buttonLabels[ status ] }
-							 </Button>
+							<StepButton />
 						 </div>
 					 ) }
 				 </div>
