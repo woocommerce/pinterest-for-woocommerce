@@ -28,7 +28,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		public function __construct() {
 			add_action( 'admin_menu', array( $this, 'register_guide_page' ), 20 );
 			add_action( 'admin_enqueue_scripts', array( $this, 'load_setup_guide_scripts' ), 20 );
-			add_action( 'admin_enqueue_scripts', array( $this, 'add_task_register_script' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'load_common_scripts' ), 20 );
 			add_action( 'admin_init', array( $this, 'maybe_go_to_service_login_url' ) );
 			add_filter( 'woocommerce_get_registered_extended_tasks', array( $this, 'register_task_list_item' ), 10, 1 );
@@ -165,12 +164,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 * Load the scripts needed for the setup guide / settings page.
 		 */
 		public function load_setup_guide_scripts() {
-			if ( ! $this->is_setup_guide_page() ) {
+			if ( $this->is_setup_guide_page() ) {
+				$build_path = '/assets/setup-guide';
+			} elseif (
+				class_exists( 'Automattic\WooCommerce\Admin\Loader' ) &&
+				\Automattic\WooCommerce\Admin\Loader::is_admin_page() &&
+				Onboarding::should_show_tasks()
+				) {
+				$build_path = '/assets/setup-task';
+			} else {
 				return;
 			}
 
 			$handle            = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE;
-			$build_path        = '/assets/setup-guide';
 			$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/index.asset.php';
 			$script_info       = file_exists( $script_asset_path )
 				? include $script_asset_path
@@ -188,6 +194,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			);
 
 			wp_enqueue_script( $handle );
+
+			wp_register_style(
+				$handle,
+				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/style-index.css',
+				array( 'wc-admin-app' ),
+				PINTEREST_FOR_WOOCOMMERCE_VERSION
+			);
+
+			wp_enqueue_style( $handle );
 		}
 
 		/**
@@ -216,44 +231,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			return ! empty( $_REQUEST[ $key ] ) ? trim( sanitize_key( wp_unslash( $_REQUEST[ $key ] ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		}
-
-
-		/**
-		 * Registers the Script that adds the setup task to WC
-		 *
-		 * @return void
-		 */
-		public function add_task_register_script() {
-
-			if (
-				! class_exists( 'Automattic\WooCommerce\Admin\Loader' ) ||
-				! \Automattic\WooCommerce\Admin\Loader::is_admin_page() ||
-				! Onboarding::should_show_tasks()
-			) {
-				return;
-			}
-
-			$handle            = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE . '-setup-task';
-			$build_path        = '/assets/setup-task';
-			$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/index.asset.php';
-			$script_info       = file_exists( $script_asset_path )
-				? include $script_asset_path
-				: array(
-					'dependencies' => array(),
-					'version'      => PINTEREST_FOR_WOOCOMMERCE_VERSION,
-				);
-
-			wp_register_script(
-				$handle,
-				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/index.js',
-				$script_info['dependencies'],
-				$script_info['version'],
-				true
-			);
-
-			wp_enqueue_script( $handle );
-		}
-
 
 		/**
 		 * Register the Task List item for WC-Admin.

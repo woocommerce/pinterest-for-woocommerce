@@ -1,10 +1,14 @@
 /**
  * External dependencies
  */
-
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
+
+/**
+ * Internal dependencies
+ */
 import WizardApp from '../setup-guide/app/views/WizardApp';
+import '../setup-guide/app/style.scss';
 
 /**
  * Use the 'woocommerce_admin_onboarding_task_list' filter to add a task page.
