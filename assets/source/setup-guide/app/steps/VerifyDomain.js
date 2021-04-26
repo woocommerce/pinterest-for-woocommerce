@@ -111,7 +111,7 @@
 					 <StepOverview
 						 title={ __( 'Verify your domain' ) }
 						 description={ __(
-							 'Claim your website yo get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of you content.'
+							'Claim your website get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of you content.'
 						 ) }
 						 link={ pin4wcSetupGuide.pinterestLinks.verifyDomain }
 					 />
