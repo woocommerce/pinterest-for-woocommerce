@@ -3,9 +3,7 @@
  */
 import '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
-import { withDispatch } from '@wordpress/data';
-import { createElement, useEffect, useState } from '@wordpress/element';
+import { createElement, useState } from '@wordpress/element';
 import { Spinner } from '@woocommerce/components';
 import { pick } from 'lodash';
 import {
@@ -22,32 +20,13 @@ import SetupAccount from '../steps/SetupAccount';
 import VerifyDomain from '../steps/VerifyDomain';
 import ConfigureSettings from '../steps/ConfigureSettings';
 import TransientNotices from '../components/TransientNotices';
+import { useBodyClasses, useCreateNotice } from '../helpers/effects';
 
-const WizardApp = ( { createNotice } ) => {
+const WizardApp = () => {
 	const [ step, setStep ] = useState( {} );
 
-	useEffect( () => {
-		document.body.parentNode.classList.remove( 'wp-toolbar' );
-		document.body.classList.remove( 'woocommerce-admin-is-loading' );
-		document.body.classList.remove( 'woocommerce-embed-page' );
-		document.body.classList.add( 'woocommerce-onboarding' );
-		document.body.classList.add( 'woocommerce-setup-guide__body' );
-		document.body.classList.add( 'woocommerce-setup-guide--wizard' );
-		document.body.classList.add( 'woocommerce-admin-full-screen' );
-
-		if ( pin4wcSetupGuide.error ) {
-			createNotice( 'error', pin4wcSetupGuide.error );
-		}
-
-		return () => {
-			document.body.classList.remove( 'woocommerce-onboarding' );
-			document.body.classList.remove( 'woocommerce-setup-guide--wizard' );
-			document.body.classList.remove( 'woocommerce-setup-guide__body' );
-			document.body.classList.add( 'woocommerce-embed-page' );
-			document.body.classList.remove( 'woocommerce-admin-full-screen' );
-			document.body.parentNode.classList.add( 'wp-toolbar' );
-		};
-	}, [ createNotice ] );
+	useBodyClasses( 'wizard' );
+	useCreateNotice( pin4wcSetupGuide.error );
 
 	const getSteps = () => {
 		const steps = [];
@@ -134,12 +113,4 @@ const WizardApp = ( { createNotice } ) => {
 	);
 };
 
-export default compose(
-	withDispatch( ( dispatch ) => {
-		const { createNotice } = dispatch( 'core/notices' );
-
-		return {
-			createNotice,
-		};
-	} )
-)( WizardApp );
+export default WizardApp;

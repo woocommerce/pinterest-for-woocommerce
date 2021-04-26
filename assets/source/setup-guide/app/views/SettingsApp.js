@@ -2,9 +2,7 @@
  * External dependencies
  */
 import '@wordpress/notices';
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 
 /**
@@ -14,21 +12,13 @@ import SetupAccount from '../steps/SetupAccount';
 import VerifyDomain from '../steps/VerifyDomain';
 import ConfigureSettings from '../steps/ConfigureSettings';
 import TransientNotices from '../components/TransientNotices';
+import { useBodyClasses, useCreateNotice } from '../helpers/effects';
 
-const SettingsApp = ( { pin4wc, createNotice } ) => {
-	useEffect( () => {
-		document.body.classList.add( 'woocommerce-setup-guide__body' );
-		document.body.classList.add( 'woocommerce-setup-guide--wizard' );
+const SettingsApp = () => {
+	const pin4wc = useSelect( select => select( OPTIONS_STORE_NAME ).getOption( wcSettings.pin4wc.optionsName ) );
 
-		if ( pin4wcSetupGuide.error ) {
-			createNotice( 'error', pin4wcSetupGuide.error );
-		}
-
-		return () => {
-			document.body.classList.remove( 'woocommerce-setup-guide--wizard' );
-			document.body.classList.remove( 'woocommerce-setup-guide__body' );
-		};
-	}, [ createNotice ] );
+	useBodyClasses();
+	useCreateNotice( wcSettings.pin4wc.error );
 
 	const isConnected = () => {
 		return undefined === pin4wc
@@ -60,19 +50,4 @@ const SettingsApp = ( { pin4wc, createNotice } ) => {
 	);
 };
 
-export default compose(
-	withSelect( ( select ) => {
-		const { getOption } = select( OPTIONS_STORE_NAME );
-
-		return {
-			pin4wc: getOption( pin4wcSetupGuide.optionsName ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { createNotice } = dispatch( 'core/notices' );
-
-		return {
-			createNotice,
-		};
-	} )
-)( SettingsApp );
+export default SettingsApp;
