@@ -41,38 +41,38 @@
 		 return result;
 	 };
  
-	 const handleVerifyDomain = () => {
-		 setStatus( 'pending' );
- 
-		 apiFetch( {
-			 path: pin4wcSetupGuide.apiRoute + '/domain_verification',
-			 method: 'POST',
-		 } )
-			 .then( response => {
-				 setStatus( 'success' );
- 
-				 const newOptions = {
-					...pin4wc,
-					[ 'account_data' ]: response.account_data
-				};
- 
-				 updateOptions( {
-					 [ pin4wcSetupGuide.optionsName ]: newOptions,
-				 } );
-			 } )
-			 .catch( error => {
-				 setStatus( 'error' );
- 
-				 createNotice(
-					 'error',
-					 error.message ||
-						 __(
-						 'Couldn’t verify your domain.',
-						 'pinterest-for-woocommerce'
-					 )
-				 );
-			 } );
-	 };
+	const handleVerifyDomain = async () => {
+		setStatus( 'pending' );
+
+		try {
+			const results = await apiFetch( {
+				path: wcSettings.pin4wc.apiRoute + '/domain_verification',
+				method: 'POST',
+			} )
+
+			setStatus( 'success' );
+
+			const newOptions = {
+				...pin4wc,
+				[ 'account_data' ]: results.account_data
+			};
+
+			updateOptions( {
+				[ wcSettings.pin4wc.optionsName ]: newOptions,
+			} );
+		} catch ( error ) {
+			setStatus( 'error' );
+
+			createNotice(
+				'error',
+				error.message ||
+					__(
+					'Couldn’t verify your domain.',
+					'pinterest-for-woocommerce'
+				)
+			);
+		}
+	};
  
 	const StepButton = () => {
 		const buttonLabels = {
