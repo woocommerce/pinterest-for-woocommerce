@@ -32,8 +32,10 @@ const SettingsApp = () => {
 		return undefined === pin4wc
 			? undefined
 			: undefined === pin4wc?.account_data?.verified_domains
-                ? false
-				: pin4wc?.account_data?.verified_domains.includes( pin4wcSetupGuide.domainToVerify );
+			? false
+			: pin4wc?.account_data?.verified_domains.includes(
+					wcSettings.pin4wc.domainToVerify
+			  );
 	};
 
 	return (

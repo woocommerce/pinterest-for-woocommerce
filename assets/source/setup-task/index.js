@@ -23,7 +23,7 @@ addFilter(
 				key: 'setup-pinterest',
 				title: __( 'Setup Pinterest Integration', 'pinterest-for-woocommerce' ),
 				container: <WizardApp />,
-				completed: pin4wcSetupGuide.isSetupComplete,
+				completed: wcSettings.pin4wc.isSetupComplete,
 				visible: true,
 				additionalInfo: __( 'Configure the connection to Pinterest and any additional settings like tracking, product sync, etc.', 'pinterest-for-woocommerce' ),
 				time: __( '5 minutes', 'pinterest-for-woocommerce' ),

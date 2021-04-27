@@ -128,7 +128,7 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 									<Button
 										isLink
 										href={
-											pin4wcSetupGuide.pinterestLinks
+											wcSettings.pin4wc.pinterestLinks
 												.enhancedMatch
 										}
 										target="_blank"
@@ -162,7 +162,7 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 									<Button
 										isLink
 										href={
-											pin4wcSetupGuide.pinterestLinks
+											wcSettings.pin4wc.pinterestLinks
 												.richPins
 										}
 										target="_blank"
@@ -183,7 +183,7 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 						<div className="woocommerce-setup-guide__footer-button">
 							<Button
 								isPrimary
-								href={ pin4wcSetupGuide.adminUrl }
+								href={ wcSettings.pin4wc.adminUrl }
 								onClick={ handleCompleteSetup }
 							>
 								{ __(
@@ -204,7 +204,7 @@ export default compose(
 		const { getOption } = select( OPTIONS_STORE_NAME );
 
 		return {
-			pin4wc: getOption( pin4wcSetupGuide.optionsName ) || [],
+			pin4wc: getOption( wcSettings.pin4wc.optionsName ) || [],
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

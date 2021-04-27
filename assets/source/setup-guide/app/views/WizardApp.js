@@ -24,7 +24,7 @@ const WizardApp = () => {
 	const [ currentStep, setCurrentStep ] = useState();
 
 	useBodyClasses( 'wizard' );
-	useCreateNotice( pin4wcSetupGuide.error );
+	useCreateNotice( wcSettings.pin4wc.error );
 
 	const steps = [
 		{

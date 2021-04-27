@@ -55,7 +55,7 @@ const SetupAccount = ( {
 		setOptions( newOptions );
 
 		const update = await updateOptions( {
-			[ pin4wcSetupGuide.optionsName ]: newOptions,
+			[ wcSettings.pin4wc.optionsName ]: newOptions,
 		} );
 
 		if ( update.success ) {
@@ -155,7 +155,8 @@ const SetupAccount = ( {
 										<Button
 											isSecondary
 											href={
-												pin4wcSetupGuide.serviceLoginUrl
+												wcSettings.pin4wc
+													.serviceLoginUrl
 											}
 										>
 											{ __(
@@ -175,7 +176,7 @@ const SetupAccount = ( {
 								<Button
 									isLink
 									href={
-										pin4wcSetupGuide.pinterestLinks
+										wcSettings.pin4wc.pinterestLinks
 											.newAccount
 									}
 									target="_blank"
@@ -210,7 +211,7 @@ export default compose(
 		const { getOption } = select( OPTIONS_STORE_NAME );
 
 		return {
-			pin4wc: getOption( pin4wcSetupGuide.optionsName ),
+			pin4wc: getOption( wcSettings.pin4wc.optionsName ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
