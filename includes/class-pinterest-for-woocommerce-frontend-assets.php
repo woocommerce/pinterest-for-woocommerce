@@ -50,7 +50,8 @@ class Pinterest_For_Woocommerce_Frontend_Assets {
 
 
 	/**
-	 * Filters the HTML script tag to defer specifics scripts.
+	 * Filters the HTML script tag to defer specifics scripts
+	 * added by the plugin in order to optimise initial page load.
 	 *
 	 * @since 1.0.0
 	 *
