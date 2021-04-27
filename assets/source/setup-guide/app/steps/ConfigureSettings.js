@@ -167,7 +167,7 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 										variant="subtitle"
 									>
 										{ __(
-											'Rich Pins',
+											'Save to Pinterest',
 											'pinterest-for-woocommerce'
 										) }
 									</Text>
@@ -176,18 +176,6 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 											'Save to Pinterest',
 											'pinterest-for-woocommerce'
 										) }
-										help={
-											<Button
-												isLink
-												href={
-													wcSettings.pin4wc
-														.pinterestLinks.richPins
-												}
-												target="_blank"
-											>
-												<Icon icon="editor-help" />
-											</Button>
-										}
 										checked={ options.save_to_pinterest }
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
