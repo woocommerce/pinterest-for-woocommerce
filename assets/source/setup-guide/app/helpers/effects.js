@@ -28,7 +28,7 @@ export const useBodyClasses = ( style ) => {
 				document.body.parentNode.classList.add( 'wp-toolbar' );
 			}
 		};
-	}, [] );
+	}, [ style ] );
 };
 
 export const useCreateNotice = ( error ) => {
@@ -38,5 +38,5 @@ export const useCreateNotice = ( error ) => {
 		if ( error ) {
 			createNotice( 'error', error );
 		}
-	}, [ error ] );
+	}, [ error, createNotice ] );
 };

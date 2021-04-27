@@ -73,19 +73,17 @@ const WizardApp = () => {
 
 	const getCurrentStep = () => {
 		const query = getQuery();
-		const currentStep = steps.find( ( s ) => s.key === query.step );
+		const step = steps.find( ( s ) => s.key === query.step );
 
-		if ( ! currentStep ) {
+		if ( ! step ) {
 			return steps[ 0 ].key;
 		}
 
-		return currentStep.key;
+		return step.key;
 	};
 
-	const goToNextStep = ( currentStep ) => {
-		const currentStepIndex = steps.findIndex(
-			( s ) => s.key === currentStep.key
-		);
+	const goToNextStep = ( step ) => {
+		const currentStepIndex = steps.findIndex( ( s ) => s.key === step.key );
 
 		const nextStep = steps[ currentStepIndex + 1 ];
 
