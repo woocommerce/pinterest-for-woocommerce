@@ -77,10 +77,12 @@ class DomainVerification extends VendorAPI {
 
 		} catch ( \Throwable $th ) {
 
+			$error_code = $th->getCode() >= 400 ? $th->getCode() : 400;
+
 			/* Translators: The error description as returned from the API */
 			$error_message = sprintf( esc_html__( 'Your domain could not be automatically verified. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
 
-			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_verification_error', $error_message, array( 'status' => $th->getCode() ) );
+			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_verification_error', $error_message, array( 'status' => $error_code ) );
 
 		}
 	}
