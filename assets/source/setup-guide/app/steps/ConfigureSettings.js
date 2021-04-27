@@ -14,6 +14,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { OPTIONS_STORE_NAME } from '@woocommerce/data';
+import { Spinner } from '@woocommerce/components';
 
 /**
  * Internal dependencies
@@ -106,83 +107,96 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							<Text
-								className="woocommerce-setup-guide__checkbox-heading"
-								variant="subtitle"
-							>
-								{ __(
-									'Tracking',
-									'pinterest-for-woocommerce'
-								) }
-							</Text>
-							<CheckboxControl
-								label={ __(
-									'Track conversions',
-									'pinterest-for-woocommerce'
-								) }
-								checked={ options.track_conversions }
-								className="woocommerce-setup-guide__checkbox-group"
-								onChange={ () =>
-									handleOptionChange( 'track_conversions' )
-								}
-							/>
-							<CheckboxControl
-								label={ __(
-									'Enhanced Match support',
-									'pinterest-for-woocommerce'
-								) }
-								help={
-									<Button
-										isLink
-										href={
-											wcSettings.pin4wc.pinterestLinks
-												.enhancedMatch
-										}
-										target="_blank"
+							{ Object.keys( options ).length > 0 ? (
+								<>
+									<Text
+										className="woocommerce-setup-guide__checkbox-heading"
+										variant="subtitle"
 									>
-										<Icon icon="editor-help" />
-									</Button>
-								}
-								checked={ options.enhanced_match_support }
-								className="woocommerce-setup-guide__checkbox-group"
-								onChange={ () =>
-									handleOptionChange(
-										'enhanced_match_support'
-									)
-								}
-							/>
-							<Text
-								className="woocommerce-setup-guide__checkbox-heading"
-								variant="subtitle"
-							>
-								{ __(
-									'Rich Pins',
-									'pinterest-for-woocommerce'
-								) }
-							</Text>
-							<CheckboxControl
-								label={ __(
-									'Save to Pinterest',
-									'pinterest-for-woocommerce'
-								) }
-								help={
-									<Button
-										isLink
-										href={
-											wcSettings.pin4wc.pinterestLinks
-												.richPins
+										{ __(
+											'Tracking',
+											'pinterest-for-woocommerce'
+										) }
+									</Text>
+									<CheckboxControl
+										label={ __(
+											'Track conversions',
+											'pinterest-for-woocommerce'
+										) }
+										checked={ options.track_conversions }
+										className="woocommerce-setup-guide__checkbox-group"
+										onChange={ () =>
+											handleOptionChange(
+												'track_conversions'
+											)
 										}
-										target="_blank"
+									/>
+									<CheckboxControl
+										label={ __(
+											'Enhanced Match support',
+											'pinterest-for-woocommerce'
+										) }
+										help={
+											<Button
+												isLink
+												href={
+													wcSettings.pin4wc
+														.pinterestLinks
+														.enhancedMatch
+												}
+												target="_blank"
+											>
+												<Icon icon="editor-help" />
+											</Button>
+										}
+										checked={
+											options.enhanced_match_support
+										}
+										className="woocommerce-setup-guide__checkbox-group"
+										onChange={ () =>
+											handleOptionChange(
+												'enhanced_match_support'
+											)
+										}
+									/>
+									<Text
+										className="woocommerce-setup-guide__checkbox-heading"
+										variant="subtitle"
 									>
-										<Icon icon="editor-help" />
-									</Button>
-								}
-								checked={ options.save_to_pinterest }
-								className="woocommerce-setup-guide__checkbox-group"
-								onChange={ () =>
-									handleOptionChange( 'save_to_pinterest' )
-								}
-							/>
+										{ __(
+											'Rich Pins',
+											'pinterest-for-woocommerce'
+										) }
+									</Text>
+									<CheckboxControl
+										label={ __(
+											'Save to Pinterest',
+											'pinterest-for-woocommerce'
+										) }
+										help={
+											<Button
+												isLink
+												href={
+													wcSettings.pin4wc
+														.pinterestLinks.richPins
+												}
+												target="_blank"
+											>
+												<Icon icon="editor-help" />
+											</Button>
+										}
+										checked={ options.save_to_pinterest }
+										className="woocommerce-setup-guide__checkbox-group"
+										onChange={ () =>
+											handleOptionChange(
+												'save_to_pinterest'
+											)
+										}
+									/>
+								</>
+							) : (
+								<Spinner />
+							) }
 						</CardBody>
 					</Card>
 
