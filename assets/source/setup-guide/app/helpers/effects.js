@@ -4,11 +4,11 @@
 import { useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 
-export const useBodyClasses = style => {
+export const useBodyClasses = ( style ) => {
 	useEffect( () => {
 		document.body.classList.add( 'woocommerce-setup-guide__body' );
 
-		if ( 'wizard' === style ) {
+		if ( style === 'wizard' ) {
 			document.body.parentNode.classList.remove( 'wp-toolbar' );
 			document.body.classList.remove( 'woocommerce-admin-is-loading' );
 			document.body.classList.remove( 'woocommerce-embed-page' );
@@ -19,17 +19,19 @@ export const useBodyClasses = style => {
 		return () => {
 			document.body.classList.remove( 'woocommerce-setup-guide__body' );
 
-			if ( 'wizard' === style ) {
+			if ( style === 'wizard' ) {
 				document.body.classList.remove( 'woocommerce-onboarding' );
 				document.body.classList.add( 'woocommerce-embed-page' );
-				document.body.classList.remove( 'woocommerce-admin-full-screen' );
+				document.body.classList.remove(
+					'woocommerce-admin-full-screen'
+				);
 				document.body.parentNode.classList.add( 'wp-toolbar' );
 			}
 		};
 	}, [] );
-}
+};
 
-export const useCreateNotice = error => {
+export const useCreateNotice = ( error ) => {
 	const { createNotice } = useDispatch( 'core/notices' );
 
 	useEffect( () => {
@@ -37,4 +39,4 @@ export const useCreateNotice = error => {
 			createNotice( 'error', error );
 		}
 	}, [ error ] );
-}
+};

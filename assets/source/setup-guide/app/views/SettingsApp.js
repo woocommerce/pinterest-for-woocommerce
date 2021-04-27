@@ -15,7 +15,9 @@ import TransientNotices from '../components/TransientNotices';
 import { useBodyClasses, useCreateNotice } from '../helpers/effects';
 
 const SettingsApp = () => {
-	const pin4wc = useSelect( select => select( OPTIONS_STORE_NAME ).getOption( wcSettings.pin4wc.optionsName ) );
+	const pin4wc = useSelect( ( select ) =>
+		select( OPTIONS_STORE_NAME ).getOption( wcSettings.pin4wc.optionsName )
+	);
 
 	useBodyClasses();
 	useCreateNotice( wcSettings.pin4wc.error );

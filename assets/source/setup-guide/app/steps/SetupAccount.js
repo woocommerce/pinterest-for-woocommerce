@@ -126,9 +126,7 @@ const SetupAccount = ( {
 											) }: ${
 												options.account_data.username
 											}
-											- ${
-												options.account_data.id
-											}
+											- ${ options.account_data.id }
 											` }</Text>
 										) }
 										<Button
