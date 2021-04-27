@@ -75,7 +75,9 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	};
 
 	const handleCompleteSetup = async () => {
-		handleOptionChange( 'is_setup_complete', true );
+		await handleOptionChange( 'is_setup_complete', true );
+
+		window.location = new URL( wcSettings.pin4wc.adminUrl );
 	};
 
 	return (
@@ -181,11 +183,7 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 
 					{ view === 'wizard' && (
 						<div className="woocommerce-setup-guide__footer-button">
-							<Button
-								isPrimary
-								href={ wcSettings.pin4wc.adminUrl }
-								onClick={ handleCompleteSetup }
-							>
+							<Button isPrimary onClick={ handleCompleteSetup }>
 								{ __(
 									'Complete Setup',
 									'pinterest-for-woocommerce'
