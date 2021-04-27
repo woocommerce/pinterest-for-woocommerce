@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
@@ -83,7 +84,9 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	const handleCompleteSetup = async () => {
 		await handleOptionChange( 'is_setup_complete', true );
 
-		window.location = new URL( wcSettings.pin4wc.adminUrl );
+		window.location = new URL(
+			decodeEntities( wcSettings.pin4wc.adminUrl )
+		);
 	};
 
 	return (

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
@@ -154,10 +155,10 @@ const SetupAccount = ( {
 									<FlexItem>
 										<Button
 											isSecondary
-											href={
+											href={ decodeEntities(
 												wcSettings.pin4wc
 													.serviceLoginUrl
-											}
+											) }
 										>
 											{ __(
 												'Connect',
