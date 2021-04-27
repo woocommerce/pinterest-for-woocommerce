@@ -111,7 +111,7 @@ class Auth extends VendorAPI {
 
 			Base::instance()->set_token();
 
-			do_action( 'pinterest_for_woocommerce_account_updated' );
+			do_action( 'pinterest_for_woocommerce_token_saved' );
 		}
 
 		wp_safe_redirect( $this->get_redirect_url( $request->get_param( 'view' ) ) . $error_args );

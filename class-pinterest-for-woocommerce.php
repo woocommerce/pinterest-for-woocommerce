@@ -48,6 +48,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		protected static $dirty_settings = false;
 
 		/**
+		 * The default settings that will be created
+		 * with the given values, if they don't exist.
+		 *
+		 * @var Pinterest_For_Woocommerce
+		 * @since 1.0.0
+		 */
+		protected static $default_settings = array(
+			'track_conversions'      => true,
+			'enhanced_match_support' => false,
+			'save_to_pinterest'      => true,
+		);
+
+		/**
 		 * Main Pinterest_For_Woocommerce Instance.
 		 *
 		 * Ensures only one instance of Pinterest_For_Woocommerce is loaded or can be loaded.
@@ -166,7 +179,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'inject_verification_code' ) );
 
-			add_action( 'pinterest_for_woocommerce_account_updated', array( $this, 'update_account_data' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 		}
 
 		/**
@@ -460,6 +474,21 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		}
 
+
+		/**
+		 * Sets the default settings based on the
+		 * given values in self::$default_settings
+		 *
+		 * @return boolean
+		 */
+		public static function set_default_settings() {
+
+			$settings = self::get_settings( true );
+			$settings = wp_parse_args( $settings, self::$default_settings );
+
+			return self::save_settings( $settings );
+
+		}
 	}
 
 endif;
