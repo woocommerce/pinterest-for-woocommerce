@@ -13,64 +13,41 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Automattic\WooCommerce\Pinterest\SaveToPinterest;
 
-require_once Pinterest_For_Woocommerce()->plugin_path() . '/includes/class-pinterest-for-woocommerce-assets.php';
-
 /**
  * Pinterest_For_Woocommerce_Frontend_Scripts Class.
  */
-class Pinterest_For_Woocommerce_Frontend_Assets extends Pinterest_For_Woocommerce_Assets {
+class Pinterest_For_Woocommerce_Frontend_Assets {
 
 	/**
 	 * Hook in methods.
 	 */
 	public function __construct() {
-		add_action( 'wp_enqueue_scripts', array( $this, 'load_scripts' ) );
-		add_action( 'wp_print_scripts', array( $this, 'localize_printed_scripts' ), 5 );
-		add_action( 'wp_print_footer_scripts', array( $this, 'localize_printed_scripts' ), 5 );
+		add_action( 'wp_enqueue_scripts', array( $this, 'load_assets' ) );
 		add_filter( 'script_loader_tag', array( $this, 'maybe_defer_scripts' ), 10, 3 );
 	}
 
-	/**
-	 * Get styles for the frontend.
-	 *
-	 * @return array
-	 */
-	public function get_styles() {
 
-		$styles = array();
+	/**
+	 * Enqueues frontend related scripts & styles
+	 *
+	 * @return void
+	 */
+	public function load_assets() {
 
 		$enabled_in_loop    = ( ( is_front_page() || is_woocommerce() ) && SaveToPinterest::show_in_loop() );
 		$enabled_in_product = ( is_product() && SaveToPinterest::show_in_product() );
+		$assets_path_url    = str_replace( array( 'http:', 'https:' ), '', Pinterest_For_Woocommerce()->plugin_url() ) . '/assets/';
+		$ext                = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
-		if ( $enabled_in_loop || $enabled_in_product ) {
-			$styles['pinterest-for-woocommerce-pins'] = array(
-				'src' => $this->localize_asset( 'css/frontend/pinterest-for-woocommerce-pins.css' ),
-			);
+		if ( ! $enabled_in_loop && ! $enabled_in_product ) {
+			return;
 		}
 
-		return apply_filters( 'pinterest_for_woocommerce_enqueue_styles', $styles );
+		wp_enqueue_script( 'pinterest-for-woocommerce-pinit', 'https://assets.pinterest.com/js/pinit.js', array(), PINTEREST_FOR_WOOCOMMERCE_VERSION, true );
+		wp_enqueue_style( 'pinterest-for-woocommerce-pins', $assets_path_url . 'css/frontend/pinterest-for-woocommerce-pins' . $ext . '.css', array(), PINTEREST_FOR_WOOCOMMERCE_VERSION );
+
 	}
 
-	/**
-	 * Get styles for the frontend.
-	 *
-	 * @return array
-	 */
-	public function get_scripts() {
-
-		$scripts = array();
-
-		$enabled_in_loop    = ( ( is_front_page() || is_woocommerce() ) && SaveToPinterest::show_in_loop() );
-		$enabled_in_product = ( is_product() && SaveToPinterest::show_in_product() );
-
-		if ( $enabled_in_loop || $enabled_in_product ) {
-			$scripts['pinterest-for-woocommerce-pinit'] = array(
-				'src' => 'https://assets.pinterest.com/js/pinit.js',
-			);
-		}
-
-		return apply_filters( 'pinterest_for_woocommerce_enqueue_scripts', $scripts );
-	}
 
 	/**
 	 * Filters the HTML script tag to defer specifics scripts.
@@ -84,11 +61,11 @@ class Pinterest_For_Woocommerce_Frontend_Assets extends Pinterest_For_Woocommerc
 	public function maybe_defer_scripts( $tag, $handle, $src ) {
 
 		$defer = array(
-			'pinterest-for-woocommerce-pinit'
+			'pinterest-for-woocommerce-pinit',
 		);
 
-		if ( in_array( $handle, $defer ) ) {
-			return '<script src="' . $src . '" defer="defer"></script>' . "\n";
+		if ( in_array( $handle, $defer, true ) ) {
+			return '<script src="' . $src . '" defer="defer"></script>' . "\n"; // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript --- Not enqueuing here.
 		}
 
 		return $tag;
