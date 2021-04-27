@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class adding Save Pin support.
  */
-class Pins {
+class SaveToPinterest {
 
 	/**
 	 * Initiate class.
@@ -30,7 +30,7 @@ class Pins {
 		}
 
 		if ( $show_product_pin ) {
-			add_filter( 'woocommerce_single_product_image_thumbnail_html', array( __CLASS__, 'filter_product_thumbnail_html' ), 1, 2 );
+			add_action( 'woocommerce_before_single_product_summary', array( __CLASS__, 'render_product_pin' ) );
 		}
 
 		if ( $show_loop_pins ) {
@@ -53,23 +53,6 @@ class Pins {
 		}
 
 		echo wp_kses_post( self::render_pin( $product->get_id() ) );
-	}
-
-
-	/**
-	 * Filter Product thumbnail to add Save Pin HTML.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $html Product's Thumbnail HTML.
-	 * @param int $post_thumbnail_id Post Thumbnail ID.
-	 *
-	 * @return string
-	 */
-	public static function filter_product_thumbnail_html( $html, $post_thumbnail_id ) {
-
-		//	Set the pin as first element inside the product thumbnail before the anchor element
-		return str_replace( '><a href="', '>' . self::render_pin( '', $post_thumbnail_id ) . '<a href="', $html );
 	}
 
 
@@ -109,7 +92,7 @@ class Pins {
 
 	/**
 	 * Return if must show Save Pin in the loop
-	 *
+	 * 
 	 * @since 1.0.0
 	 *
 	 * @return bool

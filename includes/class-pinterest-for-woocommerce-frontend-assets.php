@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Automattic\WooCommerce\Pinterest\Pins;
+use Automattic\WooCommerce\Pinterest\SaveToPinterest;
 
 require_once Pinterest_For_Woocommerce()->plugin_path() . '/includes/class-pinterest-for-woocommerce-assets.php';
 
@@ -39,8 +39,8 @@ class Pinterest_For_Woocommerce_Frontend_Assets extends Pinterest_For_Woocommerc
 
 		$styles = array();
 
-		$enabled_in_loop    = ( ( is_front_page() || is_woocommerce() ) && Pins::show_in_loop() );
-		$enabled_in_product = ( is_product() && Pins::show_in_product() );
+		$enabled_in_loop    = ( ( is_front_page() || is_woocommerce() ) && SaveToPinterest::show_in_loop() );
+		$enabled_in_product = ( is_product() && SaveToPinterest::show_in_product() );
 
 		if ( $enabled_in_loop || $enabled_in_product ) {
 			$styles['pinterest-for-woocommerce-pins'] = array(
@@ -60,8 +60,8 @@ class Pinterest_For_Woocommerce_Frontend_Assets extends Pinterest_For_Woocommerc
 
 		$scripts = array();
 
-		$enabled_in_loop    = ( ( is_front_page() || is_woocommerce() ) && Pins::show_in_loop() );
-		$enabled_in_product = ( is_product() && Pins::show_in_product() );
+		$enabled_in_loop    = ( ( is_front_page() || is_woocommerce() ) && SaveToPinterest::show_in_loop() );
+		$enabled_in_product = ( is_product() && SaveToPinterest::show_in_product() );
 
 		if ( $enabled_in_loop || $enabled_in_product ) {
 			$scripts['pinterest-for-woocommerce-pinit'] = array(
