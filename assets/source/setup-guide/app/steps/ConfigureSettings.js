@@ -30,6 +30,7 @@ const ALLOWED_OPTIONS = [
 
 const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	const [ options, setOptions ] = useState( {} );
+	const [ isSaving, setIsSaving ] = useState( false );
 
 	useEffect( () => {
 		if ( options !== pin4wc ) {
@@ -41,6 +42,8 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 		if ( ! ALLOWED_OPTIONS.includes( name ) ) {
 			return;
 		}
+
+		setIsSaving( true );
 
 		const oldOptions = Object.assign( {}, options );
 		const newOptions = {
@@ -72,6 +75,8 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 				)
 			);
 		}
+
+		setIsSaving( false );
 	};
 
 	const handleCompleteSetup = async () => {
@@ -183,11 +188,20 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 
 					{ view === 'wizard' && (
 						<div className="woocommerce-setup-guide__footer-button">
-							<Button isPrimary onClick={ handleCompleteSetup }>
-								{ __(
-									'Complete Setup',
-									'pinterest-for-woocommerce'
-								) }
+							<Button
+								isPrimary
+								onClick={ handleCompleteSetup }
+								disabled={ isSaving }
+							>
+								{ isSaving
+									? __(
+											'Saving settings…',
+											'pinterest-for-woocommerce'
+									  )
+									: __(
+											'Complete Setup',
+											'pinterest-for-woocommerce'
+									  ) }
 							</Button>
 						</div>
 					) }
