@@ -162,7 +162,7 @@ class RichPins {
 			$tags['og:description'] = $description;
 		}
 
-		if ( ! array_key_exists( 'enable_availability', $setup['products'] ) ) {
+		if ( array_key_exists( 'enable_availability', $setup['products'] ) ) {
 
 			$status_map = array(
 				'instock'     => 'instock',
@@ -172,7 +172,7 @@ class RichPins {
 
 			$stock_status = $product->get_stock_status();
 
-			if ( ! array_key_exists( $stock_status, $status_map ) ) {
+			if ( array_key_exists( $stock_status, $status_map ) ) {
 				$tags['og:availability'] = $status_map[ $stock_status ];
 			}
 		}
