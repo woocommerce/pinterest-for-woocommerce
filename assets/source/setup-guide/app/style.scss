@@ -46,21 +46,32 @@ $root: ".woocommerce-setup-guide";
 
 		#{$root} {
 
-			&__header {
-				align-items: center;
-				background: #fff;
-				border-bottom: 1px solid #dcdcde;
-				display: flex;
-				height: 60px;
-				justify-content: center;
+			&__main {
 
 				.woocommerce-stepper {
-					margin: 0 16px;
-					width: 100%;
 
 					&__steps {
+						align-items: center;
+						display: flex;
+						height: 60px;
+						justify-content: center;
 						margin: 0 auto;
 						max-width: 768px;
+						overview: hidden;
+						position: relative;
+
+						&::before {
+							background: #fff;
+							border-bottom: 1px solid #dcdcde;
+							content: "";
+							display: block;
+							height: 100%;
+							left: 50%;
+							position: absolute;
+							top: 0;
+							transform: translateX(-50%);
+							width: 100vw;
+						}
 					}
 
 					&__step {
@@ -94,6 +105,14 @@ $root: ".woocommerce-setup-guide";
 				.components-card__footer {
 					padding-left: var(--large-gap);
 					padding-right: var(--large-gap);
+				}
+
+				.components-button.is-link.is-destructive {
+					color: #cc1818;
+
+					&:hover:not(:disabled) {
+						color: #710d0d;
+					}
 				}
 			}
 
