@@ -34,14 +34,16 @@ class Pinterest_For_Woocommerce_Frontend_Assets {
 	 */
 	public function load_assets() {
 
-		$enabled_in_loop    = ( ( is_front_page() || is_woocommerce() ) && SaveToPinterest::show_in_loop() );
-		$enabled_in_product = ( is_product() && SaveToPinterest::show_in_product() );
-		$assets_path_url    = str_replace( array( 'http:', 'https:' ), '', Pinterest_For_Woocommerce()->plugin_url() ) . '/assets/';
-		$ext                = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-
-		if ( ! $enabled_in_loop && ! $enabled_in_product ) {
+		if ( ! function_exists( 'is_woocommerce' ) ) {
 			return;
 		}
+
+		if ( ! ( ( is_front_page() || is_woocommerce() || is_product() ) && SaveToPinterest::show_pin_button() ) ) {
+			return;
+		}
+
+		$assets_path_url = str_replace( array( 'http:', 'https:' ), '', Pinterest_For_Woocommerce()->plugin_url() ) . '/assets/';
+		$ext             = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
 		wp_enqueue_script( 'pinterest-for-woocommerce-pinit', 'https://assets.pinterest.com/js/pinit.js', array(), PINTEREST_FOR_WOOCOMMERCE_VERSION, true );
 		wp_enqueue_style( 'pinterest-for-woocommerce-pins', $assets_path_url . 'css/frontend/pinterest-for-woocommerce-pins' . $ext . '.css', array(), PINTEREST_FOR_WOOCOMMERCE_VERSION );

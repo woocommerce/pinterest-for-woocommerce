@@ -22,18 +22,8 @@ class SaveToPinterest {
 	 */
 	public static function maybe_init() {
 
-		$show_loop_pins   = self::show_in_loop();
-		$show_product_pin = self::show_in_product();
-
-		if ( ! $show_loop_pins && ! $show_product_pin ) {
-			return;
-		}
-
-		if ( $show_product_pin ) {
+		if ( self::show_pin_button() ) {
 			add_action( 'woocommerce_before_single_product_summary', array( __CLASS__, 'render_product_pin' ) );
-		}
-
-		if ( $show_loop_pins ) {
 			add_action( 'woocommerce_before_shop_loop_item', array( __CLASS__, 'render_product_pin' ), 1 );
 		}
 	}
@@ -98,55 +88,13 @@ class SaveToPinterest {
 
 
 	/**
-	 * Return if must show Save Pin in the loop
+	 * Return if we must show the Save Pin button.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return bool
 	 */
-	public static function show_in_loop() {
-
-		static $show;
-
-		if ( is_null( $show ) ) {
-
-			/**
-			 * Allow 3rd parties to enable or disable Save Pin feature for the loop.
-			 *
-			 * @since 1.0.0
-			 *
-			 * @param bool $is_enabled If true, Save Pin button will be present in the loop. Default: defined by setup.
-			 */
-			$show = apply_filters( 'pinterest_for_woocommerce_show_loop_pins', Pinterest_For_Woocommerce()::get_setting( 'show_loop_pins' ) );
-		}
-
-		return $show;
-	}
-
-
-	/**
-	 * Return if must show Save Pin in the product single
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return bool
-	 */
-	public static function show_in_product() {
-
-		static $show;
-
-		if ( is_null( $show ) ) {
-
-			/**
-			 * Allow 3rd parties to enable or disable Save Pin feature for product.
-			 *
-			 * @since 1.0.0
-			 *
-			 * @param bool $is_enabled If true, Save Pin button will be present in the product page. Default: defined by setup.
-			 */
-			$show = apply_filters( 'pinterest_for_woocommerce_show_product_pin', Pinterest_For_Woocommerce()::get_setting( 'show_product_pin' ) );
-		}
-
-		return $show;
+	public static function show_pin_button() {
+		return (bool) Pinterest_For_Woocommerce()::get_setting( 'save_to_pinterest' );
 	}
 }
