@@ -22,6 +22,11 @@
 	&>[class*="_button_pin"] {
 		opacity: 0;
 		visibility: hidden;
+
+		@media (hover: none) {
+		    opacity: 1;
+		    visibility: visible;
+		}
 	}
 
 	&:hover {
