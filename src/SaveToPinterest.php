@@ -78,7 +78,7 @@ class SaveToPinterest {
 		 *
 		 */
 		return sprintf(
-			'<a data-pin-do="buttonPin" href="%s"></a>',
+			'<div class="pin4wc-image-wrapper"><a data-pin-do="buttonPin" href="%s"></a></div>',
 			add_query_arg(
 				$attributes,
 				'https://www.pinterest.com/pin/create/button/'
