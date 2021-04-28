@@ -79,7 +79,14 @@ class SaveToPinterest {
 			$attributes['media'] = esc_url( $attachment[0] );
 		}
 
-		//	Return HTML that will be replace by Pinterest
+		/**
+		 * Return HTML that will be replaced by the Pinterest button.
+		 *
+		 * Documentation: https://developers.pinterest.com/docs/widgets/save/
+		 * Here we set the 'pin-do' data attribute to 'buttonPin' so that the
+		 * Image used is the one explicitly set in the media attribute.
+		 *
+		 */
 		return sprintf(
 			'<a data-pin-do="buttonPin" href="%s"></a>',
 			add_query_arg(
@@ -92,7 +99,7 @@ class SaveToPinterest {
 
 	/**
 	 * Return if must show Save Pin in the loop
-	 * 
+	 *
 	 * @since 1.0.0
 	 *
 	 * @return bool
