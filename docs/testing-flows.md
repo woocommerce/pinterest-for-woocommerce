@@ -16,6 +16,10 @@ These flows can be used when testing PRs or releases, and as a basis for documen
 
 _tbc_
 
+## Save to Pinterest button
+
+- Shopper can save (pin) products to Pinterest from product page and archive pages, e.g. shop page.
+
 ## Pinterest pins
 
 - Merchant can expose [OpenGraph metadata](https://ogp.me/) for products and posts to enable Rich Pins.
