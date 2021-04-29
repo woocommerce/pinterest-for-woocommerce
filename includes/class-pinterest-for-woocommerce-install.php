@@ -2,8 +2,6 @@
 /**
  * Installation related functions and actions.
  *
- * @author   WooCommece
- * @category Admin
  * @package  Pinterest_For_Woocommerce/Classes
  * @version  1.0.0
  */
@@ -21,9 +19,9 @@ class Pinterest_For_Woocommerce_Install {
 	 * Install Pinterest_For_Woocommerce.
 	 */
 	public static function install() {
-		// PERFORM INSTALL ACTIONS HERE
+		// PERFORM INSTALL ACTIONS HERE.
 
-		// Trigger action
+		// Trigger action.
 		do_action( 'pinterest_for_woocommerce_installed' );
 	}
 }

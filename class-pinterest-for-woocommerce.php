@@ -2,8 +2,6 @@
 /**
  * Installation related functions and actions.
  *
- * @author   WooCommece
- * @category Core
  * @package  Pinterest_For_Woocommerce
  * @version  1.0.0
  */
@@ -12,6 +10,9 @@ use Automattic\WooCommerce\Pinterest as Pinterest;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
+	/**
+	 * Base Plugin class holding generic functionality
+	 */
 	final class Pinterest_For_Woocommerce {
 
 		/**
@@ -29,7 +30,35 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		protected static $instance = null;
 
+		/**
+		 * The initialized state of the class.
+		 *
+		 * @var Pinterest_For_Woocommerce
+		 * @since 1.0.0
+		 */
 		protected static $initialized = false;
+
+		/**
+		 * When set to true, the settings have been
+		 * changed and the runtime cached must be flushed
+		 *
+		 * @var Pinterest_For_Woocommerce
+		 * @since 1.0.0
+		 */
+		protected static $dirty_settings = false;
+
+		/**
+		 * The default settings that will be created
+		 * with the given values, if they don't exist.
+		 *
+		 * @var Pinterest_For_Woocommerce
+		 * @since 1.0.0
+		 */
+		protected static $default_settings = array(
+			'track_conversions'      => true,
+			'enhanced_match_support' => false,
+			'save_to_pinterest'      => true,
+		);
 
 		/**
 		 * Main Pinterest_For_Woocommerce Instance.
@@ -51,6 +80,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Cloning is forbidden.
+		 *
 		 * @since 1.0.0
 		 */
 		public function __clone() {
@@ -59,6 +89,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Unserializing instances of this class is forbidden.
+		 *
 		 * @since 1.0.0
 		 */
 		public function __wakeup() {
@@ -90,9 +121,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			define( 'PINTEREST_FOR_WOOCOMMERCE_PREFIX', 'pinterest-for-woocommerce' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME', plugin_basename( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE ) );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', $this->version );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest-for-woocommerce' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest_for_woocommerce' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide-app' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.com/' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE', 'pinterest' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_VERSION', '1' );
@@ -124,7 +155,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Include required core files used in admin and on the frontend.
 		 */
 		private function includes() {
-			include_once 'includes/pinterest-for-woocommerce-core-functions.php';
+
 			include_once 'includes/class-pinterest-for-woocommerce-install.php';
 
 			Pinterest\API\Base::instance();
@@ -140,11 +171,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Hook into actions and filters.
+		 *
 		 * @since  1.0.0
 		 */
 		private function init_hooks() {
 			add_action( 'init', array( $this, 'init' ), 0 );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
+			add_action( 'wp_head', array( $this, 'inject_verification_code' ) );
+
+			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 		}
 
 		/**
@@ -180,6 +216,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Get the plugin url.
+		 *
 		 * @return string
 		 */
 		public function plugin_url() {
@@ -188,6 +225,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Get the plugin path.
+		 *
 		 * @return string
 		 */
 		public function plugin_path() {
@@ -196,6 +234,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Get the template path.
+		 *
 		 * @return string
 		 */
 		public function template_path() {
@@ -204,6 +243,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Get Ajax URL.
+		 *
 		 * @return string
 		 */
 		public function ajax_url() {
@@ -217,14 +257,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param boolean $force
+		 * @param boolean $force Controls whether to force getting a fresh value instead of one from the runtime cache.
 		 * @return array
 		 */
 		public static function get_settings( $force = false ) {
 
 			static $settings;
 
-			if ( is_null( $settings ) || $force ) {
+			if ( is_null( $settings ) || $force || self::$dirty_settings ) {
 				$settings = get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME );
 			}
 
@@ -237,8 +277,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param string $key
-		 * @param boolean $force
+		 * @param string  $key The key of specific option to retrieve.
+		 * @param boolean $force Controls whether to force getting a fresh value instead of one from the runtime cache.
 		 *
 		 * @return mixed
 		 */
@@ -255,8 +295,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param string $key
-		 * @param mixed $data
+		 * @param string $key The key of specific option to retrieve.
+		 * @param mixed  $data The data to save for this option key.
 		 *
 		 * @return boolean
 		 */
@@ -275,11 +315,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array $settings
+		 * @param array $settings The array of settings to save.
 		 *
 		 * @return boolean
 		 */
 		public static function save_settings( $settings ) {
+			self::$dirty_settings = true;
 			return update_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME, $settings );
 		}
 
@@ -290,8 +331,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public function init_api_endpoints() {
 			new Pinterest\API\Auth();
-			new Pinterest\API\Options\Get();
-			new Pinterest\API\Options\Update();
+			new Pinterest\API\DomainVerification();
 		}
 
 		/**
@@ -320,19 +360,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array $token
+		 * @param array $token The array containing the token values to save.
 		 *
 		 * @return boolean
 		 */
 		public static function save_token( $token ) {
 
-			$settings = self::get_settings();
-
 			$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['access_token'] );
-
-			$settings['token'] = $token;
-
-			return self::save_settings( $settings );
+			return self::save_setting( 'token', $token );
 		}
 
 
@@ -373,20 +408,86 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
+		 * @param string $view The context view parameter.
+		 *
 		 * @return string
 		 */
-		public static function get_service_login_url() {
+		public static function get_service_login_url( $view = null ) {
 
 			$control_key = uniqid();
+			$view        = is_null( $view ) ? 'settings' : $view;
 			$state       = http_build_query(
 				array(
-					'redirect' => get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT ) . '?control=' . $control_key,
+					'redirect' => get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT ) . '?control=' . $control_key . '&view=' . $view,
 				)
 			);
 
 			set_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
 
 			return self::get_connection_proxy_url() . 'login/pinterestv3?' . $state;
+		}
+
+
+		/**
+		 * Injects needed meta tags to the site's header
+		 *
+		 * @since 1.0.0
+		 */
+		public function inject_verification_code() {
+
+			if ( self::get_setting( 'verfication_code' ) ) {
+				printf( '<meta name="p:domain_verify" content="%s"/>', esc_attr( self::get_setting( 'verfication_code' ) ) );
+			}
+		}
+
+
+		/**
+		 * Fetches the account_data parameters from Pinterest's API
+		 * Saves it to the plugin options and returns it.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @return array() account_data from Pinterest
+		 */
+		public static function update_account_data() {
+
+			$account_data = Pinterest\API\Base::get_account_info();
+
+			if ( 'success' === $account_data['status'] ) {
+
+				$data = array_intersect_key(
+					(array) $account_data['data'],
+					array(
+						'verified_domains' => '',
+						'domain_verified'  => '',
+						'username'         => '',
+						'id'               => '',
+						'image_medium_url' => '',
+					)
+				);
+
+				Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
+				return $data;
+			}
+
+			return array();
+
+		}
+
+
+		/**
+		 * Sets the default settings based on the
+		 * given values in self::$default_settings
+		 *
+		 * @return boolean
+		 */
+		public static function set_default_settings() {
+
+			$settings = self::get_settings( true );
+			$settings = wp_parse_args( $settings, self::$default_settings );
+
+			return self::save_settings( $settings );
+
 		}
 	}
 

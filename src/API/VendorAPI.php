@@ -2,8 +2,6 @@
 /**
  * Pinterest Vendor API
  *
- * @author      WooCommerce
- * @category    API
  * @package     Pinterest_For_Woocommerce/API
  * @version     1.0.0
  */
@@ -16,20 +14,60 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Base Class for registering our endpoints.
+ */
 class VendorAPI {
 
+	/**
+	 * The API namespace
+	 *
+	 * @var string
+	 */
 	private $api_namespace = \PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v';
-	private $api_version   = \PINTEREST_FOR_WOOCOMMERCE_API_VERSION;
 
+	/**
+	 * The API version
+	 *
+	 * @var string
+	 */
+	private $api_version = \PINTEREST_FOR_WOOCOMMERCE_API_VERSION;
+
+	/**
+	 * The base of the endpoint
+	 *
+	 * @var string
+	 */
 	public $base;
+
+	/**
+	 * The endpoint's methods
+	 *
+	 * @var string
+	 */
 	public $methods = 'POST';
+
+	/**
+	 * The endpoint_callback
+	 *
+	 * @var string
+	 */
 	public $endpoint_callback;
 
-	// Getters
+	/**
+	 * Returns the namespace.
+	 *
+	 * @return string
+	 */
 	public function get_namespace() {
 		return $this->api_namespace;
 	}
 
+	/**
+	 * Returns the version.
+	 *
+	 * @return string
+	 */
 	public function get_version() {
 		return $this->api_version;
 	}
@@ -61,7 +99,7 @@ class VendorAPI {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param WP_REST_Request $request
+	 * @param WP_REST_Request $request The request.
 	 *
 	 * @return boolean
 	 */
@@ -73,8 +111,8 @@ class VendorAPI {
 	/**
 	 * Return is user has permissions to edit option
 	 *
-	 * @param string $option
-	 * @param WP_REST_Request $request
+	 * @param string          $option the option to check for permission.
+	 * @param WP_REST_Request $request The request.
 	 *
 	 * @return boolean
 	 */

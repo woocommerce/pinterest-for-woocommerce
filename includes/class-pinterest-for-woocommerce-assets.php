@@ -5,8 +5,6 @@
  * @class       Pinterest_For_Woocommerce_Frontend_Scripts
  * @version     1.0.0
  * @package     Pinterest_For_Woocommerce/Classes/
- * @category    Class
- * @author      WooCommece
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,26 +18,29 @@ abstract class Pinterest_For_Woocommerce_Assets {
 
 	/**
 	 * Contains an array of script handles registered by WC.
+	 *
 	 * @var array
 	 */
 	private $scripts = array();
 
 	/**
 	 * Contains an array of script handles registered by WC.
+	 *
 	 * @var array
 	 */
 	private $styles = array();
 
 	/**
 	 * Contains an array of script handles localized by WC.
+	 *
 	 * @var array
 	 */
 	private $wp_localize_scripts = array();
 
 	/**
 	 * Tryies to localize the minified version if required and exists, otherwise load the unminified version
-	 * @access protected
-	 * @param  string   $path
+	 *
+	 * @param string $path The path of the asset to localize.
 	 * @return string
 	 */
 	protected function localize_asset( $path ) {
@@ -61,7 +62,7 @@ abstract class Pinterest_For_Woocommerce_Assets {
 
 	/**
 	 * Get styles for the frontend.
-	 * @access private
+	 *
 	 * @return array
 	 */
 	public function get_styles() {
@@ -70,7 +71,7 @@ abstract class Pinterest_For_Woocommerce_Assets {
 
 	/**
 	 * Get styles for the frontend.
-	 * @access private
+	 *
 	 * @return array
 	 */
 	public function get_scripts() {
@@ -81,12 +82,12 @@ abstract class Pinterest_For_Woocommerce_Assets {
 	 * Register a script for use.
 	 *
 	 * @uses   wp_register_script()
-	 * @access private
-	 * @param  string   $handle
-	 * @param  string   $path
-	 * @param  string[] $deps
-	 * @param  string   $version
-	 * @param  boolean  $in_footer
+	 *
+	 * @param  string   $handle handle that will be passed to wp_register_script().
+	 * @param  string   $path path that will be passed to wp_register_script().
+	 * @param  string[] $deps deps that will be passed to wp_register_script().
+	 * @param  string   $version version that will be passed to wp_register_script().
+	 * @param  boolean  $in_footer in_footer that will be passed to wp_register_script().
 	 */
 	private function register_script( $handle, $path, $deps = array( 'jquery' ), $version = PINTEREST_FOR_WOOCOMMERCE_VERSION, $in_footer = true ) {
 		$this->scripts[] = $handle;
@@ -97,12 +98,12 @@ abstract class Pinterest_For_Woocommerce_Assets {
 	 * Register and enqueue a script for use.
 	 *
 	 * @uses   wp_enqueue_script()
-	 * @access private
-	 * @param  string   $handle
-	 * @param  string   $path
-	 * @param  string[] $deps
-	 * @param  string   $version
-	 * @param  boolean  $in_footer
+	 *
+	 * @param  string   $handle handle that will be passed to wp_register_script().
+	 * @param  string   $path path that will be passed to wp_register_script().
+	 * @param  string[] $deps deps that will be passed to wp_register_script().
+	 * @param  string   $version version that will be passed to wp_register_script().
+	 * @param  boolean  $in_footer in_footer that will be passed to wp_register_script().
 	 */
 	private function enqueue_script( $handle, $path = '', $deps = array( 'jquery' ), $version = PINTEREST_FOR_WOOCOMMERCE_VERSION, $in_footer = true ) {
 		if ( ! in_array( $handle, $this->scripts, true ) && $path ) {
@@ -115,12 +116,12 @@ abstract class Pinterest_For_Woocommerce_Assets {
 	 * Register a style for use.
 	 *
 	 * @uses   wp_register_style()
-	 * @access private
-	 * @param  string   $handle
-	 * @param  string   $path
-	 * @param  string[] $deps
-	 * @param  string   $version
-	 * @param  string   $media
+	 *
+	 * @param  string   $handle handle that will be passed to wp_register_style().
+	 * @param  string   $path path that will be passed to wp_register_style().
+	 * @param  string[] $deps deps that will be passed to wp_register_style().
+	 * @param  string   $version version that will be passed to wp_register_style().
+	 * @param  string   $media media that will be passed to wp_register_style().
 	 */
 	private function register_style( $handle, $path, $deps = array(), $version = PINTEREST_FOR_WOOCOMMERCE_VERSION, $media = 'all' ) {
 		$this->styles[] = $handle;
@@ -131,12 +132,12 @@ abstract class Pinterest_For_Woocommerce_Assets {
 	 * Register and enqueue a styles for use.
 	 *
 	 * @uses   wp_enqueue_style()
-	 * @access private
-	 * @param  string   $handle
-	 * @param  string   $path
-	 * @param  string[] $deps
-	 * @param  string   $version
-	 * @param  string   $media
+	 *
+	 * @param  string   $handle handle that will be passed to wp_register_style().
+	 * @param  string   $path path that will be passed to wp_register_style().
+	 * @param  string[] $deps deps that will be passed to wp_register_style().
+	 * @param  string   $version version that will be passed to wp_register_style().
+	 * @param  string   $media media that will be passed to wp_register_style().
 	 */
 	private function enqueue_style( $handle, $path = '', $deps = array(), $version = PINTEREST_FOR_WOOCOMMERCE_VERSION, $media = 'all' ) {
 		if ( ! in_array( $handle, $this->styles, true ) && $path ) {
@@ -159,7 +160,7 @@ abstract class Pinterest_For_Woocommerce_Assets {
 		$assets_path          = str_replace( array( 'http:', 'https:' ), '', Pinterest_For_Woocommerce()->plugin_url() ) . '/assets/';
 		$frontend_script_path = $assets_path . 'js/frontend/';
 
-		// JS Scripts
+		// JS Scripts.
 		$enqueue_scripts = $this->get_scripts();
 		if ( $enqueue_scripts ) {
 			foreach ( $enqueue_scripts as $handle => $args ) {
@@ -176,7 +177,7 @@ abstract class Pinterest_For_Woocommerce_Assets {
 			}
 		}
 
-		// CSS Styles
+		// CSS Styles.
 		$enqueue_styles = $this->get_styles();
 		if ( $enqueue_styles ) {
 			foreach ( $enqueue_styles as $handle => $args ) {
@@ -196,9 +197,9 @@ abstract class Pinterest_For_Woocommerce_Assets {
 
 	/**
 	 * Localize a WC script once.
-	 * @access private
+	 *
 	 * @since  1.0.0 this needs less wp_script_is() calls due to https://core.trac.wordpress.org/ticket/28404 being added in WP 4.0.
-	 * @param  string $handle
+	 * @param  string $handle handle of the script to localize.
 	 */
 	private function localize_script( $handle ) {
 		if ( ! in_array( $handle, $this->wp_localize_scripts, true ) && wp_script_is( $handle ) ) {
@@ -213,8 +214,8 @@ abstract class Pinterest_For_Woocommerce_Assets {
 
 	/**
 	 * Return data for script handles.
-	 * @access private
-	 * @param  string $handle
+	 *
+	 * @param  string $handle handle of the script to get data for.
 	 * @return array|bool
 	 */
 	private function get_script_data( $handle ) {
