@@ -47,15 +47,13 @@ class Base {
 	 *
 	 * @var array
 	 */
-	protected static $token;
+	protected static $token = null;
 
 
 	/**
 	 * Initialize class
 	 */
-	public function __construct() {
-		self::set_token();
-	}
+	public function __construct() {}
 
 
 	/**
@@ -68,13 +66,6 @@ class Base {
 		return self::$instance;
 	}
 
-
-	/**
-	 * Read the token from the settings and set it to the class var.
-	 */
-	public static function set_token() {
-		self::$token = Pinterest_For_Woocommerce()::get_token();
-	}
 
 	/**
 	 * API requests wrapper
@@ -154,6 +145,8 @@ class Base {
 
 		try {
 
+			self::get_token();
+
 			if ( $request['auth_header'] ) {
 				$request['headers']['Authorization'] = 'Bearer ' . self::$token['access_token'];
 			}
@@ -212,6 +205,20 @@ class Base {
 		}
 
 		return $body;
+	}
+
+
+	/**
+	 * Gets and caches the Token from the plugin's settings.
+	 *
+	 * @return mixed
+	 */
+	public static function get_token() {
+		if ( is_null( self::$token ) ) {
+			self::$token = Pinterest_For_Woocommerce()::get_token();
+		}
+
+		return self::$token;
 	}
 
 

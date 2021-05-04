@@ -109,8 +109,6 @@ class Auth extends VendorAPI {
 				)
 			);
 
-			Base::instance()->set_token();
-
 			do_action( 'pinterest_for_woocommerce_token_saved' );
 		}
 
