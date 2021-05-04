@@ -205,28 +205,6 @@ class Base {
 
 
 	/**
-	 * Log data
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $prefix Log prefix.
-	 *
-	 * @param array  $data The data to log.
-	 */
-	public static function log( $prefix, $data ) {
-
-		if ( ! class_exists( 'WC_Logger' ) ) {
-			return;
-		}
-
-		wc_get_logger()->add(
-			self::$log_file_name,
-			self::$log_prefix . ( empty( self::$log_prefix ) || empty( $prefix ) ? '' : ' - ' ) . strtoupper( $prefix ) . ( empty( self::$log_prefix ) && empty( $prefix ) ? '' : ' => ' ) . $data
-		);
-	}
-
-
-	/**
 	 * Return array with response body
 	 *
 	 * @since 1.0.0
