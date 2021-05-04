@@ -33,7 +33,7 @@ class Logger {
 	protected static $log_file_name = \PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX;
 
 	/**
-	 * Always log errors, debug only when is on the settings.
+	 * Always log errors, Logging of debug messages can be disabled via a filter.
 	 *
 	 * @param string $message The message to be logged.
 	 * @param string $level   The level/context of the message.
@@ -58,7 +58,7 @@ class Logger {
 	}
 
 	/**
-	 * Logger for requests, unset auth to don't compromise data.
+	 * Helper for Logging API requests.
 	 *
 	 * @param string $url The URL of the request.
 	 * @param string $args The Arguments of the request.
@@ -74,7 +74,7 @@ class Logger {
 	}
 
 	/**
-	 * Logger for responses.
+	 *  Helper for Logging API responses.
 	 *
 	 * @param string $response The body of the response.
 	 * @param string $level The default level/context of the message to be logged.
