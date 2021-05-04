@@ -158,8 +158,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			include_once 'includes/class-pinterest-for-woocommerce-install.php';
 
-			Pinterest\API\Base::instance();
-
 			if ( $this->is_request( 'admin' ) ) {
 				include_once 'includes/admin/class-pinterest-for-woocommerce-admin.php';
 			}
