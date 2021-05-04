@@ -345,7 +345,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			try {
 				$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::decrypt( $token['access_token'] );
-			} catch ( \Exception $e ) {
+			} catch ( \Exception $th ) {
+				/* Translators: The error description */
+				Pinterest\Logger::log( sprintf( esc_html__( 'Could not decrypt Key value. Try reconnecting to Pinterest. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() ), 'error' );
 				$token = array();
 			}
 
