@@ -146,6 +146,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 					'version'      => PINTEREST_FOR_WOOCOMMERCE_VERSION,
 				);
 
+			$script_info['dependencies'][] = 'wc-settings';
+
 			wp_register_script(
 				$handle,
 				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/index.js',
