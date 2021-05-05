@@ -76,7 +76,7 @@ class Logger {
 	/**
 	 *  Helper for Logging API responses.
 	 *
-	 * @param string $response The body of the response.
+	 * @param array|WP_Error $response The body of the response.
 	 * @param string $level The default level/context of the message to be logged.
 	 *
 	 * @return void
