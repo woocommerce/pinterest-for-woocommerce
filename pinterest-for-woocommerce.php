@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The plugin bootstrap file
  *
@@ -16,7 +15,7 @@
  * Plugin Name:       Pinterest for WooCommerce
  * Plugin URI:        https://woocommerce.com
  * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
- * Version:           1.0.0
+ * Version:           0.1.0
  * Author:            WooCommece
  * Author URI:        https://woocommerce.com
  * License:           GPL-2.0+
@@ -91,9 +90,7 @@ require_once 'class-pinterest-for-woocommerce.php';
  * @since  1.0.0
  * @return Pinterest_For_Woocommerce
  */
-
-// phpcs:ignore WordPress.NamingConventions.ValidFunctionName
-function Pinterest_For_Woocommerce() {
+function Pinterest_For_Woocommerce() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
 	return Pinterest_For_Woocommerce::instance();
 }
 

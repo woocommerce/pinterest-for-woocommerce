@@ -3,14 +3,12 @@
  * WordPress Plugin Boilerplate Admin
  *
  * @class    Pinterest_For_Woocommerce_Admin
- * @author   WooCommece
- * @category Admin
  * @package  Pinterest_For_Woocommerce/Admin
  * @version  2.6.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 /**

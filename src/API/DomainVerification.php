@@ -2,8 +2,6 @@
 /**
  * API Options
  *
- * @author      WooCommerce
- * @category    API
  * @package     Pinterest_For_Woocommerce/API
  * @version     1.0.0
  */
@@ -17,8 +15,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Endpoint handing Domain verification.
+ */
 class DomainVerification extends VendorAPI {
 
+	/**
+	 * Initialize class
+	 */
 	public function __construct() {
 
 		$this->base              = 'domain_verification';
@@ -34,7 +38,7 @@ class DomainVerification extends VendorAPI {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param WP_REST_Request $request
+	 * @param WP_REST_Request $request The request.
 	 *
 	 * @return boolean
 	 */
@@ -43,6 +47,14 @@ class DomainVerification extends VendorAPI {
 	}
 
 
+	/**
+	 * Handle domain verification by triggering the realtime verification process
+	 * using the Pinterst API.
+	 *
+	 * @return mixed
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
 	public function handle_verification() {
 
 		try {
@@ -55,10 +67,9 @@ class DomainVerification extends VendorAPI {
 
 				$result = Base::trigger_verification();
 
-				do_action( 'pinterest_for_woocommerce_account_updated' );
-
 				if ( 'success' === $result['status'] ) {
-					return $result['data'];
+					$account_data = Pinterest_For_Woocommerce()::update_account_data();
+					return array_merge( (array) $result['data'], array( 'account_data' => $account_data ) );
 				}
 			}
 
@@ -66,7 +77,12 @@ class DomainVerification extends VendorAPI {
 
 		} catch ( \Throwable $th ) {
 
-			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_verification_error', esc_html__( 'Your domain could not be automatically verified. Please checks the logs for additional information.', 'pinterest-for-woocommerce' ) );
+			$error_code = $th->getCode() >= 400 ? $th->getCode() : 400;
+
+			/* Translators: The error description as returned from the API */
+			$error_message = sprintf( esc_html__( 'Your domain could not be automatically verified. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
+
+			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_verification_error', $error_message, array( 'status' => $error_code ) );
 
 		}
 	}

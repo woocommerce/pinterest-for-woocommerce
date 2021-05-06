@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
@@ -14,6 +15,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { OPTIONS_STORE_NAME } from '@woocommerce/data';
+import { Spinner } from '@woocommerce/components';
 
 /**
  * Internal dependencies
@@ -30,6 +32,7 @@ const ALLOWED_OPTIONS = [
 
 const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	const [ options, setOptions ] = useState( {} );
+	const [ isSaving, setIsSaving ] = useState( false );
 
 	useEffect( () => {
 		if ( options !== pin4wc ) {
@@ -38,42 +41,52 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	}, [ pin4wc, options ] );
 
 	const handleOptionChange = async ( name, value ) => {
-		if ( ALLOWED_OPTIONS.includes( name ) ) {
-			const oldOptions = Object.assign( {}, options );
-			const newOptions = {
-				...options,
-				[ name ]: value ?? ! options[ name ],
-			};
-
-			setOptions( newOptions );
-
-			const update = await updateOptions( {
-				[ pin4wcSetupGuide.optionsName ]: newOptions,
-			} );
-
-			if ( update.success ) {
-				createNotice(
-					'success',
-					__(
-						'Settings were saved successfully.',
-						'pinterest-for-woocommerce'
-					)
-				);
-			} else {
-				setOptions( oldOptions );
-				createNotice(
-					'error',
-					__(
-						'There was a problem saving your settings.',
-						'pinterest-for-woocommerce'
-					)
-				);
-			}
+		if ( ! ALLOWED_OPTIONS.includes( name ) ) {
+			return;
 		}
+
+		setIsSaving( true );
+
+		const oldOptions = Object.assign( {}, options );
+		const newOptions = {
+			...options,
+			[ name ]: value ?? ! options[ name ],
+		};
+
+		setOptions( newOptions );
+
+		const update = await updateOptions( {
+			[ wcSettings.pin4wc.optionsName ]: newOptions,
+		} );
+
+		if ( update.success ) {
+			createNotice(
+				'success',
+				__(
+					'Settings were saved successfully.',
+					'pinterest-for-woocommerce'
+				)
+			);
+		} else {
+			setOptions( oldOptions );
+			createNotice(
+				'error',
+				__(
+					'There was a problem saving your settings.',
+					'pinterest-for-woocommerce'
+				)
+			);
+		}
+
+		setIsSaving( false );
 	};
 
 	const handleCompleteSetup = async () => {
-		handleOptionChange( 'is_setup_complete', true );
+		await handleOptionChange( 'is_setup_complete', true );
+
+		window.location = new URL(
+			decodeEntities( wcSettings.pin4wc.adminUrl )
+		);
 	};
 
 	return (
@@ -97,83 +110,84 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							<Text
-								className="woocommerce-setup-guide__checkbox-heading"
-								variant="subtitle"
-							>
-								{ __(
-									'Tracking',
-									'pinterest-for-woocommerce'
-								) }
-							</Text>
-							<CheckboxControl
-								label={ __(
-									'Track conversions',
-									'pinterest-for-woocommerce'
-								) }
-								checked={ options.track_conversions }
-								className="woocommerce-setup-guide__checkbox-group"
-								onChange={ () =>
-									handleOptionChange( 'track_conversions' )
-								}
-							/>
-							<CheckboxControl
-								label={ __(
-									'Enhanced Match support',
-									'pinterest-for-woocommerce'
-								) }
-								help={
-									<Button
-										isLink
-										href={
-											pin4wcSetupGuide.pinterestLinks
-												.enhancedMatch
-										}
-										target="_blank"
+							{ Object.keys( options ).length > 0 ? (
+								<>
+									<Text
+										className="woocommerce-setup-guide__checkbox-heading"
+										variant="subtitle"
 									>
-										<Icon icon="editor-help" />
-									</Button>
-								}
-								checked={ options.enhanced_match_support }
-								className="woocommerce-setup-guide__checkbox-group"
-								onChange={ () =>
-									handleOptionChange(
-										'enhanced_match_support'
-									)
-								}
-							/>
-							<Text
-								className="woocommerce-setup-guide__checkbox-heading"
-								variant="subtitle"
-							>
-								{ __(
-									'Rich Pins',
-									'pinterest-for-woocommerce'
-								) }
-							</Text>
-							<CheckboxControl
-								label={ __(
-									'Save to Pinterest',
-									'pinterest-for-woocommerce'
-								) }
-								help={
-									<Button
-										isLink
-										href={
-											pin4wcSetupGuide.pinterestLinks
-												.richPins
+										{ __(
+											'Tracking',
+											'pinterest-for-woocommerce'
+										) }
+									</Text>
+									<CheckboxControl
+										label={ __(
+											'Track conversions',
+											'pinterest-for-woocommerce'
+										) }
+										checked={ options.track_conversions }
+										className="woocommerce-setup-guide__checkbox-group"
+										onChange={ () =>
+											handleOptionChange(
+												'track_conversions'
+											)
 										}
-										target="_blank"
+									/>
+									<CheckboxControl
+										label={ __(
+											'Enhanced Match support',
+											'pinterest-for-woocommerce'
+										) }
+										help={
+											<Button
+												isLink
+												href={
+													wcSettings.pin4wc
+														.pinterestLinks
+														.enhancedMatch
+												}
+												target="_blank"
+											>
+												<Icon icon="editor-help" />
+											</Button>
+										}
+										checked={
+											options.enhanced_match_support
+										}
+										className="woocommerce-setup-guide__checkbox-group"
+										onChange={ () =>
+											handleOptionChange(
+												'enhanced_match_support'
+											)
+										}
+									/>
+									<Text
+										className="woocommerce-setup-guide__checkbox-heading"
+										variant="subtitle"
 									>
-										<Icon icon="editor-help" />
-									</Button>
-								}
-								checked={ options.save_to_pinterest }
-								className="woocommerce-setup-guide__checkbox-group"
-								onChange={ () =>
-									handleOptionChange( 'save_to_pinterest' )
-								}
-							/>
+										{ __(
+											'Save to Pinterest',
+											'pinterest-for-woocommerce'
+										) }
+									</Text>
+									<CheckboxControl
+										label={ __(
+											'Save to Pinterest',
+											'pinterest-for-woocommerce'
+										) }
+										checked={ options.save_to_pinterest }
+										className="woocommerce-setup-guide__checkbox-group"
+										onChange={ () =>
+											handleOptionChange(
+												'save_to_pinterest'
+											)
+										}
+									/>
+								</>
+							) : (
+								<Spinner />
+							) }
 						</CardBody>
 					</Card>
 
@@ -181,13 +195,18 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 						<div className="woocommerce-setup-guide__footer-button">
 							<Button
 								isPrimary
-								href={ pin4wcSetupGuide.adminUrl }
 								onClick={ handleCompleteSetup }
+								disabled={ isSaving }
 							>
-								{ __(
-									'Complete Setup',
-									'pinterest-for-woocommerce'
-								) }
+								{ isSaving
+									? __(
+											'Saving settings…',
+											'pinterest-for-woocommerce'
+									  )
+									: __(
+											'Complete Setup',
+											'pinterest-for-woocommerce'
+									  ) }
 							</Button>
 						</div>
 					) }
@@ -202,7 +221,7 @@ export default compose(
 		const { getOption } = select( OPTIONS_STORE_NAME );
 
 		return {
-			pin4wc: getOption( pin4wcSetupGuide.optionsName ) || [],
+			pin4wc: getOption( wcSettings.pin4wc.optionsName ) || [],
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

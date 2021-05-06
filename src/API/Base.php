@@ -5,31 +5,50 @@
  * @class       Pinterest_For_Woocommerce_API
  * @version     1.0.0
  * @package     Pinterest_For_WordPress/Classes/
- * @category    Class
- * @author      WooCommerce
  */
 
 namespace Automattic\WooCommerce\Pinterest\API;
+
+use Automattic\WooCommerce\Pinterest\Logger as Logger;
+
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Base API Methods
+ */
 class Base {
 
 	const API_DOMAIN  = 'https://api.pinterest.com';
 	const API_VERSION = 3;
 
-	protected static $instance      = null;
-	protected static $log_file_name = \PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX;
-	protected static $log_prefix    = '';
-	protected static $token;
-	protected static $init;
+	/**
+	 * Holds the instance of the class.
+	 *
+	 * @var Base
+	 */
+	protected static $instance = null;
 
-	public function __construct() {
-		self::set_token();
-	}
 
+	/**
+	 * The token as saved in the settings.
+	 *
+	 * @var array
+	 */
+	protected static $token = null;
+
+
+	/**
+	 * Initialize class
+	 */
+	public function __construct() {}
+
+
+	/**
+	 * Initialize and/or return the instance
+	 */
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
@@ -37,9 +56,6 @@ class Base {
 		return self::$instance;
 	}
 
-	public static function set_token() {
-		self::$token = Pinterest_For_Woocommerce()::get_token();
-	}
 
 	/**
 	 * API requests wrapper
@@ -49,9 +65,13 @@ class Base {
 	 * Request parameter:
 	 * $endpoint
 	 *
-	 * @param array $request (See above)
+	 * @param string $endpoint the endpoint to perform the request on.
+	 * @param string $method eg, POST, GET, PUT etc.
+	 * @param array  $payload Payload to be sent on the request's body.
 	 *
 	 * @return array
+	 *
+	 * @throws \Exception PHP exception.
 	 */
 	public static function make_request( $endpoint, $method = 'POST', $payload = array() ) {
 
@@ -66,10 +86,7 @@ class Base {
 			return self::handle_request( $request );
 		} catch ( \Exception $e ) {
 
-			$title        = __( 'Couldn\'t perform request', 'pinterest-for-woocommerce' );
-			$post_message = __( 'Please try reconnecting with Pinterest.', 'pinterest-for-woocommerce' );
-
-			self::log( 'error', sprintf( '%1$s, %2$s', $title, $post_message ) );
+			Logger::log( $e->getMessage(), 'error' );
 
 			throw $e;
 		}
@@ -90,9 +107,11 @@ class Base {
 	 * array['headers']           array
 	 *          ['content-type']  string    Default: application/json
 	 *
-	 * @param array $request (See above)
+	 * @param array $request (See above).
 	 *
 	 * @return array
+	 *
+	 * @throws \Exception PHP exception.
 	 */
 	public static function handle_request( $request ) {
 
@@ -113,6 +132,8 @@ class Base {
 
 		try {
 
+			self::get_token();
+
 			if ( $request['auth_header'] ) {
 				$request['headers']['Authorization'] = 'Bearer ' . self::$token['access_token'];
 			}
@@ -124,24 +145,19 @@ class Base {
 				'body'      => $request['args'],
 			);
 
-			self::log(
-				'request',
-				wp_json_encode(
-					array(
-						'url'  => $request['url'],
-						'args' => $request['args'],
-					)
-				)
-			);
+			// Log request.
+			Logger::log_request( $request['url'], $request_args, 'debug' );
 
 			$response = wp_remote_request( $request['url'], $request_args );
 
 			if ( is_wp_error( $response ) ) {
-				self::log( 'response', sprintf( 'Error %s', $response->get_error_message() ) );
-				throw new \Exception( $response->get_error_message(), 1 );
+				$error_message = ( is_wp_error( $response ) ) ? $response->get_error_message() : $response['body'];
+
+				throw new \Exception( $error_message, 1 );
 			}
 
-			self::log( 'response', wp_json_encode( $response ) );
+			// Log response.
+			Logger::log_response( $response, 'debug' );
 
 			$body = self::parse_response( $response );
 
@@ -166,7 +182,7 @@ class Base {
 				$message = $body['error_description'];
 			}
 
-			// translators: Additional message
+			/* Translators: Additional message */
 			throw new \Exception( sprintf( __( 'Error Processing Request%s', 'pinterest-for-woocommerce' ), ( empty( $message ) ? '' : ': ' . $message ) ), $response_code );
 		}
 
@@ -174,34 +190,17 @@ class Base {
 	}
 
 
-	public static function log_token( $token ) {
-
-		// Log response without exposing the sensitive data
-		$obody                 = $token;
-		$obody['access_token'] = empty( $obody['access_token'] ) ? '' : '--HIDDEN(' . strlen( $obody['access_token'] ) . ')--';
-		self::log( 'response', wp_json_encode( $obody ) );
-	}
-
-
 	/**
-	 * Log data
+	 * Gets and caches the Token from the plugin's settings.
 	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $prefix
-	 *
-	 * @param array $data
+	 * @return mixed
 	 */
-	public static function log( $prefix, $data ) {
-
-		if ( ! class_exists( 'WC_Logger' ) ) {
-			return;
+	public static function get_token() {
+		if ( is_null( self::$token ) ) {
+			self::$token = Pinterest_For_Woocommerce()::get_token();
 		}
 
-		wc_get_logger()->add(
-			self::$log_file_name,
-			self::$log_prefix . ( empty( self::$log_prefix ) || empty( $prefix ) ? '' : ' - ' ) . strtoupper( $prefix ) . ( empty( self::$log_prefix ) && empty( $prefix ) ? '' : ' => ' ) . $data
-		);
+		return self::$token;
 	}
 
 
@@ -210,9 +209,11 @@ class Base {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param mixed
+	 * @param mixed $response The response to parse.
 	 *
 	 * @return array
+	 *
+	 * @throws \Exception PHP exception.
 	 */
 	protected static function parse_response( $response ) {
 
@@ -226,12 +227,23 @@ class Base {
 	}
 
 
+	/**
+	 * Request the verification data from the API and return the response.
+	 *
+	 * @return mixed
+	 */
 	public static function domain_verification_data() {
 		$response = self::make_request( 'domains/verification', 'GET' );
 		return $response;
 	}
 
 
+	/**
+	 * Trigger the (realtime) verification process using the API and return the response.
+	 *
+	 * @param boolean $allow_multiple Parameter passed to the API.
+	 * @return mixed
+	 */
 	public static function trigger_verification( $allow_multiple = true ) {
 
 		$domain      = wp_parse_url( site_url(), PHP_URL_HOST );
@@ -246,6 +258,11 @@ class Base {
 	}
 
 
+	/**
+	 * Request the account data from the API and return the response.
+	 *
+	 * @return mixed
+	 */
 	public static function get_account_info() {
 		$response = self::make_request( 'users/me', 'GET' );
 		return $response;

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
@@ -50,11 +51,12 @@ const SetupAccount = ( {
 		const newOptions = Object.assign( {}, options );
 
 		delete newOptions.token;
+		delete newOptions.crypto_encoded_key;
 
 		setOptions( newOptions );
 
 		const update = await updateOptions( {
-			[ pin4wcSetupGuide.optionsName ]: newOptions,
+			[ wcSettings.pin4wc.optionsName ]: newOptions,
 		} );
 
 		if ( update.success ) {
@@ -125,9 +127,7 @@ const SetupAccount = ( {
 											) }: ${
 												options.account_data.username
 											}
-											- ${
-												options.account_data.id
-											}
+											- ${ options.account_data.id }
 											` }</Text>
 										) }
 										<Button
@@ -155,9 +155,10 @@ const SetupAccount = ( {
 									<FlexItem>
 										<Button
 											isSecondary
-											href={
-												pin4wcSetupGuide.serviceLoginUrl
-											}
+											href={ decodeEntities(
+												wcSettings.pin4wc
+													.serviceLoginUrl
+											) }
 										>
 											{ __(
 												'Connect',
@@ -176,7 +177,7 @@ const SetupAccount = ( {
 								<Button
 									isLink
 									href={
-										pin4wcSetupGuide.pinterestLinks
+										wcSettings.pin4wc.pinterestLinks
 											.newAccount
 									}
 									target="_blank"
@@ -211,7 +212,7 @@ export default compose(
 		const { getOption } = select( OPTIONS_STORE_NAME );
 
 		return {
-			pin4wc: getOption( pin4wcSetupGuide.optionsName ),
+			pin4wc: getOption( wcSettings.pin4wc.optionsName ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

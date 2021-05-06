@@ -12,6 +12,7 @@
     "@wordpress/compose": "^3.13.1",
     "@wordpress/data": "^4.27.1",
     "@wordpress/element": "^2.13.1",
+    "@wordpress/html-entities": "^2.7.0",
     "@wordpress/i18n": "^3.11.0",
     "@wordpress/notices": "^2.12.7",
     "classnames": "^2.2.6",
@@ -46,6 +47,7 @@
     "gulp-util": "^3.0.8",
     "gulp-vinyl-zip": "^2.1.2",
     "gulp-wp-pot": "^2.3.4",
+    "md5": "^2.3.0",
     "merge-stream": "^1.0.1",
     "node-sass": "^4.14.1",
     "path": ">=0.12.7",
@@ -59,7 +61,8 @@
     "build": "wp-scripts build && gulp build",
     "start": "wp-scripts start",
     "lint:js": "wp-scripts lint-js assets/source/setup-guide",
-    "lint:js:fix": "wp-scripts lint-js assets/source/setup-guide --fix"
+    "lint:js:fix": "wp-scripts lint-js assets/source/setup-guide --fix",
+    "build:zip": "composer install && wp-scripts build && gulp build && gulp package"
   },
   "keywords": [
     "pinterest for wordpress",
