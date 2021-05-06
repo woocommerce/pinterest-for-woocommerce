@@ -59,6 +59,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			'track_conversions'      => true,
 			'enhanced_match_support' => false,
 			'save_to_pinterest'      => true,
+			'rich_pins_on_posts'     => true,
+			'rich_pins_on_products'  => true,
 		);
 
 		/**

@@ -28,6 +28,8 @@ const ALLOWED_OPTIONS = [
 	'enhanced_match_support',
 	'save_to_pinterest',
 	'is_setup_complete',
+	'rich_pins_on_posts',
+	'rich_pins_on_products',
 ];
 
 const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
