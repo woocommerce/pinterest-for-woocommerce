@@ -38,7 +38,7 @@ class Pinterest_For_Woocommerce_Frontend_Assets {
 			return;
 		}
 
-		if ( ! ( ( is_front_page() || is_woocommerce() || is_product() ) && SaveToPinterest::show_pin_button() ) ) {
+		if ( ! ( SaveToPinterest::show_pin_button() && ( is_front_page() || is_woocommerce() || is_product() || self::has_product_blocks() ) ) ) {
 			return;
 		}
 
@@ -48,6 +48,30 @@ class Pinterest_For_Woocommerce_Frontend_Assets {
 		wp_enqueue_script( 'pinterest-for-woocommerce-pinit', 'https://assets.pinterest.com/js/pinit.js', array(), PINTEREST_FOR_WOOCOMMERCE_VERSION, true );
 		wp_enqueue_style( 'pinterest-for-woocommerce-pins', $assets_path_url . 'css/frontend/pinterest-for-woocommerce-pins' . $ext . '.css', array(), PINTEREST_FOR_WOOCOMMERCE_VERSION );
 
+	}
+
+
+	/**
+	 * Checks if we are displaying a page/post that has product blocks in it,
+	 * by calling has_block() for each of the registered WC product blocks with
+	 * product in the name.
+	 *
+	 * @return boolean
+	 */
+	private static function has_product_blocks() {
+
+		$all_blocks = get_dynamic_block_names();
+
+		$product_blocks = preg_grep( '/woocommerce\/\S*product/', $all_blocks );
+
+		foreach ( $product_blocks as $block ) {
+
+			if ( has_block( $block ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 
