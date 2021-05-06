@@ -11,8 +11,13 @@
 		visibility: visible;
 	}
 
-	.product:hover > & {
+	.product:hover > &,
+	.wc-block-grid__product:hover > & {
 		opacity: 1;
 		visibility: visible;
+
+		a {
+			text-decoration: none;
+		}
 	}
 }
