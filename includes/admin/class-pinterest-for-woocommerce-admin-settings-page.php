@@ -232,7 +232,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				return $settings;
 			}
 
-			$settings['pin4wc'] =  array(
+			$settings['pin4wc'] = array(
 				'adminUrl'        => esc_url(
 					add_query_arg(
 						array(
