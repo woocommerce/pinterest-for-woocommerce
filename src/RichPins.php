@@ -34,8 +34,11 @@ class RichPins {
 			return;
 		}
 
+		$tags = array();
+
 		/**
 		 * Allow 3rd parties to disable Rich Pins content.
+		 *
 		 * @see https://developers.pinterest.com/docs/rich-pins/overview/?#opt-out
 		 *
 		 * @since 1.0.0
@@ -45,7 +48,30 @@ class RichPins {
 		$disable_rich_pins = apply_filters( 'pinterest_for_woocommerce_disable_rich_pins', false );
 
 		if ( ! $disable_rich_pins ) {
-			$tags = self::get_opengraph_tags();
+
+			$rich_pins_on_products = Pinterest_For_Woocommerce()::get_setting( 'rich_pins_on_products' );
+			$rich_pins_on_posts    = Pinterest_For_Woocommerce()::get_setting( 'rich_pins_on_posts' );
+
+			if ( $rich_pins_on_products || $rich_pins_on_posts ) {
+
+				$args = apply_filters(
+					'pinterest_for_woocommerce_richpins_args',
+					array(
+						'products' => array(
+							'enabled'             => $rich_pins_on_products,
+							'enable_description'  => true,
+							'enable_availability' => true,
+						),
+						'posts'    => array(
+							'enabled'             => $rich_pins_on_posts,
+							'enable_publish_time' => true,
+							'enable_author'       => true,
+						),
+					)
+				);
+
+				$tags = self::get_opengraph_tags( $args );
+			}
 		}
 
 		if ( empty( $tags ) || $disable_rich_pins ) {
@@ -70,30 +96,11 @@ class RichPins {
 	 *
 	 * @return array
 	 */
-	protected static function get_opengraph_tags() {
+	protected static function get_opengraph_tags( $args ) {
 
-		$setup = wp_parse_args(
-			Pinterest_For_Woocommerce()::get_setting( 'rich_pins' ),
-			array(
-				'products' => array(
-					'enabled'             => true,
-					'enable_description'  => true,
-					'enable_availability' => true,
-				),
-				'posts'    => array(
-					'enabled'             => true,
-					'enable_publish_time' => true,
-					'enable_author'       => true,
-				),
-			)
-		);
-
-		if ( empty( $setup['products']['enabled'] ) && empty( $setup['posts']['enabled'] ) ) {
+		if ( empty( $args['products']['enabled'] ) && empty( $args['posts']['enabled'] ) ) {
 			return array();
 		}
-
-		add_filter( 'pinterest_for_woocommerce_opengraph_tags', array( __CLASS__, 'add_product_opengraph_tags' ), 10, 2 );
-		add_filter( 'pinterest_for_woocommerce_opengraph_tags', array( __CLASS__, 'add_post_opengraph_tags' ), 10, 2 );
 
 		$tags = array(
 			'og:url'       => esc_url( get_the_permalink() ),
@@ -107,15 +114,18 @@ class RichPins {
 			$tags['og:image'] = $image;
 		}
 
+		$tags = self::add_product_opengraph_tags( $tags, $args );
+		$tags = self::add_post_opengraph_tags( $tags, $args );
+
 		/**
 		 * Filter OpenGraph tags.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param array $is_disable OpenGraph tags.
-		 * @param array $setup      Rich Pins setup.
+		 * @param array $tags  OpenGraph tags.
+		 * @param array $args Rich Pins arguments.
 		 */
-		return (array) apply_filters( 'pinterest_for_woocommerce_opengraph_tags', $tags, $setup );
+		return (array) apply_filters( 'pinterest_for_woocommerce_opengraph_tags', $tags, $args );
 	}
 
 
@@ -127,13 +137,13 @@ class RichPins {
 	 * @since 1.0.0
 	 *
 	 * @param array $tags  Open Graph Tags.
-	 * @param array $setup Rich Pins Setup.
+	 * @param array $args Rich Pins arguments.
 	 *
 	 * @return array
 	 */
-	public static function add_product_opengraph_tags( $tags, $setup ) {
+	public static function add_product_opengraph_tags( $tags, $args ) {
 
-		if ( ! is_singular( 'product' ) || empty( $setup['products']['enabled'] ) ) {
+		if ( ! is_singular( 'product' ) || empty( $args['products']['enabled'] ) ) {
 			return $tags;
 		}
 
@@ -154,7 +164,7 @@ class RichPins {
 			$tags['og:price:standard_amount'] = $product->get_regular_price();
 		}
 
-		if ( ! empty( $setup['products']['enable_description'] ) ) {
+		if ( ! empty( $args['products']['enable_description'] ) ) {
 			$description = $product->get_short_description();
 			if ( empty( $description ) ) {
 				$description = $product->get_description();
@@ -162,7 +172,7 @@ class RichPins {
 			$tags['og:description'] = $description;
 		}
 
-		if ( array_key_exists( 'enable_availability', $setup['products'] ) ) {
+		if ( array_key_exists( 'enable_availability', $args['products'] ) ) {
 
 			$status_map = array(
 				'instock'     => 'instock',
@@ -189,13 +199,13 @@ class RichPins {
 	 * @since 1.0.0
 	 *
 	 * @param array $tags  OpenGraph tags.
-	 * @param array $setup Rich Pins Setup.
+	 * @param array $args Rich Pins arguments.
 	 *
 	 * @return array
 	 */
-	public static function add_post_opengraph_tags( $tags, $setup ) {
+	public static function add_post_opengraph_tags( $tags, $args ) {
 
-		if ( ! is_singular( 'post' ) || empty( $setup['posts']['enabled'] ) ) {
+		if ( ! is_singular( 'post' ) || empty( $args['posts']['enabled'] ) ) {
 			return $tags;
 		}
 
@@ -203,12 +213,12 @@ class RichPins {
 		$tags['og:description'] = get_the_excerpt();
 
 		// tags enabled by setup.
-		if ( ! empty( $setup['posts']['enable_publish_time'] ) ) {
+		if ( ! empty( $args['posts']['enable_publish_time'] ) ) {
 			$tags['article:published_time'] = get_the_date( 'c' );
 		}
 
 		$author = get_userdata( get_queried_object()->post_author );
-		if ( ! empty( $setup['posts']['enable_author'] ) && ! empty( $author->display_name ) ) {
+		if ( ! empty( $args['posts']['enable_author'] ) && ! empty( $author->display_name ) ) {
 			$tags['article:author'] = $author->display_name;
 		}
 
