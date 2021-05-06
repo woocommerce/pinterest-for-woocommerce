@@ -92,7 +92,7 @@ class Crypto {
 				return self::get_key( 1 );
 			}
 
-			API\Base::log( 'error', esc_html__( 'Could not decrypt Key value. Try reconnecting to Pinterest.', 'pinterest-for-woocommerce' ) );
+			Logger::log( esc_html__( 'Could not decrypt Key value. Try reconnecting to Pinterest.', 'pinterest-for-woocommerce' ), 'error' );
 			Pinterest_For_Woocommerce()::save_setting( 'crypto_encoded_key', false ); // Reset base key.
 			return false;
 		}
@@ -136,7 +136,7 @@ class Crypto {
 			// Either there's a bug in our code, we're trying to decrypt with the
 			// wrong key, or the encrypted credit card number was corrupted in the
 			// database.
-			API\Base::log( 'error', esc_html__( 'Could not decrypt Key value. Try reconnecting to Pinterest.', 'pinterest-for-woocommerce' ) );
+			Logger::log( esc_html__( 'Could not decrypt Key value. Try reconnecting to Pinterest.', 'pinterest-for-woocommerce' ), 'error' );
 		}
 
 		return $value;

@@ -7,6 +7,7 @@
  */
 
 namespace Automattic\WooCommerce\Pinterest\API;
+use Automattic\WooCommerce\Pinterest\Logger as Logger;
 
 use \WP_REST_Request;
 
@@ -97,7 +98,7 @@ class Auth extends VendorAPI {
 
 		if ( ! empty( $error ) ) {
 			$error_args = '&error=' . $error;
-			Base::log( 'error', wp_json_encode( $error ) );
+			Logger::log( wp_json_encode( $error ), 'error' );
 		}
 
 		// Save token information.

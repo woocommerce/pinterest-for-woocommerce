@@ -9,6 +9,9 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest\Logger as Logger;
+
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -28,19 +31,6 @@ class Base {
 	 */
 	protected static $instance = null;
 
-	/**
-	 * The log_file_name.
-	 *
-	 * @var string
-	 */
-	protected static $log_file_name = \PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX;
-
-	/**
-	 * The log prefix.
-	 *
-	 * @var string
-	 */
-	protected static $log_prefix = '';
 
 	/**
 	 * The token as saved in the settings.
@@ -96,10 +86,7 @@ class Base {
 			return self::handle_request( $request );
 		} catch ( \Exception $e ) {
 
-			$title        = __( 'Couldn\'t perform request', 'pinterest-for-woocommerce' );
-			$post_message = __( 'Please try reconnecting with Pinterest.', 'pinterest-for-woocommerce' );
-
-			self::log( 'error', sprintf( '%1$s, %2$s', $title, $post_message ) );
+			Logger::log( $e->getMessage(), 'error' );
 
 			throw $e;
 		}
@@ -158,24 +145,19 @@ class Base {
 				'body'      => $request['args'],
 			);
 
-			self::log(
-				'request',
-				wp_json_encode(
-					array(
-						'url'  => $request['url'],
-						'args' => $request['args'],
-					)
-				)
-			);
+			// Log request.
+			Logger::log_request( $request['url'], $request_args, 'debug' );
 
 			$response = wp_remote_request( $request['url'], $request_args );
 
 			if ( is_wp_error( $response ) ) {
-				self::log( 'response', sprintf( 'Error %s', $response->get_error_message() ) );
-				throw new \Exception( $response->get_error_message(), 1 );
+				$error_message = ( is_wp_error( $response ) ) ? $response->get_error_message() : $response['body'];
+
+				throw new \Exception( $error_message, 1 );
 			}
 
-			self::log( 'response', wp_json_encode( $response ) );
+			// Log response.
+			Logger::log_response( $response, 'debug' );
 
 			$body = self::parse_response( $response );
 
@@ -219,28 +201,6 @@ class Base {
 		}
 
 		return self::$token;
-	}
-
-
-	/**
-	 * Log data
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $prefix Log prefix.
-	 *
-	 * @param array  $data The data to log.
-	 */
-	public static function log( $prefix, $data ) {
-
-		if ( ! class_exists( 'WC_Logger' ) ) {
-			return;
-		}
-
-		wc_get_logger()->add(
-			self::$log_file_name,
-			self::$log_prefix . ( empty( self::$log_prefix ) || empty( $prefix ) ? '' : ' - ' ) . strtoupper( $prefix ) . ( empty( self::$log_prefix ) && empty( $prefix ) ? '' : ' => ' ) . $data
-		);
 	}
 
 
