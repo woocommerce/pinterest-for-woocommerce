@@ -2,6 +2,9 @@
 <ruleset name="WooCommerce Coding Standards">
 	<description>Pinterest for WooCommerce ruleset.</description>
 	
+	<!-- Οnly files with a php extension -->
+	<arg name="extensions" value="php" />
+
 	<!-- Exclude paths -->
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
