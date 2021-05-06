@@ -219,6 +219,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			return $registered_tasks_list_items;
 		}
 
+
+		/**
+		 * Initialize asset data and registering it with
+		 * the internal WC data registry.
+		 *
+		 * @param array $settings The settings array to be filtered.
+		 *
+		 * @return array
+		 */
 		public function component_settings( $settings ) {
 			if ( $this->is_setup_guide_page() ) {
 				$default_view = 'settings';
