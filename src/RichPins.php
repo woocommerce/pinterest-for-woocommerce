@@ -94,6 +94,8 @@ class RichPins {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @param array $args Rich Pins arguments.
+	 *
 	 * @return array
 	 */
 	protected static function get_opengraph_tags( $args ) {

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Installation related functions and actions.
  *
