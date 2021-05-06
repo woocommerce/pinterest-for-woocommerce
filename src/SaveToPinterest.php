@@ -25,6 +25,7 @@ class SaveToPinterest {
 		if ( self::show_pin_button() ) {
 			add_action( 'woocommerce_before_single_product_summary', array( __CLASS__, 'render_product_pin' ) );
 			add_action( 'woocommerce_before_shop_loop_item', array( __CLASS__, 'render_product_pin' ), 1 );
+			add_filter( 'woocommerce_blocks_product_grid_item_html', array( __CLASS__, 'add_to_wc_blocks' ), 10, 3 );
 		}
 	}
 
@@ -75,7 +76,6 @@ class SaveToPinterest {
 		 * Documentation: https://developers.pinterest.com/docs/widgets/save/
 		 * Here we set the 'pin-do' data attribute to 'buttonPin' so that the
 		 * Image used is the one explicitly set in the media attribute.
-		 *
 		 */
 		return sprintf(
 			'<div class="pin4wc-image-wrapper"><a data-pin-do="buttonPin" href="%s"></a></div>',
@@ -97,4 +97,26 @@ class SaveToPinterest {
 	public static function show_pin_button() {
 		return (bool) Pinterest_For_Woocommerce()::get_setting( 'save_to_pinterest' );
 	}
+
+
+	/**
+	 * Add the Pinit button's markup to WC blocks
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string     $html The html to be filtered.
+	 * @param Object     $data Data passed to the filter.
+	 * @param WC_Product $product The product object.
+	 *
+	 * @return bool
+	 */
+	public static function add_to_wc_blocks( $html, $data, $product ) {
+
+		if ( empty( $product ) ) {
+			return;
+		}
+
+		return str_replace( '</li>', self::render_pin( $product->get_id() ) . '</li>', $html );
+	}
+
 }
