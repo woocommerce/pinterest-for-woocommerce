@@ -7,6 +7,7 @@
  */
 
 namespace Automattic\WooCommerce\Pinterest\API;
+
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 
 use \WP_REST_Request;
