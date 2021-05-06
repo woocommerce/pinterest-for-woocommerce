@@ -5,7 +5,8 @@
 	<!-- Οnly files with a php extension -->
 	<arg name="extensions" value="php" />
 
-	<!-- Exclude paths -->
+	<!-- Exclude Patterns -->
+	<exclude-pattern>*/index.php</exclude-pattern>
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 
@@ -35,5 +36,9 @@
 
 	<rule ref="PHPCompatibility">
 		<exclude-pattern>tests/</exclude-pattern>
+	</rule>
+
+	<rule ref="Squiz.Commenting.FileComment.Missing">
+		<exclude-pattern>index.asset.php</exclude-pattern>
 	</rule>
 </ruleset>
