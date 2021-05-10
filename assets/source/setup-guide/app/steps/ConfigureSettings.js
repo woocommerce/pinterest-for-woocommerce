@@ -28,6 +28,8 @@ const ALLOWED_OPTIONS = [
 	'enhanced_match_support',
 	'save_to_pinterest',
 	'is_setup_complete',
+	'rich_pins_on_posts',
+	'rich_pins_on_products',
 ];
 
 const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
@@ -159,6 +161,41 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 										onChange={ () =>
 											handleOptionChange(
 												'enhanced_match_support'
+											)
+										}
+									/>
+									<Text
+										className="woocommerce-setup-guide__checkbox-heading"
+										variant="subtitle"
+									>
+										{ __(
+											'Rich Pins',
+											'pinterest-for-woocommerce'
+										) }
+									</Text>
+									<CheckboxControl
+										label={ __(
+											'Enable Rich Pins for Products',
+											'pinterest-for-woocommerce'
+										) }
+										checked={ options.rich_pins_on_products }
+										className="woocommerce-setup-guide__checkbox-group"
+										onChange={ () =>
+											handleOptionChange(
+												'rich_pins_on_products'
+											)
+										}
+									/>
+									<CheckboxControl
+										label={ __(
+											'Enable Rich Pins for Posts',
+											'pinterest-for-woocommerce'
+										) }
+										checked={ options.rich_pins_on_posts }
+										className="woocommerce-setup-guide__checkbox-group"
+										onChange={ () =>
+											handleOptionChange(
+												'rich_pins_on_posts'
 											)
 										}
 									/>

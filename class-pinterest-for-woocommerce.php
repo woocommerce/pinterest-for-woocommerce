@@ -58,6 +58,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			'track_conversions'      => true,
 			'enhanced_match_support' => false,
 			'save_to_pinterest'      => true,
+			'rich_pins_on_posts'     => true,
+			'rich_pins_on_products'  => true,
 		);
 
 		/**
@@ -175,9 +177,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		private function init_hooks() {
 			add_action( 'init', array( $this, 'init' ), 0 );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
-			add_action( 'wp_head', array( $this, 'inject_verification_code' ) );
+			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
+			add_action( 'wp_head', array( Pinterest\RichPins::class, 'maybe_inject_rich_pins_opengraph_tags' ) );
 			add_action( 'wp', array( Pinterest\SaveToPinterest::class, 'maybe_init' ) );
-
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 		}
@@ -428,12 +430,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 
+
 		/**
 		 * Injects needed meta tags to the site's header
 		 *
 		 * @since 1.0.0
 		 */
-		public function inject_verification_code() {
+		public function maybe_inject_verification_code() {
 
 			if ( self::get_setting( 'verfication_code' ) ) {
 				printf( '<meta name="p:domain_verify" content="%s"/>', esc_attr( self::get_setting( 'verfication_code' ) ) );
