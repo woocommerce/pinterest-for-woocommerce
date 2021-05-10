@@ -62,7 +62,7 @@ class Pinterest_For_Woocommerce_Frontend_Assets {
 
 		$all_blocks = get_dynamic_block_names();
 
-		$product_blocks = preg_grep( '/woocommerce\/\S*product/', $all_blocks );
+		$product_blocks = preg_grep( '/woocommerce\//', $all_blocks );
 
 		foreach ( $product_blocks as $block ) {
 
