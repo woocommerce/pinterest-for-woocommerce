@@ -28,7 +28,6 @@ class Pinterest_For_Woocommerce_Admin {
 	 * Include any classes we need within admin.
 	 */
 	public function includes() {
-		include_once 'class-pinterest-for-woocommerce-admin-assets.php';
 		include_once 'class-pinterest-for-woocommerce-admin-settings-page.php';
 	}
 
