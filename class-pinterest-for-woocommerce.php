@@ -426,7 +426,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			set_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
 
-			return self::get_connection_proxy_url() . 'login/pinterestv3?' . $state;
+			return self::get_connection_proxy_url() . 'login/pinterestv3native?' . $state;
 		}
 
 
