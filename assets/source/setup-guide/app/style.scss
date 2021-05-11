@@ -71,12 +71,18 @@ $root: ".woocommerce-setup-guide";
 							top: 0;
 							transform: translateX(-50%);
 							width: 100vw;
+							z-index: -1;
 						}
 					}
 
 					&__step {
 						padding-left: 12px;
 						padding-right: 12px;
+
+						&-divider {
+							align-self: center;
+							margin-top: 0;
+						}
 					}
 				}
 			}
