@@ -16,6 +16,7 @@ import {
  */
 import SetupAccount from '../steps/SetupAccount';
 import ClaimWebsite from '../steps/ClaimWebsite';
+import SetupTracking from '../steps/SetupTracking';
 import SetupPins from '../steps/SetupPins';
 import TransientNotices from '../components/TransientNotices';
 import { useBodyClasses, useCreateNotice } from '../helpers/effects';
@@ -36,6 +37,11 @@ const WizardApp = () => {
 			key: 'claim-website',
 			container: ClaimWebsite,
 			label: __( 'Claim your website', 'pinterest-for-woocommerce' ),
+		},
+		{
+			key: 'setup-tracking',
+			container: SetupTracking,
+			label: __( 'Set up tracking', 'pinterest-for-woocommerce' ),
 		},
 		{
 			key: 'setup-pins',

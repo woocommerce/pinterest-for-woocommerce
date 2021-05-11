@@ -10,6 +10,7 @@ import { OPTIONS_STORE_NAME } from '@woocommerce/data';
  */
 import SetupAccount from '../steps/SetupAccount';
 import ClaimWebsite from '../steps/ClaimWebsite';
+import SetupTracking from '../steps/SetupTracking';
 import SetupPins from '../steps/SetupPins';
 import TransientNotices from '../components/TransientNotices';
 import { useBodyClasses, useCreateNotice } from '../helpers/effects';
@@ -38,6 +39,10 @@ const SettingsApp = () => {
 			  );
 	};
 
+	const isTrackingConfigured = () => {
+		return false;
+	};
+
 	return (
 		<div className="woocommerce-layout">
 			<div className="woocommerce-layout__main">
@@ -45,7 +50,8 @@ const SettingsApp = () => {
 				<div className="woocommerce-setup-guide__container">
 					<SetupAccount view="settings" />
 					{ isConnected() && <ClaimWebsite view="settings" /> }
-					{ isConnected() && isDomainVerified() && (
+					{ isConnected() && isDomainVerified() && <SetupTracking view="settings" /> }
+					{ isConnected() && isDomainVerified() && isTrackingConfigured() && (
 						<SetupPins view="settings" />
 					) }
 				</div>
