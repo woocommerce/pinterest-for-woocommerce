@@ -17,7 +17,7 @@ import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import StepStatus from '../components/StepStatus';
 
-const VerifyDomain = ( {
+const ClaimWebsite = ( {
 	goToNextStep,
 	pin4wc,
 	updateOptions,
@@ -43,7 +43,7 @@ const VerifyDomain = ( {
 		return result;
 	};
 
-	const handleVerifyDomain = async () => {
+	const handleClaimWebsite = async () => {
 		setStatus( 'pending' );
 
 		try {
@@ -89,7 +89,7 @@ const VerifyDomain = ( {
 				isPrimary
 				disabled={ status === 'pending' }
 				onClick={
-					status === 'success' ? goToNextStep : handleVerifyDomain
+					status === 'success' ? goToNextStep : handleClaimWebsite
 				}
 			>
 				{ buttonLabels[ status ] }
@@ -98,22 +98,22 @@ const VerifyDomain = ( {
 	};
 
 	return (
-		<div className="woocommerce-setup-guide__verify-domain">
+		<div className="woocommerce-setup-guide__claim-website">
 			{ view === 'wizard' && (
 				<StepHeader
-					title={ __( 'Verify your domain' ) }
-					subtitle={ __( 'Step Two' ) }
+					title={ __( 'Claim your website', 'pinterest-for-woocommerce' ) }
+					subtitle={ __( 'Step Two', 'pinterest-for-woocommerce' ) }
 				/>
 			) }
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={ __( 'Verify your domain' ) }
+						title={ __( 'Claim your website', 'pinterest-for-woocommerce' ) }
 						description={ __(
 							'Claim your website get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of you content.'
 						) }
-						link={ wcSettings.pin4wc.pinterestLinks.verifyDomain }
+						link={ wcSettings.pin4wc.pinterestLinks.claimWebsite }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
@@ -164,4 +164,4 @@ export default compose(
 			updateOptions,
 		};
 	} )
-)( VerifyDomain );
+)( ClaimWebsite );

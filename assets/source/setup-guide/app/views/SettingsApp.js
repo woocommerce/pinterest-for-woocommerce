@@ -9,8 +9,8 @@ import { OPTIONS_STORE_NAME } from '@woocommerce/data';
  * Internal dependencies
  */
 import SetupAccount from '../steps/SetupAccount';
-import VerifyDomain from '../steps/VerifyDomain';
-import ConfigureSettings from '../steps/ConfigureSettings';
+import ClaimWebsite from '../steps/ClaimWebsite';
+import SetupPins from '../steps/SetupPins';
 import TransientNotices from '../components/TransientNotices';
 import { useBodyClasses, useCreateNotice } from '../helpers/effects';
 
@@ -44,9 +44,9 @@ const SettingsApp = () => {
 				<TransientNotices />
 				<div className="woocommerce-setup-guide__container">
 					<SetupAccount view="settings" />
-					{ isConnected() && <VerifyDomain view="settings" /> }
+					{ isConnected() && <ClaimWebsite view="settings" /> }
 					{ isConnected() && isDomainVerified() && (
-						<ConfigureSettings view="settings" />
+						<SetupPins view="settings" />
 					) }
 				</div>
 			</div>

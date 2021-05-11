@@ -32,7 +32,7 @@ const ALLOWED_OPTIONS = [
 	'rich_pins_on_products',
 ];
 
-const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
+const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	const [ options, setOptions ] = useState( {} );
 	const [ isSaving, setIsSaving ] = useState( false );
 
@@ -92,20 +92,21 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	};
 
 	return (
-		<div className="woocommerce-setup-guide__configure-settings">
+		<div className="woocommerce-setup-guide__setup-pins">
 			{ view === 'wizard' && (
 				<StepHeader
-					title={ __( 'Configure your settings' ) }
-					subtitle={ __( 'Step Three' ) }
+					title={ __( 'Set up pins', 'pinterest-for-woocommerce' ) }
+					subtitle={ __( 'Step Four', 'pinterest-for-woocommerce' ) }
 				/>
 			) }
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={ __( 'Setup tracking and Rich Pins' ) }
+						title={ __( 'Set up pins and Rich Pins', 'pinterest-for-woocommerce' ) }
 						description={ __(
-							'Use description text to help users understand more'
+							'Use description text to help users understand more',
+                            'pinterest-for-woocommerce'
 						) }
 					/>
 				</div>
@@ -270,4 +271,4 @@ export default compose(
 			updateOptions,
 		};
 	} )
-)( ConfigureSettings );
+)( SetupPins );

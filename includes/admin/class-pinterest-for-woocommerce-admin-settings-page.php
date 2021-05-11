@@ -267,7 +267,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				'error'           => isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				'pinterestLinks'  => array(
 					'newAccount'    => 'https://business.pinterest.com/',
-					'verifyDomain'  => 'https://help.pinterest.com/en/business/article/claim-your-website',
+					'claimWebsite'  => 'https://help.pinterest.com/en/business/article/claim-your-website',
 					'richPins'      => 'https://help.pinterest.com/en/business/article/rich-pins',
 					'enhancedMatch' => 'https://help.pinterest.com/en/business/article/enhanced-match',
 				),

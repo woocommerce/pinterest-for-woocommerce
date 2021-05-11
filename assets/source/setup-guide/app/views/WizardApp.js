@@ -15,8 +15,8 @@ import {
  * Internal dependencies
  */
 import SetupAccount from '../steps/SetupAccount';
-import VerifyDomain from '../steps/VerifyDomain';
-import ConfigureSettings from '../steps/ConfigureSettings';
+import ClaimWebsite from '../steps/ClaimWebsite';
+import SetupPins from '../steps/SetupPins';
 import TransientNotices from '../components/TransientNotices';
 import { useBodyClasses, useCreateNotice } from '../helpers/effects';
 
@@ -33,14 +33,14 @@ const WizardApp = () => {
 			label: __( 'Set up your account', 'pinterest-for-woocommerce' ),
 		},
 		{
-			key: 'verify-domain',
-			container: VerifyDomain,
-			label: __( 'Verify your domain', 'pinterest-for-woocommerce' ),
+			key: 'claim-website',
+			container: ClaimWebsite,
+			label: __( 'Claim your website', 'pinterest-for-woocommerce' ),
 		},
 		{
-			key: 'configure-settings',
-			container: ConfigureSettings,
-			label: __( 'Configure your settings', 'pinterest-for-woocommerce' ),
+			key: 'setup-pins',
+			container: SetupPins,
+			label: __( 'Set up pins', 'pinterest-for-woocommerce' ),
 		},
 	];
 
