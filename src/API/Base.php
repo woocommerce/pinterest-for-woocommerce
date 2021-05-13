@@ -268,4 +268,33 @@ class Base {
 		$response = self::make_request( 'users/me', 'GET' );
 		return $response;
 	}
+
+
+	/**
+	 * Get the advertiser object from the Pinterest API.
+	 * If no $advertiser_id is given, the default advertiser object for the
+	 * current user is returned.
+	 *
+	 * @param string $advertiser_id the advertiser_id to request the Advertiser for.
+	 *
+	 * @return mixed
+	 */
+	public static function get_advertiser( $advertiser_id = 'me' ) {
+		$response = self::make_request( 'advertisers/' . $advertiser_id . '/', 'GET', array(), 'ads' );
+		return $response;
+	}
+
+
+	/**
+	 * Get the advertiser's tracking tags.
+	 *
+	 * @param string $advertiser_id the advertiser_id to request the tags for.
+	 *
+	 * @return mixed
+	 */
+	public static function get_advertiser_tags( $advertiser_id ) {
+		$response = self::make_request( 'advertisers/' . $advertiser_id . '/tags/', 'GET', array(), 'ads' );
+		return $response;
+	}
+
 }
