@@ -66,19 +66,20 @@ class Base {
 	 * $endpoint
 	 *
 	 * @param string $endpoint the endpoint to perform the request on.
-	 * @param string $method eg, POST, GET, PUT etc.
-	 * @param array  $payload Payload to be sent on the request's body.
+	 * @param string $method   eg, POST, GET, PUT etc.
+	 * @param array  $payload  Payload to be sent on the request's body.
+	 * @param string $api      The specific Endpoints subset.
 	 *
 	 * @return array
 	 *
 	 * @throws \Exception PHP exception.
 	 */
-	public static function make_request( $endpoint, $method = 'POST', $payload = array() ) {
+	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '' ) {
 
 		try {
-
+			$api     = empty( $api ) ? '' : trailingslashit( $api );
 			$request = array(
-				'url'    => self::API_DOMAIN . '/v' . self::API_VERSION . '/' . $endpoint,
+				'url'    => self::API_DOMAIN . '/' . $api . 'v' . self::API_VERSION . '/' . $endpoint,
 				'method' => $method,
 				'args'   => $payload,
 			);
