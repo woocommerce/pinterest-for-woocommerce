@@ -297,4 +297,48 @@ class Base {
 		return $response;
 	}
 
+
+	/**
+	 * Create a tag for the given advertiser.
+	 *
+	 * @param string $advertiser_id the advertiser_id to create a tag for.
+	 *
+	 * @return mixed
+	 */
+	public static function create_tag( $advertiser_id ) {
+
+		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto Created by Pinterest For WooCommerce', 'pinterest-for-woocommerce' ) );
+
+		$response = self::make_request(
+			'tags/',
+			'POST',
+			array(
+				'advertiser' => $advertiser_id,
+				'name'       => $tag_name,
+			),
+			'ads'
+		);
+
+		return $response;
+	}
+
+
+	/**
+	 * Update the tags configuration.
+	 *
+	 * @param string $tag_id The tag_id for which we want to update the configuration.
+	 * @param array  $config The configuration to set.
+	 *
+	 * @return mixed
+	 */
+	public static function update_tag_config( $tag_id, $config = array() ) {
+
+		if ( empty( $config ) ) {
+			return false;
+		}
+
+		$response = self::make_request( 'tags/' . $tag_id . '/configs/', 'PUT', $config, 'ads' );
+
+		return $response;
+	}
 }
