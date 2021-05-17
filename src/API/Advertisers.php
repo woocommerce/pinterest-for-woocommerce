@@ -70,7 +70,7 @@ class Advertisers extends VendorAPI {
 				throw new \Exception( esc_html__( 'Response error', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			return array( 'advertiser' => $advertisers['data']->id );
+			return array( 'advertisers' => $advertisers['data'] );
 
 		} catch ( \Throwable $th ) {
 
