@@ -58,7 +58,7 @@ class Advertisers extends VendorAPI {
 
 		try {
 
-			$advertisers = Base::get_advertiser();
+			$advertisers = Base::get_advertisers();
 
 			if ( 'success' !== $advertisers['status'] && 1000 === $advertisers['code'] ) {
 				// User needs to take manual action in Pinterest dashboard.

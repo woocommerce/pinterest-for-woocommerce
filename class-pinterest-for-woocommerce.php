@@ -483,6 +483,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
+		 * Returns the Pinterest AccountID from the database.
+		 *
+		 * @return string|false
+		 */
+		public static function get_account_id() {
+			$account_data = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+			return isset( $account_data['id'] ) ? $account_data['id'] : false;
+		}
+
+
+		/**
 		 * Sets the default settings based on the
 		 * given values in self::$default_settings
 		 *

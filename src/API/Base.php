@@ -279,8 +279,9 @@ class Base {
 	 *
 	 * @return mixed
 	 */
-	public static function get_advertiser( $advertiser_id = 'me' ) {
-		$response = self::make_request( 'advertisers/' . $advertiser_id . '/', 'GET', array(), 'ads' );
+	public static function get_advertisers( $pinterest_user = null ) {
+		$pinterest_user = ! is_null( $pinterest_user ) ? $pinterest_user : Pinterest_For_Woocommerce()::get_account_id();
+		$response       = self::make_request( 'advertisers/?owner_user_id=' . $pinterest_user, 'GET', array(), 'ads' );
 		return $response;
 	}
 
