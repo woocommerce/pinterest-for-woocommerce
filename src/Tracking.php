@@ -73,6 +73,42 @@ class Tracking {
 
 
 	/**
+	 * Adjust given base tag in order to enable Enhanched match, by adding
+	 * The hashed user email's either by checking the logged in user or the currently stored
+	 * session data.
+	 *
+	 * See https://help.pinterest.com/en/business/article/enhanced-match
+	 *
+	 * @param string $base_tag The tag to be filtered.
+	 *
+	 * @return string
+	 */
+	public static function enable_enhanched_match( $base_tag ) {
+
+		$user_email = '';
+
+		if ( is_user_logged_in() ) {
+
+			$user       = wp_get_current_user();
+			$user_email = $user->user_email;
+		}
+
+		if ( empty( $user_email ) ) {
+			$session_customer = function_exists( 'WC' ) ? WC()->session->get( 'customer' ) : false;
+			$user_email       = $session_customer ? $session_customer['email'] : false;
+		}
+
+		if ( empty( $user_email ) ) {
+			return $base_tag;
+		}
+
+		$base_tag = preg_replace( '/(pintrk\(\s*\'load\'\s*\,\s*\')(\d+)(\'\s*\))/m', '$1$2\' { em: \'' . md5( $user_email ) . '\' })', $base_tag );
+
+		return $base_tag;
+	}
+
+
+	/**
 	 * Use woocommerce_add_to_cart to enqueue our AddToCart event.
 	 *
 	 * @param string  $cart_item_key The cart item's key.
@@ -343,6 +379,8 @@ class Tracking {
 	public static function print_script() {
 
 		if ( ! empty( self::$script ) ) {
+
+			self::$script = Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) ? self::enable_enhanched_match( self::$script ) : self::$script;
 
 			echo self::$script; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
