@@ -102,7 +102,11 @@ class Tracking {
 			return $base_tag;
 		}
 
-		$base_tag = preg_replace( '/(pintrk\(\s*\'load\'\s*\,\s*\')(\d+)(\'\s*\))/m', '$1$2\' { em: \'' . md5( $user_email ) . '\' })', $base_tag );
+		// Add Hashed e-mail to the JS part.
+		$base_tag = preg_replace( '/(pintrk\(\s*\'load\'\s*\,\s*\')(\d+)(\'\s*\))/m', '$1$2\', { em: \'' . md5( $user_email ) . '\' })', $base_tag );
+
+		// Add Hashed e-mail to the <img> part of the tag.
+		$base_tag = preg_replace( '/(<img.+src=\\")(.+)(\\")/m', '$1$2&pd[em]=' . md5( $user_email ) . '$3', $base_tag );
 
 		return $base_tag;
 	}
