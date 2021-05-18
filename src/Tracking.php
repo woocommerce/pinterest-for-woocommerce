@@ -48,11 +48,7 @@ class Tracking {
 		// WC events.
 		if ( function_exists( 'WC' ) ) {
 
-			// Product page visit.
-			self::page_visit_event();
-
-			// Product category page visit.
-			self::category_visit_event();
+			add_action( 'wp', array( __CLASS__, 'late_events_handling' ) );
 
 			// AddToCart - ajax.
 			if ( 'yes' === get_option( 'woocommerce_enable_ajax_add_to_cart' ) ) {
@@ -69,6 +65,20 @@ class Tracking {
 
 		// Print to head.
 		add_action( 'wp_head', array( __CLASS__, 'print_script' ) );
+	}
+
+
+	/**
+	 * Initialize events that need access to conditional tags.
+	 *
+	 * @return void
+	 */
+	public static function late_events_handling() {
+		// Product page visit.
+		self::page_visit_event();
+
+		// Product category page visit.
+		self::category_visit_event();
 	}
 
 
