@@ -78,7 +78,11 @@ class Tags extends VendorAPI {
 				// No tag created yet. Lets create one.
 				$tag = Base::create_tag( $advertiser_id );
 
-				$tags[] = $tag;
+				if ( 'success' === $tag['status'] ) {
+					$tags[ $tag['data']->id ] = $tag['data'];
+				} else {
+					throw new \Exception( esc_html__( 'Could not create a tag. Please check the logs for additional information.', 'pinterest-for-woocommerce' ), 400 );
+				}
 			}
 
 			Pinterest_For_Woocommerce()::save_setting( 'account_tags', $tags );
