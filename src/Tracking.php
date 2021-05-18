@@ -241,7 +241,7 @@ class Tracking {
 		$active_tag = self::get_active_tag();
 
 		if ( $active_tag ) {
-			self::$script .= $active_tag;
+			self::$script .= $active_tag->code_snippet;
 		}
 	}
 
@@ -358,7 +358,7 @@ class Tracking {
 	/**
 	 * Get the actual JS & markup for the base tag as configured in the settings.
 	 *
-	 * @return string
+	 * @return object|boolean
 	 */
 	private static function get_active_tag() {
 
@@ -368,9 +368,9 @@ class Tracking {
 			return false;
 		}
 
-		$account_tags = Pinterest_For_Woocommerce()::get_setting( 'account_tags' );
+		$account_tags = (array) Pinterest_For_Woocommerce()::get_setting( 'account_tags' );
 
-		return isset( $account_tags[ $active_tag_id ] ) ? $account_tags[ $active_tag_id ] : false;
+		return ! empty( $account_tags ) && isset( $account_tags[ $active_tag_id ] ) ? $account_tags[ $active_tag_id ] : false;
 	}
 
 
@@ -389,7 +389,7 @@ class Tracking {
 			echo self::$script; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 			if ( ! empty( self::$events ) ) {
-				echo '<script>' . implode( ' ', self::$events ) . '</script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo '<script>' . implode( PHP_EOL, self::$events ) . '</script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 		}
 	}
