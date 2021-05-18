@@ -123,9 +123,6 @@ class Base {
 				'method'      => 'POST',
 				'auth_header' => true,
 				'args'        => array(),
-				'headers'     => array(
-					'content-type' => 'application/json',
-				),
 			)
 		);
 
