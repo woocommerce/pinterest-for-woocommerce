@@ -64,12 +64,7 @@ const SetupTracking = ( {
 			setAdvertisersList( results.advertisers );
 
 			if ( results.advertisers.length > 0 ) {
-				if ( results.advertisers.length === 1 ) {
-					handleOptionChange(
-						'advertiser',
-						results.advertisers[ 0 ].id
-					);
-				}
+				handleOptionChange( 'advertiser', results.advertisers[ 0 ].id );
 			} else {
 				setStatus( 'error' );
 			}
@@ -100,10 +95,8 @@ const SetupTracking = ( {
 
 			setTagsList( results );
 
-			if ( results.length > 0 ) {
-				if ( results.length === 1 ) {
-					handleOptionChange( 'tag', results[ 0 ].id );
-				}
+			if ( Object.keys( results ).length > 0 ) {
+				handleOptionChange( 'tag', Object.keys( results )[ 0 ] );
 			} else {
 				setStatus( 'error' );
 			}
