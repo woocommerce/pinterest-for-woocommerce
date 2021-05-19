@@ -72,7 +72,7 @@ class Tags extends VendorAPI {
 				throw new \Exception( esc_html__( 'Response error', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$tags = $response['data'];
+			$tags = (array) $response['data'];
 
 			if ( empty( $tags ) ) {
 				// No tag created yet. Lets create one.
