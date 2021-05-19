@@ -250,7 +250,7 @@ class Tracking {
 
 		$active_tag = self::get_active_tag();
 
-		if ( $active_tag ) {
+		if ( $active_tag && is_object( $active_tag ) && property_exists( $active_tag, 'code_snippet' ) ) {
 			self::$script .= $active_tag->code_snippet;
 		}
 	}
