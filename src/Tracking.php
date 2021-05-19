@@ -38,7 +38,7 @@ class Tracking {
 	 */
 	public static function maybe_init() {
 
-		if ( ! self::tracking_enabled() || wp_doing_cron() ) {
+		if ( ! self::tracking_enabled() || wp_doing_cron() || is_admin() ) {
 			return;
 		}
 
@@ -372,7 +372,7 @@ class Tracking {
 	 */
 	private static function get_active_tag() {
 
-		$active_tag_id = Pinterest_For_Woocommerce()::get_setting( 'active_tag_id' );
+		$active_tag_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
 
 		if ( empty( $active_tag_id ) ) {
 			return false;
