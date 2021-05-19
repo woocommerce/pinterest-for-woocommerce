@@ -297,9 +297,7 @@ const SetupTracking = ( {
 									</>
 								) }
 
-								{ undefined !== pin4wc &&
-									Object.keys( pin4wc ).length > 0 &&
-									undefined !== advertiser &&
+								{ undefined !== advertiser &&
 									( undefined !== tagsList ? (
 										Object.keys( tagsList ).length > 0 && (
 											<>
