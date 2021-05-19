@@ -101,7 +101,10 @@ const ClaimWebsite = ( {
 		<div className="woocommerce-setup-guide__claim-website">
 			{ view === 'wizard' && (
 				<StepHeader
-					title={ __( 'Claim your website', 'pinterest-for-woocommerce' ) }
+					title={ __(
+						'Claim your website',
+						'pinterest-for-woocommerce'
+					) }
 					subtitle={ __( 'Step Two', 'pinterest-for-woocommerce' ) }
 				/>
 			) }
@@ -109,7 +112,10 @@ const ClaimWebsite = ( {
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={ __( 'Claim your website', 'pinterest-for-woocommerce' ) }
+						title={ __(
+							'Claim your website',
+							'pinterest-for-woocommerce'
+						) }
 						description={ __(
 							'Claim your website get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of you content.'
 						) }

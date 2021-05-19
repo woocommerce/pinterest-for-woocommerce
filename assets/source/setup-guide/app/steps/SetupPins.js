@@ -40,7 +40,7 @@ const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 		if ( options !== pin4wc ) {
 			setOptions( pin4wc );
 		}
-	}, [ pin4wc ] );
+	}, [ pin4wc, options ] );
 
 	const handleOptionChange = async ( name, value ) => {
 		if ( ! ALLOWED_OPTIONS.includes( name ) ) {
@@ -103,10 +103,13 @@ const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={ __( 'Set up pins and Rich Pins', 'pinterest-for-woocommerce' ) }
+						title={ __(
+							'Set up pins and Rich Pins',
+							'pinterest-for-woocommerce'
+						) }
 						description={ __(
 							'Use description text to help users understand more',
-                            'pinterest-for-woocommerce'
+							'pinterest-for-woocommerce'
 						) }
 					/>
 				</div>
@@ -179,7 +182,9 @@ const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 											'Enable Rich Pins for Products',
 											'pinterest-for-woocommerce'
 										) }
-										checked={ options.rich_pins_on_products }
+										checked={
+											options.rich_pins_on_products
+										}
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
 											handleOptionChange(

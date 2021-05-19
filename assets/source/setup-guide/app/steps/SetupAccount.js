@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -38,7 +38,7 @@ const SetupAccount = ( {
 		if ( options !== pin4wc ) {
 			setOptions( pin4wc );
 		}
-	}, [ pin4wc ] );
+	}, [ pin4wc, options ] );
 
 	const isConnected = () => {
 		return undefined === options
@@ -121,14 +121,18 @@ const SetupAccount = ( {
 											) }
 										</Text>
 										{ options?.account_data?.id && (
-											<Text variant="body">{ `${ __(
-												'Account',
-												'pinterest-for-woocommerce'
-											) }: ${
-												options.account_data.username
-											}
-											- ${ options.account_data.id }
-											` }</Text>
+											<Text variant="body">
+												{ sprintf(
+													'%s: %s - %s',
+													__(
+														'Account',
+														'pinterest-for-woocommerce'
+													),
+													options.account_data
+														.username,
+													options.account_data.id
+												) }
+											</Text>
 										) }
 										<Button
 											isLink

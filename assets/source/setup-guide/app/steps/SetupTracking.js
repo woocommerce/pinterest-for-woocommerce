@@ -6,7 +6,13 @@ import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { Button, Card, CardBody, SelectControl, __experimentalText as Text } from '@wordpress/components';
+import {
+	Button,
+	Card,
+	CardBody,
+	SelectControl,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 import { Spinner } from '@woocommerce/components';
 
@@ -17,14 +23,14 @@ import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 
 const SetupTracking = ( {
-    goToNextStep,
-    pin4wc,
-    updateOptions,
-    createNotice,
-    view,
- } ) => {
+	goToNextStep,
+	pin4wc,
+	updateOptions,
+	createNotice,
+	view,
+} ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
-    const [ status, setStatus ] = useState( 'idle' );
+	const [ status, setStatus ] = useState( 'idle' );
 	const [ advertisersList, setAdvertisersList ] = useState();
 	const [ tagsList, setTagsList ] = useState();
 	const [ advertiser, setAdvertiser ] = useState();
@@ -40,11 +46,11 @@ const SetupTracking = ( {
 				setTag( pin4wc.tracking_tag );
 			}
 
-			if ( undefined === advertisersList) {
+			if ( undefined === advertisersList ) {
 				fetchAdvertisers();
 			}
 		}
-	}, [ pin4wc ] );
+	}, [ pin4wc, advertisersList, advertiser, tag ] );
 
 	const fetchAdvertisers = async () => {
 		try {
@@ -55,17 +61,20 @@ const SetupTracking = ( {
 				method: 'GET',
 			} );
 
-			setAdvertisersList(results.advertisers);
+			setAdvertisersList( results.advertisers );
 
 			if ( results.advertisers.length > 0 ) {
 				if ( results.advertisers.length === 1 ) {
-					handleOptionChange('advertiser', results.advertisers[0].id);
+					handleOptionChange(
+						'advertiser',
+						results.advertisers[ 0 ].id
+					);
 				}
 			} else {
 				setStatus( 'error' );
 			}
 		} catch ( error ) {
-            setStatus( 'error' );
+			setStatus( 'error' );
 			createNotice(
 				'error',
 				error.message ||
@@ -77,20 +86,23 @@ const SetupTracking = ( {
 		}
 	};
 
-	const fetchTags = async advertiser => {
+	const fetchTags = async ( advertiserId ) => {
 		try {
 			setTagsList();
 
 			const results = await apiFetch( {
-				path: wcSettings.pin4wc.apiRoute + '/tags/?advrtsr_id=' + advertiser,
+				path:
+					wcSettings.pin4wc.apiRoute +
+					'/tags/?advrtsr_id=' +
+					advertiserId,
 				method: 'GET',
 			} );
 
-			setTagsList(results);
+			setTagsList( results );
 
 			if ( results.length > 0 ) {
 				if ( results.length === 1 ) {
-					handleOptionChange('tag', results[0].id);
+					handleOptionChange( 'tag', results[ 0 ].id );
 				}
 			} else {
 				setStatus( 'error' );
@@ -109,15 +121,15 @@ const SetupTracking = ( {
 	};
 
 	const handleOptionChange = async ( name, value ) => {
-		if ( 'advertiser' === name ) {
+		if ( name === 'advertiser' ) {
 			setAdvertiser( value );
 			setStatus( 'idle' );
-			fetchTags( value )
-		} else if ( 'tag' === name ) {
+			fetchTags( value );
+		} else if ( name === 'tag' ) {
 			setTag( value );
 			setStatus( 'success' );
 		}
-	}
+	};
 
 	const handleCompleteSetup = async () => {
 		setIsSaving( true );
@@ -153,132 +165,213 @@ const SetupTracking = ( {
 		setIsSaving( false );
 
 		goToNextStep();
-	}
+	};
 
 	const handleTryAgain = () => {
 		setStatus( 'idle' );
 
-		advertiser ? fetchTags( advertiser ) : fetchAdvertisers();
-	}
+		if ( advertiser ) {
+			fetchTags( advertiser );
+		} else {
+			fetchAdvertisers();
+		}
+	};
 
-    const StepButton = () => {
-        if ( 'idle' === status ) {
-            return '';
-        }
+	const StepButton = () => {
+		if ( status === 'idle' ) {
+			return '';
+		}
 
-        const buttonLabels = {
-            error: __( 'Try Again', 'pinterest-for-woocommerce' ),
-            success: __( 'Continue', 'pinterest-for-woocommerce' ),
-        };
+		const buttonLabels = {
+			error: __( 'Try Again', 'pinterest-for-woocommerce' ),
+			success: __( 'Continue', 'pinterest-for-woocommerce' ),
+		};
 
-        return (
-            <Button
-                isPrimary
-                disabled={ isSaving }
-                onClick={
-                    status === 'success' ? handleCompleteSetup : handleTryAgain
-                }
-            >
-                { buttonLabels[ status ] }
-            </Button>
-        );
-    };
+		return (
+			<Button
+				isPrimary
+				disabled={ isSaving }
+				onClick={
+					status === 'success' ? handleCompleteSetup : handleTryAgain
+				}
+			>
+				{ buttonLabels[ status ] }
+			</Button>
+		);
+	};
 
-    return (
-        <div className="woocommerce-setup-guide__setup-tracking">
-            { view === 'wizard' && (
-                <StepHeader
-                    title={ __( 'Set up tracking', 'pinterest-for-woocommerce' ) }
-                    subtitle={ __( 'Step Three', 'pinterest-for-woocommerce' ) }
-                />
-            ) }
+	return (
+		<div className="woocommerce-setup-guide__setup-tracking">
+			{ view === 'wizard' && (
+				<StepHeader
+					title={ __(
+						'Set up tracking',
+						'pinterest-for-woocommerce'
+					) }
+					subtitle={ __( 'Step Three', 'pinterest-for-woocommerce' ) }
+				/>
+			) }
 
-            <div className="woocommerce-setup-guide__step-columns">
-                <div className="woocommerce-setup-guide__step-column">
-                    <StepOverview
-                        title={ __( 'Select your advertiser and tag', 'pinterest-for-woocommerce' ) }
-                        link={ wcSettings.pin4wc.pinterestLinks.SetupTracking }
-                    />
-                </div>
-                <div className="woocommerce-setup-guide__step-column">
-                    <Card>
-                        { undefined !== pin4wc && Object.keys( pin4wc ).length > 0 && undefined !== advertisersList ? (
-                            <CardBody size="large">
-                                { 0 < advertisersList.length
-									? (
-										<div>
-											<SelectControl
-												label={ __( 'Advertiser', 'pinterest-for-woocommerce')}
-												value={advertiser}
-												onChange={e => handleOptionChange('advertiser', e.target.value)}
-												options={advertisersList.map(advertiser => ({ label: advertiser.id, value: advertiser.id }))}
-												help={__('Select the advertiser for which you would like to install a tracking snippet.', 'pinterest-for-woocommerce')}
-											/>
-										</div>
-									)
-									: (
-										<>
-											<Text variant="body" className="text-margin">{__( 'Tracking cannot be configured automatically.', 'pinterest-for-woocommerce' )}</Text>
-											<Text variant="body" className="text-margin">{__('Please visit your', 'pinterest-for-woocommerce' )} <Button isLink href={wcSettings.pin4wc.pinterestLinks.Dashboard} target="_blank">{__('Pinterest Dashboard', 'pinterest-for-woocommerce' )}</Button> {__('and click “Create Ad”.', 'pinterest-for-woocommerce')}</Text>
-											<Text variant="body" className="text-margin">{__('After completing this step, click “Try again” button.', 'pinterest-for-woocommerce' )}</Text>
-										</>
-									)
-								}
+			<div className="woocommerce-setup-guide__step-columns">
+				<div className="woocommerce-setup-guide__step-column">
+					<StepOverview
+						title={ __(
+							'Select your advertiser and tag',
+							'pinterest-for-woocommerce'
+						) }
+						link={ wcSettings.pin4wc.pinterestLinks.SetupTracking }
+					/>
+				</div>
+				<div className="woocommerce-setup-guide__step-column">
+					<Card>
+						{ undefined !== pin4wc &&
+						Object.keys( pin4wc ).length > 0 &&
+						undefined !== advertisersList ? (
+							<CardBody size="large">
+								{ advertisersList.length > 0 ? (
+									<div>
+										<SelectControl
+											label={ __(
+												'Advertiser',
+												'pinterest-for-woocommerce'
+											) }
+											value={ advertiser }
+											onChange={ ( e ) =>
+												handleOptionChange(
+													'advertiser',
+													e.target.value
+												)
+											}
+											options={ advertisersList.map(
+												( item ) => ( {
+													label: item.id,
+													value: item.id,
+												} )
+											) }
+											help={ __(
+												'Select the advertiser for which you would like to install a tracking snippet.',
+												'pinterest-for-woocommerce'
+											) }
+										/>
+									</div>
+								) : (
+									<>
+										<Text
+											variant="body"
+											className="text-margin"
+										>
+											{ __(
+												'Tracking cannot be configured automatically.',
+												'pinterest-for-woocommerce'
+											) }
+										</Text>
+										<Text
+											variant="body"
+											className="text-margin"
+										>
+											{ __(
+												'Please visit your',
+												'pinterest-for-woocommerce'
+											) }{ ' ' }
+											<Button
+												isLink
+												href={
+													wcSettings.pin4wc
+														.pinterestLinks
+														.Dashboard
+												}
+												target="_blank"
+											>
+												{ __(
+													'Pinterest Dashboard',
+													'pinterest-for-woocommerce'
+												) }
+											</Button>{ ' ' }
+											{ __(
+												'and click “Create Ad”.',
+												'pinterest-for-woocommerce'
+											) }
+										</Text>
+										<Text
+											variant="body"
+											className="text-margin"
+										>
+											{ __(
+												'After completing this step, click “Try again” button.',
+												'pinterest-for-woocommerce'
+											) }
+										</Text>
+									</>
+								) }
 
-								{ undefined !== pin4wc && Object.keys( pin4wc ).length > 0 && undefined !== advertiser
-									&& ( undefined !== tagsList
-										? (
-											0 < Object.keys(tagsList).length
-											&& (
-												<>
-													<SelectControl
-														label={ __( 'Tracking Tag', 'pinterest-for-woocommerce')}
-														value={tag}
-														onChange={e => handleOptionChange('tag', e.target.value)}
-														options={Object.values(tagsList).map(tag => ({label: tag.id, value: tag.id}))}
-														help={__('Select the tracking tag to use.', 'pinterest-for-woocommerce')}
-													/>
-												</>
-											)
-										) : (
-											<Spinner />
+								{ undefined !== pin4wc &&
+									Object.keys( pin4wc ).length > 0 &&
+									undefined !== advertiser &&
+									( undefined !== tagsList ? (
+										Object.keys( tagsList ).length > 0 && (
+											<>
+												<SelectControl
+													label={ __(
+														'Tracking Tag',
+														'pinterest-for-woocommerce'
+													) }
+													value={ tag }
+													onChange={ ( e ) =>
+														handleOptionChange(
+															'tag',
+															e.target.value
+														)
+													}
+													options={ Object.values(
+														tagsList
+													).map( ( item ) => ( {
+														label: item.id,
+														value: item.id,
+													} ) ) }
+													help={ __(
+														'Select the tracking tag to use.',
+														'pinterest-for-woocommerce'
+													) }
+												/>
+											</>
 										)
-									)
-								}
-                            </CardBody>
-                        ) : (
-                            <CardBody size="large">
-                                <Spinner />
-                            </CardBody>
-                        ) }
-                    </Card>
+									) : (
+										<Spinner />
+									) ) }
+							</CardBody>
+						) : (
+							<CardBody size="large">
+								<Spinner />
+							</CardBody>
+						) }
+					</Card>
 
-                    { view === 'wizard' && (
-                        <div className="woocommerce-setup-guide__footer-button">
-                            <StepButton />
-                        </div>
-                    ) }
-                </div>
-            </div>
-        </div>
-    );
+					{ view === 'wizard' && (
+						<div className="woocommerce-setup-guide__footer-button">
+							<StepButton />
+						</div>
+					) }
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default compose(
-    withSelect( ( select ) => {
-        const { getOption } = select( OPTIONS_STORE_NAME );
+	withSelect( ( select ) => {
+		const { getOption } = select( OPTIONS_STORE_NAME );
 
-        return {
-            pin4wc: getOption( wcSettings.pin4wc.optionsName ),
-        };
-    } ),
-    withDispatch( ( dispatch ) => {
-        const { createNotice } = dispatch( 'core/notices' );
-        const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
+		return {
+			pin4wc: getOption( wcSettings.pin4wc.optionsName ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { createNotice } = dispatch( 'core/notices' );
+		const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
 
-        return {
-            createNotice,
-            updateOptions,
-        };
-    } )
+		return {
+			createNotice,
+			updateOptions,
+		};
+	} )
 )( SetupTracking );
