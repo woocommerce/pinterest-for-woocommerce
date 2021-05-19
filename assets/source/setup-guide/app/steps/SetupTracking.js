@@ -229,10 +229,10 @@ const SetupTracking = ( {
 												'pinterest-for-woocommerce'
 											) }
 											value={ advertiser }
-											onChange={ ( e ) =>
+											onChange={ ( selectedAdvertiser ) =>
 												handleOptionChange(
 													'advertiser',
-													e.target.value
+													selectedAdvertiser
 												)
 											}
 											options={ advertisersList.map(
@@ -307,10 +307,12 @@ const SetupTracking = ( {
 														'pinterest-for-woocommerce'
 													) }
 													value={ tag }
-													onChange={ ( e ) =>
+													onChange={ (
+														selectedTag
+													) =>
 														handleOptionChange(
 															'tag',
-															e.target.value
+															selectedTag
 														)
 													}
 													options={ Object.values(
