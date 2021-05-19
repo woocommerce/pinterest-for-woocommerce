@@ -286,7 +286,7 @@ const SetupTracking = ( {
 											className="text-margin"
 										>
 											{ __(
-												'Tracking cannot be configured automatically.',
+												'Tracking cannot be configured automatically since your account is not configured as an Advertiser.',
 												'pinterest-for-woocommerce'
 											) }
 										</Text>
@@ -295,7 +295,7 @@ const SetupTracking = ( {
 											className="text-margin"
 										>
 											{ __(
-												'Please visit your',
+												'Please follow the instructions',
 												'pinterest-for-woocommerce'
 											) }{ ' ' }
 											<Button
@@ -303,17 +303,17 @@ const SetupTracking = ( {
 												href={
 													wcSettings.pin4wc
 														.pinterestLinks
-														.Dashboard
+														.createAdvertiser
 												}
 												target="_blank"
 											>
 												{ __(
-													'Pinterest Dashboard',
+													'here',
 													'pinterest-for-woocommerce'
 												) }
 											</Button>{ ' ' }
 											{ __(
-												'and click “Create Ad”.',
+												'in order to create an advertiser.',
 												'pinterest-for-woocommerce'
 											) }
 										</Text>
@@ -322,7 +322,7 @@ const SetupTracking = ( {
 											className="text-margin"
 										>
 											{ __(
-												'After completing this step, click “Try again” button.',
+												'After completing this step, click the “Try again” button.',
 												'pinterest-for-woocommerce'
 											) }
 										</Text>
