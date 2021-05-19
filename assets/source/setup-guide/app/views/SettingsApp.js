@@ -40,7 +40,9 @@ const SettingsApp = () => {
 	};
 
 	const isTrackingConfigured = () => {
-		return false;
+		return undefined === pin4wc
+			? undefined
+			: !! ( pin4wc?.tracking_advertiser && pin4wc?.tracking_tag );
 	};
 
 	return (
@@ -50,10 +52,14 @@ const SettingsApp = () => {
 				<div className="woocommerce-setup-guide__container">
 					<SetupAccount view="settings" />
 					{ isConnected() && <ClaimWebsite view="settings" /> }
-					{ isConnected() && isDomainVerified() && <SetupTracking view="settings" /> }
-					{ isConnected() && isDomainVerified() && isTrackingConfigured() && (
-						<SetupPins view="settings" />
+					{ isConnected() && isDomainVerified() && (
+						<SetupTracking view="settings" />
 					) }
+					{ isConnected() &&
+						isDomainVerified() &&
+						isTrackingConfigured() && (
+							<SetupPins view="settings" />
+						) }
 				</div>
 			</div>
 		</div>
