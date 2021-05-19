@@ -1,6 +1,5 @@
 # local files
 .DS_Store
-package-lock.json
 
 # Ignore node_modules and oter local dev files
 *.lessc.css
