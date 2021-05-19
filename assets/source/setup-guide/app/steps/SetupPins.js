@@ -40,7 +40,7 @@ const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 		if ( options !== pin4wc ) {
 			setOptions( pin4wc );
 		}
-	}, [ pin4wc, options ] );
+	}, [ pin4wc ] );
 
 	const handleOptionChange = async ( name, value ) => {
 		if ( ! ALLOWED_OPTIONS.includes( name ) ) {

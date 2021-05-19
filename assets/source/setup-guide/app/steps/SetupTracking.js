@@ -29,6 +29,7 @@ const SetupTracking = ( {
 	createNotice,
 	view,
 } ) => {
+	const [ options, setOptions ] = useState( {} );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ status, setStatus ] = useState( 'idle' );
 	const [ advertisersList, setAdvertisersList ] = useState();
@@ -37,16 +38,18 @@ const SetupTracking = ( {
 	const [ tag, setTag ] = useState();
 
 	useEffect( () => {
-		if ( undefined !== pin4wc ) {
-			if ( pin4wc.tracking_advertiser !== advertiser ) {
+		if ( options !== pin4wc ) {
+			setOptions( pin4wc );
+
+			if ( pin4wc?.tracking_advertiser !== advertiser ) {
 				setAdvertiser( pin4wc.tracking_advertiser );
 			}
 
-			if ( pin4wc.tracking_tag !== tag ) {
+			if ( pin4wc?.tracking_tag !== tag ) {
 				setTag( pin4wc.tracking_tag );
 			}
 
-			if ( undefined === advertisersList ) {
+			if ( undefined === advertisersList && undefined !== pin4wc ) {
 				fetchAdvertisers();
 			}
 		}
@@ -64,7 +67,16 @@ const SetupTracking = ( {
 			setAdvertisersList( results.advertisers );
 
 			if ( results.advertisers.length > 0 ) {
-				handleOptionChange( 'advertiser', results.advertisers[ 0 ].id );
+				if ( ! pin4wc?.tracking_advertiser ) {
+					if ( ! advertiser && ! options?.tracking_advertiser ) {
+						handleOptionChange(
+							'advertiser',
+							results.advertisers[ 0 ].id
+						);
+					}
+				} else {
+					fetchTags( pin4wc?.tracking_advertiser );
+				}
 			} else {
 				setStatus( 'error' );
 			}
@@ -96,9 +108,19 @@ const SetupTracking = ( {
 			setTagsList( results );
 
 			if ( Object.keys( results ).length > 0 ) {
-				handleOptionChange( 'tag', Object.keys( results )[ 0 ] );
+				if (
+					! tag &&
+					! options?.tracking_tag &&
+					! pin4wc?.tracking_tag
+				) {
+					handleOptionChange( 'tag', Object.keys( results )[ 0 ] );
+				}
 			} else {
 				setStatus( 'error' );
+			}
+
+			if ( ! tag && pin4wc?.tracking_tag ) {
+				setStatus( 'success' );
 			}
 		} catch ( error ) {
 			setStatus( 'error' );
@@ -116,21 +138,30 @@ const SetupTracking = ( {
 	const handleOptionChange = async ( name, value ) => {
 		if ( name === 'advertiser' ) {
 			setAdvertiser( value );
-			setStatus( 'idle' );
+			setTag();
 			fetchTags( value );
 		} else if ( name === 'tag' ) {
 			setTag( value );
-			setStatus( 'success' );
 		}
+
+		if ( advertiser && tag ) {
+			setStatus( 'success' );
+		} else {
+			setStatus( 'idle' );
+		}
+
+		saveOptions( name, value );
 	};
 
-	const handleCompleteSetup = async () => {
+	const saveOptions = async ( name, value ) => {
+		const tempOptions = options ?? pin4wc;
+
 		setIsSaving( true );
 
+		const oldOptions = Object.assign( {}, tempOptions );
 		const newOptions = {
-			...pin4wc,
-			tracking_advertiser: advertiser ?? pin4wc.tracking_advertiser,
-			tracking_tag: tag ?? pin4wc.tracking_tag,
+			...tempOptions,
+			[ `tracking_${ name }` ]: value,
 		};
 
 		const update = await updateOptions( {
@@ -146,6 +177,7 @@ const SetupTracking = ( {
 				)
 			);
 		} else {
+			setOptions( oldOptions );
 			createNotice(
 				'error',
 				__(
@@ -156,8 +188,6 @@ const SetupTracking = ( {
 		}
 
 		setIsSaving( false );
-
-		goToNextStep();
 	};
 
 	const handleTryAgain = () => {
@@ -184,9 +214,7 @@ const SetupTracking = ( {
 			<Button
 				isPrimary
 				disabled={ isSaving }
-				onClick={
-					status === 'success' ? handleCompleteSetup : handleTryAgain
-				}
+				onClick={ status === 'success' ? goToNextStep : handleTryAgain }
 			>
 				{ buttonLabels[ status ] }
 			</Button>

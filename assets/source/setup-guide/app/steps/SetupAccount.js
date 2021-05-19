@@ -38,7 +38,7 @@ const SetupAccount = ( {
 		if ( options !== pin4wc ) {
 			setOptions( pin4wc );
 		}
-	}, [ pin4wc, options ] );
+	}, [ pin4wc ] );
 
 	const isConnected = () => {
 		return undefined === options
