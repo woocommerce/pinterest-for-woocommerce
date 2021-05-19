@@ -268,11 +268,9 @@ class Base {
 
 
 	/**
-	 * Get the advertiser object from the Pinterest API.
-	 * If no $advertiser_id is given, the default advertiser object for the
-	 * current user is returned.
+	 * Get the advertiser object from the Pinterest API for the given User ID.
 	 *
-	 * @param string $advertiser_id the advertiser_id to request the Advertiser for.
+	 * @param string $pinterest_user the user to request the Advertiser for.
 	 *
 	 * @return mixed
 	 */
