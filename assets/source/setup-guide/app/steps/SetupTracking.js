@@ -50,7 +50,7 @@ const SetupTracking = ( {
 				fetchAdvertisers();
 			}
 		}
-	}, [ pin4wc, advertisersList, advertiser, tag ] );
+	}, [ pin4wc ] );
 
 	const fetchAdvertisers = async () => {
 		try {
