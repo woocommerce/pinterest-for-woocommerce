@@ -62,7 +62,6 @@ class Advertisers extends VendorAPI {
 
 			if ( 'success' !== $advertisers['status'] && 1000 === $advertisers['code'] ) {
 				// User needs to take manual action in Pinterest dashboard.
-				// TODO: 
 				throw new \Exception( esc_html__( 'No advertiser exists.', 'pinterest-for-woocommerce' ), 1000 );
 			}
 
