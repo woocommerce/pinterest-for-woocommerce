@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
@@ -237,7 +237,11 @@ const SetupTracking = ( {
 											}
 											options={ advertisersList.map(
 												( item ) => ( {
-													label: item.id,
+													label: sprintf(
+														'%1$s (%2$d)',
+														item.name,
+														item.id
+													),
 													value: item.id,
 												} )
 											) }
@@ -318,7 +322,11 @@ const SetupTracking = ( {
 													options={ Object.values(
 														tagsList
 													).map( ( item ) => ( {
-														label: item.id,
+														label: sprintf(
+															'%1$s (%2$d)',
+															item.name,
+															item.id
+														),
 														value: item.id,
 													} ) ) }
 													help={ __(

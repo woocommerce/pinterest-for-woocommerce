@@ -123,7 +123,7 @@ const SetupAccount = ( {
 										{ options?.account_data?.id && (
 											<Text variant="body">
 												{ sprintf(
-													'%s: %s - %s',
+													'%1$s: %2$s - %3$s',
 													__(
 														'Account',
 														'pinterest-for-woocommerce'
