@@ -60,7 +60,7 @@ class Tags extends VendorAPI {
 		try {
 
 			$tags          = array();
-			$advertiser_id = $request->get_param( 'advertiser_id' );
+			$advertiser_id = $request->get_param( 'advrtsr_id' );
 
 			if ( ! $advertiser_id ) {
 				throw new \Exception( esc_html__( 'Advertiser missing', 'pinterest-for-woocommerce' ), 400 );
