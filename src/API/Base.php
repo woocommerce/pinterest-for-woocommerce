@@ -267,4 +267,52 @@ class Base {
 		$response = self::make_request( 'users/me', 'GET' );
 		return $response;
 	}
+
+
+	/**
+	 * Creates a merchant for the authenticated user or returns the existing one.
+	 *
+	 * @param array $args The arguments to be passed to the API request.
+	 *
+	 * @return mixed
+	 */
+	public static function maybe_create_merchant( $args ) {
+
+		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto Created by Pinterest For WooCommerce', 'pinterest-for-woocommerce' ) );
+
+		$args = wp_parse_args(
+			$args,
+			array(
+				'display_name'                      => $merchant_name,
+				'return_merchant_if_already_exists' => true,
+			)
+		);
+
+		$response = self::make_request(
+			add_query_arg( $args, 'commerce/product_pin_merchants/' ),
+			'POST'
+		);
+
+		return $response;
+	}
+
+
+	/**
+	 * Creates a merchant for the given advertiser or returns the existing one.
+	 *
+	 * @param string $merchant_id The merchant ID the feed belongs to.
+	 * @param string $feed_id     The ID of the feed to be updated.
+	 * @param array  $args        The arguments to be passed to the API request.
+	 *
+	 * @return mixed
+	 */
+	public static function update_merchant_feed( $merchant_id, $feed_id, $args ) {
+
+		$response = self::make_request(
+			add_query_arg( $args, 'commerce/product_pin_merchants/' . $merchant_id . '/feed/' . $feed_id . '/' ),
+			'PUT'
+		);
+
+		return $response;
+	}
 }
