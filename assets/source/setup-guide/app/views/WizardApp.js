@@ -130,7 +130,10 @@ const WizardApp = () => {
 		<div className="woocommerce-layout">
 			<div className="woocommerce-layout__main woocommerce-setup-guide__main">
 				<TransientNotices />
-				<Stepper currentStep={ currentStep } steps={ getSteps() } />
+				{ appSettings
+					? <Stepper currentStep={ currentStep } steps={ getSteps() } />
+					: <Spinner />
+				}
 			</div>
 		</div>
 	);

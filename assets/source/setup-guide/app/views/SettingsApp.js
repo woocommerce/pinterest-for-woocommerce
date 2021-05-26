@@ -37,25 +37,29 @@ const SettingsApp = () => {
 		<div className="woocommerce-layout">
 			<div className="woocommerce-layout__main">
 				<TransientNotices />
-				<div className="woocommerce-setup-guide__container">
-					<SetupAccount view="settings" {...childComponentProps } />
+				{ appSettings
+					? (
+						<div className="woocommerce-setup-guide__container">
+							<SetupAccount view="settings" {...childComponentProps } />
 
-					{ isConnected( appSettings ) && (
-						<>
-						<ClaimWebsite view="settings" {...childComponentProps } />
+							{ isConnected( appSettings ) && (
+								<>
+								<ClaimWebsite view="settings" {...childComponentProps } />
 
-						{ isDomainVerified( appSettings ) && (
-							<>
-							<SetupTracking view="settings" {...childComponentProps } />
+								{ isDomainVerified( appSettings ) && (
+									<>
+									<SetupTracking view="settings" {...childComponentProps } />
 
-							{ isTrackingConfigured( appSettings ) && (
-								<SetupPins view="settings" {...childComponentProps } />
+									{ isTrackingConfigured( appSettings ) && (
+										<SetupPins view="settings" {...childComponentProps } />
+									)}
+									</>
+								)}
+								</>
 							)}
-							</>
-						)}
-						</>
-					)}
-				</div>
+						</div>
+					) : <Spinner />
+				}
 			</div>
 		</div>
 	);
