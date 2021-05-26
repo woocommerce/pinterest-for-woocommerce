@@ -334,6 +334,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public function init_api_endpoints() {
 			new Pinterest\API\Auth();
 			new Pinterest\API\DomainVerification();
+			new Pinterest\API\FeedState();
 		}
 
 		/**

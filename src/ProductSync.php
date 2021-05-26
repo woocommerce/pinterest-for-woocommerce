@@ -363,7 +363,7 @@ class ProductSync {
 	 *
 	 * @return array
 	 */
-	private static function feed_job_status( $status = null, $args = null ) {
+	public static function feed_job_status( $status = null, $args = null ) {
 
 		// TODO: add/move logging here?
 
