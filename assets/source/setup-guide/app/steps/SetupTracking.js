@@ -30,24 +30,12 @@ const SetupTracking = ( {
 	const [ status, setStatus ] = useState( 'idle' );
 	const [ advertisersList, setAdvertisersList ] = useState();
 	const [ tagsList, setTagsList ] = useState();
-	const [ advertiser, setAdvertiser ] = useState();
-	const [ tag, setTag ] = useState();
 
 	useEffect( () => {
-		if ( options !== appSettings ) {
-			if ( appSettings?.tracking_advertiser !== advertiser ) {
-				setAdvertiser( appSettings.tracking_advertiser );
-			}
-
-			if ( appSettings?.tracking_tag !== tag ) {
-				setTag( appSettings.tracking_tag );
-			}
-
-			if ( undefined === advertisersList && undefined !== appSettings ) {
-				fetchAdvertisers();
-			}
+		if ( undefined === advertisersList ) {
+			fetchAdvertisers();
 		}
-	}, [ appSettings ] );
+	}, [ advertisersList ] );
 
 	const fetchAdvertisers = async () => {
 		try {
@@ -62,12 +50,10 @@ const SetupTracking = ( {
 
 			if ( results.advertisers.length > 0 ) {
 				if ( ! appSettings?.tracking_advertiser ) {
-					if ( ! advertiser && ! appSettings?.tracking_advertiser ) {
-						handleOptionChange(
-							'advertiser',
-							results.advertisers[ 0 ].id
-						);
-					}
+					handleOptionChange(
+						'advertiser',
+						results.advertisers[ 0 ].id
+					);
 				} else {
 					fetchTags( appSettings?.tracking_advertiser );
 				}
@@ -103,7 +89,6 @@ const SetupTracking = ( {
 
 			if ( Object.keys( results ).length > 0 ) {
 				if (
-					! tag &&
 					! appSettings?.tracking_tag
 				) {
 					handleOptionChange( 'tag', Object.keys( results )[ 0 ] );
@@ -112,7 +97,7 @@ const SetupTracking = ( {
 				setStatus( 'error' );
 			}
 
-			if ( ! tag && appSettings?.tracking_tag ) {
+			if ( appSettings?.tracking_tag ) {
 				setStatus( 'success' );
 			}
 		} catch ( error ) {
@@ -130,14 +115,10 @@ const SetupTracking = ( {
 
 	const handleOptionChange = async ( name, value ) => {
 		if ( name === 'advertiser' ) {
-			setAdvertiser( value );
-			setTag();
 			fetchTags( value );
-		} else if ( name === 'tag' ) {
-			setTag( value );
 		}
 
-		if ( advertiser && tag ) {
+		if ( appSettings?.tracking_advertiser && appSettings?.tracking_tag ) {
 			setStatus( 'success' );
 		} else {
 			setStatus( 'idle' );
@@ -182,8 +163,8 @@ const SetupTracking = ( {
 	const handleTryAgain = () => {
 		setStatus( 'idle' );
 
-		if ( advertiser ) {
-			fetchTags( advertiser );
+		if ( appSettings.tracking_advertiser ) {
+			fetchTags( appSettings.tracking_advertiser );
 		} else {
 			fetchAdvertisers();
 		}
@@ -245,7 +226,7 @@ const SetupTracking = ( {
 												'Advertiser',
 												'pinterest-for-woocommerce'
 											) }
-											value={ advertiser }
+											value={ appSettings.tracking_advertiser }
 											onChange={ ( selectedAdvertiser ) =>
 												handleOptionChange(
 													'advertiser',
@@ -318,7 +299,7 @@ const SetupTracking = ( {
 									</>
 								) }
 
-								{ undefined !== advertiser &&
+								{ undefined !== appSettings.tracking_advertiser &&
 									( undefined !== tagsList ? (
 										Object.keys( tagsList ).length > 0 && (
 											<>
@@ -327,7 +308,7 @@ const SetupTracking = ( {
 														'Tracking Tag',
 														'pinterest-for-woocommerce'
 													) }
-													value={ tag }
+													value={ appSettings.tracking_tag }
 													onChange={ (
 														selectedTag
 													) =>
