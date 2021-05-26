@@ -16,32 +16,16 @@ import { Spinner } from '@woocommerce/components';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import StepStatus from '../components/StepStatus';
+import { isDomainVerified } from '../helpers/conditionals'
 
 const ClaimWebsite = ( {
 	goToNextStep,
-	pin4wc,
-	updateOptions,
+	appSettings,
+	setAppSettings,
 	createNotice,
 	view,
 } ) => {
 	const [ status, setStatus ] = useState( 'idle' );
-
-	const isDomainVerified = () => {
-		const result =
-			undefined === pin4wc
-				? undefined
-				: undefined === pin4wc?.account_data?.verified_domains
-				? false
-				: pin4wc?.account_data?.verified_domains.includes(
-						wcSettings.pin4wc.domainToVerify
-				  );
-
-		if ( result === true && status !== 'success' ) {
-			setStatus( 'success' );
-		}
-
-		return result;
-	};
 
 	const handleClaimWebsite = async () => {
 		setStatus( 'pending' );
@@ -55,11 +39,11 @@ const ClaimWebsite = ( {
 			setStatus( 'success' );
 
 			const newOptions = {
-				...pin4wc,
+				...appSettings,
 				account_data: results.account_data,
 			};
 
-			updateOptions( {
+			setAppSettings( {
 				[ wcSettings.pin4wc.optionsName ]: newOptions,
 			} );
 		} catch ( error ) {
@@ -124,16 +108,16 @@ const ClaimWebsite = ( {
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
-						{ undefined !== isDomainVerified() ? (
+						{ undefined !== isDomainVerified( appSettings ) ? (
 							<CardBody size="large">
 								<StepStatus
 									label={ wcSettings.pin4wc.domainToVerify }
 									status={ status }
-									options={ pin4wc }
+									options={ appSettings }
 								/>
 
 								{ view === 'settings' &&
-									! isDomainVerified() && <StepButton /> }
+									! isDomainVerified( appSettings ) && <StepButton /> }
 							</CardBody>
 						) : (
 							<CardBody size="large">

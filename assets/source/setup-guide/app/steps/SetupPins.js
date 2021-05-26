@@ -32,15 +32,13 @@ const ALLOWED_OPTIONS = [
 	'rich_pins_on_products',
 ];
 
-const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
-	const [ options, setOptions ] = useState( {} );
+const SetupPins = ( {
+	appSettings,
+	setAppSettings,
+	createNotice,
+	view
+} ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
-
-	useEffect( () => {
-		if ( options !== pin4wc ) {
-			setOptions( pin4wc );
-		}
-	}, [ pin4wc ] );
 
 	const handleOptionChange = async ( name, value ) => {
 		if ( ! ALLOWED_OPTIONS.includes( name ) ) {
@@ -49,16 +47,13 @@ const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 
 		setIsSaving( true );
 
-		const oldOptions = Object.assign( {}, options );
-		const newOptions = {
-			...options,
-			[ name ]: value ?? ! options[ name ],
+		const newSettings = {
+			...appSettings,
+			[ name ]: value ?? ! appSettings[ name ],
 		};
 
-		setOptions( newOptions );
-
-		const update = await updateOptions( {
-			[ wcSettings.pin4wc.optionsName ]: newOptions,
+		const update = await setAppSettings( {
+			[ wcSettings.pin4wc.optionsName ]: newSettings,
 		} );
 
 		if ( update.success ) {
@@ -70,7 +65,6 @@ const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 				)
 			);
 		} else {
-			setOptions( oldOptions );
 			createNotice(
 				'error',
 				__(
@@ -116,7 +110,7 @@ const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{ Object.keys( options ).length > 0 ? (
+							{ undefined !== appSettings && Object.keys( appSettings ).length > 0 ? (
 								<>
 									<Text
 										className="woocommerce-setup-guide__checkbox-heading"
@@ -132,7 +126,7 @@ const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 											'Track conversions',
 											'pinterest-for-woocommerce'
 										) }
-										checked={ options.track_conversions }
+										checked={ appSettings.track_conversions }
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
 											handleOptionChange(
@@ -159,7 +153,7 @@ const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 											</Button>
 										}
 										checked={
-											options.enhanced_match_support
+											appSettings.enhanced_match_support
 										}
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
@@ -183,7 +177,7 @@ const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 											'pinterest-for-woocommerce'
 										) }
 										checked={
-											options.rich_pins_on_products
+											appSettings.rich_pins_on_products
 										}
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
@@ -197,7 +191,7 @@ const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 											'Enable Rich Pins for Posts',
 											'pinterest-for-woocommerce'
 										) }
-										checked={ options.rich_pins_on_posts }
+										checked={ appSettings.rich_pins_on_posts }
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
 											handleOptionChange(
@@ -219,7 +213,7 @@ const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 											'Save to Pinterest',
 											'pinterest-for-woocommerce'
 										) }
-										checked={ options.save_to_pinterest }
+										checked={ appSettings.save_to_pinterest }
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
 											handleOptionChange(
@@ -259,21 +253,4 @@ const SetupPins = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	);
 };
 
-export default compose(
-	withSelect( ( select ) => {
-		const { getOption } = select( OPTIONS_STORE_NAME );
-
-		return {
-			pin4wc: getOption( wcSettings.pin4wc.optionsName ) || [],
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { createNotice } = dispatch( 'core/notices' );
-		const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
-
-		return {
-			createNotice,
-			updateOptions,
-		};
-	} )
-)( SetupPins );
+export default SetupPins;

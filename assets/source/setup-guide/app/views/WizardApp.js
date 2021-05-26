@@ -3,6 +3,7 @@
  */
 import '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { createElement, useState } from '@wordpress/element';
 import { Spinner, Stepper } from '@woocommerce/components';
 import {
@@ -20,9 +21,23 @@ import SetupTracking from '../steps/SetupTracking';
 import SetupPins from '../steps/SetupPins';
 import TransientNotices from '../components/TransientNotices';
 import { useBodyClasses, useCreateNotice } from '../helpers/effects';
+import { SETTINGS_STORE_NAME } from '../data';
 
 const WizardApp = () => {
 	const [ currentStep, setCurrentStep ] = useState();
+
+	const appSettings = useSelect( ( select ) =>
+		select( SETTINGS_STORE_NAME ).getSetting( wcSettings.pin4wc.optionsName )
+	);
+
+	const { updateSettings: setAppSettings } = useDispatch( SETTINGS_STORE_NAME );
+	const { createNotice } = useDispatch( 'core/notices' );
+
+	const childComponentProps = {
+		appSettings,
+		setAppSettings,
+		createNotice
+	}
 
 	useBodyClasses( 'wizard' );
 	useCreateNotice( wcSettings.pin4wc.error );
@@ -53,6 +68,7 @@ const WizardApp = () => {
 	const getSteps = () => {
 		return steps.map( ( step, index ) => {
 			const container = createElement( step.container, {
+				...childComponentProps,
 				query: getQuery(),
 				step,
 				goToNextStep: () => goToNextStep( step ),
