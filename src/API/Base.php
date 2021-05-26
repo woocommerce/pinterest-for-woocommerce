@@ -270,6 +270,19 @@ class Base {
 
 
 	/**
+	 * Request the account data from the API and return the response.
+	 *
+	 * @param string $merchant_id The ID of the merchant for the request.
+	 *
+	 * @return mixed
+	 */
+	public static function get_merchant( $merchant_id ) {
+		$response = self::make_request( 'commerce/product_pin_merchants/' . $merchant_id . '/', 'GET' );
+		return $response;
+	}
+
+
+	/**
 	 * Creates a merchant for the authenticated user or returns the existing one.
 	 *
 	 * @param array $args The arguments to be passed to the API request.
@@ -315,4 +328,18 @@ class Base {
 
 		return $response;
 	}
+
+
+	/**
+	 * Request the feed report data from the API and return the response.
+	 *
+	 * @param string $merchant_id The ID of the merchant for the request.
+	 *
+	 * @return mixed
+	 */
+	public static function get_feed_report( $merchant_id ) {
+		$response = self::make_request( 'catalogs/datasource/feed_report/' . $merchant_id . '/', 'GET' );
+		return $response;
+	}
+
 }
