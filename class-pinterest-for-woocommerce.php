@@ -181,6 +181,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
 			add_action( 'wp_head', array( Pinterest\RichPins::class, 'maybe_inject_rich_pins_opengraph_tags' ) );
 			add_action( 'wp', array( Pinterest\SaveToPinterest::class, 'maybe_init' ) );
+			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 		}
