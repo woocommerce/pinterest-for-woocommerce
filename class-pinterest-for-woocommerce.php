@@ -335,6 +335,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			new Pinterest\API\Auth();
 			new Pinterest\API\DomainVerification();
 			new Pinterest\API\FeedState();
+			new Pinterest\API\FeedIssues();
 		}
 
 		/**
