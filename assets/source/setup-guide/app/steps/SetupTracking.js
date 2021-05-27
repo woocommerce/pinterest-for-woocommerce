@@ -88,9 +88,7 @@ const SetupTracking = ( {
 			setTagsList( results );
 
 			if ( Object.keys( results ).length > 0 ) {
-				if (
-					! appSettings?.tracking_tag
-				) {
+				if ( ! appSettings?.tracking_tag ) {
 					handleOptionChange( 'tag', Object.keys( results )[ 0 ] );
 				}
 			} else {
@@ -221,7 +219,9 @@ const SetupTracking = ( {
 												'Advertiser',
 												'pinterest-for-woocommerce'
 											) }
-											value={ appSettings.tracking_advertiser }
+											value={
+												appSettings.tracking_advertiser
+											}
 											onChange={ ( selectedAdvertiser ) =>
 												handleOptionChange(
 													'advertiser',
@@ -294,7 +294,8 @@ const SetupTracking = ( {
 									</>
 								) }
 
-								{ undefined !== appSettings.tracking_advertiser &&
+								{ undefined !==
+									appSettings.tracking_advertiser &&
 									( undefined !== tagsList ? (
 										Object.keys( tagsList ).length > 0 && (
 											<>
@@ -303,7 +304,9 @@ const SetupTracking = ( {
 														'Tracking Tag',
 														'pinterest-for-woocommerce'
 													) }
-													value={ appSettings.tracking_tag }
+													value={
+														appSettings.tracking_tag
+													}
 													onChange={ (
 														selectedTag
 													) =>

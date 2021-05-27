@@ -2,7 +2,6 @@
  * Get settings from state tree.
  *
  * @param {Object} state - Reducer state
- * @param {Array} name - Setting name
  */
 export const getSettings = ( state ) => {
 	return state.settings;

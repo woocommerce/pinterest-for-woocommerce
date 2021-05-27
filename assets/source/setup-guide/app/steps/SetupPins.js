@@ -3,9 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	Button,
 	Card,
@@ -14,7 +12,6 @@ import {
 	Icon,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 import { Spinner } from '@woocommerce/components';
 
 /**
@@ -23,12 +20,7 @@ import { Spinner } from '@woocommerce/components';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 
-const SetupPins = ( {
-	appSettings,
-	setAppSettings,
-	createNotice,
-	view
-} ) => {
+const SetupPins = ( { appSettings, setAppSettings, createNotice, view } ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
 
 	const handleOptionChange = async ( name, value ) => {
@@ -92,7 +84,8 @@ const SetupPins = ( {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{ undefined !== appSettings && Object.keys( appSettings ).length > 0 ? (
+							{ undefined !== appSettings &&
+							Object.keys( appSettings ).length > 0 ? (
 								<>
 									<Text
 										className="woocommerce-setup-guide__checkbox-heading"
@@ -108,7 +101,9 @@ const SetupPins = ( {
 											'Track conversions',
 											'pinterest-for-woocommerce'
 										) }
-										checked={ appSettings.track_conversions }
+										checked={
+											appSettings.track_conversions
+										}
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
 											handleOptionChange(
@@ -173,7 +168,9 @@ const SetupPins = ( {
 											'Enable Rich Pins for Posts',
 											'pinterest-for-woocommerce'
 										) }
-										checked={ appSettings.rich_pins_on_posts }
+										checked={
+											appSettings.rich_pins_on_posts
+										}
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
 											handleOptionChange(
@@ -195,7 +192,9 @@ const SetupPins = ( {
 											'Save to Pinterest',
 											'pinterest-for-woocommerce'
 										) }
-										checked={ appSettings.save_to_pinterest }
+										checked={
+											appSettings.save_to_pinterest
+										}
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
 											handleOptionChange(

@@ -61,7 +61,7 @@ export function* patchSettings( data ) {
 	yield setIsUpdating( true );
 	yield receiveSettings( data );
 
-	const settings = yield select(STORE_NAME, 'getSettings');
+	const settings = yield select( STORE_NAME, 'getSettings' );
 
 	try {
 		const results = yield apiFetch( {
@@ -69,7 +69,7 @@ export function* patchSettings( data ) {
 			method: 'POST',
 			data: {
 				[ OPTIONS_NAME ]: settings,
-			}
+			},
 		} );
 
 		yield setIsUpdating( false );

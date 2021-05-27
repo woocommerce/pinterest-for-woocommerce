@@ -20,7 +20,7 @@ import { Spinner } from '@woocommerce/components';
  */
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
-import { isConnected } from '../helpers/conditionals'
+import { isConnected } from '../helpers/conditionals';
 
 const SetupAccount = ( {
 	appSettings,
@@ -32,7 +32,7 @@ const SetupAccount = ( {
 	const handleDisconnectAccount = async () => {
 		const update = await setAppSettings( {
 			token: null,
-			crypto_encoded_key: null
+			crypto_encoded_key: null,
 		} );
 
 		if ( update.success ) {
@@ -170,16 +170,17 @@ const SetupAccount = ( {
 						) }
 					</Card>
 
-					{ view === 'wizard' && isConnected( appSettings ) === true && (
-						<div className="woocommerce-setup-guide__footer-button">
-							<Button isPrimary onClick={ goToNextStep }>
-								{ __(
-									'Continue',
-									'pinterest-for-woocommerce'
-								) }
-							</Button>
-						</div>
-					) }
+					{ view === 'wizard' &&
+						isConnected( appSettings ) === true && (
+							<div className="woocommerce-setup-guide__footer-button">
+								<Button isPrimary onClick={ goToNextStep }>
+									{ __(
+										'Continue',
+										'pinterest-for-woocommerce'
+									) }
+								</Button>
+							</div>
+						) }
 				</div>
 			</div>
 		</div>

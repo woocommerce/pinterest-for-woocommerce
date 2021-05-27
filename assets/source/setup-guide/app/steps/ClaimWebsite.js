@@ -16,7 +16,7 @@ import { Spinner } from '@woocommerce/components';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import StepStatus from '../components/StepStatus';
-import { isDomainVerified } from '../helpers/conditionals'
+import { isDomainVerified } from '../helpers/conditionals';
 
 const ClaimWebsite = ( {
 	goToNextStep,
@@ -110,7 +110,9 @@ const ClaimWebsite = ( {
 								/>
 
 								{ view === 'settings' &&
-									! isDomainVerified( appSettings ) && <StepButton /> }
+									! isDomainVerified( appSettings ) && (
+										<StepButton />
+									) }
 							</CardBody>
 						) : (
 							<CardBody size="large">

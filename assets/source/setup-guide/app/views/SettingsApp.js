@@ -3,6 +3,7 @@
  */
 import '@wordpress/notices';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { Spinner } from '@woocommerce/components';
 
 /**
  * Internal dependencies
@@ -13,7 +14,11 @@ import SetupTracking from '../steps/SetupTracking';
 import SetupPins from '../steps/SetupPins';
 import TransientNotices from '../components/TransientNotices';
 import { useBodyClasses, useCreateNotice } from '../helpers/effects';
-import { isConnected, isDomainVerified, isTrackingConfigured } from '../helpers/conditionals';
+import {
+	isConnected,
+	isDomainVerified,
+	isTrackingConfigured,
+} from '../helpers/conditionals';
 import { SETTINGS_STORE_NAME } from '../data';
 
 const SettingsApp = () => {
@@ -21,14 +26,16 @@ const SettingsApp = () => {
 		select( SETTINGS_STORE_NAME ).getSettings()
 	);
 
-	const { patchSettings: setAppSettings } = useDispatch( SETTINGS_STORE_NAME );
+	const { patchSettings: setAppSettings } = useDispatch(
+		SETTINGS_STORE_NAME
+	);
 	const { createNotice } = useDispatch( 'core/notices' );
 
 	const childComponentProps = {
 		appSettings,
 		setAppSettings,
-		createNotice
-	}
+		createNotice,
+	};
 
 	useBodyClasses();
 	useCreateNotice( wcSettings.pin4wc.error );
@@ -37,29 +44,43 @@ const SettingsApp = () => {
 		<div className="woocommerce-layout">
 			<div className="woocommerce-layout__main">
 				<TransientNotices />
-				{ appSettings
-					? (
-						<div className="woocommerce-setup-guide__container">
-							<SetupAccount view="settings" {...childComponentProps } />
+				{ appSettings ? (
+					<div className="woocommerce-setup-guide__container">
+						<SetupAccount
+							view="settings"
+							{ ...childComponentProps }
+						/>
 
-							{ isConnected( appSettings ) && (
-								<>
-								<ClaimWebsite view="settings" {...childComponentProps } />
+						{ isConnected( appSettings ) && (
+							<>
+								<ClaimWebsite
+									view="settings"
+									{ ...childComponentProps }
+								/>
 
 								{ isDomainVerified( appSettings ) && (
 									<>
-									<SetupTracking view="settings" {...childComponentProps } />
+										<SetupTracking
+											view="settings"
+											{ ...childComponentProps }
+										/>
 
-									{ isTrackingConfigured( appSettings ) && (
-										<SetupPins view="settings" {...childComponentProps } />
-									)}
+										{ isTrackingConfigured(
+											appSettings
+										) && (
+											<SetupPins
+												view="settings"
+												{ ...childComponentProps }
+											/>
+										) }
 									</>
-								)}
-								</>
-							)}
-						</div>
-					) : <Spinner />
-				}
+								) }
+							</>
+						) }
+					</div>
+				) : (
+					<Spinner />
+				) }
 			</div>
 		</div>
 	);

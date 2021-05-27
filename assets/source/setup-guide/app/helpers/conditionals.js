@@ -1,10 +1,10 @@
-export const isConnected = appSettings => {
+export const isConnected = ( appSettings ) => {
 	return undefined === appSettings
 		? undefined
 		: !! appSettings?.token?.access_token;
 };
 
-export const isDomainVerified = appSettings => {
+export const isDomainVerified = ( appSettings ) => {
 	return undefined === appSettings
 		? undefined
 		: undefined === appSettings?.account_data?.verified_domains
@@ -14,7 +14,7 @@ export const isDomainVerified = appSettings => {
 		  );
 };
 
-export const isTrackingConfigured = appSettings => {
+export const isTrackingConfigured = ( appSettings ) => {
 	return undefined === appSettings
 		? undefined
 		: !! ( appSettings?.tracking_advertiser && appSettings?.tracking_tag );

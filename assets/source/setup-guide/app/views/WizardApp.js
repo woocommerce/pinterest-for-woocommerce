@@ -30,14 +30,16 @@ const WizardApp = () => {
 		select( SETTINGS_STORE_NAME ).getSettings()
 	);
 
-	const { patchSettings: setAppSettings } = useDispatch( SETTINGS_STORE_NAME );
+	const { patchSettings: setAppSettings } = useDispatch(
+		SETTINGS_STORE_NAME
+	);
 	const { createNotice } = useDispatch( 'core/notices' );
 
 	const childComponentProps = {
 		appSettings,
 		setAppSettings,
-		createNotice
-	}
+		createNotice,
+	};
 
 	useBodyClasses( 'wizard' );
 	useCreateNotice( wcSettings.pin4wc.error );
@@ -130,10 +132,11 @@ const WizardApp = () => {
 		<div className="woocommerce-layout">
 			<div className="woocommerce-layout__main woocommerce-setup-guide__main">
 				<TransientNotices />
-				{ appSettings
-					? <Stepper currentStep={ currentStep } steps={ getSteps() } />
-					: <Spinner />
-				}
+				{ appSettings ? (
+					<Stepper currentStep={ currentStep } steps={ getSteps() } />
+				) : (
+					<Spinner />
+				) }
 			</div>
 		</div>
 	);
