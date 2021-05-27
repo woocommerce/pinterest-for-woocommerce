@@ -8,6 +8,10 @@ import { Spinner } from '@woocommerce/components';
 /**
  * Internal dependencies
  */
+import SyncToggler from './sections/SyncToggler';
+import SyncStatuses from './sections/SyncStatuses';
+import SyncOverview from './sections/SyncOverview';
+import SyncIssues from './sections/SyncIssues';
 import TransientNotices from './components/TransientNotices';
 import { useCreateNotice } from './helpers/effects';
 import { SETTINGS_STORE_NAME } from './data';
@@ -35,7 +39,10 @@ const App = () => {
 				{ appSettings
 					? (
 						<div className="woocommerce-catalog_sync__container">
-							Init Catalog Sync page
+							<SyncToggler />
+							<SyncStatuses />
+							<SyncOverview />
+							<SyncIssues />
 						</div>
 					) : <Spinner />
 				}
