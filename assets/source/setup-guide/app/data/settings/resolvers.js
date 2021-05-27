@@ -2,18 +2,23 @@
  * Internal dependencies
  */
 import { receiveSettings, setRequestingError } from './actions';
-import { batchFetch } from './controls';
+import { fetch } from './controls';
 
 /**
- * Request an option value.
- *
- * @param {string} name - Setting name
+ * Request all settings values.
  */
-export function* getSetting( name ) {
+export function* getSettings() {
 	try {
-		const result = yield batchFetch( name );
+		const result = yield fetch();
 		yield receiveSettings( result );
 	} catch ( error ) {
-		yield setRequestingError( error, name );
+		yield setRequestingError( error, 'all' );
 	}
+}
+
+/**
+ * Request a setting value.
+ */
+export function* getSetting() {
+	getSettings();
 }

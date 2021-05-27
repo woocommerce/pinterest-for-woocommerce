@@ -38,14 +38,7 @@ const ClaimWebsite = ( {
 
 			setStatus( 'success' );
 
-			const newOptions = {
-				...appSettings,
-				account_data: results.account_data,
-			};
-
-			setAppSettings( {
-				[ wcSettings.pin4wc.optionsName ]: newOptions,
-			} );
+			setAppSettings( { account_data: results.account_data } );
 		} catch ( error ) {
 			setStatus( 'error' );
 

@@ -18,10 +18,10 @@ import { SETTINGS_STORE_NAME } from '../data';
 
 const SettingsApp = () => {
 	const appSettings = useSelect( ( select ) =>
-		select( SETTINGS_STORE_NAME ).getSetting( wcSettings.pin4wc.optionsName )
+		select( SETTINGS_STORE_NAME ).getSettings()
 	);
 
-	const { updateSettings: setAppSettings } = useDispatch( SETTINGS_STORE_NAME );
+	const { patchSettings: setAppSettings } = useDispatch( SETTINGS_STORE_NAME );
 	const { createNotice } = useDispatch( 'core/notices' );
 
 	const childComponentProps = {

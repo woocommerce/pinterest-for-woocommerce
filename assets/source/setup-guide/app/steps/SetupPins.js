@@ -23,15 +23,6 @@ import { Spinner } from '@woocommerce/components';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 
-const ALLOWED_OPTIONS = [
-	'track_conversions',
-	'enhanced_match_support',
-	'save_to_pinterest',
-	'is_setup_complete',
-	'rich_pins_on_posts',
-	'rich_pins_on_products',
-];
-
 const SetupPins = ( {
 	appSettings,
 	setAppSettings,
@@ -41,19 +32,10 @@ const SetupPins = ( {
 	const [ isSaving, setIsSaving ] = useState( false );
 
 	const handleOptionChange = async ( name, value ) => {
-		if ( ! ALLOWED_OPTIONS.includes( name ) ) {
-			return;
-		}
-
 		setIsSaving( true );
 
-		const newSettings = {
-			...appSettings,
-			[ name ]: value ?? ! appSettings[ name ],
-		};
-
 		const update = await setAppSettings( {
-			[ wcSettings.pin4wc.optionsName ]: newSettings,
+			[ name ]: value ?? ! appSettings[ name ],
 		} );
 
 		if ( update.success ) {

@@ -30,13 +30,9 @@ const SetupAccount = ( {
 	goToNextStep,
 } ) => {
 	const handleDisconnectAccount = async () => {
-		const newSettings = Object.assign( {}, appSettings );
-
-		delete newSettings.token;
-		delete newSettings.crypto_encoded_key;
-
 		const update = await setAppSettings( {
-			[ wcSettings.pin4wc.optionsName ]: newSettings,
+			token: null,
+			crypto_encoded_key: null
 		} );
 
 		if ( update.success ) {

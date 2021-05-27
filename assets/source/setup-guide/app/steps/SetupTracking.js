@@ -130,13 +130,8 @@ const SetupTracking = ( {
 	const saveOptions = async ( name, value ) => {
 		setIsSaving( true );
 
-		const newSettings = {
-			...appSettings,
-			[ `tracking_${ name }` ]: value,
-		};
-
 		const update = await setAppSettings( {
-			[ wcSettings.pin4wc.optionsName ]: newSettings,
+			[ `tracking_${ name }` ]: value,
 		} );
 
 		if ( update.success ) {
