@@ -31,19 +31,15 @@ class ProductsXmlFeed {
 		'g:google_product_category',
 		'link',
 		'g:image_link',
-		'g:condition',
 		'g:availability',
 		'g:price', // <numeric> <ISO 4217>
 		'sale_price', // <numeric> <ISO 4217>
-		'g:ean',
 		'g:mpn',
-		'g:brand',
-		'g:custom_label_0',
 		'g:tax',
 		'g:shipping',
-		'g:identifier_exists',
 		'g:additional_image_link',
 	);
+
 
 	/**
 	 * Returns the XML header to be printed.
@@ -51,10 +47,9 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	public static function get_xml_header() {
-		return '<?xml version="1.0"?>
-		<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
-			<channel>' . PHP_EOL;
+		return '<?xml version="1.0"?>' . PHP_EOL . '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">' . PHP_EOL . "\t" . '<channel>' . PHP_EOL;
 	}
+
 
 	/**
 	 * Returns the XML footer to be printed.
@@ -62,8 +57,7 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	public static function get_xml_footer() {
-		return '    </channel>
-		</rss>';
+		return "\t" . '</channel>' . PHP_EOL . '</rss>';
 	}
 
 
@@ -76,16 +70,16 @@ class ProductsXmlFeed {
 	 */
 	public static function get_xml_item( $product ) {
 
-		$xml = "\t\t\t\t<item>" . PHP_EOL;
+		$xml = "\t\t<item>" . PHP_EOL;
 
 		foreach ( apply_filters( 'pinterest_for_woocommerce_feed_item_structure', self::$feed_item_structure, $product ) as $attribute ) {
 			$method_name = 'get_property_' . str_replace( ':', '_', $attribute );
 			if ( method_exists( __CLASS__, $method_name ) ) {
-				$xml .= "\t\t\t\t\t" . call_user_func_array( array( __CLASS__, $method_name ), array( $product, $attribute ) ) . PHP_EOL;
+				$xml .= "\t\t\t" . call_user_func_array( array( __CLASS__, $method_name ), array( $product, $attribute ) ) . PHP_EOL;
 			}
 		}
 
-		$xml .= "\t\t\t\t</item>" . PHP_EOL;
+		$xml .= "\t\t</item>" . PHP_EOL;
 
 		return apply_filters( 'pinterest_for_woocommerce_feed_item_xml', $xml, $product );
 	}
@@ -102,6 +96,23 @@ class ProductsXmlFeed {
 	private static function get_property_g_id( $product, $property ) {
 		return '<' . $property . '>' . $product->get_id() . '</' . $property . '>';
 	}
+
+	/**
+	 * Undocumented function
+	 *
+	 * @param WC_Product $product the product.
+	 * @param string     $property The name of the property.
+	 *
+	 * @return string
+	 */
+	private static function get_property_item_group_id( $product, $property ) {
+
+		///...
+
+		return '<' . $property . '>' . $product->get_id() . '</' . $property . '>';
+	}
+
+
 
 	/**
 	 * Undocumented function
@@ -136,8 +147,14 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_g_product_type( $product, $property ) {
-		return '<' . $property . '>' . 'Tools &gt; Mirrors' . '</' . $property . '>'; // TODO:  . ?
-		// return $product->get_id();.
+
+		$taxonomies = self::get_taxonomies( $product->get_id() );
+
+		if ( empty( $taxonomies ) ) {
+			return;
+		}
+
+		return '<' . $property . '>' . implode( ' &gt; ', $taxonomies ) . '</' . $property . '>';
 	}
 
 	/**
@@ -149,7 +166,15 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_g_google_product_category( $product, $property ) {
-		return '<' . $property . '>' . wc_get_product_category_list( $product->get_id(), '&gt;' ) . '</' . $property . '>';
+
+		$taxonomies = self::get_taxonomies( $product->get_id() );
+
+		if ( empty( $taxonomies ) ) {
+			return;
+		}
+
+		return '<' . $property . '>' . implode( ' &gt; ', $taxonomies ) . '</' . $property . '>';
+
 	}
 
 	/**
@@ -183,17 +208,6 @@ class ProductsXmlFeed {
 		return '<' . $property . '>' . wp_get_attachment_image_src( $image_id )[0] . '</' . $property . '>';
 	}
 
-	/**
-	 * Undocumented function
-	 *
-	 * @param WC_Product $product the product.
-	 * @param string     $property The name of the property.
-	 *
-	 * @return string
-	 */
-	// private static function get_property_g_condition( $product, $property ) {
-	// return '<' . $property . '>' . $product->get_id() . '</'. $property . '>';
-	// }
 
 	/**
 	 * Undocumented function
@@ -257,45 +271,9 @@ class ProductsXmlFeed {
 	 *
 	 * @return string
 	 */
-	// private static function get_property_g_ean( $product, $property ) {
-	// return '<' . $property . '>' . $product->get_id() . '</'. $property . '>';
-	// }
-
-	/**
-	 * Undocumented function
-	 *
-	 * @param WC_Product $product the product.
-	 * @param string     $property The name of the property.
-	 *
-	 * @return string
-	 */
 	private static function get_property_g_mpn( $product, $property ) {
 		return '<' . $property . '>' . $product->get_sku() . '</' . $property . '>';
 	}
-
-	/**
-	 * Undocumented function
-	 *
-	 * @param WC_Product $product the product.
-	 * @param string     $property The name of the property.
-	 *
-	 * @return string
-	 */
-	// private static function get_property_g_brand( $product, $property ) {
-	// return '<' . $property . '>' . $product->get_id() . '</'. $property . '>';
-	// }
-
-	/**
-	 * Undocumented function
-	 *
-	 * @param WC_Product $product the product.
-	 * @param string     $property The name of the property.
-	 *
-	 * @return string
-	 */
-	// private static function get_property_g_custom_label_0( $product, $property ) {
-	// return '<' . $property . '>' . $product->get_id() . '</'. $property . '>';
-	// }
 
 	/**
 	 * Undocumented function
@@ -329,21 +307,22 @@ class ProductsXmlFeed {
 	 *
 	 * @return string
 	 */
-	private static function get_property_g_identifier_exists( $product, $property ) {
-		return '<' . $property . '>FALSE</' . $property . '>'; // TODO: ?
-	}
-
-	/**
-	 * Undocumented function
-	 *
-	 * @param WC_Product $product the product.
-	 * @param string     $property The name of the property.
-	 *
-	 * @return string
-	 */
 	// private static function get_property_g_additional_image_link( $product, $property ) {
 	// return '<' . $property . '>' . $product->get_id() . '</'. $property . '>';
 	// }
+
+
+	private static function get_taxonomies( $product_id ) {
+
+		$terms = wc_get_object_terms( $product_id, 'product_cat' );
+
+		if ( empty( $terms ) ) {
+			return array();
+		}
+
+		return wp_list_pluck( $terms, 'name' );
+
+	}
 
 
 }
