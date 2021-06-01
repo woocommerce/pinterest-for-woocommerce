@@ -5,7 +5,7 @@ import TYPES from './action-types';
 
 const settingsReducer = (
 	state = { isUpdating: false, requestingErrors: {} },
-	{ type, settings, error, isUpdating, name, keyValuePairs }
+	{ type, settings, error, isUpdating, name }
 ) => {
 	switch ( type ) {
 		case TYPES.RECEIVE_SETTINGS:
@@ -13,7 +13,7 @@ const settingsReducer = (
 				...state,
 				settings: {
 					...state.settings,
-					...settings
+					...settings,
 				},
 			};
 			break;
