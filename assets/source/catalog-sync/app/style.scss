@@ -27,6 +27,32 @@ $root: ".woocommerce-catalog-sync";
 		}
 	}
 
+	.woocommerce-summary {
+		background: none;
+		border: 0;
+		box-shadow: none;
+		margin: 0;
+
+		&__item {
+			background: none;
+			border-bottom: 0;
+
+			&-container {
+
+				&:last-child {
+
+					> div {
+						border-right: 0;
+					}
+				}
+			}
+		}
+	}
+
+	.no-padding {
+		padding: 0;
+	}
+
 	.muted {
 		color: #757575;
 	}
