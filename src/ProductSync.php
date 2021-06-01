@@ -182,7 +182,6 @@ class ProductSync {
 					if ( $not_expired ) {
 						self::trigger_async_feed_generation();
 					}
-
 				} else {
 					self::feed_reschedule();
 				}
@@ -237,17 +236,21 @@ class ProductSync {
 
 		if ( ! isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
 			// No feed registered.
+			$merchant = API\Base::maybe_create_merchant( $feed_args ); // TODO: test (case where merchant exists, no feed registered)
 
-			$merchant   = API\Base::maybe_create_merchant( $feed_args ); // TODO: test (case where merchant exists, no feed registered)
-			$registered = $merchant && 'success' === $merchant['status'] && isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location );
-
+			if ( $merchant && 'success' === $merchant['status'] && isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
+				$registered = $merchant['data']->product_pin_feed_profile->id;
+			}
 		} elseif ( $feed_args['feed_location'] === $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) {
 			// Feed registered.
-			$registered = true;
+			$registered = $merchant['data']->product_pin_feed_profile->id;
 		} else {
 			// A diff feed was registered. Update to the current one.
-			$feed       = API\Base::update_merchant_feed( $merchant['data']->product_pin_feed_profile->merchant_id, $merchant['data']->product_pin_feed_profile->id, $feed_args );
-			$registered = $feed && 'success' === $feed['status'] && isset( $feed['data']->location_config->full_feed_fetch_location );
+			$feed = API\Base::update_merchant_feed( $merchant['data']->product_pin_feed_profile->merchant_id, $merchant['data']->product_pin_feed_profile->id, $feed_args );
+
+			if ( $feed && 'success' === $feed['status'] && isset( $feed['data']->location_config->full_feed_fetch_location ) ) {
+				$registered = $feed['data']->id;
+			}
 		}
 
 		Pinterest_For_Woocommerce()::save_setting( 'feed_registered', $registered );
