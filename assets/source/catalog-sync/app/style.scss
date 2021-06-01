@@ -1,352 +1,42 @@
-$root: ".woocommerce-setup-guide";
+$root: ".woocommerce-catalog-sync";
 
-#{$root} {
+#pin4wc-catalog-sync {
 
-	&__body {
+	.woocommerce-layout__main {
+		padding-left: 40px;
+		padding-left: var(--large-gap);
+	}
 
-		&.woocommerce-admin-full-screen {
-			margin-top: 0;
-
-			.woocommerce-layout__header {
-				top: 0;
-				left: 0;
-				width: 100%;
-			}
-		}
-
-		@media screen and (max-width: 600px) {
-			#wpbody {
-				padding-top: 0;
-			}
-		}
-
-		.wrap {
-			margin: 0;
-		}
-
-		#wpcontent {
+	#{$root} {
+		&__state-body {
 			padding: 0;
 		}
 
-		.woocommerce-layout {
+		&__state-item {
+			padding: 24px 32px;
 
-			&__main {
-				display: block;
-				padding-right: 0;
+			&:not(:first-child) {
+				border-top: 1px solid rgb(226, 228, 231);
 			}
 
-			.woocommerce-spinner {
-				display: none;
-			}
-
-			.woocommerce-list__item-content {
-				white-space: break-spaces;
-			}
-		}
-
-		#{$root} {
-
-			&__main {
-
-				.woocommerce-stepper {
-
-					&__steps {
-						align-items: center;
-						display: flex;
-						height: 60px;
-						justify-content: center;
-						margin: 0 auto;
-						max-width: 768px;
-						overview: hidden;
-						position: relative;
-
-						&::before {
-							background: #fff;
-							border-bottom: 1px solid #dcdcde;
-							content: "";
-							display: block;
-							height: 100%;
-							left: 50%;
-							position: absolute;
-							top: 0;
-							transform: translateX(-50%);
-							width: 100vw;
-							z-index: -1;
-						}
-					}
-
-					&__step {
-						padding-left: 12px;
-						padding-right: 12px;
-
-						&-divider {
-							align-self: center;
-							margin-top: 0;
-						}
-					}
-				}
-			}
-
-			&__container {
-				color: #000;
-				max-width: 1032px;
-				padding-left: 16px;
-				padding-right: 16px;
-
-				@media (min-width: 783px) {
-					margin: var(--large-gap) auto;
+			p {
+				+ p {
+					margin-top: 0.75rem;
 				}
 
-				> div {
-
-					&:not(:first-child) {
-						margin-top: calc(var(--large-gap) + (var(--main-gap) / 2));
-					}
+				.emoji {
+					margin-right: 0.5rem;
 				}
-
-				.components-card__body.is-size-large {
-					padding: var(--large-gap);
-				}
-
-				.components-card__footer {
-					padding-left: var(--large-gap);
-					padding-right: var(--large-gap);
-				}
-
-				.components-button.is-link.is-destructive {
-					color: #cc1818;
-
-					&:hover:not(:disabled) {
-						color: #710d0d;
-					}
-				}
-			}
-
-			&__step {
-
-				&-header {
-					margin: 16px auto 40px;
-					max-width: 490px;
-					text-align: center;
-
-					@media (min-width: 783px) {
-						margin: 0 auto var(--large-gap);
-						min-height: 120px;
-					}
-
-					> div {
-						margin: 12px 0;
-					}
-
-					&__subtitle {
-						text-transform: uppercase;
-					}
-
-					&__description {
-						color: #191E23;
-					}
-				}
-
-				&-overview {
-					margin-top: var(--large-gap);
-					position: absolute;
-
-					> div {
-						margin: 8px 0;
-					}
-
-					&__description {
-						color: #191E23;
-					}
-
-					&__link {
-
-						a {
-							text-decoration: none;
-
-							&:hover {
-								text-decoration: underline;
-							}
-						}
-					}
-				}
-
-				&-status {
-					--bg-color: transparent;
-					--border-color: #ddd;
-					padding: 8px;
-					display: flex;
-
-					&.has-error {
-						--border-color: var(--wc-red);
-						--bg-color: var(--border-color);
-					}
-
-					&.has-pending,
-					&.has-success {
-						--border-color: var(--wp-admin-theme-color);
-						--bg-color: var(--border-color);
-					}
-
-					&__icon {
-						align-items: center;
-						background-color: var(--bg-color);
-						border: 1px solid var(--border-color);
-						border-radius: 50%;
-						color: #fff;
-						display: inline-flex;
-						font-size: 16px;
-						height: 22px;
-						justify-content: center;
-						margin-right: 12px;
-						min-width: 22px;
-						width: 22px;
-
-						.woocommerce-spinner {
-							border-radius: 50%;
-							display: block;
-							max-height: 22px;
-							min-width: 22px;
-							width: 22px;
-
-							&__circle {
-								stroke: #fff;
-							}
-						}
-					}
-				}
-
-				&-columns {
-					@media (min-width: 783px) {
-						column-gap: 24px;
-						display: grid;
-						grid-template-columns: 328px auto;
-					}
-				}
-
-				&-column {
-					position: relative;
-
-					.woocommerce-spinner {
-						display: block;
-					}
-				}
-			}
-
-			&__setup-account {
-
-				.is-connected {
-
-					> * {
-						margin: 8px 0;
-					}
-				}
-			}
-
-			&__claim-website {
-
-				.components-card__body {
-					align-items: center;
-					display: flex;
-					justify-content: space-between;
-				}
-
-				.is-verified {
-
-					> * {
-						margin: 8px 0;
-					}
-				}
-
-				.has-idle {
-
-					#{$root} {
-						&__step-status__icon {
-							display: none;
-						}
-					}
-				}
-			}
-
-			&__setup-tracking {
-
-				.text-margin {
-					margin: 1em 0;
-				}
-			}
-
-			&__checkbox {
-
-				&-heading {
-					margin: 24px 0;
-
-					&:first-child {
-						margin-top: 0;
-					}
-				}
-
-				&-group {
-					align-items: center;
-					display: flex;
-					margin-bottom: 16px;
-
-					&:last-child {
-						margin-bottom: 0;
-					}
-
-					.components-base-control {
-
-						&__field,
-						&__help {
-							margin: 0;
-						}
-
-						&__help {
-							margin-left: 12px;
-
-							.components-button {
-								display: inline-block;
-								text-decoration: none;
-
-								&:not(:hover) {
-									color: inherit;
-								}
-							}
-						}
-					}
-				}
-			}
-
-			&__footer-button {
-				display: block;
-				margin-top: var(--large-gap);
-				text-align: right;
 			}
 		}
+	}
 
-		.woocommerce-layout__primary {
-			display: none;
-		}
+	.muted {
+		color: #757575;
+	}
 
-		&.woocommerce-task-dashboard__body {
-			.woocommerce-layout__primary {
-				display: block;
-				margin: 60px 0 0 0;
-			}
-
-			.woocommerce-layout__header {
-				display: block;
-				border-bottom: 1px solid #dcdcde;
-			}
-
-			.woocommerce-navigation {
-				display: none;
-			}
-
-			.woocommerce-homescreen {
-				max-width: 100%;
-			}
-		}
+	.align-items-start {
+		align-items: flex-start;
 	}
 }
 
