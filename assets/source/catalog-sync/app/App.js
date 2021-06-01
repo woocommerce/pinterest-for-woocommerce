@@ -8,8 +8,7 @@ import { Spinner } from '@woocommerce/components';
 /**
  * Internal dependencies
  */
-import SyncToggler from './sections/SyncToggler';
-import SyncStatuses from './sections/SyncStatuses';
+import SyncState from './sections/SyncState';
 import SyncOverview from './sections/SyncOverview';
 import SyncIssues from './sections/SyncIssues';
 import TransientNotices from './components/TransientNotices';
@@ -21,14 +20,16 @@ const App = () => {
 		select( SETTINGS_STORE_NAME ).getSettings()
 	);
 
-	const { patchSettings: setAppSettings } = useDispatch( SETTINGS_STORE_NAME );
+	const { patchSettings: setAppSettings } = useDispatch(
+		SETTINGS_STORE_NAME
+	);
 	const { createNotice } = useDispatch( 'core/notices' );
 
 	const childComponentProps = {
 		appSettings,
 		setAppSettings,
-		createNotice
-	}
+		createNotice,
+	};
 
 	useCreateNotice( wcSettings.pin4wc.error );
 
@@ -36,16 +37,15 @@ const App = () => {
 		<div className="woocommerce-layout">
 			<div className="woocommerce-layout__main">
 				<TransientNotices />
-				{ appSettings
-					? (
-						<div className="woocommerce-catalog_sync__container">
-							<SyncToggler />
-							<SyncStatuses />
-							<SyncOverview />
-							<SyncIssues />
-						</div>
-					) : <Spinner />
-				}
+				{ appSettings ? (
+					<div className="woocommerce-catalog-sync__container">
+						<SyncState />
+						<SyncOverview />
+						<SyncIssues />
+					</div>
+				) : (
+					<Spinner />
+				) }
 			</div>
 		</div>
 	);
