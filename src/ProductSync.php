@@ -150,24 +150,24 @@ class ProductSync {
 			// Get merchant Obj from API.
 			$merchant = API\Base::maybe_create_merchant( $feed_args );
 
-			if ( 'success' !== $merchant['status'] ) {
-				throw new \Exception( __( 'Error' ) ); // TODO:
-			}
+		if ( 'success' !== $merchant['status'] ) {
+			throw new \Exception( __( 'Error' ) ); // TODO:
+		}
 
-			$registered = false;
+		$registered = false;
 
-			if ( ! isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
-				// No feed registered.
+		if ( ! isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
+			// No feed registered.
 
-				$merchant   = API\Base::maybe_create_merchant( $feed_args ); // TODO: test (case where merchant exists, no feed registered)
-				$registered = $merchant && 'success' === $merchant['status'] && isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location );
+			$merchant   = API\Base::maybe_create_merchant( $feed_args ); // TODO: test (case where merchant exists, no feed registered)
+			$registered = $merchant && 'success' === $merchant['status'] && isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location );
 
-			} elseif ( $feed_args['feed_location'] === $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) {
-				// Feed registered.
-				$registered = true;
-			} else {
-				// A diff feed was registered. Update to the current one.
-				$feed       = API\Base::update_merchant_feed( $merchant['data']->product_pin_feed_profile->merchant_id, $merchant['data']->product_pin_feed_profile->id, $feed_args );
+		} elseif ( $feed_args['feed_location'] === $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) {
+			// Feed registered.
+			$registered = true;
+		} else {
+			// A diff feed was registered. Update to the current one.
+			$feed       = API\Base::update_merchant_feed( $merchant['data']->product_pin_feed_profile->merchant_id, $merchant['data']->product_pin_feed_profile->id, $feed_args );
 				$registered = $feed && 'success' === $feed['status'] && isset( $feed['data']->location_config->full_feed_fetch_location );
 			}
 
@@ -202,12 +202,39 @@ class ProductSync {
 	 * @return array
 	 */
 	private static function get_product_ids_for_feed() {
-		return wc_get_products(
+
+		$product_ids = wc_get_products(
 			array(
 				'limit'  => -1,
 				'return' => 'ids',
 			)
 		);
+
+		if ( empty( $product_ids ) ) {
+			return array();
+		}
+
+		$products_count = count( $product_ids );
+
+		// Get Variations of the current product and inject them into our array.
+		for ( $i = 0; $i < $products_count; $i++ ) {
+
+			$type = \WC_Product_Factory::get_product_type( $product_ids[ $i ] );
+
+			if ( in_array( $type, array( 'variable' ), true ) ) {
+
+				$product  = wc_get_product( $product_ids[ $i ] );
+				$children = $product->get_children();
+
+				array_splice( $product_ids, $i + 1, 0, $children );
+
+				$i = $i + count( $children );
+
+				$products_count = $products_count + count( $children );
+			}
+		}
+
+		return $product_ids;
 	}
 
 
@@ -289,7 +316,7 @@ class ProductSync {
 			$iteration_buffer .= ProductsXmlFeed::get_xml_item( wc_get_product( $product_id ) );
 			$iteration_buffer_size++;
 
-			if ( $iteration_buffer_size >= self::$products_per_write || $current_index >= count( $product_ids ) ) {
+			if ( $iteration_buffer_size >= self::$products_per_write || $current_index >= $products_count ) {
 				if ( false !== fwrite( $xml_file, $iteration_buffer ) ) {
 					$iteration_buffer      = '';
 					$iteration_buffer_size = 0;
@@ -330,7 +357,7 @@ class ProductSync {
 			}
 		}
 
-		if ( $current_index >= count( $product_ids ) ) {
+		if ( $current_index >= $products_count ) {
 			// Write footer.
 			fwrite( $xml_file, ProductsXmlFeed::get_xml_footer() );
 
@@ -343,7 +370,7 @@ class ProductSync {
 		fclose( $xml_file );
 
 		$end = microtime( true );
-		self::log( 'Feed step generation completed in ' . round( ( $end - $start ) * 1000 ) . 'ms. Current Index: ' . $current_index . ' / ' . count( $product_ids ) );
+		self::log( 'Feed step generation completed in ' . round( ( $end - $start ) * 1000 ) . 'ms. Current Index: ' . $current_index . ' / ' . $products_count );
 		self::log( 'Wrote ' . $step_index . ' products to file: ' . $state['feed_file'] );
 	}
 
