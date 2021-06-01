@@ -45,19 +45,21 @@ class ProductSync {
 		add_action( self::ACTION_HANDLE_SYNC, array( __CLASS__, 'handle_feed_registration' ) );
 		add_action( self::ACTION_FEED_GENERATION, array( __CLASS__, 'handle_feed_generation' ) );
 
-		// Check if enabled.
-		if ( self::is_product_sync_enabled() ) {
+		// ACTION_HANDLE_SYNC task handles both registration and de-registration.
+		if ( self::is_product_sync_enabled() || self::is_feed_registered() ) {
 
 			if ( false === as_next_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 				$interval = 10 * MINUTE_IN_SECONDS;
 
 				as_schedule_recurring_action( time() + $interval, $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 			}
+		}
 
+		if ( self::is_product_sync_enabled() ) {
 			$state = self::feed_job_status();
 
-			if ( $state && 'scheduled_for_generation' === $state['status'] && false === as_next_scheduled_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-				as_enqueue_async_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+			if ( $state && 'scheduled_for_generation' === $state['status'] ) {
+				self::trigger_async_feed_generation();
 			}
 		}
 	}
@@ -68,7 +70,7 @@ class ProductSync {
 	 *
 	 * @return void
 	 */
-	public function feed_reset() {
+	public static function feed_reset() {
 
 		$state = Pinterest_For_Woocommerce()::get_setting( 'feed_job' );
 
@@ -92,6 +94,8 @@ class ProductSync {
 		$feed_job['status'] = 'scheduled_for_generation';
 
 		Pinterest_For_Woocommerce()::save_setting( 'feed_job', $feed_job );
+
+		self::log( 'Feed generation (re)scheduled.' );
 	}
 
 
@@ -119,6 +123,16 @@ class ProductSync {
 
 
 	/**
+	 * Checks if the feature is enabled, and all requirements are met.
+	 *
+	 * @return boolean
+	 */
+	private static function is_feed_registered() {
+		return Pinterest_For_Woocommerce()::get_setting( 'feed_registered' );
+	}
+
+
+	/**
 	 * Check if the feed is registered based on the plugin's settings.
 	 * If not, try to register it,
 	 * Log issues.
@@ -131,12 +145,8 @@ class ProductSync {
 	 */
 	public static function handle_feed_registration() {
 
-		if ( ! self::is_product_sync_enabled() ) {
-			// TODO: Remove registered feed from API
-			return false;
-		}
-
-		$state = self::feed_job_status( 'check_registration' );
+		$state         = self::feed_job_status( 'check_registration' );
+		$force_new_reg = false;
 
 		$feed_args = array(
 			'feed_location'                     => $state['feed_url'],
@@ -146,9 +156,78 @@ class ProductSync {
 			'return_merchant_if_already_exists' => true,
 		);
 
+		if ( ! self::is_product_sync_enabled() ) {
+			// Handle feed deregistration.
+			self::handle_feed_deregistration( $feed_args );
+
+			return false;
+		}
+
 		try {
-			// Get merchant Obj from API.
-			$merchant = API\Base::maybe_create_merchant( $feed_args );
+			$registered = self::is_feed_registered();
+
+			$registered = true;
+
+			if ( empty( $registered ) || $force_new_reg ) {
+				$registered = self::register_feed( $feed_args );
+			}
+
+			if ( $registered ) {
+
+				$not_expired = ( 'generated' === $state['status'] && $state['finished'] > ( time() - DAY_IN_SECONDS ) );
+
+				// If local is not generated, or is older than X , schedule regeneration.
+				if ( 'starting' === $state['status'] || 'in_progress' === $state['status'] || $not_expired ) {
+					// Make sure the task is scheduled.
+					if ( $not_expired ) {
+						self::trigger_async_feed_generation();
+					}
+
+				} else {
+					self::feed_reschedule();
+				}
+
+				return true;
+			}
+
+			// TODO: handle error.
+			return $registered;
+
+		} catch ( \Throwable $th ) {
+			// throw $th;
+		}
+
+	}
+
+	private static function handle_feed_deregistration( $feed_args ) {
+		$feed_args['feed_status'] = 'DISABLED';
+		unset( $feed_args['return_merchant_if_already_exists'] );
+
+		$merchant_id = Pinterest_For_Woocommerce()::get_setting( 'merchant_id' );
+		$feed_id     = Pinterest_For_Woocommerce()::get_setting( 'feed_registered' );
+
+		if ( ! empty( $merchant_id ) && ! empty( $feed_id ) ) {
+			API\Base::update_merchant_feed( $merchant_id, $feed_id, $feed_args );
+		}
+
+		Pinterest_For_Woocommerce()::save_setting( 'feed_registered', false );
+
+		self::feed_reset();
+	}
+
+	private static function trigger_async_feed_generation() {
+
+		if ( false === as_next_scheduled_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+			as_enqueue_async_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		}
+	}
+
+	private static function register_feed( $feed_args ) {
+
+		// $merchant = Base::get_merchant( $merchant_id );
+
+		// Get merchant Obj from API.
+		$merchant = API\Base::maybe_create_merchant( $feed_args );
 
 		if ( 'success' !== $merchant['status'] ) {
 			throw new \Exception( __( 'Error' ) ); // TODO:
@@ -168,30 +247,13 @@ class ProductSync {
 		} else {
 			// A diff feed was registered. Update to the current one.
 			$feed       = API\Base::update_merchant_feed( $merchant['data']->product_pin_feed_profile->merchant_id, $merchant['data']->product_pin_feed_profile->id, $feed_args );
-				$registered = $feed && 'success' === $feed['status'] && isset( $feed['data']->location_config->full_feed_fetch_location );
-			}
-
-			if ( $registered ) {
-				// If local is not generated, or is older than X , schedule regeneration.
-				if ( 'starting' === $state['status'] ||
-					'in_progress' === $state['status'] ||
-					( 'generated' === $state['status'] && $state['finished'] < ( time() - DAY_IN_SECONDS ) )
-				) {
-					// Do nothing
-				} else {
-					self::feed_reschedule();
-				}
-
-				return true;
-			}
-
-			// TODO: handle error.
-			return $registered;
-
-		} catch ( \Throwable $th ) {
-			// throw $th;
+			$registered = $feed && 'success' === $feed['status'] && isset( $feed['data']->location_config->full_feed_fetch_location );
 		}
 
+		Pinterest_For_Woocommerce()::save_setting( 'feed_registered', $registered );
+		Pinterest_For_Woocommerce()::save_setting( 'merchant_id', $merchant['data']->id );
+
+		return $registered;
 	}
 
 
@@ -364,7 +426,7 @@ class ProductSync {
 			self::feed_job_status( 'generated' );
 		} else {
 			// We got more products left. Schedule next iteration.
-			as_enqueue_async_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+			self::trigger_async_feed_generation();
 		}
 
 		fclose( $xml_file );
@@ -437,9 +499,5 @@ class ProductSync {
 
 		return $state_data;
 
-	}
-
-	private function clear_xml_feed() {
-		// TODO: ?
 	}
 }
