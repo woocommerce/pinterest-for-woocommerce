@@ -149,14 +149,22 @@ class FeedIssues extends VendorAPI {
 
 			// Fallback
 
-			$all_lines = WP_Filesystem_Base::get_contents_array( $file );
+			global $wp_filesystem;
+
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+
+			if ( ! is_a( $wp_filesystem, 'WP_Filesystem_Base' ) ) {
+				$creds = request_filesystem_credentials( site_url() );
+				WP_Filesystem( $creds );
+			}
+
+			$all_lines = $wp_filesystem->get_contents_array( $issues_file );
 
 			if ( $has_keys ) {
 				$keys = $all_lines[0];
 			}
 
 			$lines = array_slice( $all_lines, $start_line, ( $end_line - $start_line ) );
-
 		}
 
 		if ( ! empty( $keys ) ) {
