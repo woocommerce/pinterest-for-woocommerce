@@ -311,7 +311,26 @@ class Base {
 
 
 	/**
-	 * Creates a merchant for the given advertiser or returns the existing one.
+	 * Adds the merchant's feed using the given arguments.
+	 *
+	 * @param string $merchant_id The merchant ID the feed belongs to.
+	 * @param array  $args        The arguments to be passed to the API request.
+	 *
+	 * @return mixed
+	 */
+	public static function add_merchant_feed( $merchant_id, $args ) {
+
+		$response = self::make_request(
+			add_query_arg( $args, 'commerce/product_pin_merchants/' . $merchant_id . '/feed/' ),
+			'POST'
+		);
+
+		return $response;
+	}
+
+
+	/**
+	 * Updates the merchant's feed using the given arguments.
 	 *
 	 * @param string $merchant_id The merchant ID the feed belongs to.
 	 * @param string $feed_id     The ID of the feed to be updated.
