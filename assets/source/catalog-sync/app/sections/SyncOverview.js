@@ -40,39 +40,39 @@ const SyncOverview = () => {
 	}
 
 	return (
-		<Card className="woocommerce-table">
+		<Card className="woocommerce-table pin4wc-catalog-sync__overview">
 			<CardHeader>
 				<Text variant="title.small" as="h2">
 					{ __( 'Overview' ) }
 				</Text>
 			</CardHeader>
 			<CardBody className="no-padding">
-			<SummaryList>
-				{ () => {
-					return [
-						<SimpleSummaryNumber
-							key="active"
-							value='145'
-							label={ __( 'Active', 'pinterest-for-woocommerce' ) }
-						/>,
-						<SimpleSummaryNumber
-							key="not-synced"
-							value='40'
-							label={ __( 'Not Synced', 'pinterest-for-woocommerce' ) }
-						/>,
-						<SimpleSummaryNumber
-							key="with-warnings"
-							value='9'
-							label={ __( 'With Warnings', 'pinterest-for-woocommerce' ) }
-						/>,
-						<SimpleSummaryNumber
-							key="with-errors"
-							value='40'
-							label={ __( 'With Errors', 'pinterest-for-woocommerce' ) }
-						/>,
-					];
-				} }
-			</SummaryList>
+				<SummaryList>
+					{ () => {
+						return [
+							<SimpleSummaryNumber
+								key="active"
+								value='145'
+								label={ __( 'Active', 'pinterest-for-woocommerce' ) }
+							/>,
+							<SimpleSummaryNumber
+								key="not-synced"
+								value='40'
+								label={ __( 'Not Synced', 'pinterest-for-woocommerce' ) }
+							/>,
+							<SimpleSummaryNumber
+								key="with-warnings"
+								value='9'
+								label={ __( 'With Warnings', 'pinterest-for-woocommerce' ) }
+							/>,
+							<SimpleSummaryNumber
+								key="with-errors"
+								value='40'
+								label={ __( 'With Errors', 'pinterest-for-woocommerce' ) }
+							/>,
+						];
+					} }
+				</SummaryList>
 			</CardBody>
 		</Card>
 	)

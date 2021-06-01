@@ -1,4 +1,4 @@
-$root: ".woocommerce-catalog-sync";
+$root: ".pin4wc-catalog-sync";
 
 #pin4wc-catalog-sync {
 
@@ -8,66 +8,82 @@ $root: ".woocommerce-catalog-sync";
 	}
 
 	#{$root} {
-		&__state-item {
-			padding: 24px 32px;
+		&__state {
 
-			&:not(:first-child) {
-				border-top: 1px solid rgb(226, 228, 231);
+			.woocommerce-table__header {
+				display: none;
 			}
 
-			p {
-				+ p {
-					margin-top: 0.75rem;
-				}
+			th:first-child {
+				width: 1%;
+				white-space: nowrap;
+			}
 
-				.emoji {
-					margin-right: 0.5rem;
-				}
+			td {
+				color: #757575;
 			}
 		}
-	}
 
-	.woocommerce-summary {
-		background: none;
-		border: 0;
-		box-shadow: none;
-		margin: 0;
+		&__overview {
 
-		&__item {
-			background: none;
-			border-bottom: 0;
+			.woocommerce-summary {
+				background: none;
+				border: 0;
+				box-shadow: none;
+				margin: 0;
 
-			&-container {
+				&__item {
+					background: none;
+					border-bottom: 0;
 
-				&:last-child {
+					&-container {
 
-					> div {
-						border-right: 0;
+						&:last-child {
+
+							> div {
+								border-right: 0;
+							}
+						}
 					}
 				}
 			}
 		}
-	}
 
-	.woocommerce-card {
+		&__issues {
 
-		&__header {
-			padding: 16px 24px;
-			border-bottom: 1px solid rgb(226, 228, 231);
-		}
+			&.woocommerce-card {
+				border: 1px solid rgb(226, 228, 231);
+				box-shadow: none;
+			}
 
-		&__title {
-			font-size: 20px;
-			line-height: 28px;
-		}
+			.woocommerce-card {
 
-		&__body {
-			padding: 0;
+				&__header {
+					padding: 16px 24px;
+					border-bottom: 1px solid rgb(226, 228, 231);
+				}
+
+				&__title {
+					font-size: 20px;
+					line-height: 28px;
+				}
+
+				&__body {
+					padding: 0;
+				}
+			}
+
+			th:first-child {
+				text-align: center;
+				white-space: nowrap;
+				width: 1%;
+			}
 
 			.woocommerce-pagination {
 				border-top: 1px solid rgb(226, 228, 231);
-				padding-top: 0.875rem;
+				margin-bottom: 0;
 				padding-bottom: 0.875rem;
+				padding-top: 0.875rem;
 			}
 		}
 	}
@@ -76,20 +92,16 @@ $root: ".woocommerce-catalog-sync";
 		padding: 0;
 	}
 
-	.muted {
-		color: #757575;
-	}
-
-	.align-items-start {
-		align-items: flex-start;
-	}
-
-	.red-warning {
+	.red-text {
 		color: #D63B44;
 	}
 
-	.yellow-warning {
+	.yellow-text {
 		color: #F0B849;
+	}
+
+	.green-text {
+		color: #23A713;
 	}
 }
 
