@@ -149,10 +149,10 @@ class ProductSync {
 		$force_new_reg = false;
 
 		$feed_args = array(
-			'feed_location'                     => $state['feed_url'],
-			'feed_format'                       => 'XML',
-			'feed_default_currency'             => get_woocommerce_currency(),
-			'default_availability_type'         => 'IN_STOCK', // TODO: ? also check with wrong value and check why its not getting logged properly in debug.log
+			'feed_location'             => $state['feed_url'],
+			'feed_format'               => 'XML',
+			'feed_default_currency'     => get_woocommerce_currency(),
+			'default_availability_type' => 'IN_STOCK', // TODO: ? also check with wrong value and check why its not getting logged properly in debug.log
 		);
 
 		if ( ! self::is_product_sync_enabled() ) {
@@ -186,11 +186,11 @@ class ProductSync {
 				return true;
 			}
 
-			// TODO: handle error.
-			return $registered;
+			throw new \Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
 
 		} catch ( \Throwable $th ) {
-			// throw $th;
+			self::log( $th->getMessage(), 'error' );
+			return false;
 		}
 
 	}
@@ -250,12 +250,7 @@ class ProductSync {
 	private static function register_feed( $feed_args ) {
 
 		// Get merchant object.
-		$merchant = self::get_merchant( $feed_args );
-
-		if ( 'success' !== $merchant['status'] ) {
-			throw new \Exception( __( 'Error' ) ); // TODO:
-		}
-
+		$merchant   = self::get_merchant( $feed_args );
 		$registered = false;
 
 		if ( ! empty( $merchant['data']->id ) && ! isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
@@ -516,7 +511,7 @@ class ProductSync {
 	 * Status can be one of the following:
 	 *
 	 * - starting                 The feed job is being initialized. A new JobID will be assigned if none exists.
-	 * - check_registration       If a JobID already exists, it is retutned, otherwise a new one will be assigned.
+	 * - check_registration       If a JobID already exists, it is returned, otherwise a new one will be assigned.
 	 * - in_progress              Signifies that we are between iterations and generating the feed.
 	 * - generated                The feed is generated, no further action will be taken.
 	 * - scheduled_for_generation The feed needs to be (re)generated. If this status is set, the next run of __CLASS__::handle_feed_generation() will start the generation process.
