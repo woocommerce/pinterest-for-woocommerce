@@ -195,6 +195,17 @@ class ProductSync {
 
 	}
 
+
+	/**
+	 * Handles de-registration of the feed.
+	 * $feed_args are needed so that they are passed to update_merchant_feed() in order to perform the update.
+	 * Running this, sets the feed to 'DISABLED' in Pinterest, deletes the local XML file and the option holding the feed
+	 * status of the feed generation job.
+	 *
+	 * @param array $feed_args The arguments used to create the feed.
+	 *
+	 * @return void
+	 */
 	private static function handle_feed_deregistration( $feed_args ) {
 		$feed_args['feed_status'] = 'DISABLED';
 
@@ -210,6 +221,12 @@ class ProductSync {
 		self::feed_reset();
 	}
 
+
+	/**
+	 * Schedules an async action - if not already scheduled - to generate the feed.
+	 *
+	 * @return void
+	 */
 	private static function trigger_async_feed_generation() {
 
 		if ( false === as_next_scheduled_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
@@ -217,6 +234,19 @@ class ProductSync {
 		}
 	}
 
+
+	/**
+	 * Handles feed registration using the given arguments.
+	 * Will try to create a merchant if none exists.
+	 * Also if a different feed is registered, it will update using the URL in the
+	 * $feed_args.
+	 *
+	 * @param array $feed_args The arguments used to create the feed.
+	 *
+	 * @return boolean|string
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
 	private static function register_feed( $feed_args ) {
 
 		// Get merchant object.
@@ -253,43 +283,51 @@ class ProductSync {
 		return $registered;
 	}
 
+
+	/**
+	 * Returns the merchant object for the current user.
+	 * If a merchant alreyad
+	 *
+	 * @param array $feed_args The arguments used to create the feed.
+	 *
+	 * @return array
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
 	private static function get_merchant( $feed_args ) {
 
-		$merchant = API\Base::maybe_create_merchant( $feed_args );
+		$merchant    = false;
+		$merchant_id = Pinterest_For_Woocommerce()::get_setting( 'merchant_id' );
 
-		if ( 'success' !== $merchant['status'] && 651 === $merchant['code'] ) {  // https://developers.pinterest.com/docs/redoc/#tag/API-Response-Codes Merchant api error = 651.
+		if ( empty( $merchant_id ) ) {
+			// Get merchant from advertiser object.
+			$advertisers = API\Base::get_advertisers();
 
-			$merchant_id = Pinterest_For_Woocommerce()::get_setting( 'merchant_id' );
-
-			if ( empty( $merchant_id ) ) {
-				// Get merchant from advertiser object.
-
-				$advertisers = API\Base::get_advertisers();
-
-				if ( 'success' !== $advertisers['status'] ) {
+			if ( 'success' !== $advertisers['status'] ) {
 					throw new \Exception( esc_html__( 'Response error when trying to get advertisers.', 'pinterest-for-woocommerce' ), 400 );
 				}
 
-				$advertiser = reset( $advertisers ); // All advertisers assigned to a user share the same merchant_id.
+			$advertiser = reset( $advertisers ); // All advertisers assigned to a user share the same merchant_id.
 
-				if ( empty( $advertiser->merchant_id ) ) {
-					// We already tried creating a merchant and got an error. This is unrecoverable.
-					throw new \Exception( esc_html__( 'Response error when trying create a merchant or get the existing one.', 'pinterest-for-woocommerce' ), 400 );
-				}
-
+			if ( ! empty( $advertiser->merchant_id ) ) {
 				$merchant_id = $advertiser->merchant_id;
 			}
-
-			$merchant = API\Base::get_merchant( $merchant_id );
-
-			if ( 'success' !== $merchant['status'] ) {
-				throw new \Exception( esc_html__( 'Could not get the Merchant object for the given Merchant ID.', 'pinterest-for-woocommerce' ), 400 );
-			}
-
-			return $merchant;
 		}
 
+		if ( ! empty( $merchant_id ) ) {
+			$merchant = API\Base::get_merchant( $merchant_id );
+		}
 
+		if ( ! $merchant || ( 'success' !== $merchant['status'] && 650 === $merchant['code'] ) ) {  // https://developers.pinterest.com/docs/redoc/#tag/API-Response-Codes Merchant not found 650.
+			// Try creating one.
+			$merchant = API\Base::maybe_create_merchant( $feed_args );
+		}
+
+		if ( 'success' !== $merchant['status'] ) {
+			throw new \Exception( esc_html__( 'Response error when trying create a merchant or get the existing one.', 'pinterest-for-woocommerce' ), 400 );
+		}
+
+		return $merchant;
 	}
 
 
