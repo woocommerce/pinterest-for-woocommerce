@@ -255,8 +255,6 @@ class ProductSync {
 
 	private static function get_merchant( $feed_args ) {
 
-		$feed_args['return_merchant_if_already_exists'] = true;
-
 		$merchant = API\Base::maybe_create_merchant( $feed_args );
 
 		if ( 'success' !== $merchant['status'] && 651 === $merchant['code'] ) {  // https://developers.pinterest.com/docs/redoc/#tag/API-Response-Codes Merchant api error = 651.
