@@ -49,6 +49,29 @@ $root: ".woocommerce-catalog-sync";
 		}
 	}
 
+	.woocommerce-card {
+
+		&__header {
+			padding: 16px 24px;
+			border-bottom: 1px solid rgb(226, 228, 231);
+		}
+
+		&__title {
+			font-size: 20px;
+			line-height: 28px;
+		}
+
+		&__body {
+			padding: 0;
+
+			.woocommerce-pagination {
+				border-top: 1px solid rgb(226, 228, 231);
+				padding-top: 0.875rem;
+				padding-bottom: 0.875rem;
+			}
+		}
+	}
+
 	.no-padding {
 		padding: 0;
 	}
@@ -59,6 +82,14 @@ $root: ".woocommerce-catalog-sync";
 
 	.align-items-start {
 		align-items: flex-start;
+	}
+
+	.red-warning {
+		color: #D63B44;
+	}
+
+	.yellow-warning {
+		color: #F0B849;
 	}
 }
 

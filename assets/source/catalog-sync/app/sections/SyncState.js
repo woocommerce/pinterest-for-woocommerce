@@ -33,7 +33,7 @@ const SyncState = () => {
 		<Card className="woocommerce-table">
 			<CardHeader>
 				<Text variant="title.small" as="h2">
-					{ __( 'Latest Activity' ) }
+					{ __( 'Feed Status', 'pinterest-for-woocommerce' ) }
 				</Text>
 			</CardHeader>
 			<CardBody className="no-padding">
