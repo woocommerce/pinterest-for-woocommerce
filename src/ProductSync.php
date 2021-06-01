@@ -142,6 +142,8 @@ class ProductSync {
 	 * and on a scheduled basis.
 	 *
 	 * @return mixed
+	 *
+	 * @throws \Exception PHP Exception.
 	 */
 	public static function handle_feed_registration() {
 
@@ -299,8 +301,8 @@ class ProductSync {
 			$advertisers = API\Base::get_advertisers();
 
 			if ( 'success' !== $advertisers['status'] ) {
-					throw new \Exception( esc_html__( 'Response error when trying to get advertisers.', 'pinterest-for-woocommerce' ), 400 );
-				}
+				throw new \Exception( esc_html__( 'Response error when trying to get advertisers.', 'pinterest-for-woocommerce' ), 400 );
+			}
 
 			$advertiser = reset( $advertisers ); // All advertisers assigned to a user share the same merchant_id.
 
@@ -375,6 +377,8 @@ class ProductSync {
 	 * on each iteration and writes to a file every $products_per_write.
 	 *
 	 * @return void
+	 *
+	 * @throws \Exception PHP Exception.
 	 */
 	public static function handle_feed_generation() {
 
@@ -390,11 +394,8 @@ class ProductSync {
 			$product_ids = self::get_product_ids_for_feed();
 
 			if ( empty( $product_ids ) ) {
-				// TODO: throw error?
-
 				self::log( 'No products found for feed generation.' );
-
-				return false;
+				return; // No need to perform any action.
 			}
 
 			$state = self::feed_job_status(
@@ -406,48 +407,73 @@ class ProductSync {
 			);
 
 			$current_index = 0;
-
 		}
 
-		if ( 'in_progress' === $state['status'] ) {
-			$product_ids   = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state['job_id'] );
-			$current_index = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state['job_id'] );
+		try {
 
-			if ( false === $current_index || empty( $product_ids ) ) {
-				// Something went wrong.
-				return false;
+			if ( 'in_progress' === $state['status'] ) {
+				$product_ids   = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state['job_id'] );
+				$current_index = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state['job_id'] );
+
+				if ( false === $current_index || empty( $product_ids ) ) {
+					throw new \Exception( esc_html__( 'Something went wrong while attempting to generated the feed.', 'pinterest-for-woocommerce' ), 400 );
+				}
+
+				$current_index = ( (int) $current_index ) + 1; // Start on the next item.
 			}
 
-			$current_index = ( (int) $current_index ) + 1; // Start on the next item.
-		}
+			$xml_file = fopen( $state['feed_file'], ( 'in_progress' === $state['status'] ? 'a' : 'w' ) );
 
-		$xml_file = fopen( $state['feed_file'], ( 'in_progress' === $state['status'] ? 'a' : 'w' ) );
+			if ( ! $xml_file ) {
+				/* Translators: the path of the file */
+				throw new \Exception( sprintf( esc_html__( 'Could not open file: %s.', 'pinterest-for-woocommerce' ), $state['feed_file'] ), 400 );
+			}
 
-		if ( ! $xml_file ) {
-			// TODO: throw error?
-			return false;
-		}
+			self::log( 'Generating feed for ' . count( $product_ids ) . ' products' );
 
-		self::log( 'Generating feed for ' . count( $product_ids ) . ' products' );
+			if ( 0 === $current_index ) {
+				// Write header.
+				fwrite( $xml_file, ProductsXmlFeed::get_xml_header() );
+			}
 
-		if ( 0 === $current_index ) {
-			// Write header.
-			fwrite( $xml_file, ProductsXmlFeed::get_xml_header() );
-		}
+			$iteration_buffer      = '';
+			$iteration_buffer_size = 0;
+			$step_index            = 0;
+			$products_count        = count( $product_ids );
 
-		$iteration_buffer      = '';
-		$iteration_buffer_size = 0;
-		$step_index            = 0;
-		$products_count        = count( $product_ids );
+			for ( $current_index; ( $current_index < $products_count ); $current_index++ ) {
 
-		for ( $current_index; ( $current_index < $products_count ); $current_index++ ) {
+				$product_id = $product_ids[ $current_index ];
 
-			$product_id = $product_ids[ $current_index ];
+				$iteration_buffer .= ProductsXmlFeed::get_xml_item( wc_get_product( $product_id ) );
+				$iteration_buffer_size++;
 
-			$iteration_buffer .= ProductsXmlFeed::get_xml_item( wc_get_product( $product_id ) );
-			$iteration_buffer_size++;
+				if ( $iteration_buffer_size >= self::$products_per_write || $current_index >= $products_count ) {
+					if ( false !== fwrite( $xml_file, $iteration_buffer ) ) {
+						$iteration_buffer      = '';
+						$iteration_buffer_size = 0;
 
-			if ( $iteration_buffer_size >= self::$products_per_write || $current_index >= $products_count ) {
+						self::feed_job_status(
+							'in_progress',
+							array(
+								'current_index' => $current_index,
+							)
+						);
+
+					} else {
+						/* Translators: the path of the file */
+						throw new \Exception( sprintf( esc_html__( 'Could not write to file: %s.', 'pinterest-for-woocommerce' ), $state['feed_file'] ), 400 );
+					}
+				}
+
+				$step_index++;
+
+				if ( $step_index >= self::$products_per_step ) {
+					break;
+				}
+			}
+
+			if ( ! empty( $iteration_buffer ) ) {
 				if ( false !== fwrite( $xml_file, $iteration_buffer ) ) {
 					$iteration_buffer      = '';
 					$iteration_buffer_size = 0;
@@ -460,49 +486,31 @@ class ProductSync {
 					);
 
 				} else {
-					// Could not write ? // TODO: error
+					/* Translators: the path of the file */
+					throw new \Exception( sprintf( esc_html__( 'Could not write to file: %s.', 'pinterest-for-woocommerce' ), $state['feed_file'] ), 400 );
 				}
 			}
 
-			$step_index++;
+			if ( $current_index >= $products_count ) {
+				// Write footer.
+				fwrite( $xml_file, ProductsXmlFeed::get_xml_footer() );
 
-			if ( $step_index >= self::$products_per_step ) {
-				break;
-			}
-		}
-
-		if ( ! empty( $iteration_buffer ) ) {
-			if ( false !== fwrite( $xml_file, $iteration_buffer ) ) {
-				$iteration_buffer      = '';
-				$iteration_buffer_size = 0;
-
-				self::feed_job_status(
-					'in_progress',
-					array(
-						'current_index' => $current_index,
-					)
-				);
-
+				self::feed_job_status( 'generated' );
 			} else {
-				// Could not write ? // TODO: error
+				// We got more products left. Schedule next iteration.
+				self::trigger_async_feed_generation();
 			}
+
+			fclose( $xml_file );
+
+			$end = microtime( true );
+			self::log( 'Feed step generation completed in ' . round( ( $end - $start ) * 1000 ) . 'ms. Current Index: ' . $current_index . ' / ' . $products_count );
+			self::log( 'Wrote ' . $step_index . ' products to file: ' . $state['feed_file'] );
+
+		} catch ( \Throwable $th ) {
+			self::log( $th->getMessage(), 'error' );
 		}
 
-		if ( $current_index >= $products_count ) {
-			// Write footer.
-			fwrite( $xml_file, ProductsXmlFeed::get_xml_footer() );
-
-			self::feed_job_status( 'generated' );
-		} else {
-			// We got more products left. Schedule next iteration.
-			self::trigger_async_feed_generation();
-		}
-
-		fclose( $xml_file );
-
-		$end = microtime( true );
-		self::log( 'Feed step generation completed in ' . round( ( $end - $start ) * 1000 ) . 'ms. Current Index: ' . $current_index . ' / ' . $products_count );
-		self::log( 'Wrote ' . $step_index . ' products to file: ' . $state['feed_file'] );
 	}
 
 
