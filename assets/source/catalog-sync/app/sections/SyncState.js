@@ -36,7 +36,7 @@ const SyncState = () => {
 					{ __( 'Latest Activity' ) }
 				</Text>
 			</CardHeader>
-			<CardBody className="woocommerce-catalog-sync__state-body">
+			<CardBody className="no-padding">
 				<StateItem />
 				<StateItem />
 				<StateItem />
