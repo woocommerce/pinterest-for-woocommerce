@@ -153,7 +153,6 @@ class ProductSync {
 			'feed_format'                       => 'XML',
 			'feed_default_currency'             => get_woocommerce_currency(),
 			'default_availability_type'         => 'IN_STOCK', // TODO: ? also check with wrong value and check why its not getting logged properly in debug.log
-			'return_merchant_if_already_exists' => true,
 		);
 
 		if ( ! self::is_product_sync_enabled() ) {
@@ -165,8 +164,6 @@ class ProductSync {
 
 		try {
 			$registered = self::is_feed_registered();
-
-			$registered = true;
 
 			if ( empty( $registered ) || $force_new_reg ) {
 				$registered = self::register_feed( $feed_args );
@@ -200,7 +197,6 @@ class ProductSync {
 
 	private static function handle_feed_deregistration( $feed_args ) {
 		$feed_args['feed_status'] = 'DISABLED';
-		unset( $feed_args['return_merchant_if_already_exists'] );
 
 		$merchant_id = Pinterest_For_Woocommerce()::get_setting( 'merchant_id' );
 		$feed_id     = Pinterest_For_Woocommerce()::get_setting( 'feed_registered' );
@@ -223,10 +219,8 @@ class ProductSync {
 
 	private static function register_feed( $feed_args ) {
 
-		// $merchant = Base::get_merchant( $merchant_id );
-
-		// Get merchant Obj from API.
-		$merchant = API\Base::maybe_create_merchant( $feed_args );
+		// Get merchant object.
+		$merchant = self::get_merchant( $feed_args );
 
 		if ( 'success' !== $merchant['status'] ) {
 			throw new \Exception( __( 'Error' ) ); // TODO:
@@ -234,9 +228,9 @@ class ProductSync {
 
 		$registered = false;
 
-		if ( ! isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
-			// No feed registered.
-			$merchant = API\Base::maybe_create_merchant( $feed_args ); // TODO: test (case where merchant exists, no feed registered)
+		if ( ! empty( $merchant['data']->id ) && ! isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
+			// No feed registered, but we got a merchant.
+			$merchant = API\Base::add_merchant_feed( $merchant['data']->id, $feed_args ); // TODO: test (case where merchant exists, no feed registered)
 
 			if ( $merchant && 'success' === $merchant['status'] && isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
 				$registered = $merchant['data']->product_pin_feed_profile->id;
@@ -257,6 +251,47 @@ class ProductSync {
 		Pinterest_For_Woocommerce()::save_setting( 'merchant_id', $merchant['data']->id );
 
 		return $registered;
+	}
+
+	private static function get_merchant( $feed_args ) {
+
+		$feed_args['return_merchant_if_already_exists'] = true;
+
+		$merchant = API\Base::maybe_create_merchant( $feed_args );
+
+		if ( 'success' !== $merchant['status'] && 651 === $merchant['code'] ) {  // https://developers.pinterest.com/docs/redoc/#tag/API-Response-Codes Merchant api error = 651.
+
+			$merchant_id = Pinterest_For_Woocommerce()::get_setting( 'merchant_id' );
+
+			if ( empty( $merchant_id ) ) {
+				// Get merchant from advertiser object.
+
+				$advertisers = API\Base::get_advertisers();
+
+				if ( 'success' !== $advertisers['status'] ) {
+					throw new \Exception( esc_html__( 'Response error when trying to get advertisers.', 'pinterest-for-woocommerce' ), 400 );
+				}
+
+				$advertiser = reset( $advertisers ); // All advertisers assigned to a user share the same merchant_id.
+
+				if ( empty( $advertiser->merchant_id ) ) {
+					// We already tried creating a merchant and got an error. This is unrecoverable.
+					throw new \Exception( esc_html__( 'Response error when trying create a merchant or get the existing one.', 'pinterest-for-woocommerce' ), 400 );
+				}
+
+				$merchant_id = $advertiser->merchant_id;
+			}
+
+			$merchant = API\Base::get_merchant( $merchant_id );
+
+			if ( 'success' !== $merchant['status'] ) {
+				throw new \Exception( esc_html__( 'Could not get the Merchant object for the given Merchant ID.', 'pinterest-for-woocommerce' ), 400 );
+			}
+
+			return $merchant;
+		}
+
+
 	}
 
 
