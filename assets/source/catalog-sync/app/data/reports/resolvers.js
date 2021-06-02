@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { receiveFeedIssues, setRequestingError } from './actions';
+import { receiveFeedIssues, receiveFeedState, setRequestingError } from './actions';
 import { fetch } from './controls';
 
 /**
@@ -22,7 +22,7 @@ export function* getFeedIssues() {
 export function* getFeedState() {
 	try {
 		const result = yield fetch( 'feed_state' );
-		yield receiveFeedIssues( result );
+		yield receiveFeedState( result );
 	} catch ( error ) {
 		yield setRequestingError( error, 'feed_state' );
 	}
