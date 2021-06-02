@@ -173,8 +173,8 @@ class Base {
 		if ( ! in_array( absint( $response_code ), array( 200, 201, 204 ), true ) ) {
 
 			$message = '';
-			if ( ! empty( $body[0]->message ) ) {
-				$message = $body[0]->message;
+			if ( ! empty( $body['message'] ) ) {
+				$message = $body['message'];
 			}
 			if ( ! empty( $body['error_description'] ) ) {
 				$message = $body['error_description'];
@@ -427,6 +427,9 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_feed_report( $merchant_id ) {
+
+		// needs cacching.
+
 		$response = self::make_request( 'catalogs/datasource/feed_report/' . $merchant_id . '/', 'GET' );
 		return $response;
 	}
