@@ -140,7 +140,7 @@ class ProductSync {
 	 * @return boolean
 	 */
 	private static function is_product_sync_enabled() {
-		return true;
+		return (bool) Pinterest_For_Woocommerce()::get_setting( 'product_sync_enabled' );
 	}
 
 
