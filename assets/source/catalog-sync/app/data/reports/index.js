@@ -22,4 +22,4 @@ registerStore( STORE_NAME, {
 	resolvers,
 } );
 
-export const SETTINGS_STORE_NAME = STORE_NAME;
+export const REPORTS_STORE_NAME = STORE_NAME;
