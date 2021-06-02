@@ -100,6 +100,7 @@ class ProductSync {
 		}
 
 		Pinterest_For_Woocommerce()::save_setting( 'feed_job', false );
+		Pinterest_For_Woocommerce()::save_setting( 'feed_data_cache', false );
 	}
 
 

@@ -21,6 +21,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class FeedIssues extends VendorAPI {
 
 	/**
+	 * Array used to hold the cached filenames for the feed Issues files.
+	 *
+	 * @var array
+	 */
+	private $feed_data_files = array();
+
+	/**
 	 * Initialize class
 	 */
 	public function __construct() {
@@ -28,6 +35,7 @@ class FeedIssues extends VendorAPI {
 		$this->base              = 'feed_issues';
 		$this->endpoint_callback = 'get_feed_issues';
 		$this->methods           = WP_REST_Server::READABLE;
+		$this->feed_data_files   = Pinterest_For_Woocommerce()::get_setting( 'feed_data_files' );
 
 		$this->register_routes();
 	}
@@ -60,14 +68,23 @@ class FeedIssues extends VendorAPI {
 
 		try {
 
-			$issues_file_url = $request->has_param( 'feed_issues_url' ) ? $request->get_param( 'feed_issues_url' ) : self::get_feed_issues_data_file();
+			$workflow        = false;
+			$issues_file_url = $request->has_param( 'feed_issues_url' ) ? $request->get_param( 'feed_issues_url' ) : false;
+
+			if ( false === $issues_file_url ) {
+				$workflow = self::get_last_feed_workflow();
+
+				if ( $workflow && isset( $workflow->s3_validation_url ) ) {
+					$issues_file_url = $workflow->s3_validation_url;
+				}
+			}
 
 			if ( empty( $issues_file_url ) ) {
 				return array( 'lines' => array() );
 			}
 
 			// Get file.
-			$issues_file = self::get_remote_file( $issues_file_url );
+			$issues_file = $this->get_remote_file( $issues_file_url, $workflow );
 
 			if ( empty( $issues_file ) ) {
 				throw new \Exception( esc_html__( 'Error downloading Feed Issues file from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
@@ -178,13 +195,25 @@ class FeedIssues extends VendorAPI {
 	 * Get the file from $url and save it to a temporary location.
 	 * Return the path of the temporary file.
 	 *
-	 * @param string $url The URL to fetch the file from.
+	 * @param string $url       The URL to fetch the file from.
+	 * @param mixed  $cache_key The variables to use in order to populate the cache key.
 	 *
 	 * @return string|boolean
 	 */
-	private static function get_remote_file( $url ) {
+	private function get_remote_file( $url, $cache_key ) {
 
-		// TODO: cache based on etag?
+		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_file_' . md5( $cache_key ? wp_json_encode( $cache_key ) : $url );
+
+		if ( isset( $this->feed_data_files[ $cache_key ] ) && file_exists( $this->feed_data_files[ $cache_key ] ) ) {
+			return $this->feed_data_files[ $cache_key ];
+		} elseif ( ! empty( $this->feed_data_files ) ) {
+
+			// Cleanup previously stored files.
+			foreach ( $this->feed_data_files as $key => $file ) {
+				@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged --- We don't care if the file is already gone.
+				unset( $this->feed_data_files[ $key ] );
+			}
+		}
 
 		if ( ! function_exists( 'wp_tempnam' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -201,21 +230,35 @@ class FeedIssues extends VendorAPI {
 			)
 		);
 
-		// TODO: cleanup / delete file?
+		$result = $response && ! is_wp_error( $response ) ? $target_file : false;
 
-		return $response && ! is_wp_error( $response ) ? $target_file : false;
+		if ( $result ) {
+			// Save to cache.
+			$this->feed_data_files[ $cache_key ] = $result;
+			$this->save_feed_data_cache();
+		}
 
+		return $result;
 	}
 
 	/**
-	 * Get the URL of feed Issues file for the latest Workflow of the
+	 * Save the current contents of feed_data_files to the options table.
+	 *
+	 * @return void
+	 */
+	private function save_feed_data_cache() {
+		Pinterest_For_Woocommerce()::save_setting( 'feed_data_cache', $this->feed_data_files );
+	}
+
+	/**
+	 * Get the latest Workflow of the
 	 * active feed, for the Merchant saved in the settings.
 	 *
-	 * @return string
+	 * @return object
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
-	private static function get_feed_issues_data_file() {
+	private static function get_last_feed_workflow() {
 
 		$merchant_id = Pinterest_For_Woocommerce()::get_setting( 'merchant_id' );
 		$feed_report = Base::get_feed_report( $merchant_id );
@@ -238,6 +281,6 @@ class FeedIssues extends VendorAPI {
 
 		$workflow = reset( $feed_report['data']->workflows );
 
-		return $workflow->s3_validation_url;
+		return $workflow;
 	}
 }
