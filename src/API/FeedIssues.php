@@ -36,6 +36,7 @@ class FeedIssues extends VendorAPI {
 		$this->endpoint_callback = 'get_feed_issues';
 		$this->methods           = WP_REST_Server::READABLE;
 		$this->feed_data_files   = Pinterest_For_Woocommerce()::get_setting( 'feed_data_files' );
+		$this->feed_data_files   = $this->feed_data_files ? $this->feed_data_files : array();
 
 		$this->register_routes();
 	}
