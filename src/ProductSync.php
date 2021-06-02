@@ -328,7 +328,7 @@ class ProductSync {
 				throw new \Exception( esc_html__( 'Response error when trying to get advertisers.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$advertiser = reset( $advertisers ); // All advertisers assigned to a user share the same merchant_id.
+			$advertiser = reset( $advertisers['data'] ); // All advertisers assigned to a user share the same merchant_id.
 
 			if ( ! empty( $advertiser->merchant_id ) ) {
 				$merchant_id = $advertiser->merchant_id;
