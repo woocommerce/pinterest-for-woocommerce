@@ -101,6 +101,8 @@ class ProductSync {
 
 		Pinterest_For_Woocommerce()::save_setting( 'feed_job', false );
 		Pinterest_For_Woocommerce()::save_setting( 'feed_data_cache', false );
+
+		self::log( 'Product Feed reset and file deleted.' );
 	}
 
 
@@ -535,7 +537,6 @@ class ProductSync {
 			/* Translators: the path of the file */
 			throw new \Exception( sprintf( esc_html__( 'Could not write to file: %s.', 'pinterest-for-woocommerce' ), $state['feed_file'] ), 400 );
 		}
-
 	}
 
 
@@ -555,8 +556,6 @@ class ProductSync {
 	 * @return array
 	 */
 	public static function feed_job_status( $status = null, $args = null ) {
-
-		// TODO: add/move logging here?
 
 		$state_data = Pinterest_For_Woocommerce()::get_setting( 'feed_job' );
 
@@ -598,6 +597,8 @@ class ProductSync {
 		}
 
 		Pinterest_For_Woocommerce()::save_setting( 'feed_job', $state_data );
+
+		self::log( 'Feed status set to: ' . $state_data['status'] );
 
 		return $state_data;
 
