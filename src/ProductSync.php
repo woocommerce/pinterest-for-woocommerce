@@ -336,7 +336,13 @@ class ProductSync {
 		}
 
 		if ( ! empty( $merchant_id ) ) {
-			$merchant = API\Base::get_merchant( $merchant_id );
+
+			try {
+				$merchant = API\Base::get_merchant( $merchant_id );
+			} catch ( \Throwable $th ) {
+				$merchant = false;
+			}
+
 		}
 
 		if ( ! $merchant || ( 'success' !== $merchant['status'] && 650 === $merchant['code'] ) ) {  // https://developers.pinterest.com/docs/redoc/#tag/API-Response-Codes Merchant not found 650.
