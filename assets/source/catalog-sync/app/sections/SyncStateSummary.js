@@ -8,36 +8,38 @@ import {
 	SummaryListPlaceholder
 } from '@woocommerce/components';
 
-const SyncStateSummary = ({ feedState }) => {
-	feedState = 1;
+const SyncStateSummary = ({ overview }) => {
+	const getItems = ( data ) => {
+		const defaultValue = __( 'N/A', 'pinterest-for-woocommerce' );
 
-	const summaryItems = [
-		<SummaryNumber
-			key="active"
-			value='145'
-			label={ __( 'Active', 'pinterest-for-woocommerce' ) }
-		/>,
-		<SummaryNumber
-			key="not-synced"
-			value='40'
-			label={ __( 'Not Synced', 'pinterest-for-woocommerce' ) }
-		/>,
-		<SummaryNumber
-			key="with-warnings"
-			value='9'
-			label={ __( 'With Warnings', 'pinterest-for-woocommerce' ) }
-		/>,
-		<SummaryNumber
-			key="with-errors"
-			value='40'
-			label={ __( 'With Errors', 'pinterest-for-woocommerce' ) }
-		/>,
-	];
+		return ( [
+			<SummaryNumber
+				key="active"
+				value={ data?.total ?? defaultValue }
+				label={ __( 'Active', 'pinterest-for-woocommerce' ) }
+			/>,
+			<SummaryNumber
+				key="not-synced"
+				value={ data?.not_synced ?? defaultValue }
+				label={ __( 'Not Synced', 'pinterest-for-woocommerce' ) }
+			/>,
+			<SummaryNumber
+				key="with-warnings"
+				value={ data?.warnings ?? defaultValue }
+				label={ __( 'With Warnings', 'pinterest-for-woocommerce' ) }
+			/>,
+			<SummaryNumber
+				key="with-errors"
+				value={ data?.errors ?? defaultValue }
+				label={ __( 'With Errors', 'pinterest-for-woocommerce' ) }
+			/>,
+		] );
+	}
 
 	return (
-		feedState
-		? <SummaryList>{ () => summaryItems }</SummaryList>
-		: <SummaryListPlaceholder numberOfItems={ summaryItems.length } />
+		overview
+		? <SummaryList>{ () => getItems(overview) }</SummaryList>
+		: <SummaryListPlaceholder numberOfItems={ 4 } />
 	)
 };
 

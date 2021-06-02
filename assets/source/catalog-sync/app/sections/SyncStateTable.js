@@ -7,8 +7,7 @@ import {
 } from '@wordpress/components';
 import { Table, TablePlaceholder } from '@woocommerce/components';
 
-const SyncStateTable = ({ feedState }) => {
-	feedState = 1;
+const SyncStateTable = ({ workflow }) => {
 	const defaultHeaderAttributes = {
 		isLeftAligned: true,
 		isSortable: false,
@@ -19,26 +18,41 @@ const SyncStateTable = ({ feedState }) => {
 		{ key: 'state', label: __( 'State', 'pinterest-for-woocommerce' ),...defaultHeaderAttributes },
 	];
 
-	const rows = [
-		[
-			{ display: 'Feed setup:' },
-			{ display: <><span className="green-text"><Icon icon="yes-alt" /> Initial setup completed</span> &nbsp; • &nbsp; 15 issues to resolve</> },
-		],
-		[
-			{ display: 'XML feed:' },
-			{ display: <><span className="green-text"><Icon icon="yes-alt" /> Up to date</span> &nbsp; • &nbsp; Last updated: 31 March 2021, 01:45pm, containing 315 products</> },
-		],
-		[
-			{ display: 'Sync with Pinterest:' },
-			{ display: <><span className="green-text"><Icon icon="yes-alt" /> Automatically pulled by Pinterest</span> &nbsp; • &nbsp; Last pulled: 31 March 2021, 01:45pm, containing 315 products</> },
-		],
-	];
+	const getRows = ( data ) => {
+		const statuses = {
+			success: 'green',
+			warning: 'yellow',
+			error: 'red',
+		}
+
+		const icons = {
+			success: 'yes-alt',
+			warning: 'warning',
+			error: 'warning'
+		}
+
+		return data.map( row => {
+			return (
+				[
+					{ display: `${row.label}:` },
+					{ display: (
+						<>
+							<span className={ `${statuses[ row.status ]}-text` }>
+								<Icon icon={ icons[ row.status ] } /> {row.status_label}
+							</span>
+							{ row.extra_info ? ` \xa0 • \xa0 ${row.extra_info }` : ''}
+						</>
+					 ) },
+				]
+			);
+		});
+	}
 
 	return (
-		feedState
+		workflow
 			? (
 				<Table
-					rows={ rows }
+					rows={ getRows( workflow ) }
 					headers={ headers }
 					showMenu={ false }
 				/>

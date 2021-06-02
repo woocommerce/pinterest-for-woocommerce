@@ -27,8 +27,8 @@ const SyncState = ({ feedState }) => {
 				</Text>
 			</CardHeader>
 			<CardBody className="no-padding">
-				<SyncStateSummary {...{ feedState } } />
-				<SyncStateTable {...{ feedState } } />
+				<SyncStateSummary overview={ feedState?.overview } />
+				<SyncStateTable workflow={ feedState?.workflow } />
 			</CardBody>
 		</Card>
 	)
