@@ -66,7 +66,6 @@ class FeedState extends VendorAPI {
 
 			$merchant_id = Pinterest_For_Woocommerce()::get_setting( 'merchant_id' );
 
-
 			$merchant = Base::get_merchant( $merchant_id );
 
 			if ( 'success' !== $merchant['status'] ) {
@@ -109,11 +108,12 @@ class FeedState extends VendorAPI {
 			$feed_report = Base::get_feed_report( $merchant_id );
 
 			if ( 'success' !== $feed_report['status'] ) {
-				// TODO: error.
+				throw new \Exception( esc_html__( 'Response error when trying to get feed report from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
+
 			}
 
 			if ( ! property_exists( $feed_report['data'], 'workflows' ) || ! is_array( $feed_report['data']->workflows ) || empty( $feed_report['data']->workflows ) ) {
-				// TODO: error.
+				throw new \Exception( esc_html__( 'Response error. Feed report contains no feed workflow.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
 			// Get latest workflow.
@@ -145,9 +145,9 @@ class FeedState extends VendorAPI {
 		} catch ( \Throwable $th ) {
 
 			/* Translators: The error description as returned from the API */
-			$error_message = sprintf( esc_html__( 'Could not fetch tracking tags for the given advertiser. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
+			$error_message = sprintf( esc_html__( 'Error getting feed\'s state. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
 
-			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_advertisers_error', $error_message, array( 'status' => $th->getCode() ) );
+			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_state_error', $error_message, array( 'status' => $th->getCode() ) );
 		}
 	}
 
