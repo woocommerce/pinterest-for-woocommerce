@@ -2,8 +2,6 @@
  * External dependencies
  */
 import { sprintf, __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import {
@@ -13,7 +11,6 @@ import {
 	SelectControl,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 import { Spinner } from '@woocommerce/components';
 
 /**
@@ -24,36 +21,21 @@ import StepOverview from '../components/StepOverview';
 
 const SetupTracking = ( {
 	goToNextStep,
-	pin4wc,
-	updateOptions,
+	appSettings,
+	setAppSettings,
 	createNotice,
 	view,
 } ) => {
-	const [ options, setOptions ] = useState( {} );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ status, setStatus ] = useState( 'idle' );
 	const [ advertisersList, setAdvertisersList ] = useState();
 	const [ tagsList, setTagsList ] = useState();
-	const [ advertiser, setAdvertiser ] = useState();
-	const [ tag, setTag ] = useState();
 
 	useEffect( () => {
-		if ( options !== pin4wc ) {
-			setOptions( pin4wc );
-
-			if ( pin4wc?.tracking_advertiser !== advertiser ) {
-				setAdvertiser( pin4wc.tracking_advertiser );
-			}
-
-			if ( pin4wc?.tracking_tag !== tag ) {
-				setTag( pin4wc.tracking_tag );
-			}
-
-			if ( undefined === advertisersList && undefined !== pin4wc ) {
-				fetchAdvertisers();
-			}
+		if ( undefined === advertisersList ) {
+			fetchAdvertisers();
 		}
-	}, [ pin4wc ] );
+	}, [ advertisersList ] );
 
 	const fetchAdvertisers = async () => {
 		try {
@@ -67,15 +49,13 @@ const SetupTracking = ( {
 			setAdvertisersList( results.advertisers );
 
 			if ( results.advertisers.length > 0 ) {
-				if ( ! pin4wc?.tracking_advertiser ) {
-					if ( ! advertiser && ! options?.tracking_advertiser ) {
-						handleOptionChange(
-							'advertiser',
-							results.advertisers[ 0 ].id
-						);
-					}
+				if ( ! appSettings?.tracking_advertiser ) {
+					handleOptionChange(
+						'advertiser',
+						results.advertisers[ 0 ].id
+					);
 				} else {
-					fetchTags( pin4wc?.tracking_advertiser );
+					fetchTags( appSettings?.tracking_advertiser );
 				}
 			} else {
 				setStatus( 'error' );
@@ -108,18 +88,14 @@ const SetupTracking = ( {
 			setTagsList( results );
 
 			if ( Object.keys( results ).length > 0 ) {
-				if (
-					! tag &&
-					! options?.tracking_tag &&
-					! pin4wc?.tracking_tag
-				) {
+				if ( ! appSettings?.tracking_tag ) {
 					handleOptionChange( 'tag', Object.keys( results )[ 0 ] );
 				}
 			} else {
 				setStatus( 'error' );
 			}
 
-			if ( ! tag && pin4wc?.tracking_tag ) {
+			if ( appSettings?.tracking_tag ) {
 				setStatus( 'success' );
 			}
 		} catch ( error ) {
@@ -137,14 +113,10 @@ const SetupTracking = ( {
 
 	const handleOptionChange = async ( name, value ) => {
 		if ( name === 'advertiser' ) {
-			setAdvertiser( value );
-			setTag();
 			fetchTags( value );
-		} else if ( name === 'tag' ) {
-			setTag( value );
 		}
 
-		if ( advertiser && tag ) {
+		if ( appSettings?.tracking_advertiser && appSettings?.tracking_tag ) {
 			setStatus( 'success' );
 		} else {
 			setStatus( 'idle' );
@@ -154,18 +126,10 @@ const SetupTracking = ( {
 	};
 
 	const saveOptions = async ( name, value ) => {
-		const tempOptions = options ?? pin4wc;
-
 		setIsSaving( true );
 
-		const oldOptions = Object.assign( {}, tempOptions );
-		const newOptions = {
-			...tempOptions,
+		const update = await setAppSettings( {
 			[ `tracking_${ name }` ]: value,
-		};
-
-		const update = await updateOptions( {
-			[ wcSettings.pin4wc.optionsName ]: newOptions,
 		} );
 
 		if ( update.success ) {
@@ -177,7 +141,6 @@ const SetupTracking = ( {
 				)
 			);
 		} else {
-			setOptions( oldOptions );
 			createNotice(
 				'error',
 				__(
@@ -193,8 +156,8 @@ const SetupTracking = ( {
 	const handleTryAgain = () => {
 		setStatus( 'idle' );
 
-		if ( advertiser ) {
-			fetchTags( advertiser );
+		if ( appSettings.tracking_advertiser ) {
+			fetchTags( appSettings.tracking_advertiser );
 		} else {
 			fetchAdvertisers();
 		}
@@ -245,8 +208,8 @@ const SetupTracking = ( {
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
-						{ undefined !== pin4wc &&
-						Object.keys( pin4wc ).length > 0 &&
+						{ undefined !== appSettings &&
+						Object.keys( appSettings ).length > 0 &&
 						undefined !== advertisersList ? (
 							<CardBody size="large">
 								{ advertisersList.length > 0 ? (
@@ -256,7 +219,9 @@ const SetupTracking = ( {
 												'Advertiser',
 												'pinterest-for-woocommerce'
 											) }
-											value={ advertiser }
+											value={
+												appSettings.tracking_advertiser
+											}
 											onChange={ ( selectedAdvertiser ) =>
 												handleOptionChange(
 													'advertiser',
@@ -329,7 +294,8 @@ const SetupTracking = ( {
 									</>
 								) }
 
-								{ undefined !== advertiser &&
+								{ undefined !==
+									appSettings.tracking_advertiser &&
 									( undefined !== tagsList ? (
 										Object.keys( tagsList ).length > 0 && (
 											<>
@@ -338,7 +304,9 @@ const SetupTracking = ( {
 														'Tracking Tag',
 														'pinterest-for-woocommerce'
 													) }
-													value={ tag }
+													value={
+														appSettings.tracking_tag
+													}
 													onChange={ (
 														selectedTag
 													) =>
@@ -386,21 +354,4 @@ const SetupTracking = ( {
 	);
 };
 
-export default compose(
-	withSelect( ( select ) => {
-		const { getOption } = select( OPTIONS_STORE_NAME );
-
-		return {
-			pin4wc: getOption( wcSettings.pin4wc.optionsName ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { createNotice } = dispatch( 'core/notices' );
-		const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
-
-		return {
-			createNotice,
-			updateOptions,
-		};
-	} )
-)( SetupTracking );
+export default SetupTracking;

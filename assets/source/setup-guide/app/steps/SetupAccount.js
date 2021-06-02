@@ -3,9 +3,6 @@
  */
 import { sprintf, __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
 import {
 	Button,
 	Card,
@@ -16,7 +13,6 @@ import {
 	FlexBlock,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 import { Spinner } from '@woocommerce/components';
 
 /**
@@ -24,39 +20,19 @@ import { Spinner } from '@woocommerce/components';
  */
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
+import { isConnected } from '../helpers/conditionals';
 
 const SetupAccount = ( {
-	pin4wc,
-	updateOptions,
+	appSettings,
+	setAppSettings,
 	createNotice,
 	view,
 	goToNextStep,
 } ) => {
-	const [ options, setOptions ] = useState( undefined );
-
-	useEffect( () => {
-		if ( options !== pin4wc ) {
-			setOptions( pin4wc );
-		}
-	}, [ pin4wc ] );
-
-	const isConnected = () => {
-		return undefined === options
-			? undefined
-			: !! options?.token?.access_token;
-	};
-
 	const handleDisconnectAccount = async () => {
-		const oldOptions = Object.assign( {}, options );
-		const newOptions = Object.assign( {}, options );
-
-		delete newOptions.token;
-		delete newOptions.crypto_encoded_key;
-
-		setOptions( newOptions );
-
-		const update = await updateOptions( {
-			[ wcSettings.pin4wc.optionsName ]: newOptions,
+		const update = await setAppSettings( {
+			token: null,
+			crypto_encoded_key: null,
 		} );
 
 		if ( update.success ) {
@@ -68,7 +44,6 @@ const SetupAccount = ( {
 				)
 			);
 		} else {
-			setOptions( oldOptions );
 			createNotice(
 				'error',
 				__(
@@ -111,7 +86,7 @@ const SetupAccount = ( {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{ isConnected() === true ? (
+							{ isConnected( appSettings ) === true ? (
 								<Flex>
 									<FlexBlock className="is-connected">
 										<Text variant="subtitle">
@@ -120,7 +95,7 @@ const SetupAccount = ( {
 												'pinterest-for-woocommerce'
 											) }
 										</Text>
-										{ options?.account_data?.id && (
+										{ appSettings?.account_data?.id && (
 											<Text variant="body">
 												{ sprintf(
 													'%1$s: %2$s - %3$s',
@@ -128,9 +103,9 @@ const SetupAccount = ( {
 														'Account',
 														'pinterest-for-woocommerce'
 													),
-													options.account_data
+													appSettings.account_data
 														.username,
-													options.account_data.id
+													appSettings.account_data.id
 												) }
 											</Text>
 										) }
@@ -146,7 +121,7 @@ const SetupAccount = ( {
 										</Button>
 									</FlexBlock>
 								</Flex>
-							) : isConnected() === false ? (
+							) : isConnected( appSettings ) === false ? (
 								<Flex>
 									<FlexBlock>
 										<Text variant="subtitle">
@@ -176,7 +151,7 @@ const SetupAccount = ( {
 							) }
 						</CardBody>
 
-						{ isConnected() === false && (
+						{ isConnected( appSettings ) === false && (
 							<CardFooter>
 								<Button
 									isLink
@@ -195,37 +170,21 @@ const SetupAccount = ( {
 						) }
 					</Card>
 
-					{ view === 'wizard' && isConnected() === true && (
-						<div className="woocommerce-setup-guide__footer-button">
-							<Button isPrimary onClick={ goToNextStep }>
-								{ __(
-									'Continue',
-									'pinterest-for-woocommerce'
-								) }
-							</Button>
-						</div>
-					) }
+					{ view === 'wizard' &&
+						isConnected( appSettings ) === true && (
+							<div className="woocommerce-setup-guide__footer-button">
+								<Button isPrimary onClick={ goToNextStep }>
+									{ __(
+										'Continue',
+										'pinterest-for-woocommerce'
+									) }
+								</Button>
+							</div>
+						) }
 				</div>
 			</div>
 		</div>
 	);
 };
 
-export default compose(
-	withSelect( ( select ) => {
-		const { getOption } = select( OPTIONS_STORE_NAME );
-
-		return {
-			pin4wc: getOption( wcSettings.pin4wc.optionsName ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
-		const { createNotice } = dispatch( 'core/notices' );
-
-		return {
-			updateOptions,
-			createNotice,
-		};
-	} )
-)( SetupAccount );
+export default SetupAccount;
