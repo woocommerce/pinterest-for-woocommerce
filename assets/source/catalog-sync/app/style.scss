@@ -16,15 +16,17 @@ $root: ".pin4wc-catalog-sync";
 
 			th:first-child {
 				width: 1%;
+				min-width: 200px;
 				white-space: nowrap;
 			}
 
 			td {
 				color: #757575;
-			}
-		}
 
-		&__overview {
+				.is-placeholder {
+					max-width: 80%;
+				}
+			}
 
 			.woocommerce-summary {
 				background: none;
@@ -34,7 +36,6 @@ $root: ".pin4wc-catalog-sync";
 
 				&__item {
 					background: none;
-					border-bottom: 0;
 
 					&-container {
 
@@ -44,6 +45,10 @@ $root: ".pin4wc-catalog-sync";
 								border-right: 0;
 							}
 						}
+					}
+
+					&-delta {
+						display: none;
 					}
 				}
 			}

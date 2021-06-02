@@ -37,12 +37,11 @@ const App = () => {
 		<div className="woocommerce-layout">
 			<div className="woocommerce-layout__main">
 				<TransientNotices />
-				{ appSettings ? (
-					<div className="woocommerce-catalog-sync__container">
-						<SyncState />
+				<div className="pin4wc-catalog-sync__container">
+					<SyncState />
 						<SyncOverview />
-						<SyncIssues />
-					</div>
+					<SyncIssues />
+				</div>
 				) : (
 					<Spinner />
 				) }
