@@ -71,6 +71,7 @@ class Logger {
 		unset( $args['headers'] );
 		$method = isset( $args['method'] ) ? $args['method'] : 'POST';
 		$data   = ! empty( $args['body'] ) ? $args['body'] : '--- EMPTY STRING ---';
+		$data   = is_array( $data ) ? wp_json_encode( $data ) : $data;
 		self::log( "{$method} Request: " . $url . "\n\n" . $data . "\n", $level );
 	}
 

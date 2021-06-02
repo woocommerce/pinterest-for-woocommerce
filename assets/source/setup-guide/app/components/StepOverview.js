@@ -15,7 +15,7 @@ const StepOverview = ( { title, description, link } ) => {
 
 			{ description && (
 				<div className="woocommerce-setup-guide__step-overview__description">
-					<Text variatn="body">{ description }</Text>
+					<Text variant="body">{ description }</Text>
 				</div>
 			) }
 

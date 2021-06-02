@@ -66,19 +66,20 @@ class Base {
 	 * $endpoint
 	 *
 	 * @param string $endpoint the endpoint to perform the request on.
-	 * @param string $method eg, POST, GET, PUT etc.
-	 * @param array  $payload Payload to be sent on the request's body.
+	 * @param string $method   eg, POST, GET, PUT etc.
+	 * @param array  $payload  Payload to be sent on the request's body.
+	 * @param string $api      The specific Endpoints subset.
 	 *
 	 * @return array
 	 *
 	 * @throws \Exception PHP exception.
 	 */
-	public static function make_request( $endpoint, $method = 'POST', $payload = array() ) {
+	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '' ) {
 
 		try {
-
+			$api     = empty( $api ) ? '' : trailingslashit( $api );
 			$request = array(
-				'url'    => self::API_DOMAIN . '/v' . self::API_VERSION . '/' . $endpoint,
+				'url'    => self::API_DOMAIN . '/' . $api . 'v' . self::API_VERSION . '/' . $endpoint,
 				'method' => $method,
 				'args'   => $payload,
 			);
@@ -122,9 +123,6 @@ class Base {
 				'method'      => 'POST',
 				'auth_header' => true,
 				'args'        => array(),
-				'headers'     => array(
-					'content-type' => 'application/json',
-				),
 			)
 		);
 
@@ -265,6 +263,78 @@ class Base {
 	 */
 	public static function get_account_info() {
 		$response = self::make_request( 'users/me', 'GET' );
+		return $response;
+	}
+
+
+	/**
+	 * Get the advertiser object from the Pinterest API for the given User ID.
+	 *
+	 * @param string $pinterest_user the user to request the Advertiser for.
+	 *
+	 * @return mixed
+	 */
+	public static function get_advertisers( $pinterest_user = null ) {
+		$pinterest_user = ! is_null( $pinterest_user ) ? $pinterest_user : Pinterest_For_Woocommerce()::get_account_id();
+		$response       = self::make_request( 'advertisers/?owner_user_id=' . $pinterest_user, 'GET', array(), 'ads' );
+		return $response;
+	}
+
+
+	/**
+	 * Get the advertiser's tracking tags.
+	 *
+	 * @param string $advertiser_id the advertiser_id to request the tags for.
+	 *
+	 * @return mixed
+	 */
+	public static function get_advertiser_tags( $advertiser_id ) {
+		$response = self::make_request( 'advertisers/' . $advertiser_id . '/tags/', 'GET', array(), 'ads' );
+		return $response;
+	}
+
+
+	/**
+	 * Create a tag for the given advertiser.
+	 *
+	 * @param string $advertiser_id the advertiser_id to create a tag for.
+	 *
+	 * @return mixed
+	 */
+	public static function create_tag( $advertiser_id ) {
+
+		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto Created by Pinterest For WooCommerce', 'pinterest-for-woocommerce' ) );
+
+		$response = self::make_request(
+			'tags/',
+			'POST',
+			array(
+				'advertiser' => $advertiser_id,
+				'name'       => $tag_name,
+			),
+			'ads'
+		);
+
+		return $response;
+	}
+
+
+	/**
+	 * Update the tags configuration.
+	 *
+	 * @param string $tag_id The tag_id for which we want to update the configuration.
+	 * @param array  $config The configuration to set.
+	 *
+	 * @return mixed
+	 */
+	public static function update_tag_config( $tag_id, $config = array() ) {
+
+		if ( empty( $config ) ) {
+			return false;
+		}
+
+		$response = self::make_request( 'tags/' . $tag_id . '/configs/', 'PUT', $config, 'ads' );
+
 		return $response;
 	}
 

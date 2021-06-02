@@ -3,9 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	Button,
 	Card,
@@ -14,7 +12,6 @@ import {
 	Icon,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 import { Spinner } from '@woocommerce/components';
 
 /**
@@ -23,42 +20,14 @@ import { Spinner } from '@woocommerce/components';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 
-const ALLOWED_OPTIONS = [
-	'track_conversions',
-	'enhanced_match_support',
-	'save_to_pinterest',
-	'is_setup_complete',
-	'rich_pins_on_posts',
-	'rich_pins_on_products',
-];
-
-const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
-	const [ options, setOptions ] = useState( {} );
+const SetupPins = ( { appSettings, setAppSettings, createNotice, view } ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
 
-	useEffect( () => {
-		if ( options !== pin4wc ) {
-			setOptions( pin4wc );
-		}
-	}, [ pin4wc, options ] );
-
 	const handleOptionChange = async ( name, value ) => {
-		if ( ! ALLOWED_OPTIONS.includes( name ) ) {
-			return;
-		}
-
 		setIsSaving( true );
 
-		const oldOptions = Object.assign( {}, options );
-		const newOptions = {
-			...options,
-			[ name ]: value ?? ! options[ name ],
-		};
-
-		setOptions( newOptions );
-
-		const update = await updateOptions( {
-			[ wcSettings.pin4wc.optionsName ]: newOptions,
+		const update = await setAppSettings( {
+			[ name ]: value ?? ! appSettings[ name ],
 		} );
 
 		if ( update.success ) {
@@ -70,7 +39,6 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 				)
 			);
 		} else {
-			setOptions( oldOptions );
 			createNotice(
 				'error',
 				__(
@@ -92,27 +60,32 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	};
 
 	return (
-		<div className="woocommerce-setup-guide__configure-settings">
+		<div className="woocommerce-setup-guide__setup-pins">
 			{ view === 'wizard' && (
 				<StepHeader
-					title={ __( 'Configure your settings' ) }
-					subtitle={ __( 'Step Three' ) }
+					title={ __( 'Set up pins', 'pinterest-for-woocommerce' ) }
+					subtitle={ __( 'Step Four', 'pinterest-for-woocommerce' ) }
 				/>
 			) }
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={ __( 'Setup tracking and Rich Pins' ) }
+						title={ __(
+							'Set up pins and Rich Pins',
+							'pinterest-for-woocommerce'
+						) }
 						description={ __(
-							'Use description text to help users understand more'
+							'Use description text to help users understand more',
+							'pinterest-for-woocommerce'
 						) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{ Object.keys( options ).length > 0 ? (
+							{ undefined !== appSettings &&
+							Object.keys( appSettings ).length > 0 ? (
 								<>
 									<Text
 										className="woocommerce-setup-guide__checkbox-heading"
@@ -128,7 +101,9 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 											'Track conversions',
 											'pinterest-for-woocommerce'
 										) }
-										checked={ options.track_conversions }
+										checked={
+											appSettings.track_conversions
+										}
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
 											handleOptionChange(
@@ -155,7 +130,7 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 											</Button>
 										}
 										checked={
-											options.enhanced_match_support
+											appSettings.enhanced_match_support
 										}
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
@@ -178,7 +153,9 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 											'Enable Rich Pins for Products',
 											'pinterest-for-woocommerce'
 										) }
-										checked={ options.rich_pins_on_products }
+										checked={
+											appSettings.rich_pins_on_products
+										}
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
 											handleOptionChange(
@@ -191,7 +168,9 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 											'Enable Rich Pins for Posts',
 											'pinterest-for-woocommerce'
 										) }
-										checked={ options.rich_pins_on_posts }
+										checked={
+											appSettings.rich_pins_on_posts
+										}
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
 											handleOptionChange(
@@ -213,7 +192,9 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 											'Save to Pinterest',
 											'pinterest-for-woocommerce'
 										) }
-										checked={ options.save_to_pinterest }
+										checked={
+											appSettings.save_to_pinterest
+										}
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
 											handleOptionChange(
@@ -253,21 +234,4 @@ const ConfigureSettings = ( { pin4wc, createNotice, updateOptions, view } ) => {
 	);
 };
 
-export default compose(
-	withSelect( ( select ) => {
-		const { getOption } = select( OPTIONS_STORE_NAME );
-
-		return {
-			pin4wc: getOption( wcSettings.pin4wc.optionsName ) || [],
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { createNotice } = dispatch( 'core/notices' );
-		const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
-
-		return {
-			createNotice,
-			updateOptions,
-		};
-	} )
-)( ConfigureSettings );
+export default SetupPins;

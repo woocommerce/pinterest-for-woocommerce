@@ -131,7 +131,7 @@ class Auth extends VendorAPI {
 		$is_setup_complete = Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete', true );
 
 		if ( empty( $is_setup_complete ) || 'no' === $is_setup_complete ) {
-			$step         = empty( $error ) ? 'verify-domain' : 'setup-account';
+			$step         = empty( $error ) ? 'claim-website' : 'setup-account';
 			$redirect_url = add_query_arg(
 				array(
 					'page' => 'wc-admin',
