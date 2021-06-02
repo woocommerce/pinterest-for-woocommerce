@@ -16,15 +16,20 @@ $root: ".pin4wc-catalog-sync";
 
 			th:first-child {
 				width: 1%;
-				min-width: 200px;
+				min-width: 175px;
 				white-space: nowrap;
+
+				.is-placeholder {
+					max-width: 100%;
+					width: 100%;
+				}
 			}
 
 			td {
 				color: #757575;
 
 				.is-placeholder {
-					max-width: 80%;
+					max-width: 60%;
 				}
 			}
 
