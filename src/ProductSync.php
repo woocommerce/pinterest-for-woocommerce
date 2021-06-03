@@ -279,7 +279,9 @@ class ProductSync {
 		$merchant   = self::get_merchant( $feed_args );
 		$registered = false;
 
-		if ( ! empty( $merchant['data']->id ) && ! isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
+		if ( ! empty( $merchant['data']->id ) && 'declined' === $merchant['data']->product_pin_approval_status ) {
+			$registered = false;
+		} elseif ( ! empty( $merchant['data']->id ) && ! isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
 			// No feed registered, but we got a merchant.
 			$merchant = API\Base::add_merchant_feed( $merchant['data']->id, $feed_args ); // TODO: test (case where merchant exists, no feed registered)
 
@@ -342,7 +344,6 @@ class ProductSync {
 			} catch ( \Throwable $th ) {
 				$merchant = false;
 			}
-
 		}
 
 		if ( ! $merchant || ( 'success' !== $merchant['status'] && 650 === $merchant['code'] ) ) {  // https://developers.pinterest.com/docs/redoc/#tag/API-Response-Codes Merchant not found 650.
