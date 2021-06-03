@@ -556,6 +556,7 @@ class ProductSync {
 	 * - in_progress              Signifies that we are between iterations and generating the feed.
 	 * - generated                The feed is generated, no further action will be taken.
 	 * - scheduled_for_generation The feed needs to be (re)generated. If this status is set, the next run of __CLASS__::handle_feed_generation() will start the generation process.
+	 * - pending_config           The feed was reset or was never configured.
 	 *
 	 * @param string $status The status of the feed's generation process. See above.
 	 * @param array  $args   The arguments that go along with the given status.
@@ -570,11 +571,19 @@ class ProductSync {
 			return $state_data;
 		}
 
-		$state_data = empty( $state_data ) ? array() : $state_data;
+		if ( ! isset( $state_data['status'] ) ) {
+			$state_data['status'] = 'pending_config';
+		}
+
+		$state_data     = empty( $state_data ) ? array() : $state_data;
+		$initial_status = $state_data['status'];
 
 		if ( 'starting' === $status || 'check_registration' === $status ) {
-			$state_data['status']  = $status;
-			$state_data['started'] = time();
+
+			if ( 'check_registration' !== $status ) {
+				$state_data['status']  = $status;
+				$state_data['started'] = time();
+			}
 
 			if ( empty( $state_data['job_id'] ) ) {
 				$state_data['job_id'] = wp_generate_password( 6, false, false );
@@ -605,7 +614,9 @@ class ProductSync {
 
 		Pinterest_For_Woocommerce()::save_setting( 'feed_job', $state_data );
 
-		self::log( 'Feed status set to: ' . $state_data['status'] );
+		if ( $initial_status !== $state_data['status'] ) {
+			self::log( 'Feed status set to: ' . $state_data['status'] );
+		}
 
 		return $state_data;
 
