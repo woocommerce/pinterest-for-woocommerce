@@ -81,6 +81,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				6
 			);
 
+			add_submenu_page(
+				'woocommerce-marketing',
+				esc_html__( 'Product Catalog', 'pinterest-for-woocommerce' ),
+				esc_html__( 'Pinterest Product Catalog', 'pinterest-for-woocommerce' ),
+				'manage_woocommerce',
+				PINTEREST_FOR_WOOCOMMERCE_CATALOG_SYNC,
+				array( $this, 'render_catalog_sync_page' ),
+				6
+			);
+
 			if (
 				! method_exists( Screen::class, 'register_post_type' ) ||
 				! method_exists( Menu::class, 'add_plugin_item' ) ||
@@ -101,6 +111,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 			Menu::add_plugin_item(
 				array(
+					'id'         => 'pin4wcCatalogSync',
+					'title'      => esc_html__( 'Product Catalog', 'pinterest-for-woocommerce' ),
+					'capability' => 'manage_woocommerce',
+					'url'        => PINTEREST_FOR_WOOCOMMERCE_CATALOG_SYNC,
+					'parent'     => 'pinterest-for-woocommerce',
+				)
+			);
+
+			Menu::add_plugin_item(
+				array(
 					'id'         => 'pin4wcSettings',
 					'title'      => esc_html__( 'Settings', 'pinterest-for-woocommerce' ),
 					'capability' => 'manage_woocommerce',
@@ -110,6 +130,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			);
 		}
 
+
+		/**
+		 * Render the placeholder HTML for the React components
+		 */
+		public function render_catalog_sync_page() {
+			echo '<div class="wrap">
+				<div id="pin4wc-catalog-sync"></div>
+			</div>';
+		}
 
 		/**
 		 * Render the placeholder HTML for the React components
@@ -125,7 +154,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 * Load the scripts needed for the setup guide / settings page.
 		 */
 		public function load_setup_guide_scripts() {
-			if ( $this->is_setup_guide_page() ) {
+			if ( $this->is_catalog_sync_page() ) {
+				$build_path = '/assets/catalog-sync';
+			} elseif ( $this->is_setup_guide_page() ) {
 				$build_path = '/assets/setup-guide';
 			} elseif (
 				class_exists( 'Automattic\WooCommerce\Admin\Loader' ) &&
@@ -166,6 +197,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			);
 
 			wp_enqueue_style( $handle );
+		}
+
+		/**
+		 * Return if it's the Setup Guide page
+		 *
+		 * @since 1.0.0
+		 *
+		 * @return boolean
+		 */
+		protected function is_catalog_sync_page() {
+
+			return ( is_admin() && PINTEREST_FOR_WOOCOMMERCE_CATALOG_SYNC === $this->get_request( 'page' ) );
 		}
 
 		/**
@@ -229,7 +272,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 * @return array
 		 */
 		public function component_settings( $settings ) {
-			if ( $this->is_setup_guide_page() ) {
+			if ( $this->is_catalog_sync_page() || $this->is_setup_guide_page() ) {
 				$default_view = 'settings';
 			} elseif (
 				class_exists( 'Automattic\WooCommerce\Admin\Loader' ) &&
