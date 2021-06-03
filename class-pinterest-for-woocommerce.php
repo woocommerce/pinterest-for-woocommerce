@@ -60,6 +60,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			'save_to_pinterest'      => true,
 			'rich_pins_on_posts'     => true,
 			'rich_pins_on_products'  => true,
+			'product_sync_enabled'   => true,
 		);
 
 		/**
