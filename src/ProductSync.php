@@ -183,7 +183,7 @@ class ProductSync {
 			'feed_location'             => $state['feed_url'],
 			'feed_format'               => 'XML',
 			'feed_default_currency'     => get_woocommerce_currency(),
-			'default_availability_type' => 'IN_STOCK', // TODO: ? also check with wrong value and check why its not getting logged properly in debug.log
+			'default_availability_type' => 'IN_STOCK',
 		);
 
 		$registered = self::is_feed_registered();
@@ -191,7 +191,7 @@ class ProductSync {
 		if ( ! self::is_product_sync_enabled() ) {
 			// Handle feed deregistration.
 			if ( $registered ) {
-				self::handle_feed_deregistration( $feed_args );
+				self::handle_feed_deregistration();
 			}
 
 			return false;
@@ -233,20 +233,9 @@ class ProductSync {
 	 * Running this, sets the feed to 'DISABLED' in Pinterest, deletes the local XML file and the option holding the feed
 	 * status of the feed generation job.
 	 *
-	 * @param array $feed_args The arguments used to create the feed.
-	 *
 	 * @return void
 	 */
-	private static function handle_feed_deregistration( $feed_args ) {
-		$feed_args['feed_status'] = 'DISABLED';
-
-		$merchant_id = Pinterest_For_Woocommerce()::get_setting( 'merchant_id' );
-		$feed_id     = Pinterest_For_Woocommerce()::get_setting( 'feed_registered' );
-
-		if ( ! empty( $merchant_id ) && ! empty( $feed_id ) ) {
-			API\Base::update_merchant_feed( $merchant_id, $feed_id, $feed_args );
-		}
-
+	private static function handle_feed_deregistration() {
 		Pinterest_For_Woocommerce()::save_setting( 'feed_registered', false );
 
 		self::feed_reset();
@@ -290,7 +279,7 @@ class ProductSync {
 			$registered = false;
 		} elseif ( ! empty( $merchant['data']->id ) && ! isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
 			// No feed registered, but we got a merchant.
-			$merchant = API\Base::add_merchant_feed( $merchant['data']->id, $feed_args ); // TODO: test (case where merchant exists, no feed registered)
+			$merchant = API\Base::add_merchant_feed( $merchant['data']->id, $feed_args );
 
 			if ( $merchant && 'success' === $merchant['status'] && isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
 				$registered = $merchant['data']->product_pin_feed_profile->id;
