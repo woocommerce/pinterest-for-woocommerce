@@ -136,15 +136,7 @@ const SetupTracking = ( {
 			[ `tracking_${ name }` ]: value,
 		} );
 
-		if ( update.success ) {
-			createNotice(
-				'success',
-				__(
-					'Settings were saved successfully.',
-					'pinterest-for-woocommerce'
-				)
-			);
-		} else {
+		if ( ! update.success ) {
 			createNotice(
 				'error',
 				__(
