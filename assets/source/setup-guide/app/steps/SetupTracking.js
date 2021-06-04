@@ -32,10 +32,14 @@ const SetupTracking = ( {
 	const [ tagsList, setTagsList ] = useState();
 
 	useEffect( () => {
-		if ( undefined === advertisersList ) {
+		if ( undefined !== appSettings && undefined === advertisersList ) {
 			fetchAdvertisers();
 		}
-	}, [ advertisersList ] );
+
+		if ( advertisersList && tagsList && appSettings?.tracking_advertiser && appSettings?.tracking_tag ) {
+			setStatus( 'success' );
+		}
+	}, [ appSettings, advertisersList ] );
 
 	const fetchAdvertisers = async () => {
 		try {
