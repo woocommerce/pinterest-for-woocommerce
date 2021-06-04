@@ -231,6 +231,16 @@ $root: ".woocommerce-setup-guide";
 						display: block;
 					}
 				}
+
+				&-modal {
+
+					&__buttons {
+
+						button + button {
+							margin-left: 12px;
+						}
+					}
+				}
 			}
 
 			&__setup-account {
