@@ -3,71 +3,47 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import {
-	Icon,
-} from '@wordpress/components';
-import { TableCard } from '@woocommerce/components';
+	getHistory,
+	getQuery,
+	onQueryChange,
+} from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
  */
 import { REPORTS_STORE_NAME } from '../data';
+import SyncIssuesTable from './SyncIssuesTable';
 
 const SyncIssues = () => {
-	const feedIssues = useSelect( ( select ) => select( REPORTS_STORE_NAME ).getFeedIssues() );
+	const [ query, setQuery ] = useState( getQuery() );
+	const feedIssues = useSelect( ( select ) => select( REPORTS_STORE_NAME ).getFeedIssues( query ) );
+	const isRequesting = useSelect( ( select ) => select( REPORTS_STORE_NAME ).isRequesting() );
 
 	if ( ! feedIssues?.lines?.length ) {
 		return null;
 	}
 
-	const defaultHeaderAttributes = {
-		isLeftAligned: true,
-		isSortable: false,
+	getHistory().listen( () => {
+		setQuery( getQuery() );
+	});
+
+	if ( ! query.paged ) {
+		query.paged = 1;
 	}
 
-	const headers = [
-		{ key: 'type', label: __( 'Type', 'pinterest-for-woocommerce' ), ...defaultHeaderAttributes },
-		{ key: 'affected-product', label: __( 'Affected Product', 'pinterest-for-woocommerce' ), ...defaultHeaderAttributes },
-		{ key: 'issue', label: __( 'Issue', 'pinterest-for-woocommerce' ), ...defaultHeaderAttributes },
-		{ key: 'edit', ...defaultHeaderAttributes },
-	];
-
-	const getRows = ( data ) => {
-		const statuses = {
-			success: 'green',
-			warning: 'yellow',
-			error: 'red',
-		}
-
-		const icons = {
-			success: 'yes-alt',
-			warning: 'warning',
-			error: 'warning'
-		}
-
-		return data.map( row => {
-			return (
-				[
-					{ display: <Icon icon={ icons[ row.status ] } className={ `${statuses[ row.status ]}-text` } /> },
-					{ display: row.product_name },
-					{ display: row.issue_description },
-					{ display: <a href={row.product_edit_link} target="_blank">{ __( 'Edit', 'pinterest-for-woocommerce' ) }</a> },
-				]
-			);
-		});
+	if ( ! query.per_page ) {
+		query.per_page = 25;
 	}
 
 	return (
-		<TableCard
-			className="pin4wc-catalog-sync__issues"
-			title={ __( 'Issues', 'pinterest-for-woocommerce' ) }
-		    rows={ feedIssues && getRows( feedIssues?.lines ) }
-		    headers={ headers }
-			showMenu={ false }
-		    query={ { page: 1 } }
-		    rowsPerPage={ 5 }
-		    totalRows={ 10 }
-			isLoading={ ! feedIssues }
+		<SyncIssuesTable
+			issues={ feedIssues?.lines }
+			query={ query }
+			totalRows={ feedIssues?.total_rows ?? 0 }
+			isRequesting={ isRequesting }
+			onQueryChange={ onQueryChange }
 		/>
 	)
 };

@@ -3,27 +3,27 @@
  */
 import { controls as dataControls } from '@wordpress/data-controls';
 import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import { API_ROUTE } from './constants';
 
-export const fetch = ( endpoint ) => {
+export const fetch = ( endpoint, data = {} ) => {
 	return {
 		type: 'FETCH',
-		endpoint
+		endpoint,
+		data
 	};
 };
 
 export const controls = {
 	...dataControls,
-	FETCH({ endpoint }) {
+	FETCH({ endpoint, data = {} }) {
 		return new Promise( ( resolve ) => {
-			const url = API_ROUTE + '/' + endpoint;
-			apiFetch( { path: url } ).then( ( result ) =>
-				resolve( result )
-			);
+			const url = addQueryArgs( `${API_ROUTE}/${endpoint}`, data );
+			apiFetch( { path: url } ).then( ( result ) => resolve( result )	);
 		} );
 	},
 };

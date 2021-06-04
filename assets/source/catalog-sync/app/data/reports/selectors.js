@@ -26,3 +26,12 @@ export const getFeedState = ( state ) => {
 export const getReportsRequestingError = ( state, name ) => {
 	return state.requestingErrors[ name ] || false;
 };
+
+/**
+ * Determine if options are being updated.
+ *
+ * @param {Object} state - Reducer state
+ */
+ export const isFetchingFeedIssues = ( state ) => {
+	return state.isFetching || false;
+};

@@ -17,6 +17,13 @@ export function receiveFeedState( feedState ) {
 	};
 }
 
+export function setIsRequesting( isRequesting ) {
+	return {
+		type: TYPES.SET_IS_REQUESTING,
+		isRequesting
+	};
+}
+
 export function setRequestingError( error, name ) {
 	return {
 		type: TYPES.SET_REQUESTING_ERROR,
