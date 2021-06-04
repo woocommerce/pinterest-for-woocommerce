@@ -185,15 +185,18 @@ class ProductSync {
 			'default_availability_type' => 'IN_STOCK', // TODO: ? also check with wrong value and check why its not getting logged properly in debug.log
 		);
 
+		$registered = self::is_feed_registered();
+
 		if ( ! self::is_product_sync_enabled() ) {
 			// Handle feed deregistration.
-			self::handle_feed_deregistration( $feed_args );
+			if ( $registered ) {
+				self::handle_feed_deregistration( $feed_args );
+			}
 
 			return false;
 		}
 
 		try {
-			$registered = self::is_feed_registered();
 
 			if ( empty( $registered ) || $force_new_reg ) {
 				$registered = self::register_feed( $feed_args );
