@@ -10,13 +10,13 @@ import { Button } from '@wordpress/components';
  */
 import { SETTINGS_STORE_NAME } from '../data';
 
-const SaveSettingsButton = ({ setAppSettings, createNotice }) => {
+const SaveSettingsButton = ( { setAppSettings, createNotice } ) => {
 	const isSaving = useSelect( ( select ) =>
 		select( SETTINGS_STORE_NAME ).isSettingsUpdating()
 	);
 
 	const saveSettings = async () => {
-		const update = await setAppSettings( {}, true )
+		const update = await setAppSettings( {}, true );
 
 		if ( update.success ) {
 			createNotice(
@@ -35,27 +35,17 @@ const SaveSettingsButton = ({ setAppSettings, createNotice }) => {
 				)
 			);
 		}
-	}
+	};
 
 	return (
 		<div className="woocommerce-setup-guide__footer-button">
-			<Button
-				isPrimary
-				onClick={ saveSettings }
-				disabled={ isSaving }
-			>
+			<Button isPrimary onClick={ saveSettings } disabled={ isSaving }>
 				{ isSaving
-					? __(
-							'Saving settings…',
-							'pinterest-for-woocommerce'
-					  )
-					: __(
-							'Save changes',
-							'pinterest-for-woocommerce'
-					  ) }
+					? __( 'Saving settings…', 'pinterest-for-woocommerce' )
+					: __( 'Save changes', 'pinterest-for-woocommerce' ) }
 			</Button>
 		</div>
-	)
-}
+	);
+};
 
 export default SaveSettingsButton;

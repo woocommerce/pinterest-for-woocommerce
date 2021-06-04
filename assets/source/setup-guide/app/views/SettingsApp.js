@@ -74,7 +74,9 @@ const SettingsApp = () => {
 													view="settings"
 													{ ...childComponentProps }
 												/>
-												<SaveSettingsButton { ...childComponentProps } />
+												<SaveSettingsButton
+													{ ...childComponentProps }
+												/>
 											</>
 										) }
 									</>

@@ -36,7 +36,12 @@ const SetupTracking = ( {
 			fetchAdvertisers();
 		}
 
-		if ( advertisersList && tagsList && appSettings?.tracking_advertiser && appSettings?.tracking_tag ) {
+		if (
+			advertisersList &&
+			tagsList &&
+			appSettings?.tracking_advertiser &&
+			appSettings?.tracking_tag
+		) {
 			setStatus( 'success' );
 		}
 	}, [ appSettings, advertisersList ] );
