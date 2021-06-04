@@ -186,7 +186,7 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_link( $product, $property ) {
-		return '<' . $property . '>' . $product->get_permalink() . '</' . $property . '>';
+		return '<' . $property . '><![CDATA[' . $product->get_permalink() . ']]></' . $property . '>';
 	}
 
 	/**
@@ -205,7 +205,7 @@ class ProductsXmlFeed {
 			return '';
 		}
 
-		return '<' . $property . '>' . wp_get_attachment_image_src( $image_id )[0] . '</' . $property . '>';
+		return '<' . $property . '><![CDATA[' . wp_get_attachment_image_src( $image_id )[0] . ']]></' . $property . '>';
 	}
 
 
