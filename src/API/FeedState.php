@@ -194,6 +194,13 @@ class FeedState extends VendorAPI {
 
 		if ( 'success' === $status ) {
 			$result = $this->add_feed_sync_status( $result );
+		} else {
+			$result['overview'] = array(
+				'total'      => 0,
+				'not_synced' => 0,
+				'warnings'   => 0,
+				'errors'     => 0,
+			);
 		}
 
 		return $result;
