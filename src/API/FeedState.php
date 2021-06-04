@@ -167,6 +167,7 @@ class FeedState extends VendorAPI {
 					$status_label = esc_html__( 'Product Feed configured for Ingestion on Pinterest', 'pinterest-for-woocommerce' );
 					break;
 				case 'pending':
+				case 'appeal_pending':
 					$status       = 'warning';
 					$status_label = esc_html__( 'Product Feed pending approval on Pinterest.', 'pinterest-for-woocommerce' );
 					break;
