@@ -2,8 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	Card,
 	CardHeader,
@@ -18,7 +17,9 @@ import { REPORTS_STORE_NAME } from '../data';
 import SyncStateSummary from './SyncStateSummary';
 import SyncStateTable from './SyncStateTable';
 
-const SyncState = ({ feedState }) => {
+const SyncState = () => {
+	const feedState = useSelect( ( select ) => select( REPORTS_STORE_NAME ).getFeedState() );
+
 	return (
 		<Card className="woocommerce-table pin4wc-catalog-sync__state">
 			<CardHeader>
@@ -34,12 +35,4 @@ const SyncState = ({ feedState }) => {
 	)
 };
 
-export default compose(
-	withSelect( ( select ) => {
-		const { getFeedState } = select( REPORTS_STORE_NAME );
-
-		return {
-			feedState: getFeedState()
-		}
-	})
-)(SyncState);
+export default SyncState;

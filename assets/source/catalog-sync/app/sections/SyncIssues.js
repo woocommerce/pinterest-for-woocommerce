@@ -2,8 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	Icon,
 } from '@wordpress/components';
@@ -14,7 +13,9 @@ import { TableCard } from '@woocommerce/components';
  */
 import { REPORTS_STORE_NAME } from '../data';
 
-const SyncIssues = ({ feedIssues }) => {
+const SyncIssues = () => {
+	const feedIssues = useSelect( ( select ) => select( REPORTS_STORE_NAME ).getFeedIssues() );
+
 	if ( ! feedIssues?.lines?.length ) {
 		return null;
 	}
@@ -71,12 +72,4 @@ const SyncIssues = ({ feedIssues }) => {
 	)
 };
 
-export default compose(
-	withSelect( ( select ) => {
-		const { getFeedIssues } = select( REPORTS_STORE_NAME );
-
-		return {
-			feedIssues: getFeedIssues()
-		}
-	})
-)(SyncIssues);
+export default SyncIssues;
