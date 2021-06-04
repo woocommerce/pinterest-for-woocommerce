@@ -15,6 +15,10 @@ import { TableCard } from '@woocommerce/components';
 import { REPORTS_STORE_NAME } from '../data';
 
 const SyncIssues = ({ feedIssues }) => {
+	if ( ! feedIssues?.lines ) {
+		return null;
+	}
+
 	const defaultHeaderAttributes = {
 		isLeftAligned: true,
 		isSortable: false,
