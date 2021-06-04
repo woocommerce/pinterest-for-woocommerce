@@ -11,6 +11,7 @@ import { Spinner } from '@woocommerce/components';
 import SetupAccount from '../steps/SetupAccount';
 import ClaimWebsite from '../steps/ClaimWebsite';
 import SetupTracking from '../steps/SetupTracking';
+import SetupProductSync from '../steps/SetupProductSync';
 import SetupPins from '../steps/SetupPins';
 import TransientNotices from '../components/TransientNotices';
 import { useBodyClasses, useCreateNotice } from '../helpers/effects';
@@ -68,10 +69,18 @@ const SettingsApp = () => {
 										{ isTrackingConfigured(
 											appSettings
 										) && (
-											<SetupPins
-												view="settings"
-												{ ...childComponentProps }
-											/>
+											<>
+												<SetupProductSync
+													{ ...childComponentProps }
+												/>
+												<SetupPins
+													view="settings"
+													{ ...childComponentProps }
+												/>
+												<SaveSettingsButton
+													{ ...childComponentProps }
+												/>
+											</>
 										) }
 									</>
 								) }
