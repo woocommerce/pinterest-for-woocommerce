@@ -26,7 +26,7 @@ const SettingsApp = () => {
 		select( SETTINGS_STORE_NAME ).getSettings()
 	);
 
-	const { patchSettings: setAppSettings } = useDispatch(
+	const { updateSettings: setAppSettings } = useDispatch(
 		SETTINGS_STORE_NAME
 	);
 	const { createNotice } = useDispatch( 'core/notices' );
