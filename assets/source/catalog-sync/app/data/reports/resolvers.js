@@ -1,17 +1,24 @@
 /**
  * Internal dependencies
  */
-import { receiveFeedIssues, receiveFeedState, setRequestingError, setIsRequesting } from './actions';
+import {
+	receiveFeedIssues,
+	receiveFeedState,
+	setRequestingError,
+	setIsRequesting,
+} from './actions';
 import { fetch } from './controls';
 
 /**
  * Request all settings values.
+ *
+ * @param query
  */
 export function* getFeedIssues( query = {} ) {
 	try {
 		const data = {
 			paged: query.paged || 1,
-			per_page: query.per_page || 25
+			per_page: query.per_page || 25,
 		};
 		yield setIsRequesting( true );
 

@@ -11,11 +11,12 @@
     "@wordpress/components": "^10.0.0",
     "@wordpress/compose": "^3.13.1",
     "@wordpress/data": "^4.27.1",
-	"@wordpress/data-controls": "^2.1.0",
+    "@wordpress/data-controls": "^2.1.0",
     "@wordpress/element": "^2.13.1",
     "@wordpress/html-entities": "^2.7.0",
     "@wordpress/i18n": "^3.11.0",
     "@wordpress/notices": "^2.12.7",
+    "@wordpress/url": "^3.1.1",
     "classnames": "^2.2.6",
     "lodash": "^4.17.15"
   },

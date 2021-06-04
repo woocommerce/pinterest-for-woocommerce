@@ -18,7 +18,9 @@ import SyncStateSummary from './SyncStateSummary';
 import SyncStateTable from './SyncStateTable';
 
 const SyncState = () => {
-	const feedState = useSelect( ( select ) => select( REPORTS_STORE_NAME ).getFeedState() );
+	const feedState = useSelect( ( select ) =>
+		select( REPORTS_STORE_NAME ).getFeedState()
+	);
 
 	return (
 		<Card className="woocommerce-table pin4wc-catalog-sync__state">
@@ -32,7 +34,7 @@ const SyncState = () => {
 				<SyncStateTable workflow={ feedState?.workflow } />
 			</CardBody>
 		</Card>
-	)
+	);
 };
 
 export default SyncState;

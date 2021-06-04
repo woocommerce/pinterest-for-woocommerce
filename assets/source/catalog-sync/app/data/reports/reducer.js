@@ -11,19 +11,19 @@ const reportsReducer = (
 		case TYPES.RECEIVE_FEEDISSUES:
 			state = {
 				...state,
-				feedIssues
+				feedIssues,
 			};
 			break;
 		case TYPES.RECEIVE_FEEDSTATE:
 			state = {
 				...state,
-				feedState
+				feedState,
 			};
 			break;
 		case TYPES.SET_IS_REQUESTING:
 			state = {
 				...state,
-				isRequesting
+				isRequesting,
 			};
 			break;
 		case TYPES.SET_REQUESTING_ERROR:

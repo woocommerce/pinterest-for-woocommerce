@@ -5,14 +5,14 @@ import { __ } from '@wordpress/i18n';
 import {
 	SummaryList,
 	SummaryNumber,
-	SummaryListPlaceholder
+	SummaryListPlaceholder,
 } from '@woocommerce/components';
 
-const SyncStateSummary = ({ overview }) => {
+const SyncStateSummary = ( { overview } ) => {
 	const getItems = ( data ) => {
 		const defaultValue = __( 'N/A', 'pinterest-for-woocommerce' );
 
-		return ( [
+		return [
 			<SummaryNumber
 				key="active"
 				value={ data?.total ?? defaultValue }
@@ -33,14 +33,14 @@ const SyncStateSummary = ({ overview }) => {
 				value={ data?.errors ?? defaultValue }
 				label={ __( 'With Errors', 'pinterest-for-woocommerce' ) }
 			/>,
-		] );
-	}
+		];
+	};
 
-	return (
-		overview
-		? <SummaryList>{ () => getItems(overview) }</SummaryList>
-		: <SummaryListPlaceholder numberOfItems={ 4 } />
-	)
+	return overview ? (
+		<SummaryList>{ () => getItems( overview ) }</SummaryList>
+	) : (
+		<SummaryListPlaceholder numberOfItems={ 4 } />
+	);
 };
 
 export default SyncStateSummary;

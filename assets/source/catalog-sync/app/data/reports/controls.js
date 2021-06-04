@@ -14,16 +14,17 @@ export const fetch = ( endpoint, data = {} ) => {
 	return {
 		type: 'FETCH',
 		endpoint,
-		data
+		data,
 	};
 };
 
 export const controls = {
 	...dataControls,
-	FETCH({ endpoint, data = {} }) {
+	FETCH( { endpoint, data = {} } ) {
 		return new Promise( ( resolve ) => {
-			const url = addQueryArgs( `${API_ROUTE}/${endpoint}`, data );
-			apiFetch( { path: url } ).then( ( result ) => resolve( result )	);
+			const url = addQueryArgs( `${ API_ROUTE }/${ endpoint }`, data );
+
+			apiFetch( { path: url } ).then( ( result ) => resolve( result ) );
 		} );
 	},
 };

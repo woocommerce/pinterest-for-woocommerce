@@ -11,7 +11,6 @@ export const getFeedIssues = ( state ) => {
  * Get setting from state tree.
  *
  * @param {Object} state - Reducer state
- * @param {Array} name - Report name
  */
 export const getFeedState = ( state ) => {
 	return state.feedState;
@@ -32,6 +31,6 @@ export const getReportsRequestingError = ( state, name ) => {
  *
  * @param {Object} state - Reducer state
  */
- export const isFetchingFeedIssues = ( state ) => {
+export const isFetchingFeedIssues = ( state ) => {
 	return state.isFetching || false;
 };
