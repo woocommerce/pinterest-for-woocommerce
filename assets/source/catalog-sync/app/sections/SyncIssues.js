@@ -15,7 +15,7 @@ import { TableCard } from '@woocommerce/components';
 import { REPORTS_STORE_NAME } from '../data';
 
 const SyncIssues = ({ feedIssues }) => {
-	if ( ! feedIssues?.lines ) {
+	if ( ! feedIssues?.lines?.length ) {
 		return null;
 	}
 
