@@ -118,6 +118,7 @@ class ProductSync {
 		$feed_job['status'] = 'scheduled_for_generation';
 
 		Pinterest_For_Woocommerce()::save_setting( 'feed_job', $feed_job );
+		self::trigger_async_feed_generation();
 
 		self::log( 'Feed generation (re)scheduled.' );
 	}
@@ -204,15 +205,12 @@ class ProductSync {
 
 			if ( $registered ) {
 
-				$not_expired = ( 'generated' === $state['status'] && $state['finished'] > ( time() - DAY_IN_SECONDS ) );
+				$expired = ( 'generated' === $state['status'] && $state['finished'] < ( time() - DAY_IN_SECONDS ) );
 
 				// If local is not generated, or is older than X , schedule regeneration.
-				if ( 'starting' === $state['status'] || 'in_progress' === $state['status'] || $not_expired ) {
-					// Make sure the task is scheduled.
-					if ( $not_expired ) {
-						self::trigger_async_feed_generation();
-					}
-				} else {
+				if ( 'starting' === $state['status'] || 'in_progress' === $state['status'] ) {
+					self::trigger_async_feed_generation();
+				} elseif ( $expired || 'pending_config' === $state['status'] ) {
 					self::feed_reschedule();
 				}
 
@@ -258,11 +256,13 @@ class ProductSync {
 	/**
 	 * Schedules an async action - if not already scheduled - to generate the feed.
 	 *
+	 * @param boolean $force When true, overrides the check for already scheduled task.
+	 *
 	 * @return void
 	 */
-	private static function trigger_async_feed_generation() {
+	private static function trigger_async_feed_generation( $force = false ) {
 
-		if ( false === as_next_scheduled_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+		if ( $force || false === as_next_scheduled_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			as_enqueue_async_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 	}
@@ -508,7 +508,7 @@ class ProductSync {
 				self::feed_job_status( 'generated' );
 			} else {
 				// We got more products left. Schedule next iteration.
-				self::trigger_async_feed_generation();
+				self::trigger_async_feed_generation( true );
 			}
 
 			fclose( $xml_file ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
