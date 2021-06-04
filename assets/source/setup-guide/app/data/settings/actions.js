@@ -38,10 +38,14 @@ export function setIsUpdating( isUpdating ) {
 	};
 }
 
-export function* updateSettings( data ) {
-	yield setIsUpdating( true );
+export function* updateSettings( data, saveToDb = false ) {
 	yield receiveSettings( data );
 
+	if ( ! saveToDb ) {
+		return { success: true };
+	}
+
+	yield setIsUpdating( true );
 	const settings = yield select( STORE_NAME, 'getSettings' );
 
 	try {

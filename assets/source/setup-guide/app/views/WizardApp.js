@@ -30,14 +30,14 @@ const WizardApp = () => {
 		select( SETTINGS_STORE_NAME ).getSettings()
 	);
 
-	const { updateSettings: setAppSettings } = useDispatch(
+	const { updateSettings } = useDispatch(
 		SETTINGS_STORE_NAME
 	);
 	const { createNotice } = useDispatch( 'core/notices' );
 
 	const childComponentProps = {
 		appSettings,
-		setAppSettings,
+		setAppSettings: ( data ) => updateSettings( data, true ),
 		createNotice,
 	};
 

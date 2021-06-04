@@ -12,6 +12,7 @@ import SetupAccount from '../steps/SetupAccount';
 import ClaimWebsite from '../steps/ClaimWebsite';
 import SetupTracking from '../steps/SetupTracking';
 import SetupPins from '../steps/SetupPins';
+import SaveSettingsButton from '../components/SaveSettingsButton';
 import TransientNotices from '../components/TransientNotices';
 import { useBodyClasses, useCreateNotice } from '../helpers/effects';
 import {
@@ -68,10 +69,13 @@ const SettingsApp = () => {
 										{ isTrackingConfigured(
 											appSettings
 										) && (
-											<SetupPins
-												view="settings"
-												{ ...childComponentProps }
-											/>
+											<>
+												<SetupPins
+													view="settings"
+													{ ...childComponentProps }
+												/>
+												<SaveSettingsButton { ...childComponentProps } />
+											</>
 										) }
 									</>
 								) }
