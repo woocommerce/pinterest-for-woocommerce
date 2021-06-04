@@ -35,15 +35,7 @@ const SetupAccount = ( {
 			crypto_encoded_key: null,
 		} );
 
-		if ( update.success ) {
-			createNotice(
-				'success',
-				__(
-					'Settings were saved successfully.',
-					'pinterest-for-woocommerce'
-				)
-			);
-		} else {
+		if ( ! update.success ) {
 			createNotice(
 				'error',
 				__(

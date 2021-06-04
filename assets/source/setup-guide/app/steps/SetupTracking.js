@@ -32,10 +32,14 @@ const SetupTracking = ( {
 	const [ tagsList, setTagsList ] = useState();
 
 	useEffect( () => {
-		if ( undefined === advertisersList ) {
+		if ( undefined !== appSettings && undefined === advertisersList ) {
 			fetchAdvertisers();
 		}
-	}, [ advertisersList ] );
+
+		if ( advertisersList && tagsList && appSettings?.tracking_advertiser && appSettings?.tracking_tag ) {
+			setStatus( 'success' );
+		}
+	}, [ appSettings, advertisersList ] );
 
 	const fetchAdvertisers = async () => {
 		try {
@@ -132,15 +136,7 @@ const SetupTracking = ( {
 			[ `tracking_${ name }` ]: value,
 		} );
 
-		if ( update.success ) {
-			createNotice(
-				'success',
-				__(
-					'Settings were saved successfully.',
-					'pinterest-for-woocommerce'
-				)
-			);
-		} else {
+		if ( ! update.success ) {
 			createNotice(
 				'error',
 				__(

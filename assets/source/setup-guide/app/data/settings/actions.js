@@ -42,25 +42,6 @@ export function* updateSettings( data ) {
 	yield setIsUpdating( true );
 	yield receiveSettings( data );
 
-	try {
-		const results = yield apiFetch( {
-			path: WC_ADMIN_NAMESPACE + '/options',
-			method: 'POST',
-			data,
-		} );
-
-		yield setIsUpdating( false );
-		return { success: true, ...results };
-	} catch ( error ) {
-		yield setUpdatingError( error );
-		return { success: false, ...error };
-	}
-}
-
-export function* patchSettings( data ) {
-	yield setIsUpdating( true );
-	yield receiveSettings( data );
-
 	const settings = yield select( STORE_NAME, 'getSettings' );
 
 	try {
@@ -73,7 +54,7 @@ export function* patchSettings( data ) {
 		} );
 
 		yield setIsUpdating( false );
-		return { success: true, ...results };
+		return { success: results[ OPTIONS_NAME ] };
 	} catch ( error ) {
 		yield setUpdatingError( error );
 		return { success: false, ...error };
