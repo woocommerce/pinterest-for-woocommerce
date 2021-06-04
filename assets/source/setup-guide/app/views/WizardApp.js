@@ -35,7 +35,8 @@ const WizardApp = () => {
 
 	const childComponentProps = {
 		appSettings,
-		setAppSettings: ( data ) => updateSettings( data, true ),
+		setAppSettings: ( data, saveToDb = true ) =>
+			updateSettings( data, saveToDb ),
 		createNotice,
 	};
 

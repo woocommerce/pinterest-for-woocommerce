@@ -3,6 +3,7 @@
  */
 import { sprintf, __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
+import { useState } from '@wordpress/element';
 import {
 	Button,
 	Card,
@@ -11,6 +12,7 @@ import {
 	Flex,
 	FlexItem,
 	FlexBlock,
+	Modal,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { Spinner } from '@woocommerce/components';
@@ -29,11 +31,64 @@ const SetupAccount = ( {
 	view,
 	goToNextStep,
 } ) => {
+	const [ isConfirmationModalOpen, setIsConfirmationModalOpen ] = useState(
+		false
+	);
+
+	const openConfirmationModal = () => {
+		setIsConfirmationModalOpen( true );
+	};
+
+	const closeConfirmationModal = () => {
+		setIsConfirmationModalOpen( false );
+	};
+
+	const renderConfirmationModal = () => {
+		return (
+			<Modal
+				title={
+					<>{ __( 'Are you sure?', 'pinterest-for-woocommerce' ) }</>
+				}
+				onRequestClose={ closeConfirmationModal }
+				className="woocommerce-setup-guide__step-modal"
+			>
+				<div className="woocommerce-setup-guide__step-modal__wrapper">
+					<p>
+						{ __(
+							'Are you sure you want to disconnect this account?',
+							'pinterest-for-woocommerce'
+						) }
+					</p>
+					<div className="woocommerce-setup-guide__step-modal__buttons">
+						<Button
+							isDestructive
+							isSecondary
+							onClick={ handleDisconnectAccount }
+						>
+							{ __(
+								"Yes, I'm sure",
+								'pinterest-for-woocommerce'
+							) }
+						</Button>
+						<Button isTertiary onClick={ closeConfirmationModal }>
+							{ __( 'Cancel', 'pinterest-for-woocommerce' ) }
+						</Button>
+					</div>
+				</div>
+			</Modal>
+		);
+	};
+
 	const handleDisconnectAccount = async () => {
-		const update = await setAppSettings( {
-			token: null,
-			crypto_encoded_key: null,
-		} );
+		closeConfirmationModal();
+
+		const update = await setAppSettings(
+			{
+				token: null,
+				crypto_encoded_key: null,
+			},
+			true
+		);
 
 		if ( ! update.success ) {
 			createNotice(
@@ -104,7 +159,7 @@ const SetupAccount = ( {
 										<Button
 											isLink
 											isDestructive
-											onClick={ handleDisconnectAccount }
+											onClick={ openConfirmationModal }
 										>
 											{ __(
 												'Disconnect Pinterest Account',
@@ -160,6 +215,8 @@ const SetupAccount = ( {
 								</Button>
 							</CardFooter>
 						) }
+
+						{ isConfirmationModalOpen && renderConfirmationModal() }
 					</Card>
 
 					{ view === 'wizard' &&
