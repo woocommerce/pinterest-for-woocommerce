@@ -14,7 +14,11 @@ import SetupProductSync from '../steps/SetupProductSync';
 import SetupPins from '../steps/SetupPins';
 import SaveSettingsButton from '../components/SaveSettingsButton';
 import TransientNotices from '../components/TransientNotices';
-import { useSettingsSelect, useBodyClasses, useCreateNotice } from '../helpers/effects';
+import {
+	useSettingsSelect,
+	useBodyClasses,
+	useCreateNotice,
+} from '../helpers/effects';
 
 const SettingsApp = () => {
 	const appSettings = useSettingsSelect();
@@ -43,6 +47,7 @@ const SettingsApp = () => {
 
 										{ isTrackingConfigured && (
 											<>
+												<SetupProductSync view="settings" />
 												<SetupPins view="settings" />
 												<SaveSettingsButton />
 											</>

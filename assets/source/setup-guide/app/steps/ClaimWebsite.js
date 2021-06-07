@@ -13,23 +13,24 @@ import { Spinner } from '@woocommerce/components';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import StepStatus from '../components/StepStatus';
-import { useSettingsSelect, useSettingsDispatch, useCreateNotice } from '../helpers/effects';
+import {
+	useSettingsSelect,
+	useSettingsDispatch,
+	useCreateNotice,
+} from '../helpers/effects';
 
-const ClaimWebsite = ( {
-	goToNextStep,
-	view,
-} ) => {
+const ClaimWebsite = ( { goToNextStep, view } ) => {
 	const [ status, setStatus ] = useState( 'idle' );
 	const appSettings = useSettingsSelect();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
-	const setAppSettings = useSettingsDispatch( 'wizard' === view );
+	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
 
 	useEffect( () => {
 		if ( isDomainVerified ) {
 			setStatus( 'success' );
 		}
-	}, [ appSettings ] );
+	}, [ appSettings, isDomainVerified ] );
 
 	const handleClaimWebsite = async () => {
 		setStatus( 'pending' );
@@ -113,10 +114,9 @@ const ClaimWebsite = ( {
 									options={ appSettings }
 								/>
 
-								{ view === 'settings' &&
-									! isDomainVerified && (
-										<StepButton />
-									) }
+								{ view === 'settings' && ! isDomainVerified && (
+									<StepButton />
+								) }
 							</CardBody>
 						) : (
 							<CardBody size="large">

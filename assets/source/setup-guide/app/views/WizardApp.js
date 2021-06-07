@@ -19,7 +19,11 @@ import ClaimWebsite from '../steps/ClaimWebsite';
 import SetupTracking from '../steps/SetupTracking';
 import SetupPins from '../steps/SetupPins';
 import TransientNotices from '../components/TransientNotices';
-import { useSettingsSelect, useBodyClasses, useCreateNotice } from '../helpers/effects';
+import {
+	useSettingsSelect,
+	useBodyClasses,
+	useCreateNotice,
+} from '../helpers/effects';
 
 const WizardApp = () => {
 	const [ currentStep, setCurrentStep ] = useState();

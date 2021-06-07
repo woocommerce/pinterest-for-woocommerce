@@ -51,9 +51,11 @@ export const getSettingsUpdatingError = ( state ) => {
  * @param {Object} state - Reducer state
  */
 export const isConnected = ( state ) => {
-	return undefined === state?.settings
-	? undefined
-	: !! state?.settings?.token?.access_token;
+	if ( undefined === state?.settings ) {
+		return;
+	}
+
+	return !! state?.settings?.token?.access_token;
 };
 
 /**
@@ -62,13 +64,17 @@ export const isConnected = ( state ) => {
  * @param {Object} state - Reducer state
  */
 export const isDomainVerified = ( state ) => {
-	return undefined === state?.settings
-		? undefined
-		: undefined === state?.settings?.account_data?.verified_domains
-			? false
-			: state?.settings?.account_data?.verified_domains.includes(
-				wcSettings.pin4wc.domainToVerify
-			);
+	if ( undefined === state?.settings ) {
+		return;
+	}
+
+	if ( undefined === state?.settings?.account_data?.verified_domains ) {
+		return false;
+	}
+
+	return state?.settings?.account_data?.verified_domains.includes(
+		wcSettings.pin4wc.domainToVerify
+	);
 };
 
 /**
@@ -77,7 +83,11 @@ export const isDomainVerified = ( state ) => {
  * @param {Object} state - Reducer state
  */
 export const isTrackingConfigured = ( state ) => {
-	return undefined === state?.settings
-		? undefined
-		: !! ( state?.settings?.tracking_advertiser && state?.settings?.tracking_tag );
+	if ( undefined === state?.settings ) {
+		return;
+	}
+
+	return !! (
+		state?.settings?.tracking_advertiser && state?.settings?.tracking_tag
+	);
 };

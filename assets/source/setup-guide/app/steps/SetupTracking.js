@@ -18,18 +18,19 @@ import { Spinner } from '@woocommerce/components';
  */
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
-import { useSettingsSelect, useSettingsDispatch, useCreateNotice } from '../helpers/effects';
+import {
+	useSettingsSelect,
+	useSettingsDispatch,
+	useCreateNotice,
+} from '../helpers/effects';
 
-const SetupTracking = ( {
-	goToNextStep,
-	view,
-} ) => {
+const SetupTracking = ( { goToNextStep, view } ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ status, setStatus ] = useState( 'idle' );
 	const [ advertisersList, setAdvertisersList ] = useState();
 	const [ tagsList, setTagsList ] = useState();
 	const appSettings = useSettingsSelect();
-	const setAppSettings = useSettingsDispatch( 'wizard' === view );
+	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
 
 	useEffect( () => {

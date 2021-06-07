@@ -11,7 +11,7 @@ import { SETTINGS_STORE_NAME } from '../data';
 
 export const useSettingsSelect = ( selector = 'getSettings' ) => {
 	return useSelect( ( select ) =>
-		select( SETTINGS_STORE_NAME )[selector]()
+		select( SETTINGS_STORE_NAME )[ selector ]()
 	);
 };
 
@@ -24,7 +24,7 @@ export const useSettingsDispatch = ( saveToDb = false ) => {
 export const useCreateNotice = () => {
 	const { createNotice } = useDispatch( 'core/notices' );
 
-	return (  type, message  ) => message && createNotice(  type, message  );
+	return ( type, message ) => message && createNotice( type, message );
 };
 
 export const useBodyClasses = ( style ) => {

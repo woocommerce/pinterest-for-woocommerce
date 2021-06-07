@@ -22,18 +22,19 @@ import { Spinner } from '@woocommerce/components';
  */
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
-import { useSettingsSelect, useSettingsDispatch, useCreateNotice } from '../helpers/effects';
+import {
+	useSettingsSelect,
+	useSettingsDispatch,
+	useCreateNotice,
+} from '../helpers/effects';
 
-const SetupAccount = ( {
-	goToNextStep,
-	view,
-} ) => {
+const SetupAccount = ( { goToNextStep, view } ) => {
 	const [ isConfirmationModalOpen, setIsConfirmationModalOpen ] = useState(
 		false
 	);
 	const appSettings = useSettingsSelect();
 	const isConnected = useSettingsSelect( 'isConnected' );
-	const setAppSettings = useSettingsDispatch( 'wizard' === view );
+	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
 
 	const openConfirmationModal = () => {
@@ -220,17 +221,16 @@ const SetupAccount = ( {
 						{ isConfirmationModalOpen && renderConfirmationModal() }
 					</Card>
 
-					{ view === 'wizard' &&
-						isConnected === true && (
-							<div className="woocommerce-setup-guide__footer-button">
-								<Button isPrimary onClick={ goToNextStep }>
-									{ __(
-										'Continue',
-										'pinterest-for-woocommerce'
-									) }
-								</Button>
-							</div>
-						) }
+					{ view === 'wizard' && isConnected === true && (
+						<div className="woocommerce-setup-guide__footer-button">
+							<Button isPrimary onClick={ goToNextStep }>
+								{ __(
+									'Continue',
+									'pinterest-for-woocommerce'
+								) }
+							</Button>
+						</div>
+					) }
 				</div>
 			</div>
 		</div>

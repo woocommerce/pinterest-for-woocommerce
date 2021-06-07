@@ -7,7 +7,11 @@ import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { useSettingsSelect, useSettingsDispatch, useCreateNotice } from '../helpers/effects';
+import {
+	useSettingsSelect,
+	useSettingsDispatch,
+	useCreateNotice,
+} from '../helpers/effects';
 
 const SaveSettingsButton = () => {
 	const isSaving = useSettingsSelect( 'isSettingsUpdating' );

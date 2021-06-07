@@ -12,7 +12,7 @@ import { fetch } from './controls';
 /**
  * Request all settings values.
  *
- * @param query
+ * @param {Object} query
  */
 export function* getFeedIssues( query = {} ) {
 	try {

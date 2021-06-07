@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { apiFetch, select } from '@wordpress/data-controls';
+import { apiFetch } from '@wordpress/api-fetch';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
