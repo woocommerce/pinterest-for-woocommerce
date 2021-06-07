@@ -31,6 +31,6 @@ export const getReportsRequestingError = ( state, name ) => {
  *
  * @param {Object} state - Reducer state
  */
-export const isFetchingFeedIssues = ( state ) => {
-	return state.isFetching || false;
+export const isRequesting = ( state ) => {
+	return state.isRequesting || false;
 };
