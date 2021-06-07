@@ -2,25 +2,24 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { SETTINGS_STORE_NAME } from '../data';
+import { useSettingsSelect, useSettingsDispatch, useCreateNotice } from '../helpers/effects';
 
-const SaveSettingsButton = ( { setAppSettings, createNotice } ) => {
-	const isSaving = useSelect( ( select ) =>
-		select( SETTINGS_STORE_NAME ).isSettingsUpdating()
-	);
+const SaveSettingsButton = () => {
+	const isSaving = useSettingsSelect( 'isSettingsUpdating' );
+	const setAppSettings = useSettingsDispatch( true );
+	const createNotice = useCreateNotice();
 
 	const saveSettings = async () => {
-		const update = await setAppSettings( {}, true );
+		const update = await setAppSettings( {} );
 
 		if ( update.success ) {
 			createNotice(
-				'error',
+				'success',
 				__(
 					'Your settings have been saved successfully.',
 					'pinterest-for-woocommerce'

@@ -14,32 +14,18 @@ import SetupTracking from '../steps/SetupTracking';
 import SetupPins from '../steps/SetupPins';
 import SaveSettingsButton from '../components/SaveSettingsButton';
 import TransientNotices from '../components/TransientNotices';
-import { useBodyClasses, useCreateNotice } from '../helpers/effects';
+import { useSettingsSelect, useBodyClasses, useCreateNotice } from '../helpers/effects';
 import {
 	isConnected,
 	isDomainVerified,
 	isTrackingConfigured,
 } from '../helpers/conditionals';
-import { SETTINGS_STORE_NAME } from '../data';
 
 const SettingsApp = () => {
-	const appSettings = useSelect( ( select ) =>
-		select( SETTINGS_STORE_NAME ).getSettings()
-	);
-
-	const { updateSettings: setAppSettings } = useDispatch(
-		SETTINGS_STORE_NAME
-	);
-	const { createNotice } = useDispatch( 'core/notices' );
-
-	const childComponentProps = {
-		appSettings,
-		setAppSettings,
-		createNotice,
-	};
+	const appSettings = useSettingsSelect();
 
 	useBodyClasses();
-	useCreateNotice( wcSettings.pin4wc.error );
+	useCreateNotice()( wcSettings.pin4wc.error );
 
 	return (
 		<div className="woocommerce-layout">
@@ -47,36 +33,22 @@ const SettingsApp = () => {
 				<TransientNotices />
 				{ appSettings ? (
 					<div className="woocommerce-setup-guide__container">
-						<SetupAccount
-							view="settings"
-							{ ...childComponentProps }
-						/>
+						<SetupAccount view="settings" />
 
 						{ isConnected( appSettings ) && (
 							<>
-								<ClaimWebsite
-									view="settings"
-									{ ...childComponentProps }
-								/>
+								<ClaimWebsite view="settings" />
 
-								{ isDomainVerified( appSettings ) && (
+								{ /* isDomainVerified( appSettings ) &&  */(
 									<>
-										<SetupTracking
-											view="settings"
-											{ ...childComponentProps }
-										/>
+										<SetupTracking view="settings" />
 
 										{ isTrackingConfigured(
 											appSettings
 										) && (
 											<>
-												<SetupPins
-													view="settings"
-													{ ...childComponentProps }
-												/>
-												<SaveSettingsButton
-													{ ...childComponentProps }
-												/>
+												<SetupPins view="settings" />
+												<SaveSettingsButton />
 											</>
 										) }
 									</>

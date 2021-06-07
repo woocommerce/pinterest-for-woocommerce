@@ -19,9 +19,13 @@ import { Spinner } from '@woocommerce/components';
  */
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
+import { useSettingsSelect, useSettingsDispatch, useCreateNotice } from '../helpers/effects';
 
-const SetupPins = ( { appSettings, setAppSettings, createNotice, view } ) => {
+const SetupPins = ( { view } ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
+	const appSettings = useSettingsSelect();
+	const setAppSettings = useSettingsDispatch( 'wizard' === view );
+	const createNotice = useCreateNotice();
 
 	const handleOptionChange = async ( name, value ) => {
 		setIsSaving( true );
