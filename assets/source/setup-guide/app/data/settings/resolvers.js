@@ -15,10 +15,3 @@ export function* getSettings() {
 		yield setRequestingError( error, 'all' );
 	}
 }
-
-/**
- * Request a setting value.
- */
-export function* getSetting() {
-	getSettings();
-}
