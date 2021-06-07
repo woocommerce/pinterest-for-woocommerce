@@ -26,6 +26,7 @@ import {
 
 const SetupTracking = ( { goToNextStep, view } ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
+	const [ isFetching, setIsFetching ] = useState( false );
 	const [ status, setStatus ] = useState( 'idle' );
 	const [ advertisersList, setAdvertisersList ] = useState();
 	const [ tagsList, setTagsList ] = useState();
@@ -34,7 +35,11 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 	const createNotice = useCreateNotice();
 
 	useEffect( () => {
-		if ( undefined !== appSettings && undefined === advertisersList ) {
+		if (
+			! isFetching &&
+			undefined !== appSettings &&
+			undefined === advertisersList
+		) {
 			fetchAdvertisers();
 		}
 
@@ -49,6 +54,8 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 	}, [ appSettings, advertisersList ] );
 
 	const fetchAdvertisers = async () => {
+		setIsFetching( true );
+
 		try {
 			setAdvertisersList();
 
@@ -82,9 +89,13 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 					)
 			);
 		}
+
+		setIsFetching( false );
 	};
 
 	const fetchTags = async ( advertiserId ) => {
+		setIsFetching( true );
+
 		try {
 			setTagsList();
 
@@ -120,6 +131,8 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 					)
 			);
 		}
+
+		setIsFetching( false );
 	};
 
 	const handleOptionChange = async ( name, value ) => {
