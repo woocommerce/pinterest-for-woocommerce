@@ -23,7 +23,6 @@ import { Spinner } from '@woocommerce/components';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import { useSettingsSelect, useSettingsDispatch, useCreateNotice } from '../helpers/effects';
-import { isConnected } from '../helpers/conditionals';
 
 const SetupAccount = ( {
 	goToNextStep,
@@ -33,6 +32,7 @@ const SetupAccount = ( {
 		false
 	);
 	const appSettings = useSettingsSelect();
+	const isConnected = useSettingsSelect( 'isConnected' );
 	const setAppSettings = useSettingsDispatch( 'wizard' === view );
 	const createNotice = useCreateNotice();
 
@@ -134,7 +134,7 @@ const SetupAccount = ( {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{ isConnected( appSettings ) === true ? (
+							{ isConnected === true ? (
 								<Flex>
 									<FlexBlock className="is-connected">
 										<Text variant="subtitle">
@@ -169,7 +169,7 @@ const SetupAccount = ( {
 										</Button>
 									</FlexBlock>
 								</Flex>
-							) : isConnected( appSettings ) === false ? (
+							) : isConnected === false ? (
 								<Flex>
 									<FlexBlock>
 										<Text variant="subtitle">
@@ -199,7 +199,7 @@ const SetupAccount = ( {
 							) }
 						</CardBody>
 
-						{ isConnected( appSettings ) === false && (
+						{ isConnected === false && (
 							<CardFooter>
 								<Button
 									isLink
@@ -221,7 +221,7 @@ const SetupAccount = ( {
 					</Card>
 
 					{ view === 'wizard' &&
-						isConnected( appSettings ) === true && (
+						isConnected === true && (
 							<div className="woocommerce-setup-guide__footer-button">
 								<Button isPrimary onClick={ goToNextStep }>
 									{ __(

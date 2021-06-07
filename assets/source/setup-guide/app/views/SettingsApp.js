@@ -2,7 +2,6 @@
  * External dependencies
  */
 import '@wordpress/notices';
-import { useSelect, useDispatch } from '@wordpress/data';
 import { Spinner } from '@woocommerce/components';
 
 /**
@@ -15,14 +14,12 @@ import SetupPins from '../steps/SetupPins';
 import SaveSettingsButton from '../components/SaveSettingsButton';
 import TransientNotices from '../components/TransientNotices';
 import { useSettingsSelect, useBodyClasses, useCreateNotice } from '../helpers/effects';
-import {
-	isConnected,
-	isDomainVerified,
-	isTrackingConfigured,
-} from '../helpers/conditionals';
 
 const SettingsApp = () => {
 	const appSettings = useSettingsSelect();
+	const isConnected = useSettingsSelect( 'isConnected' );
+	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
+	const isTrackingConfigured = useSettingsSelect( 'isTrackingConfigured' );
 
 	useBodyClasses();
 	useCreateNotice()( wcSettings.pin4wc.error );
@@ -35,17 +32,15 @@ const SettingsApp = () => {
 					<div className="woocommerce-setup-guide__container">
 						<SetupAccount view="settings" />
 
-						{ isConnected( appSettings ) && (
+						{ isConnected && (
 							<>
 								<ClaimWebsite view="settings" />
 
-								{ /* isDomainVerified( appSettings ) &&  */(
+								{ isDomainVerified && (
 									<>
 										<SetupTracking view="settings" />
 
-										{ isTrackingConfigured(
-											appSettings
-										) && (
+										{ isTrackingConfigured && (
 											<>
 												<SetupPins view="settings" />
 												<SaveSettingsButton />

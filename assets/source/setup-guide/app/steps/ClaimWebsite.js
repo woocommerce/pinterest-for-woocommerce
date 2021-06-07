@@ -14,7 +14,6 @@ import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import StepStatus from '../components/StepStatus';
 import { useSettingsSelect, useSettingsDispatch, useCreateNotice } from '../helpers/effects';
-import { isDomainVerified } from '../helpers/conditionals';
 
 const ClaimWebsite = ( {
 	goToNextStep,
@@ -22,11 +21,12 @@ const ClaimWebsite = ( {
 } ) => {
 	const [ status, setStatus ] = useState( 'idle' );
 	const appSettings = useSettingsSelect();
+	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
 	const setAppSettings = useSettingsDispatch( 'wizard' === view );
 	const createNotice = useCreateNotice();
 
 	useEffect( () => {
-		if ( isDomainVerified( appSettings ) ) {
+		if ( isDomainVerified ) {
 			setStatus( 'success' );
 		}
 	}, [ appSettings ] );
@@ -105,7 +105,7 @@ const ClaimWebsite = ( {
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
-						{ undefined !== isDomainVerified( appSettings ) ? (
+						{ undefined !== isDomainVerified ? (
 							<CardBody size="large">
 								<StepStatus
 									label={ wcSettings.pin4wc.domainToVerify }
@@ -114,7 +114,7 @@ const ClaimWebsite = ( {
 								/>
 
 								{ view === 'settings' &&
-									! isDomainVerified( appSettings ) && (
+									! isDomainVerified && (
 										<StepButton />
 									) }
 							</CardBody>

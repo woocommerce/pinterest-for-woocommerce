@@ -44,3 +44,40 @@ export const isSettingsUpdating = ( state ) => {
 export const getSettingsUpdatingError = ( state ) => {
 	return state.updatingError || false;
 };
+
+/**
+ * Determine if an options update resulted in an error.
+ *
+ * @param {Object} state - Reducer state
+ */
+export const isConnected = ( state ) => {
+	return undefined === state?.settings
+	? undefined
+	: !! state?.settings?.token?.access_token;
+};
+
+/**
+ * Determine if an options update resulted in an error.
+ *
+ * @param {Object} state - Reducer state
+ */
+export const isDomainVerified = ( state ) => {
+	return undefined === state?.settings
+		? undefined
+		: undefined === state?.settings?.account_data?.verified_domains
+			? false
+			: state?.settings?.account_data?.verified_domains.includes(
+				wcSettings.pin4wc.domainToVerify
+			);
+};
+
+/**
+ * Determine if an options update resulted in an error.
+ *
+ * @param {Object} state - Reducer state
+ */
+export const isTrackingConfigured = ( state ) => {
+	return undefined === state?.settings
+		? undefined
+		: !! ( state?.settings?.tracking_advertiser && state?.settings?.tracking_tag );
+};
