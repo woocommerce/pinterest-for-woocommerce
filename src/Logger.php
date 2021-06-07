@@ -20,7 +20,7 @@ class Logger {
 	/**
 	 * The single instance of the class.
 	 *
-	 * @var Pinterest_For_Woocommerce
+	 * @var WC_Logger
 	 * @since 1.0.0
 	 */
 	public static $logger;
@@ -37,10 +37,11 @@ class Logger {
 	 *
 	 * @param string $message The message to be logged.
 	 * @param string $level   The level/context of the message.
+	 * @param string $feature Used to direct logs to a separate file.
 	 *
 	 * @return string
 	 */
-	public static function log( $message, $level = 'debug' ) {
+	public static function log( $message, $level = 'debug', $feature = null ) {
 
 		$logging = 'error' === $level ? true : apply_filters( 'pinterest_for_woocommerce_debug_logging', true );
 
@@ -52,7 +53,7 @@ class Logger {
 			self::$logger = wc_get_logger();
 		}
 
-		$handler = array( 'source' => self::$log_file_name );
+		$handler = array( 'source' => self::$log_file_name . ( is_null( $feature ) ? '' : '-' . $feature ) );
 
 		self::$logger->log( $level, $message, $handler );
 	}

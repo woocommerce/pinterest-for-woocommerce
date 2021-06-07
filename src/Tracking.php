@@ -370,7 +370,7 @@ class Tracking {
 	 *
 	 * @return object|boolean
 	 */
-	private static function get_active_tag() {
+	public static function get_active_tag() {
 
 		$active_tag_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
 
