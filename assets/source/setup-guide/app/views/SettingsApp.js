@@ -26,6 +26,10 @@ const SettingsApp = () => {
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
 	const isTrackingConfigured = useSettingsSelect( 'isTrackingConfigured' );
 
+	const isGroup1Visible = isConnected;
+	const isGroup2Visible = isGroup1Visible && isDomainVerified;
+	const isGroup3Visible = isGroup2Visible && isTrackingConfigured;
+
 	useBodyClasses();
 	useCreateNotice()( wcSettings.pin4wc.error );
 
@@ -37,23 +41,13 @@ const SettingsApp = () => {
 					<div className="woocommerce-setup-guide__container">
 						<SetupAccount view="settings" />
 
-						{ isConnected && (
+						{ isGroup1Visible && <ClaimWebsite view="settings" /> }
+						{ isGroup2Visible && <SetupTracking view="settings" /> }
+						{ isGroup3Visible && (
 							<>
-								<ClaimWebsite view="settings" />
-
-								{ isDomainVerified && (
-									<>
-										<SetupTracking view="settings" />
-
-										{ isTrackingConfigured && (
-											<>
-												<SetupProductSync view="settings" />
-												<SetupPins view="settings" />
-												<SaveSettingsButton />
-											</>
-										) }
-									</>
-								) }
+								<SetupProductSync view="settings" />
+								<SetupPins view="settings" />
+								<SaveSettingsButton />
 							</>
 						) }
 					</div>
