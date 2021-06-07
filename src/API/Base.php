@@ -434,4 +434,24 @@ class Base {
 		return $response;
 	}
 
+
+	/**
+	 * Request the managed map representing all of the error, recommendation, and status messages for catalogs.
+	 *
+	 * @return mixed
+	 */
+	public static function get_message_map() {
+
+		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_api_get_message_map';
+		$cache     = get_transient( $cache_key );
+
+		if ( $cache ) {
+			return $cache;
+		}
+
+		$response = self::make_request( 'catalogs/message_map', 'GET' );
+		set_transient( $cache_key, $response, DAY_IN_SECONDS );
+
+		return $response;
+	}
 }

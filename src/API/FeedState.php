@@ -23,6 +23,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 class FeedState extends VendorAPI {
 
 	/**
+	 * The error contexts to search for in the workflow responses.
+	 *
+	 * @var array
+	 */
+	const ERROR_CONTEXTS = array(
+		'validation_stats_warnings',
+		'ingestion_stats_warnings',
+		'validation_stats_errors',
+		'ingestion_stats_errors',
+	);
+
+	/**
+	 * The error codes that are related to the feed itself,
+	 * and not a specific product.
+	 *
+	 * @var array
+	 */
+	const GLOBAL_ERROR_CODES = array(
+		'100',
+		'101',
+		'102',
+		'103',
+	);
+
+	/**
 	 * Initialize class
 	 */
 	public function __construct() {
@@ -261,12 +286,13 @@ class FeedState extends VendorAPI {
 				$status       = 'error';
 				$status_label = esc_html__( 'Feed ingestion failed.', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
-					/* Translators: %1$s Time string */
-					esc_html__( 'Last attempt: %1$s', 'pinterest-for-woocommerce' ),
-					$workflow->created_at,
+					/* Translators: %1$s Time difference string */
+					esc_html__( 'Last attempt: %1$s ago', 'pinterest-for-woocommerce' ),
+					human_time_diff( ( $workflow->created_at / 1000 ) ),
 					(int) $workflow->product_count
 				);
 
+				$extra_info .= $this->get_global_error_from_workflow( (array) $workflow );
 			} else {
 				$status       = 'error';
 				$status_label = esc_html__( 'Unknown status in workflow.', 'pinterest-for-woocommerce' );
@@ -275,6 +301,8 @@ class FeedState extends VendorAPI {
 					esc_html__( 'API Returned an unknown status: %1$s', 'pinterest-for-woocommerce' ),
 					$workflow->workflow_status
 				);
+
+				$extra_info .= $this->get_global_error_from_workflow( (array) $workflow );
 			}
 
 			$result['overview'] = $this->get_totals_from_workflow( (array) $workflow );
@@ -310,30 +338,61 @@ class FeedState extends VendorAPI {
 	 */
 	private function get_totals_from_workflow( $workflow ) {
 
-		$warnings = 0;
-		$errors   = 0;
+		$sums = array(
+			'warnings' => 0,
+			'errors'   => 0,
+		);
 
-		if ( ! empty( $workflow['validation_stats_warnings'] ) ) {
-			$warnings += array_sum( $workflow['validation_stats_warnings'] );
-		}
-
-		if ( ! empty( $workflow['ingestion_stats_warnings'] ) ) {
-			$warnings += array_sum( $workflow['ingestion_stats_warnings'] );
-		}
-
-		if ( ! empty( $workflow['validation_stats_errors'] ) ) {
-			$errors += array_sum( $workflow['validation_stats_errors'] );
-		}
-
-		if ( ! empty( $workflow['ingestion_stats_errors'] ) ) {
-			$errors += array_sum( $workflow['ingestion_stats_errors'] );
+		foreach ( self::ERROR_CONTEXTS as $context ) {
+			if ( ! empty( $workflow[ $context ] ) ) {
+				$what           = strpos( $context, 'errors' ) ? 'errors' : 'warnings';
+				$sums[ $what ] += array_sum( $workflow[ $context ] );
+			}
 		}
 
 		return array(
 			'total'      => $workflow['original_product_count'],
 			'not_synced' => $workflow['original_product_count'] - $workflow['product_count'],
-			'warnings'   => $warnings,
-			'errors'     => $errors,
+			'warnings'   => $sums['warnings'],
+			'errors'     => $sums['errors'],
 		);
+	}
+
+
+	/**
+	 * Parses the given workflow and returns a string which contains the
+	 * first error message found to be related to the feed globally and not
+	 * a specific product.
+	 *
+	 * @param array $workflow The workflow array.
+	 *
+	 * @return string
+	 */
+	private function get_global_error_from_workflow( $workflow ) {
+
+		$error_code = null;
+
+		foreach ( self::ERROR_CONTEXTS as $context ) {
+			if ( ! empty( $workflow[ $context ] ) ) {
+
+				foreach ( $workflow[ $context ] as $code => $count ) {
+					if ( in_array( $code, self::GLOBAL_ERROR_CODES, true ) ) {
+						$error_code = $code;
+						break 2;
+					}
+				}
+			}
+		}
+
+		if ( $error_code ) {
+			$messages_map = Base::get_message_map();
+
+			if ( 'success' === $messages_map['status'] && isset( $messages_map['data']->$error_code ) ) {
+				/* Translators: The error message as returned by the Pinterest API */
+				return ' - ' . sprintf( esc_html__( 'Pinterest returned: %1$s', 'pinterest-for-woocommerce' ), $messages_map['data']->$error_code );
+			}
+		}
+
+		return '';
 	}
 }
