@@ -120,10 +120,12 @@ class FeedIssues extends VendorAPI {
 
 		$product = wc_get_product( $line['ItemId'] );
 
-		$line['product_name']      = $product->get_name();
-		$line['product_edit_link'] = get_edit_post_link( $product->get_id() );
-
-		return $line;
+		return array(
+			'status'            => 'ERROR' === $line['Code'] ? 'error' : 'warning',
+			'product_name'      => $product ? $product->get_name() : esc_html( 'Invalid product', 'pinterest-for-woocommerce' ),
+			'product_edit_link' => $product ? get_edit_post_link( $product->get_id() ) : '',
+			'issue_description' => $line['Message'],
+		);
 	}
 
 
