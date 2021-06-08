@@ -270,39 +270,59 @@ class FeedState extends VendorAPI {
 			);
 			$workflow = reset( $feed_report['data']->workflows );
 
-			if ( 'SUCCESS' === $workflow->workflow_status ) { // TODO: check
-				$status       = 'success';
-				$status_label = esc_html__( 'Automatically pulled by Pinterest', 'pinterest-for-woocommerce' );
-				$extra_info   = sprintf(
-					/* Translators: %1$s Time string, %2$s number of products */
-					esc_html__( 'Last pulled: %1$s, containing %2$d products', 'pinterest-for-woocommerce' ),
-					$workflow->created_at,
-					(int) $workflow->product_count
-				);
-			} elseif ( 'UNDER_REVIEW' === $workflow->workflow_status ) {
-				$status       = 'warning';
-				$status_label = esc_html__( 'Feed is under review.', 'pinterest-for-woocommerce' );
-			} elseif ( 'FAILED' === $workflow->workflow_status ) {
-				$status       = 'error';
-				$status_label = esc_html__( 'Feed ingestion failed.', 'pinterest-for-woocommerce' );
-				$extra_info   = sprintf(
-					/* Translators: %1$s Time difference string */
-					esc_html__( 'Last attempt: %1$s ago', 'pinterest-for-woocommerce' ),
-					human_time_diff( ( $workflow->created_at / 1000 ) ),
-					(int) $workflow->product_count
-				);
+			switch ( $workflow->workflow_status ) {
+				case 'COMPLETED':
+				case 'COMPLETED_EARLY':
+					$status       = 'success';
+					$status_label = esc_html__( 'Automatically pulled by Pinterest', 'pinterest-for-woocommerce' );
+					$extra_info   = sprintf(
+						/* Translators: %1$s Time string, %2$s number of products */
+						esc_html__( 'Last pulled: %1$s ago, containing %2$d products', 'pinterest-for-woocommerce' ),
+						human_time_diff( ( $workflow->created_at / 1000 ) ),
+						(int) $workflow->product_count
+					);
+					break;
 
-				$extra_info .= $this->get_global_error_from_workflow( (array) $workflow );
-			} else {
-				$status       = 'error';
-				$status_label = esc_html__( 'Unknown status in workflow.', 'pinterest-for-woocommerce' );
-				$extra_info   = sprintf(
-					/* Translators: The status text returned by the API. */
-					esc_html__( 'API Returned an unknown status: %1$s', 'pinterest-for-woocommerce' ),
-					$workflow->workflow_status
-				);
+				case 'PROCESSING':
+					$status       = 'pending';
+					$status_label = esc_html__( 'Processing', 'pinterest-for-woocommerce' );
+					$extra_info   = sprintf(
+						/* Translators: %1$s Time string, %2$s number of products */
+						esc_html__( 'Last pulled: %1$s ago, containing %2$d products', 'pinterest-for-woocommerce' ),
+						human_time_diff( ( $workflow->created_at / 1000 ) ),
+						(int) $workflow->product_count
+					);
+					break;
 
-				$extra_info .= $this->get_global_error_from_workflow( (array) $workflow );
+				case 'UNDER_REVIEW':
+					$status       = 'pending';
+					$status_label = esc_html__( 'Feed is under review.', 'pinterest-for-woocommerce' );
+					break;
+
+				case 'FAILED':
+					$status       = 'error';
+					$status_label = esc_html__( 'Feed ingestion failed.', 'pinterest-for-woocommerce' );
+					$extra_info   = sprintf(
+						/* Translators: %1$s Time difference string */
+						esc_html__( 'Last attempt: %1$s ago', 'pinterest-for-woocommerce' ),
+						human_time_diff( ( $workflow->created_at / 1000 ) ),
+						(int) $workflow->product_count
+					);
+
+					$extra_info .= $this->get_global_error_from_workflow( (array) $workflow );
+					break;
+
+				default:
+					$status       = 'error';
+					$status_label = esc_html__( 'Unknown status in workflow.', 'pinterest-for-woocommerce' );
+					$extra_info   = sprintf(
+						/* Translators: The status text returned by the API. */
+						esc_html__( 'API Returned an unknown status: %1$s', 'pinterest-for-woocommerce' ),
+						$workflow->workflow_status
+					);
+
+					$extra_info .= $this->get_global_error_from_workflow( (array) $workflow );
+					break;
 			}
 
 			$result['overview'] = $this->get_totals_from_workflow( (array) $workflow );
