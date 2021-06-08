@@ -344,9 +344,9 @@ class FeedState extends VendorAPI {
 		);
 
 		foreach ( self::ERROR_CONTEXTS as $context ) {
-			if ( ! empty( $workflow[ $context ] ) ) {
+			if ( ! empty( (array) $workflow[ $context ] ) ) {
 				$what           = strpos( $context, 'errors' ) ? 'errors' : 'warnings';
-				$sums[ $what ] += array_sum( $workflow[ $context ] );
+				$sums[ $what ] += array_sum( (array) $workflow[ $context ] );
 			}
 		}
 
