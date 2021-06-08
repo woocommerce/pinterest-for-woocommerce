@@ -35,7 +35,7 @@ class FeedIssues extends VendorAPI {
 		$this->base              = 'feed_issues';
 		$this->endpoint_callback = 'get_feed_issues';
 		$this->methods           = WP_REST_Server::READABLE;
-		$this->feed_data_files   = Pinterest_For_Woocommerce()::get_setting( 'feed_data_files' );
+		$this->feed_data_files   = Pinterest_For_Woocommerce()::get_setting( 'feed_data_cache' );
 		$this->feed_data_files   = $this->feed_data_files ? $this->feed_data_files : array();
 
 		$this->register_routes();
@@ -202,6 +202,11 @@ class FeedIssues extends VendorAPI {
 	 * @return string|boolean
 	 */
 	private function get_remote_file( $url, $cache_key ) {
+
+		if ( is_array( $cache_key ) && ! empty( $cache_key ) ) {
+			$ignore_for_cache = array( 's3_source_url', 's3_validation_url' ); // These 2 are different on every response.
+			$cache_key        = array_diff_key( $cache_key, array_flip( $ignore_for_cache ) );
+		}
 
 		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_file_' . md5( $cache_key ? wp_json_encode( $cache_key ) : $url );
 
