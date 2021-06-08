@@ -10,6 +10,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 
 use \WP_REST_Server;
 use \WP_REST_Request;
+use \WP_REST_Response;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -71,6 +72,8 @@ class FeedIssues extends VendorAPI {
 
 			$workflow        = false;
 			$issues_file_url = $request->has_param( 'feed_issues_url' ) ? $request->get_param( 'feed_issues_url' ) : false;
+			$paged           = $request->has_param( 'paged' ) ? (int) $request->get_param( 'paged' ) : 1;
+			$per_page        = $request->has_param( 'per_page' ) ? (int) $request->get_param( 'per_page' ) : 25;
 
 			if ( false === $issues_file_url ) {
 				$workflow = self::get_last_feed_workflow();
@@ -85,19 +88,26 @@ class FeedIssues extends VendorAPI {
 			}
 
 			// Get file.
-			$issues_file = $this->get_remote_file( $issues_file_url, $workflow );
+			$issues_file = $this->get_remote_file( $issues_file_url, (array) $workflow );
 
 			if ( empty( $issues_file ) ) {
 				throw new \Exception( esc_html__( 'Error downloading Feed Issues file from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$lines = self::parse_lines( $issues_file, 0, 10 ); // TODO: pagination?
+			$start_line  = ( ( $paged - 1 ) * $per_page );
+			$end_line    = $start_line + $per_page - 1; // Starting from 0.
+			$issues_data = self::parse_lines( $issues_file, $start_line, $end_line );
 
-			if ( ! empty( $lines ) ) {
-				$lines = array_map( array( __CLASS__, 'add_product_data' ), $lines );
+			if ( ! empty( $issues_data['lines'] ) ) {
+				$issues_data['lines'] = array_map( array( __CLASS__, 'prepare_issue_lines' ), $issues_data['lines'] );
 			}
 
-			return array( 'lines' => $lines );
+			$response = new WP_REST_Response( array( 'lines' => $issues_data['lines'] ) );
+
+			$response->header( 'X-WP-Total', $issues_data['total'] );
+			$response->header( 'X-WP-TotalPages', ceil( $issues_data['total'] / $per_page ) );
+
+			return $response;
 
 		} catch ( \Throwable $th ) {
 
@@ -116,7 +126,7 @@ class FeedIssues extends VendorAPI {
 	 *
 	 * @return array
 	 */
-	private static function add_product_data( $line ) {
+	private static function prepare_issue_lines( $line ) {
 
 		$product = wc_get_product( $line['ItemId'] );
 
