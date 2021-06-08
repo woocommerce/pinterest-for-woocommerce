@@ -152,9 +152,14 @@ class FeedIssues extends VendorAPI {
 		try {
 			$spl = new \SplFileObject( $issues_file );
 
+			// Get last line.
+			$spl->seek( $spl->getSize() );
+			$last_line = (int) $spl->key();
+
 			if ( $has_keys ) {
 				$spl->seek( 0 );
 				$keys = $spl->current();
+				$last_line--;
 			}
 
 			for ( $i = $start_line; $i <= $end_line; $i++ ) {
@@ -190,7 +195,10 @@ class FeedIssues extends VendorAPI {
 			$line = array_combine( $keys, array_map( 'trim', explode( $delim, $line ) ) );
 		}
 
-		return $lines;
+		return array(
+			'lines' => $lines,
+			'total' => $last_line,
+		);
 	}
 
 
