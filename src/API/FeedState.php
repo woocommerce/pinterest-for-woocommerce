@@ -116,12 +116,12 @@ class FeedState extends VendorAPI {
 
 		switch ( $state['status'] ) {
 			case 'starting':
-				$status       = 'warning';
+				$status       = 'pending';
 				$status_label = esc_html__( 'Feed generation is being initialized', 'pinterest-for-woocommerce' );
 				break;
 
 			case 'in_progress':
-				$status       = 'warning';
+				$status       = 'pending';
 				$status_label = esc_html__( 'Feed generation in progress', 'pinterest-for-woocommerce' );
 				break;
 
@@ -131,12 +131,12 @@ class FeedState extends VendorAPI {
 				break;
 
 			case 'scheduled_for_generation':
-				$status       = 'warning';
+				$status       = 'pending';
 				$status_label = esc_html__( 'Feed generation will start shortly', 'pinterest-for-woocommerce' );
 				break;
 
 			case 'pending_config':
-				$status       = 'warning';
+				$status       = 'pending';
 				$status_label = esc_html__( 'Feed pending configuration', 'pinterest-for-woocommerce' );
 				break;
 
@@ -193,7 +193,7 @@ class FeedState extends VendorAPI {
 					break;
 				case 'pending':
 				case 'appeal_pending':
-					$status       = 'warning';
+					$status       = 'pending';
 					$status_label = esc_html__( 'Product Feed pending approval on Pinterest.', 'pinterest-for-woocommerce' );
 					break;
 				case 'declined':
@@ -202,7 +202,7 @@ class FeedState extends VendorAPI {
 					break;
 
 				default:
-					$status       = 'error';
+					$status       = 'warning';
 					$status_label = esc_html__( 'Product Feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' );
 					break;
 			}
