@@ -277,22 +277,26 @@ class ProductSync {
 
 		if ( ! empty( $merchant['data']->id ) && 'declined' === $merchant['data']->product_pin_approval_status ) {
 			$registered = false;
+			self::log( 'Pinterest returned a Declined status for product_pin_approval_status' );
 		} elseif ( ! empty( $merchant['data']->id ) && ! isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
 			// No feed registered, but we got a merchant.
 			$merchant = API\Base::add_merchant_feed( $merchant['data']->id, $feed_args );
 
 			if ( $merchant && 'success' === $merchant['status'] && isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
 				$registered = $merchant['data']->product_pin_feed_profile->id;
+				self::log( 'Added merchant feed: ' . $feed_args['feed_location'] );
 			}
 		} elseif ( $feed_args['feed_location'] === $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) {
 			// Feed registered.
 			$registered = $merchant['data']->product_pin_feed_profile->id;
+			self::log( 'Feed registered for merchant: ' . $feed_args['feed_location'] );
 		} else {
 			// A diff feed was registered. Update to the current one.
 			$feed = API\Base::update_merchant_feed( $merchant['data']->product_pin_feed_profile->merchant_id, $merchant['data']->product_pin_feed_profile->id, $feed_args );
 
 			if ( $feed && 'success' === $feed['status'] && isset( $feed['data']->location_config->full_feed_fetch_location ) ) {
 				$registered = $feed['data']->id;
+				self::log( 'Merchant\'s feed updated to current location: ' . $feed_args['feed_location'] );
 			}
 		}
 
@@ -330,6 +334,7 @@ class ProductSync {
 
 			if ( ! empty( $advertiser->merchant_id ) ) {
 				$merchant_id = $advertiser->merchant_id;
+				self::log( 'Got merchant Id from user\'s advertisers: ' . $merchant_id );
 			}
 		}
 
