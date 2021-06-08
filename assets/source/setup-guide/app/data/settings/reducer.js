@@ -4,7 +4,11 @@
 import TYPES from './action-types';
 
 const settingsReducer = (
-	state = { isUpdating: false, requestingErrors: {} },
+	state = {
+		settings: {},
+		isUpdating: false,
+		requestingErrors: {},
+	},
 	action
 ) => {
 	switch ( action.type ) {
@@ -34,7 +38,6 @@ const settingsReducer = (
 		case TYPES.SET_UPDATING_ERROR:
 			state = {
 				...state,
-				error: action.error,
 				updatingError: action.error,
 				isUpdating: false,
 			};

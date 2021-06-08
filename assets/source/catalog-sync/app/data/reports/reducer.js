@@ -3,7 +3,15 @@
  */
 import TYPES from './action-types';
 
-const reportsReducer = ( state = { requestingErrors: {} }, action ) => {
+const reportsReducer = (
+	state = {
+		feedIssues: {},
+		feedState: {},
+		isRequesting: false,
+		requestingErrors: {},
+	},
+	action
+) => {
 	switch ( action.type ) {
 		case TYPES.RECEIVE_FEEDISSUES:
 			state = {
