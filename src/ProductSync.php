@@ -142,7 +142,7 @@ class ProductSync {
 	 *
 	 * @return boolean
 	 */
-	private static function is_product_sync_enabled() {
+	public static function is_product_sync_enabled() {
 
 		$domain_verified  = Pinterest_For_Woocommerce()::is_domain_verified();
 		$tracking_enabled = Pinterest_For_Woocommerce()::is_tracking_enabled();

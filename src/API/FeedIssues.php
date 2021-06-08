@@ -8,6 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest as Pinterest;
+
 use \WP_REST_Server;
 use \WP_REST_Request;
 use \WP_REST_Response;
@@ -70,6 +72,10 @@ class FeedIssues extends VendorAPI {
 
 		try {
 
+			if ( ! Pinterest\ProductSync::is_product_sync_enabled() ) {
+				return array( 'lines' => array() );
+			}
+
 			$workflow        = false;
 			$issues_file_url = $request->has_param( 'feed_issues_url' ) ? $request->get_param( 'feed_issues_url' ) : false;
 			$paged           = $request->has_param( 'paged' ) ? (int) $request->get_param( 'paged' ) : 1;
@@ -130,9 +136,11 @@ class FeedIssues extends VendorAPI {
 
 		$product = wc_get_product( $line['ItemId'] );
 
+		// handle variations?
+
 		return array(
 			'status'            => 'ERROR' === $line['Code'] ? 'error' : 'warning',
-			'product_name'      => $product ? $product->get_name() : esc_html( 'Invalid product', 'pinterest-for-woocommerce' ),
+			'product_name'      => $product ? $product->get_name() : esc_html__( 'Invalid product', 'pinterest-for-woocommerce' ),
 			'product_edit_link' => $product ? get_edit_post_link( $product->get_id() ) : '',
 			'issue_description' => $line['Message'],
 		);

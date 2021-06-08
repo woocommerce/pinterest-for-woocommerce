@@ -86,6 +86,26 @@ class FeedState extends VendorAPI {
 		try {
 
 			$result = array();
+
+			if ( ! Pinterest\ProductSync::is_product_sync_enabled() ) {
+				return array(
+					'workflow' => array(
+						array(
+							'label'        => esc_html__( 'XML Feed', 'pinterest-for-woocommerce' ),
+							'status'       => 'error',
+							'status_label' => esc_html__( 'Feed is disabled.', 'pinterest-for-woocommerce' ),
+							'extra_info'   => '',
+						),
+					),
+					'overview' => array(
+						'total'      => 0,
+						'not_synced' => 0,
+						'warnings'   => 0,
+						'errors'     => 0,
+					),
+				);
+			}
+
 			$result = $this->add_local_feed_state( $result );
 			$result = $this->add_feed_registration_state( $result );
 
