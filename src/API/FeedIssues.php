@@ -108,7 +108,12 @@ class FeedIssues extends VendorAPI {
 				$issues_data['lines'] = array_map( array( __CLASS__, 'prepare_issue_lines' ), $issues_data['lines'] );
 			}
 
-			$response = new WP_REST_Response( array( 'lines' => $issues_data['lines'] ) );
+			$response = new WP_REST_Response(
+				array(
+					'lines'      => $issues_data['lines'],
+					'total_rows' => $issues_data['total'],
+				)
+			);
 
 			$response->header( 'X-WP-Total', $issues_data['total'] );
 			$response->header( 'X-WP-TotalPages', ceil( $issues_data['total'] / $per_page ) );
