@@ -139,14 +139,25 @@ class FeedIssues extends VendorAPI {
 	 */
 	private static function prepare_issue_lines( $line ) {
 
-		$product = wc_get_product( $line['ItemId'] );
+		$product      = wc_get_product( $line['ItemId'] );
+		$edit_link    = '';
+		$product_name = esc_html__( 'Invalid product', 'pinterest-for-woocommerce' );
 
-		// handle variations?
+		if ( $product ) {
+			$product_name = $product->get_name();
+		}
+
+		if ( $product->get_parent_id() ) {
+			$product_name .= ' ' . esc_html__( '(Variation)', 'pinterest-for-woocommerce' );
+			$edit_link     = get_edit_post_link( $product->get_parent_id() );
+		}
+
+		$edit_link = empty( $edit_link ) && $product ? get_edit_post_link( $product->get_id() ) : $edit_link;
 
 		return array(
 			'status'            => 'ERROR' === $line['Code'] ? 'error' : 'warning',
-			'product_name'      => $product ? $product->get_name() : esc_html__( 'Invalid product', 'pinterest-for-woocommerce' ),
-			'product_edit_link' => $product ? get_edit_post_link( $product->get_id() ) : '',
+			'product_name'      => $product_name,
+			'product_edit_link' => $edit_link,
 			'issue_description' => $line['Message'],
 		);
 	}
@@ -184,6 +195,9 @@ class FeedIssues extends VendorAPI {
 				$keys = $spl->current();
 				$last_line--;
 			}
+
+			// Don't go over last line.
+			$end_line = $end_line > $last_line ? $last_line : $end_line;
 
 			for ( $i = $start_line; $i <= $end_line; $i++ ) {
 				$spl->seek( $i );
