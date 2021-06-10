@@ -399,10 +399,10 @@ class Tracking {
 
 		if ( ! empty( self::$script ) ) {
 
-			echo self::$script; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo self::$script; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
 
 			if ( ! empty( self::$events ) ) {
-				echo '<script>' . implode( PHP_EOL, self::$events ) . '</script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo '<script>' . implode( PHP_EOL, self::$events ) . '</script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
 			}
 		}
 	}
