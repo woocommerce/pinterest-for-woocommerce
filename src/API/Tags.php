@@ -85,8 +85,6 @@ class Tags extends VendorAPI {
 				}
 			}
 
-			Pinterest_For_Woocommerce()::save_setting( 'account_tags', $tags );
-
 			return $tags;
 
 		} catch ( \Throwable $th ) {
