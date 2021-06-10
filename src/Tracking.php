@@ -147,6 +147,7 @@ class Tracking {
 			'AddToCart',
 			array(
 				'product_id'     => $product->get_id(),
+				'product_name'   => $product->get_name(),
 				'value'          => $product->get_price(),
 				'order_quantity' => $quantity,
 				'currency'       => get_woocommerce_currency(),
@@ -283,6 +284,7 @@ class Tracking {
 
 			$data = array(
 				'product_id'    => $product->get_id(),
+				'product_name'  => $product->get_name(),
 				'product_price' => $product->get_price(),
 			);
 		}
@@ -303,10 +305,10 @@ class Tracking {
 		if ( is_product_category() ) {
 
 			$queried_object = get_queried_object();
-			$term_id        = $queried_object->term_id;
 
 			$data = array(
-				'product_category' => $term_id,
+				'product_category' => $queried_object->term_id,
+				'category_name'    => $queried_object->name,
 			);
 
 			self::add_event( 'ViewCategory', $data );
