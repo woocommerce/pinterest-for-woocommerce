@@ -303,7 +303,7 @@ class Base {
 	 */
 	public static function create_tag( $advertiser_id ) {
 
-		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto Created by Pinterest For WooCommerce', 'pinterest-for-woocommerce' ) );
+		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		$response = self::make_request(
 			'tags/',
