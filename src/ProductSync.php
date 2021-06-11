@@ -243,6 +243,154 @@ class ProductSync {
 
 
 	/**
+	 * Handles the feed's generation,
+	 * Using AS scheduled tasks prints $products_per_step number of products
+	 * on each iteration and writes to a file every $products_per_write.
+	 *
+	 * @return void
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
+	public static function handle_feed_generation() {
+
+		$state = self::feed_job_status();
+		$start = microtime( true );
+
+		if ( $state && 'generated' === $state['status'] ) {
+			return; // No need to perform any action.
+		}
+
+		if ( ! $state || ( $state && 'scheduled_for_generation' === $state['status'] ) ) {
+			// We need to start a generation from scratch.
+			$product_ids = self::get_product_ids_for_feed();
+
+			if ( empty( $product_ids ) ) {
+				self::log( 'No products found for feed generation.' );
+				return; // No need to perform any action.
+			}
+
+			$state = self::feed_job_status(
+				'starting',
+				array(
+					'dataset'       => $product_ids,
+					'current_index' => 0,
+				)
+			);
+
+			self::$current_index = 0;
+		}
+
+		try {
+
+			if ( 'in_progress' === $state['status'] ) {
+				$product_ids         = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state['job_id'] );
+				self::$current_index = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state['job_id'] );
+
+				if ( false === self::$current_index || empty( $product_ids ) ) {
+					throw new \Exception( esc_html__( 'Something went wrong while attempting to generated the feed.', 'pinterest-for-woocommerce' ), 400 );
+				}
+
+				self::$current_index = ( (int) self::$current_index ) + 1; // Start on the next item.
+			}
+
+			$xml_file = fopen( $state['feed_file'], ( 'in_progress' === $state['status'] ? 'a' : 'w' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
+
+			if ( ! $xml_file ) {
+				/* Translators: the path of the file */
+				throw new \Exception( sprintf( esc_html__( 'Could not open file: %s.', 'pinterest-for-woocommerce' ), $state['feed_file'] ), 400 );
+			}
+
+			self::log( 'Generating feed for ' . count( $product_ids ) . ' products' );
+
+			if ( 0 === self::$current_index ) {
+				// Write header.
+				fwrite( $xml_file, ProductsXmlFeed::get_xml_header() ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
+			}
+
+			self::$iteration_buffer      = '';
+			self::$iteration_buffer_size = 0;
+			$step_index                  = 0;
+			$products_count              = count( $product_ids );
+			$state['products_count']     = $products_count;
+
+			for ( self::$current_index; ( self::$current_index < $products_count ); self::$current_index++ ) {
+
+				$product_id = $product_ids[ self::$current_index ];
+
+				self::$iteration_buffer .= ProductsXmlFeed::get_xml_item( wc_get_product( $product_id ) );
+				self::$iteration_buffer_size++;
+
+				if ( self::$iteration_buffer_size >= self::$products_per_write || self::$current_index >= $products_count ) {
+					self::write_iteration_buffer( $xml_file, $state );
+				}
+
+				$step_index++;
+
+				if ( $step_index >= self::$products_per_step ) {
+					break;
+				}
+			}
+
+			if ( ! empty( self::$iteration_buffer ) ) {
+				self::write_iteration_buffer( $xml_file, $state );
+			}
+
+			if ( self::$current_index >= $products_count ) {
+				// Write footer.
+				fwrite( $xml_file, ProductsXmlFeed::get_xml_footer() ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
+
+				self::feed_job_status( 'generated' );
+			} else {
+				// We got more products left. Schedule next iteration.
+				self::trigger_async_feed_generation( true );
+			}
+
+			fclose( $xml_file ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
+
+			$end = microtime( true );
+			self::log( 'Feed step generation completed in ' . round( ( $end - $start ) * 1000 ) . 'ms. Current Index: ' . self::$current_index . ' / ' . $products_count );
+			self::log( 'Wrote ' . $step_index . ' products to file: ' . $state['feed_file'] );
+
+		} catch ( \Throwable $th ) {
+			self::log( $th->getMessage(), 'error' );
+		}
+
+	}
+
+
+	/**
+	 * Writes the iteration_buffer to the given file.
+	 *
+	 * @param resource $xml_file The file handle.
+	 * @param array    $state    The array holding the feed_state values.
+	 *
+	 * @return void
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
+	private static function write_iteration_buffer( $xml_file, $state ) {
+
+		if ( false !== fwrite( $xml_file, self::$iteration_buffer ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
+			self::$iteration_buffer      = '';
+			self::$iteration_buffer_size = 0;
+
+			self::feed_job_status(
+				'in_progress',
+				array(
+					'current_index' => self::$current_index,
+					/* Translators: %1$s number of products written, %2$s total number of products */
+					'progress'      => sprintf( esc_html__( 'Wrote %1$s out of %2$s products.', 'pinterest-for-woocommerce' ), self::$current_index, $state['products_count'] ),
+				)
+			);
+
+		} else {
+			/* Translators: the path of the file */
+			throw new \Exception( sprintf( esc_html__( 'Could not write to file: %s.', 'pinterest-for-woocommerce' ), $state['feed_file'] ), 400 );
+		}
+	}
+
+
+	/**
 	 * Schedules an async action - if not already scheduled - to generate the feed.
 	 *
 	 * @param boolean $force When true, overrides the check for already scheduled task.
@@ -400,154 +548,6 @@ class ProductSync {
 		}
 
 		return $product_ids;
-	}
-
-
-	/**
-	 * Handles the feed's generation,
-	 * Using AS scheduled tasks prints $products_per_step number of products
-	 * on each iteration and writes to a file every $products_per_write.
-	 *
-	 * @return void
-	 *
-	 * @throws \Exception PHP Exception.
-	 */
-	public static function handle_feed_generation() {
-
-		$state = self::feed_job_status();
-		$start = microtime( true );
-
-		if ( $state && 'generated' === $state['status'] ) {
-			return; // No need to perform any action.
-		}
-
-		if ( ! $state || ( $state && 'scheduled_for_generation' === $state['status'] ) ) {
-			// We need to start a generation from scratch.
-			$product_ids = self::get_product_ids_for_feed();
-
-			if ( empty( $product_ids ) ) {
-				self::log( 'No products found for feed generation.' );
-				return; // No need to perform any action.
-			}
-
-			$state = self::feed_job_status(
-				'starting',
-				array(
-					'dataset'       => $product_ids,
-					'current_index' => 0,
-				)
-			);
-
-			self::$current_index = 0;
-		}
-
-		try {
-
-			if ( 'in_progress' === $state['status'] ) {
-				$product_ids         = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state['job_id'] );
-				self::$current_index = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state['job_id'] );
-
-				if ( false === self::$current_index || empty( $product_ids ) ) {
-					throw new \Exception( esc_html__( 'Something went wrong while attempting to generated the feed.', 'pinterest-for-woocommerce' ), 400 );
-				}
-
-				self::$current_index = ( (int) self::$current_index ) + 1; // Start on the next item.
-			}
-
-			$xml_file = fopen( $state['feed_file'], ( 'in_progress' === $state['status'] ? 'a' : 'w' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
-
-			if ( ! $xml_file ) {
-				/* Translators: the path of the file */
-				throw new \Exception( sprintf( esc_html__( 'Could not open file: %s.', 'pinterest-for-woocommerce' ), $state['feed_file'] ), 400 );
-			}
-
-			self::log( 'Generating feed for ' . count( $product_ids ) . ' products' );
-
-			if ( 0 === self::$current_index ) {
-				// Write header.
-				fwrite( $xml_file, ProductsXmlFeed::get_xml_header() ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
-			}
-
-			self::$iteration_buffer      = '';
-			self::$iteration_buffer_size = 0;
-			$step_index                  = 0;
-			$products_count              = count( $product_ids );
-			$state['products_count']     = $products_count;
-
-			for ( self::$current_index; ( self::$current_index < $products_count ); self::$current_index++ ) {
-
-				$product_id = $product_ids[ self::$current_index ];
-
-				self::$iteration_buffer .= ProductsXmlFeed::get_xml_item( wc_get_product( $product_id ) );
-				self::$iteration_buffer_size++;
-
-				if ( self::$iteration_buffer_size >= self::$products_per_write || self::$current_index >= $products_count ) {
-					self::write_iteration_buffer( $xml_file, $state );
-				}
-
-				$step_index++;
-
-				if ( $step_index >= self::$products_per_step ) {
-					break;
-				}
-			}
-
-			if ( ! empty( self::$iteration_buffer ) ) {
-				self::write_iteration_buffer( $xml_file, $state );
-			}
-
-			if ( self::$current_index >= $products_count ) {
-				// Write footer.
-				fwrite( $xml_file, ProductsXmlFeed::get_xml_footer() ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
-
-				self::feed_job_status( 'generated' );
-			} else {
-				// We got more products left. Schedule next iteration.
-				self::trigger_async_feed_generation( true );
-			}
-
-			fclose( $xml_file ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
-
-			$end = microtime( true );
-			self::log( 'Feed step generation completed in ' . round( ( $end - $start ) * 1000 ) . 'ms. Current Index: ' . self::$current_index . ' / ' . $products_count );
-			self::log( 'Wrote ' . $step_index . ' products to file: ' . $state['feed_file'] );
-
-		} catch ( \Throwable $th ) {
-			self::log( $th->getMessage(), 'error' );
-		}
-
-	}
-
-
-	/**
-	 * Writes the iteration_buffer to the given file.
-	 *
-	 * @param resource $xml_file The file handle.
-	 * @param array    $state    The array holding the feed_state values.
-	 *
-	 * @return void
-	 *
-	 * @throws \Exception PHP Exception.
-	 */
-	private static function write_iteration_buffer( $xml_file, $state ) {
-
-		if ( false !== fwrite( $xml_file, self::$iteration_buffer ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
-			self::$iteration_buffer      = '';
-			self::$iteration_buffer_size = 0;
-
-			self::feed_job_status(
-				'in_progress',
-				array(
-					'current_index' => self::$current_index,
-					/* Translators: %1$s number of products written, %2$s total number of products */
-					'progress'      => sprintf( esc_html__( 'Wrote %1$s out of %2$s products.', 'pinterest-for-woocommerce' ), self::$current_index, $state['products_count'] ),
-				)
-			);
-
-		} else {
-			/* Translators: the path of the file */
-			throw new \Exception( sprintf( esc_html__( 'Could not write to file: %s.', 'pinterest-for-woocommerce' ), $state['feed_file'] ), 400 );
-		}
 	}
 
 
