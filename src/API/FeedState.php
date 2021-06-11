@@ -143,6 +143,12 @@ class FeedState extends VendorAPI {
 			case 'in_progress':
 				$status       = 'pending';
 				$status_label = esc_html__( 'Feed generation in progress', 'pinterest-for-woocommerce' );
+				$extra_info   = sprintf(
+					/* Translators: %1$s Time string, %2$s text string indicating progress */
+					esc_html__( 'Last activity: %1$s ago - %2$s', 'pinterest-for-woocommerce' ),
+					human_time_diff( $state['last_activity'] ),
+					$state['progress']
+				);
 				break;
 
 			case 'generated':
@@ -210,6 +216,14 @@ class FeedState extends VendorAPI {
 				case 'approved':
 					$status       = 'success';
 					$status_label = esc_html__( 'Product Feed configured for Ingestion on Pinterest', 'pinterest-for-woocommerce' );
+
+					$extra_info   = sprintf(
+						/* Translators: %1$s The URL of the product feed, %2$s Time string */
+						esc_html__( 'Pinterest will fetch your product\'s feed URL (%1$s) every %2$s', 'pinterest-for-woocommerce' ),
+						$merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location,
+						human_time_diff( 0, ( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq / 1000 ) )
+					);
+
 					break;
 				case 'pending':
 				case 'appeal_pending':

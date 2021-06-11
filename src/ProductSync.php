@@ -472,6 +472,7 @@ class ProductSync {
 			self::$iteration_buffer_size = 0;
 			$step_index                  = 0;
 			$products_count              = count( $product_ids );
+			$state['products_count']     = $products_count;
 
 			for ( self::$current_index; ( self::$current_index < $products_count ); self::$current_index++ ) {
 
@@ -538,6 +539,8 @@ class ProductSync {
 				'in_progress',
 				array(
 					'current_index' => self::$current_index,
+					/* Translators: %1$s number of products written, %2$s total number of products */
+					'progress'      => sprintf( esc_html__( 'Wrote %1$s out of %2$s products.', 'pinterest-for-woocommerce' ), self::$current_index, $state['products_count'] ),
 				)
 			);
 
@@ -599,7 +602,10 @@ class ProductSync {
 				set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state_data['job_id'], $args['dataset'], DAY_IN_SECONDS );
 			}
 		} elseif ( 'in_progress' === $status ) {
-			$state_data['status'] = 'in_progress';
+			$state_data['status']        = 'in_progress';
+			$state_data['finished']      = 0;
+			$state_data['last_activity'] = time();
+			$state_data['progress']      = $args['progress'];
 
 			if ( isset( $args, $args['current_index'] ) ) {
 				set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state_data['job_id'], $args['current_index'], DAY_IN_SECONDS );
