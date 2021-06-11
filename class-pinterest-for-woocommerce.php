@@ -20,7 +20,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @var string
 		 */
-		public $version = '0.2.0';
+		public $version = '0.3.0';
 
 		/**
 		 * The single instance of the class.
@@ -181,6 +181,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
 			add_action( 'wp_head', array( Pinterest\RichPins::class, 'maybe_inject_rich_pins_opengraph_tags' ) );
 			add_action( 'wp', array( Pinterest\SaveToPinterest::class, 'maybe_init' ) );
+			add_action( 'init', array( Pinterest\Tracking::class, 'maybe_init' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 		}
@@ -333,6 +334,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public function init_api_endpoints() {
 			new Pinterest\API\Auth();
 			new Pinterest\API\DomainVerification();
+			new Pinterest\API\Advertisers();
+			new Pinterest\API\Tags();
 		}
 
 		/**
@@ -476,6 +479,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			return array();
 
+		}
+
+
+		/**
+		 * Returns the Pinterest AccountID from the database.
+		 *
+		 * @return string|false
+		 */
+		public static function get_account_id() {
+			$account_data = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+			return isset( $account_data['id'] ) ? $account_data['id'] : false;
 		}
 
 

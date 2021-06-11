@@ -1,11 +1,9 @@
 /**
  * External dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	Button,
 	Card,
@@ -14,9 +12,9 @@ import {
 	Flex,
 	FlexItem,
 	FlexBlock,
+	Modal,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 import { Spinner } from '@woocommerce/components';
 
 /**
@@ -24,51 +22,75 @@ import { Spinner } from '@woocommerce/components';
  */
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
+import { isConnected } from '../helpers/conditionals';
 
 const SetupAccount = ( {
-	pin4wc,
-	updateOptions,
+	appSettings,
+	setAppSettings,
 	createNotice,
 	view,
 	goToNextStep,
 } ) => {
-	const [ options, setOptions ] = useState( undefined );
+	const [ isConfirmationModalOpen, setIsConfirmationModalOpen ] = useState(
+		false
+	);
 
-	useEffect( () => {
-		if ( options !== pin4wc ) {
-			setOptions( pin4wc );
-		}
-	}, [ pin4wc, options ] );
+	const openConfirmationModal = () => {
+		setIsConfirmationModalOpen( true );
+	};
 
-	const isConnected = () => {
-		return undefined === options
-			? undefined
-			: !! options?.token?.access_token;
+	const closeConfirmationModal = () => {
+		setIsConfirmationModalOpen( false );
+	};
+
+	const renderConfirmationModal = () => {
+		return (
+			<Modal
+				title={
+					<>{ __( 'Are you sure?', 'pinterest-for-woocommerce' ) }</>
+				}
+				onRequestClose={ closeConfirmationModal }
+				className="woocommerce-setup-guide__step-modal"
+			>
+				<div className="woocommerce-setup-guide__step-modal__wrapper">
+					<p>
+						{ __(
+							'Are you sure you want to disconnect this account?',
+							'pinterest-for-woocommerce'
+						) }
+					</p>
+					<div className="woocommerce-setup-guide__step-modal__buttons">
+						<Button
+							isDestructive
+							isSecondary
+							onClick={ handleDisconnectAccount }
+						>
+							{ __(
+								"Yes, I'm sure",
+								'pinterest-for-woocommerce'
+							) }
+						</Button>
+						<Button isTertiary onClick={ closeConfirmationModal }>
+							{ __( 'Cancel', 'pinterest-for-woocommerce' ) }
+						</Button>
+					</div>
+				</div>
+			</Modal>
+		);
 	};
 
 	const handleDisconnectAccount = async () => {
-		const oldOptions = Object.assign( {}, options );
-		const newOptions = Object.assign( {}, options );
+		closeConfirmationModal();
 
-		delete newOptions.token;
-		delete newOptions.crypto_encoded_key;
+		const update = await setAppSettings(
+			{
+				token: null,
+				crypto_encoded_key: null,
+			},
+			true
+		);
 
-		setOptions( newOptions );
-
-		const update = await updateOptions( {
-			[ wcSettings.pin4wc.optionsName ]: newOptions,
-		} );
-
-		if ( update.success ) {
-			createNotice(
-				'success',
-				__(
-					'Settings were saved successfully.',
-					'pinterest-for-woocommerce'
-				)
-			);
-		} else {
-			setOptions( oldOptions );
+		if ( ! update.success ) {
 			createNotice(
 				'error',
 				__(
@@ -111,7 +133,7 @@ const SetupAccount = ( {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{ isConnected() === true ? (
+							{ isConnected( appSettings ) === true ? (
 								<Flex>
 									<FlexBlock className="is-connected">
 										<Text variant="subtitle">
@@ -120,20 +142,24 @@ const SetupAccount = ( {
 												'pinterest-for-woocommerce'
 											) }
 										</Text>
-										{ options?.account_data?.id && (
-											<Text variant="body">{ `${ __(
-												'Account',
-												'pinterest-for-woocommerce'
-											) }: ${
-												options.account_data.username
-											}
-											- ${ options.account_data.id }
-											` }</Text>
+										{ appSettings?.account_data?.id && (
+											<Text variant="body">
+												{ sprintf(
+													'%1$s: %2$s - %3$s',
+													__(
+														'Account',
+														'pinterest-for-woocommerce'
+													),
+													appSettings.account_data
+														.username,
+													appSettings.account_data.id
+												) }
+											</Text>
 										) }
 										<Button
 											isLink
 											isDestructive
-											onClick={ handleDisconnectAccount }
+											onClick={ openConfirmationModal }
 										>
 											{ __(
 												'Disconnect Pinterest Account',
@@ -142,7 +168,7 @@ const SetupAccount = ( {
 										</Button>
 									</FlexBlock>
 								</Flex>
-							) : isConnected() === false ? (
+							) : isConnected( appSettings ) === false ? (
 								<Flex>
 									<FlexBlock>
 										<Text variant="subtitle">
@@ -172,7 +198,7 @@ const SetupAccount = ( {
 							) }
 						</CardBody>
 
-						{ isConnected() === false && (
+						{ isConnected( appSettings ) === false && (
 							<CardFooter>
 								<Button
 									isLink
@@ -189,39 +215,25 @@ const SetupAccount = ( {
 								</Button>
 							</CardFooter>
 						) }
+
+						{ isConfirmationModalOpen && renderConfirmationModal() }
 					</Card>
 
-					{ view === 'wizard' && isConnected() === true && (
-						<div className="woocommerce-setup-guide__footer-button">
-							<Button isPrimary onClick={ goToNextStep }>
-								{ __(
-									'Continue',
-									'pinterest-for-woocommerce'
-								) }
-							</Button>
-						</div>
-					) }
+					{ view === 'wizard' &&
+						isConnected( appSettings ) === true && (
+							<div className="woocommerce-setup-guide__footer-button">
+								<Button isPrimary onClick={ goToNextStep }>
+									{ __(
+										'Continue',
+										'pinterest-for-woocommerce'
+									) }
+								</Button>
+							</div>
+						) }
 				</div>
 			</div>
 		</div>
 	);
 };
 
-export default compose(
-	withSelect( ( select ) => {
-		const { getOption } = select( OPTIONS_STORE_NAME );
-
-		return {
-			pin4wc: getOption( wcSettings.pin4wc.optionsName ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
-		const { createNotice } = dispatch( 'core/notices' );
-
-		return {
-			updateOptions,
-			createNotice,
-		};
-	} )
-)( SetupAccount );
+export default SetupAccount;

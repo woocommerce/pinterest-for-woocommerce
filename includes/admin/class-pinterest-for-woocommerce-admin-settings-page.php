@@ -266,10 +266,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				'optionsName'     => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,
 				'error'           => isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				'pinterestLinks'  => array(
-					'newAccount'    => 'https://business.pinterest.com/',
-					'verifyDomain'  => 'https://help.pinterest.com/en/business/article/claim-your-website',
-					'richPins'      => 'https://help.pinterest.com/en/business/article/rich-pins',
-					'enhancedMatch' => 'https://help.pinterest.com/en/business/article/enhanced-match',
+					'newAccount'       => 'https://business.pinterest.com/',
+					'claimWebsite'     => 'https://help.pinterest.com/en/business/article/claim-your-website',
+					'richPins'         => 'https://help.pinterest.com/en/business/article/rich-pins',
+					'enhancedMatch'    => 'https://help.pinterest.com/en/business/article/enhanced-match',
+					'createAdvertiser' => 'https://help.pinterest.com/en/business/article/create-an-advertiser-account',
 				),
 				'isSetupComplete' => Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete' ),
 			);

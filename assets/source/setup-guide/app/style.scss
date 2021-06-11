@@ -71,12 +71,18 @@ $root: ".woocommerce-setup-guide";
 							top: 0;
 							transform: translateX(-50%);
 							width: 100vw;
+							z-index: -1;
 						}
 					}
 
 					&__step {
 						padding-left: 12px;
 						padding-right: 12px;
+
+						&-divider {
+							align-self: center;
+							margin-top: 0;
+						}
 					}
 				}
 			}
@@ -225,6 +231,16 @@ $root: ".woocommerce-setup-guide";
 						display: block;
 					}
 				}
+
+				&-modal {
+
+					&__buttons {
+
+						button + button {
+							margin-left: 12px;
+						}
+					}
+				}
 			}
 
 			&__setup-account {
@@ -237,7 +253,7 @@ $root: ".woocommerce-setup-guide";
 				}
 			}
 
-			&__verify-domain {
+			&__claim-website {
 
 				.components-card__body {
 					align-items: center;
@@ -259,6 +275,13 @@ $root: ".woocommerce-setup-guide";
 							display: none;
 						}
 					}
+				}
+			}
+
+			&__setup-tracking {
+
+				.text-margin {
+					margin: 1em 0;
 				}
 			}
 

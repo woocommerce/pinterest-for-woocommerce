@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Button, Card, CardBody } from '@wordpress/components';
 import { OPTIONS_STORE_NAME } from '@woocommerce/data';
@@ -16,34 +16,24 @@ import { Spinner } from '@woocommerce/components';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import StepStatus from '../components/StepStatus';
+import { isDomainVerified } from '../helpers/conditionals';
 
-const VerifyDomain = ( {
+const ClaimWebsite = ( {
 	goToNextStep,
-	pin4wc,
-	updateOptions,
+	appSettings,
+	setAppSettings,
 	createNotice,
 	view,
 } ) => {
 	const [ status, setStatus ] = useState( 'idle' );
 
-	const isDomainVerified = () => {
-		const result =
-			undefined === pin4wc
-				? undefined
-				: undefined === pin4wc?.account_data?.verified_domains
-				? false
-				: pin4wc?.account_data?.verified_domains.includes(
-						wcSettings.pin4wc.domainToVerify
-				  );
-
-		if ( result === true && status !== 'success' ) {
+	useEffect( () => {
+		if ( isDomainVerified( appSettings ) ) {
 			setStatus( 'success' );
 		}
+	}, [ appSettings ] );
 
-		return result;
-	};
-
-	const handleVerifyDomain = async () => {
+	const handleClaimWebsite = async () => {
 		setStatus( 'pending' );
 
 		try {
@@ -54,14 +44,7 @@ const VerifyDomain = ( {
 
 			setStatus( 'success' );
 
-			const newOptions = {
-				...pin4wc,
-				account_data: results.account_data,
-			};
-
-			updateOptions( {
-				[ wcSettings.pin4wc.optionsName ]: newOptions,
-			} );
+			setAppSettings( { account_data: results.account_data } );
 		} catch ( error ) {
 			setStatus( 'error' );
 
@@ -89,7 +72,7 @@ const VerifyDomain = ( {
 				isPrimary
 				disabled={ status === 'pending' }
 				onClick={
-					status === 'success' ? goToNextStep : handleVerifyDomain
+					status === 'success' ? goToNextStep : handleClaimWebsite
 				}
 			>
 				{ buttonLabels[ status ] }
@@ -98,36 +81,44 @@ const VerifyDomain = ( {
 	};
 
 	return (
-		<div className="woocommerce-setup-guide__verify-domain">
+		<div className="woocommerce-setup-guide__claim-website">
 			{ view === 'wizard' && (
 				<StepHeader
-					title={ __( 'Verify your domain' ) }
-					subtitle={ __( 'Step Two' ) }
+					title={ __(
+						'Claim your website',
+						'pinterest-for-woocommerce'
+					) }
+					subtitle={ __( 'Step Two', 'pinterest-for-woocommerce' ) }
 				/>
 			) }
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={ __( 'Verify your domain' ) }
+						title={ __(
+							'Claim your website',
+							'pinterest-for-woocommerce'
+						) }
 						description={ __(
 							'Claim your website get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of you content.'
 						) }
-						link={ wcSettings.pin4wc.pinterestLinks.verifyDomain }
+						link={ wcSettings.pin4wc.pinterestLinks.claimWebsite }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
-						{ undefined !== isDomainVerified() ? (
+						{ undefined !== isDomainVerified( appSettings ) ? (
 							<CardBody size="large">
 								<StepStatus
 									label={ wcSettings.pin4wc.domainToVerify }
 									status={ status }
-									options={ pin4wc }
+									options={ appSettings }
 								/>
 
 								{ view === 'settings' &&
-									! isDomainVerified() && <StepButton /> }
+									! isDomainVerified( appSettings ) && (
+										<StepButton />
+									) }
 							</CardBody>
 						) : (
 							<CardBody size="large">
@@ -164,4 +155,4 @@ export default compose(
 			updateOptions,
 		};
 	} )
-)( VerifyDomain );
+)( ClaimWebsite );
