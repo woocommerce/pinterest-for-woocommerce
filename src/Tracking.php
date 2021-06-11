@@ -37,6 +37,7 @@ class Tracking {
 
 	/**
 	 * The base tracking snippet.
+	 * Documentation: https://help.pinterest.com/en/business/article/install-the-pinterest-tag
 	 *
 	 * @var array
 	 */
@@ -44,6 +45,7 @@ class Tracking {
 
 	/**
 	 * The base tracking snippet with Enchanced match support.
+	 * Documentation: https://help.pinterest.com/en/business/article/enhanced-match
 	 *
 	 * @var array
 	 */
@@ -105,7 +107,7 @@ class Tracking {
 	 *
 	 * @return string|false
 	 */
-	public static function get_hashed_email() {
+	public static function get_hashed_customer_email() {
 
 		$user_email = false;
 
@@ -259,7 +261,7 @@ class Tracking {
 		}
 
 		if ( Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) ) {
-			$email = self::get_hashed_email();
+			$email = self::get_hashed_customer_email();
 		}
 
 		$snippet = empty( $email ) ? self::$base_tag : self::$base_tag_em;
