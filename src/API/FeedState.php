@@ -169,6 +169,12 @@ class FeedState extends VendorAPI {
 			default:
 				$status       = 'error';
 				$status_label = esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' );
+				$extra_info   = sprintf(
+					/* Translators: %1$s Time string, %2$s text string indicating progress */
+					esc_html__( 'Last activity: %1$s ago - %2$s', 'pinterest-for-woocommerce' ),
+					human_time_diff( $state['last_activity'] ),
+					$state['progress']
+				);
 				break;
 		}
 
