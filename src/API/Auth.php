@@ -127,10 +127,12 @@ class Auth extends VendorAPI {
 	 */
 	private function get_redirect_url( $view = null ) {
 
-		$redirect_url      = admin_url( 'admin.php?page=' . \PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE );
-		$is_setup_complete = Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete', true );
+		$redirect_url            = admin_url( 'admin.php?page=' . \PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE );
+		$is_setup_complete       = Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete', true );
+		$dismissed_wc_tasks      = get_option( 'woocommerce_task_list_dismissed_tasks' );
+		$is_setup_task_dismissed = ! empty( $dismissed_wc_tasks ) && is_array( $dismissed_wc_tasks ) && in_array( 'setup-pinterest', $dismissed_wc_tasks, true );
 
-		if ( empty( $is_setup_complete ) || 'no' === $is_setup_complete ) {
+		if ( ( empty( $is_setup_complete ) || 'no' === $is_setup_complete ) && ! $is_setup_task_dismissed ) {
 			$step         = empty( $error ) ? 'claim-website' : 'setup-account';
 			$redirect_url = add_query_arg(
 				array(
@@ -152,6 +154,5 @@ class Auth extends VendorAPI {
 		}
 
 		return $redirect_url;
-
 	}
 }
