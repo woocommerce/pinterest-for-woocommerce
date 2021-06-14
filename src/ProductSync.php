@@ -615,8 +615,9 @@ class ProductSync {
 			$state_data['feed_url']  = trailingslashit( $upload_dir['baseurl'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-' . $state_data['job_id'] . '.xml';
 
 			if ( isset( $args, $args['dataset'] ) ) {
-				set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state_data['job_id'], $args['dataset'], DAY_IN_SECONDS );
+				set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state_data['job_id'], $args['dataset'], WEEK_IN_SECONDS );
 			}
+
 		} elseif ( 'in_progress' === $status ) {
 			$state_data['status']        = 'in_progress';
 			$state_data['finished']      = 0;
@@ -624,7 +625,7 @@ class ProductSync {
 			$state_data['progress']      = $args['progress'];
 
 			if ( isset( $args, $args['current_index'] ) ) {
-				set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state_data['job_id'], $args['current_index'], DAY_IN_SECONDS );
+				set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state_data['job_id'], $args['current_index'], WEEK_IN_SECONDS );
 			}
 
 		} elseif ( 'generated' === $status ) {
