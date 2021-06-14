@@ -109,16 +109,23 @@ class ProductSync {
 	/**
 	 * Schedules the regeneration process of the XML feed.
 	 *
+	 * @param boolean $force Forces rescheduling even when the status indicates that its not needed.
+	 *
 	 * @return void
 	 */
-	public static function feed_reschedule() {
+	public static function feed_reschedule( $force = false ) {
 
-		$feed_job           = Pinterest_For_Woocommerce()::get_setting( 'feed_job' );
-		$feed_job           = $feed_job ? $feed_job : array();
+		$feed_job = Pinterest_For_Woocommerce()::get_setting( 'feed_job' );
+		$feed_job = $feed_job ? $feed_job : array();
+
+		if ( ! $force && isset( $feed_job['status'] ) && in_array( $feed_job['status'], array( 'scheduled_for_generation', 'in_progress', 'starting' ), true ) ) {
+			return;
+		}
+
 		$feed_job['status'] = 'scheduled_for_generation';
 
 		Pinterest_For_Woocommerce()::save_setting( 'feed_job', $feed_job );
-		self::trigger_async_feed_generation();
+		self::trigger_async_feed_generation( $force );
 
 		self::log( 'Feed generation (re)scheduled.' );
 	}
@@ -285,12 +292,11 @@ class ProductSync {
 			if ( 'in_progress' === $state['status'] ) {
 				$product_ids         = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state['job_id'] );
 				self::$current_index = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state['job_id'] );
+				self::$current_index = false === self::$current_index ? self::$current_index : ( (int) self::$current_index ) + 1; // Start on the next item.
+			}
 
-				if ( false === self::$current_index || empty( $product_ids ) ) {
-					throw new \Exception( esc_html__( 'Something went wrong while attempting to generated the feed.', 'pinterest-for-woocommerce' ), 400 );
-				}
-
-				self::$current_index = ( (int) self::$current_index ) + 1; // Start on the next item.
+			if ( false === self::$current_index || empty( $product_ids ) ) {
+				throw new \Exception( esc_html__( 'Something went wrong while attempting to generate the feed.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
 			$xml_file = fopen( $state['feed_file'], ( 'in_progress' === $state['status'] ? 'a' : 'w' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
@@ -352,9 +358,18 @@ class ProductSync {
 			self::log( 'Wrote ' . $step_index . ' products to file: ' . $state['feed_file'] );
 
 		} catch ( \Throwable $th ) {
+
+			if ( 'error' === $state['status'] ) {
+				// Already errored at once. Restart job.
+				self::feed_reschedule( true );
+				self::log( $th->getMessage(), 'error' );
+				self::log( 'Restarting Feed generation.', 'error' );
+				return;
+			}
+
+			self::feed_job_status( 'error', array( 'progress' => $th->getMessage() ) );
 			self::log( $th->getMessage(), 'error' );
 		}
-
 	}
 
 
@@ -561,6 +576,7 @@ class ProductSync {
 	 * - generated                The feed is generated, no further action will be taken.
 	 * - scheduled_for_generation The feed needs to be (re)generated. If this status is set, the next run of __CLASS__::handle_feed_generation() will start the generation process.
 	 * - pending_config           The feed was reset or was never configured.
+	 * - error                    The generation process returned an error.
 	 *
 	 * @param string $status The status of the feed's generation process. See above.
 	 * @param array  $args   The arguments that go along with the given status.
@@ -610,9 +626,19 @@ class ProductSync {
 			if ( isset( $args, $args['current_index'] ) ) {
 				set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state_data['job_id'], $args['current_index'], DAY_IN_SECONDS );
 			}
+
 		} elseif ( 'generated' === $status ) {
 			$state_data['status']   = 'generated';
 			$state_data['finished'] = time();
+
+			// Cleanup.
+			delete_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state_data['job_id'] );
+			delete_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state_data['job_id'] );
+
+		} elseif ( 'error' === $status ) {
+			$state_data['status']        = 'error';
+			$state_data['last_activity'] = time();
+			$state_data['progress']      = $args['progress'];
 
 			// Cleanup.
 			delete_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state_data['job_id'] );
