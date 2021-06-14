@@ -37,14 +37,24 @@ class FeedState extends VendorAPI {
 	/**
 	 * The error codes that are related to the feed itself,
 	 * and not a specific product.
+	 * Source: https://help.pinterest.com/en/business/article/data-source-ingestion
 	 *
 	 * @var array
 	 */
 	const GLOBAL_ERROR_CODES = array(
+		'3',
 		'100',
 		'101',
 		'102',
 		'103',
+		'129',
+		'138',
+		'139',
+		'140',
+		'143',
+		'150',
+		'152',
+		'155',
 	);
 
 	/**
@@ -222,7 +232,6 @@ class FeedState extends VendorAPI {
 				case 'approved':
 					$status       = 'success';
 					$status_label = esc_html__( 'Product Feed configured for Ingestion on Pinterest', 'pinterest-for-woocommerce' );
-
 					$extra_info   = sprintf(
 						/* Translators: %1$s The URL of the product feed, %2$s Time string */
 						esc_html__( 'Pinterest will fetch your product\'s feed URL (%1$s) every %2$s', 'pinterest-for-woocommerce' ),
