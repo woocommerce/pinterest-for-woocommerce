@@ -82,6 +82,15 @@ class ProductSync {
 			if ( $state && 'scheduled_for_generation' === $state['status'] ) {
 				self::trigger_async_feed_generation();
 			}
+
+			add_action( 'edit_post', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
+
+			if ( 'yes' === get_option( 'woocommerce_manage_stock' ) ) {
+				add_action( 'woocommerce_variation_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
+				add_action( 'woocommerce_product_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
+			}
+
+			add_action( 'pinterest_for_woocommerce_feed_generated', array( __CLASS__, 'reschedule_if_dirty' ) );
 		}
 	}
 
@@ -346,6 +355,8 @@ class ProductSync {
 				fwrite( $xml_file, ProductsXmlFeed::get_xml_footer() ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
 
 				self::feed_job_status( 'generated' );
+
+				do_action( 'pinterest_for_woocommerce_feed_generated', $state );
 			} else {
 				// We got more products left. Schedule next iteration.
 				self::trigger_async_feed_generation( true );
@@ -617,7 +628,6 @@ class ProductSync {
 			if ( isset( $args, $args['dataset'] ) ) {
 				set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state_data['job_id'], $args['dataset'], WEEK_IN_SECONDS );
 			}
-
 		} elseif ( 'in_progress' === $status ) {
 			$state_data['status']        = 'in_progress';
 			$state_data['finished']      = 0;
@@ -627,7 +637,6 @@ class ProductSync {
 			if ( isset( $args, $args['current_index'] ) ) {
 				set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state_data['job_id'], $args['current_index'], WEEK_IN_SECONDS );
 			}
-
 		} elseif ( 'generated' === $status ) {
 			$state_data['status']   = 'generated';
 			$state_data['finished'] = time();
@@ -654,5 +663,36 @@ class ProductSync {
 
 		return $state_data;
 
+	}
+
+
+	/**
+	 * Check if Given ID is of a product and if yes, mark feed as dirty.
+	 *
+	 * @param integer $product_id The product ID.
+	 *
+	 * return void
+	 */
+	public static function mark_feed_dirty( $product_id ) {
+		if ( ! wc_get_product( $product_id ) ) {
+			return;
+		}
+
+		Pinterest_For_Woocommerce()::save_setting( 'feed_dirty', true );
+	}
+
+
+	/**
+	 * Check if feed is marked and dirty, and reschedule feed generation.
+	 *
+	 * @return void
+	 */
+	public static function reschedule_if_dirty() {
+
+		if ( Pinterest_For_Woocommerce()::get_setting( 'feed_dirty' ) ) {
+			Pinterest_For_Woocommerce()::save_setting( 'feed_dirty', false );
+			self::log( 'Feed is dirty.' );
+			self::feed_reschedule();
+		}
 	}
 }
