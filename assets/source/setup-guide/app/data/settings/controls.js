@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { controls as dataControls } from '@wordpress/data-controls';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -15,6 +16,7 @@ export const fetch = () => {
 };
 
 export const controls = {
+	...dataControls,
 	FETCH() {
 		return new Promise( ( resolve ) => {
 			const url = `${ WC_ADMIN_NAMESPACE }/options?options=${ OPTIONS_NAME }`;
