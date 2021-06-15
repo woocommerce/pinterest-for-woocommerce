@@ -1,4 +1,4 @@
-<?php
+<?php //phpcs:disable WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
 /**
  * Pinterest For WooCommerce Catalog Syncing
  *
@@ -106,6 +106,10 @@ class ProductSync {
 
 		if ( file_exists( $state['feed_file'] ) ) {
 			unlink( $state['feed_file'] );
+		}
+
+		if ( file_exists( $state['tmp_file'] ) ) {
+			unlink( $state['tmp_file'] );
 		}
 
 		Pinterest_For_Woocommerce()::save_data( 'feed_job', false );
@@ -308,18 +312,19 @@ class ProductSync {
 				throw new \Exception( esc_html__( 'Something went wrong while attempting to generate the feed.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$xml_file = fopen( $state['feed_file'], ( 'in_progress' === $state['status'] ? 'a' : 'w' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
+			$target_file = $state['tmp_file'];
+			$xml_file    = fopen( $target_file, ( 'in_progress' === $state['status'] ? 'a' : 'w' ) );
 
 			if ( ! $xml_file ) {
 				/* Translators: the path of the file */
-				throw new \Exception( sprintf( esc_html__( 'Could not open file: %s.', 'pinterest-for-woocommerce' ), $state['feed_file'] ), 400 );
+				throw new \Exception( sprintf( esc_html__( 'Could not open file: %s.', 'pinterest-for-woocommerce' ), $target_file ), 400 );
 			}
 
 			self::log( 'Generating feed for ' . count( $product_ids ) . ' products' );
 
 			if ( 0 === self::$current_index ) {
 				// Write header.
-				fwrite( $xml_file, ProductsXmlFeed::get_xml_header() ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
+				fwrite( $xml_file, ProductsXmlFeed::get_xml_header() );
 			}
 
 			self::$iteration_buffer      = '';
@@ -352,21 +357,28 @@ class ProductSync {
 
 			if ( self::$current_index >= $products_count ) {
 				// Write footer.
-				fwrite( $xml_file, ProductsXmlFeed::get_xml_footer() ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
+				fwrite( $xml_file, ProductsXmlFeed::get_xml_footer() );
+				fclose( $xml_file );
 
 				self::feed_job_status( 'generated' );
+
+				if ( ! rename( $state['tmp_file'], $state['feed_file'] ) ) {
+					/* Translators: the path of the file */
+					throw new \Exception( sprintf( esc_html__( 'Could not write feed to file: %s.', 'pinterest-for-woocommerce' ), $state['feed_file'] ), 400 );
+				}
+
+				$target_file = $state['feed_file'];
 
 				do_action( 'pinterest_for_woocommerce_feed_generated', $state );
 			} else {
 				// We got more products left. Schedule next iteration.
+				fclose( $xml_file );
 				self::trigger_async_feed_generation( true );
 			}
 
-			fclose( $xml_file ); // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
-
 			$end = microtime( true );
 			self::log( 'Feed step generation completed in ' . round( ( $end - $start ) * 1000 ) . 'ms. Current Index: ' . self::$current_index . ' / ' . $products_count );
-			self::log( 'Wrote ' . $step_index . ' products to file: ' . $state['feed_file'] );
+			self::log( 'Wrote ' . $step_index . ' products to file: ' . $target_file );
 
 		} catch ( \Throwable $th ) {
 
@@ -396,7 +408,7 @@ class ProductSync {
 	 */
 	private static function write_iteration_buffer( $xml_file, $state ) {
 
-		if ( false !== fwrite( $xml_file, self::$iteration_buffer ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
+		if ( false !== fwrite( $xml_file, self::$iteration_buffer ) ) {
 			self::$iteration_buffer      = '';
 			self::$iteration_buffer_size = 0;
 
@@ -411,7 +423,7 @@ class ProductSync {
 
 		} else {
 			/* Translators: the path of the file */
-			throw new \Exception( sprintf( esc_html__( 'Could not write to file: %s.', 'pinterest-for-woocommerce' ), $state['feed_file'] ), 400 );
+			throw new \Exception( sprintf( esc_html__( 'Could not write to file: %s.', 'pinterest-for-woocommerce' ), $state['tmp_file'] ), 400 );
 		}
 	}
 
@@ -623,6 +635,7 @@ class ProductSync {
 			$upload_dir = wp_get_upload_dir();
 
 			$state_data['feed_file'] = trailingslashit( $upload_dir['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-' . $state_data['job_id'] . '.xml';
+			$state_data['tmp_file']  = trailingslashit( $upload_dir['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-' . $state_data['job_id'] . '-tmp.xml';
 			$state_data['feed_url']  = trailingslashit( $upload_dir['baseurl'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-' . $state_data['job_id'] . '.xml';
 
 			if ( isset( $args, $args['dataset'] ) ) {
