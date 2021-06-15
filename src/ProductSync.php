@@ -272,7 +272,7 @@ class ProductSync {
 		$state = self::feed_job_status();
 		$start = microtime( true );
 
-		if ( $state && 'generated' === $state['status'] ) {
+		if ( $state && 'generated' === $state['status'] || ! self::is_product_sync_enabled() ) {
 			return; // No need to perform any action.
 		}
 
