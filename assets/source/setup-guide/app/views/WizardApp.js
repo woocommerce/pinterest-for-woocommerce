@@ -16,6 +16,7 @@ import {
  */
 import SetupAccount from '../steps/SetupAccount';
 import ClaimWebsite from '../steps/ClaimWebsite';
+import SetupProductSync from '../steps/SetupProductSync';
 import SetupTracking from '../steps/SetupTracking';
 import SetupPins from '../steps/SetupPins';
 import TransientNotices from '../components/TransientNotices';
@@ -43,6 +44,11 @@ const WizardApp = () => {
 			key: 'claim-website',
 			container: ClaimWebsite,
 			label: __( 'Claim your website', 'pinterest-for-woocommerce' ),
+		},
+		{
+			key: 'setup-product-sync',
+			container: SetupProductSync,
+			label: __( 'Set up product sync', 'pinterest-for-woocommerce' ),
 		},
 		{
 			key: 'setup-tracking',

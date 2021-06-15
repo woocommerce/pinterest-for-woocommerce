@@ -56,8 +56,9 @@ $root: ".woocommerce-setup-guide";
 						height: 60px;
 						justify-content: center;
 						margin: 0 auto;
-						max-width: 768px;
 						overview: hidden;
+						padding-left: 16px;
+						padding-right: 16px;
 						position: relative;
 
 						&::before {
