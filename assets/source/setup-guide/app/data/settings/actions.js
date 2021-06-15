@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { apiFetch } from '@wordpress/api-fetch';
 import { select } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -47,7 +47,7 @@ export function* updateSettings( data, saveToDb = false ) {
 	}
 
 	yield setIsUpdating( true );
-	const settings = yield select( STORE_NAME, 'getSettings' );
+	const settings = yield select( STORE_NAME ).getSettings();
 
 	try {
 		const results = yield apiFetch( {
