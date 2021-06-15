@@ -164,6 +164,12 @@ class FeedState extends VendorAPI {
 			case 'generated':
 				$status       = 'success';
 				$status_label = esc_html__( 'Up to date', 'pinterest-for-woocommerce' );
+				$extra_info   = sprintf(
+					/* Translators: %1$s Time string, %2$s text string indicating progress */
+					esc_html__( 'Feed generated %1$s ago - %2$s', 'pinterest-for-woocommerce' ),
+					human_time_diff( $state['last_activity'] ),
+					$state['progress']
+				);
 				break;
 
 			case 'scheduled_for_generation':
@@ -216,6 +222,10 @@ class FeedState extends VendorAPI {
 
 		try {
 
+			if ( empty( $merchant_id ) || ! Pinterest_For_Woocommerce()::get_data( 'feed_registered' ) ) {
+				throw new \Exception( esc_html__( 'Product Feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' ), 200 );
+			}
+
 			$merchant = Base::get_merchant( $merchant_id );
 
 			if ( 'success' !== $merchant['status'] ) {
@@ -251,12 +261,10 @@ class FeedState extends VendorAPI {
 					break;
 
 				default:
-					$status       = 'warning';
-					$status_label = esc_html__( 'Product Feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' );
-					break;
+					throw new \Exception( esc_html__( 'Product Feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' ) );
 			}
 		} catch ( \Throwable $th ) {
-			$status       = 'error';
+			$status       = 200 === $th->getCode() ? 'pending' : 'error';
 			$status_label = $th->getMessage();
 		}
 
