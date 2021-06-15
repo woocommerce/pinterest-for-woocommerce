@@ -102,14 +102,14 @@ class ProductSync {
 	 */
 	public static function feed_reset() {
 
-		$state = Pinterest_For_Woocommerce()::get_setting( 'feed_job' );
+		$state = Pinterest_For_Woocommerce()::get_data( 'feed_job' );
 
 		if ( file_exists( $state['feed_file'] ) ) {
 			unlink( $state['feed_file'] );
 		}
 
-		Pinterest_For_Woocommerce()::save_setting( 'feed_job', false );
-		Pinterest_For_Woocommerce()::save_setting( 'feed_data_cache', false );
+		Pinterest_For_Woocommerce()::save_data( 'feed_job', false );
+		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', false );
 
 		self::log( 'Product Feed reset and file deleted.' );
 	}
@@ -124,7 +124,7 @@ class ProductSync {
 	 */
 	public static function feed_reschedule( $force = false ) {
 
-		$feed_job = Pinterest_For_Woocommerce()::get_setting( 'feed_job' );
+		$feed_job = Pinterest_For_Woocommerce()::get_data( 'feed_job' );
 		$feed_job = $feed_job ? $feed_job : array();
 
 		if ( ! $force && isset( $feed_job['status'] ) && in_array( $feed_job['status'], array( 'scheduled_for_generation', 'in_progress', 'starting' ), true ) ) {
@@ -133,7 +133,7 @@ class ProductSync {
 
 		$feed_job['status'] = 'scheduled_for_generation';
 
-		Pinterest_For_Woocommerce()::save_setting( 'feed_job', $feed_job );
+		Pinterest_For_Woocommerce()::save_data( 'feed_job', $feed_job );
 		self::trigger_async_feed_generation( $force );
 
 		self::log( 'Feed generation (re)scheduled.' );
@@ -173,7 +173,7 @@ class ProductSync {
 	 * @return boolean
 	 */
 	private static function is_feed_registered() {
-		return Pinterest_For_Woocommerce()::get_setting( 'feed_registered' );
+		return Pinterest_For_Woocommerce()::get_data( 'feed_registered' );
 	}
 
 
@@ -252,7 +252,7 @@ class ProductSync {
 	 * @return void
 	 */
 	private static function handle_feed_deregistration() {
-		Pinterest_For_Woocommerce()::save_setting( 'feed_registered', false );
+		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
 
 		self::feed_reset();
 	}
@@ -474,8 +474,8 @@ class ProductSync {
 			}
 		}
 
-		Pinterest_For_Woocommerce()::save_setting( 'feed_registered', $registered );
-		Pinterest_For_Woocommerce()::save_setting( 'merchant_id', $merchant['data']->id );
+		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $registered );
+		Pinterest_For_Woocommerce()::save_data( 'merchant_id', $merchant['data']->id );
 
 		return $registered;
 	}
@@ -494,7 +494,7 @@ class ProductSync {
 	private static function get_merchant( $feed_args ) {
 
 		$merchant    = false;
-		$merchant_id = Pinterest_For_Woocommerce()::get_setting( 'merchant_id' );
+		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
 
 		if ( empty( $merchant_id ) ) {
 			// Get merchant from advertiser object.
@@ -596,7 +596,7 @@ class ProductSync {
 	 */
 	public static function feed_job_status( $status = null, $args = null ) {
 
-		$state_data = Pinterest_For_Woocommerce()::get_setting( 'feed_job' );
+		$state_data = Pinterest_For_Woocommerce()::get_data( 'feed_job' );
 
 		if ( is_null( $status ) || ( ! is_null( $status ) && 'check_registration' === $status && ! empty( $state_data['job_id'] ) ) ) {
 			return $state_data;
@@ -655,7 +655,7 @@ class ProductSync {
 			delete_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state_data['job_id'] );
 		}
 
-		Pinterest_For_Woocommerce()::save_setting( 'feed_job', $state_data );
+		Pinterest_For_Woocommerce()::save_data( 'feed_job', $state_data );
 
 		if ( $initial_status !== $state_data['status'] ) {
 			self::log( 'Feed status set to: ' . $state_data['status'] );
@@ -678,7 +678,7 @@ class ProductSync {
 			return;
 		}
 
-		Pinterest_For_Woocommerce()::save_setting( 'feed_dirty', true );
+		Pinterest_For_Woocommerce()::save_data( 'feed_dirty', true );
 	}
 
 
@@ -689,8 +689,8 @@ class ProductSync {
 	 */
 	public static function reschedule_if_dirty() {
 
-		if ( Pinterest_For_Woocommerce()::get_setting( 'feed_dirty' ) ) {
-			Pinterest_For_Woocommerce()::save_setting( 'feed_dirty', false );
+		if ( Pinterest_For_Woocommerce()::get_data( 'feed_dirty' ) ) {
+			Pinterest_For_Woocommerce()::save_data( 'feed_dirty', false );
 			self::log( 'Feed is dirty.' );
 			self::feed_reschedule();
 		}

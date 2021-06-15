@@ -211,7 +211,7 @@ class FeedState extends VendorAPI {
 	 */
 	private function add_feed_registration_state( $result ) {
 
-		$merchant_id = Pinterest_For_Woocommerce()::get_setting( 'merchant_id' );
+		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
 		$extra_info  = '';
 
 		try {
@@ -294,7 +294,7 @@ class FeedState extends VendorAPI {
 	 */
 	private function add_feed_sync_status( $result ) {
 
-		$merchant_id = Pinterest_For_Woocommerce()::get_setting( 'merchant_id' );
+		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
 		$extra_info  = '';
 
 		try {

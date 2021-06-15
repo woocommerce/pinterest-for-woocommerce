@@ -38,7 +38,7 @@ class FeedIssues extends VendorAPI {
 		$this->base              = 'feed_issues';
 		$this->endpoint_callback = 'get_feed_issues';
 		$this->methods           = WP_REST_Server::READABLE;
-		$this->feed_data_files   = Pinterest_For_Woocommerce()::get_setting( 'feed_data_cache' );
+		$this->feed_data_files   = Pinterest_For_Woocommerce()::get_data( 'feed_data_cache' );
 		$this->feed_data_files   = $this->feed_data_files ? $this->feed_data_files : array();
 
 		$this->register_routes();
@@ -300,7 +300,7 @@ class FeedIssues extends VendorAPI {
 	 * @return void
 	 */
 	private function save_feed_data_cache() {
-		Pinterest_For_Woocommerce()::save_setting( 'feed_data_cache', $this->feed_data_files );
+		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', $this->feed_data_files );
 	}
 
 	/**
@@ -313,7 +313,7 @@ class FeedIssues extends VendorAPI {
 	 */
 	private static function get_last_feed_workflow() {
 
-		$merchant_id = Pinterest_For_Woocommerce()::get_setting( 'merchant_id' );
+		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
 		$feed_report = Base::get_feed_report( $merchant_id );
 
 		if ( 'success' !== $feed_report['status'] ) {
