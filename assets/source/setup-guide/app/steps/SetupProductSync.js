@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	Button,
 	Card,
 	CardBody,
 	CheckboxControl,
@@ -20,7 +21,7 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
-const SetupProductSync = ( { view } ) => {
+const SetupProductSync = ( { goToNextStep, view } ) => {
 	const appSettings = useSettingsSelect();
 	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
@@ -92,6 +93,20 @@ const SetupProductSync = ( { view } ) => {
 							) }
 						</CardBody>
 					</Card>
+
+					{ view === 'wizard' && (
+						<div className="woocommerce-setup-guide__footer-button">
+							<Button
+								isPrimary
+								onClick={ goToNextStep }
+							>
+								{ __(
+										'Continue',
+										'pinterest-for-woocommerce'
+								  ) }
+							</Button>
+						</div>
+					) }
 				</div>
 			</div>
 		</div>
