@@ -103,8 +103,14 @@ class FeedState extends VendorAPI {
 						array(
 							'label'        => esc_html__( 'XML Feed', 'pinterest-for-woocommerce' ),
 							'status'       => 'error',
-							'status_label' => esc_html__( 'Feed is disabled.', 'pinterest-for-woocommerce' ),
-							'extra_info'   => '',
+							'status_label' => esc_html__( 'Product Sync is disabled.', 'pinterest-for-woocommerce' ),
+							'extra_info'   => wp_kses_post(
+								sprintf(
+									/* Translators: %1$s The URL of the settings page */
+									__( 'Visit the <a href="%1$s">settings</a> page to enabled it.', 'pinterest-for-woocommerce' ),
+									esc_url( add_query_arg( array( 'page' => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE ), get_admin_url( null, 'admin.php' ) ) )
+								)
+							),
 						),
 					),
 					'overview' => array(
@@ -242,11 +248,13 @@ class FeedState extends VendorAPI {
 				case 'approved':
 					$status       = 'success';
 					$status_label = esc_html__( 'Product Feed configured for Ingestion on Pinterest', 'pinterest-for-woocommerce' );
-					$extra_info   = sprintf(
-						/* Translators: %1$s The URL of the product feed, %2$s Time string */
-						esc_html__( 'Pinterest will fetch your product\'s feed URL (%1$s) every %2$s', 'pinterest-for-woocommerce' ),
-						$merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location,
-						human_time_diff( 0, ( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq / 1000 ) )
+					$extra_info   = wp_kses_post(
+						sprintf(
+							/* Translators: %1$s The URL of the product feed, %2$s Time string */
+							__( 'Pinterest will fetch your <a href="%1$s" target="_blank">product\'s feed URL</a> every %2$s', 'pinterest-for-woocommerce' ),
+							$merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location,
+							human_time_diff( 0, ( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq / 1000 ) )
+						)
 					);
 
 					break;
