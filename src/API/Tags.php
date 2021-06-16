@@ -85,14 +85,12 @@ class Tags extends VendorAPI {
 				}
 			}
 
-			Pinterest_For_Woocommerce()::save_setting( 'account_tags', $tags );
-
 			return $tags;
 
 		} catch ( \Throwable $th ) {
 
 			/* Translators: The error description as returned from the API */
-			$error_message = sprintf( esc_html__( 'Could not fetch tracking tags for the given advertiser. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
+			$error_message = sprintf( esc_html__( 'No tracking tag available. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
 
 			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_tags_error', $error_message, array( 'status' => $th->getCode() ) );
 
