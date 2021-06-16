@@ -79,7 +79,7 @@ const LandingPageApp = () => {
 				<Panel header={ __( 'Frequently asked questions', 'pinterest-for-woocommerce' ) }>
 					{
 						faqItems.map( ( item, index ) => (
-							<PanelBody title={item.question } initialOpen={ index === 0 } key={ index }>
+							<PanelBody title={item.question } initialOpen={ false } key={ index }>
 								<PanelRow>{item.answer}</PanelRow>
 							</PanelBody>
 						))
