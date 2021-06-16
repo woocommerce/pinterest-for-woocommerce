@@ -56,8 +56,19 @@ const LandingPageApp = () => {
 							<FlexBlock key={index}>
 								<img src={ item.image_url } />
 								<Text variant="subtitle">{ item.title }</Text>
-								<Text variant="body">{ item.text }</Text>
-								{ item?.extra && <Text variant="body" className="extra">{ item.text }</Text> }
+								<Text variant="body"
+									dangerouslySetInnerHTML={ {
+										__html: item.text,
+									} }
+								/>
+								{ item?.extra &&
+								<Text
+									variant="body"
+									className="extra"
+									dangerouslySetInnerHTML={ {
+										__html: item.extra,
+									} }
+								/> }
 							</FlexBlock>
 						))
 					}
