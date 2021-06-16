@@ -61,6 +61,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			'rich_pins_on_posts'     => true,
 			'rich_pins_on_products'  => true,
 			'product_sync_enabled'   => true,
+			'enable_debug_logging'   => false,
 		);
 
 		/**

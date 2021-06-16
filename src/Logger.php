@@ -43,7 +43,7 @@ class Logger {
 	 */
 	public static function log( $message, $level = 'debug', $feature = null ) {
 
-		$logging = 'error' === $level ? true : apply_filters( 'pinterest_for_woocommerce_debug_logging', true );
+		$logging = 'error' === $level ? true : Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' );
 
 		if ( empty( $logging ) || ! function_exists( 'wc_get_logger' ) ) {
 			return;
