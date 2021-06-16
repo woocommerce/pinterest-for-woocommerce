@@ -684,7 +684,7 @@ class ProductSync {
 	 *
 	 * @param integer $product_id The product ID.
 	 *
-	 * return void
+	 * @return void
 	 */
 	public static function mark_feed_dirty( $product_id ) {
 		if ( ! wc_get_product( $product_id ) ) {
