@@ -26,12 +26,12 @@ const SyncStateSummary = ( { overview } ) => {
 			<SummaryNumber
 				key="with-warnings"
 				value={ data?.warnings ?? defaultValue }
-				label={ __( 'With Warnings', 'pinterest-for-woocommerce' ) }
+				label={ __( 'Warnings', 'pinterest-for-woocommerce' ) }
 			/>,
 			<SummaryNumber
 				key="with-errors"
 				value={ data?.errors ?? defaultValue }
-				label={ __( 'With Errors', 'pinterest-for-woocommerce' ) }
+				label={ __( 'Errors', 'pinterest-for-woocommerce' ) }
 			/>,
 		];
 	};

@@ -8,8 +8,11 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest as Pinterest;
+
 use \WP_REST_Server;
 use \WP_REST_Request;
+use \WP_REST_Response;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,7 +38,7 @@ class FeedIssues extends VendorAPI {
 		$this->base              = 'feed_issues';
 		$this->endpoint_callback = 'get_feed_issues';
 		$this->methods           = WP_REST_Server::READABLE;
-		$this->feed_data_files   = Pinterest_For_Woocommerce()::get_setting( 'feed_data_files' );
+		$this->feed_data_files   = Pinterest_For_Woocommerce()::get_data( 'feed_data_cache' );
 		$this->feed_data_files   = $this->feed_data_files ? $this->feed_data_files : array();
 
 		$this->register_routes();
@@ -69,8 +72,14 @@ class FeedIssues extends VendorAPI {
 
 		try {
 
+			if ( ! Pinterest\ProductSync::is_product_sync_enabled() ) {
+				return array( 'lines' => array() );
+			}
+
 			$workflow        = false;
 			$issues_file_url = $request->has_param( 'feed_issues_url' ) ? $request->get_param( 'feed_issues_url' ) : false;
+			$paged           = $request->has_param( 'paged' ) ? (int) $request->get_param( 'paged' ) : 1;
+			$per_page        = $request->has_param( 'per_page' ) ? (int) $request->get_param( 'per_page' ) : 25;
 
 			if ( false === $issues_file_url ) {
 				$workflow = self::get_last_feed_workflow();
@@ -85,19 +94,31 @@ class FeedIssues extends VendorAPI {
 			}
 
 			// Get file.
-			$issues_file = $this->get_remote_file( $issues_file_url, $workflow );
+			$issues_file = $this->get_remote_file( $issues_file_url, (array) $workflow );
 
 			if ( empty( $issues_file ) ) {
 				throw new \Exception( esc_html__( 'Error downloading Feed Issues file from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$lines = self::parse_lines( $issues_file, 0, 10 ); // TODO: pagination?
+			$start_line  = ( ( $paged - 1 ) * $per_page );
+			$end_line    = $start_line + $per_page - 1; // Starting from 0.
+			$issues_data = self::parse_lines( $issues_file, $start_line, $end_line );
 
-			if ( ! empty( $lines ) ) {
-				$lines = array_map( array( __CLASS__, 'add_product_data' ), $lines );
+			if ( ! empty( $issues_data['lines'] ) ) {
+				$issues_data['lines'] = array_map( array( __CLASS__, 'prepare_issue_lines' ), $issues_data['lines'] );
 			}
 
-			return array( 'lines' => $lines );
+			$response = new WP_REST_Response(
+				array(
+					'lines'      => $issues_data['lines'],
+					'total_rows' => $issues_data['total'],
+				)
+			);
+
+			$response->header( 'X-WP-Total', $issues_data['total'] );
+			$response->header( 'X-WP-TotalPages', ceil( $issues_data['total'] / $per_page ) );
+
+			return $response;
 
 		} catch ( \Throwable $th ) {
 
@@ -116,14 +137,29 @@ class FeedIssues extends VendorAPI {
 	 *
 	 * @return array
 	 */
-	private static function add_product_data( $line ) {
+	private static function prepare_issue_lines( $line ) {
 
-		$product = wc_get_product( $line['ItemId'] );
+		$product      = wc_get_product( $line['ItemId'] );
+		$edit_link    = '';
+		$product_name = esc_html__( 'Invalid product', 'pinterest-for-woocommerce' );
 
-		$line['product_name']      = $product->get_name();
-		$line['product_edit_link'] = get_edit_post_link( $product->get_id() );
+		if ( $product ) {
+			$product_name = $product->get_name();
+		}
 
-		return $line;
+		if ( $product->get_parent_id() ) {
+			$product_name .= ' ' . esc_html__( '(Variation)', 'pinterest-for-woocommerce' );
+			$edit_link     = get_edit_post_link( $product->get_parent_id() );
+		}
+
+		$edit_link = empty( $edit_link ) && $product ? get_edit_post_link( $product->get_id() ) : $edit_link;
+
+		return array(
+			'status'            => 'ERROR' === $line['Code'] ? 'error' : 'warning',
+			'product_name'      => $product_name,
+			'product_edit_link' => $edit_link,
+			'issue_description' => $line['Message'],
+		);
 	}
 
 
@@ -150,10 +186,18 @@ class FeedIssues extends VendorAPI {
 		try {
 			$spl = new \SplFileObject( $issues_file );
 
+			// Get last line.
+			$spl->seek( $spl->getSize() );
+			$last_line = (int) $spl->key();
+
 			if ( $has_keys ) {
 				$spl->seek( 0 );
 				$keys = $spl->current();
+				$last_line--;
 			}
+
+			// Don't go over last line.
+			$end_line = $end_line > $last_line ? $last_line : $end_line;
 
 			for ( $i = $start_line; $i <= $end_line; $i++ ) {
 				$spl->seek( $i );
@@ -188,7 +232,10 @@ class FeedIssues extends VendorAPI {
 			$line = array_combine( $keys, array_map( 'trim', explode( $delim, $line ) ) );
 		}
 
-		return $lines;
+		return array(
+			'lines' => $lines,
+			'total' => $last_line,
+		);
 	}
 
 
@@ -202,6 +249,11 @@ class FeedIssues extends VendorAPI {
 	 * @return string|boolean
 	 */
 	private function get_remote_file( $url, $cache_key ) {
+
+		if ( is_array( $cache_key ) && ! empty( $cache_key ) ) {
+			$ignore_for_cache = array( 's3_source_url', 's3_validation_url' ); // These 2 are different on every response.
+			$cache_key        = array_diff_key( $cache_key, array_flip( $ignore_for_cache ) );
+		}
 
 		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_file_' . md5( $cache_key ? wp_json_encode( $cache_key ) : $url );
 
@@ -248,7 +300,7 @@ class FeedIssues extends VendorAPI {
 	 * @return void
 	 */
 	private function save_feed_data_cache() {
-		Pinterest_For_Woocommerce()::save_setting( 'feed_data_cache', $this->feed_data_files );
+		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', $this->feed_data_files );
 	}
 
 	/**
@@ -261,7 +313,7 @@ class FeedIssues extends VendorAPI {
 	 */
 	private static function get_last_feed_workflow() {
 
-		$merchant_id = Pinterest_For_Woocommerce()::get_setting( 'merchant_id' );
+		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
 		$feed_report = Base::get_feed_report( $merchant_id );
 
 		if ( 'success' !== $feed_report['status'] ) {
