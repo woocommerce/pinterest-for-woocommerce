@@ -293,24 +293,24 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 					'title'     => esc_html__( 'Get your products in front of more than 475M people on Pinterest', 'pinterest-for-woocommerce' ),
 					'text'      => esc_html__( 'Pinterest is a visual discovery engine people use to find inspiration for their lives and make it easier to shop for home decor, fashion and style, electronics and more. 400 million people have saved more than 300 billion Pins across a range of interests, which others with similar tastes can discover through search and recommendations.', 'pinterest-for-woocommerce' ),
 					'tos_link'  => 'https://business.pinterest.com/business-terms-of-service/',
-					'image_url' => 'https://placehold.it/416x300/',
+					'image_url' => 'http://placehold.it/416x300/',
 				),
 				'features'  => array(
 					array(
 						'title'     => esc_html__( 'Connect your account', 'pinterest-for-woocommerce' ),
 						'text'      => esc_html__( 'Install the Pinterest for WooCommerce app to quickly upload your product catalog and publish Pins for items you sell. Track performance with the Pinterest Tag and keep your Pins up to date with our daily automatic updates.', 'pinterest-for-woocommerce' ),
-						'image_url' => 'https://placehold.it/100x100/',
+						'image_url' => 'http://placehold.it/100x100/',
 					),
 					array(
 						'title'     => esc_html__( 'Increase organic reach', 'pinterest-for-woocommerce' ),
 						'text'      => esc_html__( 'Once you\'ve uploaded your catalog, people on Pinterest can easily discover, save and buy products from your website without any advertising spend from you.*', 'pinterest-for-woocommerce' ),
 						'extra'     => esc_html__( '*It can take up to 5 business days for the product catalog to sync for this first time', 'pinterest-for-woocommerce' ),
-						'image_url' => 'https://placehold.it/100x100/',
+						'image_url' => 'http://placehold.it/100x100/',
 					),
 					array(
 						'title'     => esc_html__( 'Merchant storefronts on profile', 'pinterest-for-woocommerce' ),
 						'text'      => esc_html__( 'Upload your catalog via the WooCommerce for Pinterest app and transform the shop tab on your business profile into an inspiring storefront. Pinners will see featured product groups and dynamically created recommendations and can easily navigate by category. Whenever they click on your profile, they\'ll be automatically taken to your storefront.', 'pinterest-for-woocommerce' ),
-						'image_url' => 'https://placehold.it/100x100/',
+						'image_url' => 'http://placehold.it/100x100/',
 					),
 				),
 				'faq_items' => array(
