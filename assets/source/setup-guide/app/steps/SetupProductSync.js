@@ -96,11 +96,14 @@ const SetupProductSync = ( { goToNextStep, view } ) => {
 
 					{ view === 'wizard' && (
 						<div className="woocommerce-setup-guide__footer-button">
-							<Button isPrimary onClick={ goToNextStep }>
+							<Button
+								isPrimary
+								onClick={ goToNextStep }
+							>
 								{ __(
-									'Continue',
-									'pinterest-for-woocommerce'
-								) }
+										'Continue',
+										'pinterest-for-woocommerce'
+								  ) }
 							</Button>
 						</div>
 					) }
