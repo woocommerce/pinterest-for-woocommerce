@@ -30,9 +30,9 @@ const LandingPageApp = () => {
 					<FlexBlock className="content-block">
 						<Text variant="title.medium">{ welcome.title }</Text>
 
-						<Text variatn="body">{ welcome.text }</Text>
+						<Text variant="body">{ welcome.text }</Text>
 
-						<Text variatn="body">
+						<Text variant="body">
 							<Button
 								isPrimary
 								onClick={() => updateQueryString({ view: 'wizard' } ) }
