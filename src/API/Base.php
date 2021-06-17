@@ -443,10 +443,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_feed_report( $merchant_id ) {
-
-		// needs cacching.
-
-		$response = self::make_request( 'catalogs/datasource/feed_report/' . $merchant_id . '/', 'GET' );
+		$response = self::make_request( 'catalogs/datasource/feed_report/' . $merchant_id . '/', 'GET', array(), '', MINUTE_IN_SECONDS );
 		return $response;
 	}
 
