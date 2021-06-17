@@ -102,7 +102,7 @@ class ProductSync {
 	 */
 	public static function feed_reset() {
 
-		$state = Pinterest_For_Woocommerce()::get_data( 'feed_job' );
+		$state = Pinterest_For_Woocommerce()::get_data( 'feed_job' ) ?? array();
 
 		if ( file_exists( $state['feed_file'] ) ) {
 			unlink( $state['feed_file'] );
@@ -128,8 +128,7 @@ class ProductSync {
 	 */
 	public static function feed_reschedule( $force = false ) {
 
-		$feed_job = Pinterest_For_Woocommerce()::get_data( 'feed_job' );
-		$feed_job = $feed_job ? $feed_job : array();
+		$feed_job = Pinterest_For_Woocommerce()::get_data( 'feed_job' ) ?? array();
 
 		if ( ! $force && isset( $feed_job['status'] ) && in_array( $feed_job['status'], array( 'scheduled_for_generation', 'in_progress', 'starting' ), true ) ) {
 			return;
@@ -177,7 +176,7 @@ class ProductSync {
 	 * @return boolean
 	 */
 	private static function is_feed_registered() {
-		return Pinterest_For_Woocommerce()::get_data( 'feed_registered' );
+		return Pinterest_For_Woocommerce()::get_data( 'feed_registered' ) ?? false;
 	}
 
 
