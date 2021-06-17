@@ -104,11 +104,11 @@ class ProductSync {
 
 		$state = Pinterest_For_Woocommerce()::get_data( 'feed_job' ) ?? array();
 
-		if ( file_exists( $state['feed_file'] ) ) {
+		if ( isset( $state['feed_file'] ) && file_exists( $state['feed_file'] ) ) {
 			unlink( $state['feed_file'] );
 		}
 
-		if ( file_exists( $state['tmp_file'] ) ) {
+		if ( isset( $state['tmp_file'] ) && file_exists( $state['tmp_file'] ) ) {
 			unlink( $state['tmp_file'] );
 		}
 

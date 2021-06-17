@@ -313,9 +313,9 @@ class FeedIssues extends VendorAPI {
 	private static function get_last_feed_workflow() {
 
 		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-		$feed_report = Base::get_feed_report( $merchant_id );
+		$feed_report = $merchant_id ? Base::get_feed_report( $merchant_id ) : false;
 
-		if ( 'success' !== $feed_report['status'] ) {
+		if ( ! $feed_report || 'success' !== $feed_report['status'] ) {
 			throw new \Exception( esc_html__( 'Could not get feed report from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
 		}
 

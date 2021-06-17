@@ -316,9 +316,9 @@ class FeedState extends VendorAPI {
 		try {
 
 			// Get feed ingestion status.
-			$feed_report = Base::get_feed_report( $merchant_id );
+			$feed_report = $merchant_id ? Base::get_feed_report( $merchant_id ) : false;
 
-			if ( 'success' !== $feed_report['status'] ) {
+			if ( ! $feed_report || 'success' !== $feed_report['status'] ) {
 				throw new \Exception( esc_html__( 'Response error when trying to get feed report from Pinterest.', 'pinterest-for-woocommerce' ) );
 			}
 
