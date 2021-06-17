@@ -494,7 +494,9 @@ class ProductSync {
 
 	/**
 	 * Returns the merchant object for the current user.
-	 * If a merchant alreyad
+	 * If a merchant already exists, either saved to the database, or is
+	 * returned by the Advertisers endpoint, it will be used, otherwise an
+	 * attempt to create a new one is made.
 	 *
 	 * @param array $feed_args The arguments used to create the feed.
 	 *
