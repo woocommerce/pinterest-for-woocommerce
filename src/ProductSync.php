@@ -62,18 +62,19 @@ class ProductSync {
 	 */
 	public static function maybe_init() {
 
+		if ( ! self::is_product_sync_enabled() && ! self::is_feed_registered() ) {
+			return;
+		}
+
 		// Schedule required actions.
 		add_action( self::ACTION_HANDLE_SYNC, array( __CLASS__, 'handle_feed_registration' ) );
 		add_action( self::ACTION_FEED_GENERATION, array( __CLASS__, 'handle_feed_generation' ) );
 
 		// ACTION_HANDLE_SYNC task handles both registration and de-registration.
-		if ( self::is_product_sync_enabled() || self::is_feed_registered() ) {
+		if ( false === as_next_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+			$interval = 10 * MINUTE_IN_SECONDS;
 
-			if ( false === as_next_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-				$interval = 10 * MINUTE_IN_SECONDS;
-
-				as_schedule_recurring_action( time() + $interval, $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-			}
+			as_schedule_recurring_action( time() + $interval, $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 
 		if ( self::is_product_sync_enabled() ) {
