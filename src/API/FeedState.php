@@ -147,7 +147,7 @@ class FeedState extends VendorAPI {
 	 */
 	private function add_local_feed_state( $result ) {
 
-		$state      = Pinterest\ProductSync::feed_job_status();
+		$state      = Pinterest\ProductSync::feed_job_status() ?? array( 'status' => 'pending_config' );
 		$extra_info = '';
 
 		switch ( $state['status'] ) {
