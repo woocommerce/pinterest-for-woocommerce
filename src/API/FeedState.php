@@ -156,12 +156,12 @@ class FeedState extends VendorAPI {
 		switch ( $state['status'] ) {
 			case 'starting':
 				$status       = 'pending';
-				$status_label = esc_html__( 'Feed generation is being initialized', 'pinterest-for-woocommerce' );
+				$status_label = esc_html__( 'Feed generation is being initialized.', 'pinterest-for-woocommerce' );
 				break;
 
 			case 'in_progress':
 				$status       = 'pending';
-				$status_label = esc_html__( 'Feed generation in progress', 'pinterest-for-woocommerce' );
+				$status_label = esc_html__( 'Feed generation in progress.', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
 					/* Translators: %1$s Time string, %2$s text string indicating progress */
 					esc_html__( 'Last activity: %1$s ago - %2$s', 'pinterest-for-woocommerce' ),
@@ -183,12 +183,12 @@ class FeedState extends VendorAPI {
 
 			case 'scheduled_for_generation':
 				$status       = 'pending';
-				$status_label = esc_html__( 'Feed generation will start shortly', 'pinterest-for-woocommerce' );
+				$status_label = esc_html__( 'Feed generation will start shortly.', 'pinterest-for-woocommerce' );
 				break;
 
 			case 'pending_config':
 				$status       = 'pending';
-				$status_label = esc_html__( 'Feed pending configuration', 'pinterest-for-woocommerce' );
+				$status_label = esc_html__( 'Feed configuration will start shortly.', 'pinterest-for-woocommerce' );
 				break;
 
 			default:
@@ -265,6 +265,7 @@ class FeedState extends VendorAPI {
 				case 'appeal_pending':
 					$status       = 'pending';
 					$status_label = esc_html__( 'Product Feed pending approval on Pinterest.', 'pinterest-for-woocommerce' );
+					$extra_info   = esc_html__( 'This usually takes 1-2 days.', 'pinterest-for-woocommerce' );
 					break;
 				case 'declined':
 					$status       = 'error';
@@ -365,6 +366,7 @@ class FeedState extends VendorAPI {
 				case 'UNDER_REVIEW':
 					$status       = 'pending';
 					$status_label = esc_html__( 'Feed is under review.', 'pinterest-for-woocommerce' );
+					$extra_info   = esc_html__( 'This usually takes 1-2 days.', 'pinterest-for-woocommerce' );
 					break;
 
 				case 'FAILED':
