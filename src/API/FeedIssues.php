@@ -182,10 +182,9 @@ class FeedIssues extends VendorAPI {
 		$start_line = $has_keys ? $start_line + 1 : $start_line;
 		$end_line   = $has_keys ? $end_line + 1 : $end_line;
 
-		try {
-			$spl = new \SplFileObject( $issues_file );
+		$spl = new \SplFileObject( $issues_file );
 
-			// Get last line.
+		// Get last line.
 			$spl->seek( $spl->getSize() );
 			$last_line = (int) $spl->key();
 
@@ -199,28 +198,8 @@ class FeedIssues extends VendorAPI {
 			$end_line = $end_line > $last_line ? $last_line : $end_line;
 
 			for ( $i = $start_line; $i <= $end_line; $i++ ) {
-				$spl->seek( $i );
-				$lines[] = $spl->current();
-			}
-		} catch ( \Throwable $th ) {
-
-			// Fallback method.
-			global $wp_filesystem;
-
-			require_once ABSPATH . '/wp-admin/includes/file.php';
-
-			if ( ! is_a( $wp_filesystem, 'WP_Filesystem_Base' ) ) {
-				$creds = request_filesystem_credentials( site_url() );
-				WP_Filesystem( $creds );
-			}
-
-			$all_lines = $wp_filesystem->get_contents_array( $issues_file );
-
-			if ( $has_keys ) {
-				$keys = $all_lines[0];
-			}
-
-			$lines = array_slice( $all_lines, $start_line, ( $end_line - $start_line ) );
+			$spl->seek( $i );
+			$lines[] = $spl->current();
 		}
 
 		if ( ! empty( $keys ) ) {
