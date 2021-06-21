@@ -62,8 +62,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "wp-scripts build && gulp build",
     "start": "wp-scripts start",
-    "lint:js": "wp-scripts lint-js assets/source/catalog-sync assets/source/setup-guide",
-    "lint:js:fix": "wp-scripts lint-js assets/source/catalog-sync assets/source/setup-guide --fix",
+    "lint:js": "wp-scripts lint-js assets/source",
+    "lint:js:fix": "wp-scripts lint-js assets/source --fix",
     "build:zip": "composer install && wp-scripts build && gulp build && gulp package"
   },
   "keywords": [
