@@ -7,7 +7,7 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import WizardApp from '../setup-guide/app/views/WizardApp';
+import App from '../setup-guide';
 import '../setup-guide/app/style.scss';
 
 /**
@@ -22,7 +22,7 @@ addFilter(
 			{
 				key: 'setup-pinterest',
 				title: __( 'Setup Pinterest Integration', 'pinterest-for-woocommerce' ),
-				container: <WizardApp />,
+				container: <App />,
 				completed: wcSettings.pin4wc.isSetupComplete,
 				visible: true,
 				additionalInfo: __( 'Configure the connection to Pinterest and any additional settings like tracking, product sync, etc.', 'pinterest-for-woocommerce' ),

@@ -31,6 +31,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			add_action( 'admin_init', array( $this, 'maybe_go_to_service_login_url' ) );
 			add_filter( 'woocommerce_get_registered_extended_tasks', array( $this, 'register_task_list_item' ), 10, 1 );
 			add_filter( 'woocommerce_shared_settings', array( $this, 'component_settings' ), 20 );
+			add_filter( 'woocommerce_shared_settings', array( $this, 'landing_page_content' ), 20 );
 		}
 
 		/**
@@ -69,7 +70,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 */
 		public function register_guide_page() {
 
-			$page_title = ( isset( $_GET['view'] ) && 'wizard' === $_GET['view'] ? __( 'Pinterest Setup Guide', 'pinterest-for-woocommerce' ) : __( 'Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
+			$page_title = ( isset( $_GET['view'] ) && 'wizard' === $_GET['view'] ? esc_html__( 'Pinterest Setup Guide', 'pinterest-for-woocommerce' ) : esc_html__( 'Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 
 			add_submenu_page(
 				'woocommerce-marketing',
@@ -94,7 +95,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			Menu::add_plugin_category(
 				array(
 					'id'     => 'pinterest-for-woocommerce',
-					'title'  => __( 'Pinterest', 'pinterest-for-woocommerce' ),
+					'title'  => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
 					'parent' => 'woocommerce',
 				)
 			);
@@ -278,6 +279,54 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			return $settings;
 		}
 
+
+		/**
+		 * Adds the content of the landing page.
+		 *
+		 * @param array $settings The settings array to be filtered.
+		 *
+		 * @return array
+		 */
+		public function landing_page_content( $settings ) {
+			$settings['pin4wc']['landing_page'] = array(
+				'welcome'   => array(
+					'title'     => esc_html__( 'Get your products in front of more than 475M people on Pinterest', 'pinterest-for-woocommerce' ),
+					'text'      => esc_html__( 'Pinterest is a visual discovery engine people use to find inspiration for their lives and make it easier to shop for home decor, fashion and style, electronics and more. 400 million people have saved more than 300 billion Pins across a range of interests, which others with similar tastes can discover through search and recommendations.', 'pinterest-for-woocommerce' ),
+					'tos_link'  => 'https://business.pinterest.com/business-terms-of-service/',
+					'image_url' => 'http://placehold.it/416x300/',
+				),
+				'features'  => array(
+					array(
+						'title'     => esc_html__( 'Connect your account', 'pinterest-for-woocommerce' ),
+						'text'      => esc_html__( 'Install the Pinterest for WooCommerce app to quickly upload your product catalog and publish Pins for items you sell. Track performance with the Pinterest Tag and keep your Pins up to date with our daily automatic updates.', 'pinterest-for-woocommerce' ),
+						'image_url' => 'http://placehold.it/100x100/',
+					),
+					array(
+						'title'     => esc_html__( 'Increase organic reach', 'pinterest-for-woocommerce' ),
+						'text'      => esc_html__( 'Once you\'ve uploaded your catalog, people on Pinterest can easily discover, save and buy products from your website without any advertising spend from you.*', 'pinterest-for-woocommerce' ),
+						'extra'     => esc_html__( '*It can take up to 5 business days for the product catalog to sync for this first time', 'pinterest-for-woocommerce' ),
+						'image_url' => 'http://placehold.it/100x100/',
+					),
+					array(
+						'title'     => esc_html__( 'Merchant storefronts on profile', 'pinterest-for-woocommerce' ),
+						'text'      => esc_html__( 'Upload your catalog via the WooCommerce for Pinterest app and transform the shop tab on your business profile into an inspiring storefront. Pinners will see featured product groups and dynamically created recommendations and can easily navigate by category. Whenever they click on your profile, they\'ll be automatically taken to your storefront.', 'pinterest-for-woocommerce' ),
+						'image_url' => 'http://placehold.it/100x100/',
+					),
+				),
+				'faq_items' => array(
+					array(
+						'question' => esc_html__( 'Why am I getting an “Account not connected” error message?', 'pinterest-for-woocommerce' ),
+						'answer'   => esc_html__( 'Your password might have changed recently. Click Reconnect Pinterest Account and follow the instructions on screen to restore the connection.', 'pinterest-for-woocommerce' ),
+					),
+					array(
+						'question' => esc_html__( 'I have more than one Pinterest Advertiser account. Can I connect my WooCommerce store to multiple Pinterest Advertiser accounts?', 'pinterest-for-woocommerce' ),
+						'answer'   => esc_html__( 'Only one Pinterest advertiser account can be linked to each WooCommerce store. If you want to connect a different Pinterest advertiser account you will need to either: Disconnect the existing Pinterest Advertiser account from your current WooCommerce store and connect a different Pinterest Advertiser account Create another WooCommerce store and connect the additional Pinterest Advertiser account.', 'pinterest-for-woocommerce' ),
+					),
+				),
+			);
+
+			return $settings;
+		}
 
 		/**
 		 * Handles redirection to the service login URL.
