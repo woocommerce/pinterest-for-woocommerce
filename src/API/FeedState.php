@@ -85,7 +85,10 @@ class FeedState extends VendorAPI {
 
 
 	/**
-	 * Get the advertisers assigned to the authorized Pinterest account.
+	 * Get the status of the current feed, for:
+	 * - the local feed configuration.
+	 * - the remote feed registration.
+	 * - the feed ingestion process.
 	 *
 	 * @return array
 	 *

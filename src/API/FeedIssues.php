@@ -59,7 +59,7 @@ class FeedIssues extends VendorAPI {
 
 
 	/**
-	 * Get the advertisers assigned to the authorized Pinterest account.
+	 * Get the feed issue lines for the last workflow of the current feed.
 	 *
 	 * @return array
 	 *
@@ -304,7 +304,7 @@ class FeedIssues extends VendorAPI {
 
 	/**
 	 * Get the latest Workflow of the
-	 * active feed, for the Merchant saved in the settings.
+	 * active feed related to the last attempt to process and ingest our feed, for the Merchant saved in the settings.
 	 *
 	 * @return object
 	 *

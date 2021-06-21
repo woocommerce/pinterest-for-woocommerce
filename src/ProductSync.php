@@ -66,24 +66,27 @@ class ProductSync {
 			return;
 		}
 
-		// Schedule required actions.
+		// Hook the Scheduled actions.
 		add_action( self::ACTION_HANDLE_SYNC, array( __CLASS__, 'handle_feed_registration' ) );
 		add_action( self::ACTION_FEED_GENERATION, array( __CLASS__, 'handle_feed_generation' ) );
 
-		// ACTION_HANDLE_SYNC task handles both registration and de-registration.
+		// Schedule the main feed control task.
 		if ( false === as_next_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			$interval = 10 * MINUTE_IN_SECONDS;
-
 			as_schedule_recurring_action( time() + $interval, $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 
 		if ( self::is_product_sync_enabled() ) {
 			$state = self::feed_job_status();
 
+			// If we are scheduled for generation, do it asap.
 			if ( $state && 'scheduled_for_generation' === $state['status'] ) {
 				self::trigger_async_feed_generation();
 			}
 
+			/**
+			 * Mark feed as needing re-generation whenever a product is edited or changed.
+			 */
 			add_action( 'edit_post', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
 
 			if ( 'yes' === get_option( 'woocommerce_manage_stock' ) ) {
@@ -91,6 +94,7 @@ class ProductSync {
 				add_action( 'woocommerce_product_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
 			}
 
+			// If feed is dirty on completion of feed generation, reschedule it.
 			add_action( 'pinterest_for_woocommerce_feed_generated', array( __CLASS__, 'reschedule_if_dirty' ) );
 		}
 	}
