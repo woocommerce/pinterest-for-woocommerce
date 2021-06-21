@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Endpoint returning the product-level issues of the XML Feed.
+ * Endpoint returning the product-level issues of the XML feed.
  */
 class FeedIssues extends VendorAPI {
 

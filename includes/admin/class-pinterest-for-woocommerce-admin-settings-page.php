@@ -88,8 +88,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 			add_submenu_page(
 				'woocommerce-marketing',
-				esc_html__( 'Product Catalog', 'pinterest-for-woocommerce' ),
-				esc_html__( 'Pinterest Product Catalog', 'pinterest-for-woocommerce' ),
+				esc_html__( 'Product catalog', 'pinterest-for-woocommerce' ),
+				esc_html__( 'Pinterest product catalog', 'pinterest-for-woocommerce' ),
 				'manage_woocommerce',
 				PINTEREST_FOR_WOOCOMMERCE_CATALOG_SYNC,
 				array( $this, 'render_settings_page' ),
@@ -107,7 +107,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			Menu::add_plugin_item(
 				array(
 					'id'         => 'pin4wcCatalogSync',
-					'title'      => esc_html__( 'Product Catalog', 'pinterest-for-woocommerce' ),
+					'title'      => esc_html__( 'Product catalog', 'pinterest-for-woocommerce' ),
 					'capability' => 'manage_woocommerce',
 					'url'        => PINTEREST_FOR_WOOCOMMERCE_CATALOG_SYNC,
 					'parent'     => 'pinterest-for-woocommerce',
@@ -132,7 +132,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		public function render_settings_page() {
 
 			$tabs = array(
-				'catalog-sync' => esc_html__( 'Product Catalog', 'pinterest-for-woocommerce' ),
+				'catalog-sync' => esc_html__( 'Product catalog', 'pinterest-for-woocommerce' ),
 				'setup-guide'  => esc_html__( 'Settings', 'pinterest-for-woocommerce' ),
 			);
 
@@ -405,7 +405,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 			if ( is_callable( 'wc_admin_connect_page' ) ) {
 
-				$page_title = 'catalog-sync' === $this->get_request( 'tab' ) ? esc_html__( 'Product Catalog', 'pinterest-for-woocommerce' ) : esc_html__( 'Settings', 'pinterest-for-woocommerce' );
+				$page_title = 'catalog-sync' === $this->get_request( 'tab' ) ? esc_html__( 'Product catalog', 'pinterest-for-woocommerce' ) : esc_html__( 'Settings', 'pinterest-for-woocommerce' );
 
 				wc_admin_connect_page(
 					array(

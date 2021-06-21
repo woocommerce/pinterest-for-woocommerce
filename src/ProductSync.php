@@ -120,7 +120,7 @@ class ProductSync {
 		Pinterest_For_Woocommerce()::save_data( 'feed_job', false );
 		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', false );
 
-		self::log( 'Product Feed reset and file deleted.' );
+		self::log( 'Product feed reset and file deleted.' );
 	}
 
 

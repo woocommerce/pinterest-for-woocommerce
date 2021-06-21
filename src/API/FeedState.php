@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Endpoint returning the current state of the XML Feed.
+ * Endpoint returning the current state of the XML feed.
  */
 class FeedState extends VendorAPI {
 
@@ -104,9 +104,9 @@ class FeedState extends VendorAPI {
 				return array(
 					'workflow' => array(
 						array(
-							'label'        => esc_html__( 'XML Feed', 'pinterest-for-woocommerce' ),
+							'label'        => esc_html__( 'XML feed', 'pinterest-for-woocommerce' ),
 							'status'       => 'error',
-							'status_label' => esc_html__( 'Product Sync is disabled.', 'pinterest-for-woocommerce' ),
+							'status_label' => esc_html__( 'Product sync is disabled.', 'pinterest-for-woocommerce' ),
 							'extra_info'   => wp_kses_post(
 								sprintf(
 									/* Translators: %1$s The URL of the settings page */
@@ -204,7 +204,7 @@ class FeedState extends VendorAPI {
 		}
 
 		$result['workflow'][] = array(
-			'label'        => esc_html__( 'XML Feed', 'pinterest-for-woocommerce' ),
+			'label'        => esc_html__( 'XML feed', 'pinterest-for-woocommerce' ),
 			'status'       => $status,
 			'status_label' => $status_label,
 			'extra_info'   => $extra_info,
@@ -232,7 +232,7 @@ class FeedState extends VendorAPI {
 		try {
 
 			if ( empty( $merchant_id ) || ! Pinterest_For_Woocommerce()::get_data( 'feed_registered' ) ) {
-				throw new \Exception( esc_html__( 'Product Feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' ), 200 );
+				throw new \Exception( esc_html__( 'Product feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' ), 200 );
 			}
 
 			$merchant = Base::get_merchant( $merchant_id );
@@ -242,7 +242,7 @@ class FeedState extends VendorAPI {
 			}
 
 			if ( 'ACTIVE' !== $merchant['data']->product_pin_feed_profile->feed_status ) {
-				throw new \Exception( esc_html__( 'Product Feed not active.', 'pinterest-for-woocommerce' ) );
+				throw new \Exception( esc_html__( 'Product feed not active.', 'pinterest-for-woocommerce' ) );
 			}
 
 			$api_approved_status = $merchant['data']->product_pin_approval_status;
@@ -250,7 +250,7 @@ class FeedState extends VendorAPI {
 			switch ( $api_approved_status ) {
 				case 'approved':
 					$status       = 'success';
-					$status_label = esc_html__( 'Product Feed configured for Ingestion on Pinterest', 'pinterest-for-woocommerce' );
+					$status_label = esc_html__( 'Product feed configured for Ingestion on Pinterest', 'pinterest-for-woocommerce' );
 					$extra_info   = wp_kses_post(
 						sprintf(
 							/* Translators: %1$s The URL of the product feed, %2$s Time string */
@@ -264,16 +264,16 @@ class FeedState extends VendorAPI {
 				case 'pending':
 				case 'appeal_pending':
 					$status       = 'pending';
-					$status_label = esc_html__( 'Product Feed pending approval on Pinterest.', 'pinterest-for-woocommerce' );
+					$status_label = esc_html__( 'Product feed pending approval on Pinterest.', 'pinterest-for-woocommerce' );
 					$extra_info   = esc_html__( 'This usually takes 1-2 days.', 'pinterest-for-woocommerce' );
 					break;
 				case 'declined':
 					$status       = 'error';
-					$status_label = esc_html__( 'Product Feed declined by Pinterest', 'pinterest-for-woocommerce' );
+					$status_label = esc_html__( 'Product feed declined by Pinterest', 'pinterest-for-woocommerce' );
 					break;
 
 				default:
-					throw new \Exception( esc_html__( 'Product Feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' ) );
+					throw new \Exception( esc_html__( 'Product feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' ) );
 			}
 		} catch ( \Throwable $th ) {
 			$status       = 200 === $th->getCode() ? 'pending' : 'error';
@@ -281,7 +281,7 @@ class FeedState extends VendorAPI {
 		}
 
 		$result['workflow'][] = array(
-			'label'        => esc_html__( 'Remote Feed Setup', 'pinterest-for-woocommerce' ),
+			'label'        => esc_html__( 'Remote feed setup', 'pinterest-for-woocommerce' ),
 			'status'       => $status,
 			'status_label' => $status_label,
 			'extra_info'   => $extra_info,
