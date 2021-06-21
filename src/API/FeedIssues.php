@@ -185,19 +185,19 @@ class FeedIssues extends VendorAPI {
 		$spl = new \SplFileObject( $issues_file );
 
 		// Get last line.
-			$spl->seek( $spl->getSize() );
-			$last_line = (int) $spl->key();
+		$spl->seek( $spl->getSize() );
+		$last_line = (int) $spl->key();
 
-			if ( $has_keys ) {
-				$spl->seek( 0 );
-				$keys = $spl->current();
-				$last_line--;
-			}
+		if ( $has_keys ) {
+			$spl->seek( 0 );
+			$keys = $spl->current();
+			$last_line--;
+		}
 
-			// Don't go over last line.
-			$end_line = $end_line > $last_line ? $last_line : $end_line;
+		// Don't go over last line.
+		$end_line = $end_line > $last_line ? $last_line : $end_line;
 
-			for ( $i = $start_line; $i <= $end_line; $i++ ) {
+		for ( $i = $start_line; $i <= $end_line; $i++ ) {
 			$spl->seek( $i );
 			$lines[] = $spl->current();
 		}
@@ -221,19 +221,19 @@ class FeedIssues extends VendorAPI {
 	 * Get the file from $url and save it to a temporary location.
 	 * Return the path of the temporary file.
 	 *
-	 * @param string $url       The URL to fetch the file from.
-	 * @param mixed  $cache_key The variables to use in order to populate the cache key.
+	 * @param string $url             The URL to fetch the file from.
+	 * @param mixed  $cache_variables The variables to use in order to populate the cache key.
 	 *
 	 * @return string|boolean
 	 */
-	private function get_remote_file( $url, $cache_key ) {
+	private function get_remote_file( $url, $cache_variables ) {
 
-		if ( is_array( $cache_key ) && ! empty( $cache_key ) ) {
+		if ( is_array( $cache_variables ) && ! empty( $cache_variables ) ) {
 			$ignore_for_cache = array( 's3_source_url', 's3_validation_url' ); // These 2 are different on every response.
-			$cache_key        = array_diff_key( $cache_key, array_flip( $ignore_for_cache ) );
+			$cache_variables  = array_diff_key( $cache_variables, array_flip( $ignore_for_cache ) );
 		}
 
-		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_file_' . md5( $cache_key ? wp_json_encode( $cache_key ) : $url );
+		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_file_' . md5( $cache_variables ? wp_json_encode( $cache_variables ) : $url );
 
 		if ( isset( $this->feed_data_files[ $cache_key ] ) && file_exists( $this->feed_data_files[ $cache_key ] ) ) {
 			return $this->feed_data_files[ $cache_key ];
