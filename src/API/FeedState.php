@@ -90,6 +90,26 @@ class FeedState extends VendorAPI {
 	 * - the remote feed registration.
 	 * - the feed ingestion process.
 	 *
+	 * The form of the returned data is as follows:
+	 *
+	 * [
+	 *   workflow => [
+	 *     [
+	 *     'label'        => 'The label of this workflow',
+	 *     'status'       => 'success|warning|error|etc',
+	 *     'status_label' => 'The result for this workflow'
+	 *     'extra_info'   => 'Extra info for this workflow'
+	 *     ],
+	 *     ...
+	 *   ],
+	 *   'overview' => [
+	 *      'total'      => 0, // Total number of products in the feed.
+	 *      'not_synced' => 0, // Number of products not synced because of errors.
+	 *      'warnings'   => 0, // Number of warnings.
+	 *      'errors'     => 0, // Number of errors.
+	 *   ]
+	 * ]
+	 *
 	 * @return array
 	 *
 	 * @throws \Exception PHP Exception.
