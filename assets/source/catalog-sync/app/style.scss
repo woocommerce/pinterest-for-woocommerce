@@ -8,6 +8,12 @@ $root: ".pin4wc-catalog-sync";
 	}
 
 	#{$root} {
+		&__container {
+			@media (min-width: 783px) {
+				margin: var(--large-gap) auto;
+			}
+		}
+
 		&__state {
 
 			.woocommerce-table__header {

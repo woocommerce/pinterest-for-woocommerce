@@ -81,30 +81,25 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				6
 			);
 
+			if ( ! $this->is_new_nav_enabled() ) {
+				$this->connect_to_enhanced_admin();
+				return;
+			}
+
 			add_submenu_page(
 				'woocommerce-marketing',
 				esc_html__( 'Product Catalog', 'pinterest-for-woocommerce' ),
 				esc_html__( 'Pinterest Product Catalog', 'pinterest-for-woocommerce' ),
 				'manage_woocommerce',
 				PINTEREST_FOR_WOOCOMMERCE_CATALOG_SYNC,
-				array( $this, 'render_catalog_sync_page' ),
+				array( $this, 'render_settings_page' ),
 				6
 			);
-
-			if (
-				! method_exists( Screen::class, 'register_post_type' ) ||
-				! method_exists( Menu::class, 'add_plugin_item' ) ||
-				! method_exists( Menu::class, 'add_plugin_category' ) ||
-				! method_exists( Features::class, 'is_enabled' ) ||
-				! Features::is_enabled( 'navigation' )
-			) {
-				return;
-			}
 
 			Menu::add_plugin_category(
 				array(
 					'id'     => 'pinterest-for-woocommerce',
-					'title'  => __( 'Pinterest', 'pinterest-for-woocommerce' ),
+					'title'  => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
 					'parent' => 'woocommerce',
 				)
 			);
@@ -134,19 +129,56 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		/**
 		 * Render the placeholder HTML for the React components
 		 */
-		public function render_catalog_sync_page() {
-			echo '<div class="wrap">
-				<div id="pin4wc-catalog-sync"></div>
-			</div>';
+		public function render_settings_page() {
+
+			$tabs = array(
+				'catalog-sync' => esc_html__( 'Product Catalog', 'pinterest-for-woocommerce' ),
+				'setup-guide'  => esc_html__( 'Settings', 'pinterest-for-woocommerce' ),
+			);
+
+			if ( $this->is_new_nav_enabled() ) {
+				echo '<div class="wrap">
+					<div id="pin4wc-' . esc_attr( str_replace( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-', '', $this->get_request( 'page' ) ) ) . '"></div>
+				</div>';
+				return;
+			}
+
+			$current_tab = empty( $this->get_request( 'tab' ) ) ? 'setup-guide' : $this->get_request( 'tab' );
+
+			echo '<div class="wrap">';
+			echo '<nav class="nav-tab-wrapper">';
+
+			foreach ( $tabs as $tab => $label ) {
+				echo sprintf(
+					'<a id="pin-tab-%1$s" href="%2$s" class="nav-tab %3$s">%4$s</a>',
+					esc_attr( $tab ),
+					esc_url( admin_url( 'admin.php?page=' . PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE ) . '&tab=' . $tab ),
+					esc_attr( $tab === $current_tab ? 'nav-tab-active' : '' ),
+					esc_html( $label )
+				);
+			}
+
+			echo '</nav>';
+
+			echo '<section class="tab-container">';
+			echo '	<div id="pin4wc-' . esc_attr( $current_tab ) . '"></div>';
+			echo '</section>';
+			echo '</div>';
+
 		}
 
+
 		/**
-		 * Render the placeholder HTML for the React components
+		 * Checks if the new WC navigation is enabled.
+		 *
+		 * @return boolean
 		 */
-		public function render_settings_page() {
-			echo '<div class="wrap">
-				<div id="pin4wc-setup-guide"></div>
-			</div>';
+		public function is_new_nav_enabled() {
+			return method_exists( Screen::class, 'register_post_type' ) &&
+				method_exists( Menu::class, 'add_plugin_item' ) &&
+				method_exists( Menu::class, 'add_plugin_category' ) &&
+				method_exists( Features::class, 'is_enabled' ) &&
+				Features::is_enabled( 'navigation' );
 		}
 
 
@@ -208,7 +240,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 */
 		protected function is_catalog_sync_page() {
 
-			return ( is_admin() && PINTEREST_FOR_WOOCOMMERCE_CATALOG_SYNC === $this->get_request( 'page' ) );
+			return (
+				is_admin() && (
+					( ! $this->is_new_nav_enabled() && PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE === $this->get_request( 'page' ) && 'catalog-sync' === $this->get_request( 'tab' ) ) ||
+					PINTEREST_FOR_WOOCOMMERCE_CATALOG_SYNC === $this->get_request( 'page' )
+				)
+			);
 		}
 
 		/**
@@ -360,6 +397,26 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			return $allowed_hosts;
 		}
 
+
+		/**
+		 * Enables enhanced admin support for the main Pinterest settings page.
+		 */
+		private function connect_to_enhanced_admin() {
+
+			if ( is_callable( 'wc_admin_connect_page' ) ) {
+
+				$page_title = 'catalog-sync' === $this->get_request( 'tab' ) ? esc_html__( 'Product Catalog', 'pinterest-for-woocommerce' ) : esc_html__( 'Settings', 'pinterest-for-woocommerce' );
+
+				wc_admin_connect_page(
+					array(
+						'id'        => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
+						'screen_id' => 'marketing_page_' . PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
+						'path'      => add_query_arg( 'page', PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE, 'admin.php' ),
+						'title'     => $page_title,
+					)
+				);
+			}
+		}
 	}
 
 endif;
