@@ -21,7 +21,6 @@ import {
 
 const ClaimWebsite = ( { goToNextStep, view } ) => {
 	const [ status, setStatus ] = useState( 'idle' );
-	const appSettings = useSettingsSelect();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
 	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
@@ -30,7 +29,7 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 		if ( isDomainVerified ) {
 			setStatus( 'success' );
 		}
-	}, [ appSettings, isDomainVerified ] );
+	}, [ isDomainVerified ] );
 
 	const handleClaimWebsite = async () => {
 		setStatus( 'pending' );
@@ -111,7 +110,6 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 								<StepStatus
 									label={ wcSettings.pin4wc.domainToVerify }
 									status={ status }
-									options={ appSettings }
 								/>
 
 								{ view === 'settings' && ! isDomainVerified && (
