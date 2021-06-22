@@ -111,7 +111,6 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 								<StepStatus
 									label={ wcSettings.pin4wc.domainToVerify }
 									status={ status }
-									options={ appSettings }
 								/>
 
 								{ view === 'settings' && ! isDomainVerified && (
