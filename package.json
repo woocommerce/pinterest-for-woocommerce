@@ -16,6 +16,7 @@
     "@wordpress/html-entities": "^2.7.0",
     "@wordpress/i18n": "^3.11.0",
     "@wordpress/notices": "^2.12.7",
+    "@wordpress/url": "^3.1.1",
     "classnames": "^2.2.6",
     "lodash": "^4.17.15"
   },
@@ -61,8 +62,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "wp-scripts build && gulp build",
     "start": "wp-scripts start",
-    "lint:js": "wp-scripts lint-js assets/source/setup-guide",
-    "lint:js:fix": "wp-scripts lint-js assets/source/setup-guide --fix",
+    "lint:js": "wp-scripts lint-js assets/source",
+    "lint:js:fix": "wp-scripts lint-js assets/source --fix",
     "build:zip": "composer install && wp-scripts build && gulp build && gulp package"
   },
   "keywords": [

@@ -65,16 +65,26 @@ class Base {
 	 * Request parameter:
 	 * $endpoint
 	 *
-	 * @param string $endpoint the endpoint to perform the request on.
-	 * @param string $method   eg, POST, GET, PUT etc.
-	 * @param array  $payload  Payload to be sent on the request's body.
-	 * @param string $api      The specific Endpoints subset.
+	 * @param string $endpoint     the endpoint to perform the request on.
+	 * @param string $method       eg, POST, GET, PUT etc.
+	 * @param array  $payload      Payload to be sent on the request's body.
+	 * @param string $api          The specific Endpoints subset.
+	 * @param int    $cache_expiry When set, enables caching on the request and the value is used as the cache's TTL (in seconds).
 	 *
 	 * @return array
 	 *
 	 * @throws \Exception PHP exception.
 	 */
-	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '' ) {
+	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
+
+		if ( ! empty( $cache_expiry ) ) {
+			$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( $endpoint . $method . wp_json_encode( $payload ) . $api );
+			$cache     = get_transient( $cache_key );
+
+			if ( $cache ) {
+				return $cache;
+			}
+		}
 
 		try {
 			$api     = empty( $api ) ? '' : trailingslashit( $api );
@@ -84,7 +94,13 @@ class Base {
 				'args'   => $payload,
 			);
 
-			return self::handle_request( $request );
+			$response = self::handle_request( $request );
+
+			if ( ! empty( $cache_expiry ) ) {
+				set_transient( $cache_key, $response, $cache_expiry );
+			}
+
+			return $response;
 		} catch ( \Exception $e ) {
 
 			Logger::log( $e->getMessage(), 'error' );
@@ -173,8 +189,8 @@ class Base {
 		if ( ! in_array( absint( $response_code ), array( 200, 201, 204 ), true ) ) {
 
 			$message = '';
-			if ( ! empty( $body[0]->message ) ) {
-				$message = $body[0]->message;
+			if ( ! empty( $body['message'] ) ) {
+				$message = $body['message'];
 			}
 			if ( ! empty( $body['error_description'] ) ) {
 				$message = $body['error_description'];
@@ -335,6 +351,110 @@ class Base {
 
 		$response = self::make_request( 'tags/' . $tag_id . '/configs/', 'PUT', $config, 'ads' );
 
+		return $response;
+	}
+
+
+	/**
+	 * Request the account data from the API and return the response.
+	 *
+	 * @param string $merchant_id The ID of the merchant for the request.
+	 *
+	 * @return mixed
+	 */
+	public static function get_merchant( $merchant_id ) {
+		$response = self::make_request( 'commerce/product_pin_merchants/' . $merchant_id . '/', 'GET' );
+		return $response;
+	}
+
+
+	/**
+	 * Creates a merchant for the authenticated user or returns the existing one.
+	 *
+	 * @param array $args The arguments to be passed to the API request.
+	 *
+	 * @return mixed
+	 */
+	public static function maybe_create_merchant( $args ) {
+
+		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto Created by Pinterest For WooCommerce', 'pinterest-for-woocommerce' ) );
+
+		$args = wp_parse_args(
+			$args,
+			array(
+				'display_name'                      => $merchant_name,
+				'return_merchant_if_already_exists' => true,
+			)
+		);
+
+		$response = self::make_request(
+			add_query_arg( $args, 'commerce/product_pin_merchants/' ),
+			'POST'
+		);
+
+		return $response;
+	}
+
+
+	/**
+	 * Adds the merchant's feed using the given arguments.
+	 *
+	 * @param string $merchant_id The merchant ID the feed belongs to.
+	 * @param array  $args        The arguments to be passed to the API request.
+	 *
+	 * @return mixed
+	 */
+	public static function add_merchant_feed( $merchant_id, $args ) {
+
+		$response = self::make_request(
+			add_query_arg( $args, 'commerce/product_pin_merchants/' . $merchant_id . '/feed/' ),
+			'POST'
+		);
+
+		return $response;
+	}
+
+
+	/**
+	 * Updates the merchant's feed using the given arguments.
+	 *
+	 * @param string $merchant_id The merchant ID the feed belongs to.
+	 * @param string $feed_id     The ID of the feed to be updated.
+	 * @param array  $args        The arguments to be passed to the API request.
+	 *
+	 * @return mixed
+	 */
+	public static function update_merchant_feed( $merchant_id, $feed_id, $args ) {
+
+		$response = self::make_request(
+			add_query_arg( $args, 'commerce/product_pin_merchants/' . $merchant_id . '/feed/' . $feed_id . '/' ),
+			'PUT'
+		);
+
+		return $response;
+	}
+
+
+	/**
+	 * Request the feed report data from the API and return the response.
+	 *
+	 * @param string $merchant_id The ID of the merchant for the request.
+	 *
+	 * @return mixed
+	 */
+	public static function get_feed_report( $merchant_id ) {
+		$response = self::make_request( 'catalogs/datasource/feed_report/' . $merchant_id . '/', 'GET', array(), '', MINUTE_IN_SECONDS );
+		return $response;
+	}
+
+
+	/**
+	 * Request the managed map representing all of the error, recommendation, and status messages for catalogs.
+	 *
+	 * @return mixed
+	 */
+	public static function get_message_map() {
+		$response = self::make_request( 'catalogs/message_map', 'GET', array(), '', DAY_IN_SECONDS );
 		return $response;
 	}
 }

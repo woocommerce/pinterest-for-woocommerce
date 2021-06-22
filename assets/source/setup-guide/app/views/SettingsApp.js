@@ -11,6 +11,7 @@ import { Spinner } from '@woocommerce/components';
 import SetupAccount from '../steps/SetupAccount';
 import ClaimWebsite from '../steps/ClaimWebsite';
 import SetupTracking from '../steps/SetupTracking';
+import SetupProductSync from '../steps/SetupProductSync';
 import SetupPins from '../steps/SetupPins';
 import SaveSettingsButton from '../components/SaveSettingsButton';
 import TransientNotices from '../components/TransientNotices';
@@ -70,6 +71,9 @@ const SettingsApp = () => {
 											appSettings
 										) && (
 											<>
+												<SetupProductSync
+													{ ...childComponentProps }
+												/>
 												<SetupPins
 													view="settings"
 													{ ...childComponentProps }
