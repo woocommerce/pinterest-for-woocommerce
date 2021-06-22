@@ -361,3 +361,68 @@ $root: ".woocommerce-setup-guide";
 	}
 }
 
+.pin4wc-landing-page {
+
+	&__welcome-section {
+
+		.components-flex {
+			padding: 36px 0;
+
+			&__block {
+				margin: 0;
+
+				&.content-block {
+					padding: 20px 64px;
+					flex: 0 0 50%;
+
+					p:not(:last-child) {
+						margin-bottom: 16px;
+					}
+				}
+
+				&.image-block {
+					align-items: center;
+					display: flex;
+
+					img {
+						height: 100%;
+						object-fit: cover;
+						width: 100%;
+					}
+				}
+			}
+		}
+	}
+
+	&__features-section {
+
+		.components-flex {
+			gap: 64px;
+			padding: 50px 64px;
+
+			&__block {
+				text-align: center;
+				margin: 0;
+
+				img {
+					border-radius: 100px;
+					height: 100px;
+					margin-bottom: 32px;
+					object-fit: cover;
+					width: 100px;
+				}
+
+				p:not(:last-child) {
+					margin-bottom: 16px;
+				}
+			}
+		}
+	}
+
+	&__faq-section {
+
+		h2 {
+			font-weight: 700;
+		}
+	}
+}

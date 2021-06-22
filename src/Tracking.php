@@ -32,6 +32,24 @@ class Tracking {
 	 */
 	private static $events = array();
 
+	private const TAG_ID_SLUG       = '%%TAG_ID%%';
+	private const HASHED_EMAIL_SLUG = '%%HASHED_EMAIL%%';
+
+	/**
+	 * The base tracking snippet.
+	 * Documentation: https://help.pinterest.com/en/business/article/install-the-pinterest-tag
+	 *
+	 * @var array
+	 */
+	private static $base_tag = "<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "');\n  pintrk('page');\n</script>\n\n<noscript>\n  <img height=\"1\" width=\"1\" style=\"display:none;\" alt=\"\" src=\"https://ct.pinterest.com/v3/?tid=" . self::TAG_ID_SLUG . "&noscript=1\" />\n</noscript>\n";
+
+	/**
+	 * The base tracking snippet with Enchanced match support.
+	 * Documentation: https://help.pinterest.com/en/business/article/enhanced-match
+	 *
+	 * @var array
+	 */
+	private static $base_tag_em = "<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "', { em: '" . self::HASHED_EMAIL_SLUG . "' });\n  pintrk('page');\n</script>\n\n<noscript>\n  <img height=\"1\" width=\"1\" style=\"display:none;\" alt=\"\" src=\"https://ct.pinterest.com/v3/?tid=" . self::TAG_ID_SLUG . '&pd[em]=' . self::HASHED_EMAIL_SLUG . "&noscript=1\" />\n</noscript>\n";
 
 	/**
 	 * Initiate class.
@@ -83,19 +101,15 @@ class Tracking {
 
 
 	/**
-	 * Adjust given base tag in order to enable Enhanched match, by adding
-	 * The hashed user email's either by checking the logged in user or the currently stored
-	 * session data.
-	 *
+	 * Retunrs the hashed e-mails from the logged in user or Session data,
+	 * to be used when Enchanced match is enabled.
 	 * See https://help.pinterest.com/en/business/article/enhanced-match
 	 *
-	 * @param string $base_tag The tag to be filtered.
-	 *
-	 * @return string
+	 * @return string|false
 	 */
-	public static function enable_enhanched_match( $base_tag ) {
+	public static function get_hashed_customer_email() {
 
-		$user_email = '';
+		$user_email = false;
 
 		if ( is_user_logged_in() ) {
 
@@ -108,17 +122,7 @@ class Tracking {
 			$user_email       = $session_customer ? $session_customer['email'] : false;
 		}
 
-		if ( empty( $user_email ) ) {
-			return $base_tag;
-		}
-
-		// Add Hashed e-mail to the JS part.
-		$base_tag = preg_replace( '/(pintrk\(\s*\'load\'\s*\,\s*\')(\d+)(\'\s*\))/m', '$1$2\', { em: \'' . md5( $user_email ) . '\' })', $base_tag );
-
-		// Add Hashed e-mail to the <img> part of the tag.
-		$base_tag = preg_replace( '/(<img.+src=\\")(.+)(\\")/m', '$1$2&pd[em]=' . md5( $user_email ) . '$3', $base_tag );
-
-		return $base_tag;
+		return $user_email ? md5( $user_email ) : false;
 	}
 
 
@@ -145,6 +149,7 @@ class Tracking {
 			'AddToCart',
 			array(
 				'product_id'     => $product->get_id(),
+				'product_name'   => $product->get_name(),
 				'value'          => $product->get_price(),
 				'order_quantity' => $quantity,
 				'currency'       => get_woocommerce_currency(),
@@ -249,10 +254,20 @@ class Tracking {
 	private static function base_tag() {
 
 		$active_tag = self::get_active_tag();
+		$email      = '';
 
-		if ( $active_tag && is_object( $active_tag ) && property_exists( $active_tag, 'code_snippet' ) ) {
-			self::$script .= $active_tag->code_snippet;
+		if ( ! $active_tag ) {
+			return;
 		}
+
+		if ( Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) ) {
+			$email = self::get_hashed_customer_email();
+		}
+
+		$snippet = empty( $email ) ? self::$base_tag : self::$base_tag_em;
+		$snippet = str_replace( array( self::TAG_ID_SLUG, self::HASHED_EMAIL_SLUG ), array( sanitize_key( $active_tag ), $email ), $snippet );
+
+		self::$script .= $snippet;
 	}
 
 
@@ -271,6 +286,7 @@ class Tracking {
 
 			$data = array(
 				'product_id'    => $product->get_id(),
+				'product_name'  => $product->get_name(),
 				'product_price' => $product->get_price(),
 			);
 		}
@@ -291,10 +307,10 @@ class Tracking {
 		if ( is_product_category() ) {
 
 			$queried_object = get_queried_object();
-			$term_id        = $queried_object->term_id;
 
 			$data = array(
-				'product_category' => $term_id,
+				'product_category' => $queried_object->term_id,
+				'category_name'    => $queried_object->name,
 			);
 
 			self::add_event( 'ViewCategory', $data );
@@ -371,16 +387,7 @@ class Tracking {
 	 * @return object|boolean
 	 */
 	public static function get_active_tag() {
-
-		$active_tag_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
-
-		if ( empty( $active_tag_id ) ) {
-			return false;
-		}
-
-		$account_tags = (array) Pinterest_For_Woocommerce()::get_setting( 'account_tags' );
-
-		return ! empty( $account_tags ) && isset( $account_tags[ $active_tag_id ] ) ? $account_tags[ $active_tag_id ] : false;
+		return Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
 	}
 
 
@@ -394,12 +401,10 @@ class Tracking {
 
 		if ( ! empty( self::$script ) ) {
 
-			self::$script = Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) ? self::enable_enhanched_match( self::$script ) : self::$script;
-
-			echo self::$script; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo self::$script; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
 
 			if ( ! empty( self::$events ) ) {
-				echo '<script>' . implode( PHP_EOL, self::$events ) . '</script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo '<script>' . implode( PHP_EOL, self::$events ) . '</script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
 			}
 		}
 	}

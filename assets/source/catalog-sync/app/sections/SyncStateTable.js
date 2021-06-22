@@ -27,12 +27,14 @@ const SyncStateTable = ( { workflow } ) => {
 	const getRows = ( data ) => {
 		const statuses = {
 			success: 'green',
+			pending: 'yellow',
 			warning: 'yellow',
 			error: 'red',
 		};
 
 		const icons = {
 			success: 'yes-alt',
+			pending: 'clock',
 			warning: 'warning',
 			error: 'warning',
 		};
@@ -49,9 +51,18 @@ const SyncStateTable = ( { workflow } ) => {
 								<Icon icon={ icons[ row.status ] } />{ ' ' }
 								{ row.status_label }
 							</span>
-							{ row.extra_info
-								? ` \xa0 • \xa0 ${ row.extra_info }`
-								: '' }
+							{ row.extra_info ? (
+								<>
+									{ ` \xa0 • \xa0 ` }
+									<span
+										dangerouslySetInnerHTML={ {
+											__html: row.extra_info,
+										} }
+									/>
+								</>
+							) : (
+								''
+							) }
 						</>
 					),
 				},

@@ -27,13 +27,12 @@ class ProductsXmlFeed {
 		'item_group_id',
 		'title',
 		'description',
-		'g:product_type', // The categorization of your product based on your custom product taxonomy. Subcategories must be sent separated by “ > “. The > must be wrapped by spaces. We do not recognize any other delimiters such as comma or pipe.
-		'g:google_product_category',
+		'g:product_type',
 		'link',
 		'g:image_link',
 		'g:availability',
-		'g:price', // <numeric> <ISO 4217>
-		'sale_price', // <numeric> <ISO 4217>
+		'g:price',
+		'sale_price',
 		'g:mpn',
 		'g:tax',
 		'g:shipping',
@@ -75,7 +74,8 @@ class ProductsXmlFeed {
 		foreach ( apply_filters( 'pinterest_for_woocommerce_feed_item_structure', self::$feed_item_structure, $product ) as $attribute ) {
 			$method_name = 'get_property_' . str_replace( ':', '_', $attribute );
 			if ( method_exists( __CLASS__, $method_name ) ) {
-				$xml .= "\t\t\t" . call_user_func_array( array( __CLASS__, $method_name ), array( $product, $attribute ) ) . PHP_EOL;
+				$att  = call_user_func_array( array( __CLASS__, $method_name ), array( $product, $attribute ) );
+				$xml .= ! empty( $att ) ? "\t\t\t" . $att . PHP_EOL : '';
 			}
 		}
 
@@ -86,7 +86,7 @@ class ProductsXmlFeed {
 
 
 	/**
-	 * Undocumented function
+	 * Returns the Product ID.
 	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
@@ -98,7 +98,7 @@ class ProductsXmlFeed {
 	}
 
 	/**
-	 * Undocumented function
+	 * Returns the item_group_id (parent id for variations).
 	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
@@ -107,15 +107,16 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_item_group_id( $product, $property ) {
 
-		///...
+		if ( ! $product->get_parent_id() ) {
+			return;
+		}
 
-		return '<' . $property . '>' . $product->get_id() . '</' . $property . '>';
+		return '<' . $property . '>' . $product->get_parent_id() . '</' . $property . '>';
 	}
 
 
-
 	/**
-	 * Undocumented function
+	 * Returns the product title.
 	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
@@ -127,7 +128,7 @@ class ProductsXmlFeed {
 	}
 
 	/**
-	 * Undocumented function
+	 * Returns the product description.
 	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
@@ -135,11 +136,18 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_description( $product, $property ) {
-		return '<' . $property . '>' . $product->get_short_description() . '</' . $property . '>';
+
+		$description = $product->get_parent_id() ? $product->get_description() : $product->get_short_description();
+
+		if ( empty( $description ) ) {
+			return;
+		}
+
+		return '<' . $property . '>' . $description . '</' . $property . '>';
 	}
 
 	/**
-	 * Undocumented function
+	 * Returns the product taxonomies.
 	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
@@ -157,28 +165,9 @@ class ProductsXmlFeed {
 		return '<' . $property . '>' . implode( ' &gt; ', $taxonomies ) . '</' . $property . '>';
 	}
 
-	/**
-	 * Undocumented function
-	 *
-	 * @param WC_Product $product the product.
-	 * @param string     $property The name of the property.
-	 *
-	 * @return string
-	 */
-	private static function get_property_g_google_product_category( $product, $property ) {
-
-		$taxonomies = self::get_taxonomies( $product->get_id() );
-
-		if ( empty( $taxonomies ) ) {
-			return;
-		}
-
-		return '<' . $property . '>' . implode( ' &gt; ', $taxonomies ) . '</' . $property . '>';
-
-	}
 
 	/**
-	 * Undocumented function
+	 * Returns the permalink.
 	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
@@ -190,7 +179,7 @@ class ProductsXmlFeed {
 	}
 
 	/**
-	 * Undocumented function
+	 * Returns the URL of the main product image.
 	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
@@ -210,7 +199,7 @@ class ProductsXmlFeed {
 
 
 	/**
-	 * Undocumented function
+	 * Returns the availability of the product.
 	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
@@ -220,10 +209,10 @@ class ProductsXmlFeed {
 	private static function get_property_g_availability( $product, $property ) {
 
 		switch ( $product->get_stock_status() ) {
-			case 'in_stock':
+			case 'instock':
 				$stock_status = 'in stock';
 				break;
-			case 'out_of_stock':
+			case 'outofstock':
 				$stock_status = 'out of stock';
 				break;
 			case 'onbackorder':
@@ -234,13 +223,11 @@ class ProductsXmlFeed {
 				break;
 		}
 
-		// TODO: preorder vs backorder?
-
-		return '<' . $property . '>' . ( $stock_status ) . '</' . $property . '>';
+		return '<' . $property . '>' . $stock_status . '</' . $property . '>';
 	}
 
 	/**
-	 * Undocumented function
+	 * Returns the base price, or the min base price for a variable product.
 	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
@@ -248,11 +235,22 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_g_price( $product, $property ) {
-		return '<' . $property . '>' . $product->get_price() . '</' . $property . '>';
+
+		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
+			$price = $product->get_variation_price();
+		} else {
+			$price = $product->get_price();
+		}
+
+		if ( empty( $price ) ) {
+			return;
+		}
+
+		return '<' . $property . '>' . $price . get_woocommerce_currency() . '</' . $property . '>';
 	}
 
 	/**
-	 * Undocumented function
+	 * Returns the sale price of the product, or the min sale price for a variable product.
 	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
@@ -260,11 +258,22 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_sale_price( $product, $property ) {
-		return '<' . $property . '>' . $product->get_sale_price() . '</' . $property . '>';
+
+		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_sale_price' ) ) {
+			$price = $product->get_variation_sale_price();
+		} else {
+			$price = $product->get_sale_price();
+		}
+
+		if ( empty( $price ) ) {
+			return;
+		}
+
+		return '<' . $property . '>' . $price . get_woocommerce_currency() . '</' . $property . '>';
 	}
 
 	/**
-	 * Undocumented function
+	 * Returns the SKU in order to populate the MPN field.
 	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
@@ -275,43 +284,41 @@ class ProductsXmlFeed {
 		return '<' . $property . '>' . $product->get_sku() . '</' . $property . '>';
 	}
 
+
 	/**
-	 * Undocumented function
+	 * Returns the gallery images for the product.
 	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
 	 *
 	 * @return string
 	 */
-	// private static function get_property_g_tax( $product, $property ) {
-	// return '<' . $property . '>' . $product->get_id() . '</'. $property . '>';
-	// }
+	private static function get_property_g_additional_image_link( $product, $property ) {
+
+		$attachment_ids = $product->get_gallery_image_ids();
+		$images         = array();
+
+		if ( $attachment_ids && $product->get_image_id() ) {
+			foreach ( $attachment_ids as $attachment_id ) {
+				$images[] = wp_get_attachment_image_src( $attachment_id )[0];
+			}
+		}
+
+		if ( empty( $images ) ) {
+			return;
+		}
+
+		return '<' . $property . '><![CDATA[' . implode( ',', $images ) . ']]></' . $property . '>';
+	}
+
 
 	/**
-	 * Undocumented function
+	 * Helper method to return the taxonomies of the product in a useful format.
 	 *
-	 * @param WC_Product $product the product.
-	 * @param string     $property The name of the property.
+	 * @param integer $product_id The product ID.
 	 *
-	 * @return string
+	 * @return array
 	 */
-	// private static function get_property_g_shipping( $product, $property ) {
-	// return '<' . $property . '>' . $product->get_id() . '</'. $property . '>';
-	// }
-
-	/**
-	 * Undocumented function
-	 *
-	 * @param WC_Product $product the product.
-	 * @param string     $property The name of the property.
-	 *
-	 * @return string
-	 */
-	// private static function get_property_g_additional_image_link( $product, $property ) {
-	// return '<' . $property . '>' . $product->get_id() . '</'. $property . '>';
-	// }
-
-
 	private static function get_taxonomies( $product_id ) {
 
 		$terms = wc_get_object_terms( $product_id, 'product_cat' );
@@ -321,8 +328,5 @@ class ProductsXmlFeed {
 		}
 
 		return wp_list_pluck( $terms, 'name' );
-
 	}
-
-
 }

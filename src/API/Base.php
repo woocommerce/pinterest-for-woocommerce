@@ -65,16 +65,26 @@ class Base {
 	 * Request parameter:
 	 * $endpoint
 	 *
-	 * @param string $endpoint the endpoint to perform the request on.
-	 * @param string $method   eg, POST, GET, PUT etc.
-	 * @param array  $payload  Payload to be sent on the request's body.
-	 * @param string $api      The specific Endpoints subset.
+	 * @param string $endpoint     the endpoint to perform the request on.
+	 * @param string $method       eg, POST, GET, PUT etc.
+	 * @param array  $payload      Payload to be sent on the request's body.
+	 * @param string $api          The specific Endpoints subset.
+	 * @param int    $cache_expiry When set, enables caching on the request and the value is used as the cache's TTL (in seconds).
 	 *
 	 * @return array
 	 *
 	 * @throws \Exception PHP exception.
 	 */
-	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '' ) {
+	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
+
+		if ( ! empty( $cache_expiry ) ) {
+			$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( $endpoint . $method . wp_json_encode( $payload ) . $api );
+			$cache     = get_transient( $cache_key );
+
+			if ( $cache ) {
+				return $cache;
+			}
+		}
 
 		try {
 			$api     = empty( $api ) ? '' : trailingslashit( $api );
@@ -84,7 +94,13 @@ class Base {
 				'args'   => $payload,
 			);
 
-			return self::handle_request( $request );
+			$response = self::handle_request( $request );
+
+			if ( ! empty( $cache_expiry ) ) {
+				set_transient( $cache_key, $response, $cache_expiry );
+			}
+
+			return $response;
 		} catch ( \Exception $e ) {
 
 			Logger::log( $e->getMessage(), 'error' );
@@ -303,7 +319,7 @@ class Base {
 	 */
 	public static function create_tag( $advertiser_id ) {
 
-		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto Created by Pinterest For WooCommerce', 'pinterest-for-woocommerce' ) );
+		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		$response = self::make_request(
 			'tags/',
@@ -427,10 +443,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_feed_report( $merchant_id ) {
-
-		// needs cacching.
-
-		$response = self::make_request( 'catalogs/datasource/feed_report/' . $merchant_id . '/', 'GET' );
+		$response = self::make_request( 'catalogs/datasource/feed_report/' . $merchant_id . '/', 'GET', array(), '', MINUTE_IN_SECONDS );
 		return $response;
 	}
 
@@ -441,17 +454,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_message_map() {
-
-		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_api_get_message_map';
-		$cache     = get_transient( $cache_key );
-
-		if ( $cache ) {
-			return $cache;
-		}
-
-		$response = self::make_request( 'catalogs/message_map', 'GET' );
-		set_transient( $cache_key, $response, DAY_IN_SECONDS );
-
+		$response = self::make_request( 'catalogs/message_map', 'GET', array(), '', DAY_IN_SECONDS );
 		return $response;
 	}
 }
