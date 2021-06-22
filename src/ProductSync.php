@@ -73,7 +73,7 @@ class ProductSync {
 		// Schedule the main feed control task.
 		if ( false === as_next_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			$interval = 10 * MINUTE_IN_SECONDS;
-			as_schedule_recurring_action( time() + $interval, $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+			as_schedule_recurring_action( time(), $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 
 		if ( self::is_product_sync_enabled() ) {
