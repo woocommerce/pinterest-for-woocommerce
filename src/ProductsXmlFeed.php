@@ -137,11 +137,9 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_description( $product, $property ) {
 
-		$description = $product->get_short_description();
+		$description = $product->get_parent_id() ? $product->get_description() : $product->get_short_description();
 
-		$taxonomies = self::get_taxonomies( $product->get_id() );
-
-		if ( empty( $taxonomies ) ) {
+		if ( empty( $description ) ) {
 			return;
 		}
 
