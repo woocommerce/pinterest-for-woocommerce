@@ -8,7 +8,7 @@ export const getSettings = ( state ) => {
 };
 
 /**
- * Get setting from state tree.
+ * Get a setting from state tree.
  *
  * @param {Object} state - Reducer state
  * @param {Array} name - Setting name
@@ -18,7 +18,7 @@ export const getSetting = ( state, name ) => {
 };
 
 /**
- * Determine if an options request resulted in an error.
+ * Determine if a settings request resulted in an error.
  *
  * @param {Object} state - Reducer state
  * @param {string} name - Setting name
@@ -28,7 +28,7 @@ export const getSettingsRequestingError = ( state, name ) => {
 };
 
 /**
- * Determine if options are being updated.
+ * Determine if settings are being updated.
  *
  * @param {Object} state - Reducer state
  */
@@ -37,7 +37,7 @@ export const isSettingsUpdating = ( state ) => {
 };
 
 /**
- * Determine if an options update resulted in an error.
+ * Determine if a settings update resulted in an error.
  *
  * @param {Object} state - Reducer state
  */
@@ -46,7 +46,7 @@ export const getSettingsUpdatingError = ( state ) => {
 };
 
 /**
- * Determine if an options update resulted in an error.
+ * Determine if a Pinterest account is connected.
  *
  * @param {Object} state - Reducer state
  */
@@ -59,7 +59,7 @@ export const isConnected = ( state ) => {
 };
 
 /**
- * Determine if an options update resulted in an error.
+ * Determine if the current domain was verified.
  *
  * @param {Object} state - Reducer state
  */
@@ -78,7 +78,7 @@ export const isDomainVerified = ( state ) => {
 };
 
 /**
- * Determine if an options update resulted in an error.
+ * Determine if a tracking advertiser and a tracking tag were configured.
  *
  * @param {Object} state - Reducer state
  */

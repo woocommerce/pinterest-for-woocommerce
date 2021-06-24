@@ -10,7 +10,7 @@ import {
 import { fetch } from './controls';
 
 /**
- * Request all settings values.
+ * Request current feed issues.
  *
  * @param {Object} query
  */
@@ -32,7 +32,7 @@ export function* getFeedIssues( query = {} ) {
 }
 
 /**
- * Request all settings values.
+ * Request current feed state.
  */
 export function* getFeedState() {
 	try {
