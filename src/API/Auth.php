@@ -137,6 +137,11 @@ class Auth extends VendorAPI {
 			return $redirect_url;
 		}
 
+		// If started on settings, go back to settings.
+		if ( ! empty( $view ) && 'settings' === $view ) {
+			return $redirect_url;
+		}
+
 		// If we have already completed onboarding, go to settings.
 		if ( $is_setup_complete ) {
 			return $redirect_url;
