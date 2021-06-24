@@ -8,7 +8,7 @@ export const getSettings = ( state ) => {
 };
 
 /**
- * Get setting from state tree.
+ * Get a setting from state tree.
  *
  * @param {Object} state - Reducer state
  * @param {Array} name - Setting name
@@ -18,7 +18,7 @@ export const getSetting = ( state, name ) => {
 };
 
 /**
- * Determine if an options request resulted in an error.
+ * Determine if a settings request resulted in an error.
  *
  * @param {Object} state - Reducer state
  * @param {string} name - Setting name
@@ -28,7 +28,7 @@ export const getSettingsRequestingError = ( state, name ) => {
 };
 
 /**
- * Determine if options are being updated.
+ * Determine if settings are being updated.
  *
  * @param {Object} state - Reducer state
  */
@@ -37,10 +37,57 @@ export const isSettingsUpdating = ( state ) => {
 };
 
 /**
- * Determine if an options update resulted in an error.
+ * Determine if a settings update resulted in an error.
  *
  * @param {Object} state - Reducer state
  */
 export const getSettingsUpdatingError = ( state ) => {
 	return state.updatingError || false;
+};
+
+/**
+ * Determine if a Pinterest account is connected.
+ *
+ * @param {Object} state - Reducer state
+ */
+export const isConnected = ( state ) => {
+	if ( undefined === state?.settings ) {
+		return;
+	}
+
+	return !! state?.settings?.token?.access_token;
+};
+
+/**
+ * Determine if the current domain was verified.
+ *
+ * @param {Object} state - Reducer state
+ */
+export const isDomainVerified = ( state ) => {
+	if ( undefined === state?.settings ) {
+		return;
+	}
+
+	if ( undefined === state?.settings?.account_data?.verified_domains ) {
+		return false;
+	}
+
+	return state?.settings?.account_data?.verified_domains.includes(
+		wcSettings.pin4wc.domainToVerify
+	);
+};
+
+/**
+ * Determine if a tracking advertiser and a tracking tag were configured.
+ *
+ * @param {Object} state - Reducer state
+ */
+export const isTrackingConfigured = ( state ) => {
+	if ( undefined === state?.settings ) {
+		return;
+	}
+
+	return !! (
+		state?.settings?.tracking_advertiser && state?.settings?.tracking_tag
+	);
 };

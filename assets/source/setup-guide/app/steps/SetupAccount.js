@@ -22,18 +22,20 @@ import { Spinner } from '@woocommerce/components';
  */
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
-import { isConnected } from '../helpers/conditionals';
+import {
+	useSettingsSelect,
+	useSettingsDispatch,
+	useCreateNotice,
+} from '../helpers/effects';
 
-const SetupAccount = ( {
-	appSettings,
-	setAppSettings,
-	createNotice,
-	view,
-	goToNextStep,
-} ) => {
+const SetupAccount = ( { goToNextStep, view } ) => {
 	const [ isConfirmationModalOpen, setIsConfirmationModalOpen ] = useState(
 		false
 	);
+	const appSettings = useSettingsSelect();
+	const isConnected = useSettingsSelect( 'isConnected' );
+	const setAppSettings = useSettingsDispatch( view === 'wizard' );
+	const createNotice = useCreateNotice();
 
 	const openConfirmationModal = () => {
 		setIsConfirmationModalOpen( true );
@@ -133,7 +135,7 @@ const SetupAccount = ( {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{ isConnected( appSettings ) === true ? (
+							{ isConnected === true ? (
 								<Flex>
 									<FlexBlock className="is-connected">
 										<Text variant="subtitle">
@@ -168,7 +170,7 @@ const SetupAccount = ( {
 										</Button>
 									</FlexBlock>
 								</Flex>
-							) : isConnected( appSettings ) === false ? (
+							) : isConnected === false ? (
 								<Flex>
 									<FlexBlock>
 										<Text variant="subtitle">
@@ -198,7 +200,7 @@ const SetupAccount = ( {
 							) }
 						</CardBody>
 
-						{ isConnected( appSettings ) === false && (
+						{ isConnected === false && (
 							<CardFooter>
 								<Button
 									isLink
@@ -219,17 +221,16 @@ const SetupAccount = ( {
 						{ isConfirmationModalOpen && renderConfirmationModal() }
 					</Card>
 
-					{ view === 'wizard' &&
-						isConnected( appSettings ) === true && (
-							<div className="woocommerce-setup-guide__footer-button">
-								<Button isPrimary onClick={ goToNextStep }>
-									{ __(
-										'Continue',
-										'pinterest-for-woocommerce'
-									) }
-								</Button>
-							</div>
-						) }
+					{ view === 'wizard' && isConnected === true && (
+						<div className="woocommerce-setup-guide__footer-button">
+							<Button isPrimary onClick={ goToNextStep }>
+								{ __(
+									'Continue',
+									'pinterest-for-woocommerce'
+								) }
+							</Button>
+						</div>
+					) }
 				</div>
 			</div>
 		</div>

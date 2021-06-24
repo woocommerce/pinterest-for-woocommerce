@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { controls as dataControls } from '@wordpress/data-controls';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -19,7 +18,6 @@ export const fetch = ( endpoint, data = {} ) => {
 };
 
 export const controls = {
-	...dataControls,
 	FETCH( { endpoint, data = {} } ) {
 		return new Promise( ( resolve ) => {
 			const url = addQueryArgs( `${ API_ROUTE }/${ endpoint }`, data );

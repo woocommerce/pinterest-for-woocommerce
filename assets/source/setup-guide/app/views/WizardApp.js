@@ -3,7 +3,6 @@
  */
 import '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
 import { createElement, useState } from '@wordpress/element';
 import { Spinner, Stepper } from '@woocommerce/components';
 import {
@@ -20,28 +19,19 @@ import ClaimWebsite from '../steps/ClaimWebsite';
 import SetupTracking from '../steps/SetupTracking';
 import SetupPins from '../steps/SetupPins';
 import TransientNotices from '../components/TransientNotices';
-import { useBodyClasses, useCreateNotice } from '../helpers/effects';
-import { SETTINGS_STORE_NAME } from '../data';
+import {
+	useSettingsSelect,
+	useBodyClasses,
+	useCreateNotice,
+} from '../helpers/effects';
 
 const WizardApp = () => {
 	const [ currentStep, setCurrentStep ] = useState();
 
-	const appSettings = useSelect( ( select ) =>
-		select( SETTINGS_STORE_NAME ).getSettings()
-	);
-
-	const { updateSettings } = useDispatch( SETTINGS_STORE_NAME );
-	const { createNotice } = useDispatch( 'core/notices' );
-
-	const childComponentProps = {
-		appSettings,
-		setAppSettings: ( data, saveToDb = true ) =>
-			updateSettings( data, saveToDb ),
-		createNotice,
-	};
+	const appSettings = useSettingsSelect();
 
 	useBodyClasses( 'wizard' );
-	useCreateNotice( wcSettings.pin4wc.error );
+	useCreateNotice()( wcSettings.pin4wc.error );
 
 	const steps = [
 		{
@@ -69,7 +59,6 @@ const WizardApp = () => {
 	const getSteps = () => {
 		return steps.map( ( step, index ) => {
 			const container = createElement( step.container, {
-				...childComponentProps,
 				query: getQuery(),
 				step,
 				goToNextStep: () => goToNextStep( step ),
