@@ -4,33 +4,38 @@
 import TYPES from './action-types';
 
 const reportsReducer = (
-	state = { requestingErrors: {} },
-	{ type, feedIssues, feedState, error, name, isRequesting }
+	state = {
+		feedIssues: {},
+		feedState: {},
+		isRequesting: false,
+		requestingErrors: {},
+	},
+	action
 ) => {
-	switch ( type ) {
+	switch ( action.type ) {
 		case TYPES.RECEIVE_FEEDISSUES:
 			state = {
 				...state,
-				feedIssues,
+				feedIssues: action.feedIssues,
 			};
 			break;
 		case TYPES.RECEIVE_FEEDSTATE:
 			state = {
 				...state,
-				feedState,
+				feedState: action.feedState,
 			};
 			break;
 		case TYPES.SET_IS_REQUESTING:
 			state = {
 				...state,
-				isRequesting,
+				isRequesting: action.isRequesting,
 			};
 			break;
 		case TYPES.SET_REQUESTING_ERROR:
 			state = {
 				...state,
 				requestingErrors: {
-					[ name ]: error,
+					[ action.name ]: action.error,
 				},
 			};
 			break;

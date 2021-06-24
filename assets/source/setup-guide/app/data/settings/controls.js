@@ -19,7 +19,7 @@ export const controls = {
 	...dataControls,
 	FETCH() {
 		return new Promise( ( resolve ) => {
-			const url = WC_ADMIN_NAMESPACE + '/options?options=' + OPTIONS_NAME;
+			const url = `${ WC_ADMIN_NAMESPACE }/options?options=${ OPTIONS_NAME }`;
 			apiFetch( { path: url } ).then( ( result ) =>
 				resolve( result[ OPTIONS_NAME ] )
 			);

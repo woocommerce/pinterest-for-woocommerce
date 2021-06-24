@@ -2,14 +2,10 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/html-entities';
-import { useState } from '@wordpress/element';
 import {
-	Button,
 	Card,
 	CardBody,
 	CheckboxControl,
-	Icon,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { Spinner } from '@woocommerce/components';
@@ -17,20 +13,19 @@ import { Spinner } from '@woocommerce/components';
 /**
  * Internal dependencies
  */
-import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
+import {
+	useSettingsSelect,
+	useSettingsDispatch,
+	useCreateNotice,
+} from '../helpers/effects';
 
-const SetupProductSync = ( {
-	appSettings,
-	setAppSettings,
-	createNotice,
-	view,
-} ) => {
-	const [ isSaving, setIsSaving ] = useState( false );
+const SetupProductSync = ( { view } ) => {
+	const appSettings = useSettingsSelect();
+	const setAppSettings = useSettingsDispatch( view === 'wizard' );
+	const createNotice = useCreateNotice();
 
 	const handleOptionChange = async ( name, value ) => {
-		setIsSaving( true );
-
 		const update = await setAppSettings( {
 			[ name ]: value ?? ! appSettings[ name ],
 		} );
@@ -44,8 +39,6 @@ const SetupProductSync = ( {
 				)
 			);
 		}
-
-		setIsSaving( false );
 	};
 
 	return (

@@ -2,12 +2,9 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Button, Card, CardBody } from '@wordpress/components';
-import { OPTIONS_STORE_NAME } from '@woocommerce/data';
 import { Spinner } from '@woocommerce/components';
 
 /**
@@ -16,22 +13,23 @@ import { Spinner } from '@woocommerce/components';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import StepStatus from '../components/StepStatus';
-import { isDomainVerified } from '../helpers/conditionals';
+import {
+	useSettingsSelect,
+	useSettingsDispatch,
+	useCreateNotice,
+} from '../helpers/effects';
 
-const ClaimWebsite = ( {
-	goToNextStep,
-	appSettings,
-	setAppSettings,
-	createNotice,
-	view,
-} ) => {
+const ClaimWebsite = ( { goToNextStep, view } ) => {
 	const [ status, setStatus ] = useState( 'idle' );
+	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
+	const setAppSettings = useSettingsDispatch( view === 'wizard' );
+	const createNotice = useCreateNotice();
 
 	useEffect( () => {
-		if ( isDomainVerified( appSettings ) ) {
+		if ( isDomainVerified ) {
 			setStatus( 'success' );
 		}
-	}, [ appSettings ] );
+	}, [ isDomainVerified ] );
 
 	const handleClaimWebsite = async () => {
 		setStatus( 'pending' );
@@ -107,18 +105,16 @@ const ClaimWebsite = ( {
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
-						{ undefined !== isDomainVerified( appSettings ) ? (
+						{ undefined !== isDomainVerified ? (
 							<CardBody size="large">
 								<StepStatus
 									label={ wcSettings.pin4wc.domainToVerify }
 									status={ status }
-									options={ appSettings }
 								/>
 
-								{ view === 'settings' &&
-									! isDomainVerified( appSettings ) && (
-										<StepButton />
-									) }
+								{ view === 'settings' && ! isDomainVerified && (
+									<StepButton />
+								) }
 							</CardBody>
 						) : (
 							<CardBody size="large">
@@ -138,21 +134,4 @@ const ClaimWebsite = ( {
 	);
 };
 
-export default compose(
-	withSelect( ( select ) => {
-		const { getOption } = select( OPTIONS_STORE_NAME );
-
-		return {
-			pin4wc: getOption( wcSettings.pin4wc.optionsName ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { createNotice } = dispatch( 'core/notices' );
-		const { updateOptions } = dispatch( OPTIONS_STORE_NAME );
-
-		return {
-			createNotice,
-			updateOptions,
-		};
-	} )
-)( ClaimWebsite );
+export default ClaimWebsite;

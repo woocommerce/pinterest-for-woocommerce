@@ -1,8 +1,31 @@
 /**
  * External dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { SETTINGS_STORE_NAME } from '../data';
+
+export const useSettingsSelect = ( selector = 'getSettings' ) => {
+	return useSelect( ( select ) =>
+		select( SETTINGS_STORE_NAME )[ selector ]()
+	);
+};
+
+export const useSettingsDispatch = ( saveToDb = false ) => {
+	const { updateSettings } = useDispatch( SETTINGS_STORE_NAME );
+
+	return ( data ) => updateSettings( data, saveToDb );
+};
+
+export const useCreateNotice = () => {
+	const { createNotice } = useDispatch( 'core/notices' );
+
+	return ( type, message ) => message && createNotice( type, message );
+};
 
 export const useBodyClasses = ( style ) => {
 	useEffect( () => {
@@ -29,14 +52,4 @@ export const useBodyClasses = ( style ) => {
 			}
 		};
 	}, [ style ] );
-};
-
-export const useCreateNotice = ( error ) => {
-	const { createNotice } = useDispatch( 'core/notices' );
-
-	useEffect( () => {
-		if ( error ) {
-			createNotice( 'error', error );
-		}
-	}, [ error, createNotice ] );
 };

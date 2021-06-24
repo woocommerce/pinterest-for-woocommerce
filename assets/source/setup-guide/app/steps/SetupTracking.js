@@ -18,21 +18,28 @@ import { Spinner } from '@woocommerce/components';
  */
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
+import {
+	useSettingsSelect,
+	useSettingsDispatch,
+	useCreateNotice,
+} from '../helpers/effects';
 
-const SetupTracking = ( {
-	goToNextStep,
-	appSettings,
-	setAppSettings,
-	createNotice,
-	view,
-} ) => {
+const SetupTracking = ( { goToNextStep, view } ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
+	const [ isFetching, setIsFetching ] = useState( false );
 	const [ status, setStatus ] = useState( 'idle' );
 	const [ advertisersList, setAdvertisersList ] = useState();
 	const [ tagsList, setTagsList ] = useState();
+	const appSettings = useSettingsSelect();
+	const setAppSettings = useSettingsDispatch( view === 'wizard' );
+	const createNotice = useCreateNotice();
 
 	useEffect( () => {
-		if ( undefined !== appSettings && undefined === advertisersList ) {
+		if (
+			! isFetching &&
+			undefined !== appSettings &&
+			undefined === advertisersList
+		) {
 			fetchAdvertisers();
 		}
 
@@ -47,6 +54,8 @@ const SetupTracking = ( {
 	}, [ appSettings, advertisersList ] );
 
 	const fetchAdvertisers = async () => {
+		setIsFetching( true );
+
 		try {
 			setAdvertisersList();
 
@@ -80,9 +89,13 @@ const SetupTracking = ( {
 					)
 			);
 		}
+
+		setIsFetching( false );
 	};
 
 	const fetchTags = async ( advertiserId ) => {
+		setIsFetching( true );
+
 		try {
 			setTagsList();
 
@@ -118,6 +131,8 @@ const SetupTracking = ( {
 					)
 			);
 		}
+
+		setIsFetching( false );
 	};
 
 	const handleOptionChange = async ( name, value ) => {

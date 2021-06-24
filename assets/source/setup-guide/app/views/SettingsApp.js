@@ -2,7 +2,6 @@
  * External dependencies
  */
 import '@wordpress/notices';
-import { useSelect, useDispatch } from '@wordpress/data';
 import { Spinner } from '@woocommerce/components';
 
 /**
@@ -15,32 +14,24 @@ import SetupProductSync from '../steps/SetupProductSync';
 import SetupPins from '../steps/SetupPins';
 import SaveSettingsButton from '../components/SaveSettingsButton';
 import TransientNotices from '../components/TransientNotices';
-import { useBodyClasses, useCreateNotice } from '../helpers/effects';
 import {
-	isConnected,
-	isDomainVerified,
-	isTrackingConfigured,
-} from '../helpers/conditionals';
-import { SETTINGS_STORE_NAME } from '../data';
+	useSettingsSelect,
+	useBodyClasses,
+	useCreateNotice,
+} from '../helpers/effects';
 
 const SettingsApp = () => {
-	const appSettings = useSelect( ( select ) =>
-		select( SETTINGS_STORE_NAME ).getSettings()
-	);
+	const appSettings = useSettingsSelect();
+	const isConnected = useSettingsSelect( 'isConnected' );
+	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
+	const isTrackingConfigured = useSettingsSelect( 'isTrackingConfigured' );
 
-	const { updateSettings: setAppSettings } = useDispatch(
-		SETTINGS_STORE_NAME
-	);
-	const { createNotice } = useDispatch( 'core/notices' );
-
-	const childComponentProps = {
-		appSettings,
-		setAppSettings,
-		createNotice,
-	};
+	const isGroup1Visible = isConnected;
+	const isGroup2Visible = isGroup1Visible && isDomainVerified;
+	const isGroup3Visible = isGroup2Visible && isTrackingConfigured;
 
 	useBodyClasses();
-	useCreateNotice( wcSettings.pin4wc.error );
+	useCreateNotice()( wcSettings.pin4wc.error );
 
 	return (
 		<div className="woocommerce-layout">
@@ -48,43 +39,15 @@ const SettingsApp = () => {
 				<TransientNotices />
 				{ appSettings ? (
 					<div className="woocommerce-setup-guide__container">
-						<SetupAccount
-							view="settings"
-							{ ...childComponentProps }
-						/>
+						<SetupAccount view="settings" />
 
-						{ isConnected( appSettings ) && (
+						{ isGroup1Visible && <ClaimWebsite view="settings" /> }
+						{ isGroup2Visible && <SetupTracking view="settings" /> }
+						{ isGroup3Visible && (
 							<>
-								<ClaimWebsite
-									view="settings"
-									{ ...childComponentProps }
-								/>
-
-								{ isDomainVerified( appSettings ) && (
-									<>
-										<SetupTracking
-											view="settings"
-											{ ...childComponentProps }
-										/>
-
-										{ isTrackingConfigured(
-											appSettings
-										) && (
-											<>
-												<SetupProductSync
-													{ ...childComponentProps }
-												/>
-												<SetupPins
-													view="settings"
-													{ ...childComponentProps }
-												/>
-												<SaveSettingsButton
-													{ ...childComponentProps }
-												/>
-											</>
-										) }
-									</>
-								) }
+								<SetupProductSync view="settings" />
+								<SetupPins view="settings" />
+								<SaveSettingsButton />
 							</>
 						) }
 					</div>
