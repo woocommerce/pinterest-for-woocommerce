@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - develop
-      - trunk
     # Only run if CSS/JS/MD-related files changed.
     paths:
       - '.github/workflows/js-css-lint-test.yml'
@@ -21,7 +20,6 @@ on:
   pull_request:
     branches:
       - develop
-      - trunk
     # Only run if CSS/JS/MD-related files changed.
     paths:
       - '.github/workflows/js-css-lint-test.yml'
