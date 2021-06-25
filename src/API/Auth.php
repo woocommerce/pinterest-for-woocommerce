@@ -72,7 +72,7 @@ class Auth extends VendorAPI {
 
 		if ( 401 === $result->get_status() ) {
 			$error_message = esc_html__( 'Something went wrong with your attempt to authorize this App. Please try agagin.', 'pinterest-for-woocommerce' );
-			wp_safe_redirect( add_query_arg( 'error', rawurlencode( $error_message ), $this->get_redirect_url( $request->get_param( 'view' ) ) ) );
+			wp_safe_redirect( add_query_arg( 'error', rawurlencode( $error_message ), $this->get_redirect_url( $request->get_param( 'view' ), true ) ) );
 			exit;
 		}
 
@@ -114,18 +114,19 @@ class Auth extends VendorAPI {
 			do_action( 'pinterest_for_woocommerce_token_saved' );
 		}
 
-		wp_safe_redirect( $this->get_redirect_url( $request->get_param( 'view' ) ) . $error_args );
+		wp_safe_redirect( $this->get_redirect_url( $request->get_param( 'view' ), ! empty( $error ) ) . $error_args );
 		exit;
 	}
 
 	/**
 	 * Returns the redirect URI based on the current request's parameters and plugin settings.
 	 *
-	 * @param string $view The context of the view.
+	 * @param string $view      The context of the view.
+	 * @param string $has_error Whether there was an error with the auth process.
 	 *
 	 * @return string
 	 */
-	private function get_redirect_url( $view = null ) {
+	private function get_redirect_url( $view = null, $has_error = false ) {
 
 		$redirect_url            = admin_url( 'admin.php?page=' . \PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE );
 		$is_setup_complete       = Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete', true );
@@ -148,7 +149,7 @@ class Auth extends VendorAPI {
 		}
 
 		// Go to WC-Admin to render our App there.
-		$step         = empty( $error ) ? 'claim-website' : 'setup-account';
+		$step         = empty( $has_error ) ? 'claim-website' : 'setup-account';
 		$redirect_url = add_query_arg(
 			array(
 				'page' => 'wc-admin',
