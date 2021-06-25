@@ -70,6 +70,12 @@
     "lint:css": "wp-scripts lint-style ./assets/source",
     "build:zip": "composer install && wp-scripts build && gulp build && gulp package"
   },
+  "browserslist": [
+    "last 5 versions",
+    "> 1%",
+    "maintained node versions",
+    "not dead"
+  ],
   "keywords": [
     "pinterest for wordpress",
     "pinterest for woocommerce",
