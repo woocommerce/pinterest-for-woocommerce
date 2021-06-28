@@ -8,6 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest\Logger as Logger;
+
 use \WP_REST_Server;
 use \WP_REST_Request;
 
@@ -19,6 +21,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Endpoint handing Domain verification.
  */
 class DomainVerification extends VendorAPI {
+
+	/**
+	 * The number of attempts to retry domain verification on error.
+	 *
+	 * @var integer
+	 */
+	private $verification_attempts = 3;
 
 	/**
 	 * Initialize class
@@ -57,10 +66,14 @@ class DomainVerification extends VendorAPI {
 	 */
 	public function handle_verification() {
 
+		static $verification_data;
+
 		try {
 
-			// Get verification code from pinterest.
-			$verification_data = Base::domain_verification_data();
+			if ( is_null( $verification_data ) ) {
+				// Get verification code from pinterest.
+				$verification_data = Base::domain_verification_data();
+			}
 
 			if ( 'success' === $verification_data['status'] && ! empty( $verification_data['data']->verification_code ) ) {
 
@@ -81,6 +94,12 @@ class DomainVerification extends VendorAPI {
 		} catch ( \Throwable $th ) {
 
 			$error_code = $th->getCode() >= 400 ? $th->getCode() : 400;
+
+			if ( 403 === $error_code && $this->verification_attempts > 0 ) {
+				$this->verification_attempts--;
+				Logger::log( sprintf( 'Retrying domain verification. Attempts left: %d', $this->verification_attempts ), 'debug' );
+				return call_user_func( __METHOD__ );
+			}
 
 			/* Translators: The error description as returned from the API */
 			$error_message = sprintf( esc_html__( 'Your domain could not be automatically verified. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
