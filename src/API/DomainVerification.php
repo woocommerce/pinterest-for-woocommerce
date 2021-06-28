@@ -63,9 +63,12 @@ class DomainVerification extends VendorAPI {
 			$verification_data = Base::domain_verification_data();
 
 			if ( 'success' === $verification_data['status'] && ! empty( $verification_data['data']->verification_code ) ) {
-				Pinterest_For_Woocommerce()::save_setting( 'verfication_code', sanitize_text_field( $verification_data['data']->verification_code ) );
+
+				Pinterest_For_Woocommerce()::save_data( 'verification_data', (array) $verification_data['data'] );
 
 				$result = Base::trigger_verification();
+
+				flush_rewrite_rules(); // Rewrite rules as we need to serve the URL for the pinterest-XXXXX.html file.
 
 				if ( 'success' === $result['status'] ) {
 					$account_data = Pinterest_For_Woocommerce()::update_account_data();
