@@ -349,7 +349,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 											</>
 										)
 									) : (
-										<Spinner />
+										<StepButton />
 									) ) }
 							</CardBody>
 						) : (
