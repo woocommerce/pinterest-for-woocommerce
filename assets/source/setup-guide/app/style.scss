@@ -149,7 +149,10 @@ $root: ".woocommerce-setup-guide";
 
 				&-overview {
 					margin-top: var(--large-gap);
-					position: absolute;
+
+					@media (min-width: 783px) {
+						position: absolute;
+					}
 
 					> div {
 						margin: 8px 0;
