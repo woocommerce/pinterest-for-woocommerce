@@ -107,7 +107,7 @@ class RichPins {
 		$tags = array(
 			'og:url'       => esc_url( get_the_permalink() ),
 			'og:site_name' => get_bloginfo( 'name' ),
-			'og:type'      => is_singular( 'product' ) ? 'og:product' : 'article',
+			'og:type'      => is_singular( 'product' ) ? 'product' : 'article',
 			'og:title'     => get_the_title(),
 		);
 
