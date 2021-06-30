@@ -78,7 +78,9 @@ class Tracking {
 		// WC events.
 		if ( function_exists( 'WC' ) ) {
 
-			add_action( 'wp', array( __CLASS__, 'late_events_handling' ) );
+			if ( ! wp_doing_ajax() ) {
+				add_action( 'wp', array( __CLASS__, 'late_events_handling' ) );
+			}
 
 			// AddToCart - ajax.
 			if ( 'yes' === get_option( 'woocommerce_enable_ajax_add_to_cart' ) ) {
