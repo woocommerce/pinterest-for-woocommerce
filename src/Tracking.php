@@ -97,6 +97,9 @@ class Tracking {
 
 		// Product category page visit.
 		self::category_visit_event();
+
+		// Search page.
+		self::search_event();
 	}
 
 
@@ -302,8 +305,6 @@ class Tracking {
 	 */
 	private static function category_visit_event() {
 
-		$data = array();
-
 		if ( is_product_category() ) {
 
 			$queried_object = get_queried_object();
@@ -316,6 +317,24 @@ class Tracking {
 			self::add_event( 'ViewCategory', $data );
 		}
 
+	}
+
+
+	/**
+	 * Enqueues the search event code for printing.
+	 *
+	 * @return void
+	 */
+	private static function search_event() {
+
+		if ( is_search() ) {
+
+			$data = array(
+				'search_query' => get_search_query(),
+			);
+
+			self::add_event( 'search', $data );
+		}
 	}
 
 
