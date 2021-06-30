@@ -186,7 +186,9 @@ class Tracking {
 	 */
 	public static function hook_add_to_cart_event( $cart_item_key, $product_id, $quantity, $variation_id ) {
 
-		if ( wp_doing_ajax() ) {
+		$redirect_to_cart = 'yes' === get_option( 'woocommerce_cart_redirect_after_add' );
+
+		if ( wp_doing_ajax() && ! $redirect_to_cart ) {
 			return;
 		}
 
