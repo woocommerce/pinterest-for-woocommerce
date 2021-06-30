@@ -83,7 +83,7 @@ class Tracking {
 			}
 
 			// AddToCart - ajax.
-			if ( 'yes' === get_option( 'woocommerce_enable_ajax_add_to_cart' ) ) {
+			if ( 'yes' === get_option( 'woocommerce_enable_ajax_add_to_cart' ) && 'yes' !== get_option( 'woocommerce_cart_redirect_after_add' ) ) {
 				add_action( 'wp_enqueue_scripts', array( __CLASS__, 'ajax_tracking_snippet' ), 20 );
 			}
 
