@@ -52,12 +52,24 @@ class Tracking {
 	private static $base_tag_em = "<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "', { em: '" . self::HASHED_EMAIL_SLUG . "' });\n  pintrk('page');\n</script>\n\n<noscript>\n  <img height=\"1\" width=\"1\" style=\"display:none;\" alt=\"\" src=\"https://ct.pinterest.com/v3/?tid=" . self::TAG_ID_SLUG . '&pd[em]=' . self::HASHED_EMAIL_SLUG . "&noscript=1\" />\n</noscript>\n";
 
 	/**
+	 * The user/customer specific key used to store an async event that is to be printed the next
+	 * time we print out events.
+	 *
+	 * @var string
+	 */
+	private static $async_transient_key = null;
+
+	/**
 	 * Initiate class.
 	 */
 	public static function maybe_init() {
 
 		if ( ! self::tracking_enabled() || wp_doing_cron() || is_admin() ) {
 			return;
+		}
+
+		if ( is_object( WC()->session ) ) {
+			self::$async_transient_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_async_events_' . md5( WC()->session->get_customer_id() );
 		}
 
 		// Base tag.
@@ -81,8 +93,26 @@ class Tracking {
 
 		}
 
+		add_action( 'shutdown', array( __CLASS__, 'save_async_events' ) );
+
 		// Print to head.
 		add_action( 'wp_head', array( __CLASS__, 'print_script' ) );
+	}
+
+
+	}
+
+
+	/**
+	 * Store any events that weren't printed on shutdown.
+	 *
+	 * @return void
+	 */
+	public static function save_async_events() {
+
+		if ( ! empty( self::$events ) && self::$async_transient_key ) {
+			set_transient( self::$async_transient_key, self::$events, 10 * MINUTE_IN_SECONDS );
+		}
 	}
 
 
@@ -92,6 +122,7 @@ class Tracking {
 	 * @return void
 	 */
 	public static function late_events_handling() {
+
 		// Product page visit.
 		self::page_visit_event();
 
@@ -155,7 +186,6 @@ class Tracking {
 				'currency'       => get_woocommerce_currency(),
 			)
 		);
-
 	}
 
 
@@ -405,6 +435,7 @@ class Tracking {
 
 			if ( ! empty( self::$events ) ) {
 				echo '<script>' . implode( PHP_EOL, self::$events ) . '</script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
+				self::$events = array();
 			}
 		}
 	}
