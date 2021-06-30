@@ -93,6 +93,8 @@ class Tracking {
 
 		}
 
+		self::load_async_events();
+
 		add_action( 'shutdown', array( __CLASS__, 'save_async_events' ) );
 
 		// Print to head.
@@ -100,6 +102,19 @@ class Tracking {
 	}
 
 
+	/**
+	 * Loads any stored events to be printed.
+	 *
+	 * @return void
+	 */
+	private static function load_async_events() {
+
+		$async_events = get_transient( self::$async_transient_key );
+
+		if ( $async_events ) {
+			self::$events = array_merge( self::$events, $async_events );
+			delete_transient( self::$async_transient_key );
+		}
 	}
 
 
