@@ -185,11 +185,15 @@ class Tracking {
 
 			$product = $order_item->get_product();
 
+			$terms      = wc_get_object_terms( $product->get_id(), 'product_cat' );
+			$categories = ! empty( $terms ) ? wp_list_pluck( $terms, 'name' ) : array();
+
 			$order_items[] = array(
 				'product_id'       => $order_item->get_id(),
 				'product_name'     => $order_item->get_name(),
 				'product_price'    => $product->get_price(),
 				'product_quantity' => $order_item->get_quantity(),
+				'product_category' => $categories,
 			);
 
 			$total_quantity += $order_item->get_quantity();
@@ -198,6 +202,7 @@ class Tracking {
 		self::add_event(
 			'checkout',
 			array(
+				'order_id'       => $order_id,
 				'value'          => $order->get_total(),
 				'order_quantity' => $total_quantity,
 				'currency'       => $order->get_currency(),
