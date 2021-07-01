@@ -157,6 +157,7 @@ class Base {
 				'headers'   => $request['headers'],
 				'sslverify' => false,
 				'body'      => $request['args'],
+				'timeout'   => 15,
 			);
 
 			// Log request.
