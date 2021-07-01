@@ -52,12 +52,12 @@ class Tracking {
 	private static $base_tag_em = "<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "', { em: '" . self::HASHED_EMAIL_SLUG . "' });\n  pintrk('page');\n</script>\n\n<noscript>\n  <img height=\"1\" width=\"1\" style=\"display:none;\" alt=\"\" src=\"https://ct.pinterest.com/v3/?tid=" . self::TAG_ID_SLUG . '&pd[em]=' . self::HASHED_EMAIL_SLUG . "&noscript=1\" />\n</noscript>\n";
 
 	/**
-	 * The user/customer specific key used to store an async event that is to be printed the next
+	 * The user/customer specific key used to store async events that are to be printed the next
 	 * time we print out events.
 	 *
 	 * @var string
 	 */
-	private static $async_transient_key = null;
+	private static $deferred_conversion_events_transient_key = null;
 
 	/**
 	 * Initiate class.
@@ -69,7 +69,7 @@ class Tracking {
 		}
 
 		if ( is_object( WC()->session ) ) {
-			self::$async_transient_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_async_events_' . md5( WC()->session->get_customer_id() );
+			self::$deferred_conversion_events_transient_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_async_events_' . md5( WC()->session->get_customer_id() );
 		}
 
 		// Base tag.
@@ -111,11 +111,11 @@ class Tracking {
 	 */
 	private static function load_async_events() {
 
-		$async_events = get_transient( self::$async_transient_key );
+		$async_events = get_transient( self::$deferred_conversion_events_transient_key );
 
 		if ( $async_events ) {
 			self::$events = array_merge( self::$events, $async_events );
-			delete_transient( self::$async_transient_key );
+			delete_transient( self::$deferred_conversion_events_transient_key );
 		}
 	}
 
@@ -127,8 +127,8 @@ class Tracking {
 	 */
 	public static function save_async_events() {
 
-		if ( ! empty( self::$events ) && self::$async_transient_key ) {
-			set_transient( self::$async_transient_key, self::$events, 10 * MINUTE_IN_SECONDS );
+		if ( ! empty( self::$events ) && self::$deferred_conversion_events_transient_key ) {
+			set_transient( self::$deferred_conversion_events_transient_key, self::$events, 10 * MINUTE_IN_SECONDS );
 		}
 	}
 
