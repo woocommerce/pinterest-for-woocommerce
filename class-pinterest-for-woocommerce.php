@@ -552,15 +552,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public function verification_rewrite() {
 
-			if ( self::get_data( 'verification_data' ) ) {
+			if ( ! self::get_data( 'verification_data' ) ) {
+				return;
+			}
 
-				$verification_data = self::get_data( 'verification_data' );
-				$filename          = isset( $verification_data['filename'] ) ? $verification_data['filename'] : false;
+			$verification_data = self::get_data( 'verification_data' );
+			$filename          = isset( $verification_data['filename'] ) ? $verification_data['filename'] : false;
 
-				if ( $filename ) {
-					$escaped = preg_quote( $filename, '/' );
-					add_rewrite_rule( '^' . $escaped . '$', 'index.php?pinterest_verification=true', 'top' );
-				}
+			if ( $filename ) {
+				$escaped = preg_quote( $filename, '/' );
+				add_rewrite_rule( '^' . $escaped . '$', 'index.php?pinterest_verification=true', 'top' );
 			}
 		}
 
@@ -590,6 +591,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return array
 		 */
 		public function verification_query_var( $public_query_vars ) {
+
+			if ( ! self::get_data( 'verification_data' ) ) {
+				return;
+			}
+
 			$public_query_vars[] = 'pinterest_verification';
 			return $public_query_vars;
 		}
@@ -601,6 +607,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @param WP $wp Current WordPress environment instance.
 		 */
 		public function verification_request( $wp ) {
+
+			if ( ! self::get_data( 'verification_data' ) ) {
+				return;
+			}
+
 			if ( isset( $wp->query_vars['pinterest_verification'] ) && 'true' === $wp->query_vars['pinterest_verification'] ) {
 
 				$verification_data = self::get_data( 'verification_data' );
