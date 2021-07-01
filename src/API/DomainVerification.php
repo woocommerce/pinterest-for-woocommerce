@@ -23,11 +23,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class DomainVerification extends VendorAPI {
 
 	/**
-	 * The number of attempts to retry domain verification on error.
+	 * The number of remaining attempts to retry domain verification on error.
 	 *
 	 * @var integer
 	 */
-	private $verification_attempts = 3;
+	private $verification_attempts_remaining = 3;
 
 	/**
 	 * Initialize class
@@ -95,9 +95,9 @@ class DomainVerification extends VendorAPI {
 
 			$error_code = $th->getCode() >= 400 ? $th->getCode() : 400;
 
-			if ( 403 === $error_code && $this->verification_attempts > 0 ) {
-				$this->verification_attempts--;
-				Logger::log( sprintf( 'Retrying domain verification. Attempts left: %d', $this->verification_attempts ), 'debug' );
+			if ( 403 === $error_code && $this->verification_attempts_remaining > 0 ) {
+				$this->verification_attempts_remaining--;
+				Logger::log( sprintf( 'Retrying domain verification. Attempts left: %d', $this->verification_attempts_remaining ), 'debug' );
 				return call_user_func( __METHOD__ );
 			}
 
