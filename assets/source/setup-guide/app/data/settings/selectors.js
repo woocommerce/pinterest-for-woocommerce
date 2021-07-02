@@ -46,19 +46,6 @@ export const getSettingsUpdatingError = (state) => {
 };
 
 /**
- * Determine if a Pinterest account is connected.
- *
- * @param {Object} state - Reducer state
- */
-export const isConnected = (state) => {
-	if (undefined === state?.settings) {
-		return;
-	}
-
-	return !!state?.settings?.token?.access_token;
-};
-
-/**
  * Determine if the current domain was verified.
  *
  * @param {Object} state - Reducer state
