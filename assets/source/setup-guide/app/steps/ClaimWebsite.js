@@ -19,32 +19,32 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
-const ClaimWebsite = ( { goToNextStep, view } ) => {
-	const [ status, setStatus ] = useState( 'idle' );
-	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
-	const setAppSettings = useSettingsDispatch( view === 'wizard' );
+const ClaimWebsite = ({ goToNextStep, view }) => {
+	const [status, setStatus] = useState('idle');
+	const isDomainVerified = useSettingsSelect('isDomainVerified');
+	const setAppSettings = useSettingsDispatch(view === 'wizard');
 	const createNotice = useCreateNotice();
 
-	useEffect( () => {
-		if ( isDomainVerified ) {
-			setStatus( 'success' );
+	useEffect(() => {
+		if (isDomainVerified) {
+			setStatus('success');
 		}
-	}, [ isDomainVerified ] );
+	}, [isDomainVerified]);
 
 	const handleClaimWebsite = async () => {
-		setStatus( 'pending' );
+		setStatus('pending');
 
 		try {
-			const results = await apiFetch( {
+			const results = await apiFetch({
 				path: wcSettings.pin4wc.apiRoute + '/domain_verification',
 				method: 'POST',
-			} );
+			});
 
-			setStatus( 'success' );
+			setStatus('success');
 
-			setAppSettings( { account_data: results.account_data } );
-		} catch ( error ) {
-			setStatus( 'error' );
+			setAppSettings({ account_data: results.account_data });
+		} catch (error) {
+			setStatus('error');
 
 			createNotice(
 				'error',
@@ -59,75 +59,75 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 
 	const StepButton = () => {
 		const buttonLabels = {
-			idle: __( 'Start Verification', 'pinterest-for-woocommerce' ),
-			pending: __( 'Verifying Domain', 'pinterest-for-woocommerce' ),
-			error: __( 'Try Again', 'pinterest-for-woocommerce' ),
-			success: __( 'Continue', 'pinterest-for-woocommerce' ),
+			idle: __('Start Verification', 'pinterest-for-woocommerce'),
+			pending: __('Verifying Domain', 'pinterest-for-woocommerce'),
+			error: __('Try Again', 'pinterest-for-woocommerce'),
+			success: __('Continue', 'pinterest-for-woocommerce'),
 		};
 
 		return (
 			<Button
 				isPrimary
-				disabled={ status === 'pending' }
+				disabled={status === 'pending'}
 				onClick={
 					status === 'success' ? goToNextStep : handleClaimWebsite
 				}
 			>
-				{ buttonLabels[ status ] }
+				{buttonLabels[status]}
 			</Button>
 		);
 	};
 
 	return (
 		<div className="woocommerce-setup-guide__claim-website">
-			{ view === 'wizard' && (
+			{view === 'wizard' && (
 				<StepHeader
-					title={ __(
+					title={__(
 						'Claim your website',
 						'pinterest-for-woocommerce'
-					) }
-					subtitle={ __( 'Step Two', 'pinterest-for-woocommerce' ) }
+					)}
+					subtitle={__('Step Two', 'pinterest-for-woocommerce')}
 				/>
-			) }
+			)}
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={ __(
-							'Claim your website',
-							'pinterest-for-woocommerce'
-						) }
-						description={ __(
-							'Claim your website to get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of you content.'
-						) }
-						link={ wcSettings.pin4wc.pinterestLinks.claimWebsite }
+						title={__(
+            'Claim your website',
+            'pinterest-for-woocommerce'
+            )}
+            description={__(
+              'Claim your website to get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of you content.'
+            )}
+            link={wcSettings.pin4wc.pinterestLinks.claimWebsite}
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
-						{ undefined !== isDomainVerified ? (
+						{undefined !== isDomainVerified ? (
 							<CardBody size="large">
 								<StepStatus
-									label={ wcSettings.pin4wc.domainToVerify }
-									status={ status }
+									label={wcSettings.pin4wc.domainToVerify}
+									status={status}
 								/>
 
-								{ view === 'settings' && ! isDomainVerified && (
+								{view === 'settings' && !isDomainVerified && (
 									<StepButton />
-								) }
+								)}
 							</CardBody>
 						) : (
 							<CardBody size="large">
 								<Spinner />
 							</CardBody>
-						) }
+						)}
 					</Card>
 
-					{ view === 'wizard' && (
+					{view === 'wizard' && (
 						<div className="woocommerce-setup-guide__footer-button">
 							<StepButton />
 						</div>
-					) }
+					)}
 				</div>
 			</div>
 		</div>

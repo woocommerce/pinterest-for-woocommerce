@@ -13,30 +13,33 @@ import WizardApp from './app/views/WizardApp';
 import './app/style.scss';
 
 const App = () => {
-	const [ view, setView ] = useState( getQuery()?.view );
+	const [view, setView] = useState(getQuery()?.view);
 
-	useEffect( () => {
-		const currentUrl = new URL( window.location.href );
-		const view = currentUrl.searchParams.get( 'view' );
+	useEffect(() => {
+		const currentUrl = new URL(window.location.href);
+		const currentView = currentUrl.searchParams.get('view');
 
-		setView( view );
+		setView(currentView);
 	});
 
-	getHistory().listen( () => {
-		setView( getQuery()?.view );
+	getHistory().listen(() => {
+		setView(getQuery()?.view);
 	});
 
-	return view === 'settings' || getQuery()?.page === 'pinterest-for-woocommerce-setup-guide'
-		? <SettingsApp />
-		: view === 'wizard'
-			? <WizardApp />
-			: <LandingPageApp />;
+	return view === 'settings' ||
+		getQuery()?.page === 'pinterest-for-woocommerce-setup-guide' ? (
+		<SettingsApp />
+	) : view === 'wizard' ? (
+		<WizardApp />
+	) : (
+		<LandingPageApp />
+	);
 };
 
-const appRoot = document.getElementById( 'pin4wc-setup-guide' );
+const appRoot = document.getElementById('pin4wc-setup-guide');
 
-if ( appRoot ) {
-	render( <App />, appRoot );
+if (appRoot) {
+	render(<App />, appRoot);
 }
 
 export default App;

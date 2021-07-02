@@ -11,7 +11,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
  */
 import './style.scss';
 
-const TransientNotices = ( { className, notices, onRemove } ) => {
+const TransientNotices = ({ className, notices, onRemove }) => {
 	const classes = classnames(
 		'woocommerce-transient-notices',
 		'components-notices__snackbar',
@@ -20,20 +20,20 @@ const TransientNotices = ( { className, notices, onRemove } ) => {
 
 	return (
 		<SnackbarList
-			notices={ notices }
-			className={ classes }
-			onRemove={ onRemove }
+			notices={notices}
+			className={classes}
+			onRemove={onRemove}
 		/>
 	);
 };
 
 export default compose(
-	withSelect( ( select ) => {
-		const notices = select( 'core/notices' ).getNotices();
+	withSelect((select) => {
+		const notices = select('core/notices').getNotices();
 
 		return { notices };
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		onRemove: dispatch( 'core/notices' ).removeNotice,
-	} ) )
-)( TransientNotices );
+	}),
+	withDispatch((dispatch) => ({
+		onRemove: dispatch('core/notices').removeNotice,
+	}))
+)(TransientNotices);

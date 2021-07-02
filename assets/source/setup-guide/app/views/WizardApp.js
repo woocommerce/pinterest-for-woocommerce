@@ -26,92 +26,92 @@ import {
 } from '../helpers/effects';
 
 const WizardApp = () => {
-	const [ currentStep, setCurrentStep ] = useState();
+	const [currentStep, setCurrentStep] = useState();
 
 	const appSettings = useSettingsSelect();
 
-	useBodyClasses( 'wizard' );
-	useCreateNotice()( wcSettings.pin4wc.error );
+	useBodyClasses('wizard');
+	useCreateNotice()(wcSettings.pin4wc.error);
 
 	const steps = [
 		{
 			key: 'setup-account',
 			container: SetupAccount,
-			label: __( 'Set up your account', 'pinterest-for-woocommerce' ),
+			label: __('Set up your account', 'pinterest-for-woocommerce'),
 		},
 		{
 			key: 'claim-website',
 			container: ClaimWebsite,
-			label: __( 'Claim your website', 'pinterest-for-woocommerce' ),
+			label: __('Claim your website', 'pinterest-for-woocommerce'),
 		},
 		{
 			key: 'setup-tracking',
 			container: SetupTracking,
-			label: __( 'Set up tracking', 'pinterest-for-woocommerce' ),
+			label: __('Set up tracking', 'pinterest-for-woocommerce'),
 		},
 		{
 			key: 'setup-pins',
 			container: SetupPins,
-			label: __( 'Set up pins', 'pinterest-for-woocommerce' ),
+			label: __('Set up pins', 'pinterest-for-woocommerce'),
 		},
 	];
 
 	const getSteps = () => {
-		return steps.map( ( step, index ) => {
-			const container = createElement( step.container, {
+		return steps.map((step, index) => {
+			const container = createElement(step.container, {
 				query: getQuery(),
 				step,
-				goToNextStep: () => goToNextStep( step ),
+				goToNextStep: () => goToNextStep(step),
 				view: 'wizard',
-			} );
+			});
 
 			step.content = (
 				<div
-					className={ `woocommerce-setup-guide__container ${ step.key }` }
+					className={`woocommerce-setup-guide__container ${step.key}`}
 				>
-					{ container }
+					{container}
 				</div>
 			);
 
-			const previousStep = steps[ index - 1 ];
+			const previousStep = steps[index - 1];
 
-			if ( ! previousStep || previousStep.isComplete ) {
-				step.onClick = ( key ) => updateQueryString( { step: key } );
+			if (!previousStep || previousStep.isComplete) {
+				step.onClick = (key) => updateQueryString({ step: key });
 			}
 
 			return step;
-		} );
+		});
 	};
 
 	const getCurrentStep = () => {
 		const query = getQuery();
-		const step = steps.find( ( s ) => s.key === query.step );
+		const step = steps.find((s) => s.key === query.step);
 
-		if ( ! step ) {
-			return steps[ 0 ].key;
+		if (!step) {
+			return steps[0].key;
 		}
 
 		return step.key;
 	};
 
-	const goToNextStep = ( step ) => {
-		const currentStepIndex = steps.findIndex( ( s ) => s.key === step.key );
+	const goToNextStep = (step) => {
+		const currentStepIndex = steps.findIndex((s) => s.key === step.key);
 
-		const nextStep = steps[ currentStepIndex + 1 ];
+		const nextStep = steps[currentStepIndex + 1];
 
-		if ( typeof nextStep === 'undefined' ) {
+		if (typeof nextStep === 'undefined') {
 			return;
 		}
 
-		return updateQueryString( { step: nextStep.key } );
+		return updateQueryString({ step: nextStep.key });
 	};
 
-	getHistory().listen( () => {
-		setCurrentStep( getCurrentStep() );
-	} );
+	getHistory().listen(() => {
+		setCurrentStep(getCurrentStep());
+	});
 
-	if ( ! currentStep ) {
-		setCurrentStep( getCurrentStep() );
+	if (!currentStep) {
+		setCurrentStep(getCurrentStep());
 
 		return <Spinner />;
 	}
@@ -120,11 +120,11 @@ const WizardApp = () => {
 		<div className="woocommerce-layout">
 			<div className="woocommerce-layout__main woocommerce-setup-guide__main">
 				<TransientNotices />
-				{ appSettings ? (
-					<Stepper currentStep={ currentStep } steps={ getSteps() } />
+				{appSettings ? (
+					<Stepper currentStep={currentStep} steps={getSteps()} />
 				) : (
 					<Spinner />
-				) }
+				)}
 			</div>
 		</div>
 	);

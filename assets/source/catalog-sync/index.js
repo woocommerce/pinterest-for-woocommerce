@@ -9,8 +9,8 @@ import { render } from '@wordpress/element';
 import App from './app/App';
 import './app/style.scss';
 
-const appRoot = document.getElementById( 'pin4wc-catalog-sync' );
+const appRoot = document.getElementById('pin4wc-catalog-sync');
 
-if ( appRoot ) {
-	render( <App />, appRoot );
+if (appRoot) {
+	render(<App />, appRoot);
 }

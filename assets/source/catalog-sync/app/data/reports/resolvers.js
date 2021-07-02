@@ -14,20 +14,20 @@ import { fetch } from './controls';
  *
  * @param {Object} query
  */
-export function* getFeedIssues( query = {} ) {
+export function* getFeedIssues(query = {}) {
 	try {
 		const data = {
 			paged: query.paged || 1,
 			per_page: query.per_page || 25,
 		};
-		yield setIsRequesting( true );
+		yield setIsRequesting(true);
 
-		const result = yield fetch( 'feed_issues', data );
-		yield receiveFeedIssues( result );
+		const result = yield fetch('feed_issues', data);
+		yield receiveFeedIssues(result);
 
-		yield setIsRequesting( false );
-	} catch ( error ) {
-		yield setRequestingError( error, 'feed_issues' );
+		yield setIsRequesting(false);
+	} catch (error) {
+		yield setRequestingError(error, 'feed_issues');
 	}
 }
 
@@ -36,9 +36,9 @@ export function* getFeedIssues( query = {} ) {
  */
 export function* getFeedState() {
 	try {
-		const result = yield fetch( 'feed_state' );
-		yield receiveFeedState( result );
-	} catch ( error ) {
-		yield setRequestingError( error, 'feed_state' );
+		const result = yield fetch('feed_state');
+		yield receiveFeedState(result);
+	} catch (error) {
+		yield setRequestingError(error, 'feed_state');
 	}
 }

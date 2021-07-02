@@ -12,7 +12,7 @@ const reportsReducer = (
 	},
 	action
 ) => {
-	switch ( action.type ) {
+	switch (action.type) {
 		case TYPES.RECEIVE_FEEDISSUES:
 			state = {
 				...state,
@@ -35,7 +35,7 @@ const reportsReducer = (
 			state = {
 				...state,
 				requestingErrors: {
-					[ action.name ]: action.error,
+					[action.name]: action.error,
 				},
 			};
 			break;

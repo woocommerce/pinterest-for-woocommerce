@@ -10,8 +10,8 @@ import { fetch } from './controls';
 export function* getSettings() {
 	try {
 		const result = yield fetch();
-		yield receiveSettings( result );
-	} catch ( error ) {
-		yield setRequestingError( error, 'all' );
+		yield receiveSettings(result);
+	} catch (error) {
+		yield setRequestingError(error, 'all');
 	}
 }
