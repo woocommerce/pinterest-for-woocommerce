@@ -399,7 +399,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_token() {
 
-			$token = self::get_setting( 'token', true );
+			$token = self::get_data( 'token', true );
 
 			try {
 				$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::decrypt( $token['access_token'] );
@@ -425,7 +425,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function save_token( $token ) {
 
 			$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['access_token'] );
-			return self::save_setting( 'token', $token );
+			return self::save_data( 'token', $token );
 		}
 
 
