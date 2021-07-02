@@ -32,7 +32,8 @@ const SetupAccount = ({ goToNextStep, view }) => {
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
 		useState(false);
 	const appSettings = useSettingsSelect();
-	const isConnected = useSettingsSelect('isConnected');
+	const [isConnected, setIsConnected] = useState(wcSettings.pin4wc.isConnected);
+
 	const setAppSettings = useSettingsDispatch(view === 'wizard');
 	const createNotice = useCreateNotice();
 

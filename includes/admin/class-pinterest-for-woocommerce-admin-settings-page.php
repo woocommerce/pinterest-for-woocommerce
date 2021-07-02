@@ -342,6 +342,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 					)
 				),
 				'domainToVerify'  => wp_parse_url( site_url(), PHP_URL_HOST ),
+				'isConnected'     => ! empty( Pinterest_For_Woocommerce()::get_token()['access_token'] ),
 				'apiRoute'        => PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION,
 				'pageSlug'        => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
 				'optionsName'     => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,
