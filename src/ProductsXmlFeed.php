@@ -237,9 +237,9 @@ class ProductsXmlFeed {
 	private static function get_property_g_price( $product, $property ) {
 
 		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
-			$price = $product->get_variation_price();
+			$price = $product->get_variation_regular_price();
 		} else {
-			$price = $product->get_price();
+			$price = $product->get_regular_price();
 		}
 
 		if ( empty( $price ) ) {
