@@ -4,6 +4,7 @@
 import { sprintf, __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
 import {
 	Button,
 	Card,
@@ -79,22 +80,21 @@ const SetupAccount = ({ goToNextStep, view }) => {
 	const handleDisconnectAccount = async () => {
 		closeConfirmationModal();
 
-		const update = await setAppSettings(
-			{
-				token: null,
-				crypto_encoded_key: null,
-			},
-			true
-		);
+		const result = await apiFetch({
+			path: wcSettings.pin4wc.apiRoute + '/auth_disconnect',
+			method: 'GET',
+		});
 
-		if (!update.success) {
+		if (!result.disconnected) {
 			createNotice(
 				'error',
 				__(
-					'There was a problem saving your settings.',
+					'There was a problem while trying to disconnect.',
 					'pinterest-for-woocommerce'
 				)
 			);
+		} else {
+			setIsConnected(false);
 		}
 	};
 
