@@ -593,7 +593,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public function verification_query_var( $public_query_vars ) {
 
 			if ( ! self::get_data( 'verification_data' ) ) {
-				return;
+				return $public_query_vars;
 			}
 
 			$public_query_vars[] = 'pinterest_verification';
