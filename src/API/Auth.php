@@ -72,7 +72,7 @@ class Auth extends VendorAPI {
 
 		if ( 401 === $result->get_status() ) {
 			$error_message = esc_html__( 'Something went wrong with your attempt to authorize this App. Please try agagin.', 'pinterest-for-woocommerce' );
-			wp_safe_redirect( add_query_arg( 'error', rawurlencode( $error_message ), $this->get_redirect_url( $request->get_param( 'view' ) ) ) );
+			wp_safe_redirect( add_query_arg( 'error', rawurlencode( $error_message ), $this->get_redirect_url( $request->get_param( 'view' ), true ) ) );
 			exit;
 		}
 
@@ -114,44 +114,60 @@ class Auth extends VendorAPI {
 			do_action( 'pinterest_for_woocommerce_token_saved' );
 		}
 
-		wp_safe_redirect( $this->get_redirect_url( $request->get_param( 'view' ) ) . $error_args );
+		wp_safe_redirect( $this->get_redirect_url( $request->get_param( 'view' ), ! empty( $error ) ) . $error_args );
 		exit;
 	}
 
 	/**
 	 * Returns the redirect URI based on the current request's parameters and plugin settings.
 	 *
-	 * @param string $view The context of the view.
+	 * @param string $view      The context of the view.
+	 * @param string $has_error Whether there was an error with the auth process.
 	 *
 	 * @return string
 	 */
-	private function get_redirect_url( $view = null ) {
+	private function get_redirect_url( $view = null, $has_error = false ) {
 
-		$redirect_url      = admin_url( 'admin.php?page=' . \PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE );
-		$is_setup_complete = Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete', true );
+		$redirect_url            = admin_url( 'admin.php?page=' . \PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE );
+		$is_setup_complete       = Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete', true );
+		$dismissed_wc_tasks      = get_option( 'woocommerce_task_list_dismissed_tasks' );
+		$is_setup_task_dismissed = ! empty( $dismissed_wc_tasks ) && is_array( $dismissed_wc_tasks ) && in_array( 'setup-pinterest', $dismissed_wc_tasks, true );
 
-		if ( empty( $is_setup_complete ) || 'no' === $is_setup_complete ) {
-			$step         = empty( $error ) ? 'claim-website' : 'setup-account';
+		// If the setup task is dismissed, we cannot go to WC-Admin, so go to settings.
+		if ( $is_setup_task_dismissed ) {
+			return $redirect_url;
+		}
+
+		// If started on settings, go back to settings.
+		if ( ! empty( $view ) && 'settings' === $view ) {
+			return $redirect_url;
+		}
+
+		// If we have already completed onboarding, go to settings.
+		if ( $is_setup_complete ) {
+			return $redirect_url;
+		}
+
+		// Go to WC-Admin to render our App there.
+		$step         = empty( $has_error ) ? 'claim-website' : 'setup-account';
+		$redirect_url = add_query_arg(
+			array(
+				'page' => 'wc-admin',
+				'task' => 'setup-pinterest',
+				'step' => $step,
+			),
+			get_admin_url( null, 'admin.php' )
+		);
+
+		if ( ! empty( $view ) ) {
 			$redirect_url = add_query_arg(
 				array(
-					'page' => 'wc-admin',
-					'task' => 'setup-pinterest',
-					'step' => $step,
+					'view' => sanitize_key( $view ),
 				),
-				get_admin_url( null, 'admin.php' )
+				$redirect_url
 			);
-
-			if ( ! empty( $view ) ) {
-				$redirect_url = add_query_arg(
-					array(
-						'view' => sanitize_key( $view ),
-					),
-					$redirect_url
-				);
-			}
 		}
 
 		return $redirect_url;
-
 	}
 }

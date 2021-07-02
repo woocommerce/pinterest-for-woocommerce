@@ -19,3 +19,6 @@ assets/source/_maps
 
 # Composer
 /vendor/
+
+# build products
+pinterest-for-woocommerce.zip
