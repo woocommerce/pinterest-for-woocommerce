@@ -41,7 +41,7 @@ const SettingsApp = () => {
 				<TransientNotices />
 				{appSettings ? (
 					<div className="woocommerce-setup-guide__container">
-						<SetupAccount view="settings" />
+						<SetupAccount view="settings" setIsConnected={setIsConnected.bind(this)} isConnected={isConnected} />
 
 						{isGroup1Visible && <ClaimWebsite view="settings" />}
 						{isGroup2Visible && <SetupTracking view="settings" />}

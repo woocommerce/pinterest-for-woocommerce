@@ -29,11 +29,10 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
-const SetupAccount = ({ goToNextStep, view }) => {
+const SetupAccount = ({ goToNextStep, view, isConnected, setIsConnected }) => {
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
 		useState(false);
 	const appSettings = useSettingsSelect();
-	const [isConnected, setIsConnected] = useState(wcSettings.pin4wc.isConnected);
 
 	const setAppSettings = useSettingsDispatch(view === 'wizard');
 	const createNotice = useCreateNotice();
