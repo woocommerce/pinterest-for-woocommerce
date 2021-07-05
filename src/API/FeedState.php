@@ -121,19 +121,14 @@ class FeedState extends VendorAPI {
 			$result = array();
 
 			if ( ! Pinterest\ProductSync::is_product_sync_enabled() ) {
+
 				return array(
 					'workflow' => array(
 						array(
 							'label'        => esc_html__( 'XML feed', 'pinterest-for-woocommerce' ),
 							'status'       => 'error',
 							'status_label' => esc_html__( 'Product sync is disabled.', 'pinterest-for-woocommerce' ),
-							'extra_info'   => wp_kses_post(
-								sprintf(
-									/* Translators: %1$s The URL of the settings page */
-									__( 'Visit the <a href="%1$s">settings</a> page to enabled it.', 'pinterest-for-woocommerce' ),
-									esc_url( add_query_arg( array( 'page' => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE ), get_admin_url( null, 'admin.php' ) ) )
-								)
-							),
+							'extra_info'   => wp_kses_post( $this->get_requirements_errors() ),
 						),
 					),
 					'overview' => array(
@@ -504,5 +499,41 @@ class FeedState extends VendorAPI {
 		}
 
 		return '';
+	}
+
+
+	/**
+	 * Return the error message related to the reasoning of Product Sync not being active.
+	 *
+	 * @return string
+	 */
+	private function get_requirements_errors() {
+
+		$errors       = array();
+		$requirements = Pinterest\ProductSync::check_product_sync_requirements();
+
+		if ( ! $requirements['domain_verified'] ) {
+			$errors[] = esc_html__( 'Your domain is not verified.', 'pinterest-for-woocommerce' );
+		}
+
+		if ( ! $requirements['tracking_enabled'] ) {
+			$errors[] = esc_html__( 'Tracking is not properly configured.', 'pinterest-for-woocommerce' );
+		}
+
+		if ( ! empty( $errors ) ) {
+			$errors[] = sprintf(
+				/* Translators: %1$s The URL of the settings page */
+				__( 'Check the <a href="%1$s">settings</a> page to and verify all settings. If everything is in place, try disconnecting and re-connecting your account.', 'pinterest-for-woocommerce' ),
+				esc_url( add_query_arg( array( 'page' => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE ), get_admin_url( null, 'admin.php' ) ) )
+			);
+		} else {
+			$errors[] = sprintf(
+				/* Translators: %1$s The URL of the settings page */
+				__( 'Visit the <a href="%1$s">settings</a> page to enabled it.', 'pinterest-for-woocommerce' ),
+				esc_url( add_query_arg( array( 'page' => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE ), get_admin_url( null, 'admin.php' ) ) )
+			);
+		}
+
+		return implode( ' ', $errors );
 	}
 }
