@@ -167,11 +167,21 @@ class ProductSync {
 	 * @return boolean
 	 */
 	public static function is_product_sync_enabled() {
+		return ! in_array( false, self::check_product_sync_requirements(), true );
+	}
 
-		$domain_verified  = Pinterest_For_Woocommerce()::is_domain_verified();
-		$tracking_enabled = $domain_verified && Pinterest_For_Woocommerce()::is_tracking_enabled();
 
-		return (bool) $domain_verified && $tracking_enabled && Pinterest_For_Woocommerce()::get_setting( 'product_sync_enabled' );
+	/**
+	 * Returns the array of requirements and their status, for the Product Sync feature.
+	 *
+	 * @return array
+	 */
+	public static function check_product_sync_requirements() {
+		return array(
+			'product_sync_enabled' => Pinterest_For_Woocommerce()::get_setting( 'product_sync_enabled' ),
+			'domain_verified'      => Pinterest_For_Woocommerce()::is_domain_verified(),
+			'tracking_enabled'     => Pinterest_For_Woocommerce()::is_tracking_enabled(),
+		);
 	}
 
 
