@@ -523,7 +523,7 @@ class FeedState extends VendorAPI {
 		if ( ! empty( $errors ) ) {
 			$errors[] = sprintf(
 				/* Translators: %1$s The URL of the settings page */
-				__( 'Check the <a href="%1$s">settings</a> page to and verify all settings. If everything is in place, try disconnecting and re-connecting your account.', 'pinterest-for-woocommerce' ),
+				__( 'Check the <a href="%1$s">settings</a> page and verify all settings. If everything is in place, try disconnecting and re-connecting your account.', 'pinterest-for-woocommerce' ),
 				esc_url( add_query_arg( array( 'page' => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE ), get_admin_url( null, 'admin.php' ) ) )
 			);
 		} else {
