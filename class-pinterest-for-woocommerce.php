@@ -438,6 +438,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function clear_token() {
+
+			self::save_data( 'crypto_encoded_key', null );
 			return self::save_token( array() );
 		}
 
