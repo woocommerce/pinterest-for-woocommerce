@@ -123,6 +123,6 @@ class VendorAPI {
 			return $permissions[ $option ];
 		}
 
-		return current_user_can( 'manage_options' );
+		return current_user_can( 'manage_woocommerce' );
 	}
 }
