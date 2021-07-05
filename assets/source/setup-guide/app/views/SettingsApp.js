@@ -12,6 +12,7 @@ import ClaimWebsite from '../steps/ClaimWebsite';
 import SetupTracking from '../steps/SetupTracking';
 import SetupProductSync from '../steps/SetupProductSync';
 import SetupPins from '../steps/SetupPins';
+import AdvancedSettings from '../steps/AdvancedSettings';
 import SaveSettingsButton from '../components/SaveSettingsButton';
 import TransientNotices from '../components/TransientNotices';
 import {
@@ -47,6 +48,7 @@ const SettingsApp = () => {
 							<>
 								<SetupProductSync view="settings" />
 								<SetupPins view="settings" />
+								<AdvancedSettings view="settings" />
 								<SaveSettingsButton />
 							</>
 						)}
