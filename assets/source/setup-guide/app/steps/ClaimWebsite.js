@@ -94,13 +94,13 @@ const ClaimWebsite = ({ goToNextStep, view }) => {
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
 						title={__(
-            'Claim your website',
-            'pinterest-for-woocommerce'
-            )}
-            description={__(
-              'Claim your website to get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of you content.'
-            )}
-            link={wcSettings.pin4wc.pinterestLinks.claimWebsite}
+							'Claim your website',
+							'pinterest-for-woocommerce'
+						)}
+						description={__(
+							'Claim your website to get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of you content.'
+						)}
+						link={wcSettings.pin4wc.pinterestLinks.claimWebsite}
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">

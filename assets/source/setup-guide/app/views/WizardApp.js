@@ -27,7 +27,9 @@ import {
 
 const WizardApp = () => {
 	const [currentStep, setCurrentStep] = useState();
-	const [isConnected, setIsConnected] = useState(wcSettings.pin4wc.isConnected);
+	const [isConnected, setIsConnected] = useState(
+		wcSettings.pin4wc.isConnected
+	);
 
 	const appSettings = useSettingsSelect();
 
@@ -40,9 +42,9 @@ const WizardApp = () => {
 			container: SetupAccount,
 			label: __('Set up your account', 'pinterest-for-woocommerce'),
 			props: {
-				setIsConnected: setIsConnected,
-				isConnected: isConnected,
-			}
+				setIsConnected,
+				isConnected,
+			},
 		},
 		{
 			key: 'claim-website',
