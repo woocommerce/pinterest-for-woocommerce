@@ -140,6 +140,10 @@ class ProductsXmlFeed {
 		$description = $product->get_parent_id() ? $product->get_description() : $product->get_short_description();
 
 		if ( empty( $description ) ) {
+			$description = get_the_excerpt( $product->get_id() );
+		}
+
+		if ( empty( $description ) ) {
 			return;
 		}
 
