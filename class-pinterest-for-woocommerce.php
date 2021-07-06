@@ -196,7 +196,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_filter( 'query_vars', array( $this, 'verification_query_var' ), 10, 1 );
 			add_action( 'parse_request', array( $this, 'verification_request' ), 10, 1 );
 
-			// Allow access to our options through the REST API for user that can manage the store.
+			// Allow access to our option through the REST API.
 			add_filter( 'woocommerce_rest_api_option_permissions', array( $this, 'add_option_permissions' ), 10, 1 );
 		}
 
@@ -269,7 +269,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Allow access to our options through the REST API for user that can manage the store.
+		 * Allow access to our option through the REST API for a user that can manage the store.
+		 * The UI relies on this option being available through the API.
 		 *
 		 * @param array $permissions The permissions array.
 		 *
