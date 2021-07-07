@@ -200,7 +200,7 @@ class Tracking {
 			array(
 				'product_id'     => $product->get_id(),
 				'product_name'   => $product->get_name(),
-				'value'          => $product->get_price(),
+				'value'          => ( $product->get_price() * $quantity ),
 				'order_quantity' => $quantity,
 				'currency'       => get_woocommerce_currency(),
 			)
