@@ -37,7 +37,10 @@ const WizardApp = () => {
 		{
 			key: 'setup-account',
 			container: SetupAccount,
-			label: __('Set up your account', 'pinterest-for-woocommerce'),
+			label: __(
+				'Set up your business account',
+				'pinterest-for-woocommerce'
+			),
 		},
 		{
 			key: 'claim-website',
@@ -47,12 +50,15 @@ const WizardApp = () => {
 		{
 			key: 'setup-tracking',
 			container: SetupTracking,
-			label: __('Set up tracking', 'pinterest-for-woocommerce'),
+			label: __(
+				'Track conversions with the Pinterest tag',
+				'pinterest-for-woocommerce'
+			),
 		},
 		{
 			key: 'setup-pins',
 			container: SetupPins,
-			label: __('Set up pins', 'pinterest-for-woocommerce'),
+			label: __('Publish Pins', 'pinterest-for-woocommerce'),
 		},
 	];
 
