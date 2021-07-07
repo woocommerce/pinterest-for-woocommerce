@@ -20,7 +20,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @var string
 		 */
-		public $version = '0.5.0';
+		public $version = '0.7.0';
 
 		/**
 		 * The single instance of the class.
@@ -61,6 +61,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			'rich_pins_on_posts'     => true,
 			'rich_pins_on_products'  => true,
 			'product_sync_enabled'   => true,
+			'enable_debug_logging'   => false,
+			'erase_plugin_data'      => false,
 		);
 
 		/**
@@ -193,7 +195,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'init', array( $this, 'verification_rewrite' ) );
 			add_filter( 'query_vars', array( $this, 'verification_query_var' ), 10, 1 );
 			add_action( 'parse_request', array( $this, 'verification_request' ), 10, 1 );
+
+			// Allow access to our option through the REST API.
+			add_filter( 'woocommerce_rest_api_option_permissions', array( $this, 'add_option_permissions' ), 10, 1 );
 		}
+
 
 		/**
 		 * Init Pinterest_For_Woocommerce when WordPress Initialises.
@@ -259,6 +265,21 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public function ajax_url() {
 			return admin_url( 'admin-ajax.php', 'relative' );
+		}
+
+
+		/**
+		 * Allow access to our option through the REST API for a user that can manage the store.
+		 * The UI relies on this option being available through the API.
+		 *
+		 * @param array $permissions The permissions array.
+		 *
+		 * @return array
+		 */
+		public function add_option_permissions( $permissions ) {
+
+			$permissions[ PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ] = current_user_can( 'manage_woocommerce' );
+			return $permissions;
 		}
 
 
@@ -596,7 +617,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public function verification_query_var( $public_query_vars ) {
 
 			if ( ! self::get_data( 'verification_data' ) ) {
-				return;
+				return $public_query_vars;
 			}
 
 			$public_query_vars[] = 'pinterest_verification';

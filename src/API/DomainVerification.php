@@ -52,7 +52,7 @@ class DomainVerification extends VendorAPI {
 	 * @return boolean
 	 */
 	public function permissions_check( WP_REST_Request $request ) {
-		return current_user_can( 'manage_options' );
+		return current_user_can( 'manage_woocommerce' );
 	}
 
 
