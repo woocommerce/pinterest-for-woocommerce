@@ -311,10 +311,10 @@ class Tracking {
 
 		$queried_object = get_queried_object();
 
-		$data = array(
-			'product_category' => $queried_object->term_id,
-			'category_name'    => $queried_object->name,
-		);
+			$data = array(
+				'product_category' => $queried_object->term_id,
+				'category_name'    => $queried_object->name,
+			);
 
 		self::add_event( 'ViewCategory', $data );
 	}
@@ -327,15 +327,14 @@ class Tracking {
 	 */
 	private static function search_event() {
 
-		if ( ! is_search() ) {
-			return;
+		if ( is_search() ) {
+
+			$data = array(
+				'search_query' => get_search_query(),
+			);
+
+			self::add_event( 'search', $data );
 		}
-
-		$data = array(
-			'search_query' => get_search_query(),
-		);
-
-		self::add_event( 'search', $data );
 	}
 
 
