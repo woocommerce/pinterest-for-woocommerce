@@ -60,6 +60,9 @@ class Tracking {
 			return;
 		}
 
+		// Enqueue our JS files.
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
+
 		// Base tag.
 		self::base_tag();
 
@@ -83,6 +86,25 @@ class Tracking {
 
 		// Print to head.
 		add_action( 'wp_head', array( __CLASS__, 'print_script' ) );
+	}
+
+
+	/**
+	 * Enqueue JS files necessary to properly track actions such as search.
+	 *
+	 * @return void
+	 */
+	public static function enqueue_scripts() {
+
+		$ext = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+
+		wp_enqueue_script(
+			PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-tracking-scripts',
+			Pinterest_For_Woocommerce()->plugin_url() . '/assets/js/pinterest-for-woocommerce-tracking' . $ext . '.js',
+			array(),
+			PINTEREST_FOR_WOOCOMMERCE_VERSION,
+			true
+		);
 	}
 
 
@@ -308,10 +330,10 @@ class Tracking {
 
 		$queried_object = get_queried_object();
 
-			$data = array(
-				'product_category' => $queried_object->term_id,
-				'category_name'    => $queried_object->name,
-			);
+		$data = array(
+			'product_category' => $queried_object->term_id,
+			'category_name'    => $queried_object->name,
+		);
 
 		self::add_event( 'ViewCategory', $data );
 	}
