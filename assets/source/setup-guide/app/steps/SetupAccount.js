@@ -106,10 +106,6 @@ const SetupAccount = ({ goToNextStep, view }) => {
 						'pinterest-for-woocommerce'
 					)}
 					subtitle={__('Step One', 'pinterest-for-woocommerce')}
-					description={__(
-						'Use description text to help users understand what accounts they need to connect, and why they need to connect it.',
-						'pinterest-for-woocommerce'
-					)}
 				/>
 			)}
 

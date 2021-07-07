@@ -50,10 +50,6 @@ const AdvancedSettings = ( { view } ) => {
 							'Advanced Settings',
 							'pinterest-for-woocommerce'
 						) }
-						description={ __(
-							'Use description text to help users understand more',
-							'pinterest-for-woocommerce'
-						) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
