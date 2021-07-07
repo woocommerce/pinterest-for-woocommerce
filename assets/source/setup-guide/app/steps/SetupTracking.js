@@ -201,7 +201,10 @@ const SetupTracking = ({ goToNextStep, view }) => {
 		<div className="woocommerce-setup-guide__setup-tracking">
 			{view === 'wizard' && (
 				<StepHeader
-					title={__('Set up tracking', 'pinterest-for-woocommerce')}
+					title={__(
+						'Track conversions with the Pinterest tag',
+						'pinterest-for-woocommerce'
+					)}
 					subtitle={__('Step Three', 'pinterest-for-woocommerce')}
 				/>
 			)}
@@ -209,10 +212,58 @@ const SetupTracking = ({ goToNextStep, view }) => {
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={__(
-							'Select your advertiser and tag',
-							'pinterest-for-woocommerce'
-						)}
+						title={
+							view === 'wizard'
+								? __(
+										'Select your advertiser and tag',
+										'pinterest-for-woocommerce'
+								  )
+								: __(
+										'Track conversions with the Pinterest tag',
+										'pinterest-for-woocommerce'
+								  )
+						}
+						description={
+							<>
+								{__(
+									'The Pinterest tag is a piece of JavaScript code you put on your website to gather conversion insights and build audiences to target based on actions people have taken on your site.',
+									'pinterest-for-woocommerce'
+								)}
+								<br />
+								<br />
+								{__(
+									'Using conversion tags means you agree to our',
+									'pinterest-for-woocommerce'
+								)}{' '}
+								<Button
+									isLink
+									href={
+										wcSettings.pin4wc.pinterestLinks
+											.adGuidelines
+									}
+									target="_blank"
+								>
+									{__(
+										'Ad Guidelines',
+										'pinterest-for-woocommerce'
+									)}
+								</Button>{' '}
+								{__('and', 'pinterest-for-woocommerce')}{' '}
+								<Button
+									isLink
+									href={
+										wcSettings.pin4wc.pinterestLinks
+											.adDataTerms
+									}
+									target="_blank"
+								>
+									{__(
+										'Ad Data Terms',
+										'pinterest-for-woocommerce'
+									)}
+								</Button>
+							</>
+						}
 						link={wcSettings.pin4wc.pinterestLinks.SetupTracking}
 					/>
 				</div>
@@ -261,7 +312,7 @@ const SetupTracking = ({ goToNextStep, view }) => {
 											className="text-margin"
 										>
 											{__(
-												'Tracking cannot be configured automatically since your Pinterest account is not configured as an Advertiser.',
+												'Tracking cannot be configured automatically.',
 												'pinterest-for-woocommerce'
 											)}
 										</Text>
@@ -270,25 +321,7 @@ const SetupTracking = ({ goToNextStep, view }) => {
 											className="text-margin"
 										>
 											{__(
-												'Please follow',
-												'pinterest-for-woocommerce'
-											)}{' '}
-											<Button
-												isLink
-												href={
-													wcSettings.pin4wc
-														.pinterestLinks
-														.createAdvertiser
-												}
-												target="_blank"
-											>
-												{__(
-													'this guide',
-													'pinterest-for-woocommerce'
-												)}
-											</Button>{' '}
-											{__(
-												'to create an advertiser account.',
+												'Please visit your Pinterest Dashboard and click “Create Ad”.',
 												'pinterest-for-woocommerce'
 											)}
 										</Text>
@@ -297,7 +330,7 @@ const SetupTracking = ({ goToNextStep, view }) => {
 											className="text-margin"
 										>
 											{__(
-												'Once you’ve successfully created it, come back here and click “Try again” below.',
+												'After completing this step, click “Try again” button.',
 												'pinterest-for-woocommerce'
 											)}
 										</Text>
