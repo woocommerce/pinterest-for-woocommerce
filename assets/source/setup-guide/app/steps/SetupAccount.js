@@ -125,8 +125,8 @@ const SetupAccount = ({ goToNextStep, view }) => {
 						}
 						description={
 							<>
-							{__(
-								'Set up a free Pinterest business account to get access to analytics on your Pins and the ability to run ads. This requires agreeing to our',
+								{__(
+									'Set up a free Pinterest business account to get access to analytics on your Pins and the ability to run ads. This requires agreeing to our',
 									'pinterest-for-woocommerce'
 								)}{' '}
 								<Button
