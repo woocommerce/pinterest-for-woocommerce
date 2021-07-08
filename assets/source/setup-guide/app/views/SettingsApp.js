@@ -46,7 +46,7 @@ const SettingsApp = () => {
 					<div className="woocommerce-setup-guide__container">
 						<SetupAccount
 							view="settings"
-							setIsConnected={setIsConnected.bind(this)}
+							setIsConnected={setIsConnected}
 							isConnected={isConnected}
 						/>
 
