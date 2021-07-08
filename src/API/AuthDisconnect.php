@@ -26,7 +26,7 @@ class AuthDisconnect extends VendorAPI {
 
 		$this->base              = 'auth_disconnect';
 		$this->endpoint_callback = 'handle_disconnect';
-		$this->methods           = 'GET';
+		$this->methods           = 'POST';
 
 		$this->register_routes();
 	}

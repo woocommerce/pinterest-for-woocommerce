@@ -81,7 +81,7 @@ const SetupAccount = ({ goToNextStep, view, isConnected, setIsConnected }) => {
 
 		const result = await apiFetch({
 			path: wcSettings.pin4wc.apiRoute + '/auth_disconnect',
-			method: 'GET',
+			method: 'POST',
 		});
 
 		if (!result.disconnected) {
