@@ -417,7 +417,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				return;
 			}
 
-			if ( ! current_user_can( 'manage_options' ) ) {
+			if ( ! current_user_can( 'manage_woocommerce' ) ) {
 				wp_die( esc_html__( 'Cheatin&#8217; huh?', 'pinterest-for-woocommerce' ) );
 				return false;
 			}

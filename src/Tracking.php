@@ -52,12 +52,24 @@ class Tracking {
 	private static $base_tag_em = "<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "', { em: '" . self::HASHED_EMAIL_SLUG . "' });\n  pintrk('page');\n</script>\n\n<noscript>\n  <img height=\"1\" width=\"1\" style=\"display:none;\" alt=\"\" src=\"https://ct.pinterest.com/v3/?tid=" . self::TAG_ID_SLUG . '&pd[em]=' . self::HASHED_EMAIL_SLUG . "&noscript=1\" />\n</noscript>\n";
 
 	/**
+	 * The user/customer specific key used to store async events that are to be printed the next
+	 * time we print out events.
+	 *
+	 * @var string
+	 */
+	private static $deferred_conversion_events_transient_key = null;
+
+	/**
 	 * Initiate class.
 	 */
 	public static function maybe_init() {
 
 		if ( ! self::tracking_enabled() || wp_doing_cron() || is_admin() ) {
 			return;
+		}
+
+		if ( is_object( WC()->session ) ) {
+			self::$deferred_conversion_events_transient_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_async_events_' . md5( WC()->session->get_customer_id() );
 		}
 
 		// Enqueue our JS files.
@@ -69,10 +81,12 @@ class Tracking {
 		// WC events.
 		if ( function_exists( 'WC' ) ) {
 
-			add_action( 'wp', array( __CLASS__, 'late_events_handling' ) );
+			if ( ! wp_doing_ajax() ) {
+				add_action( 'wp', array( __CLASS__, 'late_events_handling' ) );
+			}
 
 			// AddToCart - ajax.
-			if ( 'yes' === get_option( 'woocommerce_enable_ajax_add_to_cart' ) ) {
+			if ( 'yes' === get_option( 'woocommerce_enable_ajax_add_to_cart' ) && 'yes' !== get_option( 'woocommerce_cart_redirect_after_add' ) ) {
 				add_action( 'wp_enqueue_scripts', array( __CLASS__, 'ajax_tracking_snippet' ), 20 );
 			}
 
@@ -84,8 +98,41 @@ class Tracking {
 
 		}
 
+		self::load_async_events();
+
+		add_action( 'shutdown', array( __CLASS__, 'save_async_events' ) );
+
 		// Print to head.
 		add_action( 'wp_head', array( __CLASS__, 'print_script' ) );
+	}
+
+
+	/**
+	 * Loads any stored events to be printed.
+	 *
+	 * @return void
+	 */
+	private static function load_async_events() {
+
+		$async_events = get_transient( self::$deferred_conversion_events_transient_key );
+
+		if ( $async_events ) {
+			self::$events = array_merge( self::$events, $async_events );
+			delete_transient( self::$deferred_conversion_events_transient_key );
+		}
+	}
+
+
+	/**
+	 * Store any events that weren't printed on shutdown.
+	 *
+	 * @return void
+	 */
+	public static function save_async_events() {
+
+		if ( ! empty( self::$events ) && self::$deferred_conversion_events_transient_key ) {
+			set_transient( self::$deferred_conversion_events_transient_key, self::$events, 10 * MINUTE_IN_SECONDS );
+		}
 	}
 
 
@@ -114,6 +161,7 @@ class Tracking {
 	 * @return void
 	 */
 	public static function late_events_handling() {
+
 		// Product page visit.
 		self::page_visit_event();
 
@@ -160,7 +208,9 @@ class Tracking {
 	 */
 	public static function hook_add_to_cart_event( $cart_item_key, $product_id, $quantity, $variation_id ) {
 
-		if ( wp_doing_ajax() ) {
+		$redirect_to_cart = 'yes' === get_option( 'woocommerce_cart_redirect_after_add' );
+
+		if ( wp_doing_ajax() && ! $redirect_to_cart ) {
 			return;
 		}
 
@@ -172,12 +222,11 @@ class Tracking {
 			array(
 				'product_id'     => $product->get_id(),
 				'product_name'   => $product->get_name(),
-				'value'          => $product->get_price(),
+				'value'          => ( $product->get_price() * $quantity ),
 				'order_quantity' => $quantity,
 				'currency'       => get_woocommerce_currency(),
 			)
 		);
-
 	}
 
 
@@ -207,11 +256,15 @@ class Tracking {
 
 			$product = $order_item->get_product();
 
+			$terms      = wc_get_object_terms( $product->get_id(), 'product_cat' );
+			$categories = ! empty( $terms ) ? wp_list_pluck( $terms, 'name' ) : array();
+
 			$order_items[] = array(
 				'product_id'       => $order_item->get_id(),
 				'product_name'     => $order_item->get_name(),
 				'product_price'    => $product->get_price(),
 				'product_quantity' => $order_item->get_quantity(),
+				'product_category' => $categories,
 			);
 
 			$total_quantity += $order_item->get_quantity();
@@ -220,6 +273,7 @@ class Tracking {
 		self::add_event(
 			'checkout',
 			array(
+				'order_id'       => $order_id,
 				'value'          => $order->get_total(),
 				'order_quantity' => $total_quantity,
 				'currency'       => $order->get_currency(),
@@ -425,6 +479,7 @@ class Tracking {
 
 			if ( ! empty( self::$events ) ) {
 				echo '<script>' . implode( PHP_EOL, self::$events ) . '</script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
+				self::$events = array();
 			}
 		}
 	}

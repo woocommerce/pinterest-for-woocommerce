@@ -20,17 +20,17 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
-const SetupProductSync = ({ view }) => {
+const AdvancedSettings = ( { view } ) => {
 	const appSettings = useSettingsSelect();
-	const setAppSettings = useSettingsDispatch(view === 'wizard');
+	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
 
-	const handleOptionChange = async (name, value) => {
-		const update = await setAppSettings({
-			[name]: value ?? !appSettings[name],
-		});
+	const handleOptionChange = async ( name, value ) => {
+		const update = await setAppSettings( {
+			[ name ]: value ?? ! appSettings[ name ],
+		} );
 
-		if (!update.success) {
+		if ( ! update.success ) {
 			createNotice(
 				'error',
 				__(
@@ -46,50 +46,75 @@ const SetupProductSync = ({ view }) => {
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={__(
-							'Set up Product Sync',
+						title={ __(
+							'Advanced Settings',
 							'pinterest-for-woocommerce'
-						)}
-						description={__(
+						) }
+						description={ __(
 							'Use description text to help users understand more',
 							'pinterest-for-woocommerce'
-						)}
+						) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{undefined !== appSettings &&
-							Object.keys(appSettings).length > 0 ? (
+							{ undefined !== appSettings &&
+							Object.keys( appSettings ).length > 0 ? (
 								<>
 									<Text
 										className="woocommerce-setup-guide__checkbox-heading"
 										variant="subtitle"
 									>
-										{__(
-											'Product Sync',
+										{ __(
+											'Debug Logging',
 											'pinterest-for-woocommerce'
-										)}
+										) }
 									</Text>
 									<CheckboxControl
-										label={__(
-											'Enable Product Sync',
+										label={ __(
+											'Enable Debug Logging',
 											'pinterest-for-woocommerce'
-										)}
+										) }
 										checked={
-											appSettings.product_sync_enabled
+											appSettings.enable_debug_logging
 										}
 										className="woocommerce-setup-guide__checkbox-group"
-										onChange={() =>
+										onChange={ () =>
 											handleOptionChange(
-												'product_sync_enabled'
+												'enable_debug_logging'
+											)
+										}
+									/>
+
+									<Text
+										className="woocommerce-setup-guide__checkbox-heading"
+										variant="subtitle"
+									>
+										{ __(
+											'Plugin Data',
+											'pinterest-for-woocommerce'
+										) }
+									</Text>
+									<CheckboxControl
+										label={ __(
+											'Erase Plugin Data',
+											'pinterest-for-woocommerce'
+										) }
+										checked={
+											appSettings.erase_plugin_data
+										}
+										className="woocommerce-setup-guide__checkbox-group"
+										onChange={ () =>
+											handleOptionChange(
+												'erase_plugin_data'
 											)
 										}
 									/>
 								</>
 							) : (
 								<Spinner />
-							)}
+							) }
 						</CardBody>
 					</Card>
 				</div>
@@ -98,4 +123,4 @@ const SetupProductSync = ({ view }) => {
 	);
 };
 
-export default SetupProductSync;
+export default AdvancedSettings;

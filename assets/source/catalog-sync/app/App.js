@@ -12,7 +12,7 @@ import TransientNotices from './components/TransientNotices';
 import { useCreateNotice } from './helpers/effects';
 
 const App = () => {
-	useCreateNotice( wcSettings.pin4wc.error );
+	useCreateNotice(wcSettings.pin4wc.error);
 
 	return (
 		<div className="woocommerce-layout">

@@ -9,7 +9,7 @@ import { Spinner } from '@woocommerce/components';
  */
 import CheckIcon from '../helpers/check-icon';
 
-const StepStatus = ( { label, status } ) => {
+const StepStatus = ({ label, status }) => {
 	const icons = {
 		pending: <Spinner />,
 		error: <Icon icon="no-alt" />,
@@ -17,15 +17,13 @@ const StepStatus = ( { label, status } ) => {
 	};
 
 	return (
-		<div
-			className={ `woocommerce-setup-guide__step-status has-${ status }` }
-		>
+		<div className={`woocommerce-setup-guide__step-status has-${status}`}>
 			<div className="woocommerce-setup-guide__step-status__icon">
-				{ icons[ status ] }
+				{icons[status]}
 			</div>
 			<div className="woocommerce-setup-guide__step-status__label">
-				<Text variant={ status === 'success' ? 'subtitle' : 'body' }>
-					{ label }
+				<Text variant={status === 'success' ? 'subtitle' : 'body'}>
+					{label}
 				</Text>
 			</div>
 		</div>

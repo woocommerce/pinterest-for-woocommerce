@@ -80,7 +80,7 @@ class FeedState extends VendorAPI {
 	 * @return boolean
 	 */
 	public function permissions_check( WP_REST_Request $request ) {
-		return current_user_can( 'manage_options' );
+		return current_user_can( 'manage_woocommerce' );
 	}
 
 
@@ -251,7 +251,7 @@ class FeedState extends VendorAPI {
 
 		try {
 
-			if ( empty( $merchant_id ) || ! Pinterest_For_Woocommerce()::get_data( 'feed_registered' ) ) {
+			if ( empty( $merchant_id ) ) {
 				throw new \Exception( esc_html__( 'Product feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' ), 200 );
 			}
 
