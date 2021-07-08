@@ -56,7 +56,7 @@ $root: ".woocommerce-setup-guide";
 						height: 60px;
 						justify-content: center;
 						margin: 0 auto;
-						max-width: 768px;
+						max-width: 850px;
 						overview: hidden;
 						position: relative;
 
@@ -259,9 +259,20 @@ $root: ".woocommerce-setup-guide";
 			&__claim-website {
 
 				.components-card__body {
-					align-items: center;
-					display: flex;
-					justify-content: space-between;
+
+					> *:not(:last-child) {
+						margin-bottom: 16px;
+					}
+				}
+
+				#{$root} {
+
+					&__step {
+
+						&-status {
+							padding: 0
+						}
+					}
 				}
 
 				.is-verified {

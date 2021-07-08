@@ -102,28 +102,48 @@ const SetupAccount = ({ goToNextStep, view }) => {
 			{view === 'wizard' && (
 				<StepHeader
 					title={__(
-						'Set up your account',
+						'Set up your business account',
 						'pinterest-for-woocommerce'
 					)}
 					subtitle={__('Step One', 'pinterest-for-woocommerce')}
-					description={__(
-						'Use description text to help users understand what accounts they need to connect, and why they need to connect it.',
-						'pinterest-for-woocommerce'
-					)}
 				/>
 			)}
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={__(
-							'Pinterest Account',
-							'pinterest-for-woocommerce'
-						)}
-						description={__(
-							'Use description text to help users understand more',
-							'pinterest-for-woocommerce'
-						)}
+						title={
+							view === 'wizard'
+								? __(
+										'Pinterest business account',
+										'pinterest-for-woocommerce'
+								  )
+								: __(
+										'Linked account',
+										'pinterest-for-woocommerce'
+								  )
+						}
+						description={
+							<>
+								{__(
+									'Set up a free Pinterest business account to get access to analytics on your Pins and the ability to run ads. This requires agreeing to our',
+									'pinterest-for-woocommerce'
+								)}{' '}
+								<Button
+									isLink
+									href={
+										wcSettings.pin4wc.pinterestLinks
+											.adGuidelines
+									}
+									target="_blank"
+								>
+									{__(
+										'advertising guidelines',
+										'pinterest-for-woocommerce'
+									)}
+								</Button>
+							</>
+						}
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">

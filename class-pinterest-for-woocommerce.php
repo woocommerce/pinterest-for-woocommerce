@@ -412,7 +412,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Get decripted token data
+		 * Get decrypted token data
 		 *
 		 * @since 1.0.0
 		 *
@@ -435,7 +435,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Save encripted token data
+		 * Save encrypted token data
 		 *
 		 * @since 1.0.0
 		 *
