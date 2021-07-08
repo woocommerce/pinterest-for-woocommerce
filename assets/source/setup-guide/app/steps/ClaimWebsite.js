@@ -4,7 +4,12 @@
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { Button, Card, CardBody } from '@wordpress/components';
+import {
+	Button,
+	Card,
+	CardBody,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { Spinner } from '@woocommerce/components';
 
 /**
@@ -93,12 +98,19 @@ const ClaimWebsite = ({ goToNextStep, view }) => {
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={__(
-							'Claim your website',
-							'pinterest-for-woocommerce'
-						)}
+						title={
+							view === 'wizard'
+								? __(
+										'Claim your website',
+										'pinterest-for-woocommerce'
+								  )
+								: __(
+										'Verified domain',
+										'pinterest-for-woocommerce'
+								  )
+						}
 						description={__(
-							'Claim your website to get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of you content.'
+							'Claim your website to get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of your content.'
 						)}
 						link={wcSettings.pin4wc.pinterestLinks.claimWebsite}
 					/>
@@ -107,6 +119,13 @@ const ClaimWebsite = ({ goToNextStep, view }) => {
 					<Card>
 						{undefined !== isDomainVerified ? (
 							<CardBody size="large">
+								<Text variant="body">
+									{__(
+										'Verify your domain to claim your website. This will allow access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site, and let people know where they can find more of your content.',
+										'pinterest-for-woocommerce'
+									)}
+								</Text>
+
 								<StepStatus
 									label={wcSettings.pin4wc.domainToVerify}
 									status={status}

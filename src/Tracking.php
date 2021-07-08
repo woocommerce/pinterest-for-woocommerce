@@ -72,6 +72,9 @@ class Tracking {
 			self::$deferred_conversion_events_transient_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_async_events_' . md5( WC()->session->get_customer_id() );
 		}
 
+		// Enqueue our JS files.
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
+
 		// Base tag.
 		self::base_tag();
 
@@ -130,6 +133,25 @@ class Tracking {
 		if ( ! empty( self::$events ) && self::$deferred_conversion_events_transient_key ) {
 			set_transient( self::$deferred_conversion_events_transient_key, self::$events, 10 * MINUTE_IN_SECONDS );
 		}
+	}
+
+
+	/**
+	 * Enqueue JS files necessary to properly track actions such as search.
+	 *
+	 * @return void
+	 */
+	public static function enqueue_scripts() {
+
+		$ext = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+
+		wp_enqueue_script(
+			PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-tracking-scripts',
+			Pinterest_For_Woocommerce()->plugin_url() . '/assets/js/pinterest-for-woocommerce-tracking' . $ext . '.js',
+			array(),
+			PINTEREST_FOR_WOOCOMMERCE_VERSION,
+			true
+		);
 	}
 
 
@@ -356,20 +378,18 @@ class Tracking {
 	 */
 	private static function category_visit_event() {
 
-		$data = array();
-
-		if ( is_product_category() ) {
-
-			$queried_object = get_queried_object();
-
-			$data = array(
-				'product_category' => $queried_object->term_id,
-				'category_name'    => $queried_object->name,
-			);
-
-			self::add_event( 'ViewCategory', $data );
+		if ( ! is_product_category() ) {
+			return;
 		}
 
+		$queried_object = get_queried_object();
+
+		$data = array(
+			'product_category' => $queried_object->term_id,
+			'category_name'    => $queried_object->name,
+		);
+
+		self::add_event( 'ViewCategory', $data );
 	}
 
 

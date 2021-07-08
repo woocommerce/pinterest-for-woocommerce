@@ -61,7 +61,7 @@ const SetupPins = ({ view }) => {
 		<div className="woocommerce-setup-guide__setup-pins">
 			{view === 'wizard' && (
 				<StepHeader
-					title={__('Set up pins', 'pinterest-for-woocommerce')}
+					title={__('Publish Pins', 'pinterest-for-woocommerce')}
 					subtitle={__('Step Four', 'pinterest-for-woocommerce')}
 				/>
 			)}
@@ -70,11 +70,11 @@ const SetupPins = ({ view }) => {
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
 						title={__(
-							'Set up pins and Rich Pins',
+							'Publish Pins and Rich Pins',
 							'pinterest-for-woocommerce'
 						)}
 						description={__(
-							'Use description text to help users understand more',
+							'Rich Pins are a type of organic Pin that automatically sync information from your website to your Pins. You can identify Rich Pins by the extra information above and below the image on closeup and the bold title in your feed. If something changes on the original website, the Rich Pin updates to reflect that change.',
 							'pinterest-for-woocommerce'
 						)}
 					/>
@@ -146,7 +146,7 @@ const SetupPins = ({ view }) => {
 									</Text>
 									<CheckboxControl
 										label={__(
-											'Enable Rich Pins for Products',
+											'Add Rich Pins for Products',
 											'pinterest-for-woocommerce'
 										)}
 										checked={
@@ -161,7 +161,7 @@ const SetupPins = ({ view }) => {
 									/>
 									<CheckboxControl
 										label={__(
-											'Enable Rich Pins for Posts',
+											'Add Rich Pins for Posts',
 											'pinterest-for-woocommerce'
 										)}
 										checked={appSettings.rich_pins_on_posts}

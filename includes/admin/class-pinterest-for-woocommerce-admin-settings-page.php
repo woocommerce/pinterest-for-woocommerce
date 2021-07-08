@@ -353,6 +353,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 					'richPins'         => 'https://help.pinterest.com/en/business/article/rich-pins',
 					'enhancedMatch'    => 'https://help.pinterest.com/en/business/article/enhanced-match',
 					'createAdvertiser' => 'https://help.pinterest.com/en/business/article/create-an-advertiser-account',
+					'adGuidelines'     => 'https://policy.pinterest.com/en/advertising-guidelines',
+					'adDataTerms'      => 'https://policy.pinterest.com/en/ad-data-terms',
 				),
 				'isSetupComplete' => Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete' ),
 			);
@@ -372,7 +374,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			$settings['pin4wc']['landing_page'] = array(
 				'welcome'   => array(
 					'title'     => esc_html__( 'Get your products in front of more than 475M people on Pinterest', 'pinterest-for-woocommerce' ),
-					'text'      => esc_html__( 'Pinterest is a visual discovery engine people use to find inspiration for their lives and make it easier to shop for home decor, fashion and style, electronics and more. 400 million people have saved more than 300 billion Pins across a range of interests, which others with similar tastes can discover through search and recommendations.', 'pinterest-for-woocommerce' ),
+					'text'      => esc_html__( 'Pinterest is a visual discovery engine people use to find inspiration for their lives! More than 475 million people have saved more than 300 billion Pins. Making it easier to turn inspiration into their next purchase.', 'pinterest-for-woocommerce' ),
 					'tos_link'  => 'https://business.pinterest.com/business-terms-of-service/',
 					'image_url' => 'http://placehold.it/416x300/',
 				),
@@ -385,12 +387,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 					array(
 						'title'     => esc_html__( 'Increase organic reach', 'pinterest-for-woocommerce' ),
 						'text'      => esc_html__( 'Once you\'ve uploaded your catalog, people on Pinterest can easily discover, save and buy products from your website without any advertising spend from you.*', 'pinterest-for-woocommerce' ),
-						'extra'     => esc_html__( '*It can take up to 5 business days for the product catalog to sync for this first time', 'pinterest-for-woocommerce' ),
+						'extra'     => esc_html__( '*It can take up to 5 business days for the product catalog to sync for this first time.', 'pinterest-for-woocommerce' ),
 						'image_url' => 'http://placehold.it/100x100/',
 					),
 					array(
 						'title'     => esc_html__( 'Merchant storefronts on profile', 'pinterest-for-woocommerce' ),
-						'text'      => esc_html__( 'Upload your catalog via the WooCommerce for Pinterest app and transform the shop tab on your business profile into an inspiring storefront. Pinners will see featured product groups and dynamically created recommendations and can easily navigate by category. Whenever they click on your profile, they\'ll be automatically taken to your storefront.', 'pinterest-for-woocommerce' ),
+						'text'      => esc_html__( 'Upload your catalog via the WooCommerce for Pinterest app and on the Shop tab By syncing your catalog to Pinterest, Pinners will be able to view your products as Pins on your Shop tab—your unique storefront on Pinterest.', 'pinterest-for-woocommerce' ),
 						'image_url' => 'http://placehold.it/100x100/',
 					),
 				),
@@ -401,7 +403,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 					),
 					array(
 						'question' => esc_html__( 'I have more than one Pinterest Advertiser account. Can I connect my WooCommerce store to multiple Pinterest Advertiser accounts?', 'pinterest-for-woocommerce' ),
-						'answer'   => esc_html__( 'Only one Pinterest advertiser account can be linked to each WooCommerce store. If you want to connect a different Pinterest advertiser account you will need to either: Disconnect the existing Pinterest Advertiser account from your current WooCommerce store and connect a different Pinterest Advertiser account Create another WooCommerce store and connect the additional Pinterest Advertiser account.', 'pinterest-for-woocommerce' ),
+						'answer'   => esc_html__( 'Only one Pinterest advertiser account can be linked to each WooCommerce store. If you want to connect a different Pinterest advertiser account you will need to either Disconnect the existing Pinterest Advertiser account from your current WooCommerce store and connect a different Pinterest Advertiser account, or Create another WooCommerce store and connect the additional Pinterest Advertiser account.', 'pinterest-for-woocommerce' ),
 					),
 				),
 			);
