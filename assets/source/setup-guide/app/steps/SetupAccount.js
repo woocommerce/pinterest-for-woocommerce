@@ -23,18 +23,13 @@ import { Spinner } from '@woocommerce/components';
  */
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
-import {
-	useSettingsSelect,
-	useSettingsDispatch,
-	useCreateNotice,
-} from '../helpers/effects';
+import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
 
 const SetupAccount = ({ goToNextStep, view, isConnected, setIsConnected }) => {
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
 		useState(false);
 	const appSettings = useSettingsSelect();
 
-	const setAppSettings = useSettingsDispatch(view === 'wizard');
 	const createNotice = useCreateNotice();
 
 	const openConfirmationModal = () => {
