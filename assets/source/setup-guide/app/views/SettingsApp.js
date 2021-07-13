@@ -3,6 +3,7 @@
  */
 import '@wordpress/notices';
 import { Spinner } from '@woocommerce/components';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,9 +24,12 @@ import {
 
 const SettingsApp = () => {
 	const appSettings = useSettingsSelect();
-	const isConnected = useSettingsSelect('isConnected');
 	const isDomainVerified = useSettingsSelect('isDomainVerified');
 	const isTrackingConfigured = useSettingsSelect('isTrackingConfigured');
+
+	const [isConnected, setIsConnected] = useState(
+		wcSettings.pin4wc.isConnected
+	);
 
 	const isGroup1Visible = isConnected;
 	const isGroup2Visible = isGroup1Visible && isDomainVerified;
@@ -40,7 +44,11 @@ const SettingsApp = () => {
 				<TransientNotices />
 				{appSettings ? (
 					<div className="woocommerce-setup-guide__container">
-						<SetupAccount view="settings" />
+						<SetupAccount
+							view="settings"
+							setIsConnected={setIsConnected}
+							isConnected={isConnected}
+						/>
 
 						{isGroup1Visible && <ClaimWebsite view="settings" />}
 						{isGroup2Visible && <SetupTracking view="settings" />}

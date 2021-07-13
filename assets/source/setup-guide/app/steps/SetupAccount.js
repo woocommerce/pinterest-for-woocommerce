@@ -4,6 +4,7 @@
 import { sprintf, __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
 import {
 	Button,
 	Card,
@@ -22,18 +23,13 @@ import { Spinner } from '@woocommerce/components';
  */
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
-import {
-	useSettingsSelect,
-	useSettingsDispatch,
-	useCreateNotice,
-} from '../helpers/effects';
+import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
 
-const SetupAccount = ({ goToNextStep, view }) => {
+const SetupAccount = ({ goToNextStep, view, isConnected, setIsConnected }) => {
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
 		useState(false);
 	const appSettings = useSettingsSelect();
-	const isConnected = useSettingsSelect('isConnected');
-	const setAppSettings = useSettingsDispatch(view === 'wizard');
+
 	const createNotice = useCreateNotice();
 
 	const openConfirmationModal = () => {
@@ -78,22 +74,21 @@ const SetupAccount = ({ goToNextStep, view }) => {
 	const handleDisconnectAccount = async () => {
 		closeConfirmationModal();
 
-		const update = await setAppSettings(
-			{
-				token: null,
-				crypto_encoded_key: null,
-			},
-			true
-		);
+		const result = await apiFetch({
+			path: wcSettings.pin4wc.apiRoute + '/auth_disconnect',
+			method: 'POST',
+		});
 
-		if (!update.success) {
+		if (!result.disconnected) {
 			createNotice(
 				'error',
 				__(
-					'There was a problem saving your settings.',
+					'There was a problem while trying to disconnect.',
 					'pinterest-for-woocommerce'
 				)
 			);
+		} else {
+			setIsConnected(false);
 		}
 	};
 

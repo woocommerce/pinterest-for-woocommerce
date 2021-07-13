@@ -404,6 +404,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public function init_api_endpoints() {
 			new Pinterest\API\Auth();
+			new Pinterest\API\AuthDisconnect();
 			new Pinterest\API\DomainVerification();
 			new Pinterest\API\Advertisers();
 			new Pinterest\API\Tags();
@@ -412,7 +413,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Get decrypted token data
+		 * Get decrypted token data.
+		 *
+		 * The Access token and Crypto key live in the data option in the following form:
+		 * data: {
+		 *   ...
+		 *   token: {
+		 *     access_token: ${encrypted_token},
+		 *   },
+		 *   crypto_encoded_key: ${encryption_key},
+		 *   ...
+		 * }
 		 *
 		 * @since 1.0.0
 		 *
@@ -420,7 +431,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_token() {
 
-			$token = self::get_setting( 'token', true );
+			$token = self::get_data( 'token', true );
 
 			try {
 				$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::decrypt( $token['access_token'] );
@@ -435,7 +446,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Save encrypted token data
+		 * Save encrypted token data. See the documentation of the get_token() method for the expected format of the related data variables.
 		 *
 		 * @since 1.0.0
 		 *
@@ -446,18 +457,20 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function save_token( $token ) {
 
 			$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['access_token'] );
-			return self::save_setting( 'token', $token );
+			return self::save_data( 'token', $token );
 		}
 
 
 		/**
-		 * Clear the token
+		 * Clear the token. See the documentation of the get_token() method for the expected format of the related data variables.
 		 *
 		 * @since 1.0.0
 		 *
 		 * @return boolean
 		 */
 		public static function clear_token() {
+
+			self::save_data( 'crypto_encoded_key', null );
 			return self::save_token( array() );
 		}
 

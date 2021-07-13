@@ -49,7 +49,7 @@ class Crypto {
 		$protected_key_encoded = $protected_key->saveToAsciiSafeString();
 
 		if ( ! empty( $protected_key_encoded ) ) {
-			Pinterest_For_Woocommerce()::save_setting( 'crypto_encoded_key', $protected_key_encoded );
+			Pinterest_For_Woocommerce()::save_data( 'crypto_encoded_key', $protected_key_encoded );
 			return $protected_key_encoded;
 		}
 
@@ -75,7 +75,7 @@ class Crypto {
 			new self();
 		}
 
-		$protected_key_encoded = Pinterest_For_Woocommerce()::get_setting( 'crypto_encoded_key' );
+		$protected_key_encoded = Pinterest_For_Woocommerce()::get_data( 'crypto_encoded_key' );
 
 		if ( empty( $protected_key_encoded ) ) {
 			$protected_key_encoded = self::create_key();
@@ -88,12 +88,12 @@ class Crypto {
 		} catch ( DefuseException\WrongKeyOrModifiedCiphertextException | DefuseException\BadFormatException $ex ) {
 
 			if ( is_null( $retry ) ) {
-				Pinterest_For_Woocommerce()::save_setting( 'crypto_encoded_key', null );
+				Pinterest_For_Woocommerce()::save_data( 'crypto_encoded_key', null );
 				return self::get_key( 1 );
 			}
 
 			Logger::log( esc_html__( 'Could not decrypt Key value. Try reconnecting to Pinterest.', 'pinterest-for-woocommerce' ), 'error' );
-			Pinterest_For_Woocommerce()::save_setting( 'crypto_encoded_key', false ); // Reset base key.
+			Pinterest_For_Woocommerce()::save_data( 'crypto_encoded_key', false ); // Reset base key.
 			return false;
 		}
 
