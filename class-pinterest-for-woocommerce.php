@@ -413,7 +413,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Get decrypted token data
+		 * Get decrypted token data.
+		 *
+		 * The Access token and Crypto key live in the data option in the following form:
+		 * data: {
+		 *   ...
+		 *   token: {
+		 *     access_token: ${encrypted_token},
+		 *   },
+		 *   crypto_encoded_key: ${encryption_key},
+		 *   ...
+		 * }
 		 *
 		 * @since 1.0.0
 		 *
@@ -436,7 +446,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Save encrypted token data
+		 * Save encrypted token data. See the documentation of the get_token() method for the expected format of the related data variables.
 		 *
 		 * @since 1.0.0
 		 *
@@ -452,7 +462,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Clear the token
+		 * Clear the token. See the documentation of the get_token() method for the expected format of the related data variables.
 		 *
 		 * @since 1.0.0
 		 *
