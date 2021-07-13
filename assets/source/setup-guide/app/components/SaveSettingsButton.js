@@ -29,15 +29,7 @@ const SaveSettingsButton = () => {
 					'pinterest-for-woocommerce'
 				)
 			);
-		} else if (!update.success && update.isEmptyData === true) {
-			createNotice(
-				'error',
-				__(
-					'Please, change your settings before save it.',
-					'pinterest-for-woocommerce'
-				)
-			);
-		} else {
+		} else if (update.isEmptyData !== true) {
 			createNotice(
 				'error',
 				__(
