@@ -25,20 +25,20 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
-const SetupPins = ({ view }) => {
-	const [isSaving, setIsSaving] = useState(false);
+const SetupPins = ( { view } ) => {
+	const [ isSaving, setIsSaving ] = useState( false );
 	const appSettings = useSettingsSelect();
-	const setAppSettings = useSettingsDispatch(view === 'wizard');
+	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
 
-	const handleOptionChange = async (name, value) => {
-		setIsSaving(true);
+	const handleOptionChange = async ( name, value ) => {
+		setIsSaving( true );
 
-		const update = await setAppSettings({
-			[name]: value ?? !appSettings[name],
-		});
+		const update = await setAppSettings( {
+			[ name ]: value ?? ! appSettings[ name ],
+		} );
 
-		if (!update.success) {
+		if ( ! update.success ) {
 			createNotice(
 				'error',
 				__(
@@ -48,70 +48,74 @@ const SetupPins = ({ view }) => {
 			);
 		}
 
-		setIsSaving(false);
+		setIsSaving( false );
 	};
 
 	const handleCompleteSetup = async () => {
-		await handleOptionChange('is_setup_complete', true);
+		await handleOptionChange( 'is_setup_complete', true );
 
-		window.location = new URL(decodeEntities(wcSettings.pin4wc.adminUrl));
+		window.location = new URL(
+			decodeEntities( wcSettings.pin4wc.adminUrl )
+		);
 	};
 
 	return (
 		<div className="woocommerce-setup-guide__setup-pins">
-			{view === 'wizard' && (
+			{ view === 'wizard' && (
 				<StepHeader
-					title={__('Publish Pins', 'pinterest-for-woocommerce')}
-					subtitle={__('Step Four', 'pinterest-for-woocommerce')}
+					title={ __( 'Publish Pins', 'pinterest-for-woocommerce' ) }
+					subtitle={ __( 'Step Four', 'pinterest-for-woocommerce' ) }
 				/>
-			)}
+			) }
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={__(
+						title={ __(
 							'Publish Pins and Rich Pins',
 							'pinterest-for-woocommerce'
-						)}
-						description={__(
+						) }
+						description={ __(
 							'Rich Pins are a type of organic Pin that automatically sync information from your website to your Pins. You can identify Rich Pins by the extra information above and below the image on closeup and the bold title in your feed. If something changes on the original website, the Rich Pin updates to reflect that change.',
 							'pinterest-for-woocommerce'
-						)}
+						) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{undefined !== appSettings &&
-							Object.keys(appSettings).length > 0 ? (
+							{ undefined !== appSettings &&
+							Object.keys( appSettings ).length > 0 ? (
 								<>
 									<Text
 										className="woocommerce-setup-guide__checkbox-heading"
 										variant="subtitle"
 									>
-										{__(
+										{ __(
 											'Tracking',
 											'pinterest-for-woocommerce'
-										)}
+										) }
 									</Text>
 									<CheckboxControl
-										label={__(
+										label={ __(
 											'Track conversions',
 											'pinterest-for-woocommerce'
-										)}
-										checked={appSettings.track_conversions}
+										) }
+										checked={
+											appSettings.track_conversions
+										}
 										className="woocommerce-setup-guide__checkbox-group"
-										onChange={() =>
+										onChange={ () =>
 											handleOptionChange(
 												'track_conversions'
 											)
 										}
 									/>
 									<CheckboxControl
-										label={__(
+										label={ __(
 											'Enhanced Match support',
 											'pinterest-for-woocommerce'
-										)}
+										) }
 										help={
 											<Button
 												isLink
@@ -129,7 +133,7 @@ const SetupPins = ({ view }) => {
 											appSettings.enhanced_match_support
 										}
 										className="woocommerce-setup-guide__checkbox-group"
-										onChange={() =>
+										onChange={ () =>
 											handleOptionChange(
 												'enhanced_match_support'
 											)
@@ -139,34 +143,36 @@ const SetupPins = ({ view }) => {
 										className="woocommerce-setup-guide__checkbox-heading"
 										variant="subtitle"
 									>
-										{__(
+										{ __(
 											'Rich Pins',
 											'pinterest-for-woocommerce'
-										)}
+										) }
 									</Text>
 									<CheckboxControl
-										label={__(
+										label={ __(
 											'Add Rich Pins for Products',
 											'pinterest-for-woocommerce'
-										)}
+										) }
 										checked={
 											appSettings.rich_pins_on_products
 										}
 										className="woocommerce-setup-guide__checkbox-group"
-										onChange={() =>
+										onChange={ () =>
 											handleOptionChange(
 												'rich_pins_on_products'
 											)
 										}
 									/>
 									<CheckboxControl
-										label={__(
+										label={ __(
 											'Add Rich Pins for Posts',
 											'pinterest-for-woocommerce'
-										)}
-										checked={appSettings.rich_pins_on_posts}
+										) }
+										checked={
+											appSettings.rich_pins_on_posts
+										}
 										className="woocommerce-setup-guide__checkbox-group"
-										onChange={() =>
+										onChange={ () =>
 											handleOptionChange(
 												'rich_pins_on_posts'
 											)
@@ -176,19 +182,21 @@ const SetupPins = ({ view }) => {
 										className="woocommerce-setup-guide__checkbox-heading"
 										variant="subtitle"
 									>
-										{__(
+										{ __(
 											'Save to Pinterest',
 											'pinterest-for-woocommerce'
-										)}
+										) }
 									</Text>
 									<CheckboxControl
-										label={__(
+										label={ __(
 											'Save to Pinterest',
 											'pinterest-for-woocommerce'
-										)}
-										checked={appSettings.save_to_pinterest}
+										) }
+										checked={
+											appSettings.save_to_pinterest
+										}
 										className="woocommerce-setup-guide__checkbox-group"
-										onChange={() =>
+										onChange={ () =>
 											handleOptionChange(
 												'save_to_pinterest'
 											)
@@ -197,18 +205,18 @@ const SetupPins = ({ view }) => {
 								</>
 							) : (
 								<Spinner />
-							)}
+							) }
 						</CardBody>
 					</Card>
 
-					{view === 'wizard' && (
+					{ view === 'wizard' && (
 						<div className="woocommerce-setup-guide__footer-button">
 							<Button
 								isPrimary
-								onClick={handleCompleteSetup}
-								disabled={isSaving}
+								onClick={ handleCompleteSetup }
+								disabled={ isSaving }
 							>
-								{isSaving
+								{ isSaving
 									? __(
 											'Saving settings…',
 											'pinterest-for-woocommerce'
@@ -216,10 +224,10 @@ const SetupPins = ({ view }) => {
 									: __(
 											'Complete Setup',
 											'pinterest-for-woocommerce'
-									  )}
+									  ) }
 							</Button>
 						</div>
-					)}
+					) }
 				</div>
 			</div>
 		</div>

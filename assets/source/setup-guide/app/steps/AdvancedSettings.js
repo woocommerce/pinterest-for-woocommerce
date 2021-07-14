@@ -20,17 +20,17 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
-const AdvancedSettings = ({ view }) => {
+const AdvancedSettings = ( { view } ) => {
 	const appSettings = useSettingsSelect();
-	const setAppSettings = useSettingsDispatch(view === 'wizard');
+	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
 
-	const handleOptionChange = async (name, value) => {
-		const update = await setAppSettings({
-			[name]: value ?? !appSettings[name],
-		});
+	const handleOptionChange = async ( name, value ) => {
+		const update = await setAppSettings( {
+			[ name ]: value ?? ! appSettings[ name ],
+		} );
 
-		if (!update.success) {
+		if ( ! update.success ) {
 			createNotice(
 				'error',
 				__(
@@ -46,37 +46,37 @@ const AdvancedSettings = ({ view }) => {
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={__(
+						title={ __(
 							'Advanced Settings',
 							'pinterest-for-woocommerce'
-						)}
+						) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{undefined !== appSettings &&
-							Object.keys(appSettings).length > 0 ? (
+							{ undefined !== appSettings &&
+							Object.keys( appSettings ).length > 0 ? (
 								<>
 									<Text
 										className="woocommerce-setup-guide__checkbox-heading"
 										variant="subtitle"
 									>
-										{__(
+										{ __(
 											'Debug Logging',
 											'pinterest-for-woocommerce'
-										)}
+										) }
 									</Text>
 									<CheckboxControl
-										label={__(
+										label={ __(
 											'Enable Debug Logging',
 											'pinterest-for-woocommerce'
-										)}
+										) }
 										checked={
 											appSettings.enable_debug_logging
 										}
 										className="woocommerce-setup-guide__checkbox-group"
-										onChange={() =>
+										onChange={ () =>
 											handleOptionChange(
 												'enable_debug_logging'
 											)
@@ -87,19 +87,21 @@ const AdvancedSettings = ({ view }) => {
 										className="woocommerce-setup-guide__checkbox-heading"
 										variant="subtitle"
 									>
-										{__(
+										{ __(
 											'Plugin Data',
 											'pinterest-for-woocommerce'
-										)}
+										) }
 									</Text>
 									<CheckboxControl
-										label={__(
+										label={ __(
 											'Erase Plugin Data',
 											'pinterest-for-woocommerce'
-										)}
-										checked={appSettings.erase_plugin_data}
+										) }
+										checked={
+											appSettings.erase_plugin_data
+										}
 										className="woocommerce-setup-guide__checkbox-group"
-										onChange={() =>
+										onChange={ () =>
 											handleOptionChange(
 												'erase_plugin_data'
 											)
@@ -108,7 +110,7 @@ const AdvancedSettings = ({ view }) => {
 								</>
 							) : (
 								<Spinner />
-							)}
+							) }
 						</CardBody>
 					</Card>
 				</div>

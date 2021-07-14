@@ -11,7 +11,7 @@ const settingsReducer = (
 	},
 	action
 ) => {
-	switch (action.type) {
+	switch ( action.type ) {
 		case TYPES.RECEIVE_SETTINGS:
 			state = {
 				...state,
@@ -31,7 +31,7 @@ const settingsReducer = (
 			state = {
 				...state,
 				requestingErrors: {
-					[action.name]: action.error,
+					[ action.name ]: action.error,
 				},
 			};
 			break;

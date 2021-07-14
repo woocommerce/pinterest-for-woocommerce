@@ -16,7 +16,7 @@ import '../setup-guide/app/style.scss';
 addFilter(
 	'woocommerce_admin_onboarding_task_list',
 	'pinterest-for-woocommerce',
-	(tasks) => {
+	( tasks ) => {
 		return [
 			...tasks,
 			{
@@ -32,7 +32,7 @@ addFilter(
 					'Configure the connection to Pinterest and any additional settings like tracking, product sync, etc.',
 					'pinterest-for-woocommerce'
 				),
-				time: __('5 minutes', 'pinterest-for-woocommerce'),
+				time: __( '5 minutes', 'pinterest-for-woocommerce' ),
 				isDismissable: true,
 			},
 		];

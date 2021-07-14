@@ -5,13 +5,13 @@ import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
 import { TableCard } from '@woocommerce/components';
 
-const SyncIssuesTable = ({
+const SyncIssuesTable = ( {
 	issues,
 	totalRows,
 	query,
 	isRequesting,
 	onQueryChange,
-}) => {
+} ) => {
 	const defaultHeaderAttributes = {
 		isLeftAligned: true,
 		isSortable: false,
@@ -20,23 +20,23 @@ const SyncIssuesTable = ({
 	const headers = [
 		{
 			key: 'type',
-			label: __('Type', 'pinterest-for-woocommerce'),
+			label: __( 'Type', 'pinterest-for-woocommerce' ),
 			...defaultHeaderAttributes,
 		},
 		{
 			key: 'affected-product',
-			label: __('Affected Product', 'pinterest-for-woocommerce'),
+			label: __( 'Affected Product', 'pinterest-for-woocommerce' ),
 			...defaultHeaderAttributes,
 		},
 		{
 			key: 'issue',
-			label: __('Issue', 'pinterest-for-woocommerce'),
+			label: __( 'Issue', 'pinterest-for-woocommerce' ),
 			...defaultHeaderAttributes,
 		},
 		{ key: 'edit', ...defaultHeaderAttributes },
 	];
 
-	const getRows = (data) => {
+	const getRows = ( data ) => {
 		const statuses = {
 			success: 'green',
 			warning: 'yellow',
@@ -49,13 +49,13 @@ const SyncIssuesTable = ({
 			error: 'warning',
 		};
 
-		return data.map((row) => {
+		return data.map( ( row ) => {
 			return [
 				{
 					display: (
 						<Icon
-							icon={icons[row.status]}
-							className={`${statuses[row.status]}-text`}
+							icon={ icons[ row.status ] }
+							className={ `${ statuses[ row.status ] }-text` }
 						/>
 					),
 				},
@@ -64,30 +64,30 @@ const SyncIssuesTable = ({
 				{
 					display: (
 						<a
-							href={row.product_edit_link}
+							href={ row.product_edit_link }
 							target="_blank"
 							rel="noreferrer"
 						>
-							{__('Edit', 'pinterest-for-woocommerce')}
+							{ __( 'Edit', 'pinterest-for-woocommerce' ) }
 						</a>
 					),
 				},
 			];
-		});
+		} );
 	};
 
 	return (
 		<TableCard
 			className="pin4wc-catalog-sync__issues"
-			title={__('Issues', 'pinterest-for-woocommerce')}
-			rows={issues && getRows(issues)}
-			headers={headers}
-			showMenu={false}
-			query={query}
-			rowsPerPage={query.per_page}
-			totalRows={totalRows}
-			isLoading={!issues || isRequesting}
-			onQueryChange={onQueryChange}
+			title={ __( 'Issues', 'pinterest-for-woocommerce' ) }
+			rows={ issues && getRows( issues ) }
+			headers={ headers }
+			showMenu={ false }
+			query={ query }
+			rowsPerPage={ query.per_page }
+			totalRows={ totalRows }
+			isLoading={ ! issues || isRequesting }
+			onQueryChange={ onQueryChange }
 		/>
 	);
 };

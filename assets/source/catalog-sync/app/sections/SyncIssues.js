@@ -12,37 +12,37 @@ import { REPORTS_STORE_NAME } from '../data';
 import SyncIssuesTable from './SyncIssuesTable';
 
 const SyncIssues = () => {
-	const [query, setQuery] = useState(getQuery());
-	const feedIssues = useSelect((select) =>
-		select(REPORTS_STORE_NAME).getFeedIssues(query)
+	const [ query, setQuery ] = useState( getQuery() );
+	const feedIssues = useSelect( ( select ) =>
+		select( REPORTS_STORE_NAME ).getFeedIssues( query )
 	);
-	const isRequesting = useSelect((select) =>
-		select(REPORTS_STORE_NAME).isRequesting()
+	const isRequesting = useSelect( ( select ) =>
+		select( REPORTS_STORE_NAME ).isRequesting()
 	);
 
-	if (!feedIssues?.lines?.length) {
+	if ( ! feedIssues?.lines?.length ) {
 		return null;
 	}
 
-	getHistory().listen(() => {
-		setQuery(getQuery());
-	});
+	getHistory().listen( () => {
+		setQuery( getQuery() );
+	} );
 
-	if (!query.paged) {
+	if ( ! query.paged ) {
 		query.paged = 1;
 	}
 
-	if (!query.per_page) {
+	if ( ! query.per_page ) {
 		query.per_page = 25;
 	}
 
 	return (
 		<SyncIssuesTable
-			issues={feedIssues?.lines}
-			query={query}
-			totalRows={feedIssues?.total_rows ?? 0}
-			isRequesting={isRequesting}
-			onQueryChange={onQueryChange}
+			issues={ feedIssues?.lines }
+			query={ query }
+			totalRows={ feedIssues?.total_rows ?? 0 }
+			isRequesting={ isRequesting }
+			onQueryChange={ onQueryChange }
 		/>
 	);
 };

@@ -25,45 +25,56 @@ import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
 
-const SetupAccount = ({ goToNextStep, view, isConnected, setIsConnected }) => {
-	const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
-		useState(false);
+const SetupAccount = ( {
+	goToNextStep,
+	view,
+	isConnected,
+	setIsConnected,
+} ) => {
+	const [ isConfirmationModalOpen, setIsConfirmationModalOpen ] = useState(
+		false
+	);
 	const appSettings = useSettingsSelect();
 
 	const createNotice = useCreateNotice();
 
 	const openConfirmationModal = () => {
-		setIsConfirmationModalOpen(true);
+		setIsConfirmationModalOpen( true );
 	};
 
 	const closeConfirmationModal = () => {
-		setIsConfirmationModalOpen(false);
+		setIsConfirmationModalOpen( false );
 	};
 
 	const renderConfirmationModal = () => {
 		return (
 			<Modal
-				title={<>{__('Are you sure?', 'pinterest-for-woocommerce')}</>}
-				onRequestClose={closeConfirmationModal}
+				title={
+					<>{ __( 'Are you sure?', 'pinterest-for-woocommerce' ) }</>
+				}
+				onRequestClose={ closeConfirmationModal }
 				className="woocommerce-setup-guide__step-modal"
 			>
 				<div className="woocommerce-setup-guide__step-modal__wrapper">
 					<p>
-						{__(
+						{ __(
 							'Are you sure you want to disconnect this account?',
 							'pinterest-for-woocommerce'
-						)}
+						) }
 					</p>
 					<div className="woocommerce-setup-guide__step-modal__buttons">
 						<Button
 							isDestructive
 							isSecondary
-							onClick={handleDisconnectAccount}
+							onClick={ handleDisconnectAccount }
 						>
-							{__("Yes, I'm sure", 'pinterest-for-woocommerce')}
+							{ __(
+								"Yes, I'm sure",
+								'pinterest-for-woocommerce'
+							) }
 						</Button>
-						<Button isTertiary onClick={closeConfirmationModal}>
-							{__('Cancel', 'pinterest-for-woocommerce')}
+						<Button isTertiary onClick={ closeConfirmationModal }>
+							{ __( 'Cancel', 'pinterest-for-woocommerce' ) }
 						</Button>
 					</div>
 				</div>
@@ -74,12 +85,12 @@ const SetupAccount = ({ goToNextStep, view, isConnected, setIsConnected }) => {
 	const handleDisconnectAccount = async () => {
 		closeConfirmationModal();
 
-		const result = await apiFetch({
+		const result = await apiFetch( {
 			path: wcSettings.pin4wc.apiRoute + '/auth_disconnect',
 			method: 'POST',
-		});
+		} );
 
-		if (!result.disconnected) {
+		if ( ! result.disconnected ) {
 			createNotice(
 				'error',
 				__(
@@ -88,21 +99,21 @@ const SetupAccount = ({ goToNextStep, view, isConnected, setIsConnected }) => {
 				)
 			);
 		} else {
-			setIsConnected(false);
+			setIsConnected( false );
 		}
 	};
 
 	return (
 		<div className="woocommerce-setup-guide__setup-account">
-			{view === 'wizard' && (
+			{ view === 'wizard' && (
 				<StepHeader
-					title={__(
+					title={ __(
 						'Set up your business account',
 						'pinterest-for-woocommerce'
-					)}
-					subtitle={__('Step One', 'pinterest-for-woocommerce')}
+					) }
+					subtitle={ __( 'Step One', 'pinterest-for-woocommerce' ) }
 				/>
-			)}
+			) }
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
@@ -120,10 +131,10 @@ const SetupAccount = ({ goToNextStep, view, isConnected, setIsConnected }) => {
 						}
 						description={
 							<>
-								{__(
+								{ __(
 									'Set up a free Pinterest business account to get access to analytics on your Pins and the ability to run ads. This requires agreeing to our',
 									'pinterest-for-woocommerce'
-								)}{' '}
+								) }{ ' ' }
 								<Button
 									isLink
 									href={
@@ -132,10 +143,10 @@ const SetupAccount = ({ goToNextStep, view, isConnected, setIsConnected }) => {
 									}
 									target="_blank"
 								>
-									{__(
+									{ __(
 										'advertising guidelines',
 										'pinterest-for-woocommerce'
-									)}
+									) }
 								</Button>
 							</>
 						}
@@ -144,18 +155,18 @@ const SetupAccount = ({ goToNextStep, view, isConnected, setIsConnected }) => {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{isConnected === true ? (
+							{ isConnected === true ? (
 								<Flex>
 									<FlexBlock className="is-connected">
 										<Text variant="subtitle">
-											{__(
+											{ __(
 												'Pinterest Account',
 												'pinterest-for-woocommerce'
-											)}
+											) }
 										</Text>
-										{appSettings?.account_data?.id && (
+										{ appSettings?.account_data?.id && (
 											<Text variant="body">
-												{sprintf(
+												{ sprintf(
 													'%1$s: %2$s - %3$s',
 													__(
 														'Account',
@@ -164,18 +175,18 @@ const SetupAccount = ({ goToNextStep, view, isConnected, setIsConnected }) => {
 													appSettings.account_data
 														.username,
 													appSettings.account_data.id
-												)}
+												) }
 											</Text>
-										)}
+										) }
 										<Button
 											isLink
 											isDestructive
-											onClick={openConfirmationModal}
+											onClick={ openConfirmationModal }
 										>
-											{__(
+											{ __(
 												'Disconnect Pinterest Account',
 												'pinterest-for-woocommerce'
-											)}
+											) }
 										</Button>
 									</FlexBlock>
 								</Flex>
@@ -183,33 +194,33 @@ const SetupAccount = ({ goToNextStep, view, isConnected, setIsConnected }) => {
 								<Flex>
 									<FlexBlock>
 										<Text variant="subtitle">
-											{__(
+											{ __(
 												'Connect your Pinterest Account',
 												'pinterest-for-woocommerce'
-											)}
+											) }
 										</Text>
 									</FlexBlock>
 									<FlexItem>
 										<Button
 											isSecondary
-											href={decodeEntities(
+											href={ decodeEntities(
 												wcSettings.pin4wc
 													.serviceLoginUrl
-											)}
+											) }
 										>
-											{__(
+											{ __(
 												'Connect',
 												'pinterest-for-woocommerce'
-											)}
+											) }
 										</Button>
 									</FlexItem>
 								</Flex>
 							) : (
 								<Spinner />
-							)}
+							) }
 						</CardBody>
 
-						{isConnected === false && (
+						{ isConnected === false && (
 							<CardFooter>
 								<Button
 									isLink
@@ -219,24 +230,27 @@ const SetupAccount = ({ goToNextStep, view, isConnected, setIsConnected }) => {
 									}
 									target="_blank"
 								>
-									{__(
+									{ __(
 										'Or, create a new Pinterest account',
 										'pinterest-for-woocommerce'
-									)}
+									) }
 								</Button>
 							</CardFooter>
-						)}
+						) }
 
-						{isConfirmationModalOpen && renderConfirmationModal()}
+						{ isConfirmationModalOpen && renderConfirmationModal() }
 					</Card>
 
-					{view === 'wizard' && isConnected === true && (
+					{ view === 'wizard' && isConnected === true && (
 						<div className="woocommerce-setup-guide__footer-button">
-							<Button isPrimary onClick={goToNextStep}>
-								{__('Continue', 'pinterest-for-woocommerce')}
+							<Button isPrimary onClick={ goToNextStep }>
+								{ __(
+									'Continue',
+									'pinterest-for-woocommerce'
+								) }
 							</Button>
 						</div>
-					)}
+					) }
 				</div>
 			</div>
 		</div>

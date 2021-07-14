@@ -20,17 +20,17 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
-const SetupProductSync = ({ view }) => {
+const SetupProductSync = ( { view } ) => {
 	const appSettings = useSettingsSelect();
-	const setAppSettings = useSettingsDispatch(view === 'wizard');
+	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
 
-	const handleOptionChange = async (name, value) => {
-		const update = await setAppSettings({
-			[name]: value ?? !appSettings[name],
-		});
+	const handleOptionChange = async ( name, value ) => {
+		const update = await setAppSettings( {
+			[ name ]: value ?? ! appSettings[ name ],
+		} );
 
-		if (!update.success) {
+		if ( ! update.success ) {
 			createNotice(
 				'error',
 				__(
@@ -46,37 +46,37 @@ const SetupProductSync = ({ view }) => {
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
-						title={__(
+						title={ __(
 							'Set up Product Sync',
 							'pinterest-for-woocommerce'
-						)}
+						) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{undefined !== appSettings &&
-							Object.keys(appSettings).length > 0 ? (
+							{ undefined !== appSettings &&
+							Object.keys( appSettings ).length > 0 ? (
 								<>
 									<Text
 										className="woocommerce-setup-guide__checkbox-heading"
 										variant="subtitle"
 									>
-										{__(
+										{ __(
 											'Product Sync',
 											'pinterest-for-woocommerce'
-										)}
+										) }
 									</Text>
 									<CheckboxControl
-										label={__(
+										label={ __(
 											'Enable Product Sync',
 											'pinterest-for-woocommerce'
-										)}
+										) }
 										checked={
 											appSettings.product_sync_enabled
 										}
 										className="woocommerce-setup-guide__checkbox-group"
-										onChange={() =>
+										onChange={ () =>
 											handleOptionChange(
 												'product_sync_enabled'
 											)
@@ -85,7 +85,7 @@ const SetupProductSync = ({ view }) => {
 								</>
 							) : (
 								<Spinner />
-							)}
+							) }
 						</CardBody>
 					</Card>
 				</div>

@@ -14,14 +14,14 @@ import {
 } from '../helpers/effects';
 
 const SaveSettingsButton = () => {
-	const isSaving = useSettingsSelect('isSettingsUpdating');
-	const setAppSettings = useSettingsDispatch(true);
+	const isSaving = useSettingsSelect( 'isSettingsUpdating' );
+	const setAppSettings = useSettingsDispatch( true );
 	const createNotice = useCreateNotice();
 
 	const saveSettings = async () => {
-		const update = await setAppSettings({});
+		const update = await setAppSettings( {} );
 
-		if (update.success) {
+		if ( update.success ) {
 			createNotice(
 				'success',
 				__(
@@ -42,10 +42,10 @@ const SaveSettingsButton = () => {
 
 	return (
 		<div className="woocommerce-setup-guide__footer-button">
-			<Button isPrimary onClick={saveSettings} disabled={isSaving}>
-				{isSaving
-					? __('Saving settings…', 'pinterest-for-woocommerce')
-					: __('Save changes', 'pinterest-for-woocommerce')}
+			<Button isPrimary onClick={ saveSettings } disabled={ isSaving }>
+				{ isSaving
+					? __( 'Saving settings…', 'pinterest-for-woocommerce' )
+					: __( 'Save changes', 'pinterest-for-woocommerce' ) }
 			</Button>
 		</div>
 	);

@@ -3,7 +3,7 @@
  *
  * @param {Object} state - Reducer state
  */
-export const getSettings = (state) => {
+export const getSettings = ( state ) => {
 	return state.settings;
 };
 
@@ -13,8 +13,8 @@ export const getSettings = (state) => {
  * @param {Object} state - Reducer state
  * @param {Array} name - Setting name
  */
-export const getSetting = (state, name) => {
-	return state.settings[name];
+export const getSetting = ( state, name ) => {
+	return state.settings[ name ];
 };
 
 /**
@@ -23,8 +23,8 @@ export const getSetting = (state, name) => {
  * @param {Object} state - Reducer state
  * @param {string} name - Setting name
  */
-export const getSettingsRequestingError = (state, name) => {
-	return state.requestingErrors[name] || false;
+export const getSettingsRequestingError = ( state, name ) => {
+	return state.requestingErrors[ name ] || false;
 };
 
 /**
@@ -32,7 +32,7 @@ export const getSettingsRequestingError = (state, name) => {
  *
  * @param {Object} state - Reducer state
  */
-export const isSettingsUpdating = (state) => {
+export const isSettingsUpdating = ( state ) => {
 	return state.isUpdating || false;
 };
 
@@ -41,7 +41,7 @@ export const isSettingsUpdating = (state) => {
  *
  * @param {Object} state - Reducer state
  */
-export const getSettingsUpdatingError = (state) => {
+export const getSettingsUpdatingError = ( state ) => {
 	return state.updatingError || false;
 };
 
@@ -50,12 +50,12 @@ export const getSettingsUpdatingError = (state) => {
  *
  * @param {Object} state - Reducer state
  */
-export const isDomainVerified = (state) => {
-	if (undefined === state?.settings) {
+export const isDomainVerified = ( state ) => {
+	if ( undefined === state?.settings ) {
 		return;
 	}
 
-	if (undefined === state?.settings?.account_data?.verified_domains) {
+	if ( undefined === state?.settings?.account_data?.verified_domains ) {
 		return false;
 	}
 
@@ -69,12 +69,12 @@ export const isDomainVerified = (state) => {
  *
  * @param {Object} state - Reducer state
  */
-export const isTrackingConfigured = (state) => {
-	if (undefined === state?.settings) {
+export const isTrackingConfigured = ( state ) => {
+	if ( undefined === state?.settings ) {
 		return;
 	}
 
-	return !!(
+	return !! (
 		state?.settings?.tracking_advertiser && state?.settings?.tracking_tag
 	);
 };
