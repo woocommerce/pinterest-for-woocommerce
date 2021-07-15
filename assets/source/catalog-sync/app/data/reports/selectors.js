@@ -3,7 +3,7 @@
  *
  * @param {Object} state - Reducer state
  */
-export const getFeedIssues = (state) => {
+export const getFeedIssues = ( state ) => {
 	return state.feedIssues;
 };
 
@@ -12,7 +12,7 @@ export const getFeedIssues = (state) => {
  *
  * @param {Object} state - Reducer state
  */
-export const getFeedState = (state) => {
+export const getFeedState = ( state ) => {
 	return state.feedState;
 };
 
@@ -22,8 +22,8 @@ export const getFeedState = (state) => {
  * @param {Object} state - Reducer state
  * @param {string} name - Report name
  */
-export const getReportsRequestingError = (state, name) => {
-	return state.requestingErrors[name] || false;
+export const getReportsRequestingError = ( state, name ) => {
+	return state.requestingErrors[ name ] || false;
 };
 
 /**
@@ -31,6 +31,6 @@ export const getReportsRequestingError = (state, name) => {
  *
  * @param {Object} state - Reducer state
  */
-export const isRequesting = (state) => {
+export const isRequesting = ( state ) => {
 	return state.isRequesting || false;
 };

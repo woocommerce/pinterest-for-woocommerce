@@ -24,19 +24,19 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
-const SetupTracking = ({ goToNextStep, view }) => {
-	const [isSaving, setIsSaving] = useState(false);
-	const [isFetching, setIsFetching] = useState(false);
-	const [status, setStatus] = useState('idle');
-	const [advertisersList, setAdvertisersList] = useState();
-	const [tagsList, setTagsList] = useState();
+const SetupTracking = ( { goToNextStep, view } ) => {
+	const [ isSaving, setIsSaving ] = useState( false );
+	const [ isFetching, setIsFetching ] = useState( false );
+	const [ status, setStatus ] = useState( 'idle' );
+	const [ advertisersList, setAdvertisersList ] = useState();
+	const [ tagsList, setTagsList ] = useState();
 	const appSettings = useSettingsSelect();
-	const setAppSettings = useSettingsDispatch(view === 'wizard');
+	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
 
-	useEffect(() => {
+	useEffect( () => {
 		if (
-			!isFetching &&
+			! isFetching &&
 			undefined !== appSettings &&
 			undefined === advertisersList
 		) {
@@ -49,34 +49,37 @@ const SetupTracking = ({ goToNextStep, view }) => {
 			appSettings?.tracking_advertiser &&
 			appSettings?.tracking_tag
 		) {
-			setStatus('success');
+			setStatus( 'success' );
 		}
-	}, [appSettings, advertisersList]);
+	}, [ appSettings, advertisersList ] );
 
 	const fetchAdvertisers = async () => {
-		setIsFetching(true);
+		setIsFetching( true );
 
 		try {
 			setAdvertisersList();
 
-			const results = await apiFetch({
+			const results = await apiFetch( {
 				path: wcSettings.pin4wc.apiRoute + '/advertisers',
 				method: 'GET',
-			});
+			} );
 
-			setAdvertisersList(results.advertisers);
+			setAdvertisersList( results.advertisers );
 
-			if (results.advertisers.length > 0) {
-				if (!appSettings?.tracking_advertiser) {
-					handleOptionChange('advertiser', results.advertisers[0].id);
+			if ( results.advertisers.length > 0 ) {
+				if ( ! appSettings?.tracking_advertiser ) {
+					handleOptionChange(
+						'advertiser',
+						results.advertisers[ 0 ].id
+					);
 				} else {
-					fetchTags(appSettings?.tracking_advertiser);
+					fetchTags( appSettings?.tracking_advertiser );
 				}
 			} else {
-				setStatus('error');
+				setStatus( 'error' );
 			}
-		} catch (error) {
-			setStatus('error');
+		} catch ( error ) {
+			setStatus( 'error' );
 			createNotice(
 				'error',
 				error.message ||
@@ -87,38 +90,38 @@ const SetupTracking = ({ goToNextStep, view }) => {
 			);
 		}
 
-		setIsFetching(false);
+		setIsFetching( false );
 	};
 
-	const fetchTags = async (advertiserId) => {
-		setIsFetching(true);
+	const fetchTags = async ( advertiserId ) => {
+		setIsFetching( true );
 
 		try {
 			setTagsList();
 
-			const results = await apiFetch({
+			const results = await apiFetch( {
 				path:
 					wcSettings.pin4wc.apiRoute +
 					'/tags/?advrtsr_id=' +
 					advertiserId,
 				method: 'GET',
-			});
+			} );
 
-			setTagsList(results);
+			setTagsList( results );
 
-			if (Object.keys(results).length > 0) {
-				if (!appSettings?.tracking_tag) {
-					handleOptionChange('tag', Object.keys(results)[0]);
+			if ( Object.keys( results ).length > 0 ) {
+				if ( ! appSettings?.tracking_tag ) {
+					handleOptionChange( 'tag', Object.keys( results )[ 0 ] );
 				}
 			} else {
-				setStatus('error');
+				setStatus( 'error' );
 			}
 
-			if (appSettings?.tracking_tag) {
-				setStatus('success');
+			if ( appSettings?.tracking_tag ) {
+				setStatus( 'success' );
 			}
-		} catch (error) {
-			setStatus('error');
+		} catch ( error ) {
+			setStatus( 'error' );
 			createNotice(
 				'error',
 				error.message ||
@@ -129,31 +132,31 @@ const SetupTracking = ({ goToNextStep, view }) => {
 			);
 		}
 
-		setIsFetching(false);
+		setIsFetching( false );
 	};
 
-	const handleOptionChange = async (name, value) => {
-		if (name === 'advertiser') {
-			fetchTags(value);
+	const handleOptionChange = async ( name, value ) => {
+		if ( name === 'advertiser' ) {
+			fetchTags( value );
 		}
 
-		if (appSettings?.tracking_advertiser && appSettings?.tracking_tag) {
-			setStatus('success');
+		if ( appSettings?.tracking_advertiser && appSettings?.tracking_tag ) {
+			setStatus( 'success' );
 		} else {
-			setStatus('idle');
+			setStatus( 'idle' );
 		}
 
-		saveOptions(name, value);
+		saveOptions( name, value );
 	};
 
-	const saveOptions = async (name, value) => {
-		setIsSaving(true);
+	const saveOptions = async ( name, value ) => {
+		setIsSaving( true );
 
-		const update = await setAppSettings({
-			[`tracking_${name}`]: value,
-		});
+		const update = await setAppSettings( {
+			[ `tracking_${ name }` ]: value,
+		} );
 
-		if (!update.success) {
+		if ( ! update.success ) {
 			createNotice(
 				'error',
 				__(
@@ -163,51 +166,51 @@ const SetupTracking = ({ goToNextStep, view }) => {
 			);
 		}
 
-		setIsSaving(false);
+		setIsSaving( false );
 	};
 
 	const handleTryAgain = () => {
-		setStatus('idle');
+		setStatus( 'idle' );
 
-		if (appSettings.tracking_advertiser) {
-			fetchTags(appSettings.tracking_advertiser);
+		if ( appSettings.tracking_advertiser ) {
+			fetchTags( appSettings.tracking_advertiser );
 		} else {
 			fetchAdvertisers();
 		}
 	};
 
 	const StepButton = () => {
-		if (status === 'idle') {
+		if ( status === 'idle' ) {
 			return '';
 		}
 
 		const buttonLabels = {
-			error: __('Try Again', 'pinterest-for-woocommerce'),
-			success: __('Continue', 'pinterest-for-woocommerce'),
+			error: __( 'Try Again', 'pinterest-for-woocommerce' ),
+			success: __( 'Continue', 'pinterest-for-woocommerce' ),
 		};
 
 		return (
 			<Button
 				isPrimary
-				disabled={isSaving}
-				onClick={status === 'success' ? goToNextStep : handleTryAgain}
+				disabled={ isSaving }
+				onClick={ status === 'success' ? goToNextStep : handleTryAgain }
 			>
-				{buttonLabels[status]}
+				{ buttonLabels[ status ] }
 			</Button>
 		);
 	};
 
 	return (
 		<div className="woocommerce-setup-guide__setup-tracking">
-			{view === 'wizard' && (
+			{ view === 'wizard' && (
 				<StepHeader
-					title={__(
+					title={ __(
 						'Track conversions with the Pinterest tag',
 						'pinterest-for-woocommerce'
-					)}
-					subtitle={__('Step Three', 'pinterest-for-woocommerce')}
+					) }
+					subtitle={ __( 'Step Three', 'pinterest-for-woocommerce' ) }
 				/>
-			)}
+			) }
 
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
@@ -225,16 +228,16 @@ const SetupTracking = ({ goToNextStep, view }) => {
 						}
 						description={
 							<>
-								{__(
+								{ __(
 									'The Pinterest tag is a piece of JavaScript code you put on your website to gather conversion insights and build audiences to target based on actions people have taken on your site.',
 									'pinterest-for-woocommerce'
-								)}
+								) }
 								<br />
 								<br />
-								{__(
+								{ __(
 									'Using conversion tags means you agree to our',
 									'pinterest-for-woocommerce'
-								)}{' '}
+								) }{ ' ' }
 								<Button
 									isLink
 									href={
@@ -243,12 +246,12 @@ const SetupTracking = ({ goToNextStep, view }) => {
 									}
 									target="_blank"
 								>
-									{__(
+									{ __(
 										'Ad Guidelines',
 										'pinterest-for-woocommerce'
-									)}
-								</Button>{' '}
-								{__('and', 'pinterest-for-woocommerce')}{' '}
+									) }
+								</Button>{ ' ' }
+								{ __( 'and', 'pinterest-for-woocommerce' ) }{ ' ' }
 								<Button
 									isLink
 									href={
@@ -257,52 +260,52 @@ const SetupTracking = ({ goToNextStep, view }) => {
 									}
 									target="_blank"
 								>
-									{__(
+									{ __(
 										'Ad Data Terms',
 										'pinterest-for-woocommerce'
-									)}
+									) }
 								</Button>
 							</>
 						}
-						link={wcSettings.pin4wc.pinterestLinks.SetupTracking}
+						link={ wcSettings.pin4wc.pinterestLinks.SetupTracking }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
-						{undefined !== appSettings &&
-						Object.keys(appSettings).length > 0 &&
+						{ undefined !== appSettings &&
+						Object.keys( appSettings ).length > 0 &&
 						undefined !== advertisersList ? (
 							<CardBody size="large">
-								{advertisersList.length > 0 ? (
+								{ advertisersList.length > 0 ? (
 									<div>
 										<SelectControl
-											label={__(
+											label={ __(
 												'Advertiser',
 												'pinterest-for-woocommerce'
-											)}
+											) }
 											value={
 												appSettings.tracking_advertiser
 											}
-											onChange={(selectedAdvertiser) =>
+											onChange={ ( selectedAdvertiser ) =>
 												handleOptionChange(
 													'advertiser',
 													selectedAdvertiser
 												)
 											}
-											options={advertisersList.map(
-												(item) => ({
+											options={ advertisersList.map(
+												( item ) => ( {
 													label: sprintf(
 														'%1$s (%2$d)',
 														item.name,
 														item.id
 													),
 													value: item.id,
-												})
-											)}
-											help={__(
+												} )
+											) }
+											help={ __(
 												'Select the advertiser for which you would like to install a tracking snippet.',
 												'pinterest-for-woocommerce'
-											)}
+											) }
 										/>
 									</div>
 								) : (
@@ -311,84 +314,86 @@ const SetupTracking = ({ goToNextStep, view }) => {
 											variant="body"
 											className="text-margin"
 										>
-											{__(
+											{ __(
 												'Tracking cannot be configured automatically.',
 												'pinterest-for-woocommerce'
-											)}
+											) }
 										</Text>
 										<Text
 											variant="body"
 											className="text-margin"
 										>
-											{__(
+											{ __(
 												'Please visit your Pinterest Dashboard and click “Create Ad”.',
 												'pinterest-for-woocommerce'
-											)}
+											) }
 										</Text>
 										<Text
 											variant="body"
 											className="text-margin"
 										>
-											{__(
+											{ __(
 												'After completing this step, click “Try again” button.',
 												'pinterest-for-woocommerce'
-											)}
+											) }
 										</Text>
 									</>
-								)}
+								) }
 
-								{undefined !==
+								{ undefined !==
 									appSettings.tracking_advertiser &&
-									(undefined !== tagsList ? (
-										Object.keys(tagsList).length > 0 && (
+									( undefined !== tagsList ? (
+										Object.keys( tagsList ).length > 0 && (
 											<>
 												<SelectControl
-													label={__(
+													label={ __(
 														'Tracking Tag',
 														'pinterest-for-woocommerce'
-													)}
+													) }
 													value={
 														appSettings.tracking_tag
 													}
-													onChange={(selectedTag) =>
+													onChange={ (
+														selectedTag
+													) =>
 														handleOptionChange(
 															'tag',
 															selectedTag
 														)
 													}
-													options={Object.values(
+													options={ Object.values(
 														tagsList
-													).map((item) => ({
+													).map( ( item ) => ( {
 														label: sprintf(
 															'%1$s (%2$d)',
 															item.name,
 															item.id
 														),
 														value: item.id,
-													}))}
-													help={__(
+													} ) ) }
+													help={ __(
 														'Select the tracking tag to use.',
 														'pinterest-for-woocommerce'
-													)}
+													) }
 												/>
 											</>
 										)
 									) : (
 										<Spinner />
-									))}
+									) ) }
 							</CardBody>
 						) : (
 							<CardBody size="large">
 								<Spinner />
 							</CardBody>
-						)}
+						) }
 					</Card>
 
-					{view === 'wizard' && (
+					{ view === 'wizard' && (
 						<div className="woocommerce-setup-guide__footer-button">
 							<StepButton />
 						</div>
-					)}
+					) }
 				</div>
 			</div>
 		</div>

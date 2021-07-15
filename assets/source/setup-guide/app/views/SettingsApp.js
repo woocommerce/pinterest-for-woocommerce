@@ -24,10 +24,10 @@ import {
 
 const SettingsApp = () => {
 	const appSettings = useSettingsSelect();
-	const isDomainVerified = useSettingsSelect('isDomainVerified');
-	const isTrackingConfigured = useSettingsSelect('isTrackingConfigured');
+	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
+	const isTrackingConfigured = useSettingsSelect( 'isTrackingConfigured' );
 
-	const [isConnected, setIsConnected] = useState(
+	const [ isConnected, setIsConnected ] = useState(
 		wcSettings.pin4wc.isConnected
 	);
 
@@ -36,34 +36,34 @@ const SettingsApp = () => {
 	const isGroup3Visible = isGroup2Visible && isTrackingConfigured;
 
 	useBodyClasses();
-	useCreateNotice()(wcSettings.pin4wc.error);
+	useCreateNotice()( wcSettings.pin4wc.error );
 
 	return (
 		<div className="woocommerce-layout">
 			<div className="woocommerce-layout__main">
 				<TransientNotices />
-				{appSettings ? (
+				{ appSettings ? (
 					<div className="woocommerce-setup-guide__container">
 						<SetupAccount
 							view="settings"
-							setIsConnected={setIsConnected}
-							isConnected={isConnected}
+							setIsConnected={ setIsConnected }
+							isConnected={ isConnected }
 						/>
 
-						{isGroup1Visible && <ClaimWebsite view="settings" />}
-						{isGroup2Visible && <SetupTracking view="settings" />}
-						{isGroup3Visible && (
+						{ isGroup1Visible && <ClaimWebsite view="settings" /> }
+						{ isGroup2Visible && <SetupTracking view="settings" /> }
+						{ isGroup3Visible && (
 							<>
 								<SetupProductSync view="settings" />
 								<SetupPins view="settings" />
 								<AdvancedSettings view="settings" />
 								<SaveSettingsButton />
 							</>
-						)}
+						) }
 					</div>
 				) : (
 					<Spinner />
-				)}
+				) }
 			</div>
 		</div>
 	);

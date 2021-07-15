@@ -30,87 +30,90 @@ const LandingPageApp = () => {
 			<Card className="woocommerce-table pin4wc-landing-page__welcome-section">
 				<Flex>
 					<FlexBlock className="content-block">
-						<Text variant="title.medium">{welcome.title}</Text>
+						<Text variant="title.medium">{ welcome.title }</Text>
 
-						<Text variant="body">{welcome.text}</Text>
+						<Text variant="body">{ welcome.text }</Text>
 
 						<Text variant="body">
 							<Button
 								isPrimary
-								onClick={() =>
-									updateQueryString({ view: 'wizard' })
+								onClick={ () =>
+									updateQueryString( { view: 'wizard' } )
 								}
 							>
-								{__('Get started', 'pinterest-for-woocommerce')}
+								{ __(
+									'Get started',
+									'pinterest-for-woocommerce'
+								) }
 							</Button>
 						</Text>
 
 						<Text variant="body">
-							{__(
+							{ __(
 								'By clicking ‘Get started’, you agree to our',
 								'pinterest-for-woocommerce'
-							)}{' '}
+							) }{ ' ' }
 							<a
-								href={welcome.tos_link}
+								href={ welcome.tos_link }
 								target="_blank"
 								rel="noreferrer"
 							>
-								{__(
+								{ __(
 									'Terms of Service',
 									'pinterest-for-woocommerce'
-								)}
+								) }
 							</a>
 							.
 						</Text>
 					</FlexBlock>
 					<FlexBlock className="image-block">
-						<img src={welcome.image_url} alt="" />
+						<img src={ welcome.image_url } alt="" />
 					</FlexBlock>
 				</Flex>
 			</Card>
 
 			<Card className="woocommerce-table pin4wc-landing-page__features-section">
 				<Flex justify="center" align="top">
-					{features.map((item, index) => (
-						<FlexBlock key={index}>
-							<img src={item.image_url} alt="" />
-							<Text variant="subtitle">{item.title}</Text>
+					{ features.map( ( item, index ) => (
+						<FlexBlock key={ index }>
+							<img src={ item.image_url } alt="" />
+							<Text variant="subtitle">{ item.title }</Text>
 							<Text
 								variant="body"
-								dangerouslySetInnerHTML={{
+								dangerouslySetInnerHTML={ {
 									__html: item.text,
-								}}
+								} }
 							/>
-							{item?.extra && (
+							{ item?.extra && (
 								<Text
 									variant="body"
 									className="extra"
-									dangerouslySetInnerHTML={{
+									dangerouslySetInnerHTML={ {
 										__html: item.extra,
-									}}
+									} }
 								/>
-							)}
+							) }
 						</FlexBlock>
-					))}
+					) ) }
 				</Flex>
 			</Card>
 
 			<Card className="woocommerce-table pin4wc-landing-page__faq-section">
 				<Panel
-					header={__(
+					header={ __(
 						'Frequently asked questions',
 						'pinterest-for-woocommerce'
-					)}
+					) }
 				>
-					{faqItems.map((item, index) => (
+					{ faqItems.map( ( item, index ) => (
 						<PanelBody
-							title={item.question}
-							initialOpen={false}
-							key={index}
+							title={ item.question }
+							initialOpen={ false }
+							key={ index }
 						>
-							<PanelRow>{item.answer}</PanelRow>
+							<PanelRow>{ item.answer }</PanelRow>
 						</PanelBody>
-					))}
+					) ) }
 				</Panel>
 			</Card>
 		</div>
