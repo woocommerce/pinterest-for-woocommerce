@@ -39,8 +39,10 @@ export function setIsUpdating( isUpdating ) {
 	};
 }
 
-export function* updateSettings( data, saveToDb = false ) {
-	yield receiveSettings( data );
+export function* updateSettings(data, saveToDb = false) {
+	const isEmptyData = Object.entries(data).length === 0;
+
+	yield receiveSettings(data);
 
 	if ( ! saveToDb ) {
 		return { success: true };
@@ -58,10 +60,10 @@ export function* updateSettings( data, saveToDb = false ) {
 			},
 		} );
 
-		yield setIsUpdating( false );
-		return { success: results[ OPTIONS_NAME ] };
-	} catch ( error ) {
-		yield setUpdatingError( error );
-		return { success: false, ...error };
+		yield setIsUpdating(false);
+		return { success: results[OPTIONS_NAME], isEmptyData };
+	} catch (error) {
+		yield setUpdatingError(error);
+		return { success: false, ...error, isEmptyData };
 	}
 }
