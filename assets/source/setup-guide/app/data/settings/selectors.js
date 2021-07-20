@@ -37,6 +37,15 @@ export const isSettingsUpdating = ( state ) => {
 };
 
 /**
+ * Determine if settings are dirty, waiting to be saved.
+ *
+ * @param {Object} state - Reducer state
+ */
+export const isSettingsDirty = (state) => {
+	return state.isDirty || false;
+};
+
+/**
  * Determine if a settings update resulted in an error.
  *
  * @param {Object} state - Reducer state

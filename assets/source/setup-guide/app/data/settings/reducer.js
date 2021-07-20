@@ -7,6 +7,7 @@ const settingsReducer = (
 	state = {
 		settings: {},
 		isUpdating: false,
+		isDirty: false,
 		requestingErrors: {},
 	},
 	action
@@ -25,6 +26,12 @@ const settingsReducer = (
 			state = {
 				...state,
 				isUpdating: action.isUpdating,
+			};
+			break;
+		case TYPES.SET_IS_DIRTY:
+			state = {
+				...state,
+				isDirty: action.isDirty,
 			};
 			break;
 		case TYPES.SET_REQUESTING_ERROR:
