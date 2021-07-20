@@ -67,11 +67,11 @@ export function* updateSettings(data, saveToDb = false) {
 			},
 		} );
 
-		yield setIsUpdating(false);
-		yield setIsDirty(false);
-		return { success: results[OPTIONS_NAME] };
-	} catch (error) {
-		yield setUpdatingError(error);
-		return { success: false, ...error, isEmptyData };
+		yield setIsUpdating( false );
+		yield setIsDirty( false );
+		return { success: results[ OPTIONS_NAME ] };
+	} catch ( error ) {
+		yield setUpdatingError( error );
+		return { success: false, ...error };
 	}
 }
