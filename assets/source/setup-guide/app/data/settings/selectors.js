@@ -41,7 +41,7 @@ export const isSettingsUpdating = ( state ) => {
  *
  * @param {Object} state - Reducer state
  */
-export const isSettingsDirty = (state) => {
+export const isSettingsDirty = ( state ) => {
 	return state.isDirty || false;
 };
 

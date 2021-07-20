@@ -43,7 +43,11 @@ const SaveSettingsButton = () => {
 
 	return (
 		<div className="woocommerce-setup-guide__footer-button">
-			<Button isPrimary onClick={ saveSettings } disabled={ isSaving || ( ! isSettingsDirty ) }>
+			<Button
+				isPrimary
+				onClick={ saveSettings }
+				disabled={ isSaving || ! isSettingsDirty }
+			>
 				{ isSaving
 					? __( 'Saving settings…', 'pinterest-for-woocommerce' )
 					: __( 'Save changes', 'pinterest-for-woocommerce' ) }

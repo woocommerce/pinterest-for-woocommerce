@@ -39,17 +39,16 @@ export function setIsUpdating( isUpdating ) {
 	};
 }
 
-export function setIsDirty(isDirty) {
+export function setIsDirty( isDirty ) {
 	return {
 		type: TYPES.SET_IS_DIRTY,
 		isDirty,
 	};
 }
 
-export function* updateSettings(data, saveToDb = false) {
-
-	yield receiveSettings(data);
-	yield setIsDirty(true);
+export function* updateSettings( data, saveToDb = false ) {
+	yield receiveSettings( data );
+	yield setIsDirty( true );
 
 	if ( ! saveToDb ) {
 		return { success: true };
@@ -72,6 +71,6 @@ export function* updateSettings(data, saveToDb = false) {
 		return { success: results[ OPTIONS_NAME ] };
 	} catch ( error ) {
 		yield setUpdatingError( error );
-		return { success: false, ...error };
+		return { success: false, ...error, isEmptyData };
 	}
 }
