@@ -15,6 +15,7 @@ import {
 
 const SaveSettingsButton = () => {
 	const isSaving = useSettingsSelect( 'isSettingsUpdating' );
+	const isSettingsDirty = useSettingsSelect( 'isSettingsDirty' );
 	const setAppSettings = useSettingsDispatch( true );
 	const createNotice = useCreateNotice();
 
@@ -50,7 +51,7 @@ const SaveSettingsButton = () => {
 
 	return (
 		<div className="woocommerce-setup-guide__footer-button">
-			<Button isPrimary onClick={ saveSettings } disabled={ isSaving }>
+			<Button isPrimary onClick={ saveSettings } disabled={ isSaving || ( ! isSettingsDirty ) }>
 				{ isSaving
 					? __( 'Saving settings…', 'pinterest-for-woocommerce' )
 					: __( 'Save changes', 'pinterest-for-woocommerce' ) }
