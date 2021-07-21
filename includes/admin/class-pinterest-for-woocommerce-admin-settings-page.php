@@ -81,7 +81,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 		}
 
-		protected function fix_menu_paths() {
+		public function fix_menu_paths() {
 			global $submenu;
 
 			if ( ! isset( $submenu['woocommerce-marketing'] ) ) {
@@ -103,7 +103,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 *
 		 * @return array
 		 */
-		protected function add_menu_items( $items ) {
+		public function add_menu_items( $items ) {
 
 			if ( $this->is_new_nav_enabled() ) {
 				return $items;
@@ -232,7 +232,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				! \Automattic\WooCommerce\Admin\Loader::is_admin_page() ||
 				! Onboarding::should_show_tasks()
 			) {
-				return;
+				return $registered_tasks_list_items;
 			}
 
 			$new_task_name = 'woocommerce_admin_add_task_pinterest_setup';
