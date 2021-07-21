@@ -18,6 +18,7 @@ import {
 	useBodyClasses,
 	useCreateNotice,
 } from '../helpers/effects';
+import NavigationClassic from '../../../components/navigation-classic';
 
 const SettingsApp = () => {
 	const appSettings = useSettingsSelect();
@@ -36,6 +37,8 @@ const SettingsApp = () => {
 	return (
 		<div className="woocommerce-layout">
 			<div className="woocommerce-layout__main">
+				<NavigationClassic />
+
 				<TransientNotices />
 				{ appSettings ? (
 					<div className="woocommerce-setup-guide__container">
