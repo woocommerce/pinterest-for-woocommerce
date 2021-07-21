@@ -12,7 +12,7 @@ import {
 	PanelRow,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { updateQueryString } from '@woocommerce/navigation';
+import { getNewPath, getHistory } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
@@ -38,7 +38,12 @@ const LandingPageApp = () => {
 							<Button
 								isPrimary
 								onClick={ () =>
-									updateQueryString( { view: 'wizard' } )
+									getHistory().push(
+										getNewPath(
+											{},
+											( wcSettings.pin4wc.isSetupComplete ? '/pinterest/connection' : '/pinterest/onboarding' )
+										)
+									)
 								}
 							>
 								{ __(
