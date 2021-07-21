@@ -293,7 +293,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 					'adGuidelines'     => 'https://policy.pinterest.com/en/advertising-guidelines',
 					'adDataTerms'      => 'https://policy.pinterest.com/en/ad-data-terms',
 				),
-				'isSetupComplete' => Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete' ),
+				'isSetupComplete' => Pinterest_For_Woocommerce()::is_setup_complete(),
 			);
 
 			return $settings;

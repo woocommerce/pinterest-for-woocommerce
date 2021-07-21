@@ -659,13 +659,23 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
+		 * Checks if setup is completed and all requirements are set.
+		 *
+		 * @return boolean
+		 */
+		public static function is_setup_complete() {
+			return self::get_setting( 'is_setup_complete', true ) && self::is_domain_verified() && self::is_tracking_configured();
+		}
+
+
+		/**
 		 * Checks whether we have verified our domain, by checking account_data as
 		 * returned by Pinterest.
 		 *
 		 * @return boolean
 		 */
 		public static function is_domain_verified() {
-			$account_data = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+			$account_data = self::get_setting( 'account_data' );
 			return isset( $account_data['domain_verified'] ) ? (bool) $account_data['domain_verified'] : false;
 		}
 
@@ -675,7 +685,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @return boolean
 		 */
-		public static function is_tracking_enabled() {
+		public static function is_tracking_configured() {
 			return false !== Pinterest\Tracking::get_active_tag();
 		}
 	}

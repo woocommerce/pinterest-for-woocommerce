@@ -129,7 +129,7 @@ class Auth extends VendorAPI {
 	private function get_redirect_url( $view = null, $has_error = false ) {
 
 		$redirect_url            = admin_url( 'admin.php?page=' . \PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE );
-		$is_setup_complete       = Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete', true );
+		$is_setup_complete       = Pinterest_For_Woocommerce()::is_setup_complete();
 		$dismissed_wc_tasks      = get_option( 'woocommerce_task_list_dismissed_tasks' );
 		$is_setup_task_dismissed = ! empty( $dismissed_wc_tasks ) && is_array( $dismissed_wc_tasks ) && in_array( 'setup-pinterest', $dismissed_wc_tasks, true );
 
