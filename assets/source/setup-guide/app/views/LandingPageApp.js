@@ -41,7 +41,9 @@ const LandingPageApp = () => {
 									getHistory().push(
 										getNewPath(
 											{},
-											( wcSettings.pin4wc.isSetupComplete ? '/pinterest/connection' : '/pinterest/onboarding' )
+											wcSettings.pin4wc.isSetupComplete
+												? '/pinterest/connection'
+												: '/pinterest/onboarding'
 										)
 									)
 								}
