@@ -1,45 +1,73 @@
 /**
  * External dependencies
  */
-import { render, useEffect, useState } from '@wordpress/element';
-import { getHistory, getQuery } from '@woocommerce/navigation';
+import { __ } from '@wordpress/i18n';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import LandingPageApp from './app/views/LandingPageApp';
-import SettingsApp from './app/views/SettingsApp';
 import WizardApp from './app/views/WizardApp';
+import ConnectionApp from './app/views/ConnectionApp';
+import SettingsApp from './app/views/SettingsApp';
+import CatalogSyncApp from '../catalog-sync/app/App';
+
 import './app/style.scss';
 
-const App = () => {
-	const [ view, setView ] = useState( getQuery()?.view );
+addFilter(
+	'woocommerce_admin_pages_list',
+	'woocommerce-marketing',
+	( pages ) => {
+		pages.push( {
+			container: LandingPageApp,
+			path: '/pinterest/landing',
+			breadcrumbs: [ 'Pinterest Landing Page' ],
+			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
+			navArgs: {
+				id: 'pinterest-for-woocommerce-landing-page',
+			},
+		} );
 
-	useEffect( () => {
-		const currentUrl = new URL( window.location.href );
-		const currentView = currentUrl.searchParams.get( 'view' );
+		pages.push( {
+			container: WizardApp,
+			path: '/pinterest/onboarding',
+			breadcrumbs: [ 'Onboarding Guide' ],
+			navArgs: {
+				id: 'pinterest-for-woocommerce-setup-guide',
+			},
+		} );
 
-		setView( currentView );
-	} );
+		pages.push( {
+			container: ConnectionApp,
+			path: '/pinterest/connection',
+			breadcrumbs: [ 'Pinterest Connection' ],
+			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
+			navArgs: {
+				id: 'pinterest-for-woocommerce-connection',
+			},
+		} );
 
-	getHistory().listen( () => {
-		setView( getQuery()?.view );
-	} );
+		pages.push( {
+			container: SettingsApp,
+			path: '/pinterest/settings',
+			breadcrumbs: [ 'Pinterest Settings' ],
+			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
+			navArgs: {
+				id: 'pinterest-for-woocommerce-settings',
+			},
+		} );
 
-	return view === 'settings' ||
-		getQuery()?.page === 'pinterest-for-woocommerce-setup-guide' ? (
-		<SettingsApp />
-	) : view === 'wizard' ? (
-		<WizardApp />
-	) : (
-		<LandingPageApp />
-	);
-};
+		pages.push( {
+			container: CatalogSyncApp,
+			path: '/pinterest/catalog',
+			breadcrumbs: [ 'Pinterest Products Catalog' ],
+			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
+			navArgs: {
+				id: 'pinterest-for-woocommerce-catalog',
+			},
+		} );
 
-const appRoot = document.getElementById( 'pin4wc-setup-guide' );
-
-if ( appRoot ) {
-	render( <App />, appRoot );
-}
-
-export default App;
+		return pages;
+	}
+);
