@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { sprintf, __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import {
@@ -69,7 +70,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 			if ( results.advertisers.length > 0 ) {
 				if ( ! appSettings?.tracking_advertiser ) {
 					handleOptionChange(
-						'advertiser',
+						'tracking_advertiser',
 						results.advertisers[ 0 ].id
 					);
 				} else {
@@ -111,7 +112,10 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 
 			if ( Object.keys( results ).length > 0 ) {
 				if ( ! appSettings?.tracking_tag ) {
-					handleOptionChange( 'tag', Object.keys( results )[ 0 ] );
+					handleOptionChange(
+						'tracking_tag',
+						Object.keys( results )[ 0 ]
+					);
 				}
 			} else {
 				setStatus( 'error' );
@@ -153,7 +157,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 		setIsSaving( true );
 
 		const update = await setAppSettings( {
-			[ `tracking_${ name }` ]: value,
+			[ name ]: value ?? ! appSettings[ name ],
 		} );
 
 		if ( ! update.success ) {
@@ -186,17 +190,28 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 
 		const buttonLabels = {
 			error: __( 'Try Again', 'pinterest-for-woocommerce' ),
-			success: __( 'Continue', 'pinterest-for-woocommerce' ),
+			success: __( 'Complete Setup', 'pinterest-for-woocommerce' ),
 		};
 
 		return (
 			<Button
 				isPrimary
 				disabled={ isSaving }
-				onClick={ status === 'success' ? goToNextStep : handleTryAgain }
+				onClick={
+					status === 'success' ? handleCompleteSetup : handleTryAgain
+				}
 			>
 				{ buttonLabels[ status ] }
 			</Button>
+		);
+	};
+
+	const handleCompleteSetup = async () => {
+		await handleOptionChange( 'is_setup_complete', true );
+
+		// TODO: go to catalog ?
+		window.location = new URL(
+			decodeEntities( wcSettings.pin4wc.adminUrl )
 		);
 	};
 
@@ -288,7 +303,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 											}
 											onChange={ ( selectedAdvertiser ) =>
 												handleOptionChange(
-													'advertiser',
+													'tracking_advertiser',
 													selectedAdvertiser
 												)
 											}
@@ -357,7 +372,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 														selectedTag
 													) =>
 														handleOptionChange(
-															'tag',
+															'tracking_tag',
 															selectedTag
 														)
 													}
