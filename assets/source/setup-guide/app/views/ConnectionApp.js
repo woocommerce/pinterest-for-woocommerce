@@ -8,9 +8,9 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import SetupProductSync from '../steps/SetupProductSync';
-import SetupPins from '../steps/SetupPins';
-import AdvancedSettings from '../steps/AdvancedSettings';
+import SetupAccount from '../steps/SetupAccount';
+import ClaimWebsite from '../steps/ClaimWebsite';
+import SetupTracking from '../steps/SetupTracking';
 import SaveSettingsButton from '../components/SaveSettingsButton';
 import TransientNotices from '../components/TransientNotices';
 import {
@@ -22,7 +22,6 @@ import {
 const SettingsApp = () => {
 	const appSettings = useSettingsSelect();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
-	const isTrackingConfigured = useSettingsSelect( 'isTrackingConfigured' );
 
 	const [ isConnected, setIsConnected ] = useState(
 		wcSettings.pin4wc.isConnected
@@ -30,7 +29,6 @@ const SettingsApp = () => {
 
 	const isGroup1Visible = isConnected;
 	const isGroup2Visible = isGroup1Visible && isDomainVerified;
-	const isGroup3Visible = isGroup2Visible && isTrackingConfigured;
 
 	useBodyClasses();
 	useCreateNotice()( wcSettings.pin4wc.error );
@@ -41,14 +39,15 @@ const SettingsApp = () => {
 				<TransientNotices />
 				{ appSettings ? (
 					<div className="woocommerce-setup-guide__container">
-						{ isGroup3Visible && (
-							<>
-								<SetupProductSync view="settings" />
-								<SetupPins view="settings" />
-								<AdvancedSettings view="settings" />
-								<SaveSettingsButton />
-							</>
-						) }
+						<SetupAccount
+							view="settings"
+							setIsConnected={ setIsConnected }
+							isConnected={ isConnected }
+						/>
+
+						{ isGroup1Visible && <ClaimWebsite view="settings" /> }
+						{ isGroup2Visible && <SetupTracking view="settings" /> }
+						{ isGroup2Visible && <SaveSettingsButton /> }
 					</div>
 				) : (
 					<Spinner />

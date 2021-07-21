@@ -11,7 +11,7 @@ import SyncIssues from './sections/SyncIssues';
 import TransientNotices from './components/TransientNotices';
 import { useCreateNotice } from './helpers/effects';
 
-const App = () => {
+const CatalogSyncApp = () => {
 	useCreateNotice( wcSettings.pin4wc.error );
 
 	return (
@@ -27,4 +27,4 @@ const App = () => {
 	);
 };
 
-export default App;
+export default CatalogSyncApp;
