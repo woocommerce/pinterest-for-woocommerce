@@ -13,6 +13,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { Spinner } from '@woocommerce/components';
+import { getNewPath } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
@@ -150,7 +151,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 			setStatus( 'idle' );
 		}
 
-		saveOptions( name, value );
+		await saveOptions( name, value );
 	};
 
 	const saveOptions = async ( name, value ) => {
@@ -209,9 +210,11 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 	const handleCompleteSetup = async () => {
 		await handleOptionChange( 'is_setup_complete', true );
 
-		// TODO: go to catalog ?
+		// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
+		const path = getNewPath( {}, '/pinterest/catalog', {} );
+
 		window.location = new URL(
-			decodeEntities( wcSettings.pin4wc.adminUrl )
+			decodeEntities( wcSettings.adminUrl + path )
 		);
 	};
 
