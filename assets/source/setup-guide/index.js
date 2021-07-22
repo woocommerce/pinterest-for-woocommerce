@@ -22,7 +22,7 @@ addFilter(
 		pages.push( {
 			container: LandingPageApp,
 			path: '/pinterest/landing',
-			breadcrumbs: [ 'Pinterest Landing Page' ],
+			breadcrumbs: [ 'Pinterest' ],
 			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
 			navArgs: {
 				id: 'pinterest-for-woocommerce-landing-page',
@@ -41,7 +41,7 @@ addFilter(
 		pages.push( {
 			container: ConnectionApp,
 			path: '/pinterest/connection',
-			breadcrumbs: [ 'Pinterest Connection' ],
+			breadcrumbs: [ 'Connection' ],
 			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
 			navArgs: {
 				id: 'pinterest-for-woocommerce-connection',
@@ -51,7 +51,7 @@ addFilter(
 		pages.push( {
 			container: SettingsApp,
 			path: '/pinterest/settings',
-			breadcrumbs: [ 'Pinterest Settings' ],
+			breadcrumbs: [ 'Settings' ],
 			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
 			navArgs: {
 				id: 'pinterest-for-woocommerce-settings',
@@ -61,7 +61,7 @@ addFilter(
 		pages.push( {
 			container: CatalogSyncApp,
 			path: '/pinterest/catalog',
-			breadcrumbs: [ 'Pinterest Products Catalog' ],
+			breadcrumbs: [ 'Products Catalog' ],
 			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
 			navArgs: {
 				id: 'pinterest-for-woocommerce-catalog',
