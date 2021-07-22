@@ -365,7 +365,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				'serviceLoginUrl' => esc_url(
 					add_query_arg(
 						array(
-							'page' => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
+							'page' => 'wc-admin',
 							PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
 							'view' => 'wizard',
 						),
@@ -375,7 +375,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				'domainToVerify'  => wp_parse_url( site_url(), PHP_URL_HOST ),
 				'isConnected'     => ! empty( Pinterest_For_Woocommerce()::get_token()['access_token'] ),
 				'apiRoute'        => PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION,
-				'pageSlug'        => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
 				'optionsName'     => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,
 				'error'           => isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				'pinterestLinks'  => array(
@@ -452,7 +451,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 */
 		public function maybe_go_to_service_login_url() {
 
-			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) || empty( $_REQUEST['page'] ) || PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE !== $_REQUEST['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
+			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) || ! class_exists( 'Automattic\WooCommerce\Admin\Loader' ) || ! \Automattic\WooCommerce\Admin\Loader::is_admin_page() ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				return;
 			}
 
