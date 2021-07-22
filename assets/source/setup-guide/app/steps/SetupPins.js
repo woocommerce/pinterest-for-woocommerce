@@ -2,8 +2,6 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/html-entities';
-import { useState } from '@wordpress/element';
 import {
 	Button,
 	Card,
@@ -17,7 +15,6 @@ import { Spinner } from '@woocommerce/components';
 /**
  * Internal dependencies
  */
-import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import {
 	useSettingsSelect,
@@ -25,15 +22,12 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
-const SetupPins = ( { view } ) => {
-	const [ isSaving, setIsSaving ] = useState( false );
+const SetupPins = ( {} ) => {
 	const appSettings = useSettingsSelect();
-	const setAppSettings = useSettingsDispatch( view === 'wizard' );
+	const setAppSettings = useSettingsDispatch( false );
 	const createNotice = useCreateNotice();
 
 	const handleOptionChange = async ( name, value ) => {
-		setIsSaving( true );
-
 		const update = await setAppSettings( {
 			[ name ]: value ?? ! appSettings[ name ],
 		} );
@@ -47,27 +41,10 @@ const SetupPins = ( { view } ) => {
 				)
 			);
 		}
-
-		setIsSaving( false );
-	};
-
-	const handleCompleteSetup = async () => {
-		await handleOptionChange( 'is_setup_complete', true );
-
-		window.location = new URL(
-			decodeEntities( wcSettings.pin4wc.adminUrl )
-		);
 	};
 
 	return (
 		<div className="woocommerce-setup-guide__setup-pins">
-			{ view === 'wizard' && (
-				<StepHeader
-					title={ __( 'Publish Pins', 'pinterest-for-woocommerce' ) }
-					subtitle={ __( 'Step Four', 'pinterest-for-woocommerce' ) }
-				/>
-			) }
-
 			<div className="woocommerce-setup-guide__step-columns">
 				<div className="woocommerce-setup-guide__step-column">
 					<StepOverview
@@ -208,26 +185,6 @@ const SetupPins = ( { view } ) => {
 							) }
 						</CardBody>
 					</Card>
-
-					{ view === 'wizard' && (
-						<div className="woocommerce-setup-guide__footer-button">
-							<Button
-								isPrimary
-								onClick={ handleCompleteSetup }
-								disabled={ isSaving }
-							>
-								{ isSaving
-									? __(
-											'Saving settings…',
-											'pinterest-for-woocommerce'
-									  )
-									: __(
-											'Complete Setup',
-											'pinterest-for-woocommerce'
-									  ) }
-							</Button>
-						</div>
-					) }
 				</div>
 			</div>
 		</div>
