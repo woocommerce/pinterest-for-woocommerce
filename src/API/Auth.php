@@ -134,11 +134,6 @@ class Auth extends VendorAPI {
 			'step' => empty( $has_error ) ? 'claim-website' : 'setup-account',
 		);
 
-		// If, somehow, we have already completed onboarding, go to settings.
-		if ( Pinterest_For_Woocommerce()::is_setup_complete() ) {
-			$query_args['path'] = '/pinterest/connection';
-		}
-
 		if ( ! empty( $view ) ) {
 			$query_args['view'] = sanitize_key( $view );
 		}
