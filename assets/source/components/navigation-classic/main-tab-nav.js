@@ -12,6 +12,11 @@ import AppTabNav from '../app-tab-nav';
 
 const tabs = [
 	{
+		key: 'catalog',
+		title: __( 'Catalog', 'pinterest-for-woocommerce' ),
+		href: getNewPath( {}, '/pinterest/catalog', {} ),
+	},
+	{
 		key: 'connection',
 		title: __( 'Connection', 'pinterest-for-woocommerce' ),
 		href: getNewPath( {}, '/pinterest/connection', {} ),
@@ -20,11 +25,6 @@ const tabs = [
 		key: 'settings',
 		title: __( 'Settings', 'pinterest-for-woocommerce' ),
 		href: getNewPath( {}, '/pinterest/settings', {} ),
-	},
-	{
-		key: 'catalog',
-		title: __( 'Catalog', 'pinterest-for-woocommerce' ),
-		href: getNewPath( {}, '/pinterest/catalog', {} ),
 	},
 ];
 
