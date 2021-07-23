@@ -8,7 +8,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import './index.scss';
+import './style.scss';
 
 const TabLink = ( { tabId, href, children, selected, ...rest } ) => {
 	return (

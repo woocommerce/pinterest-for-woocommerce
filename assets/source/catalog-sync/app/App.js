@@ -17,7 +17,7 @@ const CatalogSyncApp = () => {
 
 	return (
 		<div className="woocommerce-layout">
-			<div className="woocommerce-layout__main">
+			<div className="woocommerce-layout__main pin4wc-catalog-sync">
 				<NavigationClassic />
 
 				<TransientNotices />
