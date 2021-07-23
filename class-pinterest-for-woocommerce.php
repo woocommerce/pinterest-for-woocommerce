@@ -664,7 +664,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function is_setup_complete() {
-			return self::get_setting( 'is_setup_complete', true ) && self::is_domain_verified() && self::is_tracking_configured();
+			return self::get_setting( 'is_setup_complete', true ) && self::is_connected() && self::is_domain_verified() && self::is_tracking_configured();
+		}
+
+
+		/**
+		 * Checks if connected by checking if we got a token in the db.
+		 *
+		 * @return boolean
+		 */
+		public static function is_connected() {
+			$token = self::get_token();
+			return $token && ! empty( $token['access_token'] );
 		}
 
 
