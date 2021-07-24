@@ -19,6 +19,29 @@ addFilter(
 	'woocommerce_admin_pages_list',
 	'woocommerce-marketing',
 	( pages ) => {
+		const navigationEnabled = !! window.wcAdminFeatures?.navigation;
+		const initialBreadcrumbs = [
+			[ '', wcSettings.woocommerceTranslation ],
+		];
+
+		/**
+		 * If the WooCommerce Navigation feature is not enabled,
+		 * we want to display the plugin under WC Marketing;
+		 * otherwise, display it under WC Navigation - Extensions.
+		 */
+		if ( ! navigationEnabled ) {
+			initialBreadcrumbs.push( [
+				'/marketing',
+				__( 'Marketing', 'pinterest-for-woocommerce' ),
+			] );
+		}
+
+		initialBreadcrumbs.push(
+			__( 'Pinterest', 'pinterest-for-woocommerce' )
+		);
+
+		console.log( initialBreadcrumbs );
+
 		pages.push( {
 			container: LandingPageApp,
 			path: '/pinterest/landing',
@@ -32,7 +55,10 @@ addFilter(
 		pages.push( {
 			container: WizardApp,
 			path: '/pinterest/onboarding',
-			breadcrumbs: [ 'Onboarding Guide' ],
+			breadcrumbs: [
+				...initialBreadcrumbs,
+				__( 'Onboarding Guide', 'pinterest-for-woocommerce' ),
+			],
 			navArgs: {
 				id: 'pinterest-for-woocommerce-setup-guide',
 			},
@@ -41,7 +67,10 @@ addFilter(
 		pages.push( {
 			container: ConnectionApp,
 			path: '/pinterest/connection',
-			breadcrumbs: [ 'Connection' ],
+			breadcrumbs: [
+				...initialBreadcrumbs,
+				__( 'Connection', 'pinterest-for-woocommerce' ),
+			],
 			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
 			navArgs: {
 				id: 'pinterest-for-woocommerce-connection',
@@ -51,7 +80,10 @@ addFilter(
 		pages.push( {
 			container: SettingsApp,
 			path: '/pinterest/settings',
-			breadcrumbs: [ 'Settings' ],
+			breadcrumbs: [
+				...initialBreadcrumbs,
+				__( 'Settings', 'pinterest-for-woocommerce' ),
+			],
 			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
 			navArgs: {
 				id: 'pinterest-for-woocommerce-settings',
@@ -61,7 +93,10 @@ addFilter(
 		pages.push( {
 			container: CatalogSyncApp,
 			path: '/pinterest/catalog',
-			breadcrumbs: [ 'Products Catalog' ],
+			breadcrumbs: [
+				...initialBreadcrumbs,
+				__( 'Products Catalogsss', 'pinterest-for-woocommerce' ),
+			],
 			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
 			navArgs: {
 				id: 'pinterest-for-woocommerce-catalog',
