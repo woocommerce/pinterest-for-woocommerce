@@ -141,7 +141,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 	};
 
 	const handleOptionChange = async ( name, value ) => {
-		if ( name === 'advertiser' ) {
+		if ( name === 'tracking_advertiser' ) {
 			fetchTags( value );
 		}
 
