@@ -45,9 +45,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 */
 		public function register_wc_admin_pages() {
 
-			$new_nav = $this->is_new_nav_enabled();
+			$new_nav        = $this->is_new_nav_enabled();
+			$setup_complete = Pinterest_For_Woocommerce()::is_setup_complete();
 
-			if ( $new_nav && Pinterest_For_Woocommerce()::is_setup_complete() ) {
+			if ( $new_nav && $setup_complete ) {
 
 					// If setup is complete, add the base menu item as a category, and the settings as the main item.
 					// Connection & catalog are added later on, for both new and old nav.
@@ -77,16 +78,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 								'order'  => 50,
 								'parent' => 'pinterest-for-woocommerce-category',
 							),
-						)
-					);
-
-					// Allow rendering of the landing page on a page refresh.
-					wc_admin_register_page(
-						array(
-							'id'     => 'pinterest-for-woocommerce-landing-page',
-							'title'  => __( 'Landing page', 'pinterest-for-woocommerce' ),
-							'parent' => '',
-							'path'   => '/pinterest/landing',
 						)
 					);
 
@@ -121,7 +112,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 			$menu_items_parent = $new_nav ? 'pinterest-for-woocommerce-category' : 'toplevel_page_woocommerce-marketing';
 
-			if ( Pinterest_For_Woocommerce()::is_setup_complete() ) {
+			if ( $setup_complete ) {
 
 				// The connection & catalog pages are registered for both old & new nav, if setup is complete.
 
@@ -162,6 +153,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 						'title'  => __( 'Setup Pinterest', 'pinterest-for-woocommerce' ),
 						'parent' => 'toplevel_page_woocommerce-marketing',
 						'path'   => '/pinterest/onboarding',
+					)
+				);
+			}
+
+			if ( $setup_complete ) {
+				// Allow rendering of the landing page on a page refresh for both old & new nav, when setup is complete.
+				wc_admin_register_page(
+					array(
+						'id'     => 'pinterest-for-woocommerce-landing-page',
+						'title'  => __( 'Landing page', 'pinterest-for-woocommerce' ),
+						'parent' => '',
+						'path'   => '/pinterest/landing',
 					)
 				);
 			}
@@ -312,7 +315,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			);
 
 			wp_enqueue_style( $handle );
-
 
 			wp_register_style(
 				PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-catalog-sync',
