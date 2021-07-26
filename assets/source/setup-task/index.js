@@ -22,7 +22,7 @@ addFilter(
 			{
 				key: 'setup-pinterest',
 				title: __(
-					'Setup Pinterest Integration',
+					'Setup Pinterest for WooCommerce',
 					'pinterest-for-woocommerce'
 				),
 				onClick: () => {
