@@ -306,6 +306,19 @@ $root: ".woocommerce-setup-guide";
 				.text-margin {
 					margin: 1em 0;
 				}
+
+				.components-base-control {
+
+					&__help {
+						margin: 0.2em 0 1.5em 0;
+					}
+
+					&:last-child .components-base-control {
+						&__help {
+							margin-bottom: 0;
+						}
+					}
+				}
 			}
 
 			&__checkbox {
