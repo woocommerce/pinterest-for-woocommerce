@@ -42,7 +42,7 @@ const LandingPageApp = () => {
 										getNewPath(
 											{},
 											wcSettings.pin4wc.isSetupComplete
-												? '/pinterest/connection'
+												? '/pinterest/catalog'
 												: '/pinterest/onboarding'
 										)
 									)
