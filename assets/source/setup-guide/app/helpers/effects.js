@@ -34,7 +34,6 @@ export const useBodyClasses = ( style ) => {
 		if ( style === 'wizard' ) {
 			document.body.parentNode.classList.remove( 'wp-toolbar' );
 			document.body.classList.remove( 'woocommerce-admin-is-loading' );
-			document.body.classList.remove( 'woocommerce-embed-page' );
 			document.body.classList.add( 'woocommerce-onboarding' );
 			document.body.classList.add( 'woocommerce-admin-full-screen' );
 		}
@@ -44,7 +43,6 @@ export const useBodyClasses = ( style ) => {
 
 			if ( style === 'wizard' ) {
 				document.body.classList.remove( 'woocommerce-onboarding' );
-				document.body.classList.add( 'woocommerce-embed-page' );
 				document.body.classList.remove(
 					'woocommerce-admin-full-screen'
 				);
