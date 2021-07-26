@@ -40,8 +40,6 @@ addFilter(
 			__( 'Pinterest', 'pinterest-for-woocommerce' )
 		);
 
-		console.log( initialBreadcrumbs );
-
 		pages.push( {
 			container: LandingPageApp,
 			path: '/pinterest/landing',
@@ -95,7 +93,7 @@ addFilter(
 			path: '/pinterest/catalog',
 			breadcrumbs: [
 				...initialBreadcrumbs,
-				__( 'Products Catalogsss', 'pinterest-for-woocommerce' ),
+				__( 'Products Catalog', 'pinterest-for-woocommerce' ),
 			],
 			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
 			navArgs: {
