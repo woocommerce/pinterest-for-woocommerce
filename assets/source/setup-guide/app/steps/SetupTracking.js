@@ -295,12 +295,13 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 						undefined !== advertisersList ? (
 							<CardBody size="large">
 								{ advertisersList.length > 0 ? (
-									<div>
+									<>
 										<SelectControl
 											label={ __(
 												'Advertiser',
 												'pinterest-for-woocommerce'
 											) }
+											labelPosition='top'
 											value={
 												appSettings.tracking_advertiser
 											}
@@ -325,7 +326,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 												'pinterest-for-woocommerce'
 											) }
 										/>
-									</div>
+									</>
 								) : (
 									<>
 										<Text
@@ -368,6 +369,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 														'Tracking Tag',
 														'pinterest-for-woocommerce'
 													) }
+													labelPosition='top'
 													value={
 														appSettings.tracking_tag
 													}
