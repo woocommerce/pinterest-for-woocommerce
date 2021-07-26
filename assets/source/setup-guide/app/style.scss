@@ -11,15 +11,19 @@ $root: ".woocommerce-setup-guide";
 				margin: 60px 0 0 0;
 			}
 
-			.woocommerce-layout__header {
-				top: 0;
-				left: 0;
-				width: 100%;
-				display: block;
-			}
-
+			.woocommerce-layout__header,
 			.woocommerce-navigation {
 				display: none;
+			}
+
+			.woocommerce-layout__main {
+				.woocommerce-layout__header {
+					top: 0;
+					left: 0;
+					width: 100%;
+					display: block;
+					border-bottom: 1px solid #dcdcde;
+				}
 			}
 		}
 

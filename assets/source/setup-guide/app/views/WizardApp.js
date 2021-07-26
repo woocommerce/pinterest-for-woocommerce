@@ -17,6 +17,7 @@ import {
 import SetupAccount from '../steps/SetupAccount';
 import ClaimWebsite from '../steps/ClaimWebsite';
 import SetupTracking from '../steps/SetupTracking';
+import OnboardingTopBar from '../components/TopBar';
 import TransientNotices from '../components/TransientNotices';
 import {
 	useSettingsSelect,
@@ -126,6 +127,7 @@ const WizardApp = () => {
 
 	return (
 		<div className="woocommerce-layout">
+			<OnboardingTopBar />
 			<div className="woocommerce-layout__main woocommerce-setup-guide__main">
 				<TransientNotices />
 				{ appSettings ? (
