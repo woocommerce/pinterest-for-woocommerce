@@ -156,16 +156,6 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 			[ `tracking_${ name }` ]: value,
 		} );
 
-		if ( ! update.success ) {
-			createNotice(
-				'error',
-				__(
-					'There was a problem saving your settings.',
-					'pinterest-for-woocommerce'
-				)
-			);
-		}
-
 		setIsSaving( false );
 	};
 

@@ -30,14 +30,6 @@ const SaveSettingsButton = () => {
 					'pinterest-for-woocommerce'
 				)
 			);
-		} else {
-			createNotice(
-				'error',
-				__(
-					'There was a problem saving your settings.',
-					'pinterest-for-woocommerce'
-				)
-			);
 		}
 	};
 

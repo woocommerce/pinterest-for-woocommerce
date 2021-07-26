@@ -29,16 +29,6 @@ const SetupProductSync = ( { view } ) => {
 		const update = await setAppSettings( {
 			[ name ]: value ?? ! appSettings[ name ],
 		} );
-
-		if ( ! update.success ) {
-			createNotice(
-				'error',
-				__(
-					'There was a problem saving your settings.',
-					'pinterest-for-woocommerce'
-				)
-			);
-		}
 	};
 
 	return (
