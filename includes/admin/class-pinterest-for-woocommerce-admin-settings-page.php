@@ -56,11 +56,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 					wc_admin_register_page(
 						array(
 							'id'       => 'pinterest-for-woocommerce-category',
-							'title'    => __( 'Pinterest', 'pinterest-for-woocommerce' ),
+							'title'    => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
 							'parent'   => 'woocommerce',
 							'path'     => '/pinterest/settings',
 							'nav_args' => array(
-								'title'        => __( 'Pinterest', 'pinterest-for-woocommerce' ),
+								'title'        => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
 								'is_category'  => true,
 								'menuId'       => 'plugins',
 								'is_top_level' => true,
@@ -71,7 +71,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 					wc_admin_register_page(
 						array(
 							'id'       => 'pinterest-for-woocommerce-settings',
-							'title'    => __( 'Settings', 'pinterest-for-woocommerce' ),
+							'title'    => esc_html__( 'Settings', 'pinterest-for-woocommerce' ),
 							'parent'   => 'pinterest-for-woocommerce-category',
 							'path'     => '/pinterest/settings',
 							'nav_args' => array(
@@ -87,11 +87,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 					wc_admin_register_page(
 						array(
 							'id'       => 'pinterest-for-woocommerce-landing-page',
-							'title'    => __( 'Pinterest', 'pinterest-for-woocommerce' ),
+							'title'    => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
 							'parent'   => 'woocommerce',
 							'path'     => '/pinterest/landing',
 							'nav_args' => array(
-								'title'        => __( 'Pinterest', 'pinterest-for-woocommerce' ),
+								'title'        => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
 								'menuId'       => 'plugins',
 								'is_top_level' => true,
 							),
@@ -102,7 +102,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 					wc_admin_register_page(
 						array(
 							'id'     => 'pinterest-for-woocommerce-setup-guide',
-							'title'  => __( 'Setup Pinterest', 'pinterest-for-woocommerce' ),
+							'title'  => esc_html__( 'Setup Pinterest', 'pinterest-for-woocommerce' ),
 							'parent' => '',
 							'path'   => '/pinterest/onboarding',
 						)
@@ -119,7 +119,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				wc_admin_register_page(
 					array(
 						'id'       => 'pinterest-for-woocommerce-connection',
-						'title'    => __( 'Connection', 'pinterest-for-woocommerce' ),
+						'title'    => esc_html__( 'Connection', 'pinterest-for-woocommerce' ),
 						'parent'   => $menu_items_parent,
 						'path'     => '/pinterest/connection',
 						'nav_args' => array(
@@ -132,7 +132,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				wc_admin_register_page(
 					array(
 						'id'       => 'pinterest-for-woocommerce-catalog',
-						'title'    => __( 'Catalog', 'pinterest-for-woocommerce' ),
+						'title'    => esc_html__( 'Catalog', 'pinterest-for-woocommerce' ),
 						'parent'   => $menu_items_parent,
 						'path'     => '/pinterest/catalog',
 						'nav_args' => array(
@@ -149,8 +149,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				// Allow rendering of the onboarding guide on a page refresh.
 				wc_admin_register_page(
 					array(
-						'id'     => 'pinterest-for-woocommerce-onboarding',
-						'title'  => __( 'Setup Pinterest', 'pinterest-for-woocommerce' ),
+						'id'     => 'pinterest-for-woocommerce-setup-guide',
+						'title'  => esc_html__( 'Setup Pinterest', 'pinterest-for-woocommerce' ),
 						'parent' => 'toplevel_page_woocommerce-marketing',
 						'path'   => '/pinterest/onboarding',
 					)
@@ -162,7 +162,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 				wc_admin_register_page(
 					array(
 						'id'     => 'pinterest-for-woocommerce-landing-page',
-						'title'  => __( 'Landing page', 'pinterest-for-woocommerce' ),
+						'title'  => esc_html__( 'Landing page', 'pinterest-for-woocommerce' ),
 						'parent' => '',
 						'path'   => '/pinterest/landing',
 					)
@@ -209,14 +209,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			if ( Pinterest_For_Woocommerce()::is_setup_complete() ) {
 				$items[] = array(
 					'id'         => 'pinterest-for-woocommerce-settings',
-					'title'      => __( 'Pinterest', 'pinterest-for-woocommerce' ),
+					'title'      => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
 					'path'       => '/pinterest/settings',
 					'capability' => 'manage_woocommerce',
 				);
 			} else {
 				$items[] = array(
 					'id'         => 'pinterest-for-woocommerce-landing-page',
-					'title'      => __( 'Pinterest', 'pinterest-for-woocommerce' ),
+					'title'      => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
 					'path'       => '/pinterest/landing',
 					'capability' => 'manage_woocommerce',
 				);
