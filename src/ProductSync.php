@@ -180,7 +180,7 @@ class ProductSync {
 	 *
 	 * @return boolean
 	 */
-	private static function is_feed_registered() {
+	public static function is_feed_registered() {
 		return Pinterest_For_Woocommerce()::get_data( 'feed_registered' ) ?? false;
 	}
 
