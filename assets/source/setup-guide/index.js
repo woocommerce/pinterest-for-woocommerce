@@ -11,7 +11,7 @@ import LandingPageApp from './app/views/LandingPageApp';
 import WizardApp from './app/views/WizardApp';
 import ConnectionApp from './app/views/ConnectionApp';
 import SettingsApp from './app/views/SettingsApp';
-import CatalogSyncApp from '../catalog-sync/app/App';
+import CatalogSyncApp from '../catalog-sync/App';
 
 import './app/style.scss';
 

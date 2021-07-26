@@ -78,30 +78,9 @@ const SetupTask = {
     },
 };
 
-const CatalogSync = {
-    ...defaultConfig,
-    plugins: [
-		...defaultConfig.plugins.filter(
-			( plugin ) =>
-				plugin.constructor.name !== 'DependencyExtractionWebpackPlugin'
-		),
-		new DependencyExtractionWebpackPlugin( {
-			injectPolyfill: true,
-			requestToExternal,
-			requestToHandle,
-		} ),
-	],
-    entry: {
-        index: './assets/source/catalog-sync/index.js',
-    },
-    output: {
-        filename: '[name].js',
-        path: __dirname + '/assets/catalog-sync',
-    },
-};
+
 
 module.exports = [
     SetupGuide,
-    SetupTask,
-    CatalogSync
+    SetupTask
 ];
