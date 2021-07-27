@@ -10,7 +10,6 @@ import { getNewPath } from '@woocommerce/navigation';
 import TopBar from '../components/top-bar';
 
 const OnboardingTopBar = () => {
-
 	return (
 		<TopBar
 			title={ __(

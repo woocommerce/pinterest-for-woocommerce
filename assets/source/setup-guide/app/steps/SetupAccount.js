@@ -108,7 +108,6 @@ const SetupAccount = ( {
 			window.location = new URL(
 				decodeEntities( wcSettings.adminUrl + path )
 			);
-
 		}
 	};
 

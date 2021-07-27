@@ -16,7 +16,6 @@ import { Icon, chevronLeft } from '@wordpress/icons';
  */
 const TopBar = ( { title, backHref, helpButton, onBackButtonClick } ) => {
 	return (
-
 		<div className="woocommerce-layout__header">
 			<div className="woocommerce-layout__header-wrapper">
 				<Link

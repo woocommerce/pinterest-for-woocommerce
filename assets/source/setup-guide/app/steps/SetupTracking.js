@@ -301,7 +301,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 												'Advertiser',
 												'pinterest-for-woocommerce'
 											) }
-											labelPosition='top'
+											labelPosition="top"
 											value={
 												appSettings.tracking_advertiser
 											}
@@ -369,7 +369,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 														'Tracking Tag',
 														'pinterest-for-woocommerce'
 													) }
-													labelPosition='top'
+													labelPosition="top"
 													value={
 														appSettings.tracking_tag
 													}
