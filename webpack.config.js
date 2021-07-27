@@ -36,6 +36,14 @@ const requestToHandle = ( request ) => {
 // Use the defaultConfig but replace the entry and output properties
 const SetupGuide = {
     ...defaultConfig,
+	resolve: {
+		...defaultConfig.resolve,
+		alias: {
+			'.~': path.resolve( process.cwd(), 'assets/source/' ),
+		},
+		// Resolve jsx/tsx files for `@woocommerce/data`...`/with-plugins-hydration`
+		extensions: [ '.ts', '.tsx', '.js', '.jsx', '.json' ],
+	},
     plugins: [
 		...defaultConfig.plugins.filter(
 			( plugin ) =>
@@ -51,6 +59,7 @@ const SetupGuide = {
         index: './assets/source/setup-guide/index.js',
     },
     output: {
+		...defaultConfig.output,
         filename: '[name].js',
         path: __dirname + '/assets/setup-guide',
     },
@@ -58,6 +67,14 @@ const SetupGuide = {
 
 const SetupTask = {
     ...defaultConfig,
+	resolve: {
+		...defaultConfig.resolve,
+		alias: {
+			'.~': path.resolve( process.cwd(), 'assets/source/' ),
+		},
+		// Resolve jsx/tsx files for `@woocommerce/data`...`/with-plugins-hydration`
+		extensions: [ '.ts', '.tsx', '.js', '.jsx', '.json' ],
+	},
     plugins: [
 		...defaultConfig.plugins.filter(
 			( plugin ) =>
@@ -77,8 +94,6 @@ const SetupTask = {
         path: __dirname + '/assets/setup-task',
     },
 };
-
-
 
 module.exports = [
     SetupGuide,

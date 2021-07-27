@@ -8,7 +8,7 @@
     "@woocommerce/data": "^1.1.1",
     "@woocommerce/navigation": "^5.2.0",
     "@wordpress/api-fetch": "^3.23.0",
-    "@wordpress/components": "^10.0.0",
+    "@wordpress/components": "^12.0.8",
     "@wordpress/compose": "^3.13.1",
     "@wordpress/data": "^4.27.1",
     "@wordpress/data-controls": "^2.1.2",
@@ -24,7 +24,7 @@
   "devDependencies": {
     "@woocommerce/eslint-plugin": "^1.2.0",
     "@wordpress/eslint-plugin": "^9.0.2",
-    "@wordpress/scripts": "^16.1.4",
+    "@wordpress/scripts": "^12.5.0",
     "browser-sync": "^2.26.3",
     "eslint": "^7.29.0",
     "gulp": ">=4.0.0",
