@@ -17,7 +17,6 @@ const requestToExternal = ( request ) => {
 	}
 
 	const wcDepMap = {
-		'@woocommerce/components': [ 'wc', 'components' ],
 		'@woocommerce/navigation': [ 'wc', 'navigation' ],
 	};
 
@@ -42,7 +41,7 @@ const SetupGuide = {
 			'.~': path.resolve( process.cwd(), 'assets/source/' ),
 		},
 		// Resolve jsx/tsx files for `@woocommerce/data`...`/with-plugins-hydration`
-		extensions: [ '.ts', '.tsx', '.js', '.jsx', '.json' ],
+		extensions: [ '.js', '.jsx', '.json' ],
 	},
     plugins: [
 		...defaultConfig.plugins.filter(
