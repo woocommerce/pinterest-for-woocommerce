@@ -26,7 +26,7 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
-const SetupTracking = ( { goToNextStep, view } ) => {
+const SetupTracking = ( { view } ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isFetching, setIsFetching ] = useState( false );
 	const [ status, setStatus ] = useState( 'idle' );
