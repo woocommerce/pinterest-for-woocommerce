@@ -233,7 +233,7 @@ const SetupTracking = ( { view } ) => {
 
 	const handleCompleteSetup = async () => {
 		// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
-		const path = getNewPath( {}, '/pinterest/catalog', {} );
+		const path = getNewPath( {}, '/pinterest/settings', {} );
 
 		window.location = new URL(
 			decodeEntities( wcSettings.adminUrl + path )
