@@ -50,63 +50,63 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 			if ( $new_nav && $setup_complete ) {
 
-					// If setup is complete, add the base menu item as a category, and the settings as the main item.
-					// Connection & catalog are added later on, for both new and old nav.
+				// If setup is complete, add the base menu item as a category, and the settings as the main item.
+				// Connection & catalog are added later on, for both new and old nav.
 
-					wc_admin_register_page(
-						array(
-							'id'       => 'pinterest-for-woocommerce-category',
-							'title'    => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
-							'parent'   => 'woocommerce',
-							'path'     => '/pinterest/settings',
-							'nav_args' => array(
-								'title'        => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
-								'is_category'  => true,
-								'menuId'       => 'plugins',
-								'is_top_level' => true,
-							),
-						)
-					);
+				wc_admin_register_page(
+					array(
+						'id'       => 'pinterest-for-woocommerce-category',
+						'title'    => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
+						'parent'   => 'woocommerce',
+						'path'     => '/pinterest/settings',
+						'nav_args' => array(
+							'title'        => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
+							'is_category'  => true,
+							'menuId'       => 'plugins',
+							'is_top_level' => true,
+						),
+					)
+				);
 
-					wc_admin_register_page(
-						array(
-							'id'       => 'pinterest-for-woocommerce-settings',
-							'title'    => esc_html__( 'Settings', 'pinterest-for-woocommerce' ),
-							'parent'   => 'pinterest-for-woocommerce-category',
-							'path'     => '/pinterest/settings',
-							'nav_args' => array(
-								'order'  => 50,
-								'parent' => 'pinterest-for-woocommerce-category',
-							),
-						)
-					);
+				wc_admin_register_page(
+					array(
+						'id'       => 'pinterest-for-woocommerce-settings',
+						'title'    => esc_html__( 'Settings', 'pinterest-for-woocommerce' ),
+						'parent'   => 'pinterest-for-woocommerce-category',
+						'path'     => '/pinterest/settings',
+						'nav_args' => array(
+							'order'  => 50,
+							'parent' => 'pinterest-for-woocommerce-category',
+						),
+					)
+				);
 
 			} elseif ( $new_nav ) {
 
-					// Setup not complete. Add the Landing page as the main menu item.
-					wc_admin_register_page(
-						array(
-							'id'       => 'pinterest-for-woocommerce-landing-page',
-							'title'    => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
-							'parent'   => 'woocommerce',
-							'path'     => '/pinterest/landing',
-							'nav_args' => array(
-								'title'        => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
-								'menuId'       => 'plugins',
-								'is_top_level' => true,
-							),
-						)
-					);
+				// Setup not complete. Add the Landing page as the main menu item.
+				wc_admin_register_page(
+					array(
+						'id'       => 'pinterest-for-woocommerce-landing-page',
+						'title'    => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
+						'parent'   => 'woocommerce',
+						'path'     => '/pinterest/landing',
+						'nav_args' => array(
+							'title'        => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
+							'menuId'       => 'plugins',
+							'is_top_level' => true,
+						),
+					)
+				);
 
-					// Allow rendering of the onboarding guide on a page refresh.
-					wc_admin_register_page(
-						array(
-							'id'     => 'pinterest-for-woocommerce-setup-guide',
-							'title'  => esc_html__( 'Setup Pinterest', 'pinterest-for-woocommerce' ),
-							'parent' => '',
-							'path'   => '/pinterest/onboarding',
-						)
-					);
+				// Allow rendering of the onboarding guide on a page refresh.
+				wc_admin_register_page(
+					array(
+						'id'     => 'pinterest-for-woocommerce-setup-guide',
+						'title'  => esc_html__( 'Setup Pinterest', 'pinterest-for-woocommerce' ),
+						'parent' => '',
+						'path'   => '/pinterest/onboarding',
+					)
+				);
 
 			}
 
