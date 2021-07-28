@@ -208,8 +208,6 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 	};
 
 	const handleCompleteSetup = async () => {
-		await handleOptionChange( 'is_setup_complete', true );
-
 		// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
 		const path = getNewPath( {}, '/pinterest/catalog', {} );
 

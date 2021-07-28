@@ -51,9 +51,6 @@ class AuthDisconnect extends VendorAPI {
 	 * @since 1.0.0
 	 */
 	public function handle_disconnect() {
-
-		Pinterest_For_Woocommerce()::save_setting( 'is_setup_complete', false );
-
 		return array(
 			'disconnected' => Pinterest_For_Woocommerce()::clear_token(),
 		);
