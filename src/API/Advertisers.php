@@ -50,15 +50,19 @@ class Advertisers extends VendorAPI {
 	/**
 	 * Get the advertisers assigned to the authorized Pinterest account.
 	 *
+	 * @param WP_REST_Request $request The request.
+	 *
 	 * @return array
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
-	public function get_advertisers() {
+	public function get_advertisers( WP_REST_Request $request ) {
 
 		try {
 
 			$advertisers = Base::get_advertisers();
+
+			$terms_agreed = $request->has_param( 'terms_agreed' ) ? (int) $request->get_param( 'terms_agreed' ) : false;
 
 			if ( 'success' !== $advertisers['status'] && 1000 === $advertisers['code'] ) {
 				// User needs to take manual action in Pinterest dashboard.
@@ -67,6 +71,11 @@ class Advertisers extends VendorAPI {
 
 			if ( 'success' !== $advertisers['status'] ) {
 				throw new \Exception( esc_html__( 'Response error', 'pinterest-for-woocommerce' ), 400 );
+			}
+
+			if ( empty( $advertisers['data'] ) && ! empty( $terms_agreed ) ) {
+				$advertiser          = Base::create_advertiser( $terms_agreed );
+				$advertisers['data'] = 'success' === $advertiser['status'] ? array( $advertiser['data'] ) : array();
 			}
 
 			return array( 'advertisers' => $advertisers['data'] );
