@@ -24,7 +24,7 @@
   "devDependencies": {
     "@woocommerce/eslint-plugin": "^1.2.0",
     "@wordpress/eslint-plugin": "^9.0.2",
-    "@wordpress/scripts": "^12.5.0",
+    "@wordpress/scripts": "^16.1.4",
     "browser-sync": "^2.26.3",
     "eslint": "^7.29.0",
     "gulp": ">=4.0.0",
