@@ -386,8 +386,8 @@ const SetupTracking = ( { view } ) => {
 														isLink
 														href={
 															wcSettings.pin4wc
-																.pinterestLinks
-																.adDataTerms
+																.countryTos
+																.terms_url
 														}
 														target="_blank"
 													>
@@ -404,7 +404,8 @@ const SetupTracking = ( { view } ) => {
 												setTermsAgreed(
 													agreed
 														? wcSettings.pin4wc
-																.countryTosId
+																.countryTos
+																.tos_id
 														: false
 												)
 											}
