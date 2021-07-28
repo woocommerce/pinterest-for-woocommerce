@@ -3,7 +3,7 @@
  */
 import { sprintf, __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import {
 	Button,
@@ -53,9 +53,9 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 		) {
 			setStatus( 'success' );
 		}
-	}, [ appSettings, advertisersList ] );
+	}, [ appSettings, advertisersList, fetchAdvertisers, isFetching, tagsList ] );
 
-	const fetchAdvertisers = async () => {
+	const fetchAdvertisers = useCallback( async () => {
 		setIsFetching( true );
 
 		try {
@@ -93,9 +93,9 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 		}
 
 		setIsFetching( false );
-	};
+	}, [fetchTags, appSettings, createNotice, handleOptionChange]);
 
-	const fetchTags = async ( advertiserId ) => {
+	const fetchTags = useCallback( async (advertiserId) => {
 		setIsFetching( true );
 
 		try {
@@ -138,9 +138,9 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 		}
 
 		setIsFetching( false );
-	};
+	}, [ appSettings, createNotice, setIsFetching, setStatus, handleOptionChange ]);
 
-	const handleOptionChange = async ( name, value ) => {
+	const handleOptionChange = useCallback( async ( name, value ) => {
 		if ( name === 'tracking_advertiser' ) {
 			fetchTags( value );
 		}
@@ -152,9 +152,9 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 		}
 
 		await saveOptions( name, value );
-	};
+	}, [ fetchTags, setStatus, appSettings, saveOptions ] );
 
-	const saveOptions = async ( name, value ) => {
+	const saveOptions = useCallback( async ( name, value ) => {
 		setIsSaving( true );
 
 		const update = await setAppSettings( {
@@ -172,7 +172,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 		}
 
 		setIsSaving( false );
-	};
+	}, [ appSettings, setIsSaving, createNotice, setAppSettings ]);
 
 	const handleTryAgain = () => {
 		setStatus( 'idle' );
