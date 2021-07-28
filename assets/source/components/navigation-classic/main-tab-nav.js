@@ -17,14 +17,14 @@ const tabs = [
 		href: getNewPath( {}, '/pinterest/catalog', {} ),
 	},
 	{
-		key: 'connection',
-		title: __( 'Connection', 'pinterest-for-woocommerce' ),
-		href: getNewPath( {}, '/pinterest/connection', {} ),
-	},
-	{
 		key: 'settings',
 		title: __( 'Settings', 'pinterest-for-woocommerce' ),
 		href: getNewPath( {}, '/pinterest/settings', {} ),
+	},
+	{
+		key: 'connection',
+		title: __( 'Connection', 'pinterest-for-woocommerce' ),
+		href: getNewPath( {}, '/pinterest/connection', {} ),
 	},
 ];
 

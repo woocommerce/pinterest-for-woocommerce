@@ -75,7 +75,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 						'parent'   => 'pinterest-for-woocommerce-category',
 						'path'     => '/pinterest/settings',
 						'nav_args' => array(
-							'order'  => 50,
+							'order'  => 40,
 							'parent' => 'pinterest-for-woocommerce-category',
 						),
 					)
@@ -123,7 +123,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 						'parent'   => $menu_items_parent,
 						'path'     => '/pinterest/connection',
 						'nav_args' => array(
-							'order'  => 40,
+							'order'  => 50,
 							'parent' => $menu_items_parent,
 						),
 					)
