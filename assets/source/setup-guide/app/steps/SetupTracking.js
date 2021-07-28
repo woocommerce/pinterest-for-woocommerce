@@ -53,7 +53,13 @@ const SetupTracking = ( { view } ) => {
 		) {
 			setStatus( 'success' );
 		}
-	}, [ appSettings, advertisersList, fetchAdvertisers, isFetching, tagsList ] );
+	}, [
+		appSettings,
+		advertisersList,
+		fetchAdvertisers,
+		isFetching,
+		tagsList,
+	] );
 
 	const fetchAdvertisers = useCallback( async () => {
 		setIsFetching( true );
@@ -93,86 +99,104 @@ const SetupTracking = ( { view } ) => {
 		}
 
 		setIsFetching( false );
-	}, [fetchTags, appSettings, createNotice, handleOptionChange]);
+	}, [ fetchTags, appSettings, createNotice, handleOptionChange ] );
 
-	const fetchTags = useCallback( async (advertiserId) => {
-		setIsFetching( true );
+	const fetchTags = useCallback(
+		async ( advertiserId ) => {
+			setIsFetching( true );
 
-		try {
-			setTagsList();
+			try {
+				setTagsList();
 
-			const results = await apiFetch( {
-				path:
-					wcSettings.pin4wc.apiRoute +
-					'/tags/?advrtsr_id=' +
-					advertiserId,
-				method: 'GET',
+				const results = await apiFetch( {
+					path:
+						wcSettings.pin4wc.apiRoute +
+						'/tags/?advrtsr_id=' +
+						advertiserId,
+					method: 'GET',
+				} );
+
+				setTagsList( results );
+
+				if ( Object.keys( results ).length > 0 ) {
+					if ( ! appSettings?.tracking_tag ) {
+						handleOptionChange(
+							'tracking_tag',
+							Object.keys( results )[ 0 ]
+						);
+					}
+				} else {
+					setStatus( 'error' );
+				}
+
+				if ( appSettings?.tracking_tag ) {
+					setStatus( 'success' );
+				}
+			} catch ( error ) {
+				setStatus( 'error' );
+				createNotice(
+					'error',
+					error.message ||
+						__(
+							'Couldn’t retrieve your tags.',
+							'pinterest-for-woocommerce'
+						)
+				);
+			}
+
+			setIsFetching( false );
+		},
+		[
+			appSettings,
+			createNotice,
+			setIsFetching,
+			setStatus,
+			handleOptionChange,
+		]
+	);
+
+	const handleOptionChange = useCallback(
+		async ( name, value ) => {
+			if ( name === 'tracking_advertiser' ) {
+				fetchTags( value );
+			}
+
+			if (
+				appSettings?.tracking_advertiser &&
+				appSettings?.tracking_tag
+			) {
+				setStatus( 'success' );
+			} else {
+				setStatus( 'idle' );
+			}
+
+			await saveOptions( name, value );
+		},
+		[ fetchTags, setStatus, appSettings, saveOptions ]
+	);
+
+	const saveOptions = useCallback(
+		async ( name, value ) => {
+			setIsSaving( true );
+
+			const update = await setAppSettings( {
+				[ name ]: value ?? ! appSettings[ name ],
 			} );
 
-			setTagsList( results );
-
-			if ( Object.keys( results ).length > 0 ) {
-				if ( ! appSettings?.tracking_tag ) {
-					handleOptionChange(
-						'tracking_tag',
-						Object.keys( results )[ 0 ]
-					);
-				}
-			} else {
-				setStatus( 'error' );
-			}
-
-			if ( appSettings?.tracking_tag ) {
-				setStatus( 'success' );
-			}
-		} catch ( error ) {
-			setStatus( 'error' );
-			createNotice(
-				'error',
-				error.message ||
+			if ( ! update.success ) {
+				createNotice(
+					'error',
 					__(
-						'Couldn’t retrieve your tags.',
+						'There was a problem saving your settings.',
 						'pinterest-for-woocommerce'
 					)
-			);
-		}
+				);
+			}
 
-		setIsFetching( false );
-	}, [ appSettings, createNotice, setIsFetching, setStatus, handleOptionChange ]);
-
-	const handleOptionChange = useCallback( async ( name, value ) => {
-		if ( name === 'tracking_advertiser' ) {
-			fetchTags( value );
-		}
-
-		if ( appSettings?.tracking_advertiser && appSettings?.tracking_tag ) {
-			setStatus( 'success' );
-		} else {
-			setStatus( 'idle' );
-		}
-
-		await saveOptions( name, value );
-	}, [ fetchTags, setStatus, appSettings, saveOptions ] );
-
-	const saveOptions = useCallback( async ( name, value ) => {
-		setIsSaving( true );
-
-		const update = await setAppSettings( {
-			[ name ]: value ?? ! appSettings[ name ],
-		} );
-
-		if ( ! update.success ) {
-			createNotice(
-				'error',
-				__(
-					'There was a problem saving your settings.',
-					'pinterest-for-woocommerce'
-				)
-			);
-		}
-
-		setIsSaving( false );
-	}, [ appSettings, setIsSaving, createNotice, setAppSettings ]);
+			setIsSaving( false );
+		},
+		[ appSettings, setIsSaving, createNotice, setAppSettings ]
+	);
 
 	const handleTryAgain = () => {
 		setStatus( 'idle' );
