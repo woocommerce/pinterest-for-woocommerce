@@ -564,6 +564,7 @@ class ProductSync {
 			array(
 				'limit'  => -1,
 				'return' => 'ids',
+				'status' => 'publish',
 			)
 		);
 
