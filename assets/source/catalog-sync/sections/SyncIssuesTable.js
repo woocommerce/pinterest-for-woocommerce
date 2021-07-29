@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
 import { TableCard } from '@woocommerce/components';
+import { decodeEntities } from '@wordpress/html-entities';
 
 const SyncIssuesTable = ( {
 	issues,
@@ -64,7 +65,7 @@ const SyncIssuesTable = ( {
 				{
 					display: (
 						<a
-							href={ row.product_edit_link }
+							href={ decodeEntities( row.product_edit_link ) }
 							target="_blank"
 							rel="noreferrer"
 						>
