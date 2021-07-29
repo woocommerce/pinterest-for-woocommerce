@@ -179,11 +179,11 @@ const SetupTracking = ( { view } ) => {
 		async ( name, value ) => {
 			setIsSaving( true );
 
-			const update = await setAppSettings( {
-				[ name ]: value ?? ! appSettings[ name ],
-			} );
-
-			if ( ! update.success ) {
+			try {
+				await setAppSettings( {
+					[ name ]: value ?? ! appSettings[ name ],
+				} );
+			} catch ( error ) {
 				createNotice(
 					'error',
 					__(
@@ -195,7 +195,7 @@ const SetupTracking = ( { view } ) => {
 
 			setIsSaving( false );
 		},
-		[ appSettings, setIsSaving, createNotice, setAppSettings ]
+		[ appSettings, setIsSaving, setAppSettings, createNotice ]
 	);
 
 	const handleTryAgain = () => {
