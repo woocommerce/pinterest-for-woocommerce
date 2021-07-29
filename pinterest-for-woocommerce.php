@@ -93,3 +93,6 @@ require_once 'class-pinterest-for-woocommerce.php';
 function Pinterest_For_Woocommerce() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
 	return Pinterest_For_Woocommerce::instance();
 }
+
+// Global for backwards compatibility.
+$GLOBALS['pinterest_for_woocommerce'] = Pinterest_For_Woocommerce();
