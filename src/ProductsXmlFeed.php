@@ -198,7 +198,13 @@ class ProductsXmlFeed {
 			return '';
 		}
 
-		return '<' . $property . '><![CDATA[' . wp_get_attachment_image_src( $image_id )[0] . ']]></' . $property . '>';
+		$image = wp_get_attachment_image_src( $image_id, 'woocommerce_single' );
+
+		if ( ! $image ) {
+			return;
+		}
+
+		return '<' . $property . '><![CDATA[' . $image[0] . ']]></' . $property . '>';
 	}
 
 
