@@ -46,7 +46,7 @@ const MainTabNav = () => {
 		}
 
 		const dashboardLink = marketingMenu.querySelector(
-			"a[href^='admin.php?page=wc-admin&path=%2Fpinterest%2Fsettings']"
+			"a[href^='admin.php?page=wc-admin&path=%2Fpinterest%2Fcatalog']"
 		);
 
 		marketingMenu.classList.add( 'current', 'wp-has-current-submenu' );
