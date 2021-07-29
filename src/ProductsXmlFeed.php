@@ -124,7 +124,7 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_title( $product, $property ) {
-		return '<' . $property . '>' . $product->get_name() . '</' . $property . '>';
+		return '<' . $property . '><![CDATA[' . $product->get_name() . ']]></' . $property . '>';
 	}
 
 	/**
@@ -147,7 +147,7 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '>' . $description . '</' . $property . '>';
+		return '<' . $property . '><![CDATA[' . $description . ']]></' . $property . '>';
 	}
 
 	/**
