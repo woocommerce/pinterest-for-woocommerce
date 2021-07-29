@@ -17,6 +17,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { Spinner } from '@woocommerce/components';
+import { getNewPath } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
@@ -100,6 +101,13 @@ const SetupAccount = ( {
 			);
 		} else {
 			setIsConnected( false );
+
+			// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
+			const path = getNewPath( {}, '/pinterest/landing', {} );
+
+			window.location = new URL(
+				decodeEntities( wcSettings.adminUrl + path )
+			);
 		}
 	};
 

@@ -3,11 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
+import { getNewPath, getHistory } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
  */
-import App from '../setup-guide';
 import '../setup-guide/app/style.scss';
 
 /**
@@ -22,10 +22,12 @@ addFilter(
 			{
 				key: 'setup-pinterest',
 				title: __(
-					'Setup Pinterest Integration',
+					'Setup Pinterest for WooCommerce',
 					'pinterest-for-woocommerce'
 				),
-				container: <App />,
+				onClick: () => {
+					getHistory().push( getNewPath( {}, '/pinterest/landing' ) );
+				},
 				completed: wcSettings.pin4wc.isSetupComplete,
 				visible: true,
 				additionalInfo: __(

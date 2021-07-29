@@ -1,45 +1,106 @@
 /**
  * External dependencies
  */
-import { render, useEffect, useState } from '@wordpress/element';
-import { getHistory, getQuery } from '@woocommerce/navigation';
+import { __ } from '@wordpress/i18n';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import LandingPageApp from './app/views/LandingPageApp';
-import SettingsApp from './app/views/SettingsApp';
 import WizardApp from './app/views/WizardApp';
+import ConnectionApp from './app/views/ConnectionApp';
+import SettingsApp from './app/views/SettingsApp';
+import CatalogSyncApp from '../catalog-sync/App';
+
 import './app/style.scss';
 
-const App = () => {
-	const [ view, setView ] = useState( getQuery()?.view );
+addFilter(
+	'woocommerce_admin_pages_list',
+	'woocommerce-marketing',
+	( pages ) => {
+		const navigationEnabled = !! window.wcAdminFeatures?.navigation;
+		const initialBreadcrumbs = [
+			[ '', wcSettings.woocommerceTranslation ],
+		];
 
-	useEffect( () => {
-		const currentUrl = new URL( window.location.href );
-		const currentView = currentUrl.searchParams.get( 'view' );
+		/**
+		 * If the WooCommerce Navigation feature is not enabled,
+		 * we want to display the plugin under WC Marketing;
+		 * otherwise, display it under WC Navigation - Extensions.
+		 */
+		if ( ! navigationEnabled ) {
+			initialBreadcrumbs.push( [
+				'/marketing',
+				__( 'Marketing', 'pinterest-for-woocommerce' ),
+			] );
+		}
 
-		setView( currentView );
-	} );
+		initialBreadcrumbs.push(
+			__( 'Pinterest', 'pinterest-for-woocommerce' )
+		);
 
-	getHistory().listen( () => {
-		setView( getQuery()?.view );
-	} );
+		pages.push( {
+			container: LandingPageApp,
+			path: '/pinterest/landing',
+			breadcrumbs: [ 'Pinterest' ],
+			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
+			navArgs: {
+				id: 'pinterest-for-woocommerce-landing-page',
+			},
+		} );
 
-	return view === 'settings' ||
-		getQuery()?.page === 'pinterest-for-woocommerce-setup-guide' ? (
-		<SettingsApp />
-	) : view === 'wizard' ? (
-		<WizardApp />
-	) : (
-		<LandingPageApp />
-	);
-};
+		pages.push( {
+			container: WizardApp,
+			path: '/pinterest/onboarding',
+			breadcrumbs: [
+				...initialBreadcrumbs,
+				__( 'Onboarding Guide', 'pinterest-for-woocommerce' ),
+			],
+			navArgs: {
+				id: 'pinterest-for-woocommerce-setup-guide',
+			},
+		} );
 
-const appRoot = document.getElementById( 'pin4wc-setup-guide' );
+		pages.push( {
+			container: ConnectionApp,
+			path: '/pinterest/connection',
+			breadcrumbs: [
+				...initialBreadcrumbs,
+				__( 'Connection', 'pinterest-for-woocommerce' ),
+			],
+			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
+			navArgs: {
+				id: 'pinterest-for-woocommerce-connection',
+			},
+		} );
 
-if ( appRoot ) {
-	render( <App />, appRoot );
-}
+		pages.push( {
+			container: SettingsApp,
+			path: '/pinterest/settings',
+			breadcrumbs: [
+				...initialBreadcrumbs,
+				__( 'Settings', 'pinterest-for-woocommerce' ),
+			],
+			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
+			navArgs: {
+				id: 'pinterest-for-woocommerce-settings',
+			},
+		} );
 
-export default App;
+		pages.push( {
+			container: CatalogSyncApp,
+			path: '/pinterest/catalog',
+			breadcrumbs: [
+				...initialBreadcrumbs,
+				__( 'Products Catalog', 'pinterest-for-woocommerce' ),
+			],
+			wpOpenMenu: 'toplevel_page_woocommerce-marketing',
+			navArgs: {
+				id: 'pinterest-for-woocommerce-catalog',
+			},
+		} );
+
+		return pages;
+	}
+);

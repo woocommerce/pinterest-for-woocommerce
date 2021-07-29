@@ -2,7 +2,8 @@
  * External dependencies
  */
 import { sprintf, __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import {
 	Button,
@@ -12,6 +13,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { Spinner } from '@woocommerce/components';
+import { getNewPath } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
@@ -24,7 +26,7 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
-const SetupTracking = ( { goToNextStep, view } ) => {
+const SetupTracking = ( { view } ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isFetching, setIsFetching ] = useState( false );
 	const [ status, setStatus ] = useState( 'idle' );
@@ -51,9 +53,15 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 		) {
 			setStatus( 'success' );
 		}
-	}, [ appSettings, advertisersList ] );
+	}, [
+		appSettings,
+		advertisersList,
+		fetchAdvertisers,
+		isFetching,
+		tagsList,
+	] );
 
-	const fetchAdvertisers = async () => {
+	const fetchAdvertisers = useCallback( async () => {
 		setIsFetching( true );
 
 		try {
@@ -69,7 +77,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 			if ( results.advertisers.length > 0 ) {
 				if ( ! appSettings?.tracking_advertiser ) {
 					handleOptionChange(
-						'advertiser',
+						'tracking_advertiser',
 						results.advertisers[ 0 ].id
 					);
 				} else {
@@ -91,83 +99,104 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 		}
 
 		setIsFetching( false );
-	};
+	}, [ fetchTags, appSettings, createNotice, handleOptionChange ] );
 
-	const fetchTags = async ( advertiserId ) => {
-		setIsFetching( true );
+	const fetchTags = useCallback(
+		async ( advertiserId ) => {
+			setIsFetching( true );
 
-		try {
-			setTagsList();
+			try {
+				setTagsList();
 
-			const results = await apiFetch( {
-				path:
-					wcSettings.pin4wc.apiRoute +
-					'/tags/?advrtsr_id=' +
-					advertiserId,
-				method: 'GET',
+				const results = await apiFetch( {
+					path:
+						wcSettings.pin4wc.apiRoute +
+						'/tags/?advrtsr_id=' +
+						advertiserId,
+					method: 'GET',
+				} );
+
+				setTagsList( results );
+
+				if ( Object.keys( results ).length > 0 ) {
+					if ( ! appSettings?.tracking_tag ) {
+						handleOptionChange(
+							'tracking_tag',
+							Object.keys( results )[ 0 ]
+						);
+					}
+				} else {
+					setStatus( 'error' );
+				}
+
+				if ( appSettings?.tracking_tag ) {
+					setStatus( 'success' );
+				}
+			} catch ( error ) {
+				setStatus( 'error' );
+				createNotice(
+					'error',
+					error.message ||
+						__(
+							'Couldn’t retrieve your tags.',
+							'pinterest-for-woocommerce'
+						)
+				);
+			}
+
+			setIsFetching( false );
+		},
+		[
+			appSettings,
+			createNotice,
+			setIsFetching,
+			setStatus,
+			handleOptionChange,
+		]
+	);
+
+	const handleOptionChange = useCallback(
+		async ( name, value ) => {
+			if ( name === 'tracking_advertiser' ) {
+				fetchTags( value );
+			}
+
+			if (
+				appSettings?.tracking_advertiser &&
+				appSettings?.tracking_tag
+			) {
+				setStatus( 'success' );
+			} else {
+				setStatus( 'idle' );
+			}
+
+			await saveOptions( name, value );
+		},
+		[ fetchTags, setStatus, appSettings, saveOptions ]
+	);
+
+	const saveOptions = useCallback(
+		async ( name, value ) => {
+			setIsSaving( true );
+
+			const update = await setAppSettings( {
+				[ name ]: value ?? ! appSettings[ name ],
 			} );
 
-			setTagsList( results );
-
-			if ( Object.keys( results ).length > 0 ) {
-				if ( ! appSettings?.tracking_tag ) {
-					handleOptionChange( 'tag', Object.keys( results )[ 0 ] );
-				}
-			} else {
-				setStatus( 'error' );
-			}
-
-			if ( appSettings?.tracking_tag ) {
-				setStatus( 'success' );
-			}
-		} catch ( error ) {
-			setStatus( 'error' );
-			createNotice(
-				'error',
-				error.message ||
+			if ( ! update.success ) {
+				createNotice(
+					'error',
 					__(
-						'Couldn’t retrieve your tags.',
+						'There was a problem saving your settings.',
 						'pinterest-for-woocommerce'
 					)
-			);
-		}
+				);
+			}
 
-		setIsFetching( false );
-	};
-
-	const handleOptionChange = async ( name, value ) => {
-		if ( name === 'advertiser' ) {
-			fetchTags( value );
-		}
-
-		if ( appSettings?.tracking_advertiser && appSettings?.tracking_tag ) {
-			setStatus( 'success' );
-		} else {
-			setStatus( 'idle' );
-		}
-
-		saveOptions( name, value );
-	};
-
-	const saveOptions = async ( name, value ) => {
-		setIsSaving( true );
-
-		const update = await setAppSettings( {
-			[ `tracking_${ name }` ]: value,
-		} );
-
-		if ( ! update.success ) {
-			createNotice(
-				'error',
-				__(
-					'There was a problem saving your settings.',
-					'pinterest-for-woocommerce'
-				)
-			);
-		}
-
-		setIsSaving( false );
-	};
+			setIsSaving( false );
+		},
+		[ appSettings, setIsSaving, createNotice, setAppSettings ]
+	);
 
 	const handleTryAgain = () => {
 		setStatus( 'idle' );
@@ -186,17 +215,28 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 
 		const buttonLabels = {
 			error: __( 'Try Again', 'pinterest-for-woocommerce' ),
-			success: __( 'Continue', 'pinterest-for-woocommerce' ),
+			success: __( 'Complete Setup', 'pinterest-for-woocommerce' ),
 		};
 
 		return (
 			<Button
 				isPrimary
 				disabled={ isSaving }
-				onClick={ status === 'success' ? goToNextStep : handleTryAgain }
+				onClick={
+					status === 'success' ? handleCompleteSetup : handleTryAgain
+				}
 			>
 				{ buttonLabels[ status ] }
 			</Button>
+		);
+	};
+
+	const handleCompleteSetup = async () => {
+		// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
+		const path = getNewPath( {}, '/pinterest/settings', {} );
+
+		window.location = new URL(
+			decodeEntities( wcSettings.adminUrl + path )
 		);
 	};
 
@@ -277,18 +317,19 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 						undefined !== advertisersList ? (
 							<CardBody size="large">
 								{ advertisersList.length > 0 ? (
-									<div>
+									<>
 										<SelectControl
 											label={ __(
 												'Advertiser',
 												'pinterest-for-woocommerce'
 											) }
+											labelPosition="top"
 											value={
 												appSettings.tracking_advertiser
 											}
 											onChange={ ( selectedAdvertiser ) =>
 												handleOptionChange(
-													'advertiser',
+													'tracking_advertiser',
 													selectedAdvertiser
 												)
 											}
@@ -307,7 +348,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 												'pinterest-for-woocommerce'
 											) }
 										/>
-									</div>
+									</>
 								) : (
 									<>
 										<Text
@@ -350,6 +391,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 														'Tracking Tag',
 														'pinterest-for-woocommerce'
 													) }
+													labelPosition="top"
 													value={
 														appSettings.tracking_tag
 													}
@@ -357,7 +399,7 @@ const SetupTracking = ( { goToNextStep, view } ) => {
 														selectedTag
 													) =>
 														handleOptionChange(
-															'tag',
+															'tracking_tag',
 															selectedTag
 														)
 													}

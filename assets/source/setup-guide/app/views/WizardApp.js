@@ -17,7 +17,7 @@ import {
 import SetupAccount from '../steps/SetupAccount';
 import ClaimWebsite from '../steps/ClaimWebsite';
 import SetupTracking from '../steps/SetupTracking';
-import SetupPins from '../steps/SetupPins';
+import OnboardingTopBar from '../components/TopBar';
 import TransientNotices from '../components/TransientNotices';
 import {
 	useSettingsSelect,
@@ -61,11 +61,6 @@ const WizardApp = () => {
 				'Track conversions with the Pinterest tag',
 				'pinterest-for-woocommerce'
 			),
-		},
-		{
-			key: 'setup-pins',
-			container: SetupPins,
-			label: __( 'Publish Pins', 'pinterest-for-woocommerce' ),
 		},
 	];
 
@@ -132,6 +127,7 @@ const WizardApp = () => {
 
 	return (
 		<div className="woocommerce-layout">
+			<OnboardingTopBar />
 			<div className="woocommerce-layout__main woocommerce-setup-guide__main">
 				<TransientNotices />
 				{ appSettings ? (
