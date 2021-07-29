@@ -270,7 +270,9 @@ class ProductsXmlFeed {
 	private static function get_property_sale_price( $product, $property ) {
 
 		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_sale_price' ) ) {
-			$price = $product->get_variation_sale_price();
+			$regular_price = $product->get_variation_regular_price();
+			$sale_price    = $product->get_variation_sale_price();
+			$price         = $regular_price > $sale_price ? $sale_price : false;
 		} else {
 			$price = $product->get_sale_price();
 		}
