@@ -373,7 +373,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 						array(
 							'page' => 'wc-admin',
 						),
-						get_admin_url( null, 'admin.php' )
+						admin_url( 'admin.php' )
 					)
 				),
 				'serviceLoginUrl' => esc_url(
@@ -383,7 +383,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 							PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
 							'view' => 'wizard',
 						),
-						get_admin_url( null, 'admin.php' )
+						admin_url( 'admin.php' )
 					)
 				),
 				'domainToVerify'  => wp_parse_url( site_url(), PHP_URL_HOST ),

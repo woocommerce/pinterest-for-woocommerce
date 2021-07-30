@@ -140,7 +140,7 @@ class Auth extends VendorAPI {
 
 		return add_query_arg(
 			$query_args,
-			get_admin_url( null, 'admin.php' )
+			admin_url( 'admin.php' )
 		);
 	}
 }
