@@ -93,3 +93,6 @@ require_once 'class-pinterest-for-woocommerce.php';
 function Pinterest_For_Woocommerce() { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
 	return Pinterest_For_Woocommerce::instance();
 }
+
+// Initiate the plugin.
+Pinterest_For_Woocommerce();
