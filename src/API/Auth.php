@@ -121,8 +121,8 @@ class Auth extends VendorAPI {
 	/**
 	 * Returns the redirect URI based on the current request's parameters and plugin settings.
 	 *
-	 * @param string $view      The context of the view.
-	 * @param string $has_error Whether there was an error with the auth process.
+	 * @param string  $view      The context of the view.
+	 * @param boolean $has_error Whether there was an error with the auth process.
 	 *
 	 * @return string
 	 */
@@ -131,7 +131,7 @@ class Auth extends VendorAPI {
 		$query_args = array(
 			'page' => 'wc-admin',
 			'path' => '/pinterest/onboarding',
-			'step' => empty( $has_error ) ? 'claim-website' : 'setup-account',
+			'step' => $has_error ? 'setup-account' : 'claim-website',
 		);
 
 		if ( ! empty( $view ) ) {
