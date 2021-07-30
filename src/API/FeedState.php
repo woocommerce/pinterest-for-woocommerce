@@ -441,7 +441,7 @@ class FeedState extends VendorAPI {
 		}
 
 		$result['workflow'][] = array(
-			'label'        => esc_html__( 'Remote Sync Status', 'pinterest-for-woocommerce' ),
+			'label'        => esc_html__( 'Remote sync status', 'pinterest-for-woocommerce' ),
 			'status'       => $status,
 			'status_label' => $status_label,
 			'extra_info'   => $extra_info,
