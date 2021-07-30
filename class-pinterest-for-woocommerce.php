@@ -508,9 +508,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$control_key = uniqid();
 			$view        = is_null( $view ) ? 'settings' : $view;
+			$rest_url    = get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT );
 			$state       = http_build_query(
 				array(
-					'redirect' => get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT ) . '?control=' . $control_key . '&view=' . $view,
+					'redirect' => add_query_arg(
+						array(
+							'control' => $control_key,
+							'view'    => $view,
+						),
+						$rest_url
+					),
 				)
 			);
 
