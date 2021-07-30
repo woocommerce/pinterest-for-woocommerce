@@ -4,13 +4,13 @@
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
+import { Spinner } from '@woocommerce/components';
 import {
 	Button,
 	Card,
 	CardBody,
-	__experimentalText as Text,
+	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
-import { Spinner } from '@woocommerce/components';
 
 /**
  * Internal dependencies

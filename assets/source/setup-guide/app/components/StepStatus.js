@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { Icon, __experimentalText as Text } from '@wordpress/components';
 import { Spinner } from '@woocommerce/components';
+import { Icon, __experimentalText as Text } from '@wordpress/components'; // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 
 /**
  * Internal dependencies
