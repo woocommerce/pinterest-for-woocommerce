@@ -38,9 +38,9 @@ const SyncIssuesTable = ( {
 
 	const getRows = ( data ) => {
 		const statuses = {
-			success: 'green',
-			warning: 'yellow',
-			error: 'red',
+			success: 'success',
+			warning: 'warning',
+			error: 'error',
 		};
 
 		const icons = {
