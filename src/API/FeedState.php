@@ -131,7 +131,15 @@ class FeedState extends VendorAPI {
 								sprintf(
 									/* Translators: %1$s The URL of the settings page */
 									__( 'Visit the <a href="%1$s">settings</a> page to enabled it.', 'pinterest-for-woocommerce' ),
-									esc_url( add_query_arg( array( 'page' => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE ), get_admin_url( null, 'admin.php' ) ) )
+									esc_url(
+										add_query_arg(
+											array(
+												'page' => 'wc-admin',
+												'path' => '/pinterest/settings',
+											),
+											admin_url( 'admin.php' )
+										)
+									)
 								)
 							),
 						),

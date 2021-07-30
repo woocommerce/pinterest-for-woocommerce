@@ -1,42 +1,53 @@
-// Load the default @wordpress/scripts config object
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
+const WooCommerceDependencyExtractionWebpackPlugin = require( '@woocommerce/dependency-extraction-webpack-plugin' );
 
-// Use the defaultConfig but replace the entry and output properties
-const SetupGuide = {
-    ...defaultConfig,
-    entry: {
-        index: './assets/source/setup-guide/index.js',
-    },
-    output: {
-        filename: '[name].js',
-        path: __dirname + '/assets/setup-guide',
-    },
+const requestToExternal = ( request ) => {
+	// Bundle these packages & components so we can use the latest, independent of WordPress version.
+	// Without bundling these specific recent versions, components like LandingPageApp don't render correctly.
+	const bundled = [ '@wordpress/components' ];
+	if ( bundled.includes( request ) ) {
+		return false;
+	}
 };
 
-const SetupTask = {
-    ...defaultConfig,
-    entry: {
-        index: './assets/source/setup-task/index.js',
-    },
-    output: {
-        filename: '[name].js',
-        path: __dirname + '/assets/setup-task',
-    },
-};
-
-const CatalogSync = {
-    ...defaultConfig,
-    entry: {
-        index: './assets/source/catalog-sync/index.js',
-    },
-    output: {
-        filename: '[name].js',
-        path: __dirname + '/assets/catalog-sync',
-    },
-};
-
-module.exports = [
-    SetupGuide,
-    SetupTask,
-    CatalogSync
+// Replace the default DependencyExtractionWebpackPlugin with the Woo version
+// and override to bundle specific newer packages (see requestToExternal above).
+const ourPlugins = [
+	...defaultConfig.plugins.filter(
+		( plugin ) =>
+			plugin.constructor.name !== 'DependencyExtractionWebpackPlugin'
+	),
+	new WooCommerceDependencyExtractionWebpackPlugin( {
+		injectPolyfill: true, // TBD Confirm this is needed for Pinterest.
+		requestToExternal,
+	} ),
 ];
+
+// Webpack config for main admin app - onboarding and settings.
+const SetupGuide = {
+	...defaultConfig,
+	plugins: ourPlugins,
+	entry: {
+		index: './assets/source/setup-guide/index.js',
+	},
+	output: {
+		...defaultConfig.output,
+		filename: '[name].js',
+		path: __dirname + '/assets/setup-guide',
+	},
+};
+
+// Webpack config for script to add our setup task.
+const SetupTask = {
+	...defaultConfig,
+	plugins: ourPlugins,
+	entry: {
+		index: './assets/source/setup-task/index.js',
+	},
+	output: {
+		filename: '[name].js',
+		path: __dirname + '/assets/setup-task',
+	},
+};
+
+module.exports = [ SetupGuide, SetupTask ];

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { __experimentalText as Text } from '@wordpress/components';
+import { __experimentalText as Text } from '@wordpress/components'; // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 
 const StepHeader = ( { title, subtitle, description } ) => {
 	return (

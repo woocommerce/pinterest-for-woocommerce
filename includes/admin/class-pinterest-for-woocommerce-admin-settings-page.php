@@ -10,6 +10,7 @@ use Automattic\WooCommerce\Admin\Features\Features;
 use Automattic\WooCommerce\Admin\Features\Navigation\Menu;
 use Automattic\WooCommerce\Admin\Features\Navigation\Screen;
 use Automattic\WooCommerce\Admin\Features\Onboarding;
+use Automattic\WooCommerce\Admin\Loader;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -26,146 +27,203 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 * Initialize class
 		 */
 		public function __construct() {
-			add_action( 'admin_menu', array( $this, 'register_guide_page' ), 20 );
-			add_action( 'admin_enqueue_scripts', array( $this, 'load_setup_guide_scripts' ), 20 );
+			add_action( 'admin_enqueue_scripts', array( $this, 'load_setup_guide_scripts' ) );
 			add_action( 'admin_init', array( $this, 'maybe_go_to_service_login_url' ) );
 			add_filter( 'woocommerce_get_registered_extended_tasks', array( $this, 'register_task_list_item' ), 10, 1 );
 			add_filter( 'woocommerce_shared_settings', array( $this, 'component_settings' ), 20 );
 			add_filter( 'woocommerce_shared_settings', array( $this, 'landing_page_content' ), 20 );
-		}
-
-		/**
-		 * Load scripts needed for both the Wizard and the settings view.
-		 */
-		public function load_common_scripts() {
-
-			if ( $this->is_setup_guide_page() ) {
-				$handle = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE;
-			} elseif (
-				class_exists( 'Automattic\WooCommerce\Admin\Loader' ) &&
-				\Automattic\WooCommerce\Admin\Loader::is_admin_page() &&
-				Onboarding::should_show_tasks()
-				) {
-				$handle = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE . '-setup-task';
-			} else {
-				return;
-			}
-
-			$build_path = '/assets/setup-guide';
-
-			wp_register_style(
-				$handle,
-				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/style-index.css',
-				array( 'wc-admin-app' ),
-				PINTEREST_FOR_WOOCOMMERCE_VERSION
-			);
-
-			wp_enqueue_style( $handle );
-
+			add_filter( 'woocommerce_marketing_menu_items', array( $this, 'add_menu_items' ) );
+			add_action( 'admin_menu', array( $this, 'fix_menu_paths' ) );
+			add_action( 'admin_menu', array( $this, 'register_wc_admin_pages' ) );
 		}
 
 
 		/**
-		 * Register the Onboarding Guide + Settings page
+		 * Handle registration of all needed pages, depending on setup_complete status,
+		 * and wether we have the new WC nav enabled or not.
+		 *
+		 * @return void
 		 */
-		public function register_guide_page() {
+		public function register_wc_admin_pages() {
 
-			$page_title = ( isset( $_GET['view'] ) && 'wizard' === $_GET['view'] ? esc_html__( 'Pinterest Setup Guide', 'pinterest-for-woocommerce' ) : esc_html__( 'Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
+			$new_nav        = $this->is_new_nav_enabled();
+			$setup_complete = Pinterest_For_Woocommerce()::is_setup_complete();
 
-			add_submenu_page(
-				'woocommerce-marketing',
-				$page_title,
-				esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
-				'manage_woocommerce',
-				PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
-				array( $this, 'render_settings_page' ),
-				6
-			);
+			if ( $new_nav && $setup_complete ) {
 
-			if ( ! $this->is_new_nav_enabled() ) {
-				$this->connect_to_enhanced_admin();
-				return;
+				// If setup is complete, add the base menu item as a category, and the settings as the main item.
+				// Connection & catalog are added later on, for both new and old nav.
+
+				wc_admin_register_page(
+					array(
+						'id'       => 'pinterest-for-woocommerce-category',
+						'title'    => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
+						'parent'   => 'woocommerce',
+						'path'     => '/pinterest/settings',
+						'nav_args' => array(
+							'title'        => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
+							'is_category'  => true,
+							'menuId'       => 'plugins',
+							'is_top_level' => true,
+						),
+					)
+				);
+
+				wc_admin_register_page(
+					array(
+						'id'       => 'pinterest-for-woocommerce-catalog',
+						'title'    => esc_html__( 'Catalog', 'pinterest-for-woocommerce' ),
+						'parent'   => 'pinterest-for-woocommerce-category',
+						'path'     => '/pinterest/catalog',
+						'nav_args' => array(
+							'order'  => 10,
+							'parent' => 'pinterest-for-woocommerce-category',
+						),
+					)
+				);
+
+			} elseif ( $new_nav ) {
+
+				// Setup not complete. Add the Landing page as the main menu item.
+				wc_admin_register_page(
+					array(
+						'id'       => 'pinterest-for-woocommerce-landing-page',
+						'title'    => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
+						'parent'   => 'woocommerce',
+						'path'     => '/pinterest/landing',
+						'nav_args' => array(
+							'title'        => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
+							'menuId'       => 'plugins',
+							'is_top_level' => true,
+						),
+					)
+				);
+
+				// Allow rendering of the onboarding guide on a page refresh.
+				wc_admin_register_page(
+					array(
+						'id'     => 'pinterest-for-woocommerce-setup-guide',
+						'title'  => esc_html__( 'Setup Pinterest', 'pinterest-for-woocommerce' ),
+						'parent' => '',
+						'path'   => '/pinterest/onboarding',
+					)
+				);
+
 			}
 
-			add_submenu_page(
-				'woocommerce-marketing',
-				esc_html__( 'Product catalog', 'pinterest-for-woocommerce' ),
-				esc_html__( 'Pinterest product catalog', 'pinterest-for-woocommerce' ),
-				'manage_woocommerce',
-				PINTEREST_FOR_WOOCOMMERCE_CATALOG_SYNC,
-				array( $this, 'render_settings_page' ),
-				6
-			);
+			$menu_items_parent = $new_nav ? 'pinterest-for-woocommerce-category' : 'toplevel_page_woocommerce-marketing';
 
-			Menu::add_plugin_category(
-				array(
-					'id'     => 'pinterest-for-woocommerce',
-					'title'  => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
-					'parent' => 'woocommerce',
-				)
-			);
+			if ( $setup_complete ) {
 
-			Menu::add_plugin_item(
-				array(
-					'id'         => 'pin4wcCatalogSync',
-					'title'      => esc_html__( 'Product catalog', 'pinterest-for-woocommerce' ),
-					'capability' => 'manage_woocommerce',
-					'url'        => PINTEREST_FOR_WOOCOMMERCE_CATALOG_SYNC,
-					'parent'     => 'pinterest-for-woocommerce',
-				)
-			);
+				// The connection & settings pages are registered for both old & new nav, if setup is complete.
 
-			Menu::add_plugin_item(
-				array(
-					'id'         => 'pin4wcSettings',
-					'title'      => esc_html__( 'Settings', 'pinterest-for-woocommerce' ),
-					'capability' => 'manage_woocommerce',
-					'url'        => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
-					'parent'     => 'pinterest-for-woocommerce',
-				)
-			);
-		}
+				wc_admin_register_page(
+					array(
+						'id'       => 'pinterest-for-woocommerce-connection',
+						'title'    => esc_html__( 'Connection', 'pinterest-for-woocommerce' ),
+						'parent'   => $menu_items_parent,
+						'path'     => '/pinterest/connection',
+						'nav_args' => array(
+							'order'  => 50,
+							'parent' => $menu_items_parent,
+						),
+					)
+				);
 
+				wc_admin_register_page(
+					array(
+						'id'       => 'pinterest-for-woocommerce-settings',
+						'title'    => esc_html__( 'Settings', 'pinterest-for-woocommerce' ),
+						'parent'   => $menu_items_parent,
+						'path'     => '/pinterest/settings',
+						'nav_args' => array(
+							'order'  => 40,
+							'parent' => $menu_items_parent,
+						),
+					)
+				);
 
-		/**
-		 * Render the placeholder HTML for the React components
-		 */
-		public function render_settings_page() {
-
-			$tabs = array(
-				'catalog-sync' => esc_html__( 'Product catalog', 'pinterest-for-woocommerce' ),
-				'setup-guide'  => esc_html__( 'Settings', 'pinterest-for-woocommerce' ),
-			);
-
-			if ( $this->is_new_nav_enabled() ) {
-				echo '<div class="wrap">
-					<div id="pin4wc-' . esc_attr( str_replace( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-', '', $this->get_request( 'page' ) ) ) . '"></div>
-				</div>';
-				return;
 			}
 
-			$current_tab = empty( $this->get_request( 'tab' ) ) ? 'setup-guide' : $this->get_request( 'tab' );
+			if ( ! $new_nav ) {
 
-			echo '<div class="wrap">';
-			echo '<nav class="nav-tab-wrapper">';
-
-			foreach ( $tabs as $tab => $label ) {
-				echo sprintf(
-					'<a id="pin-tab-%1$s" href="%2$s" class="nav-tab %3$s">%4$s</a>',
-					esc_attr( $tab ),
-					esc_url( admin_url( 'admin.php?page=' . PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE ) . '&tab=' . $tab ),
-					esc_attr( $tab === $current_tab ? 'nav-tab-active' : '' ),
-					esc_html( $label )
+				// Allow rendering of the onboarding guide on a page refresh.
+				wc_admin_register_page(
+					array(
+						'id'     => 'pinterest-for-woocommerce-setup-guide',
+						'title'  => esc_html__( 'Setup Pinterest', 'pinterest-for-woocommerce' ),
+						'parent' => 'toplevel_page_woocommerce-marketing',
+						'path'   => '/pinterest/onboarding',
+					)
 				);
 			}
 
-			echo '</nav>';
+			if ( $setup_complete ) {
+				// Allow rendering of the landing page on a page refresh for both old & new nav, when setup is complete.
+				wc_admin_register_page(
+					array(
+						'id'     => 'pinterest-for-woocommerce-landing-page',
+						'title'  => esc_html__( 'Landing page', 'pinterest-for-woocommerce' ),
+						'parent' => '',
+						'path'   => '/pinterest/landing',
+					)
+				);
+			}
+		}
 
-			echo '<section class="tab-container">';
-			echo '	<div id="pin4wc-' . esc_attr( $current_tab ) . '"></div>';
-			echo '</section>';
-			echo '</div>';
 
+		/**
+		 * Fix sub-menu paths. wc_admin_register_page() gets it wrong.
+		 *
+		 * @return void
+		 */
+		public function fix_menu_paths() {
+			global $submenu;
+
+			if ( ! isset( $submenu['woocommerce-marketing'] ) || $this->is_new_nav_enabled() ) {
+				return;
+			}
+
+			foreach ( $submenu['woocommerce-marketing'] as &$item ) {
+				// The "slug" (aka the path) is the third item in the array.
+				if ( 0 === strpos( $item[2], 'wc-admin' ) ) {
+					$item[2] = 'admin.php?page=' . $item[2];
+				}
+			}
+		}
+
+
+		/**
+		 * Add the base menu item using the woocommerce_marketing_menu_items filter,
+		 * Depending on status of setup_complete.
+		 *
+		 * @param array $items The array of items to be filtered.
+		 *
+		 * @return array
+		 */
+		public function add_menu_items( $items ) {
+
+			if ( $this->is_new_nav_enabled() ) {
+				return $items;
+			}
+
+			if ( Pinterest_For_Woocommerce()::is_setup_complete() ) {
+				$items[] = array(
+					'id'         => 'pinterest-for-woocommerce-catalog',
+					'title'      => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
+					'path'       => '/pinterest/catalog',
+					'capability' => 'manage_woocommerce',
+				);
+			} else {
+				$items[] = array(
+					'id'         => 'pinterest-for-woocommerce-landing-page',
+					'title'      => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
+					'path'       => '/pinterest/landing',
+					'capability' => 'manage_woocommerce',
+				);
+			}
+
+			return $items;
 		}
 
 
@@ -187,19 +245,47 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 * Load the scripts needed for the setup guide / settings page.
 		 */
 		public function load_setup_guide_scripts() {
-			if ( $this->is_catalog_sync_page() ) {
-				$build_path = '/assets/catalog-sync';
-			} elseif ( $this->is_setup_guide_page() ) {
-				$build_path = '/assets/setup-guide';
-			} elseif (
-				class_exists( 'Automattic\WooCommerce\Admin\Loader' ) &&
-				\Automattic\WooCommerce\Admin\Loader::is_admin_page() &&
-				Onboarding::should_show_tasks()
-				) {
-				$build_path = '/assets/setup-task';
-			} else {
+
+			if ( ! class_exists( Loader::class ) || ! Loader::is_admin_page() ) {
 				return;
 			}
+
+			if ( Onboarding::should_show_tasks() ) {
+
+				$build_path = '/assets/setup-task';
+
+				$handle            = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE . '-setup-task';
+				$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/index.asset.php';
+				$script_info       = file_exists( $script_asset_path )
+					? include $script_asset_path
+					: array(
+						'dependencies' => array(),
+						'version'      => PINTEREST_FOR_WOOCOMMERCE_VERSION,
+					);
+
+				$script_info['dependencies'][] = 'wc-settings';
+
+				wp_register_script(
+					$handle,
+					Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/index.js',
+					$script_info['dependencies'],
+					$script_info['version'],
+					true
+				);
+
+				wp_enqueue_script( $handle );
+
+				wp_register_style(
+					$handle,
+					Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/style-index.css',
+					array( 'wc-admin-app' ),
+					PINTEREST_FOR_WOOCOMMERCE_VERSION
+				);
+
+				wp_enqueue_style( $handle );
+			}
+
+			$build_path = '/assets/setup-guide';
 
 			$handle            = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE;
 			$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/index.asset.php';
@@ -230,49 +316,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			);
 
 			wp_enqueue_style( $handle );
-		}
 
-		/**
-		 * Return if it's the Setup Guide page
-		 *
-		 * @since 1.0.0
-		 *
-		 * @return boolean
-		 */
-		protected function is_catalog_sync_page() {
-
-			return (
-				is_admin() && (
-					( ! $this->is_new_nav_enabled() && PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE === $this->get_request( 'page' ) && 'catalog-sync' === $this->get_request( 'tab' ) ) ||
-					PINTEREST_FOR_WOOCOMMERCE_CATALOG_SYNC === $this->get_request( 'page' )
-				)
+			wp_register_style(
+				PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-catalog-sync',
+				Pinterest_For_Woocommerce()->plugin_url() . '/assets/catalog-sync/style-index.css',
+				array( 'wc-admin-app' ),
+				PINTEREST_FOR_WOOCOMMERCE_VERSION
 			);
-		}
 
-		/**
-		 * Return if it's the Setup Guide page
-		 *
-		 * @since 1.0.0
-		 *
-		 * @return boolean
-		 */
-		protected function is_setup_guide_page() {
-
-			return ( is_admin() && PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE === $this->get_request( 'page' ) );
-		}
-
-		/**
-		 * Return Request value
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param string $key the key of the request parameter we need.
-		 *
-		 * @return string
-		 */
-		protected function get_request( $key ) {
-
-			return ! empty( $_REQUEST[ $key ] ) ? trim( sanitize_key( wp_unslash( $_REQUEST[ $key ] ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			wp_enqueue_style( $handle );
 
 		}
 
@@ -284,11 +336,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		public function register_task_list_item( $registered_tasks_list_items ) {
 
 			if (
-				! class_exists( 'Automattic\WooCommerce\Admin\Loader' ) ||
-				! \Automattic\WooCommerce\Admin\Loader::is_admin_page() ||
+				! class_exists( Loader::class ) ||
+				! Loader::is_admin_page() ||
 				! Onboarding::should_show_tasks()
 			) {
-				return;
+				return $registered_tasks_list_items;
 			}
 
 			$new_task_name = 'woocommerce_admin_add_task_pinterest_setup';
@@ -310,16 +362,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 * @return array
 		 */
 		public function component_settings( $settings ) {
-			if ( $this->is_catalog_sync_page() || $this->is_setup_guide_page() ) {
-				$default_view = 'settings';
-			} elseif (
-				class_exists( 'Automattic\WooCommerce\Admin\Loader' ) &&
-				\Automattic\WooCommerce\Admin\Loader::is_admin_page() &&
-				Onboarding::should_show_tasks()
-				) {
-				$default_view = 'wizard';
-			} else {
-				return $settings;
+
+			if ( ! class_exists( Loader::class ) || ! Loader::is_admin_page() ) {
+				return;
 			}
 
 			$settings['pin4wc'] = array(
@@ -328,23 +373,22 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 						array(
 							'page' => 'wc-admin',
 						),
-						get_admin_url( null, 'admin.php' )
+						admin_url( 'admin.php' )
 					)
 				),
 				'serviceLoginUrl' => esc_url(
 					add_query_arg(
 						array(
-							'page' => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
+							'page' => 'wc-admin',
 							PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
-							'view' => ( isset( $_GET['view'] ) ? sanitize_key( $_GET['view'] ) : $default_view ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
+							'view' => 'wizard',
 						),
-						get_admin_url( null, 'admin.php' )
+						admin_url( 'admin.php' )
 					)
 				),
 				'domainToVerify'  => wp_parse_url( site_url(), PHP_URL_HOST ),
 				'isConnected'     => ! empty( Pinterest_For_Woocommerce()::get_token()['access_token'] ),
 				'apiRoute'        => PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION,
-				'pageSlug'        => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
 				'optionsName'     => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,
 				'error'           => isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				'pinterestLinks'  => array(
@@ -356,7 +400,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 					'adGuidelines'     => 'https://policy.pinterest.com/en/advertising-guidelines',
 					'adDataTerms'      => 'https://policy.pinterest.com/en/ad-data-terms',
 				),
-				'isSetupComplete' => Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete' ),
+				'isSetupComplete' => Pinterest_For_Woocommerce()::is_setup_complete(),
 			);
 
 			return $settings;
@@ -371,6 +415,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 * @return array
 		 */
 		public function landing_page_content( $settings ) {
+
+			if ( ! class_exists( Loader::class ) || ! Loader::is_admin_page() ) {
+				return;
+			}
+
 			$settings['pin4wc']['landing_page'] = array(
 				'welcome'   => array(
 					'title'     => esc_html__( 'Get your products in front of more than 475M people on Pinterest', 'pinterest-for-woocommerce' ),
@@ -416,7 +465,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 */
 		public function maybe_go_to_service_login_url() {
 
-			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) || empty( $_REQUEST['page'] ) || PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE !== $_REQUEST['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
+			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				return;
 			}
 
@@ -447,27 +496,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 			$allowed_hosts[] = wp_parse_url( $service_domain, PHP_URL_HOST );
 
 			return $allowed_hosts;
-		}
-
-
-		/**
-		 * Enables enhanced admin support for the main Pinterest settings page.
-		 */
-		private function connect_to_enhanced_admin() {
-
-			if ( is_callable( 'wc_admin_connect_page' ) ) {
-
-				$page_title = 'catalog-sync' === $this->get_request( 'tab' ) ? esc_html__( 'Product catalog', 'pinterest-for-woocommerce' ) : esc_html__( 'Settings', 'pinterest-for-woocommerce' );
-
-				wc_admin_connect_page(
-					array(
-						'id'        => PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
-						'screen_id' => 'marketing_page_' . PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE,
-						'path'      => add_query_arg( 'page', PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE, 'admin.php' ),
-						'title'     => $page_title,
-					)
-				);
-			}
 		}
 	}
 

@@ -121,53 +121,26 @@ class Auth extends VendorAPI {
 	/**
 	 * Returns the redirect URI based on the current request's parameters and plugin settings.
 	 *
-	 * @param string $view      The context of the view.
-	 * @param string $has_error Whether there was an error with the auth process.
+	 * @param string  $view      The context of the view.
+	 * @param boolean $has_error Whether there was an error with the auth process.
 	 *
 	 * @return string
 	 */
 	private function get_redirect_url( $view = null, $has_error = false ) {
 
-		$redirect_url            = admin_url( 'admin.php?page=' . \PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE );
-		$is_setup_complete       = Pinterest_For_Woocommerce()::get_setting( 'is_setup_complete', true );
-		$dismissed_wc_tasks      = get_option( 'woocommerce_task_list_dismissed_tasks' );
-		$is_setup_task_dismissed = ! empty( $dismissed_wc_tasks ) && is_array( $dismissed_wc_tasks ) && in_array( 'setup-pinterest', $dismissed_wc_tasks, true );
-
-		// If the setup task is dismissed, we cannot go to WC-Admin, so go to settings.
-		if ( $is_setup_task_dismissed ) {
-			return $redirect_url;
-		}
-
-		// If started on settings, go back to settings.
-		if ( ! empty( $view ) && 'settings' === $view ) {
-			return $redirect_url;
-		}
-
-		// If we have already completed onboarding, go to settings.
-		if ( $is_setup_complete ) {
-			return $redirect_url;
-		}
-
-		// Go to WC-Admin to render our App there.
-		$step         = empty( $has_error ) ? 'claim-website' : 'setup-account';
-		$redirect_url = add_query_arg(
-			array(
-				'page' => 'wc-admin',
-				'task' => 'setup-pinterest',
-				'step' => $step,
-			),
-			get_admin_url( null, 'admin.php' )
+		$query_args = array(
+			'page' => 'wc-admin',
+			'path' => '/pinterest/onboarding',
+			'step' => $has_error ? 'setup-account' : 'claim-website',
 		);
 
 		if ( ! empty( $view ) ) {
-			$redirect_url = add_query_arg(
-				array(
-					'view' => sanitize_key( $view ),
-				),
-				$redirect_url
-			);
+			$query_args['view'] = sanitize_key( $view );
 		}
 
-		return $redirect_url;
+		return add_query_arg(
+			$query_args,
+			admin_url( 'admin.php' )
+		);
 	}
 }

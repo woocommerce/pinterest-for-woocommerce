@@ -26,10 +26,10 @@ const SyncStateTable = ( { workflow } ) => {
 
 	const getRows = ( data ) => {
 		const statuses = {
-			success: 'green',
-			pending: 'yellow',
-			warning: 'yellow',
-			error: 'red',
+			success: 'success',
+			pending: 'warning',
+			warning: 'warning',
+			error: 'error',
 		};
 
 		const icons = {

@@ -51,7 +51,7 @@ export const getSettingsUpdatingError = ( state ) => {
  * @param {Object} state - Reducer state
  */
 export const isDomainVerified = ( state ) => {
-	if ( undefined === state?.settings ) {
+	if ( undefined === state?.settings?.account_data ) {
 		return;
 	}
 

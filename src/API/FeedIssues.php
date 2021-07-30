@@ -71,7 +71,7 @@ class FeedIssues extends VendorAPI {
 
 		try {
 
-			if ( ! Pinterest\ProductSync::is_product_sync_enabled() ) {
+			if ( ! Pinterest\ProductSync::is_product_sync_enabled() || ! Pinterest\ProductSync::is_feed_registered() ) {
 				return array( 'lines' => array() );
 			}
 
