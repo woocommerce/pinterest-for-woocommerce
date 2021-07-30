@@ -465,7 +465,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 */
 		public function maybe_go_to_service_login_url() {
 
-			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) || ! class_exists( Loader::class ) || ! Loader::is_admin_page() ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
+			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				return;
 			}
 
