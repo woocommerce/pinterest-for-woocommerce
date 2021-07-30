@@ -94,5 +94,5 @@ function Pinterest_For_Woocommerce() { // phpcs:ignore WordPress.NamingConventio
 	return Pinterest_For_Woocommerce::instance();
 }
 
-// Global for backwards compatibility.
-$GLOBALS['pinterest_for_woocommerce'] = Pinterest_For_Woocommerce();
+// Initiate the plugin.
+Pinterest_For_Woocommerce();

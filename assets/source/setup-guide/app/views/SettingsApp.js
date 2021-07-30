@@ -3,7 +3,6 @@
  */
 import '@wordpress/notices';
 import { Spinner } from '@woocommerce/components';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,16 +22,6 @@ import NavigationClassic from '../../../components/navigation-classic';
 
 const SettingsApp = () => {
 	const appSettings = useSettingsSelect();
-	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
-	const isTrackingConfigured = useSettingsSelect( 'isTrackingConfigured' );
-
-	const [ isConnected, setIsConnected ] = useState(
-		wcSettings.pin4wc.isConnected
-	);
-
-	const isGroup1Visible = isConnected;
-	const isGroup2Visible = isGroup1Visible && isDomainVerified;
-	const isGroup3Visible = isGroup2Visible && isTrackingConfigured;
 
 	useBodyClasses();
 	useCreateNotice()( wcSettings.pin4wc.error );
@@ -45,14 +34,12 @@ const SettingsApp = () => {
 				<TransientNotices />
 				{ appSettings ? (
 					<div className="woocommerce-setup-guide__container">
-						{ isGroup3Visible && (
-							<>
-								<SetupProductSync view="settings" />
-								<SetupPins view="settings" />
-								<AdvancedSettings view="settings" />
-								<SaveSettingsButton />
-							</>
-						) }
+						<>
+							<SetupProductSync view="settings" />
+							<SetupPins view="settings" />
+							<AdvancedSettings view="settings" />
+							<SaveSettingsButton />
+						</>
 					</div>
 				) : (
 					<Spinner />

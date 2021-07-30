@@ -5,16 +5,16 @@ import { sprintf, __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
+import { Spinner } from '@woocommerce/components';
+import { getNewPath } from '@woocommerce/navigation';
 import {
 	Button,
 	Card,
 	CardBody,
 	SelectControl,
 	CheckboxControl,
-	__experimentalText as Text,
+	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
-import { Spinner } from '@woocommerce/components';
-import { getNewPath } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies

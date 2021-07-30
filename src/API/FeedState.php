@@ -137,7 +137,7 @@ class FeedState extends VendorAPI {
 												'page' => 'wc-admin',
 												'path' => '/pinterest/settings',
 											),
-											get_admin_url( null, 'admin.php' )
+											admin_url( 'admin.php' )
 										)
 									)
 								)

@@ -10,6 +10,7 @@ use Automattic\WooCommerce\Admin\Features\Features;
 use Automattic\WooCommerce\Admin\Features\Navigation\Menu;
 use Automattic\WooCommerce\Admin\Features\Navigation\Screen;
 use Automattic\WooCommerce\Admin\Features\Onboarding;
+use Automattic\WooCommerce\Admin\Loader;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -70,12 +71,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 				wc_admin_register_page(
 					array(
-						'id'       => 'pinterest-for-woocommerce-settings',
-						'title'    => esc_html__( 'Settings', 'pinterest-for-woocommerce' ),
+						'id'       => 'pinterest-for-woocommerce-catalog',
+						'title'    => esc_html__( 'Catalog', 'pinterest-for-woocommerce' ),
 						'parent'   => 'pinterest-for-woocommerce-category',
-						'path'     => '/pinterest/settings',
+						'path'     => '/pinterest/catalog',
 						'nav_args' => array(
-							'order'  => 40,
+							'order'  => 10,
 							'parent' => 'pinterest-for-woocommerce-category',
 						),
 					)
@@ -114,7 +115,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 			if ( $setup_complete ) {
 
-				// The connection & catalog pages are registered for both old & new nav, if setup is complete.
+				// The connection & settings pages are registered for both old & new nav, if setup is complete.
 
 				wc_admin_register_page(
 					array(
@@ -131,12 +132,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 				wc_admin_register_page(
 					array(
-						'id'       => 'pinterest-for-woocommerce-catalog',
-						'title'    => esc_html__( 'Catalog', 'pinterest-for-woocommerce' ),
+						'id'       => 'pinterest-for-woocommerce-settings',
+						'title'    => esc_html__( 'Settings', 'pinterest-for-woocommerce' ),
 						'parent'   => $menu_items_parent,
-						'path'     => '/pinterest/catalog',
+						'path'     => '/pinterest/settings',
 						'nav_args' => array(
-							'order'  => 10,
+							'order'  => 40,
 							'parent' => $menu_items_parent,
 						),
 					)
@@ -208,9 +209,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 			if ( Pinterest_For_Woocommerce()::is_setup_complete() ) {
 				$items[] = array(
-					'id'         => 'pinterest-for-woocommerce-settings',
+					'id'         => 'pinterest-for-woocommerce-catalog',
 					'title'      => esc_html__( 'Pinterest', 'pinterest-for-woocommerce' ),
-					'path'       => '/pinterest/settings',
+					'path'       => '/pinterest/catalog',
 					'capability' => 'manage_woocommerce',
 				);
 			} else {
@@ -245,7 +246,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 */
 		public function load_setup_guide_scripts() {
 
-			if ( ! class_exists( 'Automattic\WooCommerce\Admin\Loader' ) || ! \Automattic\WooCommerce\Admin\Loader::is_admin_page() ) {
+			if ( ! class_exists( Loader::class ) || ! Loader::is_admin_page() ) {
 				return;
 			}
 
@@ -335,8 +336,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		public function register_task_list_item( $registered_tasks_list_items ) {
 
 			if (
-				! class_exists( 'Automattic\WooCommerce\Admin\Loader' ) ||
-				! \Automattic\WooCommerce\Admin\Loader::is_admin_page() ||
+				! class_exists( Loader::class ) ||
+				! Loader::is_admin_page() ||
 				! Onboarding::should_show_tasks()
 			) {
 				return $registered_tasks_list_items;
@@ -362,7 +363,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 */
 		public function component_settings( $settings ) {
 
-			if ( ! class_exists( 'Automattic\WooCommerce\Admin\Loader' ) || ! \Automattic\WooCommerce\Admin\Loader::is_admin_page() ) {
+			if ( ! class_exists( Loader::class ) || ! Loader::is_admin_page() ) {
 				return;
 			}
 
@@ -372,7 +373,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 						array(
 							'page' => 'wc-admin',
 						),
-						get_admin_url( null, 'admin.php' )
+						admin_url( 'admin.php' )
 					)
 				),
 				'serviceLoginUrl' => esc_url(
@@ -382,7 +383,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 							PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
 							'view' => 'wizard',
 						),
-						get_admin_url( null, 'admin.php' )
+						admin_url( 'admin.php' )
 					)
 				),
 				'domainToVerify'  => wp_parse_url( site_url(), PHP_URL_HOST ),
@@ -416,7 +417,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 */
 		public function landing_page_content( $settings ) {
 
-			if ( ! class_exists( 'Automattic\WooCommerce\Admin\Loader' ) || ! \Automattic\WooCommerce\Admin\Loader::is_admin_page() ) {
+			if ( ! class_exists( Loader::class ) || ! Loader::is_admin_page() ) {
 				return;
 			}
 
@@ -465,7 +466,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 		 */
 		public function maybe_go_to_service_login_url() {
 
-			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) || ! class_exists( 'Automattic\WooCommerce\Admin\Loader' ) || ! \Automattic\WooCommerce\Admin\Loader::is_admin_page() ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
+			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				return;
 			}
 

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { getNewPath, getHistory } from '@woocommerce/navigation';
 import {
 	Button,
 	Card,
@@ -10,9 +11,8 @@ import {
 	Panel,
 	PanelBody,
 	PanelRow,
-	__experimentalText as Text,
+	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
-import { getNewPath, getHistory } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies

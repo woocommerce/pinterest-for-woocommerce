@@ -27,8 +27,8 @@ const TopBar = ( { title, backHref, helpButton, onBackButtonClick } ) => {
 					<Icon icon={ chevronLeft } onClick={ onBackButtonClick } />
 				</Link>
 				<div className="woocommerce-layout__header-heading with-back-button">
-					<span className="title">{ title }</span>
-					<div className="actions">{ helpButton }</div>
+					<span>{ title }</span>
+					<div>{ helpButton }</div>
 				</div>
 			</div>
 		</div>

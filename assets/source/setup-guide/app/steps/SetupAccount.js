@@ -5,6 +5,8 @@ import { sprintf, __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
+import { Spinner } from '@woocommerce/components';
+import { getNewPath } from '@woocommerce/navigation';
 import {
 	Button,
 	Card,
@@ -14,10 +16,8 @@ import {
 	FlexItem,
 	FlexBlock,
 	Modal,
-	__experimentalText as Text,
+	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
-import { Spinner } from '@woocommerce/components';
-import { getNewPath } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
@@ -163,7 +163,7 @@ const SetupAccount = ( {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{ isConnected === true ? (
+							{ isConnected === true ? ( // eslint-disable-line no-nested-ternary --- Code is reasonable readable
 								<Flex>
 									<FlexBlock className="is-connected">
 										<Text variant="subtitle">
