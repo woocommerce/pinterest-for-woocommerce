@@ -279,14 +279,17 @@ class FeedState extends VendorAPI {
 				case 'approved':
 					$status       = 'success';
 					$status_label = esc_html__( 'Product feed configured for Ingestion on Pinterest', 'pinterest-for-woocommerce' );
-					$extra_info   = wp_kses_post(
-						sprintf(
-							/* Translators: %1$s The URL of the product feed, %2$s Time string */
+
+					if ( ! empty( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq ) ) {
+						$extra_info   = wp_kses_post(
+							sprintf(
+								/* Translators: %1$s The URL of the product feed, %2$s Time string */
 							__( 'Pinterest will fetch your <a href="%1$s" target="_blank">product\'s feed URL</a> every %2$s', 'pinterest-for-woocommerce' ),
-							$merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location,
-							human_time_diff( 0, ( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq / 1000 ) )
-						)
-					);
+								$merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location,
+								human_time_diff( 0, ( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq / 1000 ) )
+							)
+						);
+					}
 
 					break;
 				case 'pending':
