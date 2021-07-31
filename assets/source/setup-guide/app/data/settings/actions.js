@@ -50,6 +50,8 @@ export function* updateSettings( data, saveToDb = false ) {
 	yield setIsUpdating( true );
 	const settings = yield select( STORE_NAME ).getSettings();
 
+	dispatch( REPORTS_STORE_NAME ).receiveFeedState( false ); // Reset issues
+	dispatch( REPORTS_STORE_NAME ).receiveFeedIssues( false ); // Reset issues
 	dispatch( REPORTS_STORE_NAME ).invalidateResolutionForStore();
 
 	try {
