@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { select } from '@wordpress/data';
+import { select, dispatch } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
+import { REPORTS_STORE_NAME } from '../../../../catalog-sync/data';
 
 /**
  * Internal dependencies
@@ -48,6 +49,8 @@ export function* updateSettings( data, saveToDb = false ) {
 
 	yield setIsUpdating( true );
 	const settings = yield select( STORE_NAME ).getSettings();
+
+	dispatch( REPORTS_STORE_NAME ).invalidateResolutionForStore();
 
 	try {
 		const results = yield apiFetch( {
