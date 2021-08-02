@@ -50,10 +50,6 @@ export function* updateSettings( data, saveToDb = false ) {
 	yield setIsUpdating( true );
 	const settings = yield select( STORE_NAME ).getSettings();
 
-	dispatch( REPORTS_STORE_NAME ).receiveFeedState( false ); // Reset issues
-	dispatch( REPORTS_STORE_NAME ).receiveFeedIssues( false ); // Reset issues
-	dispatch( REPORTS_STORE_NAME ).invalidateResolutionForStore();
-
 	try {
 		const results = yield apiFetch( {
 			path: WC_ADMIN_NAMESPACE + '/options',
@@ -62,6 +58,10 @@ export function* updateSettings( data, saveToDb = false ) {
 				[ OPTIONS_NAME ]: settings,
 			},
 		} );
+
+		dispatch( REPORTS_STORE_NAME ).receiveFeedState( false ); // Reset issues
+		dispatch( REPORTS_STORE_NAME ).receiveFeedIssues( false ); // Reset issues
+		dispatch( REPORTS_STORE_NAME ).invalidateResolutionForStore();
 
 		yield setIsUpdating( false );
 		return { success: results[ OPTIONS_NAME ] };
