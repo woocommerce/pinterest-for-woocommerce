@@ -3,13 +3,13 @@
  */
 import { select, dispatch } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
-import { REPORTS_STORE_NAME } from '../../../../catalog-sync/data';
 
 /**
  * Internal dependencies
  */
 import TYPES from './action-types';
 import { STORE_NAME, WC_ADMIN_NAMESPACE, OPTIONS_NAME } from './constants';
+import { REPORTS_STORE_NAME } from '../../../../catalog-sync/data';
 
 export function receiveSettings( settings ) {
 	return {
