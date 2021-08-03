@@ -20,6 +20,14 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       pinterest-for-woocommerce
  * Domain Path:       /i18n/languages
+ *
+ * Requires at least: 5.6
+ * Tested up to: 5.8
+ * Requires PHP: 7.2
+ *
+ * WC requires at least: 5.3
+ * WC tested up to: 5.5
+ *
  */
 
 // If this file is called directly, abort.
