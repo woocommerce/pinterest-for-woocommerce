@@ -27,7 +27,6 @@
  *
  * WC requires at least: 5.3
  * WC tested up to: 5.5
- *
  */
 
 // If this file is called directly, abort.
