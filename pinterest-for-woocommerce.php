@@ -1,12 +1,5 @@
 <?php
 /**
- * The plugin bootstrap file
- *
- * This file is read by WordPress to generate the plugin information in the plugin
- * admin area. This file also includes all of the dependencies used by the plugin,
- * registers the activation and deactivation functions, and defines a function
- * that starts the plugin.
- *
  * @link              https://woocommerce.com
  * @since             1.0.0
  * @package           woocommerce/pinterest-for-woocommerce
@@ -14,9 +7,9 @@
  * @wordpress-plugin
  * Plugin Name:       Pinterest for WooCommerce
  * Plugin URI:        https://woocommerce.com
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Description:       Grow your business on Pinterest! Use this official plugin to allow shoppers to Pin products while browsing your store, track conversions, and advertise on Pinterest.
  * Version:           0.9.0
- * Author:            WooCommece
+ * Author:            WooCommerce
  * Author URI:        https://woocommerce.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
