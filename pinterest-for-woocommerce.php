@@ -11,7 +11,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Pinterest for WooCommerce
- * Plugin URI:        https://woocommerce.com
+ * Plugin URI:        https://woocommerce.com/products/pinterest-for-woocommerce/
  * Description:       Grow your business on Pinterest! Use this official plugin to allow shoppers to Pin products while browsing your store, track conversions, and advertise on Pinterest.
  * Version:           0.9.0
  * Author:            WooCommerce
