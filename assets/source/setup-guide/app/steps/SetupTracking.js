@@ -3,7 +3,12 @@
  */
 import { sprintf, __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useCallback,
+	createInterpolateElement,
+} from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@woocommerce/components';
 import { getNewPath } from '@woocommerce/navigation';
@@ -376,28 +381,26 @@ const SetupTracking = ( { view } ) => {
 										</Text>
 
 										<CheckboxControl
-											label={
-												<>
-													{ __(
-														'I accept the',
-														'pinterest-for-woocommerce'
-													) }{ ' ' }
-													<Button
-														isLink
-														href={
-															wcSettings.pin4wc
-																.countryTos
-																.terms_url
-														}
-														target="_blank"
-													>
-														{ __(
-															'Pinterest Advertising Agreement',
-															'pinterest-for-woocommerce'
-														) }
-													</Button>
-												</>
-											}
+											label={ createInterpolateElement(
+												__(
+													'I accept the <link>Pinterest Advertising Agreement</link>',
+													'pinterest-for-woocommerce'
+												),
+												{
+													link: (
+														<Button
+															isLink
+															href={
+																wcSettings
+																	.pin4wc
+																	.countryTos
+																	.terms_url
+															}
+															target="_blank"
+														></Button>
+													),
+												}
+											) }
 											checked={ termsAgreed }
 											className="woocommerce-setup-guide__checkbox-group"
 											onChange={ ( agreed ) =>
