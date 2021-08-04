@@ -46,6 +46,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		);
 
 		/**
+		 * Set the minimum required versions for the plugin.
+		 */
+		const PLUGIN_REQUIREMENTS = array(
+			'php_version' => '7.2',
+			'wp_version'  => '5.6',
+			'wc_version'  => '5.3',
+		);
+
+		/**
 		 * Pinterest_For_Woocommerce version.
 		 *
 		 * @var string
@@ -108,7 +117,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function instance() {
 			if ( is_null( self::$instance ) ) {
 				self::$instance = new self();
-				self::$instance->initalize_plugin();
+				self::$instance->maybe_init_plugin();
 			}
 			return self::$instance;
 		}
@@ -134,7 +143,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Pinterest_For_Woocommerce Initializer.
 		 */
-		public function initalize_plugin() {
+		public function maybe_init_plugin() {
 			if ( self::$initialized ) {
 				_doing_it_wrong( __FUNCTION__, esc_html__( 'Only a single instance of this class is allowed. Use singleton.', 'pinterest-for-woocommerce' ), '1.0.0' );
 				return;
@@ -143,11 +152,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			self::$initialized = true;
 
 			$this->define_constants();
-			$this->includes();
-			$this->init_hooks();
+
+			add_action( 'plugins_loaded', array( $this, 'init_plugin' ) );
 
 			do_action( 'pinterest_for_woocommerce_loaded' );
 		}
+
 
 		/**
 		 * Define Pinterest_For_Woocommerce Constants.
@@ -204,11 +214,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Hook into actions and filters.
+		 * Include plugins files and hook into actions and filters.
 		 *
 		 * @since  1.0.0
 		 */
-		private function init_hooks() {
+		public function init_plugin() {
+
+			if ( ! $this->check_plugin_requirements() ) {
+				return;
+			}
+
+			$this->includes();
+
 			add_action( 'init', array( $this, 'init' ), 0 );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
@@ -241,6 +258,61 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Init action.
 			do_action( 'pinterest_for_woocommerce_init' );
+		}
+
+
+		/**
+		 * Checks all plugin requirements. If run in admin context also adds a notice.
+		 *
+		 * @return boolean
+		 */
+		public function check_plugin_requirements() {
+
+			$errors = array();
+			global $wp_version;
+
+			if ( ! version_compare( PHP_VERSION, self::PLUGIN_REQUIREMENTS['php_version'], '>=' ) ) {
+				/* Translators: The minimum PHP version */
+				$errors[] = sprintf( esc_html__( 'Pinterest For WooCommerce requires a minimum PHP version of %s.', 'pinterest-for-woocommerce' ), self::PLUGIN_REQUIREMENTS['php_version'] );
+			}
+
+			if ( ! version_compare( $wp_version, self::PLUGIN_REQUIREMENTS['wp_version'], '>=' ) ) {
+				/* Translators: The minimum WP version */
+				$errors[] = sprintf( esc_html__( 'Pinterest For WooCommerce requires a minimum WordPress version of %s.', 'pinterest-for-woocommerce' ), self::PLUGIN_REQUIREMENTS['wp_version'] );
+			}
+
+			if ( ! defined( 'WC_VERSION' ) || ! version_compare( WC_VERSION, self::PLUGIN_REQUIREMENTS['wc_version'], '>=' ) ) {
+				/* Translators: The minimum WC version */
+				$errors[] = sprintf( esc_html__( 'Pinterest For WooCommerce requires a minimum WooCommerce version of %s.', 'pinterest-for-woocommerce' ), self::PLUGIN_REQUIREMENTS['wc_version'] );
+			}
+
+			if ( apply_filters( 'woocommerce_admin_disabled', false ) ) {
+				$errors[] = esc_html__( 'Pinterest For WooCommerce requires WooCommerce Admin to be enabled.', 'pinterest-for-woocommerce' );
+			}
+
+			if ( empty( $errors ) ) {
+				return true;
+			}
+
+			if ( $this->is_request( 'admin' ) ) {
+				add_action(
+					'admin_notices',
+					function() use ( $errors ) {
+						?>
+						<div class="notice notice-error">
+							<?php
+							foreach ( $errors as $error ) {
+								echo '<p>' . esc_html( $error ) . '</p>';
+							}
+							?>
+						</div>
+						<?php
+					}
+				);
+				return;
+			}
+
+			return false;
 		}
 
 		/**
