@@ -31,7 +31,7 @@ const SetupTracking = ( { view } ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isFetching, setIsFetching ] = useState( false );
 	const [ status, setStatus ] = useState( 'idle' );
-	const [ TermsAgreed, setTermsAgreed ] = useState( false );
+	const [ termsAgreed, setTermsAgreed ] = useState( false );
 	const [ advertisersList, setAdvertisersList ] = useState();
 	const [ tagsList, setTagsList ] = useState();
 	const appSettings = useSettingsSelect();
@@ -73,7 +73,7 @@ const SetupTracking = ( { view } ) => {
 				path:
 					wcSettings.pin4wc.apiRoute +
 					'/advertisers/?terms_agreed=' +
-					TermsAgreed,
+					termsAgreed,
 				method: 'GET',
 			} );
 
@@ -110,7 +110,7 @@ const SetupTracking = ( { view } ) => {
 		appSettings,
 		createNotice,
 		handleOptionChange,
-		TermsAgreed,
+		termsAgreed,
 		setTermsAgreed,
 	] );
 
@@ -235,7 +235,7 @@ const SetupTracking = ( { view } ) => {
 		return (
 			<Button
 				isPrimary
-				disabled={ isSaving || ! TermsAgreed }
+				disabled={ isSaving || ! termsAgreed }
 				onClick={
 					status === 'success' ? handleCompleteSetup : handleTryAgain
 				}
@@ -398,7 +398,7 @@ const SetupTracking = ( { view } ) => {
 													</Button>
 												</>
 											}
-											checked={ TermsAgreed }
+											checked={ termsAgreed }
 											className="woocommerce-setup-guide__checkbox-group"
 											onChange={ ( agreed ) =>
 												setTermsAgreed(
