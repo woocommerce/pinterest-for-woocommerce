@@ -21,7 +21,7 @@ const SyncStateSummary = ( { overview } ) => {
 			<SummaryNumber
 				key="not-synced"
 				value={ data?.not_synced ?? defaultValue }
-				label={ __( 'Not Synced', 'pinterest-for-woocommerce' ) }
+				label={ __( 'Not synced', 'pinterest-for-woocommerce' ) }
 			/>,
 			<SummaryNumber
 				key="with-warnings"

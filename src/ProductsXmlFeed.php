@@ -124,7 +124,7 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_title( $product, $property ) {
-		return '<' . $property . '>' . $product->get_name() . '</' . $property . '>';
+		return '<' . $property . '><![CDATA[' . $product->get_name() . ']]></' . $property . '>';
 	}
 
 	/**
@@ -147,7 +147,7 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '>' . $description . '</' . $property . '>';
+		return '<' . $property . '><![CDATA[' . $description . ']]></' . $property . '>';
 	}
 
 	/**
@@ -198,7 +198,13 @@ class ProductsXmlFeed {
 			return '';
 		}
 
-		return '<' . $property . '><![CDATA[' . wp_get_attachment_image_src( $image_id )[0] . ']]></' . $property . '>';
+		$image = wp_get_attachment_image_src( $image_id, 'woocommerce_single' );
+
+		if ( ! $image ) {
+			return;
+		}
+
+		return '<' . $property . '><![CDATA[' . $image[0] . ']]></' . $property . '>';
 	}
 
 
@@ -264,7 +270,9 @@ class ProductsXmlFeed {
 	private static function get_property_sale_price( $product, $property ) {
 
 		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_sale_price' ) ) {
-			$price = $product->get_variation_sale_price();
+			$regular_price = $product->get_variation_regular_price();
+			$sale_price    = $product->get_variation_sale_price();
+			$price         = $regular_price > $sale_price ? $sale_price : false;
 		} else {
 			$price = $product->get_sale_price();
 		}

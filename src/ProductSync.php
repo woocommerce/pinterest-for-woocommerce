@@ -560,10 +560,19 @@ class ProductSync {
 	 */
 	private static function get_product_ids_for_feed() {
 
+		$excluded_product_types = apply_filters(
+			'pinterest_for_woocommerce_excluded_product_types',
+			array(
+				'grouped',
+			)
+		);
+
 		$product_ids = wc_get_products(
 			array(
 				'limit'  => -1,
 				'return' => 'ids',
+				'status' => 'publish',
+				'type'   => array_diff( array_merge( array_keys( wc_get_product_types() ) ), $excluded_product_types ),
 			)
 		);
 
