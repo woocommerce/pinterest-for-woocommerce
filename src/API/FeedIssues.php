@@ -148,10 +148,10 @@ class FeedIssues extends VendorAPI {
 
 		if ( $product->get_parent_id() ) {
 			$product_name .= ' ' . esc_html__( '(Variation)', 'pinterest-for-woocommerce' );
-			$edit_link     = get_edit_post_link( $product->get_parent_id() );
+			$edit_link     = get_edit_post_link( $product->get_parent_id(), 'not_display' ); // get_edit_post_link() will return '&' instead of  '&amp;' for anything other than the 'display' context.
 		}
 
-		$edit_link = empty( $edit_link ) && $product ? get_edit_post_link( $product->get_id() ) : $edit_link;
+		$edit_link = empty( $edit_link ) && $product ? get_edit_post_link( $product->get_id(), 'not_display' ) : $edit_link; // get_edit_post_link() will return '&' instead of  '&amp;' for anything other than the 'display' context.
 
 		return array(
 			'status'            => 'ERROR' === $line['Code'] ? 'error' : 'warning',
