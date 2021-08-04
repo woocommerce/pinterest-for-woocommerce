@@ -1,6 +1,6 @@
 <?php
 /**
- * Settings Page
+ * Handle Admin init.
  *
  * @package     Pinterest/Admin
  * @version     1.0.0
@@ -16,12 +16,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
+if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 	/**
 	 * Class handling the settings page and onboarding Wizard registration and rendering.
 	 */
-	class Pinterest_For_Woocommerce_Admin_Settings_Page {
+	class Pinterest_For_Woocommerce_Admin {
 
 		/**
 		 * Initialize class
@@ -502,4 +502,4 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 
 endif;
 
-return new Pinterest_For_Woocommerce_Admin_Settings_Page();
+return new Pinterest_For_Woocommerce_Admin();
