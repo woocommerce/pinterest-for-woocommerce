@@ -12,6 +12,7 @@ import {
 	Card,
 	CardBody,
 	SelectControl,
+	CheckboxControl,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
@@ -30,6 +31,7 @@ const SetupTracking = ( { view } ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isFetching, setIsFetching ] = useState( false );
 	const [ status, setStatus ] = useState( 'idle' );
+	const [ TermsAgreed, setTermsAgreed ] = useState( false );
 	const [ advertisersList, setAdvertisersList ] = useState();
 	const [ tagsList, setTagsList ] = useState();
 	const appSettings = useSettingsSelect();
@@ -68,7 +70,10 @@ const SetupTracking = ( { view } ) => {
 			setAdvertisersList();
 
 			const results = await apiFetch( {
-				path: wcSettings.pin4wc.apiRoute + '/advertisers',
+				path:
+					wcSettings.pin4wc.apiRoute +
+					'/advertisers/?terms_agreed=' +
+					TermsAgreed,
 				method: 'GET',
 			} );
 
@@ -83,8 +88,9 @@ const SetupTracking = ( { view } ) => {
 				} else {
 					fetchTags( appSettings?.tracking_advertiser );
 				}
+				setTermsAgreed( true );
 			} else {
-				setStatus( 'error' );
+				setStatus( 'notAgreed' );
 			}
 		} catch ( error ) {
 			setStatus( 'error' );
@@ -99,7 +105,14 @@ const SetupTracking = ( { view } ) => {
 		}
 
 		setIsFetching( false );
-	}, [ fetchTags, appSettings, createNotice, handleOptionChange ] );
+	}, [
+		fetchTags,
+		appSettings,
+		createNotice,
+		handleOptionChange,
+		TermsAgreed,
+		setTermsAgreed,
+	] );
 
 	const fetchTags = useCallback(
 		async ( advertiserId ) => {
@@ -214,6 +227,7 @@ const SetupTracking = ( { view } ) => {
 		}
 
 		const buttonLabels = {
+			notAgreed: __( 'Continue', 'pinterest-for-woocommerce' ),
 			error: __( 'Try Again', 'pinterest-for-woocommerce' ),
 			success: __( 'Complete Setup', 'pinterest-for-woocommerce' ),
 		};
@@ -221,7 +235,7 @@ const SetupTracking = ( { view } ) => {
 		return (
 			<Button
 				isPrimary
-				disabled={ isSaving }
+				disabled={ isSaving || ! TermsAgreed }
 				onClick={
 					status === 'success' ? handleCompleteSetup : handleTryAgain
 				}
@@ -356,28 +370,46 @@ const SetupTracking = ( { view } ) => {
 											className="text-margin"
 										>
 											{ __(
-												'Tracking cannot be configured automatically.',
+												'In order to proceed you need to read and accept the contents of the Pinterest Advertising Agreement.',
 												'pinterest-for-woocommerce'
 											) }
 										</Text>
-										<Text
-											variant="body"
-											className="text-margin"
-										>
-											{ __(
-												'Please visit your Pinterest Dashboard and click “Create Ad”.',
-												'pinterest-for-woocommerce'
-											) }
-										</Text>
-										<Text
-											variant="body"
-											className="text-margin"
-										>
-											{ __(
-												'After completing this step, click “Try again” button.',
-												'pinterest-for-woocommerce'
-											) }
-										</Text>
+
+										<CheckboxControl
+											label={
+												<>
+													{ __(
+														'I accept the',
+														'pinterest-for-woocommerce'
+													) }{ ' ' }
+													<Button
+														isLink
+														href={
+															wcSettings.pin4wc
+																.countryTos
+																.terms_url
+														}
+														target="_blank"
+													>
+														{ __(
+															'Pinterest Advertising Agreement',
+															'pinterest-for-woocommerce'
+														) }
+													</Button>
+												</>
+											}
+											checked={ TermsAgreed }
+											className="woocommerce-setup-guide__checkbox-group"
+											onChange={ ( agreed ) =>
+												setTermsAgreed(
+													agreed
+														? wcSettings.pin4wc
+																.countryTos
+																.tos_id
+														: false
+												)
+											}
+										/>
 									</>
 								) }
 

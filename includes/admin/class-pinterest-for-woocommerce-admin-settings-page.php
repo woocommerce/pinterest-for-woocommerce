@@ -401,6 +401,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin_Settings_Page' ) ) :
 					'adDataTerms'      => 'https://policy.pinterest.com/en/ad-data-terms',
 				),
 				'isSetupComplete' => Pinterest_For_Woocommerce()::is_setup_complete(),
+				'countryTos'      => Pinterest_For_Woocommerce()::get_applicable_tos(),
 			);
 
 			return $settings;

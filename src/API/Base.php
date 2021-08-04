@@ -285,6 +285,31 @@ class Base {
 
 
 	/**
+	 * Create an advertiser given the accepted TOS terms ID.
+	 *
+	 * @param string $tos_id The ID of the accepted TOS terms.
+	 *
+	 * @return mixed
+	 */
+	public static function create_advertiser( $tos_id ) {
+
+		$advertiser_name = apply_filters( 'pinterest_for_woocommerce_default_advertiser_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
+
+		$response = self::make_request(
+			'advertisers/',
+			'POST',
+			array(
+				'tos_id' => $tos_id,
+				'name'   => $advertiser_name,
+			),
+			'ads'
+		);
+
+		return $response;
+	}
+
+
+	/**
 	 * Get the advertiser object from the Pinterest API for the given User ID.
 	 *
 	 * @param string $pinterest_user the user to request the Advertiser for.

@@ -16,6 +16,36 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 	final class Pinterest_For_Woocommerce {
 
 		/**
+		 * Tos IDs and URLs per country.
+		 */
+		const TOS_PER_COUNTRY = array(
+			'US' => array(
+				'tos_id'    => 8,
+				'terms_url' => 'https://business.pinterest.com/en/pinterest-advertising-services-agreement',
+			),
+			'CA' => array(
+				'tos_id'    => 8,
+				'terms_url' => 'https://business.pinterest.com/en/pinterest-advertising-services-agreement',
+			),
+			'FR' => array(
+				'tos_id'    => 11,
+				'terms_url' => 'https://business.pinterest.com/fr/pinterest-advertising-services-agreement',
+			),
+			'BR' => array(
+				'tos_id'    => 15,
+				'terms_url' => 'https://business.pinterest.com/pt-br/pinterest-advertising-services-agreement/',
+			),
+			'MX' => array(
+				'tos_id'    => 16,
+				'terms_url' => 'https://business.pinterest.com/es/pinterest-advertising-services-agreement/mexico/',
+			),
+			'*'  => array(
+				'tos_id'    => 9,
+				'terms_url' => 'https://business.pinterest.com/en-gb/pinterest-advertising-services-agreement/',
+			),
+		);
+
+		/**
 		 * Pinterest_For_Woocommerce version.
 		 *
 		 * @var string
@@ -705,6 +735,23 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function is_tracking_configured() {
 			return false !== Pinterest\Tracking::get_active_tag();
+		}
+
+
+		/**
+		 * Returns the Terms object for the currently configured base country.
+		 *
+		 * @return array
+		 */
+		public static function get_applicable_tos() {
+
+			if ( ! function_exists( 'wc_get_base_location' ) ) {
+				return array();
+			}
+
+			$base_location = wc_get_base_location();
+
+			return isset( $base_location, $base_location['country'], self::TOS_PER_COUNTRY[ $base_location['country'] ] ) ? self::TOS_PER_COUNTRY[ $base_location['country'] ] : self::TOS_PER_COUNTRY['*'];
 		}
 	}
 
