@@ -19,9 +19,9 @@ const SaveSettingsButton = () => {
 	const createNotice = useCreateNotice();
 
 	const saveSettings = async () => {
-		const update = await setAppSettings( {} );
+		try {
+			await setAppSettings( {} );
 
-		if ( update.success ) {
 			createNotice(
 				'success',
 				__(
@@ -29,7 +29,7 @@ const SaveSettingsButton = () => {
 					'pinterest-for-woocommerce'
 				)
 			);
-		} else {
+		} catch ( error ) {
 			createNotice(
 				'error',
 				__(

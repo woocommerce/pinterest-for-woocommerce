@@ -62,6 +62,6 @@ export function* updateSettings( data, saveToDb = false ) {
 		return { success: results[ OPTIONS_NAME ] };
 	} catch ( error ) {
 		yield setUpdatingError( error );
-		return { success: false, ...error };
+		throw error;
 	}
 }

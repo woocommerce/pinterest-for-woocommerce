@@ -28,11 +28,11 @@ const SetupPins = ( {} ) => {
 	const createNotice = useCreateNotice();
 
 	const handleOptionChange = async ( name, value ) => {
-		const update = await setAppSettings( {
-			[ name ]: value ?? ! appSettings[ name ],
-		} );
-
-		if ( ! update.success ) {
+		try {
+			await setAppSettings( {
+				[ name ]: value ?? ! appSettings[ name ],
+			} );
+		} catch ( error ) {
 			createNotice(
 				'error',
 				__(
