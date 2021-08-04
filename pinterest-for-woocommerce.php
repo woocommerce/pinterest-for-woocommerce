@@ -13,7 +13,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Pinterest for WooCommerce
- * Plugin URI:        https://woocommerce.com
+ * Plugin URI:        https://woocommerce.com/products/pinterest-for-woocommerce/
  * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
  * Version:           0.8.0
  * Author:            WooCommece
