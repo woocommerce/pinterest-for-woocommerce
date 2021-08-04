@@ -59,8 +59,7 @@ export function* updateSettings( data, saveToDb = false ) {
 			},
 		} );
 
-		dispatch( REPORTS_STORE_NAME ).receiveFeedState( false ); // Reset issues
-		dispatch( REPORTS_STORE_NAME ).receiveFeedIssues( false ); // Reset issues
+		dispatch( REPORTS_STORE_NAME ).resetFeed();
 		dispatch( REPORTS_STORE_NAME ).invalidateResolutionForStore();
 
 		yield setIsUpdating( false );

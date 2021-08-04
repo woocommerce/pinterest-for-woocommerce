@@ -25,6 +25,13 @@ const reportsReducer = (
 				feedState: action.feedState,
 			};
 			break;
+		case TYPES.RESET_FEED:
+			state = {
+				...state,
+				feedIssues: {},
+				feedState: {},
+			};
+			break;
 		case TYPES.SET_IS_REQUESTING:
 			state = {
 				...state,

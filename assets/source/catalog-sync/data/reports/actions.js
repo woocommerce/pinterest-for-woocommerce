@@ -31,3 +31,9 @@ export function setRequestingError( error, name ) {
 		name,
 	};
 }
+
+export function resetFeed() {
+	return {
+		type: TYPES.RESET_FEED,
+	};
+}
