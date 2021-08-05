@@ -396,19 +396,22 @@ $root: ".woocommerce-setup-guide";
 	&__welcome-section {
 
 		.components-flex {
+			align-items: flex-end;
+
 			@media (min-width: 783px) {
-				padding: 36px 0;
+				padding-top: 36px;
 			}
 
 			&__block {
 				margin: 0;
 
 				&.content-block {
-					padding: 20px 32px;
+					padding: 20px 64px;
 					flex: 0 0 50%;
 
 					@media (min-width: 783px) {
-						padding: 20px 64px;
+
+						padding: 20px 32px 68px 32px;
 					}
 
 					p:not(:last-child) {
@@ -419,6 +422,11 @@ $root: ".woocommerce-setup-guide";
 				&.image-block {
 					align-items: center;
 					display: flex;
+					margin-top: 32px;
+
+					@media (min-width: 783px) {
+						margin-top: 0;
+					}
 
 					img {
 						height: 100%;
