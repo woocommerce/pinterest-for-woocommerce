@@ -16,15 +16,13 @@ const CatalogSyncApp = () => {
 	useCreateNotice( wcSettings.pin4wc.error );
 
 	return (
-		<div className="woocommerce-layout">
-			<div className="woocommerce-layout__main pin4wc-catalog-sync">
-				<NavigationClassic />
+		<div className="pin4wc-catalog-sync">
+			<NavigationClassic />
 
-				<TransientNotices />
-				<div className="pin4wc-catalog-sync__container">
-					<SyncState />
-					<SyncIssues />
-				</div>
+			<TransientNotices />
+			<div className="pin4wc-catalog-sync__container">
+				<SyncState />
+				<SyncIssues />
 			</div>
 		</div>
 	);
