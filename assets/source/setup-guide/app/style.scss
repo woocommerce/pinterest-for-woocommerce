@@ -8,7 +8,7 @@ $root: ".woocommerce-setup-guide";
 			margin-top: 0;
 
 			.woocommerce-layout__primary {
-				margin: 60px 0 0 0;
+				margin-top: 60px;
 			}
 
 			.woocommerce-layout__header,
@@ -45,7 +45,6 @@ $root: ".woocommerce-setup-guide";
 
 			&__main {
 				display: block;
-				padding-right: 0;
 			}
 
 			.woocommerce-spinner {
@@ -103,11 +102,12 @@ $root: ".woocommerce-setup-guide";
 			&__container {
 				color: #000;
 				max-width: 1032px;
-				padding-left: 16px;
-				padding-right: 16px;
 
 				@media (min-width: 783px) {
 					margin: var(--large-gap) auto;
+					padding-left: 16px;
+					padding-right: 16px;
+
 				}
 
 				> div {
@@ -242,6 +242,11 @@ $root: ".woocommerce-setup-guide";
 
 				&-column {
 					position: relative;
+					margin-bottom: var(--large-gap);
+
+					@media (min-width: 783px) {
+						margin-bottom: 0;
+					}
 
 					.woocommerce-spinner {
 						display: block;
