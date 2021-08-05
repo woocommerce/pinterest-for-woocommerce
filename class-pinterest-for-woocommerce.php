@@ -745,13 +745,24 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_applicable_tos() {
 
+			$base_country = self::get_base_country();
+
+			return $base_country && isset( self::TOS_PER_COUNTRY[ $base_country ] ) ? self::TOS_PER_COUNTRY[ $base_country ] : self::TOS_PER_COUNTRY['*'];
+		}
+
+		/**
+		 * Helper function to return the country set in WC's settings using wc_get_base_location().
+		 *
+		 * @return string|null
+		 */
+		public static function get_base_country() {
 			if ( ! function_exists( 'wc_get_base_location' ) ) {
-				return array();
+				return null;
 			}
 
 			$base_location = wc_get_base_location();
 
-			return isset( $base_location, $base_location['country'], self::TOS_PER_COUNTRY[ $base_location['country'] ] ) ? self::TOS_PER_COUNTRY[ $base_location['country'] ] : self::TOS_PER_COUNTRY['*'];
+			return ! empty( $base_location['country'] ) ? $base_location['country'] : null;
 		}
 	}
 
