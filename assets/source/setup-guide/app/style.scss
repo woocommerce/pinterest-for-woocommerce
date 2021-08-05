@@ -17,6 +17,7 @@ $root: ".woocommerce-setup-guide";
 			}
 
 			.woocommerce-layout__main {
+
 				.woocommerce-layout__header {
 					top: 0;
 					left: 0;
@@ -28,6 +29,7 @@ $root: ".woocommerce-setup-guide";
 		}
 
 		@media screen and (max-width: 600px) {
+
 			#wpbody {
 				padding-top: 0;
 			}
@@ -156,7 +158,7 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					&__description {
-						color: #191E23;
+						color: #191e23;
 					}
 				}
 
@@ -172,7 +174,7 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					&__description {
-						color: #191E23;
+						color: #191e23;
 					}
 
 					&__link {
@@ -233,6 +235,7 @@ $root: ".woocommerce-setup-guide";
 				}
 
 				&-columns {
+
 					@media (min-width: 783px) {
 						column-gap: 24px;
 						display: grid;
@@ -283,7 +286,7 @@ $root: ".woocommerce-setup-guide";
 					&__step {
 
 						&-status {
-							padding: 0
+							padding: 0;
 						}
 					}
 				}
@@ -298,6 +301,7 @@ $root: ".woocommerce-setup-guide";
 				.has-idle {
 
 					#{$root} {
+
 						&__step-status__icon {
 							display: none;
 						}
@@ -318,6 +322,7 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					&:last-child .components-base-control {
+
 						&__help {
 							margin-bottom: 0;
 						}
@@ -445,7 +450,9 @@ $root: ".woocommerce-setup-guide";
 }
 
 .pin4wc-catalog-sync {
+
 	&__container {
+
 		@media (min-width: 783px) {
 			margin: var(--large-gap) auto;
 		}
@@ -544,34 +551,30 @@ $root: ".woocommerce-setup-guide";
 		}
 	}
 
-	.no-padding {
-		padding: 0;
-	}
-
 	.error-text {
 
-		color: #D63B44;
+		color: #d63b44;
 
 		svg {
-			fill: #D63B44;
+			fill: #d63b44;
 		}
 	}
 
 	.warning-text {
 
-		color: #F0B849;
+		color: #f0b849;
 
 		svg {
-			fill: #F0B849;
+			fill: #f0b849;
 		}
 	}
 
 	.success-text {
 
-		color: #23A713;
+		color: #23a713;
 
 		svg {
-			fill: #23A713;
+			fill: #23a713;
 		}
 	}
 }
