@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { select } from '@wordpress/data';
+import { select, dispatch } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 
 /**
@@ -9,6 +9,7 @@ import { apiFetch } from '@wordpress/data-controls';
  */
 import TYPES from './action-types';
 import { STORE_NAME, WC_ADMIN_NAMESPACE, OPTIONS_NAME } from './constants';
+import { REPORTS_STORE_NAME } from '../../../../catalog-sync/data';
 
 export function receiveSettings( settings ) {
 	return {
@@ -57,6 +58,9 @@ export function* updateSettings( data, saveToDb = false ) {
 				[ OPTIONS_NAME ]: settings,
 			},
 		} );
+
+		dispatch( REPORTS_STORE_NAME ).resetFeed();
+		dispatch( REPORTS_STORE_NAME ).invalidateResolutionForStore();
 
 		yield setIsUpdating( false );
 		return { success: results[ OPTIONS_NAME ] };
