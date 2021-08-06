@@ -406,12 +406,12 @@ $root: ".woocommerce-setup-guide";
 				margin: 0;
 
 				&.content-block {
-					padding: 20px 64px;
+					padding: 20px 32px;
 					flex: 0 0 50%;
 
 					@media (min-width: 783px) {
 
-						padding: 20px 32px 68px 32px;
+						padding: 20px 64px 64px 64px;
 					}
 
 					p:not(:last-child) {
