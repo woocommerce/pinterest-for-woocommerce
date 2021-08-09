@@ -6,6 +6,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	Card,
 	CardHeader,
+	CardBody,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
@@ -28,8 +29,10 @@ const SyncState = () => {
 					{ __( 'Overview', 'pinterest-for-woocommerce' ) }
 				</Text>
 			</CardHeader>
-			<SyncStateSummary overview={ feedState?.overview } />
-			<SyncStateTable workflow={ feedState?.workflow } />
+			<CardBody className="no-padding">
+				<SyncStateSummary overview={ feedState?.overview } />
+				<SyncStateTable workflow={ feedState?.workflow } />
+			</CardBody>
 		</Card>
 	);
 };
