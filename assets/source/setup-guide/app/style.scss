@@ -21,6 +21,7 @@ $root: ".woocommerce-setup-guide";
 			}
 
 			.woocommerce-layout__main {
+
 				.woocommerce-layout__header {
 					top: 0;
 					left: 0;
@@ -32,6 +33,7 @@ $root: ".woocommerce-setup-guide";
 		}
 
 		@media screen and (max-width: #{ ($break-small - 1) }) {
+
 			#wpbody {
 				padding-top: 0;
 			}
@@ -73,7 +75,6 @@ $root: ".woocommerce-setup-guide";
 						justify-content: center;
 						margin: 0 auto;
 						max-width: 850px;
-						overview: hidden;
 						position: relative;
 
 						&::before {
@@ -160,7 +161,7 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					&__description {
-						color: #191E23;
+						color: #191e23;
 					}
 				}
 
@@ -176,7 +177,7 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					&__description {
-						color: #191E23;
+						color: #191e23;
 					}
 
 					&__link {
@@ -237,6 +238,7 @@ $root: ".woocommerce-setup-guide";
 				}
 
 				&-columns {
+
 					@include break-medium() {
 						column-gap: 24px;
 						display: grid;
@@ -292,7 +294,7 @@ $root: ".woocommerce-setup-guide";
 					&__step {
 
 						&-status {
-							padding: 0
+							padding: 0;
 						}
 					}
 				}
@@ -307,6 +309,7 @@ $root: ".woocommerce-setup-guide";
 				.has-idle {
 
 					#{$root} {
+
 						&__step-status__icon {
 							display: none;
 						}
@@ -327,6 +330,7 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					&:last-child .components-base-control {
+
 						&__help {
 							margin-bottom: 0;
 						}
@@ -480,7 +484,9 @@ $root: ".woocommerce-setup-guide";
 }
 
 .pin4wc-catalog-sync {
+
 	&__container {
+
 		@include break-medium() {
 			margin: var(--large-gap) auto;
 		}
@@ -590,43 +596,32 @@ $root: ".woocommerce-setup-guide";
 			white-space: nowrap;
 			width: 1%;
 		}
-
-		.woocommerce-pagination {
-			border-top: 1px solid rgb(226, 228, 231);
-			margin-bottom: 0;
-			padding-bottom: 0.875rem;
-			padding-top: 0.875rem;
-		}
-	}
-
-	.no-padding {
-		padding: 0;
 	}
 
 	.error-text {
 
-		color: #D63B44;
+		color: #d63b44;
 
 		svg {
-			fill: #D63B44;
+			fill: #d63b44;
 		}
 	}
 
 	.warning-text {
 
-		color: #F0B849;
+		color: #f0b849;
 
 		svg {
-			fill: #F0B849;
+			fill: #f0b849;
 		}
 	}
 
 	.success-text {
 
-		color: #23A713;
+		color: #23a713;
 
 		svg {
-			fill: #23A713;
+			fill: #23a713;
 		}
 	}
 }
