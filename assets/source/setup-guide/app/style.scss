@@ -1,5 +1,9 @@
 $root: ".woocommerce-setup-guide";
 
+@import '~@wordpress/base-styles/variables';
+@import '~@wordpress/base-styles/mixins';
+@import '~@wordpress/base-styles/breakpoints';
+
 #{$root} {
 
 	&__body {
@@ -103,7 +107,7 @@ $root: ".woocommerce-setup-guide";
 				color: #000;
 				max-width: 1032px;
 
-				@media (min-width: 783px) {
+				@include break-medium() {
 					margin: var(--large-gap) auto;
 					padding-left: 16px;
 					padding-right: 16px;
@@ -142,7 +146,7 @@ $root: ".woocommerce-setup-guide";
 					max-width: 490px;
 					text-align: center;
 
-					@media (min-width: 783px) {
+					@include break-medium() {
 						margin: 0 auto var(--large-gap);
 						min-height: 120px;
 					}
@@ -163,7 +167,7 @@ $root: ".woocommerce-setup-guide";
 				&-overview {
 					margin-top: var(--large-gap);
 
-					@media (min-width: 783px) {
+					@include break-medium() {
 						position: absolute;
 					}
 
@@ -233,7 +237,7 @@ $root: ".woocommerce-setup-guide";
 				}
 
 				&-columns {
-					@media (min-width: 783px) {
+					@include break-medium() {
 						column-gap: 24px;
 						display: grid;
 						grid-template-columns: 328px auto;
@@ -244,7 +248,7 @@ $root: ".woocommerce-setup-guide";
 					position: relative;
 					margin-bottom: var(--large-gap);
 
-					@media (min-width: 783px) {
+					@include break-medium() {
 						margin-bottom: 0;
 					}
 
@@ -388,7 +392,7 @@ $root: ".woocommerce-setup-guide";
 	.components-flex {
 		flex-direction: column;
 
-		@media (min-width: 783px) {
+		@include break-medium() {
 			flex-direction: row;
 		}
 	}
@@ -398,7 +402,7 @@ $root: ".woocommerce-setup-guide";
 		.components-flex {
 			align-items: flex-end;
 
-			@media (min-width: 783px) {
+			@include break-medium() {
 				padding-top: 36px;
 			}
 
@@ -409,7 +413,7 @@ $root: ".woocommerce-setup-guide";
 					padding: 20px 32px;
 					flex: 0 0 50%;
 
-					@media (min-width: 783px) {
+					@include break-medium() {
 
 						padding: 20px 64px 64px 64px;
 					}
@@ -424,7 +428,7 @@ $root: ".woocommerce-setup-guide";
 					display: flex;
 					margin-top: 32px;
 
-					@media (min-width: 783px) {
+					@include break-medium() {
 						margin-top: 0;
 					}
 
@@ -444,7 +448,7 @@ $root: ".woocommerce-setup-guide";
 			gap: 64px;
 			padding: 32px;
 
-			@media (min-width: 783px) {
+			@include break-medium() {
 				padding: 50px 64px;
 			}
 
@@ -477,7 +481,7 @@ $root: ".woocommerce-setup-guide";
 
 .pin4wc-catalog-sync {
 	&__container {
-		@media (min-width: 783px) {
+		@include break-medium() {
 			margin: var(--large-gap) auto;
 		}
 	}
