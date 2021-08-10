@@ -27,25 +27,23 @@ const SettingsApp = () => {
 	useCreateNotice()( wcSettings.pin4wc.error );
 
 	return (
-		<div className="woocommerce-layout">
-			<div className="woocommerce-layout__main">
-				<NavigationClassic />
+		<>
+			<NavigationClassic />
 
-				<TransientNotices />
-				{ appSettings ? (
-					<div className="woocommerce-setup-guide__container">
-						<>
-							<SetupProductSync view="settings" />
-							<SetupPins view="settings" />
-							<AdvancedSettings view="settings" />
-							<SaveSettingsButton />
-						</>
-					</div>
-				) : (
-					<Spinner />
-				) }
-			</div>
-		</div>
+			<TransientNotices />
+			{ appSettings ? (
+				<div className="woocommerce-setup-guide__container">
+					<>
+						<SetupProductSync view="settings" />
+						<SetupPins view="settings" />
+						<AdvancedSettings view="settings" />
+						<SaveSettingsButton />
+					</>
+				</div>
+			) : (
+				<Spinner />
+			) }
+		</>
 	);
 };
 

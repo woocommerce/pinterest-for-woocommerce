@@ -126,9 +126,9 @@ const WizardApp = () => {
 	}
 
 	return (
-		<div className="woocommerce-layout">
+		<>
 			<OnboardingTopBar />
-			<div className="woocommerce-layout__main woocommerce-setup-guide__main">
+			<div className="woocommerce-setup-guide__main">
 				<TransientNotices />
 				{ appSettings ? (
 					<Stepper currentStep={ currentStep } steps={ getSteps() } />
@@ -136,7 +136,7 @@ const WizardApp = () => {
 					<Spinner />
 				) }
 			</div>
-		</div>
+		</>
 	);
 };
 
