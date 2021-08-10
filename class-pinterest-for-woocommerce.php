@@ -578,7 +578,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			self::save_setting( 'tracking_advertiser', null );
 			self::save_setting( 'tracking_tag', null );
 
-			return ! self::is_connected();
+			// At this point we're disconnected.
+			return true;
 		}
 
 
