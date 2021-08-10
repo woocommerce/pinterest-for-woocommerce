@@ -29,6 +29,15 @@
  * WC tested up to: 5.5
  */
 
+/**
+ * Developer note: updating minimum PHP, WordPress and WooCommerce versions.
+ *
+ * When updating any version metadata above please ensure other files are updated
+ * as needed, for example:
+ * - `class-pinterest-for-woocommerce.php`
+ * - `phpcs.xml`
+ */
+
 // If this file is called directly, abort.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
