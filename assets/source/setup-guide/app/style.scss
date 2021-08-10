@@ -31,7 +31,7 @@ $root: ".woocommerce-setup-guide";
 			}
 		}
 
-		@media screen and (max-width: 600px) {
+		@media screen and (max-width: #{ ($break-small - 1) }) {
 			#wpbody {
 				padding-top: 0;
 			}
@@ -488,7 +488,7 @@ $root: ".woocommerce-setup-guide";
 
 	&__state {
 
-		@media ( max-width: 782px ) {
+		@media ( max-width: #{ ($break-medium - 1) } ) {
 			tr {
 				display: flex;
 				flex-direction: column;

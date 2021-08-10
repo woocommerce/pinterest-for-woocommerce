@@ -1,14 +1,18 @@
+@import '~@wordpress/base-styles/variables';
+@import '~@wordpress/base-styles/mixins';
+@import '~@wordpress/base-styles/breakpoints';
+
 .woocommerce-transient-notices {
 	position: fixed;
 	bottom: 12px;
 	left: 176px;
 	z-index: 99999;
 
-	@media ( max-width: 960px ) {
+	@media ( max-width: #{ ($break-large - 1) } ) {
 		left: 50px;
 	}
 
-	@media ( max-width: 782px ) {
+	@media ( max-width: #{ ($break-medium - 1) } ) {
 		left: 16px;
 	}
 
