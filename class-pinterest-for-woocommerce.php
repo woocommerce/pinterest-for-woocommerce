@@ -566,7 +566,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @return boolean
+		 * @return boolean True if disconnection was successful.
 		 */
 		public static function disconnect() {
 
