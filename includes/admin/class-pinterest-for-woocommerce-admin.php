@@ -430,19 +430,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				),
 				'features'  => array(
 					array(
-						'title'     => esc_html__( 'Connect your account', 'pinterest-for-woocommerce' ),
-						'text'      => esc_html__( 'Install the Pinterest for WooCommerce app to quickly upload your product catalog and publish Pins for items you sell. Track performance with the Pinterest Tag and keep your Pins up to date with our daily automatic updates.', 'pinterest-for-woocommerce' ),
+						'title'     => esc_html__( 'Sync your catalog', 'pinterest-for-woocommerce' ),
+						'text'      => esc_html__( 'Connect your store to seamlessly sync your product catalog with Pinterest and create rich pins for each item. Your pins are kept up to date with daily automatic updates.', 'pinterest-for-woocommerce' ),
 						'image_url' => Pinterest_For_Woocommerce()->plugin_url() . '/assets/images/landing_connect.svg',
 					),
 					array(
 						'title'     => esc_html__( 'Increase organic reach', 'pinterest-for-woocommerce' ),
-						'text'      => esc_html__( 'Once you\'ve uploaded your catalog, people on Pinterest can easily discover, save and buy products from your website without any advertising spend from you.*', 'pinterest-for-woocommerce' ),
-						'extra'     => esc_html__( '*It can take up to 5 business days for the product catalog to sync for this first time.', 'pinterest-for-woocommerce' ),
+						'text'      => esc_html__( 'Pinterest users can easily discover, save and buy products from your website without any advertising spend from you. Track your performance with the Pinterest tag.', 'pinterest-for-woocommerce' ),
 						'image_url' => Pinterest_For_Woocommerce()->plugin_url() . '/assets/images/landing_organic.svg',
 					),
 					array(
-						'title'     => esc_html__( 'Merchant storefronts on profile', 'pinterest-for-woocommerce' ),
-						'text'      => esc_html__( 'Upload your catalog via the WooCommerce for Pinterest app and on the Shop tab By syncing your catalog to Pinterest, Pinners will be able to view your products as Pins on your Shop tab—your unique storefront on Pinterest.', 'pinterest-for-woocommerce' ),
+						'title'     => esc_html__( 'Create a storefront on Pinterest', 'pinterest-for-woocommerce' ),
+						'text'      => esc_html__( 'Syncing your catalog creates a Shop tab on your Pinterest profile which allows Pinterest users to easily discover your products.', 'pinterest-for-woocommerce' ),
 						'image_url' => Pinterest_For_Woocommerce()->plugin_url() . '/assets/images/landing_catalog.svg',
 					),
 				),
