@@ -152,6 +152,8 @@ const SetupAccount = ( {
 											wcSettings.pin4wc.pinterestLinks
 												.adGuidelines
 										}
+										target="_blank"
+										rel="noreferrer"
 									/>
 								),
 							}
