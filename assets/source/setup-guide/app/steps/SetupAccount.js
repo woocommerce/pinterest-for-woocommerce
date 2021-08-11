@@ -5,7 +5,7 @@ import { sprintf, __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { createInterpolateElement, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { Spinner, Link } from '@woocommerce/components';
+import { Spinner } from '@woocommerce/components';
 import { getNewPath } from '@woocommerce/navigation';
 import {
 	Button,
