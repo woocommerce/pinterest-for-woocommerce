@@ -119,9 +119,15 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 					<Card>
 						{ undefined !== isDomainVerified ? (
 							<CardBody size="large">
+								<Text variant="subtitle">
+									{ __(
+										'Verify your domain to claim your website',
+										'pinterest-for-woocommerce'
+									) }
+								</Text>
 								<Text variant="body">
 									{ __(
-										'Verify your domain to claim your website. This will allow access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site, and let people know where they can find more of your content.',
+										'This will allow access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site, and let people know where they can find more of your content.',
 										'pinterest-for-woocommerce'
 									) }
 								</Text>

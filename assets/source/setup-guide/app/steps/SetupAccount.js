@@ -3,7 +3,7 @@
  */
 import { sprintf, __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState } from '@wordpress/element';
+import { createInterpolateElement, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@woocommerce/components';
 import { getNewPath } from '@woocommerce/navigation';
@@ -137,27 +137,26 @@ const SetupAccount = ( {
 										'pinterest-for-woocommerce'
 								  )
 						}
-						description={
-							<>
-								{ __(
-									'Set up a free Pinterest business account to get access to analytics on your Pins and the ability to run ads. This requires agreeing to our',
-									'pinterest-for-woocommerce'
-								) }{ ' ' }
-								<Button
-									isLink
-									href={
-										wcSettings.pin4wc.pinterestLinks
-											.adGuidelines
-									}
-									target="_blank"
-								>
-									{ __(
-										'advertising guidelines',
-										'pinterest-for-woocommerce'
-									) }
-								</Button>
-							</>
-						}
+						description={ createInterpolateElement(
+							__(
+								'Set up a free Pinterest business account to get access to analytics on your Pins and the ability to run ads. This requires agreeing to the <a>Pinterest advertising guidelines</a>.',
+								'pinterest-for-woocommerce'
+							),
+							{
+								a: (
+									// Disabling no-content rule - content is interpolated from above string.
+									// eslint-disable-next-line jsx-a11y/anchor-has-content
+									<a
+										href={
+											wcSettings.pin4wc.pinterestLinks
+												.adGuidelines
+										}
+										target="_blank"
+										rel="noreferrer"
+									/>
+								),
+							}
+						) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
