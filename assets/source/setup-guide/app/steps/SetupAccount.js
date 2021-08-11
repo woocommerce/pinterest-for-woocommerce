@@ -18,6 +18,7 @@ import {
 	Modal,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -137,27 +138,24 @@ const SetupAccount = ( {
 										'pinterest-for-woocommerce'
 								  )
 						}
-						description={
-							<>
-								{ __(
-									'Set up a free Pinterest business account to get access to analytics on your Pins and the ability to run ads. This requires agreeing to our',
-									'pinterest-for-woocommerce'
-								) }{ ' ' }
-								<Button
-									isLink
-									href={
-										wcSettings.pin4wc.pinterestLinks
-											.adGuidelines
-									}
-									target="_blank"
-								>
-									{ __(
-										'advertising guidelines',
-										'pinterest-for-woocommerce'
-									) }
-								</Button>
-							</>
-						}
+						description={ createInterpolateElement(
+							__(
+								'Set up a free Pinterest business account to get access to analytics on your Pins and the ability to run ads. This requires agreeing to the <a>Pinterest advertising guidelines</a>.',
+								'pinterest-for-woocommerce'
+							),
+							{
+								a: (
+									// Disabling no-content rule - content is interpolated from above string.
+									// eslint-disable-next-line jsx-a11y/anchor-has-content
+									<a
+										href={
+											wcSettings.pin4wc.pinterestLinks
+												.adGuidelines
+										}
+									/>
+								),
+							}
+						) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
