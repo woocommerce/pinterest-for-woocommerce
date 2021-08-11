@@ -562,16 +562,24 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Clear the token. See the documentation of the get_token() method for the expected format of the related data variables.
+		 * Disconnect by clearing the Token and any other data that we should gather from scratch.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @return boolean
+		 * @return boolean True if disconnection was successful.
 		 */
-		public static function clear_token() {
+		public static function disconnect() {
 
-			self::save_data( 'crypto_encoded_key', null );
-			return self::save_token( array() );
+			// Flush the whole data option.
+			delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+
+			// Remove settings that may cause issues if stale on disconnect.
+			self::save_setting( 'account_data', null );
+			self::save_setting( 'tracking_advertiser', null );
+			self::save_setting( 'tracking_tag', null );
+
+			// At this point we're disconnected.
+			return true;
 		}
 
 
