@@ -35,28 +35,26 @@ const SettingsApp = () => {
 	useCreateNotice()( wcSettings.pin4wc.error );
 
 	return (
-		<div className="woocommerce-layout">
-			<div className="woocommerce-layout__main">
-				<NavigationClassic />
+		<>
+			<NavigationClassic />
 
-				<TransientNotices />
-				{ appSettings ? (
-					<div className="woocommerce-setup-guide__container">
-						<SetupAccount
-							view="settings"
-							setIsConnected={ setIsConnected }
-							isConnected={ isConnected }
-						/>
+			<TransientNotices />
+			{ appSettings ? (
+				<div className="woocommerce-setup-guide__container">
+					<SetupAccount
+						view="settings"
+						setIsConnected={ setIsConnected }
+						isConnected={ isConnected }
+					/>
 
-						{ isGroup1Visible && <ClaimWebsite view="settings" /> }
-						{ isGroup2Visible && <SetupTracking view="settings" /> }
-						{ isGroup2Visible && <SaveSettingsButton /> }
-					</div>
-				) : (
-					<Spinner />
-				) }
-			</div>
-		</div>
+					{ isGroup1Visible && <ClaimWebsite view="settings" /> }
+					{ isGroup2Visible && <SetupTracking view="settings" /> }
+					{ isGroup2Visible && <SaveSettingsButton /> }
+				</div>
+			) : (
+				<Spinner />
+			) }
+		</>
 	);
 };
 

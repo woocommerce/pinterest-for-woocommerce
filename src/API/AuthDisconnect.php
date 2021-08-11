@@ -52,7 +52,7 @@ class AuthDisconnect extends VendorAPI {
 	 */
 	public function handle_disconnect() {
 		return array(
-			'disconnected' => Pinterest_For_Woocommerce()::clear_token(),
+			'disconnected' => Pinterest_For_Woocommerce()::disconnect(),
 		);
 	}
 }

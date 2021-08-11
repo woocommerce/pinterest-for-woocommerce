@@ -49,7 +49,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Set the minimum required versions for the plugin.
 		 */
 		const PLUGIN_REQUIREMENTS = array(
-			'php_version' => '7.2',
+			'php_version' => '7.4',
 			'wp_version'  => '5.6',
 			'wc_version'  => '5.3',
 		);
@@ -562,16 +562,24 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Clear the token. See the documentation of the get_token() method for the expected format of the related data variables.
+		 * Disconnect by clearing the Token and any other data that we should gather from scratch.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @return boolean
+		 * @return boolean True if disconnection was successful.
 		 */
-		public static function clear_token() {
+		public static function disconnect() {
 
-			self::save_data( 'crypto_encoded_key', null );
-			return self::save_token( array() );
+			// Flush the whole data option.
+			delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+
+			// Remove settings that may cause issues if stale on disconnect.
+			self::save_setting( 'account_data', null );
+			self::save_setting( 'tracking_advertiser', null );
+			self::save_setting( 'tracking_tag', null );
+
+			// At this point we're disconnected.
+			return true;
 		}
 
 
@@ -815,13 +823,24 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_applicable_tos() {
 
+			$base_country = self::get_base_country();
+
+			return $base_country && isset( self::TOS_PER_COUNTRY[ $base_country ] ) ? self::TOS_PER_COUNTRY[ $base_country ] : self::TOS_PER_COUNTRY['*'];
+		}
+
+		/**
+		 * Helper function to return the country set in WC's settings using wc_get_base_location().
+		 *
+		 * @return string|null
+		 */
+		public static function get_base_country() {
 			if ( ! function_exists( 'wc_get_base_location' ) ) {
-				return array();
+				return null;
 			}
 
 			$base_location = wc_get_base_location();
 
-			return isset( $base_location, $base_location['country'], self::TOS_PER_COUNTRY[ $base_location['country'] ] ) ? self::TOS_PER_COUNTRY[ $base_location['country'] ] : self::TOS_PER_COUNTRY['*'];
+			return ! empty( $base_location['country'] ) ? $base_location['country'] : null;
 		}
 	}
 

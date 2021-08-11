@@ -208,6 +208,8 @@ class ProductSync {
 			'feed_format'               => 'XML',
 			'feed_default_currency'     => get_woocommerce_currency(),
 			'default_availability_type' => 'IN_STOCK',
+			'country'                   => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
+			'locale'                    => str_replace( '_', '-', determine_locale() ),
 		);
 
 		$registered = self::is_feed_registered();

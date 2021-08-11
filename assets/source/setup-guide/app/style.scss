@@ -1,5 +1,9 @@
 $root: ".woocommerce-setup-guide";
 
+@import '~@wordpress/base-styles/variables';
+@import '~@wordpress/base-styles/mixins';
+@import '~@wordpress/base-styles/breakpoints';
+
 #{$root} {
 
 	&__body {
@@ -8,7 +12,7 @@ $root: ".woocommerce-setup-guide";
 			margin-top: 0;
 
 			.woocommerce-layout__primary {
-				margin: 60px 0 0 0;
+				margin-top: 60px;
 			}
 
 			.woocommerce-layout__header,
@@ -17,6 +21,7 @@ $root: ".woocommerce-setup-guide";
 			}
 
 			.woocommerce-layout__main {
+
 				.woocommerce-layout__header {
 					top: 0;
 					left: 0;
@@ -27,7 +32,8 @@ $root: ".woocommerce-setup-guide";
 			}
 		}
 
-		@media screen and (max-width: 600px) {
+		@media screen and (max-width: #{ ($break-small - 1) }) {
+
 			#wpbody {
 				padding-top: 0;
 			}
@@ -45,7 +51,6 @@ $root: ".woocommerce-setup-guide";
 
 			&__main {
 				display: block;
-				padding-right: 0;
 			}
 
 			.woocommerce-spinner {
@@ -70,7 +75,6 @@ $root: ".woocommerce-setup-guide";
 						justify-content: center;
 						margin: 0 auto;
 						max-width: 850px;
-						overview: hidden;
 						position: relative;
 
 						&::before {
@@ -103,11 +107,12 @@ $root: ".woocommerce-setup-guide";
 			&__container {
 				color: #000;
 				max-width: 1032px;
-				padding-left: 16px;
-				padding-right: 16px;
 
-				@media (min-width: 783px) {
+				@include break-medium() {
 					margin: var(--large-gap) auto;
+					padding-left: 16px;
+					padding-right: 16px;
+
 				}
 
 				> div {
@@ -142,7 +147,7 @@ $root: ".woocommerce-setup-guide";
 					max-width: 490px;
 					text-align: center;
 
-					@media (min-width: 783px) {
+					@include break-medium() {
 						margin: 0 auto var(--large-gap);
 						min-height: 120px;
 					}
@@ -156,14 +161,14 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					&__description {
-						color: #191E23;
+						color: #191e23;
 					}
 				}
 
 				&-overview {
 					margin-top: var(--large-gap);
 
-					@media (min-width: 783px) {
+					@include break-medium() {
 						position: absolute;
 					}
 
@@ -172,7 +177,7 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					&__description {
-						color: #191E23;
+						color: #191e23;
 					}
 
 					&__link {
@@ -233,7 +238,8 @@ $root: ".woocommerce-setup-guide";
 				}
 
 				&-columns {
-					@media (min-width: 783px) {
+
+					@include break-medium() {
 						column-gap: 24px;
 						display: grid;
 						grid-template-columns: 328px auto;
@@ -242,6 +248,11 @@ $root: ".woocommerce-setup-guide";
 
 				&-column {
 					position: relative;
+					margin-bottom: var(--large-gap);
+
+					@include break-medium() {
+						margin-bottom: 0;
+					}
 
 					.woocommerce-spinner {
 						display: block;
@@ -283,7 +294,7 @@ $root: ".woocommerce-setup-guide";
 					&__step {
 
 						&-status {
-							padding: 0
+							padding: 0;
 						}
 					}
 				}
@@ -298,6 +309,7 @@ $root: ".woocommerce-setup-guide";
 				.has-idle {
 
 					#{$root} {
+
 						&__step-status__icon {
 							display: none;
 						}
@@ -318,6 +330,7 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					&:last-child .components-base-control {
+
 						&__help {
 							margin-bottom: 0;
 						}
@@ -380,17 +393,34 @@ $root: ".woocommerce-setup-guide";
 	max-width: 824px;
 	margin: 0 auto;
 
+	.components-flex {
+		flex-direction: column;
+
+		@include break-medium() {
+			flex-direction: row;
+		}
+	}
+
 	&__welcome-section {
 
 		.components-flex {
-			padding: 36px 0;
+			align-items: flex-end;
+
+			@include break-medium() {
+				padding-top: 36px;
+			}
 
 			&__block {
 				margin: 0;
 
 				&.content-block {
-					padding: 20px 64px;
+					padding: 20px 32px;
 					flex: 0 0 50%;
+
+					@include break-medium() {
+
+						padding: 20px 64px 64px 64px;
+					}
 
 					p:not(:last-child) {
 						margin-bottom: 16px;
@@ -400,6 +430,11 @@ $root: ".woocommerce-setup-guide";
 				&.image-block {
 					align-items: center;
 					display: flex;
+					margin-top: 32px;
+
+					@include break-medium() {
+						margin-top: 0;
+					}
 
 					img {
 						height: 100%;
@@ -415,7 +450,11 @@ $root: ".woocommerce-setup-guide";
 
 		.components-flex {
 			gap: 64px;
-			padding: 50px 64px;
+			padding: 32px;
+
+			@include break-medium() {
+				padding: 50px 64px;
+			}
 
 			&__block {
 				text-align: center;
@@ -445,13 +484,35 @@ $root: ".woocommerce-setup-guide";
 }
 
 .pin4wc-catalog-sync {
+
 	&__container {
-		@media (min-width: 783px) {
+
+		@include break-medium() {
 			margin: var(--large-gap) auto;
 		}
 	}
 
 	&__state {
+
+		@media ( max-width: #{ ($break-medium - 1) } ) {
+			tr {
+				display: flex;
+				flex-direction: column;
+				padding-top: 10px;
+				padding-bottom: 10px;
+			}
+
+			th {
+				padding-bottom: 0;
+			}
+
+			th,
+			td {
+				padding-left: 0;
+				padding-right: 0;
+				border: 0;
+			}
+		}
 
 		.woocommerce-table__header {
 			display: none;
@@ -535,43 +596,32 @@ $root: ".woocommerce-setup-guide";
 			white-space: nowrap;
 			width: 1%;
 		}
-
-		.woocommerce-pagination {
-			border-top: 1px solid rgb(226, 228, 231);
-			margin-bottom: 0;
-			padding-bottom: 0.875rem;
-			padding-top: 0.875rem;
-		}
-	}
-
-	.no-padding {
-		padding: 0;
 	}
 
 	.error-text {
 
-		color: #D63B44;
+		color: #d63b44;
 
 		svg {
-			fill: #D63B44;
+			fill: #d63b44;
 		}
 	}
 
 	.warning-text {
 
-		color: #F0B849;
+		color: #f0b849;
 
 		svg {
-			fill: #F0B849;
+			fill: #f0b849;
 		}
 	}
 
 	.success-text {
 
-		color: #23A713;
+		color: #23a713;
 
 		svg {
-			fill: #23A713;
+			fill: #23a713;
 		}
 	}
 }

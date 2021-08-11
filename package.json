@@ -25,6 +25,7 @@
   "devDependencies": {
     "@woocommerce/dependency-extraction-webpack-plugin": "^1.6.0",
     "@woocommerce/eslint-plugin": "^1.2.0",
+    "@wordpress/base-styles": "^3.6.0",
     "@wordpress/eslint-plugin": "^9.0.2",
     "@wordpress/scripts": "^16.1.4",
     "browser-sync": "^2.26.3",
@@ -95,6 +96,8 @@
     "lint:js:fix": "wp-scripts lint-js ./assets/source --fix",
     "format:js": "wp-scripts format ./assets/source",
     "lint:css": "wp-scripts lint-style ./assets/source",
+    "lint:php": "composer run-script phpcs ./",
+    "lint:css:fix": "wp-scripts lint-style ./assets/source --fix",
     "build:zip": "composer install && wp-scripts build && gulp build && gulp package"
   },
   "browserslist": [
