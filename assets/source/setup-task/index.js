@@ -31,7 +31,7 @@ addFilter(
 				completed: wcSettings.pin4wc.isSetupComplete,
 				visible: true,
 				additionalInfo: __(
-					'Configure the connection to Pinterest and any additional settings like tracking, product sync, etc.',
+					'Connect your store to Pinterest to sync products and track conversions.',
 					'pinterest-for-woocommerce'
 				),
 				time: __( '5 minutes', 'pinterest-for-woocommerce' ),
