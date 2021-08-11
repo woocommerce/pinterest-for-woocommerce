@@ -424,7 +424,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			$settings['pin4wc']['landing_page'] = array(
 				'welcome'   => array(
 					'title'     => esc_html__( 'Get your products in front of more than 475M people on Pinterest', 'pinterest-for-woocommerce' ),
-					'text'      => esc_html__( 'Pinterest is a visual discovery engine people use to find inspiration for their lives! More than 475 million people have saved more than 300 billion Pins. Making it easier to turn inspiration into their next purchase.', 'pinterest-for-woocommerce' ),
+					'text'      => esc_html__( 'Pinterest is a visual discovery engine people use to find inspiration for their lives! More than 475 million people have saved more than 300 billion Pins, making it easier to turn inspiration into their next purchase.', 'pinterest-for-woocommerce' ),
 					'tos_link'  => 'https://business.pinterest.com/business-terms-of-service/',
 					'image_url' => Pinterest_For_Woocommerce()->plugin_url() . '/assets/images/landing_welcome.png',
 				),
