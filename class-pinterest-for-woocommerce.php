@@ -49,7 +49,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Set the minimum required versions for the plugin.
 		 */
 		const PLUGIN_REQUIREMENTS = array(
-			'php_version' => '7.2',
+			'php_version' => '7.4',
 			'wp_version'  => '5.6',
 			'wc_version'  => '5.3',
 		);

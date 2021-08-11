@@ -23,10 +23,19 @@
  *
  * Requires at least: 5.6
  * Tested up to: 5.8
- * Requires PHP: 7.2
+ * Requires PHP: 7.4
  *
  * WC requires at least: 5.3
  * WC tested up to: 5.5
+ */
+
+/**
+ * Developer note: updating minimum PHP, WordPress and WooCommerce versions.
+ *
+ * When updating any version metadata above please ensure other files are updated
+ * as needed, for example:
+ * - `class-pinterest-for-woocommerce.php`
+ * - `phpcs.xml`
  */
 
 // If this file is called directly, abort.
