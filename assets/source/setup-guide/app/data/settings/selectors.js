@@ -60,7 +60,7 @@ export const isDomainVerified = ( state ) => {
 	}
 
 	return state?.settings?.account_data?.verified_domains.includes(
-		wcSettings.pin4wc.domainToVerify
+		wcSettings.pinterest_for_woocommerce.domainToVerify
 	);
 };
 

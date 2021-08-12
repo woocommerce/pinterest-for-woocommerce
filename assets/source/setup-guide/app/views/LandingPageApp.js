@@ -23,7 +23,7 @@ const LandingPageApp = () => {
 		welcome,
 		features,
 		faq_items: faqItems,
-	} = wcSettings.pin4wc.landing_page;
+	} = wcSettings.pinterest_for_woocommerce.landing_page;
 
 	return (
 		<div className="pin4wc-landing-page">
@@ -41,7 +41,8 @@ const LandingPageApp = () => {
 									getHistory().push(
 										getNewPath(
 											{},
-											wcSettings.pin4wc.isSetupComplete
+											wcSettings.pinterest_for_woocommerce
+												.isSetupComplete
 												? '/pinterest/catalog'
 												: '/pinterest/onboarding'
 										)

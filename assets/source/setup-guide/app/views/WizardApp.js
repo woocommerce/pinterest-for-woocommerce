@@ -28,13 +28,13 @@ import {
 const WizardApp = () => {
 	const [ currentStep, setCurrentStep ] = useState();
 	const [ isConnected, setIsConnected ] = useState(
-		wcSettings.pin4wc.isConnected
+		wcSettings.pinterest_for_woocommerce.isConnected
 	);
 
 	const appSettings = useSettingsSelect();
 
 	useBodyClasses( 'wizard' );
-	useCreateNotice()( wcSettings.pin4wc.error );
+	useCreateNotice()( wcSettings.pinterest_for_woocommerce.error );
 
 	const steps = [
 		{

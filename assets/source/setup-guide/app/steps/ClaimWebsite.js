@@ -41,7 +41,9 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 
 		try {
 			const results = await apiFetch( {
-				path: wcSettings.pin4wc.apiRoute + '/domain_verification',
+				path:
+					wcSettings.pinterest_for_woocommerce.apiRoute +
+					'/domain_verification',
 				method: 'POST',
 			} );
 
@@ -112,7 +114,10 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 						description={ __(
 							'Claim your website to get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of your content.'
 						) }
-						link={ wcSettings.pin4wc.pinterestLinks.claimWebsite }
+						link={
+							wcSettings.pinterest_for_woocommerce.pinterestLinks
+								.claimWebsite
+						}
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
@@ -133,7 +138,10 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 								</Text>
 
 								<StepStatus
-									label={ wcSettings.pin4wc.domainToVerify }
+									label={
+										wcSettings.pinterest_for_woocommerce
+											.domainToVerify
+									}
 									status={ status }
 								/>
 

@@ -24,7 +24,7 @@ const SettingsApp = () => {
 	const appSettings = useSettingsSelect();
 
 	useBodyClasses();
-	useCreateNotice()( wcSettings.pin4wc.error );
+	useCreateNotice()( wcSettings.pinterest_for_woocommerce.error );
 
 	return (
 		<>

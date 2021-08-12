@@ -76,7 +76,7 @@ const SetupTracking = ( { view } ) => {
 
 			const results = await apiFetch( {
 				path:
-					wcSettings.pin4wc.apiRoute +
+					wcSettings.pinterest_for_woocommerce.apiRoute +
 					'/advertisers/?terms_agreed=' +
 					termsAgreed,
 				method: 'GET',
@@ -128,7 +128,7 @@ const SetupTracking = ( { view } ) => {
 
 				const results = await apiFetch( {
 					path:
-						wcSettings.pin4wc.apiRoute +
+						wcSettings.pinterest_for_woocommerce.apiRoute +
 						'/tags/?advrtsr_id=' +
 						advertiserId,
 					method: 'GET',
@@ -300,8 +300,8 @@ const SetupTracking = ( { view } ) => {
 								<Button
 									isLink
 									href={
-										wcSettings.pin4wc.pinterestLinks
-											.adGuidelines
+										wcSettings.pinterest_for_woocommerce
+											.pinterestLinks.adGuidelines
 									}
 									target="_blank"
 								>
@@ -314,8 +314,8 @@ const SetupTracking = ( { view } ) => {
 								<Button
 									isLink
 									href={
-										wcSettings.pin4wc.pinterestLinks
-											.adDataTerms
+										wcSettings.pinterest_for_woocommerce
+											.pinterestLinks.adDataTerms
 									}
 									target="_blank"
 								>
@@ -326,7 +326,10 @@ const SetupTracking = ( { view } ) => {
 								</Button>
 							</>
 						}
-						link={ wcSettings.pin4wc.pinterestLinks.SetupTracking }
+						link={
+							wcSettings.pinterest_for_woocommerce.pinterestLinks
+								.SetupTracking
+						}
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
@@ -392,7 +395,7 @@ const SetupTracking = ( { view } ) => {
 															isLink
 															href={
 																wcSettings
-																	.pin4wc
+																	.pinterest_for_woocommerce
 																	.countryTos
 																	.terms_url
 															}
@@ -406,7 +409,8 @@ const SetupTracking = ( { view } ) => {
 											onChange={ ( agreed ) =>
 												setTermsAgreed(
 													agreed
-														? wcSettings.pin4wc
+														? wcSettings
+																.pinterest_for_woocommerce
 																.countryTos
 																.tos_id
 														: false
