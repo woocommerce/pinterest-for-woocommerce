@@ -431,23 +431,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 			return array(
 				'landing_page' => array(
-					'features'  => array(
-						array(
-							'title'     => esc_html__( 'Sync your catalog', 'pinterest-for-woocommerce' ),
-							'text'      => esc_html__( 'Connect your store to seamlessly sync your product catalog with Pinterest and create rich pins for each item. Your pins are kept up to date with daily automatic updates.', 'pinterest-for-woocommerce' ),
-							'image_url' => Pinterest_For_Woocommerce()->plugin_url() . '/assets/images/landing_connect.svg',
-						),
-						array(
-							'title'     => esc_html__( 'Increase organic reach', 'pinterest-for-woocommerce' ),
-							'text'      => esc_html__( 'Pinterest users can easily discover, save and buy products from your website without any advertising spend from you. Track your performance with the Pinterest tag.', 'pinterest-for-woocommerce' ),
-							'image_url' => Pinterest_For_Woocommerce()->plugin_url() . '/assets/images/landing_organic.svg',
-						),
-						array(
-							'title'     => esc_html__( 'Create a storefront on Pinterest', 'pinterest-for-woocommerce' ),
-							'text'      => esc_html__( 'Syncing your catalog creates a Shop tab on your Pinterest profile which allows Pinterest users to easily discover your products.', 'pinterest-for-woocommerce' ),
-							'image_url' => Pinterest_For_Woocommerce()->plugin_url() . '/assets/images/landing_catalog.svg',
-						),
-					),
 					'faq_items' => array(
 						array(
 							'question' => esc_html__( 'Why am I getting an “Account not connected” error message?', 'pinterest-for-woocommerce' ),

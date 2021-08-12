@@ -20,9 +20,44 @@ import {
 
 const LandingPageApp = () => {
 	const {
-		features,
 		faq_items: faqItems,
 	} = wcSettings.pinterest_for_woocommerce.landing_page;
+
+	const features = [
+		{
+			title: __( 'Sync your catalog', 'pinterest-for-woocommerce' ),
+			text: __(
+				'Connect your store to seamlessly sync your product catalog with Pinterest and create rich pins for each item. Your pins are kept up to date with daily automatic updates.',
+				'pinterest-for-woocommerce'
+			),
+			image_url:
+				wcSettings.pinterest_for_woocommerce.pluginUrl +
+				'/assets/images/landing_connect.svg',
+		},
+		{
+			title: __( 'Increase organic reach', 'pinterest-for-woocommerce' ),
+			text: __(
+				'Pinterest users can easily discover, save and buy products from your website without any advertising spend from you. Track your performance with the Pinterest tag.',
+				'pinterest-for-woocommerce'
+			),
+			image_url:
+				wcSettings.pinterest_for_woocommerce.pluginUrl +
+				'/assets/images/landing_organic.svg',
+		},
+		{
+			title: __(
+				'Create a storefront on Pinterest',
+				'pinterest-for-woocommerce'
+			),
+			text: __(
+				'Syncing your catalog creates a Shop tab on your Pinterest profile which allows Pinterest users to easily discover your products.',
+				'pinterest-for-woocommerce'
+			),
+			image_url:
+				wcSettings.pinterest_for_woocommerce.pluginUrl +
+				'/assets/images/landing_catalog.svg',
+		},
+	];
 
 	return (
 		<div className="pinterest-for-woocommerce-landing-page">
