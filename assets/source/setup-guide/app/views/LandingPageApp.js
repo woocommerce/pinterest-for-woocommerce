@@ -20,7 +20,6 @@ import {
 
 const LandingPageApp = () => {
 	const {
-		welcome,
 		features,
 		faq_items: faqItems,
 	} = wcSettings.pinterest_for_woocommerce.landing_page;
@@ -30,9 +29,19 @@ const LandingPageApp = () => {
 			<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__welcome-section">
 				<Flex>
 					<FlexBlock className="content-block">
-						<Text variant="title.medium">{ welcome.title }</Text>
+						<Text variant="title.medium">
+							{ __(
+								'Get your products in front of more than 475M people on Pinterest',
+								'pinterest-for-woocommerce'
+							) }
+						</Text>
 
-						<Text variant="body">{ welcome.text }</Text>
+						<Text variant="body">
+							{ __(
+								'Pinterest is a visual discovery engine people use to find inspiration for their lives! More than 475 million people have saved more than 300 billion Pins, making it easier to turn inspiration into their next purchase.',
+								'pinterest-for-woocommerce'
+							) }
+						</Text>
 
 						<Text variant="body">
 							<Button
@@ -62,7 +71,7 @@ const LandingPageApp = () => {
 								'pinterest-for-woocommerce'
 							) }{ ' ' }
 							<a
-								href={ welcome.tos_link }
+								href="https://business.pinterest.com/business-terms-of-service/"
 								target="_blank"
 								rel="noreferrer"
 							>
@@ -75,7 +84,13 @@ const LandingPageApp = () => {
 						</Text>
 					</FlexBlock>
 					<FlexBlock className="image-block">
-						<img src={ welcome.image_url } alt="" />
+						<img
+							src={
+								wcSettings.pinterest_for_woocommerce.pluginUrl +
+								'/assets/images/landing_welcome.png'
+							}
+							alt=""
+						/>
 					</FlexBlock>
 				</Flex>
 			</Card>
