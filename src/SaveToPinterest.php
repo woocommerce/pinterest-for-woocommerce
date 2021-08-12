@@ -78,7 +78,7 @@ class SaveToPinterest {
 		 * Image used is the one explicitly set in the media attribute.
 		 */
 		return sprintf(
-			'<div class="pin4wc-image-wrapper"><a data-pin-do="buttonPin" href="%s"></a></div>',
+			'<div class="pinterest-for-woocommerce-image-wrapper"><a data-pin-do="buttonPin" href="%s"></a></div>',
 			add_query_arg(
 				$attributes,
 				'https://www.pinterest.com/pin/create/button/'

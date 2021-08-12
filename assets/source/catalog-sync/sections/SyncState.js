@@ -22,7 +22,7 @@ const SyncState = () => {
 	);
 
 	return (
-		<Card className="woocommerce-table pin4wc-catalog-sync__state">
+		<Card className="woocommerce-table pinterest-for-woocommerce-catalog-sync__state">
 			<CardHeader>
 				<Text variant="title.small" as="h2">
 					{ __( 'Overview', 'pinterest-for-woocommerce' ) }
