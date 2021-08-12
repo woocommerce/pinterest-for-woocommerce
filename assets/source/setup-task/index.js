@@ -28,7 +28,7 @@ addFilter(
 				onClick: () => {
 					getHistory().push( getNewPath( {}, '/pinterest/landing' ) );
 				},
-				completed: wcSettings.pin4wc.isSetupComplete,
+				completed: wcSettings.pinterest_for_woocommerce.isSetupComplete,
 				visible: true,
 				additionalInfo: __(
 					'Connect your store to Pinterest to sync products and track conversions.',

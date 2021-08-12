@@ -23,11 +23,11 @@ const LandingPageApp = () => {
 		welcome,
 		features,
 		faq_items: faqItems,
-	} = wcSettings.pin4wc.landing_page;
+	} = wcSettings.pinterest_for_woocommerce.landing_page;
 
 	return (
-		<div className="pin4wc-landing-page">
-			<Card className="woocommerce-table pin4wc-landing-page__welcome-section">
+		<div className="pinterest-for-woocommerce-landing-page">
+			<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__welcome-section">
 				<Flex>
 					<FlexBlock className="content-block">
 						<Text variant="title.medium">{ welcome.title }</Text>
@@ -41,7 +41,8 @@ const LandingPageApp = () => {
 									getHistory().push(
 										getNewPath(
 											{},
-											wcSettings.pin4wc.isSetupComplete
+											wcSettings.pinterest_for_woocommerce
+												.isSetupComplete
 												? '/pinterest/catalog'
 												: '/pinterest/onboarding'
 										)
@@ -79,7 +80,7 @@ const LandingPageApp = () => {
 				</Flex>
 			</Card>
 
-			<Card className="woocommerce-table pin4wc-landing-page__features-section">
+			<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__features-section">
 				<Flex justify="center" align="top">
 					{ features.map( ( item, index ) => (
 						<FlexBlock key={ index }>
@@ -105,7 +106,7 @@ const LandingPageApp = () => {
 				</Flex>
 			</Card>
 
-			<Card className="woocommerce-table pin4wc-landing-page__faq-section">
+			<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__faq-section">
 				<Panel
 					header={ __(
 						'Frequently asked questions',

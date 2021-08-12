@@ -25,14 +25,14 @@ const SettingsApp = () => {
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
 
 	const [ isConnected, setIsConnected ] = useState(
-		wcSettings.pin4wc.isConnected
+		wcSettings.pinterest_for_woocommerce.isConnected
 	);
 
 	const isGroup1Visible = isConnected;
 	const isGroup2Visible = isGroup1Visible && isDomainVerified;
 
 	useBodyClasses();
-	useCreateNotice()( wcSettings.pin4wc.error );
+	useCreateNotice()( wcSettings.pinterest_for_woocommerce.error );
 
 	return (
 		<>

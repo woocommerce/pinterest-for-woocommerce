@@ -13,14 +13,14 @@ import { useCreateNotice } from './helpers/effects';
 import NavigationClassic from '../components/navigation-classic';
 
 const CatalogSyncApp = () => {
-	useCreateNotice( wcSettings.pin4wc.error );
+	useCreateNotice( wcSettings.pinterest_for_woocommerce.error );
 
 	return (
-		<div className="pin4wc-catalog-sync">
+		<div className="pinterest-for-woocommerce-catalog-sync">
 			<NavigationClassic />
 
 			<TransientNotices />
-			<div className="pin4wc-catalog-sync__container">
+			<div className="pinterest-for-woocommerce-catalog-sync__container">
 				<SyncState />
 				<SyncIssues />
 			</div>

@@ -370,7 +370,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				$this->get_landing_page_content()
 			);
 
-			Package::container()->get( AssetDataRegistry::class )->add( 'pin4wc', $data );
+			Package::container()->get( AssetDataRegistry::class )->add( 'pinterest_for_woocommerce', $data );
 		}
 
 

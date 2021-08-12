@@ -97,7 +97,8 @@ const SetupPins = ( {} ) => {
 											<Button
 												isLink
 												href={
-													wcSettings.pin4wc
+													wcSettings
+														.pinterest_for_woocommerce
 														.pinterestLinks
 														.enhancedMatch
 												}

@@ -78,7 +78,7 @@ const SyncIssuesTable = ( {
 
 	return (
 		<TableCard
-			className="pin4wc-catalog-sync__issues"
+			className="pinterest-for-woocommerce-catalog-sync__issues"
 			title={ __( 'Issues', 'pinterest-for-woocommerce' ) }
 			rows={ issues && getRows( issues ) }
 			headers={ headers }

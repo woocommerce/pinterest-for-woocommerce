@@ -87,7 +87,9 @@ const SetupAccount = ( {
 		closeConfirmationModal();
 
 		const result = await apiFetch( {
-			path: wcSettings.pin4wc.apiRoute + '/auth_disconnect',
+			path:
+				wcSettings.pinterest_for_woocommerce.apiRoute +
+				'/auth_disconnect',
 			method: 'POST',
 		} );
 
@@ -148,8 +150,8 @@ const SetupAccount = ( {
 									// eslint-disable-next-line jsx-a11y/anchor-has-content
 									<a
 										href={
-											wcSettings.pin4wc.pinterestLinks
-												.adGuidelines
+											wcSettings.pinterest_for_woocommerce
+												.pinterestLinks.adGuidelines
 										}
 										target="_blank"
 										rel="noreferrer"
@@ -211,7 +213,8 @@ const SetupAccount = ( {
 										<Button
 											isSecondary
 											href={ decodeEntities(
-												wcSettings.pin4wc
+												wcSettings
+													.pinterest_for_woocommerce
 													.serviceLoginUrl
 											) }
 										>
@@ -232,8 +235,8 @@ const SetupAccount = ( {
 								<Button
 									isLink
 									href={
-										wcSettings.pin4wc.pinterestLinks
-											.newAccount
+										wcSettings.pinterest_for_woocommerce
+											.pinterestLinks.newAccount
 									}
 									target="_blank"
 								>
