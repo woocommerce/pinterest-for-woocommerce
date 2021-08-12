@@ -19,10 +19,6 @@ import {
  */
 
 const LandingPageApp = () => {
-	const {
-		faq_items: faqItems,
-	} = wcSettings.pinterest_for_woocommerce.landing_page;
-
 	const features = [
 		{
 			title: __( 'Sync your catalog', 'pinterest-for-woocommerce' ),
@@ -56,6 +52,30 @@ const LandingPageApp = () => {
 			image_url:
 				wcSettings.pinterest_for_woocommerce.pluginUrl +
 				'/assets/images/landing_catalog.svg',
+		},
+	];
+
+	const faqItems = [
+		{
+			question: __(
+				'Why am I getting an “Account not connected” error message?',
+				'pinterest-for-woocommerce'
+			),
+			answer: __(
+				'Your password might have changed recently. Click Reconnect Pinterest Account and follow the instructions on screen to restore the connection.',
+				'pinterest-for-woocommerce'
+			),
+		},
+
+		{
+			question: __(
+				'I have more than one Pinterest Advertiser account. Can I connect my WooCommerce store to multiple Pinterest Advertiser accounts?',
+				'pinterest-for-woocommerce'
+			),
+			answer: __(
+				'Only one Pinterest advertiser account can be linked to each WooCommerce store. If you want to connect a different Pinterest advertiser account you will need to either Disconnect the existing Pinterest Advertiser account from your current WooCommerce store and connect a different Pinterest Advertiser account, or Create another WooCommerce store and connect the additional Pinterest Advertiser account.',
+				'pinterest-for-woocommerce'
+			),
 		},
 	];
 
