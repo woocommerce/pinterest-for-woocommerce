@@ -365,12 +365,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				return;
 			}
 
-			$data = array_merge(
-				$this->get_component_settings(),
-				$this->get_landing_page_content()
-			);
-
-			Package::container()->get( AssetDataRegistry::class )->add( 'pinterest_for_woocommerce', $data );
+			Package::container()->get( AssetDataRegistry::class )->add( 'pinterest_for_woocommerce', $this->get_component_settings() );
 		}
 
 
@@ -418,20 +413,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				),
 				'isSetupComplete' => Pinterest_For_Woocommerce()::is_setup_complete(),
 				'countryTos'      => Pinterest_For_Woocommerce()::get_applicable_tos(),
-			);
-		}
-
-
-		/**
-		 * Adds the content of the landing page.
-		 *
-		 * @return array
-		 */
-		private function get_landing_page_content() {
-
-			return array(
-				'landing_page' => array(
-				),
 			);
 		}
 
