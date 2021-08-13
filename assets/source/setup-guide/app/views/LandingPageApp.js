@@ -204,12 +204,14 @@ const LandingPageApp = () => {
 	) : null;
 
 	return (
-		<div className="pinterest-for-woocommerce-landing-page">
+		<>
 			{ prelaunchNotice }
-			<WelcomeSection />
-			<FeaturesSection />
-			<FaqSection />
-		</div>
+			<div className="pinterest-for-woocommerce-landing-page">
+				<WelcomeSection />
+				<FeaturesSection />
+				<FaqSection />
+			</div>
+		</>
 	);
 };
 
