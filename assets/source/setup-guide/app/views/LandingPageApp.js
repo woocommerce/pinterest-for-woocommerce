@@ -133,15 +133,6 @@ const FeaturesSection = () => {
 						<img src={ item.image_url } alt="" />
 						<Text variant="subtitle">{ item.title }</Text>
 						<Text variant="body">{ item.text }</Text>
-						{ item?.extra && (
-							<Text
-								variant="body"
-								className="extra"
-								dangerouslySetInnerHTML={ {
-									__html: item.extra,
-								} }
-							/>
-						) }
 					</FlexBlock>
 				) ) }
 			</Flex>
