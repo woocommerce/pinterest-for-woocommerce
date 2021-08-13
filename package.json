@@ -98,7 +98,7 @@
     "lint:css": "wp-scripts lint-style ./assets/source",
     "lint:php": "composer run-script phpcs ./",
     "lint:css:fix": "wp-scripts lint-style ./assets/source --fix",
-    "build:zip": "composer install && wp-scripts build && gulp build && gulp package"
+    "build:zip": "composer install --no-dev && wp-scripts build && gulp build && gulp package"
   },
   "browserslist": [
     "last 5 versions",
