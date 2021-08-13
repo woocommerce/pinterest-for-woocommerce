@@ -92,53 +92,51 @@ const WelcomeSection = () => {
 };
 
 const FeaturesSection = () => {
-	const features = [
-		{
-			title: __( 'Sync your catalog', 'pinterest-for-woocommerce' ),
-			text: __(
-				'Connect your store to seamlessly sync your product catalog with Pinterest and create rich pins for each item. Your pins are kept up to date with daily automatic updates.',
-				'pinterest-for-woocommerce'
-			),
-			image_url:
-				wcSettings.pinterest_for_woocommerce.pluginUrl +
-				'/assets/images/landing_connect.svg',
-		},
-		{
-			title: __( 'Increase organic reach', 'pinterest-for-woocommerce' ),
-			text: __(
-				'Pinterest users can easily discover, save and buy products from your website without any advertising spend from you. Track your performance with the Pinterest tag.',
-				'pinterest-for-woocommerce'
-			),
-			image_url:
-				wcSettings.pinterest_for_woocommerce.pluginUrl +
-				'/assets/images/landing_organic.svg',
-		},
-		{
-			title: __(
-				'Create a storefront on Pinterest',
-				'pinterest-for-woocommerce'
-			),
-			text: __(
-				'Syncing your catalog creates a Shop tab on your Pinterest profile which allows Pinterest users to easily discover your products.',
-				'pinterest-for-woocommerce'
-			),
-			image_url:
-				wcSettings.pinterest_for_woocommerce.pluginUrl +
-				'/assets/images/landing_catalog.svg',
-		},
-	];
-
 	return (
 		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__features-section">
 			<Flex justify="center" align="top">
-				{ features.map( ( item, index ) => (
-					<Feature
-						key={ index }
-						imageUrl={ item.image_url }
-						title={ item.title }
-						text={ item.text }
-					/>
-				) ) }
+				<Feature
+					imageUrl={
+						wcSettings.pinterest_for_woocommerce.pluginUrl +
+						'/assets/images/landing_connect.svg'
+					}
+					title={ __(
+						'Sync your catalog',
+						'pinterest-for-woocommerce'
+					) }
+					text={ __(
+						'Connect your store to seamlessly sync your product catalog with Pinterest and create rich pins for each item. Your pins are kept up to date with daily automatic updates.',
+						'pinterest-for-woocommerce'
+					) }
+				/>
+				<Feature
+					imageUrl={
+						wcSettings.pinterest_for_woocommerce.pluginUrl +
+						'/assets/images/landing_organic.svg'
+					}
+					title={ __(
+						'Increase organic reach',
+						'pinterest-for-woocommerce'
+					) }
+					text={ __(
+						'Pinterest users can easily discover, save and buy products from your website without any advertising spend from you. Track your performance with the Pinterest tag.',
+						'pinterest-for-woocommerce'
+					) }
+				/>
+				<Feature
+					imageUrl={
+						wcSettings.pinterest_for_woocommerce.pluginUrl +
+						'/assets/images/landing_catalog.svg'
+					}
+					title={ __(
+						'Create a storefront on Pinterest',
+						'pinterest-for-woocommerce'
+					) }
+					text={ __(
+						'Syncing your catalog creates a Shop tab on your Pinterest profile which allows Pinterest users to easily discover your products.',
+						'pinterest-for-woocommerce'
+					) }
+				/>
 			</Flex>
 		</Card>
 	);
@@ -155,30 +153,6 @@ const Feature = ( { title, text, imageUrl } ) => {
 };
 
 const FaqSection = () => {
-	const faqItems = [
-		{
-			question: __(
-				'Why am I getting an “Account not connected” error message?',
-				'pinterest-for-woocommerce'
-			),
-			answer: __(
-				'Your password might have changed recently. Click Reconnect Pinterest Account and follow the instructions on screen to restore the connection.',
-				'pinterest-for-woocommerce'
-			),
-		},
-
-		{
-			question: __(
-				'I have more than one Pinterest Advertiser account. Can I connect my WooCommerce store to multiple Pinterest Advertiser accounts?',
-				'pinterest-for-woocommerce'
-			),
-			answer: __(
-				'Only one Pinterest advertiser account can be linked to each WooCommerce store. If you want to connect a different Pinterest advertiser account you will need to either Disconnect the existing Pinterest Advertiser account from your current WooCommerce store and connect a different Pinterest Advertiser account, or Create another WooCommerce store and connect the additional Pinterest Advertiser account.',
-				'pinterest-for-woocommerce'
-			),
-		},
-	];
-
 	return (
 		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__faq-section">
 			<Panel
@@ -187,13 +161,26 @@ const FaqSection = () => {
 					'pinterest-for-woocommerce'
 				) }
 			>
-				{ faqItems.map( ( item, index ) => (
-					<FaqQuestion
-						key={ index }
-						question={ item.question }
-						answer={ item.answer }
-					/>
-				) ) }
+				<FaqQuestion
+					question={ __(
+						'Why am I getting an “Account not connected” error message?',
+						'pinterest-for-woocommerce'
+					) }
+					answer={ __(
+						'Your password might have changed recently. Click Reconnect Pinterest Account and follow the instructions on screen to restore the connection.',
+						'pinterest-for-woocommerce'
+					) }
+				/>
+				<FaqQuestion
+					question={ __(
+						'I have more than one Pinterest Advertiser account. Can I connect my WooCommerce store to multiple Pinterest Advertiser accounts?',
+						'pinterest-for-woocommerce'
+					) }
+					answer={ __(
+						'Only one Pinterest advertiser account can be linked to each WooCommerce store. If you want to connect a different Pinterest advertiser account you will need to either Disconnect the existing Pinterest Advertiser account from your current WooCommerce store and connect a different Pinterest Advertiser account, or Create another WooCommerce store and connect the additional Pinterest Advertiser account.',
+						'pinterest-for-woocommerce'
+					) }
+				/>
 			</Panel>
 		</Card>
 	);
