@@ -18,7 +18,7 @@ import {
  * Internal dependencies
  */
 
-const welcomeSection = () => {
+const WelcomeSection = () => {
 	return (
 		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__welcome-section">
 			<Flex>
@@ -88,7 +88,7 @@ const welcomeSection = () => {
 	);
 };
 
-const featuresSection = () => {
+const FeaturesSection = () => {
 	const features = [
 		{
 			title: __( 'Sync your catalog', 'pinterest-for-woocommerce' ),
@@ -154,7 +154,7 @@ const featuresSection = () => {
 	);
 };
 
-const faqSection = () => {
+const FaqSection = () => {
 	const faqItems = [
 		{
 			question: __(
@@ -204,11 +204,11 @@ const faqSection = () => {
 const LandingPageApp = () => {
 	return (
 		<div className="pinterest-for-woocommerce-landing-page">
-			{ welcomeSection() }
+			{ WelcomeSection() }
 
-			{ featuresSection() }
+			{ FeaturesSection() }
 
-			{ faqSection() }
+			{ FaqSection() }
 		</div>
 	);
 };
