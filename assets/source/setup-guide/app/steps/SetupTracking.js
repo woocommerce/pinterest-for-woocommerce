@@ -137,7 +137,11 @@ const SetupTracking = ( { view } ) => {
 				setTagsList( results );
 
 				if ( Object.keys( results ).length > 0 ) {
-					if ( ! appSettings?.tracking_tag ) {
+					if (
+						! appSettings?.tracking_tag ||
+						typeof results[ appSettings?.tracking_tag ] ===
+							'undefined'
+					) {
 						handleOptionChange(
 							'tracking_tag',
 							Object.keys( results )[ 0 ]
