@@ -18,6 +18,7 @@ import {
 /**
  * Internal dependencies
  */
+import PrelaunchNotice from '../../../components/prelaunch-notice';
 
 const WelcomeSection = () => {
 	return (
@@ -195,14 +196,22 @@ const FaqQuestion = ( { question, answer } ) => {
 };
 
 const LandingPageApp = () => {
+	const { pluginVersion } = wcSettings.pinterest_for_woocommerce;
+
+	// Only show the pre-launch beta notice if the plugin version is a beta.
+	const prelaunchNotice = pluginVersion.includes( 'beta' ) ? (
+		<PrelaunchNotice />
+	) : null;
+
 	return (
-		<div className="pinterest-for-woocommerce-landing-page">
-			<WelcomeSection />
-
-			<FeaturesSection />
-
-			<FaqSection />
-		</div>
+		<>
+			{ prelaunchNotice }
+			<div className="pinterest-for-woocommerce-landing-page">
+				<WelcomeSection />
+				<FeaturesSection />
+				<FaqSection />
+			</div>
+		</>
 	);
 };
 

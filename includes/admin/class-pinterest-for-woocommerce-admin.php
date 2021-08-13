@@ -378,6 +378,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		private function get_component_settings() {
 
 			return array(
+				'pluginVersion'   => PINTEREST_FOR_WOOCOMMERCE_VERSION,
 				'adminUrl'        => esc_url(
 					add_query_arg(
 						array(
