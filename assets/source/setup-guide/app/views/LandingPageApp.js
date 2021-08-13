@@ -193,11 +193,11 @@ const FaqSection = () => {
 const LandingPageApp = () => {
 	return (
 		<div className="pinterest-for-woocommerce-landing-page">
-			{ WelcomeSection() }
+			<WelcomeSection />
 
-			{ FeaturesSection() }
+			<FeaturesSection />
 
-			{ FaqSection() }
+			<FaqSection />
 		</div>
 	);
 };
