@@ -196,7 +196,7 @@ const FaqQuestion = ( { question, answer } ) => {
 };
 
 const LandingPageApp = () => {
-	const { pluginVersion } = wcSettings.pinterestForWooCommerce;
+	const { pluginVersion } = wcSettings.pinterest_for_woocommerce;
 
 	// Only show the pre-launch beta notice if the plugin version is a beta.
 	const prelaunchNotice = pluginVersion.includes( 'beta' ) ? (
