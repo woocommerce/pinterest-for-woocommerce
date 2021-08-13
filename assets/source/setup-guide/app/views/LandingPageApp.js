@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { getNewPath, getHistory } from '@woocommerce/navigation';
+import { createInterpolateElement } from '@wordpress/element';
 import {
 	Button,
 	Card,
@@ -57,21 +58,23 @@ const WelcomeSection = () => {
 					</Text>
 
 					<Text variant="body">
-						{ __(
-							'By clicking ‘Get started’, you agree to our',
-							'pinterest-for-woocommerce'
-						) }{ ' ' }
-						<a
-							href="https://business.pinterest.com/business-terms-of-service/"
-							target="_blank"
-							rel="noreferrer"
-						>
-							{ __(
-								'Terms of Service',
+						{ createInterpolateElement(
+							__(
+								'By clicking ‘Get started’, you agree to our <a>Terms of Service</a>.',
 								'pinterest-for-woocommerce'
-							) }
-						</a>
-						.
+							),
+							{
+								a: (
+									// Disabling no-content rule - content is interpolated from above string.
+									// eslint-disable-next-line jsx-a11y/anchor-has-content
+									<a
+										href="https://business.pinterest.com/business-terms-of-service/"
+										target="_blank"
+										rel="noreferrer"
+									/>
+								),
+							}
+						) }
 					</Text>
 				</FlexBlock>
 				<FlexBlock className="image-block">
