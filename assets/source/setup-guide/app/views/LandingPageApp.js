@@ -132,14 +132,25 @@ const FeaturesSection = () => {
 		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__features-section">
 			<Flex justify="center" align="top">
 				{ features.map( ( item, index ) => (
-					<FlexBlock key={ index }>
-						<img src={ item.image_url } alt="" />
-						<Text variant="subtitle">{ item.title }</Text>
-						<Text variant="body">{ item.text }</Text>
-					</FlexBlock>
+					<Feature
+						key={ index }
+						imageUrl={ item.image_url }
+						title={ item.title }
+						text={ item.text }
+					/>
 				) ) }
 			</Flex>
 		</Card>
+	);
+};
+
+const Feature = ( { title, text, imageUrl } ) => {
+	return (
+		<FlexBlock>
+			<img src={ imageUrl } alt="" />
+			<Text variant="subtitle">{ title }</Text>
+			<Text variant="body">{ text }</Text>
+		</FlexBlock>
 	);
 };
 
@@ -177,16 +188,22 @@ const FaqSection = () => {
 				) }
 			>
 				{ faqItems.map( ( item, index ) => (
-					<PanelBody
-						title={ item.question }
-						initialOpen={ false }
+					<FaqQuestion
 						key={ index }
-					>
-						<PanelRow>{ item.answer }</PanelRow>
-					</PanelBody>
+						question={ item.question }
+						answer={ item.answer }
+					/>
 				) ) }
 			</Panel>
 		</Card>
+	);
+};
+
+const FaqQuestion = ( { question, answer } ) => {
+	return (
+		<PanelBody title={ question } initialOpen={ false }>
+			<PanelRow>{ answer }</PanelRow>
+		</PanelBody>
 	);
 };
 
