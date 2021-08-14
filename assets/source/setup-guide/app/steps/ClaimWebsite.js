@@ -31,10 +31,10 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 	const createNotice = useCreateNotice();
 
 	useEffect( () => {
-		if ( isDomainVerified ) {
+		if ( status !== 'pending' && isDomainVerified ) {
 			setStatus( 'success' );
 		}
-	}, [ isDomainVerified ] );
+	}, [ status, isDomainVerified ] );
 
 	const handleClaimWebsite = async () => {
 		setStatus( 'pending' );
@@ -47,9 +47,9 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 				method: 'POST',
 			} );
 
-			setStatus( 'success' );
+			await setAppSettings( { account_data: results.account_data } );
 
-			setAppSettings( { account_data: results.account_data } );
+			setStatus( 'success' );
 		} catch ( error ) {
 			setStatus( 'error' );
 
