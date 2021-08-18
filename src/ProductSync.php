@@ -470,7 +470,7 @@ class ProductSync {
 		if ( ! empty( $merchant['data']->id ) && 'declined' === $merchant['data']->product_pin_approval_status ) {
 			$registered = false;
 			self::log( 'Pinterest returned a Declined status for product_pin_approval_status' );
-		} elseif ( ! empty( $merchant['data']->id ) && ! isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
+		} elseif ( ! empty( $merchant['data']->id ) && ! isset( $merchant['data']->product_pin_feed_profile ) ) {
 			// No feed registered, but we got a merchant.
 			$merchant = API\Base::add_merchant_feed( $merchant['data']->id, $feed_args );
 
