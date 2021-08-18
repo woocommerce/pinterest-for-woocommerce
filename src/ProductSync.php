@@ -140,6 +140,9 @@ class ProductSync {
 		}
 
 		$feed_job['status'] = 'scheduled_for_generation';
+		if ( isset( $feed_job['finished'] ) ) {
+			unset( $feed_job['finished'] );
+		}
 
 		Pinterest_For_Woocommerce()::save_data( 'feed_job', $feed_job );
 		self::trigger_async_feed_generation( $force );
@@ -231,12 +234,10 @@ class ProductSync {
 
 			if ( $registered ) {
 
-				$expired = ( 'generated' === $state['status'] && $state['finished'] < ( time() - DAY_IN_SECONDS ) );
-
-				// If local is not generated, or is older than X , schedule regeneration.
+				// If local is not generated, or needs to be regenerated, schedule regeneration.
 				if ( 'starting' === $state['status'] || 'in_progress' === $state['status'] ) {
 					self::trigger_async_feed_generation();
-				} elseif ( $expired || 'pending_config' === $state['status'] ) {
+				} elseif ( 'scheduled_for_generation' === $state['status'] || 'pending_config' === $state['status'] ) {
 					self::feed_reschedule();
 				}
 
@@ -626,6 +627,18 @@ class ProductSync {
 	public static function feed_job_status( $status = null, $args = null ) {
 
 		$state_data = Pinterest_For_Woocommerce()::get_data( 'feed_job' );
+
+		if ( ! is_null( $state_data ) ) {
+			$expired = ( 'generated' === $state_data['status'] && $state_data['finished'] < ( time() - DAY_IN_SECONDS ) );
+
+			if ( $expired ) {
+				$state_data['status'] = 'scheduled_for_generation';
+				if ( isset( $state_data['finished'] ) ) {
+					unset( $state_data['finished'] );
+				}
+				Pinterest_For_Woocommerce()::save_data( 'feed_job', $state_data );
+			}
+		}
 
 		if ( is_null( $status ) || ( ! is_null( $status ) && 'check_registration' === $status && ! empty( $state_data['job_id'] ) ) ) {
 			return $state_data;
