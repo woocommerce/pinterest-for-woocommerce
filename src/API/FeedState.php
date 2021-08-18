@@ -202,12 +202,10 @@ class FeedState extends VendorAPI {
 				$status       = 'success';
 				$status_label = esc_html__( 'Up to date', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
-					/* Translators: %1$s Time string, %2$s text string indicating progress, %3$s hyperlink open tag, %4$s hyperlink close tag */
-					esc_html__( '%3$sFeed%4$s generated %1$s ago - %2$s', 'pinterest-for-woocommerce' ),
+					/* Translators: %1$s Time string, %2$s text string indicating progress */
+					esc_html__( 'Successfully generated %1$s ago - %2$s', 'pinterest-for-woocommerce' ),
 					human_time_diff( $state['last_activity'] ),
-					$state['progress'],
-					'<a href="' . $state['feed_url'] . '" target="_blank">',
-					'</a>'
+					$state['progress']
 				);
 				break;
 
