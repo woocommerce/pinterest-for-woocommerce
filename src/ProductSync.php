@@ -493,7 +493,6 @@ class ProductSync {
 		}
 
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $registered );
-		Pinterest_For_Woocommerce()::save_data( 'merchant_id', $merchant['data']->id );
 
 		return $registered;
 	}
@@ -513,8 +512,9 @@ class ProductSync {
 	 */
 	private static function get_merchant( $feed_args ) {
 
-		$merchant    = false;
-		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
+		$merchant          = false;
+		$merchant_id       = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
+		$saved_merchant_id = $merchant_id;
 
 		if ( empty( $merchant_id ) ) {
 			// Get merchant from advertiser object.
@@ -536,6 +536,9 @@ class ProductSync {
 
 			try {
 				$merchant = API\Base::get_merchant( $merchant_id );
+				if ( $saved_merchant_id !== $merchant_id ) {
+					Pinterest_For_Woocommerce()::save_data( 'merchant_id', $merchant['data']->id );
+				}
 			} catch ( \Throwable $th ) {
 				$merchant = false;
 			}
@@ -544,9 +547,12 @@ class ProductSync {
 		if ( ! $merchant || ( 'success' !== $merchant['status'] && 650 === $merchant['code'] ) ) {  // https://developers.pinterest.com/docs/redoc/#tag/API-Response-Codes Merchant not found 650.
 			// Try creating one.
 			$merchant = API\Base::maybe_create_merchant( $feed_args );
+			if ( 'success' === $merchant['status'] ) {
+				Pinterest_For_Woocommerce()::save_data( 'merchant_id', $merchant['data']->id );
+			}
 		}
 
-		if ( 'success' !== $merchant['status'] ) {
+		if ( ! $merchant || 'success' !== $merchant['status'] ) {
 			throw new \Exception( esc_html__( 'Response error when trying create a merchant or get the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
