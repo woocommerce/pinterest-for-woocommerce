@@ -79,9 +79,13 @@ class ProductSync {
 		if ( self::is_product_sync_enabled() ) {
 			$state = self::feed_job_status();
 
-			// If we are scheduled for generation, do it asap.
-			if ( $state && 'scheduled_for_generation' === $state['status'] ) {
-				self::trigger_async_feed_generation();
+			if ( $state ) {
+				// If local is not generated, or needs to be regenerated, schedule regeneration.
+				if ( 'starting' === $state['status'] || 'in_progress' === $state['status'] ) {
+					self::trigger_async_feed_generation();
+				} elseif ( 'scheduled_for_generation' === $state['status'] || 'pending_config' === $state['status'] ) {
+					self::feed_reschedule();
+				}
 			}
 
 			/**
@@ -233,14 +237,6 @@ class ProductSync {
 			}
 
 			if ( $registered ) {
-
-				// If local is not generated, or needs to be regenerated, schedule regeneration.
-				if ( 'starting' === $state['status'] || 'in_progress' === $state['status'] ) {
-					self::trigger_async_feed_generation();
-				} elseif ( 'scheduled_for_generation' === $state['status'] || 'pending_config' === $state['status'] ) {
-					self::feed_reschedule();
-				}
-
 				return true;
 			}
 
