@@ -474,8 +474,8 @@ class ProductSync {
 			// No feed registered, but we got a merchant.
 			$merchant = API\Base::add_merchant_feed( $merchant['data']->id, $feed_args );
 
-			if ( $merchant && 'success' === $merchant['status'] && isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
-				$registered = $merchant['data']->product_pin_feed_profile->id;
+			if ( $merchant && 'success' === $merchant['status'] && isset( $merchant['data']->location_config->full_feed_fetch_location ) ) {
+				$registered = $merchant['data']->id;
 				self::log( 'Added merchant feed: ' . $feed_args['feed_location'] );
 			}
 		} elseif ( $feed_args['feed_location'] === $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) {
