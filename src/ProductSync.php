@@ -200,8 +200,7 @@ class ProductSync {
 	 */
 	public static function handle_feed_registration() {
 
-		$state         = self::feed_job_status( 'check_registration' );
-		$force_new_reg = false;
+		$state = self::feed_job_status( 'check_registration' );
 
 		$feed_args = array(
 			'feed_location'             => $state['feed_url'],
@@ -224,10 +223,7 @@ class ProductSync {
 		}
 
 		try {
-
-			if ( empty( $registered ) || $force_new_reg ) {
-				$registered = self::register_feed( $feed_args );
-			}
+			$registered = self::register_feed( $feed_args );
 
 			if ( $registered ) {
 
