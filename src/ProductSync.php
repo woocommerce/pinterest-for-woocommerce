@@ -494,21 +494,37 @@ class ProductSync {
 			$registered = $merchant['data']->product_pin_feed_profile->id;
 			self::log( 'Feed registered for merchant: ' . $feed_args['feed_location'] );
 		} else {
-			$product_pin_feed_profile = $merchant['data']->product_pin_feed_profile;
+			$product_pin_feed_profile    = $merchant['data']->product_pin_feed_profile;
+			$product_pin_feed_profile_id = false;
+			$prev_registered             = self::is_feed_registered();
+			if ( false !== $prev_registered ) {
+				try {
+					$feed                        = API\Base::get_merchant_feed( $merchant['data']->id, $prev_registered );
+					$product_pin_feed_profile_id = $feed['data']->feed_profile_id;
+				} catch ( \Throwable $e ) {
+					$product_pin_feed_profile_id = false;
+				}
+			}
 
-			$configured_path = dirname( $product_pin_feed_profile->location_config->full_feed_fetch_location );
-			$local_path      = dirname( $feed_args['feed_location'] );
+			if ( false === $product_pin_feed_profile_id ) {
+				$configured_path = dirname( $product_pin_feed_profile->location_config->full_feed_fetch_location );
+				$local_path      = dirname( $feed_args['feed_location'] );
 
-			if ( $configured_path === $local_path && $feed_args['country'] === $product_pin_feed_profile->country && $feed_args['locale'] === $product_pin_feed_profile->locale ) { // We can assume we're on the same site
-				// A diff feed was registered. Update to the current one.
+				if ( $configured_path === $local_path && $feed_args['country'] === $product_pin_feed_profile->country && $feed_args['locale'] === $product_pin_feed_profile->locale ) {
+					// We can assume we're on the same site.
 
+					$product_pin_feed_profile_id = $product_pin_feed_profile->id;
+				}
+			}
+
+			if ( false !== $product_pin_feed_profile_id ) { // We update a feed, if we have one matching our site.
 				// We cannot change the country or locale, so we remove that from the parameters to send.
 				$update_feed_args = $feed_args;
 				unset( $update_feed_args['country'] );
 				unset( $update_feed_args['locale'] );
 
 				// Actually do the update.
-				$feed = API\Base::update_merchant_feed( $product_pin_feed_profile->merchant_id, $product_pin_feed_profile->id, $update_feed_args );
+				$feed = API\Base::update_merchant_feed( $product_pin_feed_profile->merchant_id, $product_pin_feed_profile_id, $update_feed_args );
 
 				if ( $feed && 'success' === $feed['status'] && isset( $feed['data']->location_config->full_feed_fetch_location ) ) {
 					$registered = $feed['data']->id;
