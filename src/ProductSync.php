@@ -210,6 +210,12 @@ class ProductSync {
 		$state         = self::feed_job_status( 'check_registration' );
 		$force_new_reg = false;
 
+		if ( 'generated' !== $state['status'] ) {
+			self::log( 'Feed didn\'t fully generate yet. Retrying later.', 'debug' );
+			// Feed is not generated yet, lets wait a bit longer.
+			return true;
+		}
+
 		$feed_args = array(
 			'feed_location'             => $state['feed_url'],
 			'feed_format'               => 'XML',
