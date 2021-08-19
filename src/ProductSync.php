@@ -530,6 +530,9 @@ class ProductSync {
 					$registered = $feed['data']->id;
 					self::log( 'Merchant\'s feed updated to current location: ' . $feed_args['feed_location'] );
 				}
+			} else {
+				// We cannot infer that a feed exists, therefore we create a new one.
+				$registered = self::do_add_merchant_feed( $merchant['data']->id, $feed_args );
 			}
 		}
 
