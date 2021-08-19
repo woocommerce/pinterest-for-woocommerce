@@ -446,6 +446,26 @@ class ProductSync {
 
 
 	/**
+	 * Make API request to add_merchant_feed.
+	 *
+	 * @param string $merchant_id The merchant ID the feed belongs to.
+	 * @param array  $feed_args   The arguments used to create the feed.
+	 *
+	 * @return string|bool
+	 */
+	private static function do_add_merchant_feed( $merchant_id, $feed_args ) {
+		$feed = API\Base::add_merchant_feed( $merchant_id, $feed_args );
+
+		if ( $feed && 'success' === $feed['status'] && isset( $feed['data']->location_config->full_feed_fetch_location ) ) {
+			self::log( 'Added merchant feed: ' . $feed_args['feed_location'] );
+			return $feed['data']->id;
+		}
+
+		return false;
+	}
+
+
+	/**
 	 * Handles feed registration using the given arguments.
 	 * Will try to create a merchant if none exists.
 	 * Also if a different feed is registered, it will update using the URL in the
@@ -468,12 +488,7 @@ class ProductSync {
 			self::log( 'Pinterest returned a Declined status for product_pin_approval_status' );
 		} elseif ( ! empty( $merchant['data']->id ) && ! isset( $merchant['data']->product_pin_feed_profile ) ) {
 			// No feed registered, but we got a merchant.
-			$merchant = API\Base::add_merchant_feed( $merchant['data']->id, $feed_args );
-
-			if ( $merchant && 'success' === $merchant['status'] && isset( $merchant['data']->location_config->full_feed_fetch_location ) ) {
-				$registered = $merchant['data']->id;
-				self::log( 'Added merchant feed: ' . $feed_args['feed_location'] );
-			}
+			$registered = self::do_add_merchant_feed( $merchant['data']->id, $feed_args );
 		} elseif ( $feed_args['feed_location'] === $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) {
 			// Feed registered.
 			$registered = $merchant['data']->product_pin_feed_profile->id;
