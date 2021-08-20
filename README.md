@@ -2,13 +2,14 @@
 
 A native integration which allows you to market your store on Pinterest, including:
 
-- Sync your WooCommerce products to Pinterest.
-- Track conversions with the Pinterest pixel.
-- Visitors to your site can pin to share your products to their boards.
+-   Sync your WooCommerce products to Pinterest via [Catalog](https://help.pinterest.com/en/business/article/before-you-get-started-with-catalogs).
+-   Add [Save button](https://help.pinterest.com/en/business/article/save-button) to your products' images, so your visitors can save them straight to a Pinterest board.
+-   Make your products and posts show up as [Rich Pins](https://help.pinterest.com/en/business/article/rich-pins) on Pinterest.
+-   Track conversions with [Pinterest tag](https://help.pinterest.com/en/business/article/track-conversions-with-pinterest-tag).
 
 ## Status - _in development_
 
-Pinterest for WooCommerce is under development. To find out more about availability and release, refer to WooCommerce.com.Pinterest for WooCommerce is under development. To find out more about availability and release, refer to WooCommerce.com.
+Pinterest for WooCommerce is under development. To find out more about availability and release, refer to WooCommerce.com.
 
 ## Support
 
@@ -16,7 +17,7 @@ This repository is not suitable for support. Please don't use our issue tracker 
 
 ### Requirements
 
-Pinterest for WooCommerce requires recent versions of PHP (7.4 or newer) and WordPress and WooCommerce (recommend latest; support last two versions, aka L-2).
+Pinterest for WooCommerce requires recent versions of PHP (7.4 or newer), and WordPress and WooCommerce (we recommend the latest, and support the last two versions, a.k.a. L-2).
 
 See [pinterest-for-woocommerce.php](https://github.com/woocommerce/pinterest-for-woocommerce/blob/develop/pinterest-for-woocommerce.php) for current required versions.
 
@@ -51,7 +52,7 @@ Now you can build the plugin using one of these commands:
 
 ### Branches
 
-- `develop` branch is the most up to date code.
+-   `develop` branch is the most up to date code.
 
 ### Development tools
 
