@@ -2,7 +2,7 @@
 
 A native integration which allows you to market your store on Pinterest, including:
 
--   Sync your WooCommerce products to Pinterest via [Catalog](https://help.pinterest.com/en/business/article/before-you-get-started-with-catalogs).
+-   [Sync your WooCommerce products to Pinterest.](https://help.pinterest.com/en/business/article/before-you-get-started-with-catalogs)
 -   Add [Save button](https://help.pinterest.com/en/business/article/save-button) to your products' images, so your visitors can save them straight to a Pinterest board.
 -   Make your products and posts show up as [Rich Pins](https://help.pinterest.com/en/business/article/rich-pins) on Pinterest.
 -   Track conversions with [Pinterest tag](https://help.pinterest.com/en/business/article/track-conversions-with-pinterest-tag).
