@@ -59,7 +59,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @var string
 		 */
-		public $version = '1.0.0-beta.1';
+		public $version = '1.0.0-beta.2';
 
 		/**
 		 * The single instance of the class.
