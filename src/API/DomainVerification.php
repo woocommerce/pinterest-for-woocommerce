@@ -97,7 +97,8 @@ class DomainVerification extends VendorAPI {
 
 			if ( 403 === $error_code && $this->verification_attempts_remaining > 0 ) {
 				$this->verification_attempts_remaining--;
-				Logger::log( sprintf( 'Retrying domain verification. Attempts left: %d', $this->verification_attempts_remaining ), 'debug' );
+				Logger::log( sprintf( 'Retrying domain verification in 5 seconds. Attempts left: %d', $this->verification_attempts_remaining ), 'debug' );
+				sleep( 5 );
 				return call_user_func( __METHOD__ );
 			}
 
