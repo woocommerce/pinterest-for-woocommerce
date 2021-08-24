@@ -79,9 +79,13 @@ class ProductSync {
 		if ( self::is_product_sync_enabled() ) {
 			$state = self::feed_job_status();
 
-			// If we are scheduled for generation, do it asap.
-			if ( $state && 'scheduled_for_generation' === $state['status'] ) {
-				self::trigger_async_feed_generation();
+			if ( $state ) {
+				// If local is not generated, or needs to be regenerated, schedule regeneration.
+				if ( 'starting' === $state['status'] || 'in_progress' === $state['status'] ) {
+					self::trigger_async_feed_generation();
+				} elseif ( 'scheduled_for_generation' === $state['status'] || 'pending_config' === $state['status'] ) {
+					self::feed_reschedule();
+				}
 			}
 
 			/**
@@ -140,6 +144,9 @@ class ProductSync {
 		}
 
 		$feed_job['status'] = 'scheduled_for_generation';
+		if ( isset( $feed_job['finished'] ) ) {
+			unset( $feed_job['finished'] );
+		}
 
 		Pinterest_For_Woocommerce()::save_data( 'feed_job', $feed_job );
 		self::trigger_async_feed_generation( $force );
@@ -202,6 +209,12 @@ class ProductSync {
 
 		$state = self::feed_job_status( 'check_registration' );
 
+		if ( 'generated' !== $state['status'] ) {
+			self::log( 'Feed didn\'t fully generate yet. Retrying later.', 'debug' );
+			// Feed is not generated yet, lets wait a bit longer.
+			return true;
+		}
+
 		$feed_args = array(
 			'feed_location'             => $state['feed_url'],
 			'feed_format'               => 'XML',
@@ -226,16 +239,6 @@ class ProductSync {
 			$registered = self::register_feed( $feed_args );
 
 			if ( $registered ) {
-
-				$expired = ( 'generated' === $state['status'] && $state['finished'] < ( time() - DAY_IN_SECONDS ) );
-
-				// If local is not generated, or is older than X , schedule regeneration.
-				if ( 'starting' === $state['status'] || 'in_progress' === $state['status'] ) {
-					self::trigger_async_feed_generation();
-				} elseif ( $expired || 'pending_config' === $state['status'] ) {
-					self::feed_reschedule();
-				}
-
 				return true;
 			}
 
@@ -682,6 +685,18 @@ class ProductSync {
 	public static function feed_job_status( $status = null, $args = null ) {
 
 		$state_data = Pinterest_For_Woocommerce()::get_data( 'feed_job' );
+
+		if ( ! is_null( $state_data ) ) {
+			$expired = ( 'generated' === $state_data['status'] && $state_data['finished'] < ( time() - DAY_IN_SECONDS ) );
+
+			if ( $expired ) {
+				$state_data['status'] = 'scheduled_for_generation';
+				if ( isset( $state_data['finished'] ) ) {
+					unset( $state_data['finished'] );
+				}
+				Pinterest_For_Woocommerce()::save_data( 'feed_job', $state_data );
+			}
+		}
 
 		if ( is_null( $status ) || ( ! is_null( $status ) && 'check_registration' === $status && ! empty( $state_data['job_id'] ) ) ) {
 			return $state_data;
