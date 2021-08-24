@@ -200,8 +200,7 @@ class ProductSync {
 	 */
 	public static function handle_feed_registration() {
 
-		$state         = self::feed_job_status( 'check_registration' );
-		$force_new_reg = false;
+		$state = self::feed_job_status( 'check_registration' );
 
 		$feed_args = array(
 			'feed_location'             => $state['feed_url'],
@@ -224,10 +223,7 @@ class ProductSync {
 		}
 
 		try {
-
-			if ( empty( $registered ) || $force_new_reg ) {
-				$registered = self::register_feed( $feed_args );
-			}
+			$registered = self::register_feed( $feed_args );
 
 			if ( $registered ) {
 
@@ -456,6 +452,26 @@ class ProductSync {
 
 
 	/**
+	 * Make API request to add_merchant_feed.
+	 *
+	 * @param string $merchant_id The merchant ID the feed belongs to.
+	 * @param array  $feed_args   The arguments used to create the feed.
+	 *
+	 * @return string|bool
+	 */
+	private static function do_add_merchant_feed( $merchant_id, $feed_args ) {
+		$feed = API\Base::add_merchant_feed( $merchant_id, $feed_args );
+
+		if ( $feed && 'success' === $feed['status'] && isset( $feed['data']->location_config->full_feed_fetch_location ) ) {
+			self::log( 'Added merchant feed: ' . $feed_args['feed_location'] );
+			return $feed['data']->id;
+		}
+
+		return false;
+	}
+
+
+	/**
 	 * Handles feed registration using the given arguments.
 	 * Will try to create a merchant if none exists.
 	 * Also if a different feed is registered, it will update using the URL in the
@@ -476,30 +492,57 @@ class ProductSync {
 		if ( ! empty( $merchant['data']->id ) && 'declined' === $merchant['data']->product_pin_approval_status ) {
 			$registered = false;
 			self::log( 'Pinterest returned a Declined status for product_pin_approval_status' );
-		} elseif ( ! empty( $merchant['data']->id ) && ! isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
+		} elseif ( ! empty( $merchant['data']->id ) && ! isset( $merchant['data']->product_pin_feed_profile ) ) {
 			// No feed registered, but we got a merchant.
-			$merchant = API\Base::add_merchant_feed( $merchant['data']->id, $feed_args );
-
-			if ( $merchant && 'success' === $merchant['status'] && isset( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) ) {
-				$registered = $merchant['data']->product_pin_feed_profile->id;
-				self::log( 'Added merchant feed: ' . $feed_args['feed_location'] );
-			}
+			$registered = self::do_add_merchant_feed( $merchant['data']->id, $feed_args );
 		} elseif ( $feed_args['feed_location'] === $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) {
 			// Feed registered.
 			$registered = $merchant['data']->product_pin_feed_profile->id;
 			self::log( 'Feed registered for merchant: ' . $feed_args['feed_location'] );
 		} else {
-			// A diff feed was registered. Update to the current one.
-			$feed = API\Base::update_merchant_feed( $merchant['data']->product_pin_feed_profile->merchant_id, $merchant['data']->product_pin_feed_profile->id, $feed_args );
+			$product_pin_feed_profile    = $merchant['data']->product_pin_feed_profile;
+			$product_pin_feed_profile_id = false;
+			$prev_registered             = self::is_feed_registered();
+			if ( false !== $prev_registered ) {
+				try {
+					$feed                        = API\Base::get_merchant_feed( $merchant['data']->id, $prev_registered );
+					$product_pin_feed_profile_id = $feed['data']->feed_profile_id;
+				} catch ( \Throwable $e ) {
+					$product_pin_feed_profile_id = false;
+				}
+			}
 
-			if ( $feed && 'success' === $feed['status'] && isset( $feed['data']->location_config->full_feed_fetch_location ) ) {
-				$registered = $feed['data']->id;
-				self::log( 'Merchant\'s feed updated to current location: ' . $feed_args['feed_location'] );
+			if ( false === $product_pin_feed_profile_id ) {
+				$configured_path = dirname( $product_pin_feed_profile->location_config->full_feed_fetch_location );
+				$local_path      = dirname( $feed_args['feed_location'] );
+
+				if ( $configured_path === $local_path && $feed_args['country'] === $product_pin_feed_profile->country && $feed_args['locale'] === $product_pin_feed_profile->locale ) {
+					// We can assume we're on the same site.
+
+					$product_pin_feed_profile_id = $product_pin_feed_profile->id;
+				}
+			}
+
+			if ( false !== $product_pin_feed_profile_id ) { // We update a feed, if we have one matching our site.
+				// We cannot change the country or locale, so we remove that from the parameters to send.
+				$update_feed_args = $feed_args;
+				unset( $update_feed_args['country'] );
+				unset( $update_feed_args['locale'] );
+
+				// Actually do the update.
+				$feed = API\Base::update_merchant_feed( $product_pin_feed_profile->merchant_id, $product_pin_feed_profile_id, $update_feed_args );
+
+				if ( $feed && 'success' === $feed['status'] && isset( $feed['data']->location_config->full_feed_fetch_location ) ) {
+					$registered = $feed['data']->id;
+					self::log( 'Merchant\'s feed updated to current location: ' . $feed_args['feed_location'] );
+				}
+			} else {
+				// We cannot infer that a feed exists, therefore we create a new one.
+				$registered = self::do_add_merchant_feed( $merchant['data']->id, $feed_args );
 			}
 		}
 
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $registered );
-		Pinterest_For_Woocommerce()::save_data( 'merchant_id', $merchant['data']->id );
 
 		return $registered;
 	}
@@ -519,8 +562,9 @@ class ProductSync {
 	 */
 	private static function get_merchant( $feed_args ) {
 
-		$merchant    = false;
-		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
+		$merchant          = false;
+		$merchant_id       = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
+		$saved_merchant_id = $merchant_id;
 
 		if ( empty( $merchant_id ) ) {
 			// Get merchant from advertiser object.
@@ -542,6 +586,9 @@ class ProductSync {
 
 			try {
 				$merchant = API\Base::get_merchant( $merchant_id );
+				if ( $saved_merchant_id !== $merchant_id ) {
+					Pinterest_For_Woocommerce()::save_data( 'merchant_id', $merchant['data']->id );
+				}
 			} catch ( \Throwable $th ) {
 				$merchant = false;
 			}
@@ -550,9 +597,12 @@ class ProductSync {
 		if ( ! $merchant || ( 'success' !== $merchant['status'] && 650 === $merchant['code'] ) ) {  // https://developers.pinterest.com/docs/redoc/#tag/API-Response-Codes Merchant not found 650.
 			// Try creating one.
 			$merchant = API\Base::maybe_create_merchant( $feed_args );
+			if ( 'success' === $merchant['status'] ) {
+				Pinterest_For_Woocommerce()::save_data( 'merchant_id', $merchant['data']->id );
+			}
 		}
 
-		if ( 'success' !== $merchant['status'] ) {
+		if ( ! $merchant || 'success' !== $merchant['status'] ) {
 			throw new \Exception( esc_html__( 'Response error when trying create a merchant or get the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
