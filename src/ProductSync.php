@@ -129,6 +129,21 @@ class ProductSync {
 
 
 	/**
+	 * Checks if the feed file for the configured (In $state var) feed exists.
+	 * This could be true as the feed is being generated, if its not the 1st time
+	 * its been generated.
+	 *
+	 * @return boolean
+	 */
+	public static function feed_file_exists() {
+
+		$state = Pinterest_For_Woocommerce()::get_data( 'feed_job' ) ?? array();
+
+		return isset( $state['feed_file'] ) && file_exists( $state['feed_file'] );
+	}
+
+
+	/**
 	 * Schedules the regeneration process of the XML feed.
 	 *
 	 * @param boolean $force Forces rescheduling even when the status indicates that its not needed.
@@ -209,7 +224,7 @@ class ProductSync {
 
 		$state = self::feed_job_status( 'check_registration' );
 
-		if ( 'generated' !== $state['status'] ) {
+		if ( ! self::feed_file_exists() ) {
 			self::log( 'Feed didn\'t fully generate yet. Retrying later.', 'debug' );
 			// Feed is not generated yet, lets wait a bit longer.
 			return true;
