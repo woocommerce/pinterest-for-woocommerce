@@ -245,7 +245,7 @@ const SetupTracking = ( { view } ) => {
 		return (
 			<Button
 				isPrimary
-				disabled={ isSaving || ! termsAgreed }
+				disabled={ isSaving || ( ! termsAgreed && status !== 'error' ) }
 				onClick={
 					status === 'success' ? handleCompleteSetup : handleTryAgain
 				}
