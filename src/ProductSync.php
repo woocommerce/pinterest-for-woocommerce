@@ -139,7 +139,7 @@ class ProductSync {
 
 		$feed_job = Pinterest_For_Woocommerce()::get_data( 'feed_job' ) ?? array();
 
-		if ( ! $force && isset( $feed_job['status'] ) && in_array( $feed_job['status'], array( 'scheduled_for_generation', 'in_progress', 'starting' ), true ) ) {
+		if ( ! $force && isset( $feed_job['status'] ) && in_array( $feed_job['status'], array( 'in_progress', 'starting' ), true ) ) {
 			return;
 		}
 
