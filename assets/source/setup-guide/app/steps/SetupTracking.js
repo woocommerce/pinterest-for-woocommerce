@@ -47,7 +47,8 @@ const SetupTracking = ( { view } ) => {
 		if (
 			! isFetching &&
 			undefined !== appSettings &&
-			undefined === advertisersList
+			undefined === advertisersList &&
+			status !== 'error'
 		) {
 			fetchAdvertisers();
 		}
