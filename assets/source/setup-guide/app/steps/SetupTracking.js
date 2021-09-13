@@ -64,6 +64,7 @@ const SetupTracking = ( { view } ) => {
 	}, [
 		appSettings,
 		advertisersList,
+		status,
 		fetchAdvertisers,
 		isFetching,
 		tagsList,
@@ -470,7 +471,21 @@ const SetupTracking = ( { view } ) => {
 							</CardBody>
 						) : (
 							<CardBody size="large">
-								<Spinner />
+								{ status === 'error' ? (
+									<>
+										<Text
+											variant="body"
+											className="errorMessage"
+										>
+											{ __(
+												'An error occurred while attempting to fetch Advertisers & Tags from Pinterest. Please try again.',
+												'pinterest-for-woocommerce'
+											) }
+										</Text>
+									</>
+								) : (
+									<Spinner />
+								) }
 							</CardBody>
 						) }
 					</Card>
