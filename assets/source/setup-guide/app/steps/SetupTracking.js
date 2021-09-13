@@ -79,7 +79,7 @@ const SetupTracking = ( { view } ) => {
 			const results = await apiFetch( {
 				path:
 					wcSettings.pinterest_for_woocommerce.apiRoute +
-					'/advertisers/?terms_agreed=' +
+					'/tagowners/?terms_agreed=' +
 					termsAgreed,
 				method: 'GET',
 			} );
