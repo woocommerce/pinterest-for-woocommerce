@@ -376,6 +376,53 @@ const SetupTracking = ( { view } ) => {
 												'pinterest-for-woocommerce'
 											) }
 										/>
+
+										{ undefined !==
+											appSettings.tracking_advertiser &&
+											( undefined !== tagsList ? (
+												Object.keys( tagsList ).length >
+													0 && (
+													<>
+														<SelectControl
+															label={ __(
+																'Tracking Tag',
+																'pinterest-for-woocommerce'
+															) }
+															labelPosition="top"
+															value={
+																appSettings.tracking_tag
+															}
+															onChange={ (
+																selectedTag
+															) =>
+																handleOptionChange(
+																	'tracking_tag',
+																	selectedTag
+																)
+															}
+															options={ Object.values(
+																tagsList
+															).map(
+																( item ) => ( {
+																	label: sprintf(
+																		'%1$s (%2$d)',
+																		item.name,
+																		item.id
+																	),
+																	value:
+																		item.id,
+																} )
+															) }
+															help={ __(
+																'Select the tracking tag to use.',
+																'pinterest-for-woocommerce'
+															) }
+														/>
+													</>
+												)
+											) : (
+												<Spinner />
+											) ) }
 									</>
 								) : (
 									<>
@@ -425,49 +472,6 @@ const SetupTracking = ( { view } ) => {
 										/>
 									</>
 								) }
-
-								{ undefined !==
-									appSettings.tracking_advertiser &&
-									( undefined !== tagsList ? (
-										Object.keys( tagsList ).length > 0 && (
-											<>
-												<SelectControl
-													label={ __(
-														'Tracking Tag',
-														'pinterest-for-woocommerce'
-													) }
-													labelPosition="top"
-													value={
-														appSettings.tracking_tag
-													}
-													onChange={ (
-														selectedTag
-													) =>
-														handleOptionChange(
-															'tracking_tag',
-															selectedTag
-														)
-													}
-													options={ Object.values(
-														tagsList
-													).map( ( item ) => ( {
-														label: sprintf(
-															'%1$s (%2$d)',
-															item.name,
-															item.id
-														),
-														value: item.id,
-													} ) ) }
-													help={ __(
-														'Select the tracking tag to use.',
-														'pinterest-for-woocommerce'
-													) }
-												/>
-											</>
-										)
-									) : (
-										<Spinner />
-									) ) }
 							</CardBody>
 						) : (
 							<CardBody size="large">
