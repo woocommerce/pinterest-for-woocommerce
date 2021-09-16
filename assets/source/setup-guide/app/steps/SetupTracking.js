@@ -476,17 +476,15 @@ const SetupTracking = ( { view } ) => {
 						) : (
 							<CardBody size="large">
 								{ status === 'error' ? (
-									<>
-										<Text
-											variant="body"
-											className="errorMessage"
-										>
-											{ __(
-												'An error occurred while attempting to fetch Advertisers & Tags from Pinterest. Please try again.',
-												'pinterest-for-woocommerce'
-											) }
-										</Text>
-									</>
+									<Text
+										variant="body"
+										className="errorMessage"
+									>
+										{ __(
+											'An error occurred while attempting to fetch Advertisers & Tags from Pinterest. Please try again.',
+											'pinterest-for-woocommerce'
+										) }
+									</Text>
 								) : (
 									<Spinner />
 								) }
