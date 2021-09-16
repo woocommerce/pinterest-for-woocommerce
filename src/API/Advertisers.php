@@ -25,7 +25,7 @@ class Advertisers extends VendorAPI {
 	 */
 	public function __construct() {
 
-		$this->base              = 'advertisers';
+		$this->base              = 'tagowners';
 		$this->endpoint_callback = 'get_advertisers';
 		$this->methods           = WP_REST_Server::READABLE;
 
