@@ -133,7 +133,7 @@ class ProductSync {
 	 * This could be true as the feed is being generated, if its not the 1st time
 	 * its been generated.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public static function feed_file_exists() {
 
