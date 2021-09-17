@@ -73,7 +73,7 @@ class ProductSync {
 		// Schedule the main feed control task.
 		if ( false === as_next_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			$interval = 10 * MINUTE_IN_SECONDS;
-			as_schedule_recurring_action( time(), $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+			as_schedule_recurring_action( time() + 10, $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 
 		if ( self::is_product_sync_enabled() ) {
@@ -129,6 +129,21 @@ class ProductSync {
 
 
 	/**
+	 * Checks if the feed file for the configured (In $state var) feed exists.
+	 * This could be true as the feed is being generated, if its not the 1st time
+	 * its been generated.
+	 *
+	 * @return bool
+	 */
+	public static function feed_file_exists() {
+
+		$state = Pinterest_For_Woocommerce()::get_data( 'feed_job' ) ?? array();
+
+		return isset( $state['feed_file'] ) && file_exists( $state['feed_file'] );
+	}
+
+
+	/**
 	 * Schedules the regeneration process of the XML feed.
 	 *
 	 * @param boolean $force Forces rescheduling even when the status indicates that its not needed.
@@ -139,7 +154,7 @@ class ProductSync {
 
 		$feed_job = Pinterest_For_Woocommerce()::get_data( 'feed_job' ) ?? array();
 
-		if ( ! $force && isset( $feed_job['status'] ) && in_array( $feed_job['status'], array( 'scheduled_for_generation', 'in_progress', 'starting' ), true ) ) {
+		if ( ! $force && isset( $feed_job['status'] ) && in_array( $feed_job['status'], array( 'in_progress', 'starting' ), true ) ) {
 			return;
 		}
 
@@ -209,7 +224,7 @@ class ProductSync {
 
 		$state = self::feed_job_status( 'check_registration' );
 
-		if ( 'generated' !== $state['status'] ) {
+		if ( ! self::feed_file_exists() ) {
 			self::log( 'Feed didn\'t fully generate yet. Retrying later.', 'debug' );
 			// Feed is not generated yet, lets wait a bit longer.
 			return true;
