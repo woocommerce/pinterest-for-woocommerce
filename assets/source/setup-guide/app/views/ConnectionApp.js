@@ -24,11 +24,11 @@ const SettingsApp = () => {
 	const appSettings = useSettingsSelect();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
 
-	const [ isConnected, setIsConnected ] = useState(
-		wcSettings.pinterest_for_woocommerce.isConnected
+	const [ isBusinessConnected, setIsBusinessConnected ] = useState(
+		wcSettings.pinterest_for_woocommerce.isBusinessConnected
 	);
 
-	const isGroup1Visible = isConnected;
+	const isGroup1Visible = isBusinessConnected;
 	const isGroup2Visible = isGroup1Visible && isDomainVerified;
 
 	useBodyClasses();
@@ -43,8 +43,8 @@ const SettingsApp = () => {
 				<div className="woocommerce-setup-guide__container">
 					<SetupAccount
 						view="settings"
-						setIsConnected={ setIsConnected }
-						isConnected={ isConnected }
+						setIsBusinessConnected={ setIsBusinessConnected }
+						isBusinessConnected={ isBusinessConnected }
 					/>
 
 					{ isGroup1Visible && <ClaimWebsite view="settings" /> }

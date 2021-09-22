@@ -29,8 +29,8 @@ import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
 const SetupAccount = ( {
 	goToNextStep,
 	view,
-	isConnected,
-	setIsConnected,
+	isBusinessConnected,
+	setIsBusinessConnected,
 } ) => {
 	const [ isConfirmationModalOpen, setIsConfirmationModalOpen ] = useState(
 		false
@@ -102,7 +102,7 @@ const SetupAccount = ( {
 				)
 			);
 		} else {
-			setIsConnected( false );
+			setIsBusinessConnected( false );
 
 			// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
 			const path = getNewPath( {}, '/pinterest/landing', {} );
@@ -164,7 +164,7 @@ const SetupAccount = ( {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<CardBody size="large">
-							{ isConnected === true ? ( // eslint-disable-line no-nested-ternary --- Code is reasonable readable
+							{ isBusinessConnected === true ? ( // eslint-disable-line no-nested-ternary --- Code is reasonable readable
 								<Flex>
 									<FlexBlock className="is-connected">
 										<Text variant="subtitle">
@@ -199,7 +199,7 @@ const SetupAccount = ( {
 										</Button>
 									</FlexBlock>
 								</Flex>
-							) : isConnected === false ? (
+							) : isBusinessConnected === false ? (
 								<Flex>
 									<FlexBlock>
 										<Text variant="subtitle">
@@ -230,7 +230,7 @@ const SetupAccount = ( {
 							) }
 						</CardBody>
 
-						{ isConnected === false && (
+						{ isBusinessConnected === false && (
 							<CardFooter>
 								<Button
 									isLink
@@ -251,7 +251,7 @@ const SetupAccount = ( {
 						{ isConfirmationModalOpen && renderConfirmationModal() }
 					</Card>
 
-					{ view === 'wizard' && isConnected === true && (
+					{ view === 'wizard' && isBusinessConnected === true && (
 						<div className="woocommerce-setup-guide__footer-button">
 							<Button isPrimary onClick={ goToNextStep }>
 								{ __(
