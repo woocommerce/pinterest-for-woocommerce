@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { useState } from '@wordpress/element';
-import { sprintf, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@woocommerce/components';
@@ -21,6 +21,20 @@ import {
  * Internal dependencies
  */
 import { useCreateNotice } from '../../helpers/effects';
+
+const PinterestLogo = () => {
+	return (
+		<>
+			<img
+				src={
+					wcSettings.pinterest_for_woocommerce.pluginUrl +
+					'/assets/images/pinterest-logo.svg'
+				}
+				alt=""
+			/>
+		</>
+	);
+};
 
 const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 	const createNotice = useCreateNotice();
@@ -106,41 +120,39 @@ const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 	return (
 		<CardBody size="large">
 			{ isConnected === true ? ( // eslint-disable-line no-nested-ternary --- Code is reasonable readable
-				<Flex>
-					<FlexBlock className="is-connected">
-						<Text variant="subtitle">
-							{ __(
-								'Pinterest Account',
-								'pinterest-for-woocommerce'
-							) }
-						</Text>
+				<Flex direction="row" gap="16" className="is-connected">
+					<FlexItem>
+						<PinterestLogo />
+					</FlexItem>
+
+					<FlexBlock>
 						{ accountData?.id && (
 							<Text variant="body">
-								{ sprintf(
-									'%1$s: %2$s - %3$s',
-									__(
-										'Account',
-										'pinterest-for-woocommerce'
-									),
-									accountData.username,
-									accountData.id
-								) }
+								{ accountData.username }
+
+								<Text variant="body" className="account-id">
+									{ accountData.id }
+								</Text>
 							</Text>
 						) }
+					</FlexBlock>
+
+					<FlexItem>
 						<Button
 							isLink
 							isDestructive
 							onClick={ openConfirmationModal }
 						>
-							{ __(
-								'Disconnect Pinterest Account',
-								'pinterest-for-woocommerce'
-							) }
+							{ __( 'Disconnect', 'pinterest-for-woocommerce' ) }
 						</Button>
-					</FlexBlock>
+					</FlexItem>
 				</Flex>
 			) : isConnected === false ? (
-				<Flex>
+				<Flex direction="row" gap="16" className="is-connected">
+					<FlexItem>
+						<PinterestLogo />
+					</FlexItem>
+
 					<FlexBlock>
 						<Text variant="subtitle">
 							{ __(
@@ -149,6 +161,7 @@ const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 							) }
 						</Text>
 					</FlexBlock>
+
 					<FlexItem>
 						<Button
 							isSecondary
