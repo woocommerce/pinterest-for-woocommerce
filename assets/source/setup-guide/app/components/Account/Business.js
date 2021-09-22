@@ -61,7 +61,27 @@ const BusinessAccountSelection = ( { businessAccounts } ) => {
 								'pinterest-for-woocommerce'
 							) }
 						</Text>
+						<Text variant="body">
+							{ __(
+								'A Pinterest business account is required to connect Pinterest with your WooCommerce store.',
+								'pinterest-for-woocommerce'
+							) }
+						</Text>
 					</FlexBlock>
+					<FlexItem>
+						<Button
+							isSecondary
+							href={ decodeEntities(
+								wcSettings.pinterest_for_woocommerce // TODO: url
+									.serviceLoginUrl
+							) }
+						>
+							{ __(
+								'Create business account',
+								'pinterest-for-woocommerce'
+							) }
+						</Button>
+					</FlexItem>
 				</Flex>
 			) }
 		</CardBody>
