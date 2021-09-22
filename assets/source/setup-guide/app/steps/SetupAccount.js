@@ -4,7 +4,7 @@
 
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, Card, CardFooter } from '@wordpress/components';
+import { Button, Card, CardFooter, CardDivider } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -12,6 +12,7 @@ import { Button, Card, CardFooter } from '@wordpress/components';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import AccountConnection from '../components/Account/Connection';
+import BusinessAccountSelection from '../components/Account/Business';
 import { useSettingsSelect } from '../helpers/effects';
 
 const SetupAccount = ( {
@@ -77,6 +78,20 @@ const SetupAccount = ( {
 							setIsBusinessConnected={ setIsBusinessConnected }
 							accountData={ appSettings.account_data }
 						/>
+
+						{ isBusinessConnected === false &&
+							wcSettings.pinterest_for_woocommerce
+								.isPersonalAccount === true && (
+								<>
+									<CardDivider />
+									<BusinessAccountSelection
+										businessAccounts={
+											wcSettings.pinterest_for_woocommerce
+												.businessAccounts
+										}
+									/>
+								</>
+							) }
 
 						{ isBusinessConnected === false && (
 							<CardFooter>
