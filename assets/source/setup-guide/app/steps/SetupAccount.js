@@ -18,6 +18,8 @@ import { useSettingsSelect } from '../helpers/effects';
 const SetupAccount = ( {
 	goToNextStep,
 	view,
+	isConnected,
+	setIsConnected,
 	isBusinessConnected,
 	setIsBusinessConnected,
 } ) => {
@@ -74,24 +76,25 @@ const SetupAccount = ( {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<AccountConnection
-							isBusinessConnected={ isBusinessConnected }
-							setIsBusinessConnected={ setIsBusinessConnected }
+							isConnected={ isConnected }
+							setIsConnected={ setIsConnected }
 							accountData={ appSettings.account_data }
 						/>
 
-						{ isBusinessConnected === false &&
-							wcSettings.pinterest_for_woocommerce
-								.isPersonalAccount === true && (
-								<>
-									<CardDivider />
-									<BusinessAccountSelection
-										businessAccounts={
-											wcSettings.pinterest_for_woocommerce
-												.businessAccounts
-										}
-									/>
-								</>
-							) }
+						{ isConnected === true &&
+							isBusinessConnected ===
+								false(
+									<>
+										<CardDivider />
+										<BusinessAccountSelection
+											businessAccounts={
+												wcSettings
+													.pinterest_for_woocommerce
+													.businessAccounts
+											}
+										/>
+									</>
+								) }
 
 						{ isBusinessConnected === false && (
 							<CardFooter>

@@ -22,11 +22,7 @@ import {
  */
 import { useCreateNotice } from '../../helpers/effects';
 
-const AccountConnection = ( {
-	isBusinessConnected,
-	setIsBusinessConnected,
-	accountData,
-} ) => {
+const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 	const createNotice = useCreateNotice();
 
 	const [ isConfirmationModalOpen, setIsConfirmationModalOpen ] = useState(
@@ -96,7 +92,7 @@ const AccountConnection = ( {
 				)
 			);
 		} else {
-			setIsBusinessConnected( false );
+			setIsConnected( false );
 
 			// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
 			const path = getNewPath( {}, '/pinterest/landing', {} );
@@ -109,7 +105,7 @@ const AccountConnection = ( {
 
 	return (
 		<CardBody size="large">
-			{ isBusinessConnected === true ? ( // eslint-disable-line no-nested-ternary --- Code is reasonable readable
+			{ isConnected === true ? ( // eslint-disable-line no-nested-ternary --- Code is reasonable readable
 				<Flex>
 					<FlexBlock className="is-connected">
 						<Text variant="subtitle">
@@ -143,7 +139,7 @@ const AccountConnection = ( {
 						</Button>
 					</FlexBlock>
 				</Flex>
-			) : isBusinessConnected === false ? (
+			) : isConnected === false ? (
 				<Flex>
 					<FlexBlock>
 						<Text variant="subtitle">

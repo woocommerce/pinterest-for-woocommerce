@@ -27,6 +27,10 @@ import {
 
 const WizardApp = () => {
 	const [ currentStep, setCurrentStep ] = useState();
+	const [ isConnected, setIsConnected ] = useState(
+		wcSettings.pinterest_for_woocommerce.isConnected
+	);
+
 	const [ isBusinessConnected, setIsBusinessConnected ] = useState(
 		wcSettings.pinterest_for_woocommerce.isBusinessConnected
 	);
@@ -45,6 +49,8 @@ const WizardApp = () => {
 				'pinterest-for-woocommerce'
 			),
 			props: {
+				setIsConnected,
+				isConnected,
 				setIsBusinessConnected,
 				isBusinessConnected,
 			},
