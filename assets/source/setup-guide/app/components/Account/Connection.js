@@ -121,31 +121,38 @@ const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 		<CardBody size="large">
 			{ isConnected === true ? ( // eslint-disable-line no-nested-ternary --- Code is reasonable readable
 				<Flex direction="row" gap="16" className="is-connected">
-					<FlexItem>
-						<PinterestLogo />
-					</FlexItem>
+					{ accountData?.id ? (
+						<>
+							<FlexItem>
+								<PinterestLogo />
+							</FlexItem>
 
-					<FlexBlock>
-						{ accountData?.id && (
-							<Text variant="body">
-								{ accountData.username }
+							<FlexBlock>
+								<Text variant="body">
+									{ accountData.username }
 
-								<Text variant="body" className="account-id">
-									{ accountData.id }
+									<span className="account-id">
+										( { accountData.id } )
+									</span>
 								</Text>
-							</Text>
-						) }
-					</FlexBlock>
+							</FlexBlock>
 
-					<FlexItem>
-						<Button
-							isLink
-							isDestructive
-							onClick={ openConfirmationModal }
-						>
-							{ __( 'Disconnect', 'pinterest-for-woocommerce' ) }
-						</Button>
-					</FlexItem>
+							<FlexItem>
+								<Button
+									isLink
+									isDestructive
+									onClick={ openConfirmationModal }
+								>
+									{ __(
+										'Disconnect',
+										'pinterest-for-woocommerce'
+									) }
+								</Button>
+							</FlexItem>
+						</>
+					) : (
+						<Spinner />
+					) }
 				</Flex>
 			) : isConnected === false ? (
 				<Flex direction="row" gap="16" className="is-connected">
