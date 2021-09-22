@@ -82,21 +82,19 @@ const SetupAccount = ( {
 						/>
 
 						{ isConnected === true &&
-							isBusinessConnected ===
-								false(
-									<>
-										<CardDivider />
-										<BusinessAccountSelection
-											businessAccounts={
-												wcSettings
-													.pinterest_for_woocommerce
-													.businessAccounts
-											}
-										/>
-									</>
-								) }
+							isBusinessConnected === false && (
+								<>
+									<CardDivider />
+									<BusinessAccountSelection
+										businessAccounts={
+											wcSettings.pinterest_for_woocommerce
+												.businessAccounts
+										}
+									/>
+								</>
+							) }
 
-						{ isBusinessConnected === false && (
+						{ isConnected === false && (
 							<CardFooter>
 								<Button
 									isLink
@@ -113,6 +111,27 @@ const SetupAccount = ( {
 								</Button>
 							</CardFooter>
 						) }
+
+						{ isConnected === true &&
+							isBusinessConnected === false &&
+							wcSettings.pinterest_for_woocommerce
+								.businessAccounts.length < 1 && (
+								<CardFooter>
+									<Button
+										isLink
+										href={
+											wcSettings.pinterest_for_woocommerce
+												.pinterestLinks.newAccount // TODO: change link
+										}
+										target="_blank"
+									>
+										{ __(
+											'Or, convert your personal account',
+											'pinterest-for-woocommerce'
+										) }
+									</Button>
+								</CardFooter>
+							) }
 					</Card>
 
 					{ view === 'wizard' && isBusinessConnected === true && (
