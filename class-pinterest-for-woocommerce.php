@@ -233,8 +233,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'wp', array( Pinterest\SaveToPinterest::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\Tracking::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
-			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'fetch_linked_businesses' ), 20 );
 
 			// Handle rewrite for Pinterest verification URL.
 			add_action( 'init', array( $this, 'verification_rewrite' ) );
@@ -671,8 +672,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 						'verified_domains' => '',
 						'domain_verified'  => '',
 						'username'         => '',
+						'full_name'        => '',
 						'id'               => '',
 						'image_medium_url' => '',
+						'is_partner'       => '',
 					)
 				);
 
@@ -681,6 +684,42 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 
 			return array();
+
+		}
+
+
+		public static function get_linked_businesses() {
+
+			$linked_businesses = Pinterest_For_Woocommerce()::get_data( 'linked_businesses' ) ?? array();
+
+			$linked_businesses = array_map(
+				function ( $business ) {
+					return array(
+						'value' => $business->id,
+						'label' => $business->full_name . ' [' . $business->id . ']',
+					);
+				},
+				$linked_businesses
+			);
+
+			return $linked_businesses;
+		}
+
+
+		public static function fetch_linked_businesses() {
+
+			$account_data = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+
+			$linked_businesses = ! $account_data['is_partner'] ? Pinterest\API\Base::get_linked_businesses() : array();
+			$linked_businesses = array();
+
+			if ( ! empty( $linked_businesses ) && 'success' === $linked_businesses['status'] ) {
+				$linked_businesses = $linked_businesses['data'];
+			}
+
+			self::save_data( 'linked_businesses', $linked_businesses );
+
+			return $linked_businesses;
 
 		}
 
