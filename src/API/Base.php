@@ -284,6 +284,12 @@ class Base {
 	}
 
 
+	public static function get_linked_businesses() {
+		$response = self::make_request( 'users/me/businesses', 'GET' );
+		return $response;
+	}
+
+
 	/**
 	 * Create an advertiser given the accepted TOS terms ID.
 	 *
