@@ -378,8 +378,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		private function get_component_settings() {
 
 			return array(
-				'pluginVersion'   => PINTEREST_FOR_WOOCOMMERCE_VERSION,
-				'adminUrl'        => esc_url(
+				'pluginVersion'       => PINTEREST_FOR_WOOCOMMERCE_VERSION,
+				'adminUrl'            => esc_url(
 					add_query_arg(
 						array(
 							'page' => 'wc-admin',
@@ -387,8 +387,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 						admin_url( 'admin.php' )
 					)
 				),
-				'pluginUrl'       => Pinterest_For_Woocommerce()->plugin_url(),
-				'serviceLoginUrl' => esc_url(
+				'pluginUrl'           => Pinterest_For_Woocommerce()->plugin_url(),
+				'serviceLoginUrl'     => esc_url(
 					add_query_arg(
 						array(
 							'page' => 'wc-admin',
@@ -398,12 +398,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 						admin_url( 'admin.php' )
 					)
 				),
-				'domainToVerify'  => wp_parse_url( site_url(), PHP_URL_HOST ),
-				'isBusinessConnected' => ! empty( Pinterest_For_Woocommerce()::get_token()['access_token'] ),
-				'apiRoute'        => PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION,
-				'optionsName'     => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,
-				'error'           => isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
-				'pinterestLinks'  => array(
+				'domainToVerify'      => wp_parse_url( site_url(), PHP_URL_HOST ),
+				'isConnected'         => ! empty( Pinterest_For_Woocommerce()::is_connected() ),
+				'isBusinessConnected' => ! empty( Pinterest_For_Woocommerce()::is_business_connected() ),
+				'businessAccounts'    => Pinterest_For_Woocommerce()::get_linked_businesses(),
+				'apiRoute'            => PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION,
+				'optionsName'         => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,
+				'error'               => isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
+				'pinterestLinks'      => array(
 					'newAccount'       => 'https://business.pinterest.com/',
 					'claimWebsite'     => 'https://help.pinterest.com/en/business/article/claim-your-website',
 					'richPins'         => 'https://help.pinterest.com/en/business/article/rich-pins',
@@ -412,8 +414,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'adGuidelines'     => 'https://policy.pinterest.com/en/advertising-guidelines',
 					'adDataTerms'      => 'https://policy.pinterest.com/en/ad-data-terms',
 				),
-				'isSetupComplete' => Pinterest_For_Woocommerce()::is_setup_complete(),
-				'countryTos'      => Pinterest_For_Woocommerce()::get_applicable_tos(),
+				'isSetupComplete'     => Pinterest_For_Woocommerce()::is_setup_complete(),
+				'countryTos'          => Pinterest_For_Woocommerce()::get_applicable_tos(),
+
 			);
 		}
 
