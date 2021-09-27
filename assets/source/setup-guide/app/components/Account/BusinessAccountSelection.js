@@ -4,6 +4,8 @@
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { Spinner } from '@woocommerce/components';
+import { addQueryArgs } from '@wordpress/url';
+import { useState } from '@wordpress/element';
 import {
 	Button,
 	CardBody,
@@ -14,7 +16,27 @@ import {
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
-const BusinessAccountSelection = ( { businessAccounts } ) => {
+const BusinessAccountSelection = ( {
+	businessAccounts,
+	setAttemptedCreation,
+} ) => {
+	const [ targetBusinessId, setTargetBusinessId ] = useState();
+
+	const handleConnectToBusiness = () => {
+		const newURL = addQueryArgs(
+			decodeEntities(
+				wcSettings.pinterest_for_woocommerce.switchBusinessAccountUrl
+			),
+			{ business_id: targetBusinessId }
+		);
+
+		window.location = new URL( newURL );
+	};
+
+	const handleAttemptedCreation = () => {
+		setAttemptedCreation( true );
+	};
+
 	return undefined !== businessAccounts ? (
 		<CardBody size="large">
 			{ businessAccounts.length > 0 ? (
@@ -28,25 +50,16 @@ const BusinessAccountSelection = ( { businessAccounts } ) => {
 					<Flex>
 						<FlexBlock className="is-connected">
 							<SelectControl
-								// value={
-								// 	appSettings.tracking_advertiser
-								// }
-								// onChange={ ( selectedAdvertiser ) =>
-								// 	handleOptionChange(
-								// 		'tracking_advertiser',
-								// 		selectedAdvertiser
-								// 	)
-								// }
 								options={ businessAccounts }
+								onChange={ ( businessId ) =>
+									setTargetBusinessId( businessId )
+								}
 							/>
 						</FlexBlock>
 						<FlexItem>
 							<Button
 								isSecondary
-								href={ decodeEntities(
-									wcSettings.pinterest_for_woocommerce
-										.serviceLoginUrl
-								) }
+								onClick={ handleConnectToBusiness }
 							>
 								{ __( 'Connect', 'pinterest-for-woocommerce' ) }
 							</Button>
@@ -73,9 +86,11 @@ const BusinessAccountSelection = ( { businessAccounts } ) => {
 						<Button
 							isSecondary
 							href={ decodeEntities(
-								wcSettings.pinterest_for_woocommerce // TODO: url
-									.serviceLoginUrl
+								wcSettings.pinterest_for_woocommerce
+									.createBusinessAccountUrl
 							) }
+							onClick={ handleAttemptedCreation }
+							target="_blank"
 						>
 							{ __(
 								'Create business account',

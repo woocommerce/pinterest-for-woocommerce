@@ -86,9 +86,9 @@ const SetupAccount = ( {
 								<>
 									<CardDivider />
 									<BusinessAccountSelection
-										businessAccounts={
-											wcSettings.pinterest_for_woocommerce
-												.businessAccounts
+										businessAccounts={ businessAccounts }
+										setAttemptedCreation={
+											setAttemptedCreation
 										}
 									/>
 								</>
