@@ -2,9 +2,15 @@
  * External dependencies
  */
 
-import { createInterpolateElement } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useCallback,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, Card, CardFooter, CardDivider } from '@wordpress/components';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -12,8 +18,8 @@ import { Button, Card, CardFooter, CardDivider } from '@wordpress/components';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import AccountConnection from '../components/Account/Connection';
-import BusinessAccountSelection from '../components/Account/Business';
-import { useSettingsSelect } from '../helpers/effects';
+import BusinessAccountSelection from '../components/Account/BusinessAccountSelection';
+import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
 
 const SetupAccount = ( {
 	goToNextStep,
@@ -23,7 +29,54 @@ const SetupAccount = ( {
 	isBusinessConnected,
 	setIsBusinessConnected,
 } ) => {
+	const createNotice = useCreateNotice();
 	const appSettings = useSettingsSelect();
+	const [ attemptedCreation, setAttemptedCreation ] = useState( false );
+	const [ businessAccounts, setBusinessAccounts ] = useState(
+		wcSettings.pinterest_for_woocommerce.businessAccounts
+	);
+
+	useEffect( () => {
+		if ( attemptedCreation ) {
+			window.addEventListener( 'focus', fetchBusinesses );
+		}
+
+		return () => window.removeEventListener( 'focus', fetchBusinesses );
+	}, [ fetchBusinesses, attemptedCreation ] );
+
+	useEffect( () => {
+		if ( ! isConnected ) {
+			setIsBusinessConnected( isConnected );
+		}
+	}, [ isConnected, setIsBusinessConnected ] );
+
+	const fetchBusinesses = useCallback( async () => {
+		try {
+			setBusinessAccounts();
+
+			const results = await apiFetch( {
+				path:
+					wcSettings.pinterest_for_woocommerce.apiRoute +
+					'/businesses/',
+				method: 'GET',
+			} );
+
+			setBusinessAccounts( results );
+
+			if ( Object.keys( results ).length > 0 ) {
+				window.removeEventListener( 'focus', fetchBusinesses );
+			}
+		} catch ( error ) {
+			createNotice(
+				'error',
+				error.message ||
+					__(
+						'Couldn’t retrieve your Linked Business Accounts.',
+						'pinterest-for-woocommerce'
+					)
+			);
+		}
+	}, [ createNotice ] );
 
 	return (
 		<div className="woocommerce-setup-guide__setup-account">
@@ -114,14 +167,15 @@ const SetupAccount = ( {
 
 						{ isConnected === true &&
 							isBusinessConnected === false &&
-							wcSettings.pinterest_for_woocommerce
-								.businessAccounts.length < 1 && (
+							undefined !== businessAccounts &&
+							businessAccounts.length < 1 && (
 								<CardFooter>
 									<Button
 										isLink
 										href={
 											wcSettings.pinterest_for_woocommerce
-												.pinterestLinks.newAccount // TODO: change link
+												.pinterestLinks
+												.convertToBusinessAcct
 										}
 										target="_blank"
 									>
