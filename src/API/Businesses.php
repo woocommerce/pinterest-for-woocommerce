@@ -60,8 +60,8 @@ class Businesses extends VendorAPI {
 
 		try {
 
-			Pinterest_For_Woocommerce()::fetch_linked_businesses();
-			$businesses = Pinterest_For_Woocommerce()::get_linked_businesses();
+			$businesses = Pinterest_For_Woocommerce()::get_linked_businesses( true );
+
 
 			return $businesses;
 

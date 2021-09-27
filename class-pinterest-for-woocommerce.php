@@ -605,36 +605,46 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Return Service Login URL
+		 * Return The Middleware URL based on the given context
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param string $view The context view parameter.
+		 * @param string $context The context parameter.
+		 * @param string $args    Additional arguments like 'view' or 'business_id'.
 		 *
 		 * @return string
 		 */
-		public static function get_service_login_url( $view = null ) {
+		public static function get_middleware_url( $context = 'login', $args = array() ) {
 
 			$control_key = uniqid();
-			$view        = is_null( $view ) ? 'settings' : $view;
+			$view        = is_null( $args['view'] ) ? 'settings' : $args['view'];
 			$rest_url    = get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT );
-			$state       = http_build_query(
-				array(
-					'redirect' => add_query_arg(
-						array(
-							'control' => $control_key,
-							'view'    => $view,
-						),
-						$rest_url
+
+			$state_params = array(
+				'redirect' => add_query_arg(
+					array(
+						'control' => $control_key,
+						'view'    => $view,
 					),
-				)
+					$rest_url
+				),
 			);
+
+			switch ( $context ) {
+				case 'create_business':
+					$state_params['create-business'] = true;
+					break;
+				case 'switch_business':
+					$state_params['switch-to-business'] = $args['business_id'];
+					break;
+			}
+
+			$state = http_build_query( $state_params );
 
 			set_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
 
 			return self::get_connection_proxy_url() . 'login/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
 		}
-
 
 
 		/**
