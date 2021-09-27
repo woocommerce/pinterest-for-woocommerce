@@ -504,13 +504,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.0.0
 		 */
 		public function init_api_endpoints() {
+			new Pinterest\API\Advertisers();
 			new Pinterest\API\Auth();
 			new Pinterest\API\AuthDisconnect();
+			new Pinterest\API\Businesses();
 			new Pinterest\API\DomainVerification();
-			new Pinterest\API\Advertisers();
-			new Pinterest\API\Tags();
 			new Pinterest\API\FeedState();
 			new Pinterest\API\FeedIssues();
+			new Pinterest\API\Tags();
 		}
 
 		/**
@@ -711,7 +712,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$account_data = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
 
 			$linked_businesses = ! $account_data['is_partner'] ? Pinterest\API\Base::get_linked_businesses() : array();
-			$linked_businesses = array();
 
 			if ( ! empty( $linked_businesses ) && 'success' === $linked_businesses['status'] ) {
 				$linked_businesses = $linked_businesses['data'];
