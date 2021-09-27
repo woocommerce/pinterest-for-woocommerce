@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
+import { Spinner } from '@woocommerce/components';
 import {
 	Button,
 	CardBody,
@@ -14,7 +15,7 @@ import {
 } from '@wordpress/components';
 
 const BusinessAccountSelection = ( { businessAccounts } ) => {
-	return (
+	return undefined !== businessAccounts ? (
 		<CardBody size="large">
 			{ businessAccounts.length > 0 ? (
 				<>
@@ -84,6 +85,10 @@ const BusinessAccountSelection = ( { businessAccounts } ) => {
 					</FlexItem>
 				</Flex>
 			) }
+		</CardBody>
+	) : (
+		<CardBody size="large">
+			<Spinner />
 		</CardBody>
 	);
 };
