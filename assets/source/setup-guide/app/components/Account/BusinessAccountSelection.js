@@ -21,7 +21,9 @@ const BusinessAccountSelection = ( {
 	setAttemptedCreation,
 } ) => {
 	const [ targetBusinessId, setTargetBusinessId ] = useState(
-		businessAccounts.length > 0 ? businessAccounts[0]['value'] : null
+		undefined !== businessAccounts && businessAccounts.length > 0
+			? businessAccounts[ 0 ][ 'value' ]
+			: null
 	);
 
 	const handleConnectToBusiness = () => {
