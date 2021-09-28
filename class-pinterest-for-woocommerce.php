@@ -714,7 +714,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			if ( $force_refresh || is_null( $linked_businesses ) ) {
 
 				$account_data       = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
-				$fetched_businesses = ! $account_data['is_partner'] ? Pinterest\API\Base::get_linked_businesses() : array();
+				$fetched_businesses = ( ! empty( $account_data ) && ! $account_data['is_partner'] ) ? Pinterest\API\Base::get_linked_businesses() : array();
 
 				if ( ! empty( $fetched_businesses ) && 'success' === $fetched_businesses['status'] ) {
 					$linked_businesses = $fetched_businesses['data'];
