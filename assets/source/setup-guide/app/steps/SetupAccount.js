@@ -1,3 +1,4 @@
+/* eslint-disable @wordpress/no-global-event-listener */
 /**
  * External dependencies
  */
@@ -148,7 +149,7 @@ const SetupAccount = ( {
 							) }
 
 						{ isConnected === false && (
-							<CardFooter>
+							<CardFooter size="large">
 								<Button
 									isLink
 									href={
@@ -169,7 +170,7 @@ const SetupAccount = ( {
 							isBusinessConnected === false &&
 							undefined !== businessAccounts &&
 							businessAccounts.length < 1 && (
-								<CardFooter>
+								<CardFooter size="large">
 									<Button
 										isLink
 										href={

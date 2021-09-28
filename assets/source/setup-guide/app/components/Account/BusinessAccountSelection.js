@@ -38,7 +38,7 @@ const BusinessAccountSelection = ( {
 	};
 
 	return undefined !== businessAccounts ? (
-		<CardBody size="large">
+		<CardBody size="large" className="business-connection">
 			{ businessAccounts.length > 0 ? (
 				<>
 					<Text variant="subtitle">
