@@ -20,7 +20,9 @@ const BusinessAccountSelection = ( {
 	businessAccounts,
 	setAttemptedCreation,
 } ) => {
-	const [ targetBusinessId, setTargetBusinessId ] = useState();
+	const [ targetBusinessId, setTargetBusinessId ] = useState(
+		businessAccounts.length > 0 ? businessAccounts[0]['value'] : null
+	);
 
 	const handleConnectToBusiness = () => {
 		const newURL = addQueryArgs(
@@ -51,6 +53,7 @@ const BusinessAccountSelection = ( {
 						<FlexBlock>
 							<SelectControl
 								options={ businessAccounts }
+								selected={ targetBusinessId }
 								onChange={ ( businessId ) =>
 									setTargetBusinessId( businessId )
 								}
