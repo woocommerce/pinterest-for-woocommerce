@@ -850,16 +850,20 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Checks if connected by checking if we got a token in the db.
+		 * Checks if connected and on a Business account.
 		 *
 		 * @return boolean
 		 */
 		public static function is_business_connected() {
 
+			if ( ! self::is_connected() ) {
+				return false;
+			}
+
 			$account_data = self::get_setting( 'account_data' );
 			$is_partner   = isset( $account_data['is_partner'] ) ? (bool) $account_data['is_partner'] : false;
 
-			return $is_partner && self::is_connected();
+			return $is_partner;
 		}
 
 
