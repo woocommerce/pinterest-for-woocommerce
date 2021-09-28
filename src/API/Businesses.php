@@ -62,7 +62,6 @@ class Businesses extends VendorAPI {
 
 			$businesses = Pinterest_For_Woocommerce()::get_linked_businesses( true );
 
-
 			return $businesses;
 
 		} catch ( \Throwable $th ) {
