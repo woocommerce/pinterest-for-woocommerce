@@ -48,7 +48,7 @@ const BusinessAccountSelection = ( {
 						) }
 					</Text>
 					<Flex>
-						<FlexBlock className="is-connected">
+						<FlexBlock>
 							<SelectControl
 								options={ businessAccounts }
 								onChange={ ( businessId ) =>
