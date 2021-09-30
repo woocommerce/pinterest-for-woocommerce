@@ -773,6 +773,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				$verification_data = self::get_data( 'verification_data' );
 				$verification_code = $verification_data['verification_code'];
 
+				wc_nocache_headers();
 				header( 'Content-Type: text/html' );
 				echo '<!DOCTYPE html><html lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><meta name="p:domain_verify" content="' . esc_attr( $verification_code ) . '"/><title></title></head><body>' . esc_html__( 'Pinterest for WooCommerce verification page', 'pinterest-for-woocommerce' ) . '</body></html>';
 				exit;
