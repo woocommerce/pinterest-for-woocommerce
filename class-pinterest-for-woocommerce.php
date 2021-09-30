@@ -710,7 +710,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			if ( $filename ) {
 				$escaped = preg_quote( $filename, '/' );
-				add_rewrite_rule( '^' . $escaped . '$', 'index.php?pinterest_verification=true', 'top' );
+				$rewrite_regex = "^{$escaped}$";
+				add_rewrite_rule( $rewrite_regex, 'index.php?pinterest_verification=true', 'top' );
+
+				// Flush rewrite rules as we need to serve the URL for the pinterest-XXXXX.html file.
+				$rewrite_rules = get_option( 'rewrite_rules' );
+				if ( ! is_array( $rewrite_rules ) || ! array_key_exists( $rewrite_regex, $rewrite_rules ) ) {
+					flush_rewrite_rules();
+				}
 			}
 		}
 
