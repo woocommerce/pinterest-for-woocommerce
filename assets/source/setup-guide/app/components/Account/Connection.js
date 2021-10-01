@@ -88,22 +88,14 @@ const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 	const handleDisconnectAccount = async () => {
 		closeConfirmationModal();
 
-		const result = await apiFetch( {
-			path:
-				wcSettings.pinterest_for_woocommerce.apiRoute +
-				'/auth_disconnect',
-			method: 'POST',
-		} );
+		try {
+			await apiFetch( {
+				path:
+					wcSettings.pinterest_for_woocommerce.apiRoute +
+					'/auth_disconnect',
+				method: 'POST',
+			} );
 
-		if ( ! result.disconnected ) {
-			createNotice(
-				'error',
-				__(
-					'There was a problem while trying to disconnect.',
-					'pinterest-for-woocommerce'
-				)
-			);
-		} else {
 			setIsConnected( false );
 
 			// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
@@ -111,6 +103,15 @@ const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 
 			window.location = new URL(
 				decodeEntities( wcSettings.adminUrl + path )
+			);
+		} catch ( error ) {
+			createNotice(
+				'error',
+				error.message ||
+					__(
+						'There was a problem while trying to disconnect.',
+						'pinterest-for-woocommerce'
+					)
 			);
 		}
 	};
