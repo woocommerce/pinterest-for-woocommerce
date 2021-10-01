@@ -35,7 +35,7 @@ class AuthDisconnect extends VendorAPI {
 	/**
 	 * REST Route callback function for POST requests.
 	 *
-	 * @since 1.0.0
+	 * @return array|WP_Error
 	 *
 	 * @since 1.0.0
 	 */

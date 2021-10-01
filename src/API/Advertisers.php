@@ -38,7 +38,7 @@ class Advertisers extends VendorAPI {
 	 *
 	 * @param WP_REST_Request $request The request.
 	 *
-	 * @return array
+	 * @return array|WP_Error
 	 *
 	 * @throws \Exception PHP Exception.
 	 */

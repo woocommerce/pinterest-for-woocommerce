@@ -47,7 +47,7 @@ class FeedIssues extends VendorAPI {
 	/**
 	 * Get the feed issue lines for the last workflow of the current feed.
 	 *
-	 * @return array
+	 * @return array|WP_Error
 	 *
 	 * @param WP_REST_Request $request The request.
 	 *
