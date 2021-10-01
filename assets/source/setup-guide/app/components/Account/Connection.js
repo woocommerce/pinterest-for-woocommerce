@@ -24,15 +24,13 @@ import { useCreateNotice } from '../../helpers/effects';
 
 const PinterestLogo = () => {
 	return (
-		<>
-			<img
-				src={
-					wcSettings.pinterest_for_woocommerce.pluginUrl +
-					'/assets/images/pinterest-logo.svg'
-				}
-				alt=""
-			/>
-		</>
+		<img
+			src={
+				wcSettings.pinterest_for_woocommerce.pluginUrl +
+				'/assets/images/pinterest-logo.svg'
+			}
+			alt=""
+		/>
 	);
 };
 
