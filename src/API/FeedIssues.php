@@ -45,20 +45,6 @@ class FeedIssues extends VendorAPI {
 
 
 	/**
-	 * Authenticate request
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param WP_REST_Request $request The request.
-	 *
-	 * @return boolean
-	 */
-	public function permissions_check( WP_REST_Request $request ) {
-		return current_user_can( 'manage_woocommerce' );
-	}
-
-
-	/**
 	 * Get the feed issue lines for the last workflow of the current feed.
 	 *
 	 * @return array

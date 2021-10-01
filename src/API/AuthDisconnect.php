@@ -33,20 +33,9 @@ class AuthDisconnect extends VendorAPI {
 
 
 	/**
-	 * Authenticate request
+	 * REST Route callback function for POST requests.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @param WP_REST_Request $request The request.
-	 *
-	 * @return boolean
-	 */
-	public function permissions_check( WP_REST_Request $request ) {
-		return current_user_can( 'manage_woocommerce' );
-	}
-
-	/**
-	 * REST Route callback function for POST requests.
 	 *
 	 * @since 1.0.0
 	 */

@@ -43,20 +43,6 @@ class DomainVerification extends VendorAPI {
 
 
 	/**
-	 * Authenticate request
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param WP_REST_Request $request The request.
-	 *
-	 * @return boolean
-	 */
-	public function permissions_check( WP_REST_Request $request ) {
-		return current_user_can( 'manage_woocommerce' );
-	}
-
-
-	/**
 	 * Handle domain verification by triggering the realtime verification process
 	 * using the Pinterst API.
 	 *
