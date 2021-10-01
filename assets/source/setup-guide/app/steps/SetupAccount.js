@@ -32,18 +32,17 @@ const SetupAccount = ( {
 } ) => {
 	const createNotice = useCreateNotice();
 	const appSettings = useSettingsSelect();
-	const [ attemptedCreation, setAttemptedCreation ] = useState( false );
 	const [ businessAccounts, setBusinessAccounts ] = useState(
 		wcSettings.pinterest_for_woocommerce.businessAccounts
 	);
 
 	useEffect( () => {
-		if ( attemptedCreation ) {
+		if ( undefined !== businessAccounts && businessAccounts.length > 0 ) {
 			window.addEventListener( 'focus', fetchBusinesses );
 		}
 
 		return () => window.removeEventListener( 'focus', fetchBusinesses );
-	}, [ fetchBusinesses, attemptedCreation ] );
+	}, [ fetchBusinesses, businessAccounts ] );
 
 	useEffect( () => {
 		if ( ! isConnected ) {
@@ -141,9 +140,6 @@ const SetupAccount = ( {
 									<CardDivider />
 									<BusinessAccountSelection
 										businessAccounts={ businessAccounts }
-										setAttemptedCreation={
-											setAttemptedCreation
-										}
 									/>
 								</>
 							) }

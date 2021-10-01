@@ -16,10 +16,7 @@ import {
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
-const BusinessAccountSelection = ( {
-	businessAccounts,
-	setAttemptedCreation,
-} ) => {
+const BusinessAccountSelection = ( { businessAccounts } ) => {
 	const [ targetBusinessId, setTargetBusinessId ] = useState(
 		undefined !== businessAccounts && businessAccounts.length > 0
 			? businessAccounts[ 0 ][ 'value' ]
@@ -35,10 +32,6 @@ const BusinessAccountSelection = ( {
 		);
 
 		window.location = new URL( newURL );
-	};
-
-	const handleAttemptedCreation = () => {
-		setAttemptedCreation( true );
 	};
 
 	return undefined !== businessAccounts ? (
@@ -94,7 +87,6 @@ const BusinessAccountSelection = ( {
 								wcSettings.pinterest_for_woocommerce
 									.createBusinessAccountUrl
 							) }
-							onClick={ handleAttemptedCreation }
 							target="_blank"
 						>
 							{ __(
