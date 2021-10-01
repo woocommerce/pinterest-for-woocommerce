@@ -499,14 +499,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				return;
 			}
 
-			if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' ] ) || ! wp_verify_nonce( sanitize_key( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' ] ), 'go_to_middleware_url' ) || ! current_user_can( 'manage_woocommerce' ) ) {
 				wp_die( esc_html__( 'Cheatin&#8217; huh?', 'pinterest-for-woocommerce' ) );
 				return false;
 			}
 
 			$context = 'login';
 
-			// phpcs:disable WordPress.Security.NonceVerification.Recommended --- not needed
 			$args = array( 'view' => ! empty( $_REQUEST['view'] ) ? sanitize_key( $_REQUEST['view'] ) : null );
 
 			if ( isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_create_account' ] ) ) {
@@ -515,7 +514,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				$context             = 'switch_business';
 				$args['business_id'] = sanitize_key( $_GET['business_id'] );
 			}
-			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 			add_filter( 'allowed_redirect_hosts', array( $this, 'allow_service_login' ) );
 
