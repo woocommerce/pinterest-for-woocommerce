@@ -284,6 +284,11 @@ class Base {
 	}
 
 
+	/**
+	 * Get the linked business accounts from the API.
+	 *
+	 * @return mixed
+	 */
 	public static function get_linked_businesses() {
 		$response = self::make_request( 'users/me/businesses', 'GET' );
 		return $response;
