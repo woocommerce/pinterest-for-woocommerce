@@ -17,7 +17,7 @@ This repository is not suitable for support. Please don't use our issue tracker 
 
 ### Requirements
 
-Pinterest for WooCommerce requires recent versions of PHP (7.4 or newer), and WordPress and WooCommerce (we recommend the latest, and support the last two versions, a.k.a. L-2).
+Pinterest for WooCommerce requires recent versions of PHP (7.3 or newer), and WordPress and WooCommerce (we recommend the latest, and support the last two versions, a.k.a. L-2).
 
 See [pinterest-for-woocommerce.php](https://github.com/woocommerce/pinterest-for-woocommerce/blob/develop/pinterest-for-woocommerce.php) for current required versions.
 
