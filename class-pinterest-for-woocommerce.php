@@ -709,21 +709,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_linked_businesses( $force_refresh = false ) {
 
-			$linked_businesses = Pinterest_For_Woocommerce()::get_data( 'linked_businesses' );
+			$linked_businesses = ! $force_refresh ? Pinterest_For_Woocommerce()::get_data( 'linked_businesses' ) : null;
 
-			if ( $force_refresh || is_null( $linked_businesses ) ) {
-
-				$account_data       = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
-				$fetched_businesses = ( ! empty( $account_data ) && ! $account_data['is_partner'] ) ? Pinterest\API\Base::get_linked_businesses() : array();
-
-				if ( ! empty( $fetched_businesses ) && 'success' === $fetched_businesses['status'] ) {
-					$linked_businesses = $fetched_businesses['data'];
-				}
-
-				$linked_businesses = $linked_businesses ?? array();
-
-				self::save_data( 'linked_businesses', $linked_businesses );
-
+			if ( null === $linked_businesses ) {
+				$linked_businesses = self::update_linked_businesses( $linked_businesses );
 			}
 
 			$linked_businesses = array_map(
@@ -739,6 +728,26 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			return $linked_businesses;
 		}
 
+
+		/**
+		 * Grabs a fresh copy of businesses from the API saves & returns them.
+		 *
+		 * @return array
+		 */
+		public static function update_linked_businesses() {
+			$account_data       = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+			$fetched_businesses = ( ! empty( $account_data ) && ! $account_data['is_partner'] ) ? Pinterest\API\Base::get_linked_businesses() : array();
+
+			if ( ! empty( $fetched_businesses ) && 'success' === $fetched_businesses['status'] ) {
+				$linked_businesses = $fetched_businesses['data'];
+			}
+
+			$linked_businesses = $linked_businesses ?? array();
+
+			self::save_data( 'linked_businesses', $linked_businesses );
+
+			return $linked_businesses;
+		}
 
 		/**
 		 * Returns the Pinterest AccountID from the database.
