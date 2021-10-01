@@ -28,7 +28,6 @@ const SetupAccount = ( {
 	isConnected,
 	setIsConnected,
 	isBusinessConnected,
-	setIsBusinessConnected,
 } ) => {
 	const createNotice = useCreateNotice();
 	const appSettings = useSettingsSelect();
@@ -43,12 +42,6 @@ const SetupAccount = ( {
 
 		return () => window.removeEventListener( 'focus', fetchBusinesses );
 	}, [ fetchBusinesses, businessAccounts ] );
-
-	useEffect( () => {
-		if ( ! isConnected ) {
-			setIsBusinessConnected( isConnected );
-		}
-	}, [ isConnected, setIsBusinessConnected ] );
 
 	const fetchBusinesses = useCallback( async () => {
 		try {

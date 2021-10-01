@@ -3,7 +3,7 @@
  */
 import '@wordpress/notices';
 import { Spinner } from '@woocommerce/components';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,6 +32,12 @@ const SettingsApp = () => {
 		wcSettings.pinterest_for_woocommerce.isBusinessConnected
 	);
 
+	useEffect( () => {
+		if ( ! isConnected ) {
+			setIsBusinessConnected( false );
+		}
+	}, [ isConnected, setIsBusinessConnected ] );
+
 	const isGroup1Visible = isBusinessConnected;
 	const isGroup2Visible = isGroup1Visible && isDomainVerified;
 
@@ -49,7 +55,6 @@ const SettingsApp = () => {
 						view="settings"
 						setIsConnected={ setIsConnected }
 						isConnected={ isConnected }
-						setIsBusinessConnected={ setIsBusinessConnected }
 						isBusinessConnected={ isBusinessConnected }
 					/>
 
