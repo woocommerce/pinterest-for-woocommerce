@@ -870,9 +870,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 
 			$account_data = self::get_setting( 'account_data' );
-			$is_partner   = isset( $account_data['is_partner'] ) ? (bool) $account_data['is_partner'] : false;
 
-			return $is_partner;
+			return isset( $account_data['is_partner'] ) ? (bool) $account_data['is_partner'] : false;
 		}
 
 
