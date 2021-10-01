@@ -379,45 +379,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 			return array(
 				'pluginVersion'            => PINTEREST_FOR_WOOCOMMERCE_VERSION,
-				'adminUrl'                 => esc_url(
-					add_query_arg(
-						array(
-							'page' => 'wc-admin',
-						),
-						admin_url( 'admin.php' )
-					)
-				),
 				'pluginUrl'                => Pinterest_For_Woocommerce()->plugin_url(),
-				'serviceLoginUrl'          => esc_url(
-					add_query_arg(
-						array(
-							'page' => 'wc-admin',
-							PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
-							'view' => 'wizard',
-						),
-						admin_url( 'admin.php' )
-					)
-				),
-				'createBusinessAccountUrl' => esc_url(
-					add_query_arg(
-						array(
-							'page' => 'wc-admin',
-							PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_create_account' => '1',
-							'view' => 'wizard',
-						),
-						admin_url( 'admin.php' )
-					)
-				),
-				'switchBusinessAccountUrl' => esc_url(
-					add_query_arg(
-						array(
-							'page' => 'wc-admin',
-							PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_switch_account' => '1',
-							'view' => 'wizard',
-						),
-						admin_url( 'admin.php' )
-					)
-				),
+				'adminUrl'                 => esc_url( $this->get_admin_url() ),
+				'serviceLoginUrl'          => esc_url( $this->get_service_login_url() ),
+				'createBusinessAccountUrl' => esc_url( $this->get_create_business_account_url() ),
+				'switchBusinessAccountUrl' => esc_url( $this->get_switch_business_account_url() ),
 				'domainToVerify'           => wp_parse_url( site_url(), PHP_URL_HOST ),
 				'isConnected'              => ! empty( Pinterest_For_Woocommerce()::is_connected() ),
 				'isBusinessConnected'      => ! empty( Pinterest_For_Woocommerce()::is_business_connected() ),
@@ -440,6 +406,89 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 			);
 		}
+
+
+		/**
+		 * Return the adminUrl
+		 *
+		 * @return string
+		 */
+		private function get_admin_url() {
+			return add_query_arg(
+				array(
+					'page' => 'wc-admin',
+				),
+				admin_url( 'admin.php' )
+			);
+		}
+
+
+		/**
+		 * Return the serviceLoginUrl
+		 *
+		 * @return string
+		 */
+		private function get_service_login_url() {
+			return add_query_arg(
+				array(
+					'page' => 'wc-admin',
+					'view' => 'wizard',
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' => $this->get_middleware_url_nonce(),
+				),
+				admin_url( 'admin.php' )
+			);
+		}
+
+
+		/**
+		 * Return the createBusinessAccountUrl
+		 *
+		 * @return string
+		 */
+		private function get_create_business_account_url() {
+			return add_query_arg(
+				array(
+					'page' => 'wc-admin',
+					'view' => 'wizard',
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_create_account' => '1',
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' => $this->get_middleware_url_nonce(),
+				),
+				admin_url( 'admin.php' )
+			);
+		}
+
+
+		/**
+		 * Return the switchBusinessAccountUrl
+		 *
+		 * @return string
+		 */
+		private function get_switch_business_account_url() {
+			return add_query_arg(
+				array(
+					'page' => 'wc-admin',
+					'view' => 'wizard',
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_switch_account' => '1',
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' => $this->get_middleware_url_nonce(),
+				),
+				admin_url( 'admin.php' )
+			);
+		}
+
+
+		/**
+		 * Create & return a nonce for the service URL.
+		 * This nonce is runtime cached.
+		 *
+		 * @return string
+		 */
+		private function get_middleware_url_nonce() {
+			static $nonce;
+
+			return null === $nonce ? wp_create_nonce( 'go_to_middleware_url' ) : $nonce;
+		}
+
 
 		/**
 		 * Handles redirection to the Middleware App (Woo Connect Bridge).
