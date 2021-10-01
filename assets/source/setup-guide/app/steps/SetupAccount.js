@@ -37,6 +37,8 @@ const SetupAccount = ( {
 
 	useEffect( () => {
 		if ( undefined !== businessAccounts && businessAccounts.length > 0 ) {
+			window.removeEventListener( 'focus', fetchBusinesses );
+		} else {
 			window.addEventListener( 'focus', fetchBusinesses );
 		}
 
@@ -55,10 +57,6 @@ const SetupAccount = ( {
 			} );
 
 			setBusinessAccounts( results );
-
-			if ( Object.keys( results ).length > 0 ) {
-				window.removeEventListener( 'focus', fetchBusinesses );
-			}
 		} catch ( error ) {
 			createNotice(
 				'error',
