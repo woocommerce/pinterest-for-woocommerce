@@ -864,7 +864,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function is_business_connected() {
-
 			if ( ! self::is_connected() ) {
 				return false;
 			}

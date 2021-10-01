@@ -24,7 +24,6 @@ class Businesses extends VendorAPI {
 	 * Initialize class
 	 */
 	public function __construct() {
-
 		$this->base              = 'businesses';
 		$this->endpoint_callback = 'get_businesses';
 		$this->methods           = WP_REST_Server::READABLE;
