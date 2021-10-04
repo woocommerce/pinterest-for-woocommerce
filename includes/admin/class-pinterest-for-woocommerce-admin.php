@@ -380,7 +380,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			return array(
 				'pluginVersion'            => PINTEREST_FOR_WOOCOMMERCE_VERSION,
 				'pluginUrl'                => Pinterest_For_Woocommerce()->plugin_url(),
-				'adminUrl'                 => $this->get_admin_url(),
 				'serviceLoginUrl'          => $this->get_service_login_url(),
 				'createBusinessAccountUrl' => $this->get_create_business_account_url(),
 				'switchBusinessAccountUrl' => $this->get_switch_business_account_url(),
@@ -404,21 +403,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				'isSetupComplete'          => Pinterest_For_Woocommerce()::is_setup_complete(),
 				'countryTos'               => Pinterest_For_Woocommerce()::get_applicable_tos(),
 
-			);
-		}
-
-
-		/**
-		 * Return the adminUrl
-		 *
-		 * @return string
-		 */
-		private function get_admin_url() {
-			return add_query_arg(
-				array(
-					'page' => 'wc-admin',
-				),
-				admin_url( 'admin.php' )
 			);
 		}
 
