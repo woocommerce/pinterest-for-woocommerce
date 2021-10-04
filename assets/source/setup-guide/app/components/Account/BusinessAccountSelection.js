@@ -18,7 +18,7 @@ import {
 const BusinessAccountSelection = ( { businessAccounts } ) => {
 	const [ targetBusinessId, setTargetBusinessId ] = useState(
 		undefined !== businessAccounts && businessAccounts.length > 0
-			? businessAccounts[ 0 ][ 'value' ]
+			? businessAccounts[ 0 ].value
 			: null
 	);
 
@@ -39,7 +39,7 @@ const BusinessAccountSelection = ( { businessAccounts } ) => {
 		);
 	}
 
-		return (
+	return (
 		<CardBody size="large" className="business-connection">
 			{ businessAccounts.length > 0 ? (
 				<>
