@@ -34,7 +34,15 @@ const BusinessAccountSelection = ( { businessAccounts } ) => {
 		window.location = new URL( newURL );
 	};
 
-	return undefined !== businessAccounts ? (
+	if ( businessAccounts === undefined ) {
+		return (
+			<CardBody size="large">
+				<Spinner />
+			</CardBody>
+		);
+	}
+
+		return (
 		<CardBody size="large" className="business-connection">
 			{ businessAccounts.length > 0 ? (
 				<>
@@ -97,10 +105,6 @@ const BusinessAccountSelection = ( { businessAccounts } ) => {
 					</FlexItem>
 				</Flex>
 			) }
-		</CardBody>
-	) : (
-		<CardBody size="large">
-			<Spinner />
 		</CardBody>
 	);
 };
