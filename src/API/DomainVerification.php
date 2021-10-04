@@ -67,8 +67,6 @@ class DomainVerification extends VendorAPI {
 
 				$result = Base::trigger_verification();
 
-				flush_rewrite_rules(); // Rewrite rules as we need to serve the URL for the pinterest-XXXXX.html file.
-
 				if ( 'success' === $result['status'] ) {
 					$account_data = Pinterest_For_Woocommerce()::update_account_data();
 					return array_merge( (array) $result['data'], array( 'account_data' => $account_data ) );

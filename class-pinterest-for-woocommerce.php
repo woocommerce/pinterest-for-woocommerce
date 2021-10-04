@@ -236,10 +236,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 
-			// Handle rewrite for Pinterest verification URL.
-			add_action( 'init', array( $this, 'verification_rewrite' ) );
-			add_filter( 'query_vars', array( $this, 'verification_query_var' ), 10, 1 );
-			add_action( 'parse_request', array( $this, 'verification_request' ), 10, 1 );
+			// Handle the Pinterest verification URL.
+			add_action( 'parse_request', array( $this, 'verification_request' ) );
 
 			// Allow access to our option through the REST API.
 			add_filter( 'woocommerce_rest_api_option_permissions', array( $this, 'add_option_permissions' ), 10, 1 );
@@ -759,26 +757,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			return isset( $account_data['id'] ) ? $account_data['id'] : false;
 		}
 
-
-		/**
-		 * Register the rewrite rule for verification request.
-		 */
-		public function verification_rewrite() {
-
-			if ( ! self::get_data( 'verification_data' ) ) {
-				return;
-			}
-
-			$verification_data = self::get_data( 'verification_data' );
-			$filename          = isset( $verification_data['filename'] ) ? $verification_data['filename'] : false;
-
-			if ( $filename ) {
-				$escaped = preg_quote( $filename, '/' );
-				add_rewrite_rule( '^' . $escaped . '$', 'index.php?pinterest_verification=true', 'top' );
-			}
-		}
-
-
 		/**
 		 * Sets the default settings based on the
 		 * given values in self::$default_settings
@@ -794,44 +772,32 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		}
 
-
-		/**
-		 * Filter the list of public query vars in order to allow the WP::parse_request
-		 * to register the query variable.
-		 *
-		 * @param array $public_query_vars The array of whitelisted query variables.
-		 *
-		 * @return array
-		 */
-		public function verification_query_var( $public_query_vars ) {
-
-			if ( ! self::get_data( 'verification_data' ) ) {
-				return $public_query_vars;
-			}
-
-			$public_query_vars[] = 'pinterest_verification';
-			return $public_query_vars;
-		}
-
-
 		/**
 		 * Hook the parse_request action and serve the html
 		 *
 		 * @param WP $wp Current WordPress environment instance.
 		 */
 		public function verification_request( $wp ) {
-
-			if ( ! self::get_data( 'verification_data' ) ) {
+			$verification_data = self::get_data( 'verification_data' );
+			if ( ! $verification_data || ! array_key_exists( 'filename', $verification_data ) ) {
 				return;
 			}
 
-			if ( isset( $wp->query_vars['pinterest_verification'] ) && 'true' === $wp->query_vars['pinterest_verification'] ) {
-
-				$verification_data = self::get_data( 'verification_data' );
-				$verification_code = $verification_data['verification_code'];
-
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			$request = trim( $wp->request ?? $_SERVER['PHP_SELF'] ?? '', '/' );
+			if ( $verification_data['filename'] === $request ) {
+				wc_nocache_headers();
 				header( 'Content-Type: text/html' );
-				echo '<!DOCTYPE html><html lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><meta name="p:domain_verify" content="' . esc_attr( $verification_code ) . '"/><title></title></head><body>' . esc_html__( 'Pinterest for WooCommerce verification page', 'pinterest-for-woocommerce' ) . '</body></html>';
+				?>
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta name="p:domain_verify" content="<?php echo esc_attr( $verification_data['verification_code'] ); ?>"/>
+	<title></title>
+</head>
+<body><?php esc_html_e( 'Pinterest for WooCommerce verification page', 'pinterest-for-woocommerce' ); ?></body>
+</html>
+				<?php
 				exit;
 			}
 		}

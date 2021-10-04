@@ -258,7 +258,7 @@ class Base {
 	 */
 	public static function trigger_verification( $allow_multiple = true ) {
 
-		$domain      = wp_parse_url( site_url(), PHP_URL_HOST );
+		$domain      = wp_parse_url( home_url(), PHP_URL_HOST );
 		$request_url = 'domains/' . $domain . '/verification/metatag/realtime/';
 
 		if ( $allow_multiple ) {

@@ -383,7 +383,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				'serviceLoginUrl'          => $this->get_service_login_url(),
 				'createBusinessAccountUrl' => $this->get_create_business_account_url(),
 				'switchBusinessAccountUrl' => $this->get_switch_business_account_url(),
-				'domainToVerify'           => wp_parse_url( site_url(), PHP_URL_HOST ),
+				'domainToVerify'           => wp_parse_url( home_url(), PHP_URL_HOST ),
 				'isConnected'              => ! empty( Pinterest_For_Woocommerce()::is_connected() ),
 				'isBusinessConnected'      => ! empty( Pinterest_For_Woocommerce()::is_business_connected() ),
 				'businessAccounts'         => Pinterest_For_Woocommerce()::get_linked_businesses(),
