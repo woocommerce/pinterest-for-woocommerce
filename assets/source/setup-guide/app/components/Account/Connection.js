@@ -3,7 +3,6 @@
  */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@woocommerce/components';
 import { getNewPath } from '@woocommerce/navigation';
@@ -101,9 +100,7 @@ const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 			// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
 			const path = getNewPath( {}, '/pinterest/landing', {} );
 
-			window.location = new URL(
-				decodeEntities( wcSettings.adminUrl + path )
-			);
+			window.location = new URL( wcSettings.adminUrl + path );
 		} catch ( error ) {
 			createNotice(
 				'error',
@@ -181,10 +178,10 @@ const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 					<FlexItem>
 						<Button
 							isSecondary
-							href={ decodeEntities(
+							href={
 								wcSettings.pinterest_for_woocommerce
 									.serviceLoginUrl
-							) }
+							}
 						>
 							{ __( 'Connect', 'pinterest-for-woocommerce' ) }
 						</Button>

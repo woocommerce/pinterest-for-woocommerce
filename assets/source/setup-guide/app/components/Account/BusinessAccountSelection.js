@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/html-entities';
 import { Spinner } from '@woocommerce/components';
 import { addQueryArgs } from '@wordpress/url';
 import { useState } from '@wordpress/element';
@@ -25,9 +24,7 @@ const BusinessAccountSelection = ( { businessAccounts } ) => {
 
 	const handleConnectToBusiness = () => {
 		const newURL = addQueryArgs(
-			decodeEntities(
-				wcSettings.pinterest_for_woocommerce.switchBusinessAccountUrl
-			),
+			wcSettings.pinterest_for_woocommerce.switchBusinessAccountUrl,
 			{ business_id: targetBusinessId }
 		);
 
@@ -91,10 +88,10 @@ const BusinessAccountSelection = ( { businessAccounts } ) => {
 					<FlexItem>
 						<Button
 							isSecondary
-							href={ decodeEntities(
+							href={
 								wcSettings.pinterest_for_woocommerce
 									.createBusinessAccountUrl
-							) }
+							}
 							target="_blank"
 						>
 							{ __(
