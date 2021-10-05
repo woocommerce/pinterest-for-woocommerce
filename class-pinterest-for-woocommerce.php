@@ -710,7 +710,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$linked_businesses = ! $force_refresh ? Pinterest_For_Woocommerce()::get_data( 'linked_businesses' ) : null;
 
 			if ( null === $linked_businesses ) {
-				$linked_businesses = self::update_linked_businesses( $linked_businesses );
+				$linked_businesses = self::update_linked_businesses();
 			}
 
 			$linked_businesses = array_map(
