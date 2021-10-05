@@ -236,7 +236,7 @@ class Base {
 			throw new \Exception( __( 'Empty body', 'pinterest-for-woocommerce' ), 204 );
 		}
 
-		return json_decode( $response['body'], true );
+		return (array) json_decode( $response['body'] );
 	}
 
 
