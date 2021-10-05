@@ -811,4 +811,15 @@ class ProductSync {
 			self::feed_reschedule();
 		}
 	}
+
+
+	/**
+	 * Cancels the scheduled product sync jobs.
+	 *
+	 * @return void
+	 */
+	public static function cancel_jobs() {
+		as_unschedule_all_actions( ProductSync::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_unschedule_all_actions( ProductSync::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+	}
 }
