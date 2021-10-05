@@ -1,29 +1,25 @@
+/* eslint-disable @wordpress/no-global-event-listener */
 /**
  * External dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/html-entities';
-import { createInterpolateElement, useState } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
-import { Spinner } from '@woocommerce/components';
-import { getNewPath } from '@woocommerce/navigation';
+
 import {
-	Button,
-	Card,
-	CardBody,
-	CardFooter,
-	Flex,
-	FlexItem,
-	FlexBlock,
-	Modal,
-	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
-} from '@wordpress/components';
+	useEffect,
+	useState,
+	useCallback,
+	createInterpolateElement,
+} from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { Button, Card, CardFooter, CardDivider } from '@wordpress/components';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
+import AccountConnection from '../components/Account/Connection';
+import BusinessAccountSelection from '../components/Account/BusinessAccountSelection';
 import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
 
 const SetupAccount = ( {
@@ -31,87 +27,47 @@ const SetupAccount = ( {
 	view,
 	isConnected,
 	setIsConnected,
+	isBusinessConnected,
 } ) => {
-	const [ isConfirmationModalOpen, setIsConfirmationModalOpen ] = useState(
-		false
-	);
-	const appSettings = useSettingsSelect();
-
 	const createNotice = useCreateNotice();
+	const appSettings = useSettingsSelect();
+	const [ businessAccounts, setBusinessAccounts ] = useState(
+		wcSettings.pinterest_for_woocommerce.businessAccounts
+	);
 
-	const openConfirmationModal = () => {
-		setIsConfirmationModalOpen( true );
-	};
+	useEffect( () => {
+		if ( undefined !== businessAccounts && businessAccounts.length > 0 ) {
+			window.removeEventListener( 'focus', fetchBusinesses );
+		} else {
+			window.addEventListener( 'focus', fetchBusinesses );
+		}
 
-	const closeConfirmationModal = () => {
-		setIsConfirmationModalOpen( false );
-	};
+		return () => window.removeEventListener( 'focus', fetchBusinesses );
+	}, [ fetchBusinesses, businessAccounts ] );
 
-	const renderConfirmationModal = () => {
-		return (
-			<Modal
-				title={
-					<>{ __( 'Are you sure?', 'pinterest-for-woocommerce' ) }</>
-				}
-				onRequestClose={ closeConfirmationModal }
-				className="woocommerce-setup-guide__step-modal"
-			>
-				<div className="woocommerce-setup-guide__step-modal__wrapper">
-					<p>
-						{ __(
-							'Are you sure you want to disconnect this account?',
-							'pinterest-for-woocommerce'
-						) }
-					</p>
-					<div className="woocommerce-setup-guide__step-modal__buttons">
-						<Button
-							isDestructive
-							isSecondary
-							onClick={ handleDisconnectAccount }
-						>
-							{ __(
-								"Yes, I'm sure",
-								'pinterest-for-woocommerce'
-							) }
-						</Button>
-						<Button isTertiary onClick={ closeConfirmationModal }>
-							{ __( 'Cancel', 'pinterest-for-woocommerce' ) }
-						</Button>
-					</div>
-				</div>
-			</Modal>
-		);
-	};
+	const fetchBusinesses = useCallback( async () => {
+		try {
+			setBusinessAccounts();
 
-	const handleDisconnectAccount = async () => {
-		closeConfirmationModal();
+			const results = await apiFetch( {
+				path:
+					wcSettings.pinterest_for_woocommerce.apiRoute +
+					'/businesses/',
+				method: 'GET',
+			} );
 
-		const result = await apiFetch( {
-			path:
-				wcSettings.pinterest_for_woocommerce.apiRoute +
-				'/auth_disconnect',
-			method: 'POST',
-		} );
-
-		if ( ! result.disconnected ) {
+			setBusinessAccounts( results );
+		} catch ( error ) {
 			createNotice(
 				'error',
-				__(
-					'There was a problem while trying to disconnect.',
-					'pinterest-for-woocommerce'
-				)
-			);
-		} else {
-			setIsConnected( false );
-
-			// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
-			const path = getNewPath( {}, '/pinterest/landing', {} );
-
-			window.location = new URL(
-				decodeEntities( wcSettings.adminUrl + path )
+				error.message ||
+					__(
+						'Couldn’t retrieve your Linked Business Accounts.',
+						'pinterest-for-woocommerce'
+					)
 			);
 		}
-	};
+	}, [ createNotice ] );
 
 	return (
 		<div className="woocommerce-setup-guide__setup-account">
@@ -163,75 +119,24 @@ const SetupAccount = ( {
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
-						<CardBody size="large">
-							{ isConnected === true ? ( // eslint-disable-line no-nested-ternary --- Code is reasonable readable
-								<Flex>
-									<FlexBlock className="is-connected">
-										<Text variant="subtitle">
-											{ __(
-												'Pinterest Account',
-												'pinterest-for-woocommerce'
-											) }
-										</Text>
-										{ appSettings?.account_data?.id && (
-											<Text variant="body">
-												{ sprintf(
-													'%1$s: %2$s - %3$s',
-													__(
-														'Account',
-														'pinterest-for-woocommerce'
-													),
-													appSettings.account_data
-														.username,
-													appSettings.account_data.id
-												) }
-											</Text>
-										) }
-										<Button
-											isLink
-											isDestructive
-											onClick={ openConfirmationModal }
-										>
-											{ __(
-												'Disconnect Pinterest Account',
-												'pinterest-for-woocommerce'
-											) }
-										</Button>
-									</FlexBlock>
-								</Flex>
-							) : isConnected === false ? (
-								<Flex>
-									<FlexBlock>
-										<Text variant="subtitle">
-											{ __(
-												'Connect your Pinterest Account',
-												'pinterest-for-woocommerce'
-											) }
-										</Text>
-									</FlexBlock>
-									<FlexItem>
-										<Button
-											isSecondary
-											href={ decodeEntities(
-												wcSettings
-													.pinterest_for_woocommerce
-													.serviceLoginUrl
-											) }
-										>
-											{ __(
-												'Connect',
-												'pinterest-for-woocommerce'
-											) }
-										</Button>
-									</FlexItem>
-								</Flex>
-							) : (
-								<Spinner />
+						<AccountConnection
+							isConnected={ isConnected }
+							setIsConnected={ setIsConnected }
+							accountData={ appSettings.account_data }
+						/>
+
+						{ isConnected === true &&
+							isBusinessConnected === false && (
+								<>
+									<CardDivider />
+									<BusinessAccountSelection
+										businessAccounts={ businessAccounts }
+									/>
+								</>
 							) }
-						</CardBody>
 
 						{ isConnected === false && (
-							<CardFooter>
+							<CardFooter size="large">
 								<Button
 									isLink
 									href={
@@ -248,10 +153,30 @@ const SetupAccount = ( {
 							</CardFooter>
 						) }
 
-						{ isConfirmationModalOpen && renderConfirmationModal() }
+						{ isConnected === true &&
+							isBusinessConnected === false &&
+							undefined !== businessAccounts &&
+							businessAccounts.length < 1 && (
+								<CardFooter size="large">
+									<Button
+										isLink
+										href={
+											wcSettings.pinterest_for_woocommerce
+												.pinterestLinks
+												.convertToBusinessAcct
+										}
+										target="_blank"
+									>
+										{ __(
+											'Or, convert your personal account',
+											'pinterest-for-woocommerce'
+										) }
+									</Button>
+								</CardFooter>
+							) }
 					</Card>
 
-					{ view === 'wizard' && isConnected === true && (
+					{ view === 'wizard' && isBusinessConnected === true && (
 						<div className="woocommerce-setup-guide__footer-button">
 							<Button isPrimary onClick={ goToNextStep }>
 								{ __(

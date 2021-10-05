@@ -131,7 +131,7 @@ class Auth extends VendorAPI {
 		$query_args = array(
 			'page' => 'wc-admin',
 			'path' => '/pinterest/onboarding',
-			'step' => $has_error ? 'setup-account' : 'claim-website',
+			'step' => $has_error || ! Pinterest_For_Woocommerce()::is_business_connected() ? 'setup-account' : 'claim-website',
 		);
 
 		if ( ! empty( $view ) ) {

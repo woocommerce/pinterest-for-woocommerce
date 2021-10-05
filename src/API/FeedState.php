@@ -71,20 +71,6 @@ class FeedState extends VendorAPI {
 
 
 	/**
-	 * Authenticate request
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param WP_REST_Request $request The request.
-	 *
-	 * @return boolean
-	 */
-	public function permissions_check( WP_REST_Request $request ) {
-		return current_user_can( 'manage_woocommerce' );
-	}
-
-
-	/**
 	 * Get the status of the current feed, for:
 	 * - the local feed configuration.
 	 * - the remote feed registration.

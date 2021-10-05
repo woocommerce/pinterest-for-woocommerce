@@ -233,8 +233,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'wp', array( Pinterest\SaveToPinterest::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\Tracking::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
-			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 
 			// Handle the Pinterest verification URL.
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
@@ -501,13 +501,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.0.0
 		 */
 		public function init_api_endpoints() {
+			new Pinterest\API\Advertisers();
 			new Pinterest\API\Auth();
 			new Pinterest\API\AuthDisconnect();
+			new Pinterest\API\Businesses();
 			new Pinterest\API\DomainVerification();
-			new Pinterest\API\Advertisers();
-			new Pinterest\API\Tags();
 			new Pinterest\API\FeedState();
 			new Pinterest\API\FeedIssues();
+			new Pinterest\API\Tags();
 		}
 
 		/**
@@ -602,36 +603,46 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Return Service Login URL
+		 * Return The Middleware URL based on the given context
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param string $view The context view parameter.
+		 * @param string $context The context parameter.
+		 * @param string $args    Additional arguments like 'view' or 'business_id'.
 		 *
 		 * @return string
 		 */
-		public static function get_service_login_url( $view = null ) {
+		public static function get_middleware_url( $context = 'login', $args = array() ) {
 
 			$control_key = uniqid();
-			$view        = is_null( $view ) ? 'settings' : $view;
+			$view        = is_null( $args['view'] ) ? 'settings' : $args['view'];
 			$rest_url    = get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT );
-			$state       = http_build_query(
-				array(
-					'redirect' => add_query_arg(
-						array(
-							'control' => $control_key,
-							'view'    => $view,
-						),
-						$rest_url
+
+			$state_params = array(
+				'redirect' => add_query_arg(
+					array(
+						'control' => $control_key,
+						'view'    => $view,
 					),
-				)
+					$rest_url
+				),
 			);
+
+			switch ( $context ) {
+				case 'create_business':
+					$state_params['create-business'] = true;
+					break;
+				case 'switch_business':
+					$state_params['switch-to-business'] = $args['business_id'];
+					break;
+			}
+
+			$state = http_build_query( $state_params );
 
 			set_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
 
 			return self::get_connection_proxy_url() . 'login/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
 		}
-
 
 
 		/**
@@ -669,8 +680,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 						'verified_domains' => '',
 						'domain_verified'  => '',
 						'username'         => '',
+						'full_name'        => '',
 						'id'               => '',
 						'image_medium_url' => '',
+						'is_partner'       => '',
 					)
 				);
 
@@ -678,10 +691,61 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				return $data;
 			}
 
+			self::get_linked_businesses( true );
+
 			return array();
 
 		}
 
+
+		/**
+		 * Fetches a fresh copy (if needed or explicitly requested), of the authenticated user's Linked business accounts.
+		 *
+		 * @param boolean $force_refresh Wether to refresh the data from the API.
+		 *
+		 * @return array
+		 */
+		public static function get_linked_businesses( $force_refresh = false ) {
+
+			$linked_businesses = ! $force_refresh ? Pinterest_For_Woocommerce()::get_data( 'linked_businesses' ) : null;
+
+			if ( null === $linked_businesses ) {
+				$linked_businesses = self::update_linked_businesses();
+			}
+
+			$linked_businesses = array_map(
+				function ( $business ) {
+					return array(
+						'value' => $business->id,
+						'label' => $business->full_name . ' [' . $business->id . ']',
+					);
+				},
+				$linked_businesses
+			);
+
+			return $linked_businesses;
+		}
+
+
+		/**
+		 * Grabs a fresh copy of businesses from the API saves & returns them.
+		 *
+		 * @return array
+		 */
+		public static function update_linked_businesses() {
+			$account_data       = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+			$fetched_businesses = ( ! empty( $account_data ) && ! $account_data['is_partner'] ) ? Pinterest\API\Base::get_linked_businesses() : array();
+
+			if ( ! empty( $fetched_businesses ) && 'success' === $fetched_businesses['status'] ) {
+				$linked_businesses = $fetched_businesses['data'];
+			}
+
+			$linked_businesses = $linked_businesses ?? array();
+
+			self::save_data( 'linked_businesses', $linked_businesses );
+
+			return $linked_businesses;
+		}
 
 		/**
 		 * Returns the Pinterest AccountID from the database.
@@ -745,7 +809,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function is_setup_complete() {
-			return self::is_connected() && self::is_domain_verified() && self::is_tracking_configured();
+			return self::is_business_connected() && self::is_domain_verified() && self::is_tracking_configured();
 		}
 
 
@@ -758,6 +822,23 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$token = self::get_token();
 			return $token && ! empty( $token['access_token'] );
 		}
+
+
+		/**
+		 * Checks if connected and on a Business account.
+		 *
+		 * @return boolean
+		 */
+		public static function is_business_connected() {
+			if ( ! self::is_connected() ) {
+				return false;
+			}
+
+			$account_data = self::get_setting( 'account_data' );
+
+			return isset( $account_data['is_partner'] ) ? (bool) $account_data['is_partner'] : false;
+		}
+
 
 
 		/**

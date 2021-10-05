@@ -30,7 +30,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		 */
 		public function __construct() {
 			add_action( 'admin_enqueue_scripts', array( $this, 'load_setup_guide_scripts' ) );
-			add_action( 'admin_init', array( $this, 'maybe_go_to_service_login_url' ) );
+			add_action( 'admin_init', array( $this, 'maybe_redirect_to_middleware' ) );
 			add_filter( 'woocommerce_get_registered_extended_tasks', array( $this, 'register_task_list_item' ), 10, 1 );
 			add_filter( 'admin_footer', array( $this, 'load_settings' ) );
 			add_filter( 'woocommerce_marketing_menu_items', array( $this, 'add_menu_items' ) );
@@ -378,64 +378,130 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		private function get_component_settings() {
 
 			return array(
-				'pluginVersion'   => PINTEREST_FOR_WOOCOMMERCE_VERSION,
-				'adminUrl'        => esc_url(
-					add_query_arg(
-						array(
-							'page' => 'wc-admin',
-						),
-						admin_url( 'admin.php' )
-					)
+				'pluginVersion'            => PINTEREST_FOR_WOOCOMMERCE_VERSION,
+				'pluginUrl'                => Pinterest_For_Woocommerce()->plugin_url(),
+				'serviceLoginUrl'          => $this->get_service_login_url(),
+				'createBusinessAccountUrl' => $this->get_create_business_account_url(),
+				'switchBusinessAccountUrl' => $this->get_switch_business_account_url(),
+				'domainToVerify'           => wp_parse_url( home_url(), PHP_URL_HOST ),
+				'isConnected'              => ! empty( Pinterest_For_Woocommerce()::is_connected() ),
+				'isBusinessConnected'      => ! empty( Pinterest_For_Woocommerce()::is_business_connected() ),
+				'businessAccounts'         => Pinterest_For_Woocommerce()::get_linked_businesses(),
+				'apiRoute'                 => PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION,
+				'optionsName'              => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,
+				'error'                    => isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
+				'pinterestLinks'           => array(
+					'newAccount'            => 'https://business.pinterest.com/',
+					'claimWebsite'          => 'https://help.pinterest.com/en/business/article/claim-your-website',
+					'richPins'              => 'https://help.pinterest.com/en/business/article/rich-pins',
+					'enhancedMatch'         => 'https://help.pinterest.com/en/business/article/enhanced-match',
+					'createAdvertiser'      => 'https://help.pinterest.com/en/business/article/create-an-advertiser-account',
+					'adGuidelines'          => 'https://policy.pinterest.com/en/advertising-guidelines',
+					'adDataTerms'           => 'https://policy.pinterest.com/en/ad-data-terms',
+					'convertToBusinessAcct' => 'https://help.pinterest.com/en/business/article/get-a-business-account#section-15096',
 				),
-				'pluginUrl'       => Pinterest_For_Woocommerce()->plugin_url(),
-				'serviceLoginUrl' => esc_url(
-					add_query_arg(
-						array(
-							'page' => 'wc-admin',
-							PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
-							'view' => 'wizard',
-						),
-						admin_url( 'admin.php' )
-					)
-				),
-				'domainToVerify'  => wp_parse_url( home_url(), PHP_URL_HOST ),
-				'isConnected'     => ! empty( Pinterest_For_Woocommerce()::get_token()['access_token'] ),
-				'apiRoute'        => PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION,
-				'optionsName'     => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,
-				'error'           => isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
-				'pinterestLinks'  => array(
-					'newAccount'       => 'https://business.pinterest.com/',
-					'claimWebsite'     => 'https://help.pinterest.com/en/business/article/claim-your-website',
-					'richPins'         => 'https://help.pinterest.com/en/business/article/rich-pins',
-					'enhancedMatch'    => 'https://help.pinterest.com/en/business/article/enhanced-match',
-					'createAdvertiser' => 'https://help.pinterest.com/en/business/article/create-an-advertiser-account',
-					'adGuidelines'     => 'https://policy.pinterest.com/en/advertising-guidelines',
-					'adDataTerms'      => 'https://policy.pinterest.com/en/ad-data-terms',
-				),
-				'isSetupComplete' => Pinterest_For_Woocommerce()::is_setup_complete(),
-				'countryTos'      => Pinterest_For_Woocommerce()::get_applicable_tos(),
+				'isSetupComplete'          => Pinterest_For_Woocommerce()::is_setup_complete(),
+				'countryTos'               => Pinterest_For_Woocommerce()::get_applicable_tos(),
+
 			);
 		}
 
-		/**
-		 * Handles redirection to the service login URL.
-		 */
-		public function maybe_go_to_service_login_url() {
 
-			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
+		/**
+		 * Return the serviceLoginUrl
+		 *
+		 * @return string
+		 */
+		private function get_service_login_url() {
+			return add_query_arg(
+				array(
+					'page' => 'wc-admin',
+					'view' => 'wizard',
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' => '1',
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' => $this->get_middleware_url_nonce(),
+				),
+				admin_url( 'admin.php' )
+			);
+		}
+
+
+		/**
+		 * Return the createBusinessAccountUrl
+		 *
+		 * @return string
+		 */
+		private function get_create_business_account_url() {
+			return add_query_arg(
+				array(
+					'page' => 'wc-admin',
+					'view' => 'wizard',
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_create_account' => '1',
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' => $this->get_middleware_url_nonce(),
+				),
+				admin_url( 'admin.php' )
+			);
+		}
+
+
+		/**
+		 * Return the switchBusinessAccountUrl
+		 *
+		 * @return string
+		 */
+		private function get_switch_business_account_url() {
+			return add_query_arg(
+				array(
+					'page' => 'wc-admin',
+					'view' => 'wizard',
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_switch_account' => '1',
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' => $this->get_middleware_url_nonce(),
+				),
+				admin_url( 'admin.php' )
+			);
+		}
+
+
+		/**
+		 * Create & return a nonce for the service URL.
+		 * This nonce is runtime cached.
+		 *
+		 * @return string
+		 */
+		private function get_middleware_url_nonce() {
+			static $nonce;
+
+			return null === $nonce ? wp_create_nonce( 'go_to_middleware_url' ) : $nonce;
+		}
+
+
+		/**
+		 * Handles redirection to the Middleware App (Woo Connect Bridge).
+		 */
+		public function maybe_redirect_to_middleware() {
+
+			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_service_login' ] ) && ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_create_account' ] ) && ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_switch_account' ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				return;
 			}
 
-			if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' ] ) || ! wp_verify_nonce( sanitize_key( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' ] ), 'go_to_middleware_url' ) || ! current_user_can( 'manage_woocommerce' ) ) {
 				wp_die( esc_html__( 'Cheatin&#8217; huh?', 'pinterest-for-woocommerce' ) );
-				return false;
+				return;
 			}
 
-			$view = ! empty( $_REQUEST['view'] ) ? sanitize_key( $_REQUEST['view'] ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
+			$context = 'login';
+
+			$args = array( 'view' => ! empty( $_REQUEST['view'] ) ? sanitize_key( $_REQUEST['view'] ) : null );
+
+			if ( isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_create_account' ] ) ) {
+				$context = 'create_business';
+			} elseif ( isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_go_to_switch_account' ] ) && ! empty( $_GET['business_id'] ) ) {
+				$context             = 'switch_business';
+				$args['business_id'] = sanitize_key( $_GET['business_id'] );
+			}
 
 			add_filter( 'allowed_redirect_hosts', array( $this, 'allow_service_login' ) );
 
-			wp_safe_redirect( Pinterest_For_Woocommerce()::get_service_login_url( $view ) );
+			wp_safe_redirect( Pinterest_For_Woocommerce()::get_middleware_url( $context, $args ) );
 			exit;
 
 		}

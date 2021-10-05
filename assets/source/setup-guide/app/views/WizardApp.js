@@ -3,7 +3,7 @@
  */
 import '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-import { createElement, useState } from '@wordpress/element';
+import { createElement, useState, useEffect } from '@wordpress/element';
 import { Spinner, Stepper } from '@woocommerce/components';
 import {
 	getHistory,
@@ -31,6 +31,16 @@ const WizardApp = () => {
 		wcSettings.pinterest_for_woocommerce.isConnected
 	);
 
+	const [ isBusinessConnected, setIsBusinessConnected ] = useState(
+		wcSettings.pinterest_for_woocommerce.isBusinessConnected
+	);
+
+	useEffect( () => {
+		if ( ! isConnected ) {
+			setIsBusinessConnected( false );
+		}
+	}, [ isConnected, setIsBusinessConnected ] );
+
 	const appSettings = useSettingsSelect();
 
 	useBodyClasses( 'wizard' );
@@ -47,6 +57,8 @@ const WizardApp = () => {
 			props: {
 				setIsConnected,
 				isConnected,
+				setIsBusinessConnected,
+				isBusinessConnected,
 			},
 		},
 		{

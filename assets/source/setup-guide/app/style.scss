@@ -272,10 +272,59 @@ $root: ".woocommerce-setup-guide";
 
 			&__setup-account {
 
-				.is-connected {
+				.connection-info {
+
+					.logo {
+						display: flex;
+					}
+
+					.account-label {
+
+						p {
+							font-weight: 600;
+
+							.account-type {
+								font-weight: normal;
+							}
+						}
+					}
+				}
+
+				.business-connection {
+
+					p {
+						margin-bottom: 0.5em;
+
+						&:last-child {
+							margin-bottom: 0;
+						}
+					}
+				}
+
+				.components-flex {
 
 					> * {
-						margin: 8px 0;
+						margin: 0 6px;
+
+						&:first-child {
+							margin-left: 0;
+						}
+
+						&:last-child {
+							margin-right: 0;
+						}
+					}
+				}
+
+				.components-base-control__field {
+					margin-bottom: 0;
+
+					.components-input-control__container {
+						margin-left: 0;
+					}
+
+					select.components-select-control__input {
+						min-height: 36px;
 					}
 				}
 			}

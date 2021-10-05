@@ -236,9 +236,7 @@ class Base {
 			throw new \Exception( __( 'Empty body', 'pinterest-for-woocommerce' ), 204 );
 		}
 
-		$body = (array) json_decode( $response['body'] );
-
-		return $body;
+		return json_decode( $response['body'], true );
 	}
 
 
@@ -248,8 +246,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function domain_verification_data() {
-		$response = self::make_request( 'domains/verification', 'GET' );
-		return $response;
+		return self::make_request( 'domains/verification', 'GET' );
 	}
 
 
@@ -268,8 +265,7 @@ class Base {
 			$request_url = add_query_arg( 'can_claim_multiple', 'true', $request_url );
 		}
 
-		$response = self::make_request( $request_url, 'POST' );
-		return $response;
+		return self::make_request( $request_url, 'POST' );
 	}
 
 
@@ -279,8 +275,17 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_account_info() {
-		$response = self::make_request( 'users/me', 'GET' );
-		return $response;
+		return self::make_request( 'users/me', 'GET' );
+	}
+
+
+	/**
+	 * Get the linked business accounts from the API.
+	 *
+	 * @return mixed
+	 */
+	public static function get_linked_businesses() {
+		return self::make_request( 'users/me/businesses', 'GET' );
 	}
 
 
@@ -295,7 +300,7 @@ class Base {
 
 		$advertiser_name = apply_filters( 'pinterest_for_woocommerce_default_advertiser_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
-		$response = self::make_request(
+		return self::make_request(
 			'advertisers/',
 			'POST',
 			array(
@@ -304,8 +309,6 @@ class Base {
 			),
 			'ads'
 		);
-
-		return $response;
 	}
 
 
@@ -318,8 +321,7 @@ class Base {
 	 */
 	public static function get_advertisers( $pinterest_user = null ) {
 		$pinterest_user = ! is_null( $pinterest_user ) ? $pinterest_user : Pinterest_For_Woocommerce()::get_account_id();
-		$response       = self::make_request( 'advertisers/?owner_user_id=' . $pinterest_user, 'GET', array(), 'ads' );
-		return $response;
+		return self::make_request( 'advertisers/?owner_user_id=' . $pinterest_user, 'GET', array(), 'ads' );
 	}
 
 
@@ -331,8 +333,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_advertiser_tags( $advertiser_id ) {
-		$response = self::make_request( 'advertisers/' . $advertiser_id . '/tags/', 'GET', array(), 'ads' );
-		return $response;
+		return self::make_request( 'advertisers/' . $advertiser_id . '/tags/', 'GET', array(), 'ads' );
 	}
 
 
@@ -347,7 +348,7 @@ class Base {
 
 		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
-		$response = self::make_request(
+		return self::make_request(
 			'tags/',
 			'POST',
 			array(
@@ -356,8 +357,6 @@ class Base {
 			),
 			'ads'
 		);
-
-		return $response;
 	}
 
 
@@ -375,9 +374,7 @@ class Base {
 			return false;
 		}
 
-		$response = self::make_request( 'tags/' . $tag_id . '/configs/', 'PUT', $config, 'ads' );
-
-		return $response;
+		return self::make_request( 'tags/' . $tag_id . '/configs/', 'PUT', $config, 'ads' );
 	}
 
 
@@ -389,8 +386,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_merchant( $merchant_id ) {
-		$response = self::make_request( 'commerce/product_pin_merchants/' . $merchant_id . '/', 'GET' );
-		return $response;
+		return self::make_request( 'commerce/product_pin_merchants/' . $merchant_id . '/', 'GET' );
 	}
 
 
@@ -413,12 +409,10 @@ class Base {
 			)
 		);
 
-		$response = self::make_request(
+		return self::make_request(
 			add_query_arg( $args, 'commerce/product_pin_merchants/' ),
 			'POST'
 		);
-
-		return $response;
 	}
 
 
@@ -432,12 +426,10 @@ class Base {
 	 */
 	public static function add_merchant_feed( $merchant_id, $args ) {
 
-		$response = self::make_request(
+		return self::make_request(
 			add_query_arg( $args, 'commerce/product_pin_merchants/' . $merchant_id . '/feed/' ),
 			'POST'
 		);
-
-		return $response;
 	}
 
 
@@ -452,12 +444,10 @@ class Base {
 	 */
 	public static function update_merchant_feed( $merchant_id, $feed_id, $args ) {
 
-		$response = self::make_request(
+		return self::make_request(
 			add_query_arg( $args, 'commerce/product_pin_merchants/' . $merchant_id . '/feed/' . $feed_id . '/' ),
 			'PUT'
 		);
-
-		return $response;
 	}
 
 
@@ -472,12 +462,10 @@ class Base {
 	public static function get_merchant_feed( $merchant_id, $feed_id ) {
 		$args = array( 'feed_profile' => $feed_id );
 
-		$response = self::make_request(
+		return self::make_request(
 			add_query_arg( $args, 'catalogs/datasource/feed_report/' . $merchant_id . '/' ),
 			'GET'
 		);
-
-		return $response;
 	}
 
 
@@ -489,8 +477,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_feed_report( $merchant_id ) {
-		$response = self::make_request( 'catalogs/datasource/feed_report/' . $merchant_id . '/', 'GET', array(), '', MINUTE_IN_SECONDS );
-		return $response;
+		return self::make_request( 'catalogs/datasource/feed_report/' . $merchant_id . '/', 'GET', array(), '', MINUTE_IN_SECONDS );
 	}
 
 
@@ -500,7 +487,6 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_message_map() {
-		$response = self::make_request( 'catalogs/message_map', 'GET', array(), '', DAY_IN_SECONDS );
-		return $response;
+		return self::make_request( 'catalogs/message_map', 'GET', array(), '', DAY_IN_SECONDS );
 	}
 }

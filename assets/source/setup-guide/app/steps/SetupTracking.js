@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { sprintf, __ } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/html-entities';
 import {
 	useEffect,
 	useState,
@@ -260,9 +259,7 @@ const SetupTracking = ( { view } ) => {
 		// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
 		const path = getNewPath( {}, '/pinterest/settings', {} );
 
-		window.location = new URL(
-			decodeEntities( wcSettings.adminUrl + path )
-		);
+		window.location = new URL( wcSettings.adminUrl + path );
 	};
 
 	return (
