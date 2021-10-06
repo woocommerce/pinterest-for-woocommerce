@@ -264,7 +264,7 @@ class FeedState extends VendorAPI {
 			switch ( $api_approved_status ) {
 				case 'approved':
 					$status       = 'success';
-					$status_label = esc_html__( 'Product feed configured for Ingestion on Pinterest', 'pinterest-for-woocommerce' );
+					$status_label = esc_html__( 'Product feed configured for ingestion on Pinterest', 'pinterest-for-woocommerce' );
 
 					if ( ! empty( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq ) ) {
 						$extra_info = wp_kses_post(
