@@ -404,7 +404,7 @@ class FeedState extends VendorAPI {
 					$status_label = esc_html__( 'Unknown status in workflow.', 'pinterest-for-woocommerce' );
 					$extra_info   = sprintf(
 						/* Translators: The status text returned by the API. */
-						esc_html__( 'API Returned an unknown status: %1$s', 'pinterest-for-woocommerce' ),
+						esc_html__( 'API returned an unknown status: %1$s', 'pinterest-for-woocommerce' ),
 						$workflow->workflow_status
 					);
 
