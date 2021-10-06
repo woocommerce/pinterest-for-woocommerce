@@ -82,7 +82,7 @@ class FeedIssues extends VendorAPI {
 			$issues_file = $this->get_remote_file( $issues_file_url, (array) $workflow );
 
 			if ( empty( $issues_file ) ) {
-				throw new \Exception( esc_html__( 'Error downloading Feed Issues file from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
+				throw new \Exception( esc_html__( 'Error downloading feed issues file from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
 			$start_line  = ( ( $paged - 1 ) * $per_page );
