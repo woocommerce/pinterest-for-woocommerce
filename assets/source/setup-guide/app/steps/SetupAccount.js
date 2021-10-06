@@ -62,7 +62,7 @@ const SetupAccount = ( {
 				'error',
 				error.message ||
 					__(
-						'Couldn’t retrieve your Linked Business Accounts.',
+						'Couldn’t retrieve your linked business accounts.',
 						'pinterest-for-woocommerce'
 					)
 			);

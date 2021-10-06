@@ -702,7 +702,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Fetches a fresh copy (if needed or explicitly requested), of the authenticated user's Linked business accounts.
+		 * Fetches a fresh copy (if needed or explicitly requested), of the authenticated user's linked business accounts.
 		 *
 		 * @param boolean $force_refresh Wether to refresh the data from the API.
 		 *
