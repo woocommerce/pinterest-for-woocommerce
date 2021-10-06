@@ -1,6 +1,6 @@
 <?php
 /**
- * Pinterest For WooCommerce Catalog Syncing
+ * Pinterest for WooCommerce Catalog Syncing
  *
  * @package     Pinterest_For_WooCommerce/Classes/
  * @version     1.0.0

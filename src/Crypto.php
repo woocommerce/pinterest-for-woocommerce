@@ -1,6 +1,6 @@
 <?php
 /**
- * Pinterest For WooCommerce Crypto Wrapper
+ * Pinterest for WooCommerce Crypto Wrapper
  *
  * @class       WP_Salesforce_Crypto
  * @version     1.0.0

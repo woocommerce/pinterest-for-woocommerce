@@ -1,6 +1,6 @@
 <?php //phpcs:disable WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
 /**
- * Pinterest For WooCommerce Catalog Syncing
+ * Pinterest for WooCommerce Catalog Syncing
  *
  * @package     Pinterest_For_WooCommerce/Classes/
  * @version     1.0.0
