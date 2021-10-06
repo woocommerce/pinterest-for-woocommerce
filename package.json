@@ -1,7 +1,7 @@
 {
   "name": "pinterest-for-woocommerce",
   "description": "Pinterest for WooCommerce",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "main": "gulpfile.js",
   "dependencies": {
     "@woocommerce/components": "^5.1.2",
