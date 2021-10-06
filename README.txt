@@ -1,114 +1,61 @@
-=== Plugin Name ===
-Contributors: (this should be a list of wordpress.org userid's)
-Donate link: https://woocommerce.com
-Tags: comments, spam
-Requires at least: 3.0.1
-Tested up to: 3.4
-Stable tag: 4.3
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+=== Pinterest for WooCommerce ===
+Contributors: automattic, pinterest, woocommerce
+Tags: woocommerce, pinterest, advertise
+Requires at least: 5.6
+Tested up to: 5.8
+Requires PHP: 7.3
+Stable tag: 1.0.0-beta.3
+License: GPLv3
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Here is a short description of the plugin.  This should be no more than 150 characters.  No markup here.
+Get your products in front of Pinterest users searching for ideas and things to buy. Connect your WooCommerce store to make your entire catalog browsable.
 
 == Description ==
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
+Pinterest gives people their next great idea. Part collection, part marketplace, it’s a one-stop shop for millions of pinners to source inspiration, new products and new possibilities. It’s like a visual search engine, guiding people to ideas, inspiration and products that are just right for them.
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+With the Pinterest for WooCommerce extension, you can put your products in front of Pinterest users who are already looking for ideas and things to buy. Connect your WooCommerce store to your *[Pinterest business account](https://business.pinterest.com/)* directly in the WooCommerce app. Your entire catalog will become browsable on Pinterest in just a few clicks.
 
-A few notes about the sections above:
+= Open-minded and undecided =
 
-*   "Contributors" is a comma separated list of wp.org/wp-plugins.org usernames
-*   "Tags" is a comma separated list of tags that apply to the plugin
-*   "Requires at least" is the lowest version that the plugin will work on
-*   "Tested up to" is the highest version that you've *successfully used to test the plugin*. Note that it might work on
-higher versions... this is just the highest one you've verified.
-*   Stable tag should indicate the Subversion "tag" of the latest stable version, or "trunk," if you use `/trunk/` for
-stable.
+People on Pinterest are eager for new ideas, which means they want to hear from you. In fact, 97% of top Pinterest searches are unbranded. Content from brands doesn’t interrupt on Pinterest—it inspires. Shopping features are built into both the organic Pinner experience, and our ad solutions.
 
-    Note that the `readme.txt` of the stable tag is the one that is considered the defining one for the plugin, so
-if the `/trunk/readme.txt` file says that the stable tag is `4.3`, then it is `/tags/4.3/readme.txt` that'll be used
-for displaying information about the plugin.  In this situation, the only thing considered from the trunk `readme.txt`
-is the stable tag pointer.  Thus, if you develop in trunk, you can update the trunk `readme.txt` to reflect changes in
-your in-development version, without having that information incorrectly disclosed about the current stable version
-that lacks those changes -- as long as the trunk's `readme.txt` points to the correct stable tag.
+We'll also automatically set up your Pinterest tag, and a shop tab on your Pinterest profile.
 
-    If no stable tag is provided, it is assumed that trunk is stable, but you should specify "trunk" if that's where
-you put the stable version, in order to eliminate any doubt.
+*[Learn more about Shopping on Pinterest](https://business.pinterest.com/en/shopping/)*
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
+= Minimum Requirements =
 
-e.g.
+* WordPress 5.6 or greater
+* WooCommerce 5.3 or greater
+* PHP version 7.3 or greater (PHP 7.4 or greater is recommended)
+* MySQL version 5.6 or greater
 
-1. Upload `pinterest-for-woocommerce.php` to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place `<?php do_action('pinterest_for_woocommerce_hook'); ?>` in your templates
+Visit the [WooCommerce server requirements documentation](https://docs.woocommerce.com/document/server-requirements/) for a detailed list of server requirements.
 
-== Frequently Asked Questions ==
+= Automatic installation =
 
-= A question that someone might have =
+Automatic installation is the easiest option as WordPress handles the file transfers itself and you don’t need to leave your web browser. To do an automatic install of this plugin, log in to your WordPress dashboard, navigate to the Plugins menu and click Add New.
 
-An answer to that question.
+In the search field type “Pinterest for WooCommerce” and click Search Plugins. Once you’ve found this plugin you can view details about it such as the point release, rating and description. Most importantly of course, you can install it by simply clicking “Install Now”.
 
-= What about foo bar? =
+= Manual installation =
 
-Answer to foo bar dilemma.
+The manual installation method involves downloading the plugin and uploading it to your webserver via your favourite FTP application. The WordPress codex contains [instructions on how to do this here](https://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
 
-== Screenshots ==
+= Where can I report bugs or contribute to the project? =
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+Bugs should be reported in the [Pinterest for WooCommerce repository](https://github.com/woocommerce/pinterest-for-woocommerce/).
+
+= This is awesome! Can I contribute? =
+
+Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/pinterest-for-woocommerce/) :)
+
+Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
 
-= 1.0 =
-* A change since the previous version.
-* Another change.
-
-= 0.5 =
-* List versions from most recent at top to oldest at bottom.
-
-== Upgrade Notice ==
-
-= 1.0 =
-Upgrade notices describe the reason a user should upgrade.  No more than 300 characters.
-
-= 0.5 =
-This version fixes a security related bug.  Upgrade immediately.
-
-== Arbitrary section ==
-
-You may provide arbitrary sections, in the same format as the ones above.  This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation."  Arbitrary sections will be shown below the built-in sections outlined above.
-
-== A brief Markdown Example ==
-
-Ordered list:
-
-1. Some feature
-1. Another feature
-1. Something else about the plugin
-
-Unordered list:
-
-* something
-* something else
-* third thing
-
-Here's a link to [WordPress](http://wordpress.org/ "Your favorite software") and one to [Markdown's Syntax Documentation][markdown syntax].
-Titles are optional, naturally.
-
-[markdown syntax]: http://daringfireball.net/projects/markdown/syntax
-            "Markdown is what the parser uses to process much of the readme file"
-
-Markdown uses email style notation for blockquotes and I've been told:
-> Asterisks for *emphasis*. Double it up  for **strong**.
-
-`<?php code(); // goes in backticks ?>`
+= 1.0.0 - 2021-10-XX =
+- Initial release
