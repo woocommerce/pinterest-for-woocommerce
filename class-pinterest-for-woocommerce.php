@@ -577,7 +577,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			self::save_setting( 'tracking_advertiser', null );
 			self::save_setting( 'tracking_tag', null );
 
-			// Cancel scheduled jobs
+			// Cancel scheduled jobs.
 			Pinterest\ProductSync::cancel_jobs();
 
 			// At this point we're disconnected.
