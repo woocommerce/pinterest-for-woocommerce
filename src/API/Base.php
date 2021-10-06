@@ -399,7 +399,7 @@ class Base {
 	 */
 	public static function maybe_create_merchant( $args ) {
 
-		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto Created by Pinterest For WooCommerce', 'pinterest-for-woocommerce' ) );
+		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest For WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		$args = wp_parse_args(
 			$args,
