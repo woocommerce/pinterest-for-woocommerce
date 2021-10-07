@@ -1,6 +1,6 @@
 <?php
 /**
- * Pinterest For WooCommerce Crypto Wrapper
+ * Pinterest for WooCommerce Crypto Wrapper
  *
  * @class       WP_Salesforce_Crypto
  * @version     1.0.0
@@ -92,7 +92,7 @@ class Crypto {
 				return self::get_key( 1 );
 			}
 
-			Logger::log( esc_html__( 'Could not decrypt Key value. Try reconnecting to Pinterest.', 'pinterest-for-woocommerce' ), 'error' );
+			Logger::log( esc_html__( 'Could not decrypt key value. Try reconnecting to Pinterest.', 'pinterest-for-woocommerce' ), 'error' );
 			Pinterest_For_Woocommerce()::save_data( 'crypto_encoded_key', false ); // Reset base key.
 			return false;
 		}
@@ -136,7 +136,7 @@ class Crypto {
 			// Either there's a bug in our code, we're trying to decrypt with the
 			// wrong key, or the encrypted credit card number was corrupted in the
 			// database.
-			Logger::log( esc_html__( 'Could not decrypt Key value. Try reconnecting to Pinterest.', 'pinterest-for-woocommerce' ), 'error' );
+			Logger::log( esc_html__( 'Could not decrypt key value. Try reconnecting to Pinterest.', 'pinterest-for-woocommerce' ), 'error' );
 		}
 
 		return $value;

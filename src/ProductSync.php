@@ -1,6 +1,6 @@
 <?php //phpcs:disable WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
 /**
- * Pinterest For WooCommerce Catalog Syncing
+ * Pinterest for WooCommerce Catalog Syncing
  *
  * @package     Pinterest_For_WooCommerce/Classes/
  * @version     1.0.0
@@ -438,7 +438,7 @@ class ProductSync {
 					'current_index' => self::$current_index,
 					'progress'      => sprintf(
 						/* Translators: %1$s number of products written, %2$s total number of products, %3$s hyperlink open tag, %4$s hyperlink close tag */
-						esc_html__( 'wrote %1$s out of %2$s products to %3$sfeed file%4$s.', 'pinterest-for-woocommerce' ),
+						esc_html__( 'Wrote %1$s out of %2$s products to %3$sfeed file%4$s.', 'pinterest-for-woocommerce' ),
 						self::$current_index,
 						$state['products_count'],
 						'<a href="' . $state['feed_url'] . '" target="_blank">',

@@ -1,6 +1,6 @@
 <?php
 /**
- * Pinterest For WooCommerce Tracking
+ * Pinterest for WooCommerce Tracking
  *
  * @package     Pinterest_For_WooCommerce/Classes/
  * @version     1.0.0

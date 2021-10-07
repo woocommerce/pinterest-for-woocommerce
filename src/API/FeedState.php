@@ -264,7 +264,7 @@ class FeedState extends VendorAPI {
 			switch ( $api_approved_status ) {
 				case 'approved':
 					$status       = 'success';
-					$status_label = esc_html__( 'Product feed configured for Ingestion on Pinterest', 'pinterest-for-woocommerce' );
+					$status_label = esc_html__( 'Product feed configured for ingestion on Pinterest', 'pinterest-for-woocommerce' );
 
 					if ( ! empty( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq ) ) {
 						$extra_info = wp_kses_post(
@@ -404,7 +404,7 @@ class FeedState extends VendorAPI {
 					$status_label = esc_html__( 'Unknown status in workflow.', 'pinterest-for-woocommerce' );
 					$extra_info   = sprintf(
 						/* Translators: The status text returned by the API. */
-						esc_html__( 'API Returned an unknown status: %1$s', 'pinterest-for-woocommerce' ),
+						esc_html__( 'API returned an unknown status: %1$s', 'pinterest-for-woocommerce' ),
 						$workflow->workflow_status
 					);
 

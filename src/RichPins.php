@@ -1,6 +1,6 @@
 <?php
 /**
- * Pinterest For WooCommerce Rich Pins
+ * Pinterest for WooCommerce Rich Pins
  *
  * @package     Pinterest_For_WooCommerce/Classes/
  * @version     1.0.0

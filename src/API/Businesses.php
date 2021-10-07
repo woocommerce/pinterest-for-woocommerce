@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Endpoint handing Pinterest Linked Business Accounts.
+ * Endpoint handing Pinterest linked business accounts.
  */
 class Businesses extends VendorAPI {
 
@@ -52,7 +52,7 @@ class Businesses extends VendorAPI {
 		} catch ( \Throwable $th ) {
 
 			/* Translators: The error description as returned from the API */
-			$error_message = sprintf( esc_html__( 'Could not fetch Linked Business Accounts for Pinterest account ID. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
+			$error_message = sprintf( esc_html__( 'Could not fetch linked business accounts for Pinterest account ID. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
 
 			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_businesses_error', $error_message, array( 'status' => $th->getCode() ) );
 		}

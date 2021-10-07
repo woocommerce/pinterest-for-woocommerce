@@ -1,6 +1,6 @@
 <?php
 /**
- * Pinterest For WooCommerce Logger
+ * Pinterest for WooCommerce Logger
  *
  * @version     1.0.0
  * @package     Pinterest_For_WooCommerce/API

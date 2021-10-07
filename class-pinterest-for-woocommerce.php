@@ -271,21 +271,21 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			if ( ! version_compare( PHP_VERSION, self::PLUGIN_REQUIREMENTS['php_version'], '>=' ) ) {
 				/* Translators: The minimum PHP version */
-				$errors[] = sprintf( esc_html__( 'Pinterest For WooCommerce requires a minimum PHP version of %s.', 'pinterest-for-woocommerce' ), self::PLUGIN_REQUIREMENTS['php_version'] );
+				$errors[] = sprintf( esc_html__( 'Pinterest for WooCommerce requires a minimum PHP version of %s.', 'pinterest-for-woocommerce' ), self::PLUGIN_REQUIREMENTS['php_version'] );
 			}
 
 			if ( ! version_compare( $wp_version, self::PLUGIN_REQUIREMENTS['wp_version'], '>=' ) ) {
 				/* Translators: The minimum WP version */
-				$errors[] = sprintf( esc_html__( 'Pinterest For WooCommerce requires a minimum WordPress version of %s.', 'pinterest-for-woocommerce' ), self::PLUGIN_REQUIREMENTS['wp_version'] );
+				$errors[] = sprintf( esc_html__( 'Pinterest for WooCommerce requires a minimum WordPress version of %s.', 'pinterest-for-woocommerce' ), self::PLUGIN_REQUIREMENTS['wp_version'] );
 			}
 
 			if ( ! defined( 'WC_VERSION' ) || ! version_compare( WC_VERSION, self::PLUGIN_REQUIREMENTS['wc_version'], '>=' ) ) {
 				/* Translators: The minimum WC version */
-				$errors[] = sprintf( esc_html__( 'Pinterest For WooCommerce requires a minimum WooCommerce version of %s.', 'pinterest-for-woocommerce' ), self::PLUGIN_REQUIREMENTS['wc_version'] );
+				$errors[] = sprintf( esc_html__( 'Pinterest for WooCommerce requires a minimum WooCommerce version of %s.', 'pinterest-for-woocommerce' ), self::PLUGIN_REQUIREMENTS['wc_version'] );
 			}
 
 			if ( apply_filters( 'woocommerce_admin_disabled', false ) ) {
-				$errors[] = esc_html__( 'Pinterest For WooCommerce requires WooCommerce Admin to be enabled.', 'pinterest-for-woocommerce' );
+				$errors[] = esc_html__( 'Pinterest for WooCommerce requires WooCommerce Admin to be enabled.', 'pinterest-for-woocommerce' );
 			}
 
 			if ( empty( $errors ) ) {
@@ -702,7 +702,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Fetches a fresh copy (if needed or explicitly requested), of the authenticated user's Linked business accounts.
+		 * Fetches a fresh copy (if needed or explicitly requested), of the authenticated user's linked business accounts.
 		 *
 		 * @param boolean $force_refresh Wether to refresh the data from the API.
 		 *
