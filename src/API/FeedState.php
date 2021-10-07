@@ -331,13 +331,18 @@ class FeedState extends VendorAPI {
 	 */
 	private function add_feed_sync_status( $result ) {
 
+		$feed_id = Pinterest\ProductSync::is_feed_registered();
+		if ( ! $feed_id ) {
+			throw new \Exception( esc_html__( 'Feed is not registered with Pinterest.', 'pinterest-for-woocommerce' ) );
+		}
+
 		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
 		$extra_info  = '';
 
 		try {
 
 			// Get feed ingestion status.
-			$feed_report = $merchant_id ? Base::get_feed_report( $merchant_id ) : false;
+			$feed_report = $merchant_id ? Base::get_merchant_feed( $merchant_id, $feed_id ) : false;
 
 			if ( ! $feed_report || 'success' !== $feed_report['status'] ) {
 				throw new \Exception( esc_html__( 'Response error when trying to get feed report from Pinterest.', 'pinterest-for-woocommerce' ) );

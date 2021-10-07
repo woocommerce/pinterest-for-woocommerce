@@ -455,29 +455,20 @@ class Base {
 	 * Get a specific merchant's feed using the given arguments.
 	 *
 	 * @param string $merchant_id The merchant ID the feed belongs to.
-	 * @param string $feed_id     The ID of the feed to be updated.
+	 * @param string $feed_id     The ID of the feed.
 	 *
 	 * @return mixed
 	 */
 	public static function get_merchant_feed( $merchant_id, $feed_id ) {
-		$args = array( 'feed_profile' => $feed_id );
-
 		return self::make_request(
-			add_query_arg( $args, 'catalogs/datasource/feed_report/' . $merchant_id . '/' ),
-			'GET'
+			'catalogs/datasource/feed_report/' . $merchant_id . '/',
+			'GET',
+			array(
+				'feed_profile' => $feed_id
+			),
+			'',
+			MINUTE_IN_SECONDS
 		);
-	}
-
-
-	/**
-	 * Request the feed report data from the API and return the response.
-	 *
-	 * @param string $merchant_id The ID of the merchant for the request.
-	 *
-	 * @return mixed
-	 */
-	public static function get_feed_report( $merchant_id ) {
-		return self::make_request( 'catalogs/datasource/feed_report/' . $merchant_id . '/', 'GET', array(), '', MINUTE_IN_SECONDS );
 	}
 
 
