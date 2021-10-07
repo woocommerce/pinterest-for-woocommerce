@@ -62,7 +62,7 @@ class ProductSync {
 	 */
 	public static function maybe_init() {
 
-		if ( ! self::is_product_sync_enabled() && ! self::is_feed_registered() ) {
+		if ( ! self::is_product_sync_enabled() && ! self::get_registered_feed_id() ) {
 			return;
 		}
 
@@ -198,11 +198,11 @@ class ProductSync {
 
 
 	/**
-	 * Checks if the feature is enabled, and all requirements are met.
+	 * Returns the feed profile ID if it's registered. Returns `false` otherwise.
 	 *
-	 * @return boolean
+	 * @return string|boolean
 	 */
-	public static function is_feed_registered() {
+	public static function get_registered_feed_id() {
 		return Pinterest_For_Woocommerce()::get_data( 'feed_registered' ) ?? false;
 	}
 
@@ -239,7 +239,7 @@ class ProductSync {
 			'locale'                    => str_replace( '_', '-', determine_locale() ),
 		);
 
-		$registered = self::is_feed_registered();
+		$registered = self::get_registered_feed_id();
 
 		if ( ! self::is_product_sync_enabled() ) {
 			// Handle feed deregistration.
@@ -520,7 +520,7 @@ class ProductSync {
 		} else {
 			$product_pin_feed_profile    = $merchant['data']->product_pin_feed_profile;
 			$product_pin_feed_profile_id = false;
-			$prev_registered             = self::is_feed_registered();
+			$prev_registered             = self::get_registered_feed_id();
 			if ( false !== $prev_registered ) {
 				try {
 					$feed                        = API\Base::get_merchant_feed( $merchant['data']->id, $prev_registered );
