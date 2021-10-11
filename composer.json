@@ -17,7 +17,9 @@
 		"defuse/php-encryption": "^2.2"
 	},
 	"require-dev": {
-		"woocommerce/woocommerce-sniffs": "^0.1.0"
+		"woocommerce/woocommerce-sniffs": "^0.1.0",
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+		"wp-coding-standards/wpcs": "^2.3"
 	},
 	"autoload": {
 		"psr-4": {
