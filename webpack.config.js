@@ -8,6 +8,21 @@ const requestToExternal = ( request ) => {
 	if ( bundled.includes( request ) ) {
 		return false;
 	}
+	// Since WooCommerce 5.8, the `window.wcSettings` no longer contains `woocommerceTranslation`,
+	// to be able to fetch that, we use unpublished `@woocommerce/wc-admin-settings` package.
+	// It's delivered with WC, so we use DEWP to import it.
+	// See https://github.com/woocommerce/woocommerce-admin/issues/7781
+	const wcDepMap = {
+		'@woocommerce/wc-admin-settings': [ 'wc', 'wcSettings' ],
+	}
+	return wcDepMap[ request ];
+};
+const requestToHandle = ( request ) => {
+	const wcHandleMap = {
+		'@woocommerce/wc-admin-settings': 'wc-settings',
+	};
+
+	return wcHandleMap[ request ];
 };
 
 // Replace the default DependencyExtractionWebpackPlugin with the Woo version
@@ -20,6 +35,7 @@ const ourPlugins = [
 	new WooCommerceDependencyExtractionWebpackPlugin( {
 		injectPolyfill: true, // TBD Confirm this is needed for Pinterest.
 		requestToExternal,
+		requestToHandle,
 	} ),
 ];
 
