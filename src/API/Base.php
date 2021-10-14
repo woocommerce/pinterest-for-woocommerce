@@ -461,7 +461,7 @@ class Base {
 	 */
 	public static function get_merchant_feed( $merchant_id, $feed_id ) {
 		return self::make_request(
-			'catalogs/datasource/feed_report/' . $merchant_id . '/',
+			"catalogs/datasource/feed_report/{$merchant_id}/",
 			'GET',
 			array(
 				'feed_profile' => $feed_id
