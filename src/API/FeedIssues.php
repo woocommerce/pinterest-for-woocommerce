@@ -56,8 +56,8 @@ class FeedIssues extends VendorAPI {
 	public function get_feed_issues( WP_REST_Request $request ) {
 
 		try {
-
-			if ( ! Pinterest\ProductSync::is_product_sync_enabled() || ! Pinterest\ProductSync::is_feed_registered() ) {
+			$feed_id = Pinterest\ProductSync::get_registered_feed_id();
+			if ( ! Pinterest\ProductSync::is_product_sync_enabled() || ! $feed_id ) {
 				return array( 'lines' => array() );
 			}
 
@@ -67,7 +67,7 @@ class FeedIssues extends VendorAPI {
 			$per_page        = $request->has_param( 'per_page' ) ? (int) $request->get_param( 'per_page' ) : 25;
 
 			if ( false === $issues_file_url ) {
-				$workflow = self::get_last_feed_workflow();
+				$workflow = self::get_feed_workflow( $feed_id );
 
 				if ( $workflow && isset( $workflow->s3_validation_url ) ) {
 					$issues_file_url = $workflow->s3_validation_url;
@@ -271,14 +271,15 @@ class FeedIssues extends VendorAPI {
 	 * Get the latest Workflow of the
 	 * active feed related to the last attempt to process and ingest our feed, for the Merchant saved in the settings.
 	 *
+	 * @param string $feed_id The ID of the feed.
+	 *
 	 * @return object
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
-	private static function get_last_feed_workflow() {
-
+	private static function get_feed_workflow( $feed_id ) {
 		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-		$feed_report = $merchant_id ? Base::get_feed_report( $merchant_id ) : false;
+		$feed_report = $merchant_id ? Base::get_merchant_feed( $merchant_id, $feed_id ) : false;
 
 		if ( ! $feed_report || 'success' !== $feed_report['status'] ) {
 			throw new \Exception( esc_html__( 'Could not get feed report from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
