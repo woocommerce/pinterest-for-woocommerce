@@ -464,7 +464,7 @@ class Base {
 			"catalogs/datasource/feed_report/{$merchant_id}/",
 			'GET',
 			array(
-				'feed_profile' => $feed_id
+				'feed_profile' => $feed_id,
 			),
 			'',
 			MINUTE_IN_SECONDS
