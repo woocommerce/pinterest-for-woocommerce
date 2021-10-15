@@ -60,7 +60,7 @@ const HealthCheck = () => {
 		pending: {
 			status: 'warning',
 			message: __(
-				'Please hold on tight as your account is pending approval from Pinterest.',
+				'Please hold on tight as your account is pending approval from Pinterest. This may take up to 5 business days.',
 				'pinterest-for-woocommerce'
 			),
 			dismissible: false,
@@ -106,6 +106,10 @@ const HealthCheck = () => {
 			status: 'warning',
 			dismissible: false,
 			message: __(
+				'Your merchant account is disapproved.',
+				'pinterest-for-woocommerce'
+			),
+			body: __(
 				'Please hold on tight as there is an Appeal pending for your Pinterest account.',
 				'pinterest-for-woocommerce'
 			),
