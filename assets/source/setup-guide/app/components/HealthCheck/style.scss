@@ -1,8 +1,14 @@
-.woocommerce-layout {
+.pinterest-for-woocommerce-healthcheck-notice {
+	margin-left: 0;
+	margin-right: 0;
+	margin-bottom: 1em;
 
-	.components-notice {
-		margin-left: 0;
-		margin-right: 0;
+	p {
+		font-weight: 600;
 		margin-bottom: 1em;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
 	}
 }
