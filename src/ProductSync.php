@@ -586,18 +586,7 @@ class ProductSync {
 
 		if ( empty( $merchant_id ) ) {
 			// Get merchant from advertiser object.
-			$advertisers = API\Base::get_advertisers();
-
-			if ( 'success' !== $advertisers['status'] ) {
-				throw new \Exception( esc_html__( 'Response error when trying to get advertisers.', 'pinterest-for-woocommerce' ), 400 );
-			}
-
-			$advertiser = reset( $advertisers['data'] ); // All advertisers assigned to a user share the same merchant_id.
-
-			if ( ! empty( $advertiser->merchant_id ) ) {
-				$merchant_id = $advertiser->merchant_id;
-				self::log( 'Got merchant Id from user\'s advertisers: ' . $merchant_id );
-			}
+			$merchant_id = API\Base::get_merchant_id_from_advertiser();
 		}
 
 		if ( ! empty( $merchant_id ) ) {
