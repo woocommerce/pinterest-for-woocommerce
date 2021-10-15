@@ -509,6 +509,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			new Pinterest\API\FeedState();
 			new Pinterest\API\FeedIssues();
 			new Pinterest\API\Tags();
+			new Pinterest\API\HealthCheck();
 		}
 
 		/**
