@@ -23,7 +23,7 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "@woocommerce/dependency-extraction-webpack-plugin": "^1.6.0",
+    "@woocommerce/dependency-extraction-webpack-plugin": "^1.7.0",
     "@woocommerce/eslint-plugin": "^1.2.0",
     "@wordpress/base-styles": "^3.6.0",
     "@wordpress/eslint-plugin": "^9.0.2",
