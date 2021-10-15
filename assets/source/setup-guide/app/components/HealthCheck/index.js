@@ -67,14 +67,22 @@ const HealthCheck = () => {
 		},
 		declined: {
 			status: 'error',
-			message: sprintf(
-				// translators: %s: The reason for disapproval.
+			message:
 				__(
-					'Your merchant accound is disapproved. The reason was "%s"',
+					'Your merchant account is disapproved.',
 					'pinterest-for-woocommerce'
-				),
-				healthStatus.reason || '-'
-			),
+				) +
+				( healthStatus.reason
+					? ' ' +
+					  sprintf(
+							// translators: %s: The reason for disapproval.
+							__(
+								'The dissaproval rationale was: "%s"',
+								'pinterest-for-woocommerce'
+							),
+							healthStatus.reason
+					  )
+					: '' ),
 			body: __(
 				'If you have a valid reason (such as having corrected the violations that resulted in the dissaproval) for appealing a merchant review decision, you can submit an appeal.',
 				'pinterest-for-woocommerce'
@@ -126,9 +134,7 @@ const HealthCheck = () => {
 			actions={ notice.actions || [] }
 			className="pinterest-for-woocommerce-healthcheck-notice"
 		>
-			<Text variant="titleSmall">
-				{ notice.message }
-			</Text>
+			<Text variant="titleSmall">{ notice.message }</Text>
 			{ notice.body }
 		</Notice>
 	);
