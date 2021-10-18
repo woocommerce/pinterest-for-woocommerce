@@ -1,0 +1,4 @@
+*** Pinterest for WooCommerce Changelog ***
+
+= 1.0.0 - 2021-10-XX =
+- Initial release
