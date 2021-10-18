@@ -1,5 +1,6 @@
 {
   "name": "pinterest-for-woocommerce",
+  "title": "Pinterest for WooCommerce",
   "description": "Pinterest for WooCommerce",
   "version": "1.0.0-beta.4",
   "main": "gulpfile.js",
@@ -127,5 +128,15 @@
   "engines": {
     "node": ">=12.20.1 <15",
     "npm": ">=6.14.10 <7"
+  },
+  "config": {
+    "wp_org_slug": "pinterest-for-woocommerce",
+    "version_replace_paths": [
+      "includes",
+      "src",
+      "class-pinterest-for-woocommerce.php",
+      "pinterest-for-woocommerce.php",
+      "uninstall.php"
+    ]
   }
 }
