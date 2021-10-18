@@ -390,19 +390,6 @@ class Base {
 	}
 
 
-	public static function get_merchant_id_from_advertiser() {
-		$advertisers = self::get_advertisers();
-
-		if ( 'success' !== $advertisers['status'] ) {
-			throw new \Exception( esc_html__( 'Response error when trying to get advertisers.', 'pinterest-for-woocommerce' ), 400 );
-		}
-
-		$advertiser = reset( $advertisers['data'] ); // All advertisers assigned to a user share the same merchant_id.
-
-		return ! empty( $advertiser->merchant_id ) ? $advertiser->merchant_id : null;
-	}
-
-
 	/**
 	 * Creates a merchant for the authenticated user or returns the existing one.
 	 *
@@ -410,7 +397,7 @@ class Base {
 	 *
 	 * @return mixed
 	 */
-	public static function maybe_create_merchant( $args ) {
+	public static function maybe_create_merchant( $args = array() ) {
 
 		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
