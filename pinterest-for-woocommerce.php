@@ -44,6 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE', __FILE__ );
+define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', '1.0.0-beta.4' ); // WRCS: DEFINED_VERSION.
 
 /**
  * Autoload packages.
