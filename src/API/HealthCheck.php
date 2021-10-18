@@ -8,6 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest as Pinterest;
+
 use \WP_REST_Server;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -42,18 +44,7 @@ class HealthCheck extends VendorAPI {
 
 		try {
 
-			$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-
-			if ( empty( $merchant_id ) ) {
-				// Get merchant from advertiser object.
-				$merchant_id = Base::get_merchant_id_from_advertiser();
-			}
-
-			if ( empty( $merchant_id ) ) {
-				throw new \Exception( esc_html__( 'No merchant configured on Pinterest.', 'pinterest-for-woocommerce' ), 200 );
-			}
-
-			$merchant = Base::get_merchant( $merchant_id );
+			$merchant = Pinterest\Merchants::get_merchant();
 
 			if ( 'success' !== $merchant['status'] || empty( $merchant['data']->product_pin_approval_status ) ) {
 				throw new \Exception( esc_html__( 'Could not get approval status from Pinterest.', 'pinterest-for-woocommerce' ), 200 );
