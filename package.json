@@ -91,7 +91,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "wp-scripts build && gulp build",
+    "dev": "wp-scripts build && gulp build",
+    "prebuild": "composer install --no-dev",
+    "build": "wp-scripts build && gulp build && gulp package",
+    "postbuild": "composer install",
     "start": "wp-scripts start",
     "lint:js": "wp-scripts lint-js ./assets/source",
     "lint:js:fix": "wp-scripts lint-js ./assets/source --fix",
@@ -99,7 +102,7 @@
     "lint:css": "wp-scripts lint-style ./assets/source",
     "lint:php": "composer run-script phpcs ./",
     "lint:css:fix": "wp-scripts lint-style ./assets/source --fix",
-    "build:zip": "composer install --no-dev && wp-scripts build && gulp build && gulp package"
+    "build:zip": "npm run build"
   },
   "browserslist": [
     "last 5 versions",
