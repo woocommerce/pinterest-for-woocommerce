@@ -10,6 +10,7 @@
 namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
+use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -129,6 +130,7 @@ class Base {
 	 * @return array
 	 *
 	 * @throws \Exception PHP exception.
+	 * @throws \PinterestApiException PHP exception.
 	 */
 	public static function handle_request( $request ) {
 
@@ -198,7 +200,13 @@ class Base {
 			}
 
 			/* Translators: Additional message */
-			throw new \Exception( sprintf( __( 'Error Processing Request%s', 'pinterest-for-woocommerce' ), ( empty( $message ) ? '' : ': ' . $message ) ), $response_code );
+			throw new ApiException(
+				array(
+					'message'  => $message,
+					'response_body' => $body,
+				),
+				$response_code
+			);
 		}
 
 		return $body;
