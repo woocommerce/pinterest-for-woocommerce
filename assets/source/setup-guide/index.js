@@ -3,9 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
-import { getSetting } from '@woocommerce/wc-admin-settings'; // eslint-disable-line import/no-unresolved
+import { getSetting } from '@woocommerce/settings'; // eslint-disable-line import/no-unresolved
 // The above is an unpublished package, delivered with WC, we use Dependency Extraction Webpack Plugin to import it.
-// See https://github.com/woocommerce/woocommerce-admin/issues/7781
+// See https://github.com/woocommerce/woocommerce-admin/issues/7781,
+// https://github.com/woocommerce/woocommerce-admin/issues/7810
+// Please note, that this is NOT https://www.npmjs.com/package/@woocommerce/settings,
+// or https://github.com/woocommerce/woocommerce-admin/tree/main/packages/wc-admin-settings
+// but https://github.com/woocommerce/woocommerce-gutenberg-products-block/blob/trunk/assets/js/settings/shared/index.ts
+// (at an unknown version).
 
 /**
  * Internal dependencies
@@ -18,14 +23,18 @@ import CatalogSyncApp from '../catalog-sync/App';
 
 import './app/style.scss';
 
+const woocommerceTranslation =
+	// Pre WC 5.8
+	getSetting( 'woocommerceTranslation' ) ||
+	// WC 5.8+
+	getSetting( 'admin' )?.woocommerceTranslation;
+
 addFilter(
 	'woocommerce_admin_pages_list',
 	'woocommerce-marketing',
 	( pages ) => {
 		const navigationEnabled = !! window.wcAdminFeatures?.navigation;
-		const initialBreadcrumbs = [
-			[ '', getSetting( 'woocommerceTranslation' ) ],
-		];
+		const initialBreadcrumbs = [ [ '', woocommerceTranslation ] ];
 
 		/**
 		 * If the WooCommerce Navigation feature is not enabled,
