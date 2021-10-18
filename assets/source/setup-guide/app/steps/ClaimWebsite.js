@@ -24,8 +24,27 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
+const StaticError = ( { reqError } ) => {
+	if ( reqError?.data?.pinterest_code === undefined ) {
+		return null;
+	}
+
+	const staticErrors = [ 71, 75 ]; // See https://developers.pinterest.com/docs/redoc/#tag/API-Response-Codes
+
+	if ( ! staticErrors.includes( reqError.data.pinterest_code ) ) {
+		return null;
+	}
+
+	return (
+		<Text variant="body" className="claim-error">
+			{ reqError.message }
+		</Text>
+	);
+};
+
 const ClaimWebsite = ( { goToNextStep, view } ) => {
 	const [ status, setStatus ] = useState( 'idle' );
+	const [ reqError, setReqError ] = useState();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
 	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
@@ -38,6 +57,7 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 
 	const handleClaimWebsite = async () => {
 		setStatus( 'pending' );
+		setReqError();
 
 		try {
 			const results = await apiFetch( {
@@ -52,6 +72,7 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 			setStatus( 'success' );
 		} catch ( error ) {
 			setStatus( 'error' );
+			setReqError( error );
 
 			createNotice(
 				'error',
@@ -144,6 +165,8 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 									}
 									status={ status }
 								/>
+
+								<StaticError reqError={ reqError } />
 
 								{ view === 'settings' && ! isDomainVerified && (
 									<StepButton />

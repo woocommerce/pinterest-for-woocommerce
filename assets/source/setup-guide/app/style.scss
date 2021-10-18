@@ -364,6 +364,10 @@ $root: ".woocommerce-setup-guide";
 						}
 					}
 				}
+
+				.claim-error {
+					color: var(--wc-red);
+				}
 			}
 
 			&__setup-tracking {
