@@ -54,8 +54,8 @@ class HealthCheck extends VendorAPI {
 				'status' => esc_html( $merchant['data']->product_pin_approval_status ),
 			);
 
-			if ( isset( $merchant['data']->product_pin_approval_status_rationale ) ) {
-				$response['reason'] = $merchant['data']->product_pin_approval_status_rationale;
+			if ( isset( $merchant['data']->product_pin_approval_status_reasons ) ) {
+				$response['reasons'] = $merchant['data']->product_pin_approval_status_reasons;
 			}
 
 			return $response;
