@@ -164,6 +164,14 @@ const HealthCheck = () => {
 	}
 
 	const notices = {
+		pending_initial_configuration: {
+			status: 'warning',
+			message: __(
+				'The feed is being configured. Depending on the number of products this may take a while as the feed needs to be fully generated before its been sent to Pinterest for registration. You can check the the status of the generation process in the Catalog tab.',
+				'pinterest-for-woocommerce'
+			),
+			dismissible: false,
+		},
 		pending: {
 			status: 'warning',
 			message: __(
