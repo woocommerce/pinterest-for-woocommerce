@@ -44,6 +44,12 @@ class HealthCheck extends VendorAPI {
 
 		try {
 
+			if ( ! Pinterest_For_Woocommerce()::get_data( 'merchant_id' ) ) {
+				return array(
+					'status' => 'pending_initial_configuration',
+				);
+			}
+
 			$merchant = Pinterest\Merchants::get_merchant();
 
 			if ( 'success' !== $merchant['status'] || empty( $merchant['data']->product_pin_approval_status ) ) {
