@@ -100,6 +100,9 @@ class ProductSync {
 
 			// If feed is dirty on completion of feed generation, reschedule it.
 			add_action( 'pinterest_for_woocommerce_feed_generated', array( __CLASS__, 'reschedule_if_dirty' ) );
+
+			// If feed is generated, but not yet registered, register it as soon as possible using an async task.
+			add_action( 'pinterest_for_woocommerce_feed_generated', array( __CLASS__, 'trigger_async_feed_registration_asap' ) );
 		}
 	}
 
@@ -466,6 +469,24 @@ class ProductSync {
 		if ( $force || false === as_next_scheduled_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			as_enqueue_async_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
+	}
+
+
+	/**
+	 * If the feed is not already registered, schedules an async action to registrer it asap.
+	 *
+	 * @return void
+	 */
+	public static function trigger_async_feed_registration_asap() {
+
+		if ( self::get_registered_feed_id() ) {
+			return;
+		}
+
+		self::log( 'running trigger_async_feed_registration_asap' );
+
+		as_unschedule_all_actions( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_enqueue_async_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 	}
 
 
