@@ -134,10 +134,6 @@ const HealthCheck = () => {
 	const appSettings = useSettingsSelect();
 	const [ healthStatus, setHealthStatus ] = useState();
 
-	useEffect( () => {
-		checkHealth();
-	}, [ checkHealth ] );
-
 	const checkHealth = useCallback( async () => {
 		try {
 			const results = await apiFetch( {
@@ -158,6 +154,10 @@ const HealthCheck = () => {
 			);
 		}
 	}, [ createNotice ] );
+
+	useEffect( () => {
+		checkHealth();
+	}, [ checkHealth ] );
 
 	if ( healthStatus === undefined || healthStatus.status === 'approved' ) {
 		return null;
