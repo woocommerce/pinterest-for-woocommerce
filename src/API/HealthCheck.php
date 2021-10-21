@@ -53,11 +53,11 @@ class HealthCheck extends VendorAPI {
 			$merchant = Pinterest\Merchants::get_merchant();
 
 			if ( 'success' !== $merchant['status'] || empty( $merchant['data']->product_pin_approval_status ) ) {
-				throw new \Exception( esc_html__( 'Could not get approval status from Pinterest.', 'pinterest-for-woocommerce' ), 200 );
+				throw new \Exception( __( 'Could not get approval status from Pinterest.', 'pinterest-for-woocommerce' ), 200 );
 			}
 
 			$response = array(
-				'status' => esc_html( $merchant['data']->product_pin_approval_status ),
+				'status' => $merchant['data']->product_pin_approval_status,
 			);
 
 			if ( isset( $merchant['data']->product_pin_approval_status_reasons ) ) {
@@ -69,7 +69,7 @@ class HealthCheck extends VendorAPI {
 		} catch ( \Throwable $th ) {
 
 			/* Translators: The error description as returned from the API */
-			$error_message = sprintf( esc_html__( 'Could not fetch account status. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
+			$error_message = sprintf( __( 'Could not fetch account status. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
 
 			return array(
 				'status'  => 'error',

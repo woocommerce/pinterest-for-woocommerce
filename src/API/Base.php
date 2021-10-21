@@ -130,7 +130,7 @@ class Base {
 	 * @return array
 	 *
 	 * @throws \Exception PHP exception.
-	 * @throws \PinterestApiException PHP exception.
+	 * @throws ApiException PHP exception.
 	 */
 	public static function handle_request( $request ) {
 
@@ -202,7 +202,7 @@ class Base {
 			/* Translators: Additional message */
 			throw new ApiException(
 				array(
-					'message'  => $message,
+					'message'       => $message,
 					'response_body' => $body,
 				),
 				$response_code

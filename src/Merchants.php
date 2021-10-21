@@ -61,7 +61,7 @@ class Merchants {
 		}
 
 		if ( ! $merchant || 'success' !== $merchant['status'] ) {
-			throw new \Exception( esc_html__( 'Response error when trying create a merchant or get the existing one.', 'pinterest-for-woocommerce' ), 400 );
+			throw new \Exception( __( 'Response error when trying create a merchant or get the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
 		return $merchant;
@@ -79,7 +79,7 @@ class Merchants {
 		$advertisers = API\Base::get_advertisers();
 
 		if ( 'success' !== $advertisers['status'] ) {
-			throw new \Exception( esc_html__( 'Response error when trying to get advertisers.', 'pinterest-for-woocommerce' ), 400 );
+			throw new \Exception( __( 'Response error when trying to get advertisers.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
 		$advertiser = reset( $advertisers['data'] ); // All advertisers assigned to a user share the same merchant_id.

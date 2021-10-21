@@ -94,7 +94,7 @@ class DomainVerification extends VendorAPI {
 				$error_message,
 				array(
 					'status'         => $error_code,
-					'pinterest_code' => is_callable( array( $th, 'get_pinterest_code' ) ) ? $th->get_pinterest_code() : 0,
+					'pinterest_code' => method_exists( $th, 'get_pinterest_code' ) ? $th->get_pinterest_code() : 0,
 				)
 			);
 
