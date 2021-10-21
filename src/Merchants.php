@@ -27,6 +27,7 @@ class Merchants {
 	 *
 	 * @return array
 	 *
+	 * @throws \Throwable PHP Exception.
 	 * @throws \Exception PHP Exception.
 	 */
 	public static function get_merchant( $feed_args = array() ) {
@@ -37,7 +38,17 @@ class Merchants {
 
 		if ( empty( $merchant_id ) ) {
 			// Get merchant from advertiser object.
-			$merchant_id = self::get_merchant_id_from_advertiser();
+
+			try {
+				$merchant_id = self::get_merchant_id_from_advertiser();
+			} catch ( \Throwable $th ) {
+
+				if ( 404 !== $th->getCode() ) {
+					throw $th;
+				}
+
+				$merchant = false;
+			}
 		}
 
 		if ( ! empty( $merchant_id ) ) {
@@ -71,7 +82,7 @@ class Merchants {
 	/**
 	 * Gets the merchant ID of the authenticated user from the data returned on the Advertisers endpoint.
 	 *
-	 * @return string|null
+	 * @return string
 	 *
 	 * @throws \Exception PHP exception.
 	 */
@@ -84,7 +95,11 @@ class Merchants {
 
 		$advertiser = reset( $advertisers['data'] ); // All advertisers assigned to a user share the same merchant_id.
 
-		return ! empty( $advertiser->merchant_id ) ? $advertiser->merchant_id : null;
+		if ( empty( $advertiser->merchant_id ) ) {
+			throw new \Exception( __( 'No merchant returned in the advertiser\'s response.', 'pinterest-for-woocommerce' ), 404 );
+		}
+
+		return $advertiser->merchant_id;
 	}
 
 }
