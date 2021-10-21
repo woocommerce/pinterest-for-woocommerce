@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,7 +24,10 @@ export const useSettingsDispatch = ( saveToDb = false ) => {
 export const useCreateNotice = () => {
 	const { createNotice } = useDispatch( 'core/notices' );
 
-	return ( type, message ) => message && createNotice( type, message );
+	return useCallback(
+		( type, message ) => message && createNotice( type, message ),
+		[ createNotice ]
+	);
 };
 
 export const useBodyClasses = ( style ) => {
