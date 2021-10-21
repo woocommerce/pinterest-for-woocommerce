@@ -24,6 +24,36 @@ We'll also automatically set up your Pinterest tag, and a shop tab on your Pinte
 
 *[Learn more about Shopping on Pinterest](https://business.pinterest.com/en/shopping/)*
 
+= Set up your foundation =
+
+*Connect your account*
+
+Install the extension and connect your account to quickly publish Product Pins, automatically update your product catalog every day, and track performance with the Pinterest tag.
+
+*Catalogs*
+
+Turn your entire product catalog into browsable product Pins, all at once.
+
+*Pinterest tag*
+
+Add the tag to your site to measure conversions and to optimize ads for shopping campaigns or retargeting.
+
+Consider longer attribution windows to capture shoppers who take more time to convert.
+
+*Build brand loyalty*
+
+People on Pinterest are nearly 50% more likely to be open to new brands while shopping. And once they find a brand they like, they’re more loyal.
+
+Become their new favorite with merchant solutions like the Shop Tab and the Verified Merchants Program. Shop Tab on profile: Consider this your always-on Pinterest shop. It’s automatically created when you upload your catalog so people can shop right from your profile.
+
+*Verified Merchant Program*
+
+People love to shop from brands they trust. That’s what the Verified Merchant Program is all about. It includes benefits like a “verified” badge on your profile and eligibility for enhanced distribution.
+
+*More about Pinterest*
+
+Pinterest is a visual discovery engine people use to find inspiration for their lives and make it easier to shop for home decor, fashion and style, electronics and more. 450 million people have saved more than 240 billion Pins across a range of interests, which others with similar tastes can discover through search and recommendations.
+
 == Installation ==
 
 = Minimum Requirements =
