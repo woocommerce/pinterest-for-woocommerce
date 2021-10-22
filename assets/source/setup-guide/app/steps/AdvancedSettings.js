@@ -73,7 +73,22 @@ const AdvancedSettings = ( { view } ) => {
 											'pinterest-for-woocommerce'
 										) }
 										checked={
-											appSettings.enable_debug_logging
+											appSettings.enable_debug_logging ||
+											wcSettings.pinterest_for_woocommerce
+												.wpDebug
+										}
+										disabled={
+											wcSettings.pinterest_for_woocommerce
+												.wpDebug
+										}
+										help={
+											wcSettings.pinterest_for_woocommerce
+												.wpDebug
+												? __(
+														'Debug logging enabled because WP_DEBUG is active.',
+														'pinterest-for-woocommerce'
+												  )
+												: null
 										}
 										className="woocommerce-setup-guide__checkbox-group"
 										onChange={ () =>
