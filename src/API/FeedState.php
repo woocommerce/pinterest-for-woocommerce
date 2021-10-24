@@ -282,7 +282,6 @@ class FeedState extends VendorAPI {
 				case 'appeal_pending':
 					$status       = 'pending';
 					$status_label = esc_html__( 'Product feed pending approval on Pinterest.', 'pinterest-for-woocommerce' );
-					$extra_info   = esc_html__( 'This usually takes 1-2 days.', 'pinterest-for-woocommerce' );
 					break;
 				case 'declined':
 					$status       = 'error';
@@ -388,7 +387,6 @@ class FeedState extends VendorAPI {
 				case 'UNDER_REVIEW':
 					$status       = 'pending';
 					$status_label = esc_html__( 'Feed is under review.', 'pinterest-for-woocommerce' );
-					$extra_info   = esc_html__( 'This usually takes 1-2 days.', 'pinterest-for-woocommerce' );
 					break;
 
 				case 'FAILED':

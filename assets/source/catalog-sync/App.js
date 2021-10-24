@@ -9,6 +9,7 @@ import '@wordpress/notices';
 import SyncState from './sections/SyncState';
 import SyncIssues from './sections/SyncIssues';
 import TransientNotices from './components/TransientNotices';
+import HealthCheck from '../setup-guide/app/components/HealthCheck';
 import { useCreateNotice } from './helpers/effects';
 import NavigationClassic from '../components/navigation-classic';
 
@@ -17,6 +18,7 @@ const CatalogSyncApp = () => {
 
 	return (
 		<div className="pinterest-for-woocommerce-catalog-sync">
+			<HealthCheck />
 			<NavigationClassic />
 
 			<TransientNotices />

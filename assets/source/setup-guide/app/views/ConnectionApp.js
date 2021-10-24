@@ -13,6 +13,7 @@ import ClaimWebsite from '../steps/ClaimWebsite';
 import SetupTracking from '../steps/SetupTracking';
 import SaveSettingsButton from '../components/SaveSettingsButton';
 import TransientNotices from '../components/TransientNotices';
+import HealthCheck from '../components/HealthCheck';
 import {
 	useSettingsSelect,
 	useBodyClasses,
@@ -46,6 +47,7 @@ const SettingsApp = () => {
 
 	return (
 		<>
+			<HealthCheck />
 			<NavigationClassic />
 
 			<TransientNotices />
