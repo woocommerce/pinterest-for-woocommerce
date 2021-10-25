@@ -186,13 +186,9 @@ gulp.task(
 				}
 				return gulp.src(
 					[
-						folder + '/**/*',
-						'!**/node_modules/**',
-						'!**/gulpfile.js',
-						'!**/.DS_Store',
-						'!**/package.json',
-						'!**/package-lock.json',
-						'!**/.git/**'
+						`${folder}/{assets,i18n,includes,src,vendor}/**/*`,
+						`${folder}/*.{php,txt,md}`,
+						'LICENSE'
 					],
 					{
 						base: path.join( folder, '..' ),

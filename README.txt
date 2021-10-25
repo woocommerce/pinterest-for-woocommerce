@@ -87,5 +87,5 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
-= 1.0.0 - 2021-10-XX =
+= 1.0.0 - 2021-xx-xx =
 - Initial release

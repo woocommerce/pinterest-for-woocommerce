@@ -59,7 +59,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @var string
 		 */
-		public $version = '1.0.0-beta.4';
+		public $version = PINTEREST_FOR_WOOCOMMERCE_VERSION;
 
 		/**
 		 * The single instance of the class.
@@ -165,7 +165,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		private function define_constants() {
 			define( 'PINTEREST_FOR_WOOCOMMERCE_PREFIX', 'pinterest-for-woocommerce' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME', plugin_basename( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE ) );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', $this->version );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest_for_woocommerce' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_DATA_NAME', 'pinterest_for_woocommerce_data' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
