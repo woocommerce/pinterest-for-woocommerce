@@ -27,7 +27,7 @@ const WelcomeSection = () => {
 				<FlexBlock className="content-block">
 					<Text variant="title.medium">
 						{ __(
-							'Get your products in front of more than 475M people on Pinterest',
+							'Get your products in front of more than 400M people on Pinterest',
 							'pinterest-for-woocommerce'
 						) }
 					</Text>
