@@ -34,7 +34,7 @@ const WelcomeSection = () => {
 
 					<Text variant="body">
 						{ __(
-							'Pinterest is a visual discovery engine people use to find inspiration for their lives! More than 475 million people have saved more than 300 billion Pins, making it easier to turn inspiration into their next purchase.',
+							'Pinterest is a visual discovery engine people use to find inspiration for their lives! More than 400 million people have saved more than 300 billion Pins, making it easier to turn inspiration into their next purchase.',
 							'pinterest-for-woocommerce'
 						) }
 					</Text>
