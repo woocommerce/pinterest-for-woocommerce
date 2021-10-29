@@ -31,10 +31,9 @@
     "@woocommerce/dependency-extraction-webpack-plugin": "^1.7.0",
     "@woocommerce/eslint-plugin": "^1.2.0",
     "@wordpress/base-styles": "^3.6.0",
-    "@wordpress/eslint-plugin": "^9.0.2",
     "@wordpress/scripts": "^16.1.4",
+    "@wordpress/stylelint-config": "^19.1.0",
     "browser-sync": "^2.26.3",
-    "eslint": "^7.29.0",
     "github-label-sync": "^2.0.2",
     "gulp": "^4.0.0",
     "gulp-add-src": "^1.0.0",
@@ -64,9 +63,9 @@
     "merge-stream": "^1.0.1",
     "node-sass": "^4.14.1",
     "path": "^0.12.7",
+    "prettier": "npm:wp-prettier@^2.2.1-beta-1",
     "semver": "^6.0.0",
     "stylelint": "^13.13.1",
-    "stylelint-config-wordpress": "^15.0.0",
     "underscore": "^1.9.1"
   },
   "eslintConfig": {
