@@ -4,10 +4,10 @@
   "description": "Pinterest for WooCommerce",
   "version": "1.0.0",
   "main": "gulpfile.js",
-	"repository": {
-		"type": "git",
-		"url": "git@github.com:woocommerce/pinterest-for-woocommerce.git"
-	},
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:woocommerce/pinterest-for-woocommerce.git"
+  },
   "dependencies": {
     "@woocommerce/components": "^5.1.2",
     "@woocommerce/data": "^1.1.1",
