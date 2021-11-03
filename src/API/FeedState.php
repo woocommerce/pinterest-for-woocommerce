@@ -11,7 +11,6 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest as Pinterest;
 
 use \WP_REST_Server;
-use \WP_REST_Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
