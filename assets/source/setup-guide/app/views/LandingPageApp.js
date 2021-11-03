@@ -191,6 +191,15 @@ const FaqSection = () => {
 };
 
 /**
+ * Clicking on getting started page faq item to collapse or expand it.
+ *
+ * @event wcadmin_pfw_get_started_faq
+ *
+ * @property {string} action `'expand' | 'collapse'` What action was initiated.
+ * @property {string} question_id Identifier of the clicked question.
+ */
+
+/**
  * FAQ component.
  *
  * @fires wcadmin_pfw_get_started_faq whenever the FAQ is toggled.
