@@ -164,6 +164,7 @@ const FaqSection = () => {
 				) }
 			>
 				<FaqQuestion
+					questionId={ 'why-account-not-connected-error' }
 					question={ __(
 						'Why am I getting an “Account not connected” error message?',
 						'pinterest-for-woocommerce'
@@ -174,6 +175,7 @@ const FaqSection = () => {
 					) }
 				/>
 				<FaqQuestion
+					questionId={ 'can-i-connect-to-multiple-accounts' }
 					question={ __(
 						'I have more than one Pinterest Advertiser account. Can I connect my WooCommerce store to multiple Pinterest Advertiser accounts?',
 						'pinterest-for-woocommerce'
@@ -193,7 +195,7 @@ const FaqSection = () => {
  *
  * @fires wcadmin_pfw_get_started_faq whenever the FAQ is toggled.
  * @param {Object} props React props
- * @param {string} props.questionId Question identifier , to be forwarded to the trackign event.
+ * @param {string} props.questionId Question identifier, to be forwarded to the trackign event.
  * @param {string} props.question Text of the question.
  * @param {string} props.answer Text of the answer.
  * @return {JSX.Element} FAQ component.
@@ -202,7 +204,7 @@ const FaqQuestion = ( { questionId, question, answer } ) => {
 	const panelToggled = useCallback(
 		( isOpened ) => {
 			recordEvent( 'wcadmin_pfw_get_started_faq', {
-				questionId,
+				question_id: questionId,
 				action: isOpened ? 'expand' : 'collapse',
 			} );
 		},
