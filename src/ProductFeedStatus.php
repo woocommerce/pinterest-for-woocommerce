@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Pinterest for WooCommerce Rich Pins
@@ -14,26 +13,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- *
+ * Helper methods that get/set the various feed state properties.
  */
 class ProductFeedStatus {
 
-
+	/**
+	 * The array that holds the parameters of the feed
+	 *
+	 * @var array
+	 */
 	private static $local_feed = array();
 
 	/**
-	 * Saves or returns the Current state of the Feed generation job.
+	 * Returns the Current state of the Feed generation job.
 	 * Status can be one of the following:
 	 *
-	 * - starting                 The feed job is being initialized. A new JobID will be assigned if none exists.
-	 * - check_registration       If a JobID already exists, it is returned, otherwise a new one will be assigned. // split into a new method.
+	 * - starting                 The feed job is being initialized.
 	 * - in_progress              Signifies that we are between iterations and generating the feed.
-	 * - generated                The feed is generated, no further action will be taken.
-	 * - scheduled_for_generation The feed needs to be (re)generated. If this status is set, the next run of __CLASS__::handle_feed_generation() will start the generation process.
+	 * - generated                The feed is generated, no further action is needed, unless the feed is expired.
+	 * - scheduled_for_generation The feed is scheduled to be (re)generated. On this status, the next run of ProductSync::handle_feed_generation() will start the generation process.
 	 * - pending_config           The feed was reset or was never configured.
 	 * - error                    The generation process returned an error.
 	 *
-	 * @param array  $args   The arguments that go along with the given status.
+	 * @param array $props   The props that go along with the given status.
 	 *
 	 * @return array
 	 */
@@ -47,7 +49,6 @@ class ProductFeedStatus {
 		$all_props = array(
 			'status'        => 'pending_config',
 			'current_index' => false,
-			// 'progress'      => 0,
 			'error_message' => '',
 			'last_activity' => 0,
 			'product_count' => 0,
@@ -64,15 +65,10 @@ class ProductFeedStatus {
 	}
 
 	/**
-	 * Undocumented function
+	 * Sets the Current state of the Feed generation job.
+	 * See the docblock of self::get() for more info.
 	 *
-	 * status
-	 * current_index
-	 *     //  * progress ???
-	 * error_message
-	 * last_activity
-	 *
-	 * @param array $state
+	 * @param array $state The array holding the feed state props to be saved.
 	 * @return void
 	 */
 	public static function set( $state ) {
@@ -83,7 +79,7 @@ class ProductFeedStatus {
 		$state['last_activity'] = time();
 
 		if ( 'starting' === $state['status'] ) {
-			$state['started']  = time();
+			$state['started'] = time();
 		}
 
 		foreach ( $state as $key => $value ) {
@@ -96,6 +92,13 @@ class ProductFeedStatus {
 	}
 
 
+	/**
+	 * Stores the given dataset on a transient.
+	 *
+	 * @param array $dataset The product dataset to be saved.
+	 *
+	 * @return bool True if the value was set, false otherwise.
+	 */
 	public static function store_dataset( $dataset ) {
 
 		$local_feed = self::get_local_feed();
@@ -103,6 +106,11 @@ class ProductFeedStatus {
 		return set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $local_feed['feed_id'], $dataset, WEEK_IN_SECONDS );
 	}
 
+	/**
+	 * Returns the stored dataset.
+	 *
+	 * @return mixed Value of transient.
+	 */
 	public static function retrieve_dataset() {
 
 		$local_feed = self::get_local_feed();
@@ -111,6 +119,13 @@ class ProductFeedStatus {
 	}
 
 
+	/**
+	 * Cleanup the stored dataset.
+	 *
+	 * *** TODO: hoook
+	 *
+	 * @return void
+	 */
 	public static function feed_data_cleanup() {
 
 		$local_feed = self::get_local_feed();
@@ -119,7 +134,12 @@ class ProductFeedStatus {
 	}
 
 
-
+	/**
+	 * Initialize the feed parameters based on the stored feed_id.
+	 * If no feed_id is stored, create a new one.
+	 *
+	 * @return void
+	 */
 	private static function init_local_feed() {
 
 		$feed_id = Pinterest_For_Woocommerce()::get_data( 'local_feed_id' );
@@ -141,6 +161,11 @@ class ProductFeedStatus {
 	}
 
 
+	/**
+	 * Return the array holding the local feed properties.
+	 *
+	 * @return array
+	 */
 	public static function get_local_feed() {
 
 		if ( empty( self::$local_feed ) ) {
