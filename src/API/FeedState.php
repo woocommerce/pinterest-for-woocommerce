@@ -164,7 +164,16 @@ class FeedState extends VendorAPI {
 	 */
 	private function add_local_feed_state( $result ) {
 
-		$state      = Pinterest\ProductSync::feed_job_status() ?? array( 'status' => 'pending_config' );
+		$local_feed = Pinterest\ProductFeedStatus::get_local_feed();
+		$state      = Pinterest\ProductFeedStatus::get(
+			array(
+				'status',
+				'current_index',
+				'last_activity',
+				'error_message',
+				'product_count',
+			)
+		);
 		$extra_info = '';
 
 		switch ( $state['status'] ) {
@@ -178,9 +187,12 @@ class FeedState extends VendorAPI {
 				$status_label = esc_html__( 'Feed generation in progress.', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
 					/* Translators: %1$s Time string, %2$s text string indicating progress */
-					esc_html__( 'Last activity: %1$s ago - %2$s', 'pinterest-for-woocommerce' ),
+					esc_html__( 'Last activity: %1$s ago - Wrote %2$s out of %3$s products to %4$sfeed file%5$s.', 'pinterest-for-woocommerce' ),
 					human_time_diff( $state['last_activity'] ),
-					$state['progress']
+					$state['current_index'],
+					$state['product_count'],
+					'<a href="' . $local_feed['feed_url'] . '" target="_blank">',
+					'</a>',
 				);
 				break;
 
@@ -189,9 +201,12 @@ class FeedState extends VendorAPI {
 				$status_label = esc_html__( 'Up to date', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
 					/* Translators: %1$s Time string, %2$s text string indicating progress */
-					esc_html__( 'Successfully generated %1$s ago - %2$s', 'pinterest-for-woocommerce' ),
+					esc_html__( 'Successfully generated %1$s ago - Wrote %2$s out of %3$s products to %4$sfeed file%5$s.', 'pinterest-for-woocommerce' ),
 					human_time_diff( $state['last_activity'] ),
-					$state['progress']
+					$state['current_index'],
+					$state['product_count'],
+					'<a href="' . $local_feed['feed_url'] . '" target="_blank">',
+					'</a>',
 				);
 				break;
 
@@ -212,7 +227,7 @@ class FeedState extends VendorAPI {
 					/* Translators: %1$s Time string, %2$s text string indicating progress */
 					esc_html__( 'Last activity: %1$s ago - %2$s', 'pinterest-for-woocommerce' ),
 					human_time_diff( $state['last_activity'] ),
-					$state['progress']
+					$state['error_message']
 				);
 				break;
 		}
