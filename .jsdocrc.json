@@ -1,0 +1,11 @@
+{
+    "opts": {
+      "recurse": true
+    },
+    "plugins": [
+      "jsdoc-plugin-typescript"
+    ],
+    "typescript": {
+      "moduleRoot": "assets/source"
+    }
+}
