@@ -110,8 +110,7 @@
     "lint:php": "composer run-script phpcs ./",
     "lint:css:fix": "wp-scripts lint-style ./assets/source --fix",
     "build:zip": "npm run build",
-    "doc:tracking": "jsdoc ./assets/source/ -c .jsdocrc.json",
-    "doc": "jsdoc ./assets/source/ -c .jsdocrc.json"
+    "doc:tracking": "jsdoc ./assets/source/ -c .jsdocrc.json -t ./woo-tracking-jsdoc"
   },
   "browserslist": [
     "last 5 versions",
