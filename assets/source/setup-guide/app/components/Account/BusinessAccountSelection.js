@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Spinner } from '@woocommerce/components';
+import { recordEvent } from '@woocommerce/tracks';
 import { addQueryArgs } from '@wordpress/url';
 import { useState } from '@wordpress/element';
 import {
@@ -15,6 +16,27 @@ import {
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
+/**
+ * Clicking on "Create business account" button.
+ *
+ * @event wcadmin_pfw_business_account_create_button_click
+ */
+/**
+ * Clicking on "Connect" business account button.
+ *
+ * @event wcadmin_pfw_business_account_connect_button_click
+ */
+
+/**
+ * Business Account Connection card.
+ *
+ * @fires wcadmin_pfw_business_account_create_button_click
+ * @fires wcadmin_pfw_business_account_connect_button_click
+ *
+ * @param {Object} props React props.
+ * @param {Array<Object>} props.businessAccounts
+ * @return {JSX.Element} Rendered component.
+ */
 const BusinessAccountSelection = ( { businessAccounts } ) => {
 	const [ targetBusinessId, setTargetBusinessId ] = useState(
 		undefined !== businessAccounts && businessAccounts.length > 0
@@ -23,6 +45,7 @@ const BusinessAccountSelection = ( { businessAccounts } ) => {
 	);
 
 	const handleConnectToBusiness = () => {
+		recordEvent( 'wcadmin_pfw_business_account_connect_button_click' );
 		const newURL = addQueryArgs(
 			wcSettings.pinterest_for_woocommerce.switchBusinessAccountUrl,
 			{ business_id: targetBusinessId }
@@ -91,6 +114,11 @@ const BusinessAccountSelection = ( { businessAccounts } ) => {
 							href={
 								wcSettings.pinterest_for_woocommerce
 									.createBusinessAccountUrl
+							}
+							onClick={ () =>
+								recordEvent(
+									'wcadmin_pfw_business_account_create_button_click'
+								)
 							}
 							target="_blank"
 						>
