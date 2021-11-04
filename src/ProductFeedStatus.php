@@ -59,7 +59,7 @@ class ProductFeedStatus {
 
 		foreach ( self::STATE_PROPS as $key => $default_value ) {
 
-			if ( null === self::$state[ $key ] ) {
+			if ( ! isset( self::$state[ $key ] ) || null === self::$state[ $key ] ) {
 				self::$state[ $key ] = get_transient( $data_prefix . $key );
 			}
 
