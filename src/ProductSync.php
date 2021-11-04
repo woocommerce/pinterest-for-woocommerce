@@ -80,8 +80,7 @@ class ProductSync {
 
 		if ( self::is_product_sync_enabled() ) {
 
-
-			$state = ProductFeedStatus::get( 'status' );
+			$state = ProductFeedStatus::get();
 			self::reschedule_if_expired();
 
 			if ( $state ) {

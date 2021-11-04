@@ -164,15 +164,7 @@ class FeedState extends VendorAPI {
 	private function add_local_feed_state( $result ) {
 
 		$local_feed = Pinterest\ProductFeedStatus::get_local_feed();
-		$state      = Pinterest\ProductFeedStatus::get(
-			array(
-				'status',
-				'current_index',
-				'last_activity',
-				'error_message',
-				'product_count',
-			)
-		);
+		$state      = Pinterest\ProductFeedStatus::get();
 		$extra_info = '';
 
 		switch ( $state['status'] ) {

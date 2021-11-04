@@ -35,26 +35,23 @@ class ProductFeedStatus {
 	 * - pending_config           The feed was reset or was never configured.
 	 * - error                    The generation process returned an error.
 	 *
-	 * @param array $props   The props that go along with the given status.
-	 *
 	 * @return array
 	 */
-	public static function get( $props = array() ) {
+	public static function get() {
 
 		$local_feed  = self::get_local_feed();
 		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_' . $local_feed['feed_id'] . '_';
 		$status      = array();
-		$props       = is_array( $props ) ? $props : array( $props );
 
-		$all_props = array(
+		$props = array(
 			'status'        => 'pending_config',
 			'current_index' => false,
-			'error_message' => '',
 			'last_activity' => 0,
 			'product_count' => 0,
+			'error_message' => '',
 		);
 
-		$props = ! empty( $props ) ? array_intersect_key( $all_props, array_flip( $props ) ) : $all_props;
+		foreach ( $props as $key => $default_value ) {
 
 		foreach ( $props as $key => $default_value ) {
 			$stored         = get_transient( $data_prefix . $key );
