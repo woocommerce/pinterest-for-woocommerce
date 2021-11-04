@@ -17,6 +17,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ProductFeedStatus {
 
+	const STATE_PROPS = array(
+		'status'        => 'pending_config',
+		'current_index' => false,
+		'last_activity' => 0,
+		'product_count' => 0,
+		'error_message' => '',
+	);
+
 	/**
 	 * The array that holds the parameters of the feed
 	 *
@@ -49,15 +57,7 @@ class ProductFeedStatus {
 		$local_feed  = self::get_local_feed();
 		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_' . $local_feed['feed_id'] . '_';
 
-		$props = array(
-			'status'        => 'pending_config',
-			'current_index' => false,
-			'last_activity' => 0,
-			'product_count' => 0,
-			'error_message' => '',
-		);
-
-		foreach ( $props as $key => $default_value ) {
+		foreach ( self::STATE_PROPS as $key => $default_value ) {
 
 			if ( null === self::$state[ $key ] ) {
 				self::$state[ $key ] = get_transient( $data_prefix . $key );
@@ -183,5 +183,24 @@ class ProductFeedStatus {
 		}
 
 		return self::$local_feed;
+	}
+
+
+	/**
+	 * Removes all transients for the given feed_id.
+	 *
+	 * @param string $feed_id The ID of the feed to cleanup transients for.
+	 *
+	 * @return void
+	 */
+	public static function feed_transients_cleanup( $feed_id ) {
+
+		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_' . $feed_id . '_';
+
+		foreach ( self::STATE_PROPS as $key => $default_value ) {
+			delete_transient( $data_prefix . $key );
+		}
+
+		delete_transient( 'pinterest-for-woocommerce_feed_dataset_' . $feed_id );
 	}
 }
