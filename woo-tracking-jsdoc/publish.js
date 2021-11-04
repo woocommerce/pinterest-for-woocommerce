@@ -38,7 +38,7 @@ exports.publish = function ( data ) {
 		? new RegExp( replacement )
 		: defaultReplacementRegex;
 
-	let mdResult = '\n';
+	let mdResult = '';
 
 	data( { kind: 'event' } ).each( ( symbol ) => {
 		// Build the event title with the link to its source.
@@ -46,7 +46,7 @@ exports.publish = function ( data ) {
 			pwd,
 			path.join( symbol.meta.path, symbol.meta.filename )
 		);
-		mdResult += `### [\`${ symbol.name }\`](${ localLocation })\n`;
+		mdResult += `\n### [\`${ symbol.name }\`](${ localLocation })\n`;
 		// description
 		mdResult += symbol.description + '\n';
 		// Build properites table.
