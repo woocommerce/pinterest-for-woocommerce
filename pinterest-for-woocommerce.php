@@ -111,3 +111,11 @@ function Pinterest_For_Woocommerce() { // phpcs:ignore WordPress.NamingConventio
 
 // Initiate the plugin.
 Pinterest_For_Woocommerce();
+
+// Register deactivation hook.
+register_deactivation_hook(
+	PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE,
+	function () {
+		Automattic\WooCommerce\Pinterest\ProductSync::cancel_jobs();
+	}
+);
