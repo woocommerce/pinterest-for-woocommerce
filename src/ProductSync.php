@@ -294,9 +294,9 @@ class ProductSync {
 	 * @return void
 	 */
 	private static function handle_feed_deregistration() {
-		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
-
 		self::feed_reset();
+		self::cancel_jobs();
+		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
 	}
 
 
