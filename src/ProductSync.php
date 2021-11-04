@@ -144,10 +144,10 @@ class ProductSync {
 			unlink( $local_feed['tmp_file'] );
 		}
 
+		ProductFeedStatus::feed_transients_cleanup( $local_feed['feed_id'] );
+
 		Pinterest_For_Woocommerce()::save_data( 'local_feed_id', false );
 		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', false );
-
-		self::log( 'Product feed reset and file deleted.' );
 
 		self::log( 'Product feed reset and files deleted.' );
 	}
