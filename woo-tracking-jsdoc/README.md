@@ -28,7 +28,7 @@ You may add any of the following properties to your JSDoc config (`.jsdocrc.json
       // Path to the markdown file to which the tracking events' docs should be added
       "path": "TRACKING.md",
       // Pattern to be used to match the content to be replaced. The groups are respectively: start marker, replaceable content, end marker.
-      "replacement": "(<woo-tracking-jsdoc.*>)([\\s\\S]*)(<\\/woo-tracking-jsdoc.*>)"
+      "replacement": "(<woo-tracking-jsdoc(?:\s[^>]*)?>)([\\s\\S]*)(<\\/woo-tracking-jsdoc.*>)"
     }
   }
 ```
