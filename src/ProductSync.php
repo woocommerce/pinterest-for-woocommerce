@@ -84,17 +84,17 @@ class ProductSync {
 		add_action( self::ACTION_HANDLE_SYNC, array( __CLASS__, 'handle_feed_registration' ) );
 		add_action( self::ACTION_FEED_GENERATION, array( __CLASS__, 'handle_feed_generation' ) );
 
-		// Schedule the main feed control task.
-		if ( false === as_next_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			$interval = 10 * MINUTE_IN_SECONDS;
-			as_schedule_recurring_action( time() + 10, $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		}
-
 		if ( self::is_product_sync_enabled() ) {
 
-			$state = ProductFeedStatus::get();
+			// Schedule the main feed control task.
+			if ( false === as_next_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+				$interval = 10 * MINUTE_IN_SECONDS;
+				as_schedule_recurring_action( time() + 10, $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+			}
+
 			self::reschedule_if_expired();
 			self::reschedule_if_errored();
+			$state = ProductFeedStatus::get();
 
 			if ( $state ) {
 				// If local is not generated, or needs to be regenerated, schedule regeneration.
@@ -123,6 +123,8 @@ class ProductSync {
 
 			// If feed is generated, but not yet registered, register it as soon as possible using an async task.
 			add_action( 'pinterest_for_woocommerce_feed_generated', array( __CLASS__, 'trigger_async_feed_registration_asap' ) );
+		} else {
+			self::handle_feed_deregistration();
 		}
 	}
 
@@ -265,17 +267,6 @@ class ProductSync {
 			'country'                   => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
 			'locale'                    => str_replace( '_', '-', determine_locale() ),
 		);
-
-		$registered = self::get_registered_feed_id();
-
-		if ( ! self::is_product_sync_enabled() ) {
-			// Handle feed deregistration.
-			if ( $registered ) {
-				self::handle_feed_deregistration();
-			}
-
-			return false;
-		}
 
 		try {
 			$registered = self::register_feed( $feed_args );
