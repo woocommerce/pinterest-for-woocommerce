@@ -212,7 +212,7 @@ const FaqSection = () => {
 const FaqQuestion = ( { questionId, question, answer } ) => {
 	const panelToggled = useCallback(
 		( isOpened ) => {
-			recordEvent( 'wcadmin_pfw_get_started_faq', {
+			recordEvent( 'pfw_get_started_faq', {
 				question_id: questionId,
 				action: isOpened ? 'expand' : 'collapse',
 			} );
