@@ -25,6 +25,13 @@ class ProductFeedStatus {
 	private static $local_feed = array();
 
 	/**
+	 * The array that holds the state of the feed, used as cache.
+	 *
+	 * @var array
+	 */
+	private static $state = array();
+
+	/**
 	 * Returns the Current state of the Feed generation job.
 	 * Status can be one of the following:
 	 *
@@ -41,7 +48,6 @@ class ProductFeedStatus {
 
 		$local_feed  = self::get_local_feed();
 		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_' . $local_feed['feed_id'] . '_';
-		$status      = array();
 
 		$props = array(
 			'status'        => 'pending_config',
@@ -53,12 +59,18 @@ class ProductFeedStatus {
 
 		foreach ( $props as $key => $default_value ) {
 
-		foreach ( $props as $key => $default_value ) {
-			$stored         = get_transient( $data_prefix . $key );
-			$status[ $key ] = false === $stored ? $default_value : $stored;
+			if ( null === self::$state[ $key ] ) {
+				self::$state[ $key ] = get_transient( $data_prefix . $key );
+			}
+
+			if ( false === self::$state[ $key ] ) {
+				self::$state[ $key ] = $default_value;
+			} elseif ( null === self::$state[ $key ] ) {
+				self::$state[ $key ] = false;
+			}
 		}
 
-		return $status;
+		return self::$state;
 	}
 
 	/**
@@ -80,7 +92,8 @@ class ProductFeedStatus {
 		}
 
 		foreach ( $state as $key => $value ) {
-			set_transient( $data_prefix . $key, $value ); // No expiration.
+			self::$state[ $key ] = $value;
+			set_transient( $data_prefix . $key, ( false === $value ? null : $value ) ); // No expiration.
 		}
 
 		if ( ! empty( $state['status'] ) ) {
