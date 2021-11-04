@@ -66,7 +66,7 @@ const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 
 	const openConfirmationModal = () => {
 		setIsConfirmationModalOpen( true );
-		recordEvent( 'wcadmin_pfw_account_disconnect_button_click' );
+		recordEvent( 'pfw_account_disconnect_button_click' );
 	};
 
 	const closeConfirmationModal = () => {
@@ -209,7 +209,7 @@ const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 							}
 							onClick={ () =>
 								recordEvent(
-									'wcadmin_pfw_account_connect_button_click'
+									'pfw_account_connect_button_click'
 								)
 							}
 						>

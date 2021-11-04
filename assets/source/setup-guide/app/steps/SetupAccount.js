@@ -171,7 +171,7 @@ const SetupAccount = ( {
 									}
 									onClick={ () =>
 										recordEvent(
-											'wcadmin_pfw_account_create_button_click'
+											'pfw_account_create_button_click'
 										)
 									}
 									target="_blank"
@@ -198,7 +198,7 @@ const SetupAccount = ( {
 										}
 										onClick={ () =>
 											recordEvent(
-												'wcadmin_pfw_account_convert_button_click'
+												'pfw_account_convert_button_click'
 											)
 										}
 										target="_blank"

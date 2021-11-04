@@ -45,7 +45,7 @@ const BusinessAccountSelection = ( { businessAccounts } ) => {
 	);
 
 	const handleConnectToBusiness = () => {
-		recordEvent( 'wcadmin_pfw_business_account_connect_button_click' );
+		recordEvent( 'pfw_business_account_connect_button_click' );
 		const newURL = addQueryArgs(
 			wcSettings.pinterest_for_woocommerce.switchBusinessAccountUrl,
 			{ business_id: targetBusinessId }
@@ -117,7 +117,7 @@ const BusinessAccountSelection = ( { businessAccounts } ) => {
 							}
 							onClick={ () =>
 								recordEvent(
-									'wcadmin_pfw_business_account_create_button_click'
+									'pfw_business_account_create_button_click'
 								)
 							}
 							target="_blank"
