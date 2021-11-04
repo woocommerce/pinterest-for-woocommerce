@@ -23,12 +23,12 @@ Some nice general description.
 You may add any of the following properties to your JSDoc config (`.jsdocrc.json`) to change those default values:
 ```js
 {
-    "templates": {
-		// Path to the markdown file to which the tracking events' docs should be added
-		"path": "TRACKING.md",
-		// Pattern to be used to match the content to be replaced. The groups are respectively: start marker, replaceable content, end marker.
-		"replacement": "(<woo-tracking-jsdoc.*>)([\s\S]*)(<\/woo-tracking-jsdoc.*>)"
-	}
+  "templates": {
+    // Path to the markdown file to which the tracking events' docs should be added
+    "path": "TRACKING.md",
+    // Pattern to be used to match the content to be replaced. The groups are respectively: start marker, replaceable content, end marker.
+    "replacement": "(<woo-tracking-jsdoc.*>)([\s\S]*)(<\/woo-tracking-jsdoc.*>)"
+  }
 ```
 
 ## Imported types
@@ -39,27 +39,26 @@ ERROR: Unable to parse a tag's type expression for source file … Invalid type 
 ```
 
 To mitigate that use a `jsdoc-plugin-typescript` plugin to skip those. `npm install --save-dev jsdoc-plugin-typescript` and add this to your config:
-```json
+```js
 {
-    "plugins": [
-      "woo-tracking-jsdoc/skip-import-type.js",
-      "jsdoc-plugin-typescript"
-    ],
-    "typescript": {
-      "moduleRoot": "assets/source" // Path to your module's root directory.
-    }
+  "plugins": [
+    "jsdoc-plugin-typescript"
+  ],
+  "typescript": {
+    "moduleRoot": "assets/source" // Path to your module's root directory.
+  }
 ```
 
 ## `~` Alias
 
 If your codebase uses a `.~` or `~` alias for the root directory, you may use `tilde-alias`.
 
-```json
+```js
 {
-    "plugins": [
-		"woo-tracking-jsdoc/tilde-alias.js",
-		"jsdoc-plugin-typescript"
-    ],
-    "typescript":
-	// …
+  "plugins": [
+    "woo-tracking-jsdoc/tilde-alias.js",
+    "jsdoc-plugin-typescript"
+  ],
+  "typescript":
+  // …
 ```
