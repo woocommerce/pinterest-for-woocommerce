@@ -3,7 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { getNewPath, getHistory } from '@woocommerce/navigation';
-import { createInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement, useCallback } from '@wordpress/element';
+import { recordEvent } from '@woocommerce/tracks';
 import {
 	Button,
 	Card,
@@ -163,6 +164,7 @@ const FaqSection = () => {
 				) }
 			>
 				<FaqQuestion
+					questionId={ 'why-account-not-connected-error' }
 					question={ __(
 						'Why am I getting an “Account not connected” error message?',
 						'pinterest-for-woocommerce'
@@ -173,6 +175,7 @@ const FaqSection = () => {
 					) }
 				/>
 				<FaqQuestion
+					questionId={ 'can-i-connect-to-multiple-accounts' }
 					question={ __(
 						'I have more than one Pinterest Advertiser account. Can I connect my WooCommerce store to multiple Pinterest Advertiser accounts?',
 						'pinterest-for-woocommerce'
@@ -187,9 +190,42 @@ const FaqSection = () => {
 	);
 };
 
-const FaqQuestion = ( { question, answer } ) => {
+/**
+ * Clicking on getting started page faq item to collapse or expand it.
+ *
+ * @event wcadmin_pfw_get_started_faq
+ *
+ * @property {string} action `'expand' | 'collapse'` What action was initiated.
+ * @property {string} question_id Identifier of the clicked question.
+ */
+
+/**
+ * FAQ component.
+ *
+ * @fires wcadmin_pfw_get_started_faq whenever the FAQ is toggled.
+ * @param {Object} props React props
+ * @param {string} props.questionId Question identifier, to be forwarded to the trackign event.
+ * @param {string} props.question Text of the question.
+ * @param {string} props.answer Text of the answer.
+ * @return {JSX.Element} FAQ component.
+ */
+const FaqQuestion = ( { questionId, question, answer } ) => {
+	const panelToggled = useCallback(
+		( isOpened ) => {
+			recordEvent( 'pfw_get_started_faq', {
+				question_id: questionId,
+				action: isOpened ? 'expand' : 'collapse',
+			} );
+		},
+		[ questionId ]
+	);
+
 	return (
-		<PanelBody title={ question } initialOpen={ false }>
+		<PanelBody
+			title={ question }
+			initialOpen={ false }
+			onToggle={ panelToggled }
+		>
 			<PanelRow>{ answer }</PanelRow>
 		</PanelBody>
 	);
