@@ -179,21 +179,21 @@ class ProductSync {
 
 		$state = ProductFeedStatus::get();
 
-		if ( ! $force && isset( $feed_job['status'] ) && in_array( $feed_job['status'], array( 'in_progress', 'starting' ), true ) ) {
-		// if scheduled_for_generation, we are rescheduling here.
-
 		if ( ! $force && isset( $state['status'] ) && in_array( $state['status'], array( 'in_progress', 'starting' ), true ) ) {
 			return;
 		}
 
-		ProductFeedStatus::set(
-			array(
-				'status' => 'scheduled_for_generation',
-			)
-		);
+		if ( 'scheduled_for_generation' !== $state['status'] ) {
+			ProductFeedStatus::set(
+				array(
+					'status' => 'scheduled_for_generation',
+				)
+			);
+		}
 
-		self::trigger_async_feed_generation( $force );
-		self::log( 'Feed generation (re)scheduled.' );
+		if ( self::trigger_async_feed_generation( $force ) ) {
+			self::log( 'Feed generation (re)scheduled.' );
+		}
 	}
 
 
@@ -486,13 +486,15 @@ class ProductSync {
 	 *
 	 * @param boolean $force When true, overrides the check for already scheduled task.
 	 *
-	 * @return void
+	 * @return boolean true if rescheduled, false otherwise.
 	 */
 	private static function trigger_async_feed_generation( $force = false ) {
 
 		if ( $force || false === as_next_scheduled_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			as_enqueue_async_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+			return 0 !== as_enqueue_async_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
+
+		return false;
 	}
 
 
