@@ -132,8 +132,6 @@ class ProductFeedStatus {
 	/**
 	 * Cleanup the stored dataset.
 	 *
-	 * *** TODO: hoook
-	 *
 	 * @return void
 	 */
 	public static function feed_data_cleanup() {

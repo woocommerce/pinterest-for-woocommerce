@@ -118,8 +118,8 @@ class ProductSync {
 			// If feed is dirty on completion of feed generation, reschedule it.
 			add_action( 'pinterest_for_woocommerce_feed_generated', array( __CLASS__, 'reschedule_if_dirty' ) );
 
-			add_action( 'pinterest_for_woocommerce_feed_generated', array( __CLASS__, 'feed_data_cleanup' ) );
-			add_action( 'pinterest_for_woocommerce_feed_error', array( __CLASS__, 'feed_data_cleanup' ) );
+			add_action( 'pinterest_for_woocommerce_feed_generated', array( __NAMESPACE__ . '\ProductFeedStatus', 'feed_data_cleanup' ) );
+			add_action( 'pinterest_for_woocommerce_feed_error', array( __NAMESPACE__ . '\ProductFeedStatus', 'feed_data_cleanup' ) );
 
 			// If feed is generated, but not yet registered, register it as soon as possible using an async task.
 			add_action( 'pinterest_for_woocommerce_feed_generated', array( __CLASS__, 'trigger_async_feed_registration_asap' ) );
