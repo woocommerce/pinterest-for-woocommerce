@@ -21,6 +21,18 @@ class ProductSync {
 	const ACTION_FEED_GENERATION = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-feed-generation';
 
 	/**
+	 * The time in seconds to consider the feed expired,
+	 * and schedule regeneration.
+	 */
+	const FEED_EXPIRY = DAY_IN_SECONDS;
+
+	/**
+	 * The time in seconds to wait after a failed feed generation attempt,
+	 * before attempting a retry.
+	 */
+	const WAIT_ON_ERROR_BEFORE_RETRY = HOUR_IN_SECONDS;
+
+	/**
 	 * The number of products to process on each Iteration of the scheduled task.
 	 * A high number increases the time it takes to complete the iteration, risking a PHP timeout.
 	 *
@@ -57,7 +69,7 @@ class ProductSync {
 	 */
 	private static $iteration_buffer_size = 0;
 
-	private static $local_feed = array();
+
 
 	/**
 	 * Initiate class.
@@ -82,11 +94,10 @@ class ProductSync {
 
 			$state = ProductFeedStatus::get();
 			self::reschedule_if_expired();
+			self::reschedule_if_errored();
 
 			if ( $state ) {
 				// If local is not generated, or needs to be regenerated, schedule regeneration.
-
-
 				if ( 'starting' === $state['status'] || 'in_progress' === $state['status'] ) {
 					self::trigger_async_feed_generation();
 				} elseif ( 'scheduled_for_generation' === $state['status'] || 'pending_config' === $state['status'] ) {
@@ -692,10 +703,23 @@ class ProductSync {
 
 		$state = ProductFeedStatus::get();
 
-		$expired = ( 'generated' === $state['status'] && $state['last_activity'] < ( time() - DAY_IN_SECONDS ) );
-
-		if ( $expired ) {
+		if ( ( 'generated' === $state['status'] && $state['last_activity'] < ( time() - self::FEED_EXPIRY ) ) ) {
 			self::log( 'Feed is expired.' );
+			self::feed_reschedule();
+		}
+	}
+
+	/**
+	 * Check if feed is expired, and reschedule feed generation.
+	 *
+	 * @return void
+	 */
+	public static function reschedule_if_errored() {
+
+		$state = ProductFeedStatus::get();
+
+		if ( ( 'error' === $state['status'] && $state['last_activity'] < ( time() - self::WAIT_ON_ERROR_BEFORE_RETRY ) ) ) {
+			self::log( 'Retrying feed generation after error.' );
 			self::feed_reschedule();
 		}
 	}
