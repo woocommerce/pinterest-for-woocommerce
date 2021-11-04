@@ -87,10 +87,6 @@ class ProductFeedStatus {
 
 		$state['last_activity'] = time();
 
-		if ( 'starting' === $state['status'] ) {
-			$state['started'] = time();
-		}
-
 		foreach ( $state as $key => $value ) {
 			self::$state[ $key ] = $value;
 			set_transient( $data_prefix . $key, ( false === $value ? null : $value ) ); // No expiration.
