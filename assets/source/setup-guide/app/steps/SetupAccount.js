@@ -12,6 +12,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { Button, Card, CardFooter, CardDivider } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
+import { recordEvent } from '@woocommerce/tracks';
 
 /**
  * Internal dependencies
@@ -22,6 +23,31 @@ import AccountConnection from '../components/Account/Connection';
 import BusinessAccountSelection from '../components/Account/BusinessAccountSelection';
 import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
 
+/**
+ * Clicking on "… create a new Pinterest account" button.
+ *
+ * @event wcadmin_pfw_account_create_button_click
+ */
+/**
+ * Clicking on "… convert your personal account" button.
+ *
+ * @event wcadmin_pfw_account_convert_button_click
+ */
+
+/**
+ * Account setup step component.
+ *
+ * @fires wcadmin_pfw_account_create_button_click
+ * @fires wcadmin_pfw_account_convert_button_click
+ *
+ * @param {Object} props React props
+ * @param {Function} props.goToNextStep
+ * @param {string} props.view
+ * @param {boolean} props.isConnected
+ * @param {Function} props.setIsConnected
+ * @param {boolean} props.isBusinessConnected
+ * @return {JSX.Element} Rendered element.
+ */
 const SetupAccount = ( {
 	goToNextStep,
 	view,
@@ -143,6 +169,11 @@ const SetupAccount = ( {
 										wcSettings.pinterest_for_woocommerce
 											.pinterestLinks.newAccount
 									}
+									onClick={ () =>
+										recordEvent(
+											'pfw_account_create_button_click'
+										)
+									}
 									target="_blank"
 								>
 									{ __(
@@ -164,6 +195,11 @@ const SetupAccount = ( {
 											wcSettings.pinterest_for_woocommerce
 												.pinterestLinks
 												.convertToBusinessAcct
+										}
+										onClick={ () =>
+											recordEvent(
+												'pfw_account_convert_button_click'
+											)
 										}
 										target="_blank"
 									>

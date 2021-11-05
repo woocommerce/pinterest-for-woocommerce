@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@woocommerce/components';
 import { getNewPath } from '@woocommerce/navigation';
+import { recordEvent } from '@woocommerce/tracks';
 import {
 	Button,
 	CardBody,
@@ -33,6 +34,29 @@ const PinterestLogo = () => {
 	);
 };
 
+/**
+ * Clicking on "Connect" Pinterest account button.
+ *
+ * @event wcadmin_pfw_account_connect_button_click
+ */
+/**
+ * Clicking on "Disconnect" Pinterest account button during account setup.
+ *
+ * @event wcadmin_pfw_account_disconnect_button_click
+ */
+
+/**
+ * Pinterest account connection component.
+ *
+ * @fires wcadmin_pfw_account_connect_button_click
+ * @fires wcadmin_pfw_account_disconnect_button_click
+ *
+ * @param {Object} props React props.
+ * @param {boolean} props.isConnected
+ * @param {Function} props.setIsConnected
+ * @param {Object} props.accountData
+ * @return {JSX.Element} Rendered element.
+ */
 const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 	const createNotice = useCreateNotice();
 
@@ -42,6 +66,7 @@ const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 
 	const openConfirmationModal = () => {
 		setIsConfirmationModalOpen( true );
+		recordEvent( 'pfw_account_disconnect_button_click' );
 	};
 
 	const closeConfirmationModal = () => {
@@ -181,6 +206,11 @@ const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 							href={
 								wcSettings.pinterest_for_woocommerce
 									.serviceLoginUrl
+							}
+							onClick={ () =>
+								recordEvent(
+									'pfw_account_connect_button_click'
+								)
 							}
 						>
 							{ __( 'Connect', 'pinterest-for-woocommerce' ) }
