@@ -1,0 +1,12 @@
+{
+  "opts": {
+    "recurse": true
+  },
+  "plugins": [
+    "woo-tracking-jsdoc/tilde-alias.js",
+    "jsdoc-plugin-typescript"
+  ],
+  "typescript": {
+    "moduleRoot": "assets/source"
+  }
+}

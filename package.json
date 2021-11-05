@@ -60,6 +60,8 @@
     "gulp-util": "^3.0.8",
     "gulp-vinyl-zip": "^2.1.2",
     "gulp-wp-pot": "^2.3.4",
+    "jsdoc": "^3.6.7",
+    "jsdoc-plugin-typescript": "^2.0.6",
     "md5": "^2.3.0",
     "merge-stream": "^1.0.1",
     "node-sass": "^4.14.1",
@@ -107,7 +109,8 @@
     "lint:css": "wp-scripts lint-style ./assets/source",
     "lint:php": "composer run-script phpcs ./",
     "lint:css:fix": "wp-scripts lint-style ./assets/source --fix",
-    "build:zip": "npm run build"
+    "build:zip": "npm run build",
+    "doc:tracking": "jsdoc ./assets/source/ -c .jsdocrc.json -t ./woo-tracking-jsdoc"
   },
   "browserslist": [
     "last 5 versions",
