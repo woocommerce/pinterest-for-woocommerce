@@ -11,7 +11,8 @@ Do not edit it manually!
 -->`;
 const disclaimerEnd = `<!---
 End of \`woo-tracking-jsdoc\`-generated content.
--->`;
+-->
+`;
 
 /** @module publish */
 
@@ -40,34 +41,39 @@ exports.publish = function ( data ) {
 
 	let mdResult = '';
 
-	data( { kind: 'event' } ).each( ( symbol ) => {
-		// Build the event title with the link to its source.
-		const localLocation = path.relative(
-			pwd,
-			path.join( symbol.meta.path, symbol.meta.filename )
-		);
-		mdResult += `\n### [\`${ symbol.name }\`](${ localLocation })\n`;
-		// description
-		mdResult += symbol.description + '\n';
-		// Build properites table.
-		if ( symbol.properties ) {
-			mdResult += `#### Properties
+	data( { kind: 'event' } )
+		.order( 'name' )
+		.each( ( symbol ) => {
+			// Build the event title with the link to its source.
+			const localLocation =
+				path.relative(
+					pwd,
+					path.join( symbol.meta.path, symbol.meta.filename )
+				) +
+				'#L' +
+				symbol.meta.lineno;
+			mdResult += `\n### [\`${ symbol.name }\`](${ localLocation })\n`;
+			// description
+			mdResult += ( symbol.description || '' ) + '\n';
+			// Build properites table.
+			if ( symbol.properties ) {
+				mdResult += `#### Properties
 |   |   |   |
 |---|---|---|\n`;
-			symbol.properties.forEach( ( property ) => {
-				// Escape `|` for markdown table.
-				const type = property.type.parsedType.typeExpression.replace(
-					/\|/g,
-					'\\|'
-				);
-				const description = property.description.replace(
-					/\|/g,
-					'\\|'
-				);
-				mdResult += `\`${ property.name }\` | \`${ type }\` | ${ description }\n`;
-			} );
-		}
-	} );
+				symbol.properties.forEach( ( property ) => {
+					// Escape `|` for markdown table.
+					const type = property.type.parsedType.typeExpression.replace(
+						/\|/g,
+						'\\|'
+					);
+					const description = property.description.replace(
+						/\|/g,
+						'\\|'
+					);
+					mdResult += `\`${ property.name }\` | \`${ type }\` | ${ description }\n`;
+				} );
+			}
+		} );
 
 	let readme = fs.readFileSync( readmePath, 'utf8' );
 	// Replace the marker with generated content.
