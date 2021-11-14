@@ -2,6 +2,8 @@ const fs = require( 'jsdoc/fs' );
 const env = require( 'jsdoc/env' );
 const path = require( 'jsdoc/path' );
 
+/** @module publish */
+
 // RegExp used to match the replacement. The groups are respectively: start marker, replacable content, end marker.
 const defaultReplacementRegex = /(<woo-tracking-jsdoc(?:\s[^>]*)?>)([\s\S]*)(<\/woo-tracking-jsdoc.*>)/;
 
@@ -14,7 +16,22 @@ End of \`woo-tracking-jsdoc\`-generated content.
 -->
 `;
 
-/** @module publish */
+/**
+ * Creates MD link to the line of code, where the symbol was defined.
+ *
+ * @param {Object} symbol JSDoc symbol object.
+ * @param {string} pwd
+ */
+function getLineLink( symbol, pwd ) {
+	const localLocation =
+		path.relative(
+			pwd,
+			path.join( symbol.meta.path, symbol.meta.filename )
+		) +
+		'#L' +
+		symbol.meta.lineno;
+	return `[\`${ symbol.name }\`](${ localLocation })`;
+}
 
 /**
  * Generate documentation output.
@@ -45,14 +62,7 @@ exports.publish = function ( data ) {
 		.order( 'name' )
 		.each( ( symbol ) => {
 			// Build the event title with the link to its source.
-			const localLocation =
-				path.relative(
-					pwd,
-					path.join( symbol.meta.path, symbol.meta.filename )
-				) +
-				'#L' +
-				symbol.meta.lineno;
-			mdResult += `\n### [\`${ symbol.name }\`](${ localLocation })\n`;
+			mdResult += `\n### ${ getLineLink( symbol, pwd ) }\n`;
 			// description
 			mdResult += ( symbol.description || '' ) + '\n';
 			// Build properites table.
@@ -71,6 +81,38 @@ exports.publish = function ( data ) {
 						'\\|'
 					);
 					mdResult += `\`${ property.name }\` | \`${ type }\` | ${ description }\n`;
+				} );
+			}
+
+			// Find all palces that fires the event.
+			const emitters = new Map();
+			// TaffyDB#has is buggy https://github.com/typicaljoe/taffydb/issues/19, so let's filter it manually.
+			data( { fires: { isArray: true } } ).each( ( emitter ) => {
+				const firesCurrent = emitter.fires.filter( ( fires ) =>
+					fires.startsWith( 'event:' + symbol.name )
+				)
+				if ( firesCurrent.length ) {
+					emitters.set(
+						emitter,
+						// Consider everything after the event name [and whitespace] an additional description.
+						// Sanitize the descriptions, trim empty ones.
+						firesCurrent.map( description => description.match( /^(\S+\s*)(.*)/ )[ 2 ])
+					);
+				}
+			} );
+			if ( emitters.size ) {
+				mdResult += `#### Emitters\n`;
+				emitters.forEach( ( descriptions, emitter ) => {
+					mdResult += '- ' + getLineLink(
+						emitter,
+						pwd
+					);
+					if( descriptions.length === 1 ){
+						mdResult += ' ' + descriptions[0];
+					} else {
+						mdResult += `\n` + descriptions.map( description => `	- ${description}`).join('\n');
+					}
+					mdResult += '\n';
 				} );
 			}
 		} );
