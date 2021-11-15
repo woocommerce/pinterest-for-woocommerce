@@ -84,7 +84,7 @@ exports.publish = function ( data ) {
 				} );
 			}
 
-			// Find all palces that fires the event.
+			// Find all places that fires the event.
 			const emitters = new Map();
 			// TaffyDB#has is buggy https://github.com/typicaljoe/taffydb/issues/19, so let's filter it manually.
 			data( { fires: { isArray: true } } ).each( ( emitter ) => {
