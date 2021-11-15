@@ -90,27 +90,31 @@ exports.publish = function ( data ) {
 			data( { fires: { isArray: true } } ).each( ( emitter ) => {
 				const firesCurrent = emitter.fires.filter( ( fires ) =>
 					fires.startsWith( 'event:' + symbol.name )
-				)
+				);
 				if ( firesCurrent.length ) {
 					emitters.set(
 						emitter,
 						// Consider everything after the event name [and whitespace] an additional description.
 						// Sanitize the descriptions, trim empty ones.
-						firesCurrent.map( description => description.match( /^(\S+\s*)(.*)/ )[ 2 ])
+						firesCurrent.map(
+							( description ) =>
+								description.match( /^(\S+\s*)(.*)/ )[ 2 ]
+						)
 					);
 				}
 			} );
 			if ( emitters.size ) {
 				mdResult += `#### Emitters\n`;
 				emitters.forEach( ( descriptions, emitter ) => {
-					mdResult += '- ' + getLineLink(
-						emitter,
-						pwd
-					);
-					if( descriptions.length === 1 ){
-						mdResult += ' ' + descriptions[0];
+					mdResult += '- ' + getLineLink( emitter, pwd );
+					if ( descriptions.length === 1 ) {
+						mdResult += ' ' + descriptions[ 0 ];
 					} else {
-						mdResult += `\n` + descriptions.map( description => `	- ${description}`).join('\n');
+						mdResult +=
+							`\n` +
+							descriptions
+								.map( ( description ) => `	- ${ description }` )
+								.join( '\n' );
 					}
 					mdResult += '\n';
 				} );
