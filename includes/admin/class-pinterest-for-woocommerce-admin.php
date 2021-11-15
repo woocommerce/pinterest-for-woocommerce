@@ -398,6 +398,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'createAdvertiser'       => 'https://help.pinterest.com/en/business/article/create-an-advertiser-account',
 					'adGuidelines'           => 'https://policy.pinterest.com/en/advertising-guidelines',
 					'adDataTerms'            => 'https://policy.pinterest.com/en/ad-data-terms',
+					'merchantGuidelines'     => 'https://policy.pinterest.com/en/merchant-guidelines',
 					'convertToBusinessAcct'  => 'https://help.pinterest.com/en/business/article/get-a-business-account#section-15096',
 					'appealDeclinedMerchant' => 'https://www.pinterest.com/product-catalogs/data-source/?showModal=true',
 				),
