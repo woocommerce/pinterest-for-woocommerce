@@ -19,6 +19,7 @@ import {
  * Internal dependencies
  */
 import PrelaunchNotice from '../../../components/prelaunch-notice';
+import UnsupportedCountryNotice from '../components/UnsupportedCountryNotice';
 
 const WelcomeSection = () => {
 	return (
@@ -196,7 +197,11 @@ const FaqQuestion = ( { question, answer } ) => {
 };
 
 const LandingPageApp = () => {
-	const { pluginVersion } = wcSettings.pinterest_for_woocommerce;
+	const {
+		pluginVersion,
+		isAdsSupportedCountry,
+		storeCountry,
+	} = wcSettings.pinterest_for_woocommerce;
 
 	// Only show the pre-launch beta notice if the plugin version is a beta.
 	const prelaunchNotice = pluginVersion.includes( 'beta' ) ? (
@@ -207,6 +212,9 @@ const LandingPageApp = () => {
 		<>
 			{ prelaunchNotice }
 			<div className="pinterest-for-woocommerce-landing-page">
+				{ ! isAdsSupportedCountry && (
+					<UnsupportedCountryNotice countryCode={ storeCountry } />
+				) }
 				<WelcomeSection />
 				<FeaturesSection />
 				<FaqSection />
