@@ -89,32 +89,26 @@ exports.publish = function ( data ) {
 			// TaffyDB#has is buggy https://github.com/typicaljoe/taffydb/issues/19, so let's filter it manually.
 			data( { fires: { isArray: true } } ).each( ( emitter ) => {
 				const firesCurrent = emitter.fires.filter( ( fires ) =>
-					fires.startsWith( 'event:' + symbol.name )
+					fires.name.startsWith( 'event:' + symbol.name )
 				);
 				if ( firesCurrent.length ) {
-					emitters.set(
-						emitter,
-						// Consider everything after the event name [and whitespace] an additional description.
-						// Sanitize the descriptions, trim empty ones.
-						firesCurrent.map(
-							( description ) =>
-								description.match( /^(\S+\s*)([\s\S]*)/ )[ 2 ]
-						)
-					);
+					emitters.set( emitter, firesCurrent );
 				}
 			} );
 			if ( emitters.size ) {
 				mdResult += `#### Emitters\n`;
-				emitters.forEach( ( descriptions, emitter ) => {
+				emitters.forEach( ( fires, emitter ) => {
 					mdResult += '- ' + getLineLink( emitter, pwd );
-					if ( descriptions.length === 1 ) {
-						mdResult += ' ' + descriptions[ 0 ];
-					} else {
+					if ( fires.length > 1 ) {
 						mdResult +=
 							`\n` +
-							descriptions
-								.map( ( description ) => `	- ${ description }` )
+							fires
+								.map(
+									( evt ) => `	- ${ evt.description || '' }`
+								)
 								.join( '\n' );
+					} else if ( fires[ 0 ] && fires[ 0 ].description ) {
+						mdResult += ' ' + fires[ 0 ].description;
 					}
 					mdResult += '\n';
 				} );

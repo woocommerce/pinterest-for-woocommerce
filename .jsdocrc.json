@@ -4,6 +4,7 @@
   },
   "plugins": [
     "woo-tracking-jsdoc/tilde-alias.js",
+    "woo-tracking-jsdoc/fires-description.js",
     "jsdoc-plugin-typescript"
   ],
   "typescript": {
