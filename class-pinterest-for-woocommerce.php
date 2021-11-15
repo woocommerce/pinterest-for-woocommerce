@@ -95,7 +95,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		protected static $default_settings = array(
 			'track_conversions'      => true,
-			'enhanced_match_support' => false,
+			'enhanced_match_support' => true,
 			'save_to_pinterest'      => true,
 			'rich_pins_on_posts'     => true,
 			'rich_pins_on_products'  => true,
