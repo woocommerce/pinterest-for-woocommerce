@@ -98,7 +98,7 @@ exports.publish = function ( data ) {
 						// Sanitize the descriptions, trim empty ones.
 						firesCurrent.map(
 							( description ) =>
-								description.match( /^(\S+\s*)(.*)/ )[ 2 ]
+								description.match( /^(\S+\s*)([\s\S]*)/ )[ 2 ]
 						)
 					);
 				}
