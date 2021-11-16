@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "106a84f36d2e4a0e238578a8b8d35b63",
+    "content-hash": "17c984c19ba05098bb16f2b9bbfaea16",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
-            "version": "v2.10.8",
+            "version": "v2.10.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-autoloader.git",
-                "reference": "95dfab9eaf9484887557ded269c44f9d03358290"
+                "reference": "af5247c3748c77517618538d12b30901c8922858"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/95dfab9eaf9484887557ded269c44f9d03358290",
-                "reference": "95dfab9eaf9484887557ded269c44f9d03358290",
+                "url": "https://api.github.com/repos/Automattic/jetpack-autoloader/zipball/af5247c3748c77517618538d12b30901c8922858",
+                "reference": "af5247c3748c77517618538d12b30901c8922858",
                 "shasum": ""
             },
             "require": {
@@ -53,9 +53,9 @@
             ],
             "description": "Creates a custom autoloader for a plugin or theme.",
             "support": {
-                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.10.8"
+                "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.10.9"
             },
-            "time": "2021-10-13T17:10:50+00:00"
+            "time": "2021-11-02T14:06:57+00:00"
         },
         {
             "name": "defuse/php-encryption",
@@ -172,6 +172,47 @@
                 "source": "https://github.com/paragonie/random_compat"
             },
             "time": "2020-10-15T08:29:30+00:00"
+        },
+        {
+            "name": "woocommerce/action-scheduler-job-framework",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/woocommerce/action-scheduler-job-framework.git",
+                "reference": "b0b21b9cc87e476ba7f8817050b39274ea7d6732"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/woocommerce/action-scheduler-job-framework/zipball/b0b21b9cc87e476ba7f8817050b39274ea7d6732",
+                "reference": "b0b21b9cc87e476ba7f8817050b39274ea7d6732",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "woocommerce/woocommerce-sniffs": "0.1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Automattic\\WooCommerce\\ActionSchedulerJobFramework\\": "src/"
+                }
+            },
+            "scripts": {
+                "phpcs": [
+                    "phpcs -s -p"
+                ]
+            },
+            "license": [
+                "GNU"
+            ],
+            "description": "A job framework for Action Scheduler (actionscheduler.org)",
+            "support": {
+                "source": "https://github.com/woocommerce/action-scheduler-job-framework/tree/2.0.0",
+                "issues": "https://github.com/woocommerce/action-scheduler-job-framework/issues"
+            },
+            "time": "2021-05-20T02:32:48+00:00"
         }
     ],
     "packages-dev": [
