@@ -9,10 +9,10 @@
 use Automattic\WooCommerce\Admin\Features\Features;
 use Automattic\WooCommerce\Admin\Features\Navigation\Menu;
 use Automattic\WooCommerce\Admin\Features\Navigation\Screen;
-use Automattic\WooCommerce\Admin\Features\Onboarding;
 use Automattic\WooCommerce\Admin\Loader;
 use Automattic\WooCommerce\Blocks\Package;
 use Automattic\WooCommerce\Blocks\Assets\AssetDataRegistry;
+use Automattic\WooCommerce\Pinterest\Compat;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -251,7 +251,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				return;
 			}
 
-			if ( Onboarding::should_show_tasks() ) {
+			if ( Compat::should_show_tasks() ) {
 
 				$build_path = '/assets/setup-task';
 
@@ -339,7 +339,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			if (
 				! class_exists( Loader::class ) ||
 				! Loader::is_admin_page() ||
-				! Onboarding::should_show_tasks()
+				! Compat::should_show_tasks()
 			) {
 				return $registered_tasks_list_items;
 			}
