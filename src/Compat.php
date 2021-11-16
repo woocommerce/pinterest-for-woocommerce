@@ -22,7 +22,7 @@ class Compat {
 	/**
 	 * Helper function to check if UI should show tasks.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.1
 	 * @return bool
 	 */
 	public static function should_show_tasks(): bool {
