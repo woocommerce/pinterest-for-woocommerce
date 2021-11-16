@@ -87,5 +87,13 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.0.1 - 2021-11-16 =
+* Fix - Add PHP, JS & CSS linting GH actions.
+* Fix - Enable enhanced match by default .
+* Fix - Fix error with WC Session when accessing REST API endpoints publicly.
+* Fix - Fix npm vulnerabilities.
+* Fix - Update, clean and make green CSS & JS linters.
+* Fix - Use Task List API to detect if we should show Pinterest onboarding tasks.
+
 = 1.0.0 - 2021-10-25 =
 - Initial release
