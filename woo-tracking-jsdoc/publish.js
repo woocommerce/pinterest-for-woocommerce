@@ -2,6 +2,8 @@ const fs = require( 'jsdoc/fs' );
 const env = require( 'jsdoc/env' );
 const path = require( 'jsdoc/path' );
 
+/** @module publish */
+
 // RegExp used to match the replacement. The groups are respectively: start marker, replacable content, end marker.
 const defaultReplacementRegex = /(<woo-tracking-jsdoc(?:\s[^>]*)?>)([\s\S]*)(<\/woo-tracking-jsdoc.*>)/;
 
@@ -11,9 +13,25 @@ Do not edit it manually!
 -->`;
 const disclaimerEnd = `<!---
 End of \`woo-tracking-jsdoc\`-generated content.
--->`;
+-->
+`;
 
-/** @module publish */
+/**
+ * Creates MD link to the line of code, where the symbol was defined.
+ *
+ * @param {Object} symbol JSDoc symbol object.
+ * @param {string} pwd
+ */
+function getLineLink( symbol, pwd ) {
+	const localLocation =
+		path.relative(
+			pwd,
+			path.join( symbol.meta.path, symbol.meta.filename )
+		) +
+		'#L' +
+		symbol.meta.lineno;
+	return `[\`${ symbol.name }\`](${ localLocation })`;
+}
 
 /**
  * Generate documentation output.
@@ -40,34 +58,62 @@ exports.publish = function ( data ) {
 
 	let mdResult = '';
 
-	data( { kind: 'event' } ).each( ( symbol ) => {
-		// Build the event title with the link to its source.
-		const localLocation = path.relative(
-			pwd,
-			path.join( symbol.meta.path, symbol.meta.filename )
-		);
-		mdResult += `\n### [\`${ symbol.name }\`](${ localLocation })\n`;
-		// description
-		mdResult += symbol.description + '\n';
-		// Build properites table.
-		if ( symbol.properties ) {
-			mdResult += `#### Properties
+	data( { kind: 'event' } )
+		.order( 'name' )
+		.each( ( symbol ) => {
+			// Build the event title with the link to its source.
+			mdResult += `\n### ${ getLineLink( symbol, pwd ) }\n`;
+			// description
+			mdResult += ( symbol.description || '' ) + '\n';
+			// Build properites table.
+			if ( symbol.properties ) {
+				mdResult += `#### Properties
 |   |   |   |
 |---|---|---|\n`;
-			symbol.properties.forEach( ( property ) => {
-				// Escape `|` for markdown table.
-				const type = property.type.parsedType.typeExpression.replace(
-					/\|/g,
-					'\\|'
+				symbol.properties.forEach( ( property ) => {
+					// Escape `|` for markdown table.
+					const type = property.type.parsedType.typeExpression.replace(
+						/\|/g,
+						'\\|'
+					);
+					const description = property.description.replace(
+						/\|/g,
+						'\\|'
+					);
+					mdResult += `\`${ property.name }\` | \`${ type }\` | ${ description }\n`;
+				} );
+			}
+
+			// Find all places that fires the event.
+			const emitters = new Map();
+			// TaffyDB#has is buggy https://github.com/typicaljoe/taffydb/issues/19, so let's filter it manually.
+			data( { fires: { isArray: true } } ).each( ( emitter ) => {
+				const firesCurrent = emitter.fires.filter( ( fires ) =>
+					fires.name.startsWith( 'event:' + symbol.name )
 				);
-				const description = property.description.replace(
-					/\|/g,
-					'\\|'
-				);
-				mdResult += `\`${ property.name }\` | \`${ type }\` | ${ description }\n`;
+				if ( firesCurrent.length ) {
+					emitters.set( emitter, firesCurrent );
+				}
 			} );
-		}
-	} );
+			if ( emitters.size ) {
+				mdResult += `#### Emitters\n`;
+				emitters.forEach( ( fires, emitter ) => {
+					mdResult += '- ' + getLineLink( emitter, pwd );
+					if ( fires.length > 1 ) {
+						mdResult +=
+							`\n` +
+							fires
+								.map(
+									( evt ) => `	- ${ evt.description || '' }`
+								)
+								.join( '\n' );
+					} else if ( fires[ 0 ] && fires[ 0 ].description ) {
+						mdResult += ' ' + fires[ 0 ].description;
+					}
+					mdResult += '\n';
+				} );
+			}
+		} );
 
 	let readme = fs.readFileSync( readmePath, 'utf8' );
 	// Replace the marker with generated content.
