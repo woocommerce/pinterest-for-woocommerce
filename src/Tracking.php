@@ -188,7 +188,7 @@ class Tracking {
 		}
 
 		if ( empty( $user_email ) ) {
-			$session_customer = function_exists( 'WC' ) ? WC()->session->get( 'customer' ) : false;
+			$session_customer = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session->get( 'customer' ) : false;
 			$user_email       = $session_customer ? $session_customer['email'] : false;
 		}
 
