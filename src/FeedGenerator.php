@@ -13,7 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Utilities\BatchQueryOffset;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\AbstractChainedJob;
-use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler;
+use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
+use WP_Query;
 
 /**
  * Class Handling feed files generation.
@@ -23,9 +24,21 @@ class FeedGenerator extends AbstractChainedJob {
 	use BatchQueryOffset;
 
 	/**
-	 * FeedGenerator instance;
+	 * @var array of local feed configurations;
 	 */
-	static $instance = null;
+	private $local_feeds_configurations;
+
+	/**
+	 * FeedGenerator initialization.
+	 *
+	 * @since x.x.x
+	 * @param ActionSchedulerInterface $action_scheduler  Action Scheduler proxy.
+	 * @param LocalFeedConfigs         $locations_configs Locations configuration class.
+	 */
+	public function __construct( ActionSchedulerInterface $action_scheduler, $locations_configs ) {
+		parent::__construct( $action_scheduler );
+		$this->local_feeds_configurations = $locations_configs;
+	}
 
 	/**
 	 * Runs before starting the job.
@@ -95,13 +108,6 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	public function get_plugin_name(): string {
 		return 'facebook_for_woocommerce';
-	}
-
-	public function init(): FeedGenerator {
-		if ( is_null( self::$instance ) ) {
-			
-			self::$instance = new FeedGenerator()
-		}
 	}
 
 }

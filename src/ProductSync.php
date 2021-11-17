@@ -11,7 +11,7 @@ namespace Automattic\WooCommerce\Pinterest;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
+use \Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
 /**
  * Class Handling registration & generation of the XML product feed.
  */
@@ -69,7 +69,12 @@ class ProductSync {
 	 */
 	private static $iteration_buffer_size = 0;
 
-
+	/**
+	 * Feed File Generator Instance
+	 *
+	 * @var $feed_generator FeedGenerator
+	 */
+	private static $feed_generator = null;
 
 	/**
 	 * Initiate class.
@@ -79,6 +84,10 @@ class ProductSync {
 		if ( ! self::is_product_sync_enabled() && ! self::get_registered_feed_id() ) {
 			return;
 		}
+
+		$locations = array( Pinterest_For_Woocommerce()::get_base_country() ?? 'US' ); // Replace with multiple countries array for multiple feed config.
+		// Start Feed File Generator.
+		self::initialize_feed_generator( $locations );
 
 		// Hook the Scheduled actions.
 		add_action( self::ACTION_HANDLE_SYNC, array( __CLASS__, 'handle_feed_registration' ) );
@@ -128,6 +137,17 @@ class ProductSync {
 		}
 	}
 
+	/**
+	 * Initialize the FeedGenerator instance.
+	 *
+	 * @since x.x.x
+	 * @param array $locations Array of location to generate the feed files for.
+	 */
+	private static function initialize_feed_generator( $locations ) {
+		$action_scheduler          = new ActionSchedulerProxy();
+		$local_feed_configurations = new LocalFeedConfigs( $locations );
+		self::$feed_generator      = new FeedGenerator( $action_scheduler, $local_feed_configurations );
+	}
 
 	/**
 	 * Deletes the XML file that is configured in the settings and deletes the feed_job option.
