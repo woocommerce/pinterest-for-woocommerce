@@ -24,7 +24,9 @@ class FeedGenerator extends AbstractChainedJob {
 	use BatchQueryOffset;
 
 	/**
-	 * @var array of local feed configurations;
+	 * Local Feed Configurations class.
+	 *
+	 * @var LocalFeedConfigs of local feed configurations;
 	 */
 	private $local_feeds_configurations;
 
@@ -32,26 +34,27 @@ class FeedGenerator extends AbstractChainedJob {
 	 * FeedGenerator initialization.
 	 *
 	 * @since x.x.x
-	 * @param ActionSchedulerInterface $action_scheduler  Action Scheduler proxy.
-	 * @param LocalFeedConfigs         $locations_configs Locations configuration class.
+	 * @param ActionSchedulerInterface $action_scheduler           Action Scheduler proxy.
+	 * @param LocalFeedConfigs         $local_feeds_configurations Locations configuration class.
 	 */
-	public function __construct( ActionSchedulerInterface $action_scheduler, $locations_configs ) {
+	public function __construct( ActionSchedulerInterface $action_scheduler, $local_feeds_configurations ) {
 		parent::__construct( $action_scheduler );
-		$this->local_feeds_configurations = $locations_configs;
+		$this->local_feeds_configurations = $local_feeds_configurations;
 	}
 
 	/**
 	 * Runs before starting the job.
 	 */
 	protected function handle_start() {
-		// Optionally do something when starting the job.
+		$this->prepare_temporary_files();
 	}
 
 	/**
 	 * Runs after the finishing the job.
 	 */
 	protected function handle_end() {
-		// Optionally do something when ending the job.
+		$this->add_footer_to_temporary_feed_files();
+		$this->rename_temporary_feed_files_to_final();
 	}
 
 	/**
@@ -81,18 +84,6 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
-	 * Process a single item.
-	 *
-	 * @param string|int|array $item A single item from the get_items_for_batch() method.
-	 * @param array            $args The args for the job.
-	 *
-	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
-	 */
-	protected function process_item( $item, array $args ) {
-		// Process each item here.
-	}
-
-	/**
 	 * Get the name/slug of the job.
 	 *
 	 * @return string
@@ -107,7 +98,71 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @return string
 	 */
 	public function get_plugin_name(): string {
-		return 'facebook_for_woocommerce';
+		return 'pinterest';
 	}
 
+	/**
+	 * Prepare a fresh temporary file for each local configuration.
+	 */
+	public function prepare_temporary_files(): void {
+		foreach ( $this->local_feeds_configurations->get_configurations() as $config ) {
+			$bytes_written = file_put_contents(
+				$config['tmp_file'],
+				ProductsXmlFeed::get_xml_header()
+			);
+
+			if ( false === $bytes_written ) {
+				// Add debug loggign
+			}
+		}
+	}
+
+	public function add_footer_to_temporary_feed_files(): void {
+		foreach ( $this->local_feeds_configurations->get_configurations() as $config ) {
+			$bytes_written = file_put_contents(
+				$config['tmp_file'],
+				ProductsXmlFeed::get_xml_footer(),
+				FILE_APPEND
+			);
+
+			if ( false === $bytes_written ) {
+				// Add debug loggign
+			}
+		}
+	}
+
+	public function rename_temporary_feed_files_to_final(): void {
+		foreach ( $this->local_feeds_configurations->get_configurations() as $config ) {
+			rename( $config['tmp_file'], $config['feed_file'] );
+			// Check success and add logging.
+		}
+	}
+
+	private function write_to_each_temporary_files( $function, $flags = 0 ): void {
+		foreach ( $this->local_feeds_configurations->get_configurations() as $config ) {
+			$bytes_written = file_put_contents(
+				$config['tmp_file'],
+				$function(),
+				$flags
+			);
+
+			if ( false === $bytes_written ) {
+				// Add debug loggign
+			}
+		}
+	}
+
+	/**
+	 * Not used.
+	 * Process a single item. Added to satisfy abstract interface definition in the framework.
+	 * We use process_items instead.
+	 *
+	 * @param string|int|array $item A single item from the get_items_for_batch() method.
+	 * @param array            $args The args for the job.
+	 *
+	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
+	 */
+	protected function process_item( $item, array $args ) {
+		// Process each item here.
+	}
 }

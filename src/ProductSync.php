@@ -93,6 +93,13 @@ class ProductSync {
 		add_action( self::ACTION_HANDLE_SYNC, array( __CLASS__, 'handle_feed_registration' ) );
 		add_action( self::ACTION_FEED_GENERATION, array( __CLASS__, 'handle_feed_generation' ) );
 
+		add_action( 'pinterest-feed-start', array( __CLASS__, 'start_feed_generator' ) );
+
+		if ( false === as_next_scheduled_action( 'pinterest-feed-start', array() ) ) {
+			$interval = 10 * MINUTE_IN_SECONDS;
+			as_schedule_recurring_action( time() + $interval, $interval, 'pinterest-feed-start' );
+		}
+
 		if ( self::is_product_sync_enabled() ) {
 
 			// Schedule the main feed control task.
@@ -147,6 +154,7 @@ class ProductSync {
 		$action_scheduler          = new ActionSchedulerProxy();
 		$local_feed_configurations = new LocalFeedConfigs( $locations );
 		self::$feed_generator      = new FeedGenerator( $action_scheduler, $local_feed_configurations );
+		self::$feed_generator->init();
 	}
 
 	/**
@@ -745,5 +753,13 @@ class ProductSync {
 	public static function cancel_jobs() {
 		as_unschedule_all_actions( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		as_unschedule_all_actions( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+	}
+
+	public static function start_feed_generator() {
+		// START: New feed generator entry point.
+		if ( ! self::$feed_generator->is_running() ) {
+			self::$feed_generator->queue_start();
+		}
+		// END: New feed generator entry point.
 	}
 }

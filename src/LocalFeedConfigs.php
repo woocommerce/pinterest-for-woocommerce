@@ -72,4 +72,11 @@ class LocalFeedConfigs {
 		);
 		$this->feeds_configurations = $feed_ids;
 	}
+
+	/**
+	 * Fetch local feed configurations;
+	 */
+	public function get_configurations() {
+		return $this->feeds_configurations;
+	}
 }
