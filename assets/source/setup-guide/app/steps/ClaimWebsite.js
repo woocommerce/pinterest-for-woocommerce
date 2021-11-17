@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@woocommerce/components';
-import { recordEvent } from '@woocommerce/tracks';
 import {
 	Button,
 	Card,
@@ -24,6 +23,7 @@ import {
 	useSettingsDispatch,
 	useCreateNotice,
 } from '../helpers/effects';
+import documentationLinkProps from '../helpers/documentation-link-props';
 
 const StaticError = ( { reqError } ) => {
 	if ( reqError?.data?.pinterest_code === undefined ) {
@@ -147,19 +147,14 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 						description={ __(
 							'Claim your website to get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of your content.'
 						) }
-						readMore={ {
+						readMore={ documentationLinkProps( {
 							href:
 								wcSettings.pinterest_for_woocommerce
 									.pinterestLinks.claimWebsite,
-							onClick: () =>
-								recordEvent( 'pfw_documentation_link_click', {
-									link_id: 'claim-website',
-									context: 'claim-website',
-									href:
-										wcSettings.pinterest_for_woocommerce
-											.pinterestLinks.claimWebsite,
-								} ),
-						} }
+							linkId: 'claim-website',
+							context: 'claim-website',
+							rel: false,
+						} ) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
