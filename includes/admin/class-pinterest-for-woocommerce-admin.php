@@ -9,10 +9,10 @@
 use Automattic\WooCommerce\Admin\Features\Features;
 use Automattic\WooCommerce\Admin\Features\Navigation\Menu;
 use Automattic\WooCommerce\Admin\Features\Navigation\Screen;
-use Automattic\WooCommerce\Admin\Features\Onboarding;
 use Automattic\WooCommerce\Admin\Loader;
 use Automattic\WooCommerce\Blocks\Package;
 use Automattic\WooCommerce\Blocks\Assets\AssetDataRegistry;
+use Automattic\WooCommerce\Pinterest\Compat;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -251,7 +251,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				return;
 			}
 
-			if ( Onboarding::should_show_tasks() ) {
+			if ( Compat::should_show_tasks() ) {
 
 				$build_path = '/assets/setup-task';
 
@@ -339,7 +339,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			if (
 				! class_exists( Loader::class ) ||
 				! Loader::is_admin_page() ||
-				! Onboarding::should_show_tasks()
+				! Compat::should_show_tasks()
 			) {
 				return $registered_tasks_list_items;
 			}
@@ -398,6 +398,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'createAdvertiser'       => 'https://help.pinterest.com/en/business/article/create-an-advertiser-account',
 					'adGuidelines'           => 'https://policy.pinterest.com/en/advertising-guidelines',
 					'adDataTerms'            => 'https://policy.pinterest.com/en/ad-data-terms',
+					'merchantGuidelines'     => 'https://policy.pinterest.com/en/merchant-guidelines',
 					'convertToBusinessAcct'  => 'https://help.pinterest.com/en/business/article/get-a-business-account#section-15096',
 					'appealDeclinedMerchant' => 'https://www.pinterest.com/product-catalogs/data-source/?showModal=true',
 				),
