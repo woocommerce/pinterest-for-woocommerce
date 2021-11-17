@@ -124,11 +124,11 @@ const SetupAccount = ( {
 						}
 						description={ createInterpolateElement(
 							__(
-								'Set up a free Pinterest business account to get access to analytics on your Pins and the ability to run ads. This requires agreeing to the <a>Pinterest advertising guidelines</a>.',
+								'Set up a free Pinterest business account to get access to analytics on your Pins and the ability to run ads. This requires agreeing to our <adGuidelinesLink>advertising guidelines</adGuidelinesLink> and following our <merchantGuidelinesLink>merchant guidelines</merchantGuidelinesLink>.',
 								'pinterest-for-woocommerce'
 							),
 							{
-								a: (
+								adGuidelinesLink: (
 									// Disabling no-content rule - content is interpolated from above string.
 									// eslint-disable-next-line jsx-a11y/anchor-has-content
 									<a
@@ -152,6 +152,19 @@ const SetupAccount = ( {
 												}
 											)
 										}
+									/>
+								),
+								merchantGuidelinesLink: (
+									// Disabling no-content rule - content is interpolated from above string.
+									// eslint-disable-next-line jsx-a11y/anchor-has-content
+									<a
+										href={
+											wcSettings.pinterest_for_woocommerce
+												.pinterestLinks
+												.merchantGuidelines
+										}
+										target="_blank"
+										rel="noreferrer"
 									/>
 								),
 							}
