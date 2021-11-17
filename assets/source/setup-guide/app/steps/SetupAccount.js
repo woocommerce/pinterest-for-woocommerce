@@ -40,6 +40,7 @@ import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
  * @fires wcadmin_pfw_account_create_button_click
  * @fires wcadmin_pfw_account_convert_button_click
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-guidelines', context: 'setup-account' }`
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'merchant-guidelines', context: 'setup-account' }`
  *
  * @param {Object} props React props
  * @param {Function} props.goToNextStep
@@ -165,6 +166,21 @@ const SetupAccount = ( {
 										}
 										target="_blank"
 										rel="noreferrer"
+										onClick={ () =>
+											recordEvent(
+												'pfw_documentation_link_click',
+												{
+													link_id:
+														'merchant-guidelines',
+													context: 'setup-account',
+													href:
+														wcSettings
+															.pinterest_for_woocommerce
+															.pinterestLinks
+															.merchantGuidelines,
+												}
+											)
+										}
 									/>
 								),
 							}
