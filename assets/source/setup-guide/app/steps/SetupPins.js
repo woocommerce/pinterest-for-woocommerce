@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Spinner } from '@woocommerce/components';
 import {
-	Button,
+	Tooltip,
 	Card,
 	CardBody,
 	CheckboxControl,
@@ -21,6 +21,14 @@ import {
 	useSettingsDispatch,
 	useCreateNotice,
 } from '../helpers/effects';
+
+function HelpTooltip( { text } ) {
+	return (
+		<Tooltip position="top center" text={ text }>
+			<Icon icon="editor-help" />
+		</Tooltip>
+	);
+}
 
 const SetupPins = ( {} ) => {
 	const appSettings = useSettingsSelect();
@@ -78,6 +86,14 @@ const SetupPins = ( {} ) => {
 											'Track conversions',
 											'pinterest-for-woocommerce'
 										) }
+										help={
+											<HelpTooltip
+												text={ __(
+													'Gather analytics for Pins you publish and Pins users create from your site.',
+													'pinterest-for-woocommerce'
+												) }
+											/>
+										}
 										checked={
 											appSettings.track_conversions
 										}
@@ -94,18 +110,12 @@ const SetupPins = ( {} ) => {
 											'pinterest-for-woocommerce'
 										) }
 										help={
-											<Button
-												isLink
-												href={
-													wcSettings
-														.pinterest_for_woocommerce
-														.pinterestLinks
-														.enhancedMatch
-												}
-												target="_blank"
-											>
-												<Icon icon="editor-help" />
-											</Button>
+											<HelpTooltip
+												text={ __(
+													'Matches conversion data with the person responsible for the conversion and lets you track cross-device checkouts.',
+													'pinterest-for-woocommerce'
+												) }
+											/>
 										}
 										checked={
 											appSettings.enhanced_match_support
@@ -131,6 +141,14 @@ const SetupPins = ( {} ) => {
 											'Add Rich Pins for Products',
 											'pinterest-for-woocommerce'
 										) }
+										help={
+											<HelpTooltip
+												text={ __(
+													'Automatically create and update rich pins on Pinterest for all synced products.',
+													'pinterest-for-woocommerce'
+												) }
+											/>
+										}
 										checked={
 											appSettings.rich_pins_on_products
 										}
@@ -146,6 +164,14 @@ const SetupPins = ( {} ) => {
 											'Add Rich Pins for Posts',
 											'pinterest-for-woocommerce'
 										) }
+										help={
+											<HelpTooltip
+												text={ __(
+													'Automatically create and update rich pins on Pinterest for posts.',
+													'pinterest-for-woocommerce'
+												) }
+											/>
+										}
 										checked={
 											appSettings.rich_pins_on_posts
 										}
@@ -170,6 +196,14 @@ const SetupPins = ( {} ) => {
 											'Save to Pinterest',
 											'pinterest-for-woocommerce'
 										) }
+										help={
+											<HelpTooltip
+												text={ __(
+													'Adds a ‘Save’ button on images allowing customers to save things straight from your website to Pinterest.',
+													'pinterest-for-woocommerce'
+												) }
+											/>
+										}
 										checked={
 											appSettings.save_to_pinterest
 										}
