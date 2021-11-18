@@ -19,7 +19,7 @@ import { recordEvent } from '@woocommerce/tracks';
  *
  * Sets `target="_blank" rel="noreferrer"` and onClick handler that fires track event.
  *
- * @fires pfw_documentation_link_click on click, with given `linkId` and `context`.
+ * @fires wcadmin_pfw_documentation_link_click on click, with given `linkId` and `context`.
  *
  * @param {Object} props React props.
  * @param {string} props.href Href to used by link and in track event.
