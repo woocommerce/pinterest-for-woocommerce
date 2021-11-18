@@ -57,6 +57,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	protected function handle_start() {
 		$this->prepare_temporary_files();
+		ProductFeedStatus::set( array( 'status' => 'in_progress' ) );
 	}
 
 	/**
@@ -65,6 +66,7 @@ class FeedGenerator extends AbstractChainedJob {
 	protected function handle_end() {
 		$this->add_footer_to_temporary_feed_files();
 		$this->rename_temporary_feed_files_to_final();
+		ProductFeedStatus::set( array( 'status' => 'generated' ) );
 	}
 
 	/**

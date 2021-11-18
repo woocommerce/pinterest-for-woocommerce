@@ -220,7 +220,7 @@ class ProductSync {
 			);
 
 			try {
-				$registered = self::register_feed( $feed_args );
+				$registered = self::register_feed( $feed_args, $location );
 
 				if ( $registered ) {
 					return true;
@@ -301,7 +301,7 @@ class ProductSync {
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
-	private static function register_feed( $feed_args ) {
+	private static function register_feed( $feed_args, $location ) {
 
 		// Get merchant object.
 		$merchant   = Merchants::get_merchant( $feed_args );
@@ -359,8 +359,9 @@ class ProductSync {
 				$registered = self::do_add_merchant_feed( $merchant['data']->id, $feed_args );
 			}
 		}
-
-		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $registered );
+		$feeds              = Pinterest_For_Woocommerce()::get_data( 'feed_registered' ) ?? array();
+		$feeds[ $location ] = $registered;
+		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $feeds );
 
 		return $registered;
 	}
@@ -437,10 +438,9 @@ class ProductSync {
 	}
 
 	public static function start_feed_generator() {
-		// START: New feed generator entry point.
 		if ( ! self::$feed_generator->is_running() ) {
 			self::$feed_generator->queue_start();
 		}
-		// END: New feed generator entry point.
+		ProductFeedStatus::set( array( 'status' => 'scheduled_for_generation' ) );
 	}
 }
