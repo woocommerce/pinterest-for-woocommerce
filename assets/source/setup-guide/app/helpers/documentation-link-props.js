@@ -27,7 +27,7 @@ import { recordEvent } from '@woocommerce/tracks';
  * @param {string} props.context Forwarded to {@link wcadmin_pfw_documentation_link_click}
  * @param {string} [props.target='_blank']
  * @param {string} [props.rel='noreferrer']
- * @param {Function} props.onClick
+ * @param {Function} [props.onClick]
  * @param {...import('react').AnchorHTMLAttributes} props.props
  */
 export default function documentationLinkProps( {
