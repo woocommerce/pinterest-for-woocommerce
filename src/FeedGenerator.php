@@ -28,7 +28,16 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @var LocalFeedConfigs of local feed configurations;
 	 */
-	private $local_feeds_configurations;
+	private $configurations;
+
+
+	/**
+	 * Location buffers. On buffer for each local feed configuration.
+	 * We write to a buffer to limit the number disk writes.
+	 *
+	 * @var array $buffers Array of feed buffers.
+	 */
+	private $buffers = array();
 
 	/**
 	 * FeedGenerator initialization.
@@ -39,7 +48,8 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	public function __construct( ActionSchedulerInterface $action_scheduler, $local_feeds_configurations ) {
 		parent::__construct( $action_scheduler );
-		$this->local_feeds_configurations = $local_feeds_configurations;
+		$this->configurations = $local_feeds_configurations;
+		$this->prepare_feed_buffers( $local_feeds_configurations );
 	}
 
 	/**
@@ -69,18 +79,66 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
 	 */
 	protected function get_items_for_batch( int $batch_number, array $args ): array {
-		$product_args = [
-			'fields'         => 'ids',
-			'post_status'    => 'publish',
-			'post_type'      => [ 'product', 'product_variation' ],
-			'posts_per_page' => $this->get_batch_size(),
-			'offset'         => $this->get_query_offset( $batch_number ),
-			'orderby'        => 'ID',
-			'order'          => 'ASC',
-		];
+		global $wpdb;
 
-		$query = new WP_Query( $product_args );
-		return $query->posts;
+		$product_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT post.ID
+				FROM {$wpdb->posts} as post
+				LEFT JOIN {$wpdb->posts} as parent ON post.post_parent = parent.ID
+				WHERE
+					( post.post_type = 'product_variation' AND parent.post_status = 'publish' )
+				OR
+					( post.post_type = 'product' AND post.post_status = 'publish' )
+				ORDER BY post.ID ASC
+				LIMIT %d OFFSET %d",
+				$this->get_batch_size(),
+				$this->get_query_offset( $batch_number )
+			)
+		);
+
+		return array_map( 'intval', $product_ids );
+	}
+
+	/**
+	 * Processes a batch of items.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array $items The items of the current batch.
+	 * @param array $args  The args for the job.
+	 *
+	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
+	 */
+	protected function process_items( array $items, array $args ) {
+		$excluded_product_types = apply_filters(
+			'pinterest_for_woocommerce_excluded_product_types',
+			array(
+				'grouped',
+			)
+		);
+
+		$types = array_diff( array_merge( array_keys( wc_get_product_types() ) ), $excluded_product_types );
+
+		$products = wc_get_products(
+			array(
+				'type'    => $types,
+				'include' => $items,
+				'orderby' => 'none',
+				'limit'   => $this->get_batch_size(),
+			)
+		);
+
+		array_walk(
+			$products,
+			function ( $product ) {
+				foreach ( $this->get_locations() as $location ) {
+					$this->buffers[ $location ] .= ProductsXmlFeed::get_xml_item( $product, $location );
+				}
+			}
+		);
+
+		$this->write_bufferrs_to_temp_files();
 	}
 
 	/**
@@ -105,7 +163,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Prepare a fresh temporary file for each local configuration.
 	 */
 	public function prepare_temporary_files(): void {
-		foreach ( $this->local_feeds_configurations->get_configurations() as $config ) {
+		foreach ( $this->configurations->get_configurations() as $config ) {
 			$bytes_written = file_put_contents(
 				$config['tmp_file'],
 				ProductsXmlFeed::get_xml_header()
@@ -118,7 +176,7 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	public function add_footer_to_temporary_feed_files(): void {
-		foreach ( $this->local_feeds_configurations->get_configurations() as $config ) {
+		foreach ( $this->configurations->get_configurations() as $config ) {
 			$bytes_written = file_put_contents(
 				$config['tmp_file'],
 				ProductsXmlFeed::get_xml_footer(),
@@ -132,14 +190,14 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	public function rename_temporary_feed_files_to_final(): void {
-		foreach ( $this->local_feeds_configurations->get_configurations() as $config ) {
+		foreach ( $this->configurations->get_configurations() as $config ) {
 			rename( $config['tmp_file'], $config['feed_file'] );
 			// Check success and add logging.
 		}
 	}
 
 	private function write_to_each_temporary_files( $function, $flags = 0 ): void {
-		foreach ( $this->local_feeds_configurations->get_configurations() as $config ) {
+		foreach ( $this->configurations->get_configurations() as $config ) {
 			$bytes_written = file_put_contents(
 				$config['tmp_file'],
 				$function(),
@@ -150,6 +208,45 @@ class FeedGenerator extends AbstractChainedJob {
 				// Add debug loggign
 			}
 		}
+	}
+
+	private function write_bufferrs_to_temp_files() {
+		foreach ( $this->configurations->get_configurations() as $location => $config ) {
+			$bytes_written = file_put_contents(
+				$config['tmp_file'],
+				$this->buffers[ $location ],
+				FILE_APPEND
+			);
+
+			if ( false === $bytes_written ) {
+				// Add debug loggign
+			}
+		}
+	}
+
+	/**
+	 * Create empty string buffers for
+	 */
+	private function prepare_feed_buffers( $local_feed_configurations ) {
+		foreach ( $this->get_locations() as $location ) {
+			$this->buffers[ $location ] = '';
+		}
+	}
+
+	/**
+	 * Fetch supported locations.
+	 */
+	private function get_locations() {
+		return array_keys( $this->configurations->get_configurations() );
+	}
+
+	/**
+	 * Get the job's batch size.
+	 *
+	 * @return int
+	 */
+	protected function get_batch_size(): int {
+		return 100;
 	}
 
 	/**

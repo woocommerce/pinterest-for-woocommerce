@@ -63,11 +63,11 @@ class ProductsXmlFeed {
 	/**
 	 * Returns the Item's XML for the given product.
 	 *
-	 * @param WC_Product $product The product to print the XML for.
-	 *
+	 * @param WC_Product $product  The product to print the XML for.
+	 * @param string     $location The location to print the XML for.
 	 * @return string
 	 */
-	public static function get_xml_item( $product ) {
+	public static function get_xml_item( $product, $location ) {
 
 		$xml = "\t\t<item>" . PHP_EOL;
 
