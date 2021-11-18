@@ -21,6 +21,16 @@ import {
  */
 import PrelaunchNotice from '../../../components/prelaunch-notice';
 
+const tosHref = 'https://business.pinterest.com/business-terms-of-service/';
+
+/**
+ * Welcome Section Card.
+ * To be used in getting started page.
+ *
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
+ *
+ * @return {JSX.Element} Rendered element.
+ */
 const WelcomeSection = () => {
 	return (
 		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__welcome-section">
@@ -70,9 +80,19 @@ const WelcomeSection = () => {
 									// Disabling no-content rule - content is interpolated from above string.
 									// eslint-disable-next-line jsx-a11y/anchor-has-content
 									<a
-										href="https://business.pinterest.com/business-terms-of-service/"
+										href={ tosHref }
 										target="_blank"
 										rel="noreferrer"
+										onClick={ () =>
+											recordEvent(
+												'pfw_documentation_link_click',
+												{
+													link_id: 'terms-of-service',
+													context: 'welcome-section',
+													href: tosHref,
+												}
+											)
+										}
 									/>
 								),
 							}

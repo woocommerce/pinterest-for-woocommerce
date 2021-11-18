@@ -116,3 +116,15 @@ addFilter(
 		return pages;
 	}
 );
+
+// List of typedefs and events used across the plugin.
+
+/**
+ * Clicking on an external documentation link.
+ *
+ * @event wcadmin_pfw_documentation_link_click
+ *
+ * @property {string} link_id Identifier of the link.
+ * @property {string} context What action was initiated.
+ * @property {string} href Href to which the user was navigated to.
+ */

@@ -22,12 +22,12 @@ Clicking on "Connect" Pinterest account button.
 ### [`wcadmin_pfw_account_convert_button_click`](assets/source/setup-guide/app/steps/SetupAccount.js#L31)
 Clicking on "… convert your personal account" button.
 #### Emitters
-- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L51)
+- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L53)
 
 ### [`wcadmin_pfw_account_create_button_click`](assets/source/setup-guide/app/steps/SetupAccount.js#L26)
 Clicking on "… create a new Pinterest account" button.
 #### Emitters
-- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L51)
+- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L53)
 
 ### [`wcadmin_pfw_account_disconnect_button_click`](assets/source/setup-guide/app/components/Account/Connection.js#L42)
 Clicking on "Disconnect" Pinterest account button during account setup.
@@ -44,7 +44,27 @@ Clicking on "Create business account" button.
 #### Emitters
 - [`BusinessAccountSelection`](assets/source/setup-guide/app/components/Account/BusinessAccountSelection.js#L40)
 
-### [`wcadmin_pfw_get_started_faq`](assets/source/setup-guide/app/views/LandingPageApp.js#L193)
+### [`wcadmin_pfw_documentation_link_click`](assets/source/setup-guide/index.js#L122)
+Clicking on an external documentation link.
+#### Properties
+|   |   |   |
+|---|---|---|
+`link_id` | `string` | Identifier of the link.
+`context` | `string` | What action was initiated.
+`href` | `string` | Href to which the user was navigated to.
+#### Emitters
+- [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L57) with `{ link_id: 'claim-website', context: 'claim-website' }`
+- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L53)
+	- with `{ link_id: 'ad-guidelines', context: 'setup-account' }`
+	- with `{ link_id: 'merchant-guidelines', context: 'setup-account' }`
+- [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L50)
+	- with `{ link_id: 'ad-guidelines', context: 'wizard'|'settings' }`
+	- with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
+	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
+	- with `{ link_id: 'setup-tracking', context: 'wizard'|'settings' }`
+- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L34) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
+
+### [`wcadmin_pfw_get_started_faq`](assets/source/setup-guide/app/views/LandingPageApp.js#L213)
 Clicking on getting started page faq item to collapse or expand it.
 #### Properties
 |   |   |   |
@@ -52,7 +72,7 @@ Clicking on getting started page faq item to collapse or expand it.
 `action` | `string` | `'expand' \| 'collapse'` What action was initiated.
 `question_id` | `string` | Identifier of the clicked question.
 #### Emitters
-- [`FaqQuestion`](assets/source/setup-guide/app/views/LandingPageApp.js#L212) whenever the FAQ is toggled.
+- [`FaqQuestion`](assets/source/setup-guide/app/views/LandingPageApp.js#L232) whenever the FAQ is toggled.
 
 <!---
 End of `woo-tracking-jsdoc`-generated content.

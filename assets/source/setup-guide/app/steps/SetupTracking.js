@@ -11,6 +11,7 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@woocommerce/components';
 import { getNewPath } from '@woocommerce/navigation';
+import { recordEvent } from '@woocommerce/tracks';
 import {
 	Button,
 	Card,
@@ -31,7 +32,22 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
-const SetupTracking = ( { view } ) => {
+/**
+ * Tracking setup component.
+ *
+ * To be used in onboarding stepper.
+ *
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-guidelines', context: 'wizard'|'settings' }`
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'setup-tracking', context: 'wizard'|'settings' }`
+ *
+ *
+ * @param {Object} props React props.
+ * @param {string} [props.view='settings'] `'wizard'|'settings'` Kind of view to render.
+ * @return {JSX.Element} rendered component
+ */
+const SetupTracking = ( { view = 'settings' } ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isFetching, setIsFetching ] = useState( false );
 	const [ status, setStatus ] = useState( 'idle' );
@@ -307,6 +323,20 @@ const SetupTracking = ( { view } ) => {
 											.pinterestLinks.adGuidelines
 									}
 									target="_blank"
+									onClick={ () =>
+										recordEvent(
+											'pfw_documentation_link_click',
+											{
+												link_id: 'ad-guidelines',
+												context: view,
+												href:
+													wcSettings
+														.pinterest_for_woocommerce
+														.pinterestLinks
+														.adGuidelines,
+											}
+										)
+									}
 								>
 									{ __(
 										'Ad Guidelines',
@@ -321,6 +351,20 @@ const SetupTracking = ( { view } ) => {
 											.pinterestLinks.adDataTerms
 									}
 									target="_blank"
+									onClick={ () =>
+										recordEvent(
+											'pfw_documentation_link_click',
+											{
+												link_id: 'ad-data-terms',
+												context: view,
+												href:
+													wcSettings
+														.pinterest_for_woocommerce
+														.pinterestLinks
+														.adDataTerms,
+											}
+										)
+									}
 								>
 									{ __(
 										'Ad Data Terms',
@@ -329,10 +373,19 @@ const SetupTracking = ( { view } ) => {
 								</Button>
 							</>
 						}
-						link={
-							wcSettings.pinterest_for_woocommerce.pinterestLinks
-								.SetupTracking
-						}
+						readMore={ {
+							href:
+								wcSettings.pinterest_for_woocommerce
+									.pinterestLinks.SetupTracking,
+							onClick: () =>
+								recordEvent( 'pfw_documentation_link_click', {
+									link_id: 'setup-tracking',
+									context: view,
+									href:
+										wcSettings.pinterest_for_woocommerce
+											.pinterestLinks.SetupTracking,
+								} ),
+						} }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
@@ -450,6 +503,21 @@ const SetupTracking = ( { view } ) => {
 																	.terms_url
 															}
 															target="_blank"
+															onClick={ () =>
+																recordEvent(
+																	'pfw_documentation_link_click',
+																	{
+																		link_id:
+																			'ad-terms-of-service',
+																		context: view,
+																		href:
+																			wcSettings
+																				.pinterest_for_woocommerce
+																				.countryTos
+																				.terms_url,
+																	}
+																)
+															}
 														></Button>
 													),
 												}

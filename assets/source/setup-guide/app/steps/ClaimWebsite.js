@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@woocommerce/components';
+import { recordEvent } from '@woocommerce/tracks';
 import {
 	Button,
 	Card,
@@ -42,6 +43,17 @@ const StaticError = ( { reqError } ) => {
 	);
 };
 
+/**
+ * Claim Website step component.
+ *
+ * To be used in onboarding setup stepper.
+ *
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'claim-website', context: 'claim-website' }`
+ * @param {Object} props React props.
+ * @param {Function} props.goToNextStep
+ * @param {string} props.view
+ * @return {JSX.Element} Rendered component.
+ */
 const ClaimWebsite = ( { goToNextStep, view } ) => {
 	const [ status, setStatus ] = useState( 'idle' );
 	const [ reqError, setReqError ] = useState();
@@ -135,10 +147,19 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 						description={ __(
 							'Claim your website to get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of your content.'
 						) }
-						link={
-							wcSettings.pinterest_for_woocommerce.pinterestLinks
-								.claimWebsite
-						}
+						readMore={ {
+							href:
+								wcSettings.pinterest_for_woocommerce
+									.pinterestLinks.claimWebsite,
+							onClick: () =>
+								recordEvent( 'pfw_documentation_link_click', {
+									link_id: 'claim-website',
+									context: 'claim-website',
+									href:
+										wcSettings.pinterest_for_woocommerce
+											.pinterestLinks.claimWebsite,
+								} ),
+						} }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
