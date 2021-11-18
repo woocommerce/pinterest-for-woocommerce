@@ -73,6 +73,10 @@ class LocalFeedConfigs {
 		$this->feeds_configurations = $feed_ids;
 	}
 
+	private function cleanup_local_feed_configs() {
+		Pinterest_For_Woocommerce()::save_data( 'local_feed_ids', false );
+	}
+
 	/**
 	 * Fetch local feed configurations;
 	 */

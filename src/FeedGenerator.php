@@ -196,6 +196,18 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 	}
 
+	public function remove_temporary_feed_files(): void {
+		foreach ( $this->configurations->get_configurations() as $config ) {
+			if ( isset( $config['feed_file'] ) && file_exists( $config['feed_file'] ) ) {
+				unlink( $config['feed_file'] );
+			}
+
+			if ( isset( $config['tmp_file'] ) && file_exists( $config['tmp_file'] ) ) {
+				unlink( $config['tmp_file'] );
+			}
+		}
+	}
+
 	private function write_to_each_temporary_files( $function, $flags = 0 ): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
 			$bytes_written = file_put_contents(
@@ -222,6 +234,14 @@ class FeedGenerator extends AbstractChainedJob {
 				// Add debug loggign
 			}
 		}
+	}
+
+	private function check_if_feed_file_exists() {
+		$config = reset( $this->configurations->get_configurations() );
+		if ( false === $config ) {
+			return false;
+		}
+		return isset( $config['feed_file'] ) && file_exists( $config['feed_file'] );
 	}
 
 	/**

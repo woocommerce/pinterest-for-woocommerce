@@ -43,7 +43,6 @@ class ProductFeedStatus {
 	 * Returns the Current state of the Feed generation job.
 	 * Status can be one of the following:
 	 *
-	 * - starting                 The feed job is being initialized.
 	 * - in_progress              Signifies that we are between iterations and generating the feed.
 	 * - generated                The feed is generated, no further action is needed, unless the feed is expired.
 	 * - scheduled_for_generation The feed is scheduled to be (re)generated. On this status, the next run of ProductSync::handle_feed_generation() will start the generation process.
@@ -54,8 +53,7 @@ class ProductFeedStatus {
 	 */
 	public static function get() {
 
-		$local_feed  = self::get_local_feed();
-		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_' . $local_feed['feed_id'] . '_';
+		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feeds_';
 
 		foreach ( self::STATE_PROPS as $key => $default_value ) {
 
@@ -82,8 +80,7 @@ class ProductFeedStatus {
 	 */
 	public static function set( $state ) {
 
-		$local_feed  = self::get_local_feed();
-		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_' . $local_feed['feed_id'] . '_';
+		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feeds_';
 
 		$state['last_activity'] = time();
 
@@ -106,10 +103,7 @@ class ProductFeedStatus {
 	 * @return bool True if the value was set, false otherwise.
 	 */
 	public static function store_dataset( $dataset ) {
-
-		$local_feed = self::get_local_feed();
-
-		return set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $local_feed['feed_id'], $dataset, WEEK_IN_SECONDS );
+		return set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset', $dataset, WEEK_IN_SECONDS );
 	}
 
 	/**
@@ -118,10 +112,7 @@ class ProductFeedStatus {
 	 * @return mixed Value of transient.
 	 */
 	public static function retrieve_dataset() {
-
-		$local_feed = self::get_local_feed();
-
-		return get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $local_feed['feed_id'] );
+		return get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset' );
 	}
 
 
@@ -131,70 +122,22 @@ class ProductFeedStatus {
 	 * @return void
 	 */
 	public static function feed_data_cleanup() {
-
-		$local_feed = self::get_local_feed();
-
-		delete_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $local_feed['feed_id'] );
+		delete_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset' );
 	}
-
-
-	/**
-	 * Initialize the feed parameters based on the stored feed_id.
-	 * If no feed_id is stored, create a new one.
-	 *
-	 * @return void
-	 */
-	private static function init_local_feed() {
-
-		$feed_id = Pinterest_For_Woocommerce()::get_data( 'local_feed_id' );
-
-		if ( ! $feed_id ) {
-			$feed_id = wp_generate_password( 6, false, false );
-			Pinterest_For_Woocommerce()::save_data( 'local_feed_id', $feed_id );
-		}
-
-		$upload_dir = wp_get_upload_dir();
-
-		// Generate on the fly. That way the path/Urls follow the current site location.
-		self::$local_feed = array(
-			'feed_id'   => $feed_id,
-			'feed_file' => trailingslashit( $upload_dir['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-' . $feed_id . '.xml',
-			'tmp_file'  => trailingslashit( $upload_dir['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-' . $feed_id . '-tmp.xml',
-			'feed_url'  => trailingslashit( $upload_dir['baseurl'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-' . $feed_id . '.xml',
-		);
-	}
-
-
-	/**
-	 * Return the array holding the local feed properties.
-	 *
-	 * @return array
-	 */
-	public static function get_local_feed() {
-
-		if ( empty( self::$local_feed ) ) {
-			self::init_local_feed();
-		}
-
-		return self::$local_feed;
-	}
-
 
 	/**
 	 * Removes all transients for the given feed_id.
 	 *
-	 * @param string $feed_id The ID of the feed to cleanup transients for.
-	 *
 	 * @return void
 	 */
-	public static function feed_transients_cleanup( $feed_id ) {
+	public static function feed_transients_cleanup() {
 
-		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_' . $feed_id . '_';
+		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feeds_';
 
 		foreach ( self::STATE_PROPS as $key => $default_value ) {
 			delete_transient( $data_prefix . $key );
 		}
 
-		delete_transient( 'pinterest-for-woocommerce_feed_dataset_' . $feed_id );
+		delete_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset' );
 	}
 }

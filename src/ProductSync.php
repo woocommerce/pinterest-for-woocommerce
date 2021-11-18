@@ -17,8 +17,7 @@ use \Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler 
  */
 class ProductSync {
 
-	const ACTION_HANDLE_SYNC     = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-handle-sync';
-	const ACTION_FEED_GENERATION = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-feed-generation';
+	const ACTION_HANDLE_SYNC = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-handle-sync';
 
 	/**
 	 * The time in seconds to consider the feed expired,
@@ -40,6 +39,13 @@ class ProductSync {
 	private static $feed_generator = null;
 
 	/**
+	 * Local Feed Configurations class.
+	 *
+	 * @var LocalFeedConfigs of local feed configurations;
+	 */
+	private static $configurations = null;
+
+	/**
 	 * Initiate class.
 	 */
 	public static function maybe_init() {
@@ -50,11 +56,10 @@ class ProductSync {
 
 		$locations = array( Pinterest_For_Woocommerce()::get_base_country() ?? 'US' ); // Replace with multiple countries array for multiple feed config.
 		// Start Feed File Generator.
-		self::initialize_feed_generator( $locations );
+		self::initialize_feed_components( $locations );
 
 		// Hook the Scheduled actions.
 		add_action( self::ACTION_HANDLE_SYNC, array( __CLASS__, 'handle_feed_registration' ) );
-		add_action( self::ACTION_FEED_GENERATION, array( __CLASS__, 'handle_feed_generation' ) );
 
 		add_action( 'pinterest-feed-start', array( __CLASS__, 'start_feed_generator' ) );
 
@@ -76,11 +81,8 @@ class ProductSync {
 			$state = ProductFeedStatus::get();
 
 			if ( $state ) {
-				// If local is not generated, or needs to be regenerated, schedule regeneration.
-				if ( 'starting' === $state['status'] || 'in_progress' === $state['status'] ) {
-					self::trigger_async_feed_generation();
-				} elseif ( 'scheduled_for_generation' === $state['status'] || 'pending_config' === $state['status'] ) {
-					self::feed_reschedule();
+				if ( 'scheduled_for_generation' === $state['status'] || 'pending_config' === $state['status'] ) {
+					self::start_feed_generator();
 				}
 			}
 
@@ -113,10 +115,10 @@ class ProductSync {
 	 * @since x.x.x
 	 * @param array $locations Array of location to generate the feed files for.
 	 */
-	private static function initialize_feed_generator( $locations ) {
-		$action_scheduler          = new ActionSchedulerProxy();
-		$local_feed_configurations = new LocalFeedConfigs( $locations );
-		self::$feed_generator      = new FeedGenerator( $action_scheduler, $local_feed_configurations );
+	private static function initialize_feed_components( $locations ) {
+		$action_scheduler     = new ActionSchedulerProxy();
+		self::$configurations = new LocalFeedConfigs( $locations );
+		self::$feed_generator = new FeedGenerator( $action_scheduler, self::$configurations );
 		self::$feed_generator->init();
 	}
 
@@ -127,19 +129,10 @@ class ProductSync {
 	 */
 	public static function feed_reset() {
 
-		$local_feed = ProductFeedStatus::get_local_feed();
+		self::$feed_generator->remove_temporary_feed_files();
+		ProductFeedStatus::feed_transients_cleanup();
+		self::$configurations->cleanup_local_feed_configs();
 
-		if ( isset( $local_feed['feed_file'] ) && file_exists( $local_feed['feed_file'] ) ) {
-			unlink( $local_feed['feed_file'] );
-		}
-
-		if ( isset( $local_feed['tmp_file'] ) && file_exists( $local_feed['tmp_file'] ) ) {
-			unlink( $local_feed['tmp_file'] );
-		}
-
-		ProductFeedStatus::feed_transients_cleanup( $local_feed['feed_id'] );
-
-		Pinterest_For_Woocommerce()::save_data( 'local_feed_id', false );
 		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', false );
 
 		self::log( 'Product feed reset and files deleted.' );
@@ -154,41 +147,8 @@ class ProductSync {
 	 * @return bool
 	 */
 	public static function feed_file_exists() {
-
-		$local_feed = ProductFeedStatus::get_local_feed();
-
-		return isset( $local_feed['feed_file'] ) && file_exists( $local_feed['feed_file'] );
+		return self::$feed_generator->check_if_feed_file_exists();
 	}
-
-
-	/**
-	 * Schedules the regeneration process of the XML feed.
-	 *
-	 * @param boolean $force Forces rescheduling even when the status indicates that its not needed.
-	 *
-	 * @return void
-	 */
-	public static function feed_reschedule( $force = false ) {
-
-		$state = ProductFeedStatus::get();
-
-		if ( ! $force && isset( $state['status'] ) && in_array( $state['status'], array( 'in_progress', 'starting' ), true ) ) {
-			return;
-		}
-
-		if ( 'scheduled_for_generation' !== $state['status'] ) {
-			ProductFeedStatus::set(
-				array(
-					'status' => 'scheduled_for_generation',
-				)
-			);
-		}
-
-		if ( self::trigger_async_feed_generation( $force ) ) {
-			self::log( 'Feed generation (re)scheduled.' );
-		}
-	}
-
 
 	/**
 	 * Logs Sync related messages separately.
@@ -248,29 +208,30 @@ class ProductSync {
 			return true;
 		}
 
-		$local_feed = ProductFeedStatus::get_local_feed();
+		foreach ( self::$configurations->get_configurations() as $location => $config ) {
 
-		$feed_args = array(
-			'feed_location'             => $local_feed['feed_url'],
-			'feed_format'               => 'XML',
-			'feed_default_currency'     => get_woocommerce_currency(),
-			'default_availability_type' => 'IN_STOCK',
-			'country'                   => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
-			'locale'                    => str_replace( '_', '-', determine_locale() ),
-		);
+			$feed_args = array(
+				'feed_location'             => $config['feed_url'],
+				'feed_format'               => 'XML',
+				'feed_default_currency'     => get_woocommerce_currency(),
+				'default_availability_type' => 'IN_STOCK',
+				'country'                   => $location,
+				'locale'                    => str_replace( '_', '-', determine_locale() ),
+			);
 
-		try {
-			$registered = self::register_feed( $feed_args );
+			try {
+				$registered = self::register_feed( $feed_args );
 
-			if ( $registered ) {
-				return true;
+				if ( $registered ) {
+					return true;
+				}
+
+				throw new \Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
+
+			} catch ( \Throwable $th ) {
+				self::log( $th->getMessage(), 'error' );
+				return false;
 			}
-
-			throw new \Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
-
-		} catch ( \Throwable $th ) {
-			self::log( $th->getMessage(), 'error' );
-			return false;
 		}
 
 	}
@@ -430,7 +391,7 @@ class ProductSync {
 		if ( Pinterest_For_Woocommerce()::get_data( 'feed_dirty' ) ) {
 			Pinterest_For_Woocommerce()::save_data( 'feed_dirty', false );
 			self::log( 'Feed is dirty.' );
-			self::feed_reschedule();
+			self::start_feed_generator();
 		}
 	}
 
@@ -446,7 +407,7 @@ class ProductSync {
 
 		if ( ( 'generated' === $state['status'] && $state['last_activity'] < ( time() - self::FEED_EXPIRY ) ) ) {
 			self::log( 'Feed is expired.' );
-			self::feed_reschedule();
+			self::start_feed_generator();
 		}
 	}
 
@@ -461,7 +422,7 @@ class ProductSync {
 
 		if ( ( 'error' === $state['status'] && $state['last_activity'] < ( time() - self::WAIT_ON_ERROR_BEFORE_RETRY ) ) ) {
 			self::log( 'Retrying feed generation after error.' );
-			self::feed_reschedule();
+			self::start_feed_generator();
 		}
 	}
 
@@ -472,7 +433,7 @@ class ProductSync {
 	 */
 	public static function cancel_jobs() {
 		as_unschedule_all_actions( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		as_unschedule_all_actions( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_unschedule_all_actions( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-feed-generation', array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 	}
 
 	public static function start_feed_generator() {
