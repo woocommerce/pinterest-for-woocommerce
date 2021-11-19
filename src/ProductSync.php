@@ -615,6 +615,20 @@ class ProductSync {
 			return array();
 		}
 
+		// Do not sync products with hidden visibility
+		$visible_product_ids = array();
+		foreach ( $product_ids as $index => $product_id ) {
+			$product = wc_get_product( $product_id );
+			if ( 'hidden' !== $product->get_catalog_visibility() ) {
+				$visible_product_ids[] = $product_id;
+			}
+		}
+		$product_ids = $visible_product_ids;
+
+		if ( empty( $product_ids ) ) {
+			return array();
+		}
+
 		$products_count = count( $product_ids );
 
 		// Get Variations of the current product and inject them into our array.
