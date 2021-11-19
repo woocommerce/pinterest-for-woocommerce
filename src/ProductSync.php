@@ -20,12 +20,6 @@ class ProductSync {
 	const ACTION_HANDLE_SYNC = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-handle-sync';
 
 	/**
-	 * The time in seconds to consider the feed expired,
-	 * and schedule regeneration.
-	 */
-	const FEED_EXPIRY = DAY_IN_SECONDS;
-
-	/**
 	 * The time in seconds to wait after a failed feed generation attempt,
 	 * before attempting a retry.
 	 */
@@ -41,7 +35,7 @@ class ProductSync {
 	/**
 	 * Local Feed Configurations class.
 	 *
-	 * @var LocalFeedConfigs of local feed configurations;
+	 * @var $configurations LocalFeedConfigs
 	 */
 	private static $configurations = null;
 
@@ -76,7 +70,6 @@ class ProductSync {
 				as_schedule_recurring_action( time() + 10, $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 			}
 
-			self::reschedule_if_expired();
 			self::reschedule_if_errored();
 			$state = ProductFeedStatus::get();
 
@@ -130,8 +123,8 @@ class ProductSync {
 	public static function feed_reset() {
 
 		self::$feed_generator->remove_temporary_feed_files();
-		ProductFeedStatus::feed_transients_cleanup();
 		self::$configurations->cleanup_local_feed_configs();
+		ProductFeedStatus::feed_transients_cleanup();
 
 		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', false );
 
@@ -392,22 +385,6 @@ class ProductSync {
 		if ( Pinterest_For_Woocommerce()::get_data( 'feed_dirty' ) ) {
 			Pinterest_For_Woocommerce()::save_data( 'feed_dirty', false );
 			self::log( 'Feed is dirty.' );
-			self::start_feed_generator();
-		}
-	}
-
-
-	/**
-	 * Check if feed is expired, and reschedule feed generation.
-	 *
-	 * @return void
-	 */
-	public static function reschedule_if_expired() {
-
-		$state = ProductFeedStatus::get();
-
-		if ( ( 'generated' === $state['status'] && $state['last_activity'] < ( time() - self::FEED_EXPIRY ) ) ) {
-			self::log( 'Feed is expired.' );
 			self::start_feed_generator();
 		}
 	}
