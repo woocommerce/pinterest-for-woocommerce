@@ -602,14 +602,19 @@ class ProductSync {
 			)
 		);
 
-		$product_ids = wc_get_products(
-			array(
-				'limit'  => -1,
-				'return' => 'ids',
-				'status' => 'publish',
-				'type'   => array_diff( array_merge( array_keys( wc_get_product_types() ) ), $excluded_product_types ),
-			)
+		$products_query_args = array(
+			'limit'        => -1,
+			'return'       => 'ids',
+			'status'       => 'publish',
+			'type'         => array_diff( array_merge( array_keys( wc_get_product_types() ) ), $excluded_product_types ),
 		);
+
+		// Do not sync out of stock products if woocommerce_hide_out_of_stock_items is set
+		if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items') ) {
+			$products_query_args['stock_status'] = 'instock';
+		}
+
+		$product_ids = wc_get_products( $products_query_args );
 
 		if ( empty( $product_ids ) ) {
 			return array();
