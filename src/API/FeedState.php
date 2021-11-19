@@ -167,10 +167,6 @@ class FeedState extends VendorAPI {
 		$extra_info = '';
 
 		switch ( $state['status'] ) {
-			case 'starting':
-				$status       = 'pending';
-				$status_label = esc_html__( 'Feed generation is being initialized.', 'pinterest-for-woocommerce' );
-				break;
 
 			case 'in_progress':
 				$status       = 'pending';
