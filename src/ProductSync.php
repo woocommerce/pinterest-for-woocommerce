@@ -17,7 +17,7 @@ use \Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler 
  */
 class ProductSync {
 
-	const ACTION_HANDLE_SYNC = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-handle-sync';
+	const ACTION_HANDLE_SYNC          = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-handle-sync';
 
 	/**
 	 * The time in seconds to wait after a failed feed generation attempt,
@@ -55,13 +55,6 @@ class ProductSync {
 		// Hook the Scheduled actions.
 		add_action( self::ACTION_HANDLE_SYNC, array( __CLASS__, 'handle_feed_registration' ) );
 
-		add_action( 'pinterest-feed-start', array( __CLASS__, 'start_feed_generator' ) );
-
-		if ( false === as_next_scheduled_action( 'pinterest-feed-start', array() ) ) {
-			$interval = 10 * MINUTE_IN_SECONDS;
-			as_schedule_recurring_action( time() + $interval, $interval, 'pinterest-feed-start' );
-		}
-
 		if ( self::is_product_sync_enabled() ) {
 
 			// Schedule the main feed control task.
@@ -71,13 +64,6 @@ class ProductSync {
 			}
 
 			self::reschedule_if_errored();
-			$state = ProductFeedStatus::get();
-
-			if ( $state ) {
-				if ( 'scheduled_for_generation' === $state['status'] || 'pending_config' === $state['status'] ) {
-					self::start_feed_generator();
-				}
-			}
 
 			/**
 			 * Mark feed as needing re-generation whenever a product is edited or changed.
@@ -88,12 +74,6 @@ class ProductSync {
 				add_action( 'woocommerce_variation_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
 				add_action( 'woocommerce_product_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
 			}
-
-			// If feed is dirty on completion of feed generation, reschedule it.
-			add_action( 'pinterest_for_woocommerce_feed_generated', array( __CLASS__, 'reschedule_if_dirty' ) );
-
-			add_action( 'pinterest_for_woocommerce_feed_generated', array( __NAMESPACE__ . '\ProductFeedStatus', 'feed_data_cleanup' ) );
-			add_action( 'pinterest_for_woocommerce_feed_error', array( __NAMESPACE__ . '\ProductFeedStatus', 'feed_data_cleanup' ) );
 
 			// If feed is generated, but not yet registered, register it as soon as possible using an async task.
 			add_action( 'pinterest_for_woocommerce_feed_generated', array( __CLASS__, 'trigger_async_feed_registration_asap' ) );
@@ -372,21 +352,7 @@ class ProductSync {
 		}
 
 		Pinterest_For_Woocommerce()::save_data( 'feed_dirty', true );
-	}
-
-
-	/**
-	 * Check if feed is marked and dirty, and reschedule feed generation.
-	 *
-	 * @return void
-	 */
-	public static function reschedule_if_dirty() {
-
-		if ( Pinterest_For_Woocommerce()::get_data( 'feed_dirty' ) ) {
-			Pinterest_For_Woocommerce()::save_data( 'feed_dirty', false );
-			self::log( 'Feed is dirty.' );
-			self::start_feed_generator();
-		}
+		self::log( 'Feed is dirty.' );
 	}
 
 	/**
@@ -412,12 +378,5 @@ class ProductSync {
 	public static function cancel_jobs() {
 		as_unschedule_all_actions( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		as_unschedule_all_actions( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-feed-generation', array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-	}
-
-	public static function start_feed_generator() {
-		if ( ! self::$feed_generator->is_running() ) {
-			self::$feed_generator->queue_start();
-		}
-		ProductFeedStatus::set( array( 'status' => 'scheduled_for_generation' ) );
 	}
 }

@@ -23,6 +23,8 @@ class FeedGenerator extends AbstractChainedJob {
 
 	use BatchQueryOffset;
 
+	const ACTION_START_FEED_GENERATOR = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-start-feed-generation';
+
 	/**
 	 * Local Feed Configurations class.
 	 *
@@ -50,23 +52,55 @@ class FeedGenerator extends AbstractChainedJob {
 		parent::__construct( $action_scheduler );
 		$this->configurations = $local_feeds_configurations;
 		$this->prepare_feed_buffers( $local_feeds_configurations );
+
+		add_action( self::ACTION_START_FEED_GENERATOR, array( __CLASS__, 'start_generation' ) );
+		if ( false === as_next_scheduled_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+			as_schedule_recurring_action( time(), DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR );
+		}
+	}
+
+	public function reschedule_next_generator_start( $time ) {
+		as_unschedule_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_schedule_recurring_action( $time, DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR );
 	}
 
 	/**
-	 * Runs before starting the job.
+	 * Start the queue processing.
+	 */
+	public function start_generation() {
+		if ( ! $this->is_running() ) {
+			$this->queue_start();
+		}
+		ProductFeedStatus::set( array( 'status' => 'scheduled_for_generation' ) );
+	}
+
+	/**
+	 * Runs as the first step of the generation process.
 	 */
 	protected function handle_start() {
 		$this->prepare_temporary_files();
-		ProductFeedStatus::set( array( 'status' => 'in_progress' ) );
+		ProductFeedStatus::set(
+			array(
+				'status'        => 'in_progress',
+				'product_count' => 0,
+			)
+		);
 	}
 
 	/**
-	 * Runs after the finishing the job.
+	 * Runs as the last step of the job.
 	 */
 	protected function handle_end() {
 		$this->add_footer_to_temporary_feed_files();
 		$this->rename_temporary_feed_files_to_final();
 		ProductFeedStatus::set( array( 'status' => 'generated' ) );
+
+		// Check if feed is dirty, reschedule if yes.
+		if ( Pinterest_For_Woocommerce()::get_data( 'feed_dirty' ) ) {
+			Pinterest_For_Woocommerce()::save_data( 'feed_dirty', false );
+
+			$this->reschedule_next_generator_start( time() + 10 );
+		}
 	}
 
 	/**
@@ -103,7 +137,8 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
-	 * Processes a batch of items.
+	 * Processes a batch of items. The middle part of the generation process.
+	 * Can run multiple times depending on the catalog size.
 	 *
 	 * @since 1.1.0
 	 *

@@ -115,16 +115,6 @@ class ProductFeedStatus {
 		return get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset' );
 	}
 
-
-	/**
-	 * Cleanup the stored dataset.
-	 *
-	 * @return void
-	 */
-	public static function feed_data_cleanup() {
-		delete_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset' );
-	}
-
 	/**
 	 * Removes all transients for the given feed_id.
 	 *
