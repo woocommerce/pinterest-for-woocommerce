@@ -140,7 +140,13 @@ class FeedGenerator extends AbstractChainedJob {
 			}
 		);
 
-		$this->write_bufferrs_to_temp_files();
+		$this->write_buffers_to_temp_files();
+		$count = ProductFeedStatus::get()['product_count'] ?? 0;
+		ProductFeedStatus::set(
+			array(
+				'product_count' => $count + count( $products ),
+			)
+		);
 	}
 
 	/**
@@ -224,7 +230,7 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 	}
 
-	private function write_bufferrs_to_temp_files() {
+	private function write_buffers_to_temp_files() {
 		foreach ( $this->configurations->get_configurations() as $location => $config ) {
 			$bytes_written = file_put_contents(
 				$config['tmp_file'],
