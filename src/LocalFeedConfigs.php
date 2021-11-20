@@ -58,15 +58,15 @@ class LocalFeedConfigs {
 		Pinterest_For_Woocommerce()::save_data( 'local_feed_ids', $feed_ids );
 
 		$file_name_base = trailingslashit( wp_get_upload_dir()['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
+		$url_base       = trailingslashit( wp_get_upload_dir()['baseurl'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
 		array_walk(
 			$feed_ids,
-			function ( &$id, $location ) use ( $file_name_base ) {
-				$base = $file_name_base . $id . '-' . $location;
+			function ( &$id, $location ) use ( $file_name_base, $url_base ) {
 				$id   = array(
 					'feed_id'   => $id,
-					'feed_file' => $base . '.xml',
-					'tmp_file'  => $base . '-tmp.xml',
-					'feed_url'  => $base . '.xml',
+					'feed_file' => $file_name_base . $id . '-' . $location . '.xml',
+					'tmp_file'  => $file_name_base . $id . '-' . $location . '-tmp.xml',
+					'feed_url'  => $url_base . $id . '-' . $location. '.xml',
 				);
 			}
 		);

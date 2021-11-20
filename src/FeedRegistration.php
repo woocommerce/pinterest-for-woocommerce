@@ -31,7 +31,7 @@ class FeedRegistration {
 	 *
 	 * @var $feed_generator FeedGenerator
 	 */
-	private static $feed_generator = null;
+	private $feed_generator = null;
 
 	/**
 	 * Feed Registration.
@@ -42,11 +42,11 @@ class FeedRegistration {
 	 */
 	public function __construct( $local_feeds_configurations, $feed_generator ) {
 		$this->configurations = $local_feeds_configurations;
+		$this->feed_generator = $feed_generator;
 
-		add_action( self::ACTION_HANDLE_SYNC, array( __CLASS__, 'handle_feed_registration' ) );
+		add_action( self::ACTION_HANDLE_SYNC, array( $this, 'handle_feed_registration' ) );
 		if ( false === as_next_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			$interval = 10 * MINUTE_IN_SECONDS;
-			as_schedule_recurring_action( time() + 10, $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+			as_schedule_recurring_action( time(), 10 * MINUTE_IN_SECONDS, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 	}
 
@@ -63,16 +63,16 @@ class FeedRegistration {
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
-	public static function handle_feed_registration() {
+	public function handle_feed_registration() {
 
-		if ( ! self::feed_file_exists() ) {
+		if ( ! $this->feed_file_exists() ) {
 			self::log( 'Feed didn\'t fully generate yet. Retrying later.', 'debug' );
 			// Feed is not generated yet, lets wait a bit longer.
 			return true;
 		}
 
 		// So far only one configuration exists. This loop is OK but the self::register_feed will need updating.
-		foreach ( self::$configurations->get_configurations() as $location => $config ) {
+		foreach ( $this->configurations->get_configurations() as $location => $config ) {
 
 			$feed_args = array(
 				'feed_location'             => $config['feed_url'],
@@ -184,8 +184,8 @@ class FeedRegistration {
 	 *
 	 * @return bool
 	 */
-	public static function feed_file_exists() {
-		return self::$feed_generator->check_if_feed_file_exists();
+	public function feed_file_exists() {
+		return $this->feed_generator->check_if_feed_file_exists();
 	}
 
 
@@ -206,6 +206,23 @@ class FeedRegistration {
 		}
 
 		return false;
+	}
+
+	/**
+	 * If the feed is not already registered, schedules an async action to registrer it asap.
+	 *
+	 * @return void
+	 */
+	public static function trigger_async_feed_registration_asap() {
+
+		if ( self::get_registered_feed_id() ) {
+			return;
+		}
+
+		self::log( 'running trigger_async_feed_registration_asap' );
+
+		as_unschedule_all_actions( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_schedule_recurring_action( time(), 10 * MINUTE_IN_SECONDS, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 	}
 
 	/**

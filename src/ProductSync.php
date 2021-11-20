@@ -78,9 +78,6 @@ class ProductSync {
 				add_action( 'woocommerce_variation_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
 				add_action( 'woocommerce_product_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
 			}
-
-			// If feed is generated, but not yet registered, register it as soon as possible using an async task.
-			add_action( 'pinterest_for_woocommerce_feed_generated', array( __CLASS__, 'trigger_async_feed_registration_asap' ) );
 		} else {
 			self::handle_feed_deregistration();
 		}
@@ -141,23 +138,6 @@ class ProductSync {
 		self::feed_reset();
 		self::cancel_jobs();
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
-	}
-
-	/**
-	 * If the feed is not already registered, schedules an async action to registrer it asap.
-	 *
-	 * @return void
-	 */
-	public static function trigger_async_feed_registration_asap() {
-
-		if ( FeedRegistration::get_registered_feed_id() ) {
-			return;
-		}
-
-		self::log( 'running trigger_async_feed_registration_asap' );
-
-		as_unschedule_all_actions( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		as_enqueue_async_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 	}
 
 	/**

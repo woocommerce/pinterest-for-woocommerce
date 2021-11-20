@@ -53,15 +53,15 @@ class FeedGenerator extends AbstractChainedJob {
 		$this->configurations = $local_feeds_configurations;
 		$this->prepare_feed_buffers( $local_feeds_configurations );
 
-		add_action( self::ACTION_START_FEED_GENERATOR, array( __CLASS__, 'start_generation' ) );
-		if ( false === as_next_scheduled_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			as_schedule_recurring_action( time(), DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR );
+		add_action( self::ACTION_START_FEED_GENERATOR, array( $this, 'start_generation' ) );
+		if ( false === as_has_scheduled_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+			as_schedule_recurring_action( time(), DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 	}
 
 	public function reschedule_next_generator_start( $time ) {
 		as_unschedule_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		as_schedule_recurring_action( $time, DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR );
+		as_schedule_recurring_action( $time, DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 	}
 
 	/**
@@ -279,8 +279,9 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 	}
 
-	private function check_if_feed_file_exists() {
-		$config = reset( $this->configurations->get_configurations() );
+	public function check_if_feed_file_exists() {
+		$configs = $this->configurations->get_configurations();
+		$config  = reset( $configs );
 		if ( false === $config ) {
 			return false;
 		}
