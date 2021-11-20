@@ -327,7 +327,7 @@ class FeedState extends VendorAPI {
 	 */
 	private function add_feed_sync_status( $result ) {
 
-		$feed_id = Pinterest\ProductSync::get_registered_feed_id();
+		$feed_id = Pinterest\FeedRegistration::get_registered_feed_id();
 		if ( ! $feed_id ) {
 			throw new \Exception( esc_html__( 'Feed is not registered with Pinterest.', 'pinterest-for-woocommerce' ) );
 		}
