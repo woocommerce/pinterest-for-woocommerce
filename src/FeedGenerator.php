@@ -26,6 +26,12 @@ class FeedGenerator extends AbstractChainedJob {
 	const ACTION_START_FEED_GENERATOR = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-start-feed-generation';
 
 	/**
+	 * The time in seconds to wait after a failed feed generation attempt,
+	 * before attempting a retry.
+	 */
+	const WAIT_ON_ERROR_BEFORE_RETRY = HOUR_IN_SECONDS;
+
+	/**
 	 * Local Feed Configurations class.
 	 *
 	 * @var LocalFeedConfigs of local feed configurations;
@@ -59,9 +65,11 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 	}
 
-	public function reschedule_next_generator_start( $time ) {
+	public function reschedule_next_generator_start( $timestamp ) {
 		as_unschedule_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		as_schedule_recurring_action( $time, DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_schedule_recurring_action( $timestamp, DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		/* translators: time in the format hours:minutes:seconds */
+		self::log( sprintf( __( 'Feed rescheduled to run at %s.', 'pinterest-for-woocommerce' ), gmdate( 'H:i:s', $timestamp ) ) );
 	}
 
 	/**
@@ -78,7 +86,14 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Runs as the first step of the generation process.
 	 */
 	protected function handle_start() {
-		$this->prepare_temporary_files();
+
+		try {
+			$this->prepare_temporary_files();
+		} catch ( \Throwable $th ) {
+			$this->handle_error( $th );
+			throw $th;
+		}
+
 		ProductFeedStatus::set(
 			array(
 				'status'        => 'in_progress',
@@ -91,8 +106,13 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Runs as the last step of the job.
 	 */
 	protected function handle_end() {
-		$this->add_footer_to_temporary_feed_files();
-		$this->rename_temporary_feed_files_to_final();
+		try {
+			$this->add_footer_to_temporary_feed_files();
+			$this->rename_temporary_feed_files_to_final();
+		} catch ( \Throwable $th ) {
+			$this->handle_error( $th );
+			throw $th;
+		}
 		ProductFeedStatus::set( array( 'status' => 'generated' ) );
 
 		// Check if feed is dirty, reschedule if yes.
@@ -148,35 +168,41 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
 	 */
 	protected function process_items( array $items, array $args ) {
-		$excluded_product_types = apply_filters(
-			'pinterest_for_woocommerce_excluded_product_types',
-			array(
-				'grouped',
-			)
-		);
+		try {
+			$excluded_product_types = apply_filters(
+				'pinterest_for_woocommerce_excluded_product_types',
+				array(
+					'grouped',
+				)
+			);
 
-		$types = array_diff( array_merge( array_keys( wc_get_product_types() ) ), $excluded_product_types );
+			$types = array_diff( array_merge( array_keys( wc_get_product_types() ) ), $excluded_product_types );
 
-		$products = wc_get_products(
-			array(
-				'type'    => $types,
-				'include' => $items,
-				'orderby' => 'none',
-				'limit'   => $this->get_batch_size(),
-			)
-		);
+			$products = wc_get_products(
+				array(
+					'type'    => $types,
+					'include' => $items,
+					'orderby' => 'none',
+					'limit'   => $this->get_batch_size(),
+				)
+			);
 
-		array_walk(
-			$products,
-			function ( $product ) {
-				foreach ( $this->get_locations() as $location ) {
-					$this->buffers[ $location ] .= ProductsXmlFeed::get_xml_item( $product, $location );
+			array_walk(
+				$products,
+				function ( $product ) {
+					foreach ( $this->get_locations() as $location ) {
+						$this->buffers[ $location ] .= ProductsXmlFeed::get_xml_item( $product, $location );
+					}
 				}
-			}
-		);
+			);
 
-		$this->write_buffers_to_temp_files();
-		$count = ProductFeedStatus::get()['product_count'] ?? 0;
+			$this->write_buffers_to_temp_files();
+			$count = ProductFeedStatus::get()['product_count'] ?? 0;
+		} catch ( \Throwable $th ) {
+			$this->handle_error( $th );
+			throw $th;
+		}
+
 		ProductFeedStatus::set(
 			array(
 				'product_count' => $count + count( $products ),
@@ -212,9 +238,7 @@ class FeedGenerator extends AbstractChainedJob {
 				ProductsXmlFeed::get_xml_header()
 			);
 
-			if ( false === $bytes_written ) {
-				// Add debug loggign
-			}
+			$this->check_files_io_errors( $bytes_written, $config['tmp_file'] );
 		}
 	}
 
@@ -226,10 +250,42 @@ class FeedGenerator extends AbstractChainedJob {
 				FILE_APPEND
 			);
 
-			if ( false === $bytes_written ) {
-				// Add debug loggign
-			}
+			$this->check_files_io_errors( $bytes_written, $config['tmp_file'] );
 		}
+	}
+
+	public function check_files_io_errors( $bytes_written, $file ) {
+		if ( false === $bytes_written ) {
+			throw new \Exception(
+				sprintf(
+					/* translators: error message with file path */
+					__( 'Could not open temporary file %s for writing', 'pinterest-for-woocommerce' ),
+					$file
+				)
+			);
+		}
+
+		if ( 0 === $bytes_written ) {
+			throw new \Exception(
+				sprintf(
+					/* translators: error message with file path */
+					__( 'Temporary file: %s is not writeable.', 'pinterest-for-woocommerce' ),
+					$file
+				)
+			);
+		}
+	}
+
+	public function handle_error( $th ) {
+		ProductFeedStatus::set(
+			array(
+				'status'        => 'error',
+				'error_message' => $th->getMessage(),
+			)
+		);
+
+		self::log( $th->getMessage(), 'error' );
+		$this->reschedule_next_generator_start( time() + self::WAIT_ON_ERROR_BEFORE_RETRY );
 	}
 
 	public function rename_temporary_feed_files_to_final(): void {
@@ -251,20 +307,6 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 	}
 
-	private function write_to_each_temporary_files( $function, $flags = 0 ): void {
-		foreach ( $this->configurations->get_configurations() as $config ) {
-			$bytes_written = file_put_contents(
-				$config['tmp_file'],
-				$function(),
-				$flags
-			);
-
-			if ( false === $bytes_written ) {
-				// Add debug loggign
-			}
-		}
-	}
-
 	private function write_buffers_to_temp_files() {
 		foreach ( $this->configurations->get_configurations() as $location => $config ) {
 			$bytes_written = file_put_contents(
@@ -273,9 +315,7 @@ class FeedGenerator extends AbstractChainedJob {
 				FILE_APPEND
 			);
 
-			if ( false === $bytes_written ) {
-				// Add debug loggign
-			}
+			$this->check_files_io_errors( $bytes_written, $config['tmp_file'] );
 		}
 	}
 
