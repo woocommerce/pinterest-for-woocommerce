@@ -65,8 +65,6 @@ class ProductSync {
 
 		if ( self::is_product_sync_enabled() ) {
 
-
-
 			self::reschedule_if_errored();
 
 			/**
