@@ -34,7 +34,7 @@ import { recordEvent } from '@woocommerce/tracks';
  *
  * @return {{herf: string, target: string, rel: string, onClick: Function, props}} Documentation link props.
  */
-export default function documentationLinkProps( {
+function documentationLinkProps( {
 	href,
 	linkId,
 	context,
@@ -62,3 +62,4 @@ export default function documentationLinkProps( {
 		},
 	};
 }
+export default documentationLinkProps;
