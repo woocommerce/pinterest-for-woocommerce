@@ -353,12 +353,12 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
-	 * Remove feed files.
+	 * Remove feed files and cancel pending actions.
 	 * Part of the cleanup procedure.
 	 *
 	 * @since x.x.x
 	 */
-	public function remove_feed_files(): void {
+	public function deregister(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
 			if ( isset( $config['feed_file'] ) && file_exists( $config['feed_file'] ) ) {
 				unlink( $config['feed_file'] );
@@ -368,6 +368,7 @@ class FeedGenerator extends AbstractChainedJob {
 				unlink( $config['tmp_file'] );
 			}
 		}
+		as_unschedule_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 	}
 
 	/**

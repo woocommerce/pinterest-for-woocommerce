@@ -45,7 +45,7 @@ class FeedRegistration {
 		$this->feed_generator = $feed_generator;
 
 		add_action( self::ACTION_HANDLE_SYNC, array( $this, 'handle_feed_registration' ) );
-		if ( false === as_next_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+		if ( false === as_has_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			as_schedule_recurring_action( time(), 10 * MINUTE_IN_SECONDS, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 	}
@@ -232,6 +232,14 @@ class FeedRegistration {
 	 */
 	public static function get_registered_feed_id() {
 		return Pinterest_For_Woocommerce()::get_data( 'feed_registered' ) ?? false;
+	}
+
+	/**
+	 * Cleanup registration data.
+	 *
+	 */
+	public static function deregister() {
+		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
 	}
 
 }

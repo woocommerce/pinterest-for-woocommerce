@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 use \Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
+use Automattic\WooCommerce\Pinterest\API\FeedIssues;
 use Automattic\WooCommerce\Pinterest\Utilities\FeedLogger;
 
 /**
@@ -49,60 +50,41 @@ class ProductSync {
 	 */
 	public static function maybe_init() {
 
-		if ( ! self::is_product_sync_enabled() && ! FeedRegistration::get_registered_feed_id() ) {
+		if ( ! self::is_product_sync_enabled() && FeedRegistration::get_registered_feed_id() ) {
+			self::initialize_feed_components();
+			self::deregister();
+		}
+
+		// Start Feed File Generator.
+
+		if ( ! self::is_product_sync_enabled() ) {
 			return;
 		}
 
-		$locations = array( Pinterest_For_Woocommerce()::get_base_country() ?? 'US' ); // Replace with multiple countries array for multiple feed config.
-		// Start Feed File Generator.
-		self::initialize_feed_components( $locations );
+		self::initialize_feed_components();
+		/**
+		 * Mark feed as needing re-generation whenever a product is edited or changed.
+		 */
+		add_action( 'edit_post', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
 
-		if ( self::is_product_sync_enabled() ) {
-
-			self::reschedule_if_errored();
-
-			/**
-			 * Mark feed as needing re-generation whenever a product is edited or changed.
-			 */
-			add_action( 'edit_post', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
-
-			if ( 'yes' === get_option( 'woocommerce_manage_stock' ) ) {
-				add_action( 'woocommerce_variation_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
-				add_action( 'woocommerce_product_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
-			}
-		} else {
-			self::handle_feed_deregistration();
+		if ( 'yes' === get_option( 'woocommerce_manage_stock' ) ) {
+			add_action( 'woocommerce_variation_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
+			add_action( 'woocommerce_product_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
 		}
 	}
 
 	/**
-	 * Initialize the FeedGenerator instance.
+	 * Initialize components of the synchronisation process.
 	 *
 	 * @since x.x.x
-	 * @param array $locations Array of location to generate the feed files for.
 	 */
-	private static function initialize_feed_components( $locations ) {
+	private static function initialize_feed_components() {
+		$locations               = array( Pinterest_For_Woocommerce()::get_base_country() ?? 'US' ); // Replace with multiple countries array for multiple feed config.
 		$action_scheduler        = new ActionSchedulerProxy();
 		self::$configurations    = new LocalFeedConfigs( $locations );
 		self::$feed_generator    = new FeedGenerator( $action_scheduler, self::$configurations );
 		self::$feed_registration = new FeedRegistration( self::$configurations, self::$feed_generator );
 		self::$feed_generator->init();
-	}
-
-	/**
-	 * Deletes the XML file that is configured in the settings and deletes the feed_job option.
-	 *
-	 * @return void
-	 */
-	public static function feed_reset() {
-
-		self::$feed_generator->remove_feed_files();
-		self::$configurations->cleanup_local_feed_configs();
-		ProductFeedStatus::feed_transients_cleanup();
-
-		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', false );
-
-		self::log( 'Product feed reset and files deleted.' );
 	}
 
 	/**
@@ -120,16 +102,18 @@ class ProductSync {
 
 	/**
 	 * Handles de-registration of the feed.
-	 * $feed_args are needed so that they are passed to update_merchant_feed() in order to perform the update.
-	 * Running this, sets the feed to 'DISABLED' in Pinterest, deletes the local XML file and the option holding the feed
-	 * status of the feed generation job.
 	 *
 	 * @return void
 	 */
-	private static function handle_feed_deregistration() {
-		self::feed_reset();
-		self::cancel_jobs();
-		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
+	private static function deregister() {
+
+		self::$feed_generator->deregister();
+		self::$configurations->deregister();
+		self::$feed_registration->deregister();
+		ProductFeedStatus::deregister();
+		FeedIssues::deregister();
+
+		self::log( 'Product feed reset and files deleted.' );
 	}
 
 	/**
@@ -148,28 +132,4 @@ class ProductSync {
 		self::log( 'Feed is dirty.' );
 	}
 
-	/**
-	 * Check if feed is expired, and reschedule feed generation.
-	 *
-	 * @return void
-	 */
-	public static function reschedule_if_errored() {
-
-		$state = ProductFeedStatus::get();
-
-		if ( ( 'error' === $state['status'] && $state['last_activity'] < ( time() - self::WAIT_ON_ERROR_BEFORE_RETRY ) ) ) {
-			self::log( 'Retrying feed generation after error.' );
-			self::start_feed_generator();
-		}
-	}
-
-	/**
-	 * Cancels the scheduled product sync jobs.
-	 *
-	 * @return void
-	 */
-	public static function cancel_jobs() {
-		as_unschedule_all_actions( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		as_unschedule_all_actions( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-feed-generation', array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-	}
 }

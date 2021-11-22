@@ -66,14 +66,17 @@ class LocalFeedConfigs {
 					'feed_id'   => $id,
 					'feed_file' => $file_name_base . $id . '-' . $location . '.xml',
 					'tmp_file'  => $file_name_base . $id . '-' . $location . '-tmp.xml',
-					'feed_url'  => $url_base . $id . '-' . $location. '.xml',
+					'feed_url'  => $url_base . $id . '-' . $location . '.xml',
 				);
 			}
 		);
 		$this->feeds_configurations = $feed_ids;
 	}
 
-	private function cleanup_local_feed_configs() {
+	/**
+	 * Cleanup local feed configs.
+	 */
+	public function deregister() {
 		Pinterest_For_Woocommerce()::save_data( 'local_feed_ids', false );
 	}
 

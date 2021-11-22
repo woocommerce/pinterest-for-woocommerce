@@ -92,7 +92,7 @@ class ProductFeedStatus {
 	 *
 	 * @return void
 	 */
-	public static function feed_transients_cleanup() {
+	public static function deregister() {
 
 		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feeds_';
 

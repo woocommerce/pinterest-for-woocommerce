@@ -301,4 +301,12 @@ class FeedIssues extends VendorAPI {
 
 		return $workflow;
 	}
+
+	/**
+	 * Cleanup feed cached data.
+	 */
+	public static function deregister() {
+		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', false );
+	}
+
 }
