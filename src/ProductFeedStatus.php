@@ -26,13 +26,6 @@ class ProductFeedStatus {
 	);
 
 	/**
-	 * The array that holds the parameters of the feed
-	 *
-	 * @var array
-	 */
-	private static $local_feed = array();
-
-	/**
 	 * The array that holds the state of the feed, used as cache.
 	 *
 	 * @var array
@@ -91,6 +84,20 @@ class ProductFeedStatus {
 
 		if ( ! empty( $state['status'] ) ) {
 			do_action( 'pinterest_for_woocommerce_feed_' . $state['status'], $state );
+		}
+	}
+
+	/**
+	 * Removes all transients for the given feed_id.
+	 *
+	 * @return void
+	 */
+	public static function feed_transients_cleanup() {
+
+		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feeds_';
+
+		foreach ( self::STATE_PROPS as $key => $default_value ) {
+			delete_transient( $data_prefix . $key );
 		}
 	}
 }
