@@ -153,7 +153,6 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 									.pinterestLinks.claimWebsite,
 							linkId: 'claim-website',
 							context: 'claim-website',
-							rel: 'noopener',
 						} ) }
 					/>
 				</div>

@@ -85,6 +85,7 @@ const WelcomeSection = () => {
 											href: tosHref,
 											linkId: 'terms-of-service',
 											context: 'welcome-section',
+											rel: 'noreferrer',
 										} ) }
 									/>
 								),

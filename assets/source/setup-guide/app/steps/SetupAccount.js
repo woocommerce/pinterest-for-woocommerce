@@ -142,6 +142,7 @@ const SetupAccount = ( {
 													.adGuidelines,
 											linkId: 'ad-guidelines',
 											context: 'setup-account',
+											rel: 'noreferrer',
 										} ) }
 									/>
 								),
@@ -157,6 +158,7 @@ const SetupAccount = ( {
 													.merchantGuidelines,
 											linkId: 'merchant-guidelines',
 											context: 'setup-account',
+											rel: 'noreferrer',
 										} ) }
 									/>
 								),

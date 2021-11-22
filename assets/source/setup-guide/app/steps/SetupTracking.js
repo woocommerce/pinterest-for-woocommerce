@@ -324,7 +324,6 @@ const SetupTracking = ( { view = 'settings' } ) => {
 												.pinterestLinks.adGuidelines,
 										linkId: 'ad-guidelines',
 										context: view,
-										rel: 'noopener',
 									} ) }
 								>
 									{ __(
@@ -341,7 +340,6 @@ const SetupTracking = ( { view = 'settings' } ) => {
 												.pinterestLinks.adDataTerms,
 										linkId: 'ad-data-terms',
 										context: view,
-										rel: 'noopener',
 									} ) }
 								>
 									{ __(
@@ -357,7 +355,6 @@ const SetupTracking = ( { view = 'settings' } ) => {
 									.pinterestLinks.SetupTracking,
 							linkId: 'setup-tracking',
 							context: view,
-							rel: 'noopener',
 						} ) }
 					/>
 				</div>
@@ -479,8 +476,6 @@ const SetupTracking = ( { view = 'settings' } ) => {
 																	linkId:
 																		'ad-terms-of-service',
 																	context: view,
-																	rel:
-																		'noopener',
 																}
 															) }
 														></Button>
