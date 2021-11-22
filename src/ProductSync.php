@@ -96,7 +96,7 @@ class ProductSync {
 	 */
 	public static function feed_reset() {
 
-		self::$feed_generator->remove_temporary_feed_files();
+		self::$feed_generator->remove_feed_files();
 		self::$configurations->cleanup_local_feed_configs();
 		ProductFeedStatus::feed_transients_cleanup();
 

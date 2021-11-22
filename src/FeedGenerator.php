@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Feed Files Generator
  *
  * @package     Pinterest_For_WooCommerce/Classes/
- * @version     x.x.x
+ * @since       x.x.x
  */
 namespace Automattic\WooCommerce\Pinterest;
 
@@ -65,6 +65,12 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 	}
 
+	/**
+	 * Reschedule the next feed generator start.
+	 *
+	 * @since x.x.x
+	 * @param integer $timestamp Next feed generator timestamp.
+	 */
 	public function reschedule_next_generator_start( $timestamp ) {
 		as_unschedule_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		as_schedule_recurring_action( $timestamp, DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
@@ -74,6 +80,8 @@ class FeedGenerator extends AbstractChainedJob {
 
 	/**
 	 * Start the queue processing.
+	 *
+	 * @since x.x.x
 	 */
 	public function start_generation() {
 		if ( ! $this->is_running() ) {
@@ -84,6 +92,10 @@ class FeedGenerator extends AbstractChainedJob {
 
 	/**
 	 * Runs as the first step of the generation process.
+	 *
+	 * @since x.x.x
+	 *
+	 * @throws \Throwable Related to issues possible when creating an empty feed temp file and populating the header.
 	 */
 	protected function handle_start() {
 
@@ -104,6 +116,11 @@ class FeedGenerator extends AbstractChainedJob {
 
 	/**
 	 * Runs as the last step of the job.
+	 * Add XML footer to the feed files and copy the move the files from tmp to the final destination.
+	 *
+	 * @since x.x.x
+	 *
+	 * @throws \Throwable Related to issues possible when adding the footer or renaming the files.
 	 */
 	protected function handle_end() {
 		try {
@@ -115,11 +132,10 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 		ProductFeedStatus::set( array( 'status' => 'generated' ) );
 
-		// Check if feed is dirty, reschedule if yes.
+		// Check if feed is dirty and reschedule in necessary.
 		if ( Pinterest_For_Woocommerce()::get_data( 'feed_dirty' ) ) {
 			Pinterest_For_Woocommerce()::save_data( 'feed_dirty', false );
-
-			$this->reschedule_next_generator_start( time() + 10 );
+			$this->reschedule_next_generator_start( time() );
 		}
 	}
 
@@ -230,6 +246,9 @@ class FeedGenerator extends AbstractChainedJob {
 
 	/**
 	 * Prepare a fresh temporary file for each local configuration.
+	 * Files is populated with the XML headers.
+	 *
+	 * @since x.x.x
 	 */
 	public function prepare_temporary_files(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
@@ -238,10 +257,15 @@ class FeedGenerator extends AbstractChainedJob {
 				ProductsXmlFeed::get_xml_header()
 			);
 
-			$this->check_files_io_errors( $bytes_written, $config['tmp_file'] );
+			$this->check_write_for_io_errors( $bytes_written, $config['tmp_file'] );
 		}
 	}
 
+	/**
+	 * Add XML footer to all of the temporary feed files.
+	 *
+	 * @since x.x.x
+	 */
 	public function add_footer_to_temporary_feed_files(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
 			$bytes_written = file_put_contents(
@@ -250,11 +274,22 @@ class FeedGenerator extends AbstractChainedJob {
 				FILE_APPEND
 			);
 
-			$this->check_files_io_errors( $bytes_written, $config['tmp_file'] );
+			$this->check_write_for_io_errors( $bytes_written, $config['tmp_file'] );
 		}
 	}
 
-	public function check_files_io_errors( $bytes_written, $file ) {
+	/**
+	 * Checks the status of the file write operation and throws if issues are found.
+	 * Utility function for functions using file_put_contents.
+	 *
+	 * @since x.x.x
+	 * @param integer $bytes_written How much data was written to the file.
+	 * @param string  $file          File location.
+	 *
+	 * @throws \Exception Can't open or write to the file.
+	 */
+	public function check_write_for_io_errors( $bytes_written, $file ): void {
+
 		if ( false === $bytes_written ) {
 			throw new \Exception(
 				sprintf(
@@ -276,6 +311,12 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 	}
 
+	/**
+	 * React to errors during feed files generation process.
+	 *
+	 * @since x.x.x
+	 * @param \Throwable $th Exception handled.
+	 */
 	public function handle_error( $th ) {
 		ProductFeedStatus::set(
 			array(
@@ -288,14 +329,36 @@ class FeedGenerator extends AbstractChainedJob {
 		$this->reschedule_next_generator_start( time() + self::WAIT_ON_ERROR_BEFORE_RETRY );
 	}
 
+	/**
+	 * Rename temporary feed files to final name.
+	 * This is the last step of the feed file generation process.
+	 *
+	 * @since x.x.x
+	 * @throws \Exception Renaming not possible.
+	 */
 	public function rename_temporary_feed_files_to_final(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
-			rename( $config['tmp_file'], $config['feed_file'] );
-			// Check success and add logging.
+			$status = rename( $config['tmp_file'], $config['feed_file'] );
+			if ( false === $status ) {
+				throw new \Exception(
+					sprintf(
+						/* translators: 1: temporary file name 2: final file name */
+						__( 'Could not rename %1$s to %2$s', 'pinterest-for-woocommerce' ),
+						$config['tmp_file'],
+						$config['feed_file']
+					)
+				);
+			}
 		}
 	}
 
-	public function remove_temporary_feed_files(): void {
+	/**
+	 * Remove feed files.
+	 * Part of the cleanup procedure.
+	 *
+	 * @since x.x.x
+	 */
+	public function remove_feed_files(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
 			if ( isset( $config['feed_file'] ) && file_exists( $config['feed_file'] ) ) {
 				unlink( $config['feed_file'] );
@@ -307,7 +370,12 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 	}
 
-	private function write_buffers_to_temp_files() {
+	/**
+	 * Write pre-populated buffers to feed files.
+	 *
+	 * @since x.x.x
+	 */
+	private function write_buffers_to_temp_files(): void {
 		foreach ( $this->configurations->get_configurations() as $location => $config ) {
 			$bytes_written = file_put_contents(
 				$config['tmp_file'],
@@ -315,10 +383,15 @@ class FeedGenerator extends AbstractChainedJob {
 				FILE_APPEND
 			);
 
-			$this->check_files_io_errors( $bytes_written, $config['tmp_file'] );
+			$this->check_write_for_io_errors( $bytes_written, $config['tmp_file'] );
 		}
 	}
 
+	/**
+	 * Check if we have a feed file on the disk.
+	 *
+	 * @since x.x.x
+	 */
 	public function check_if_feed_file_exists() {
 		$configs = $this->configurations->get_configurations();
 		$config  = reset( $configs );
@@ -330,8 +403,10 @@ class FeedGenerator extends AbstractChainedJob {
 
 	/**
 	 * Create empty string buffers for
+	 *
+	 * @since x.x.x
 	 */
-	private function prepare_feed_buffers( $local_feed_configurations ) {
+	private function prepare_feed_buffers(): void {
 		foreach ( $this->get_locations() as $location ) {
 			$this->buffers[ $location ] = '';
 		}
@@ -339,8 +414,10 @@ class FeedGenerator extends AbstractChainedJob {
 
 	/**
 	 * Fetch supported locations.
+	 *
+	 * @since x.x.x
 	 */
-	private function get_locations() {
+	private function get_locations(): array {
 		return array_keys( $this->configurations->get_configurations() );
 	}
 
