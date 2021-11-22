@@ -68,7 +68,7 @@ class ProductSync {
 	}
 
 	/**
-	 * Observe pinterest option change and decide if we need to register of deregister.
+	 * Observe pinterest option change and decide if we need to deregister.
 	 */
 	public static function maybe_deregister( $old_value, $value ) {
 		if ( ! is_array( $value ) ) {
