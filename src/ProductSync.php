@@ -22,12 +22,6 @@ class ProductSync {
 	use FeedLogger;
 
 	/**
-	 * The time in seconds to wait after a failed feed generation attempt,
-	 * before attempting a retry.
-	 */
-	const WAIT_ON_ERROR_BEFORE_RETRY = HOUR_IN_SECONDS;
-
-	/**
 	 * Feed File Generator Instance
 	 *
 	 * @var $feed_generator FeedGenerator

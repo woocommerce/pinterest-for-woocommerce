@@ -93,41 +93,4 @@ class ProductFeedStatus {
 			do_action( 'pinterest_for_woocommerce_feed_' . $state['status'], $state );
 		}
 	}
-
-
-	/**
-	 * Stores the given dataset on a transient.
-	 *
-	 * @param array $dataset The product dataset to be saved.
-	 *
-	 * @return bool True if the value was set, false otherwise.
-	 */
-	public static function store_dataset( $dataset ) {
-		return set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset', $dataset, WEEK_IN_SECONDS );
-	}
-
-	/**
-	 * Returns the stored dataset.
-	 *
-	 * @return mixed Value of transient.
-	 */
-	public static function retrieve_dataset() {
-		return get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset' );
-	}
-
-	/**
-	 * Removes all transients for the given feed_id.
-	 *
-	 * @return void
-	 */
-	public static function feed_transients_cleanup() {
-
-		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feeds_';
-
-		foreach ( self::STATE_PROPS as $key => $default_value ) {
-			delete_transient( $data_prefix . $key );
-		}
-
-		delete_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset' );
-	}
 }
