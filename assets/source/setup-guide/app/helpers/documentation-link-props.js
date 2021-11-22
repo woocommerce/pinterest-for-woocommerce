@@ -17,7 +17,9 @@ import { recordEvent } from '@woocommerce/tracks';
  * Creates properties for an external documentation link.
  * May take any other props to be extended and forwarded to a link element (`<a>`, `<Button isLink>`).
  *
- * Sets `target="_blank" rel="noopener"` and onClick handler that fires track event.
+ * Sets `target="_blank" rel="noopener"` and `onClick` handler that fires track event.
+ *
+ * Please be careful not to overwrite the `onClick` handler coincidently.
  *
  * @fires wcadmin_pfw_documentation_link_click on click, with given `linkId` and `context`.
  *
@@ -27,8 +29,10 @@ import { recordEvent } from '@woocommerce/tracks';
  * @param {string} props.context Forwarded to {@link wcadmin_pfw_documentation_link_click}
  * @param {string} [props.target='_blank']
  * @param {string} [props.rel='noopener']
- * @param {Function} [props.onClick]
+ * @param {Function} [props.onClick] onClick event handler to be decorated with firing Track event.
  * @param {...import('react').AnchorHTMLAttributes} props.props
+ *
+ * @return {{herf: string, target: string, rel: string, onClick: Function, props}} Documentation link props.
  */
 export default function documentationLinkProps( {
 	href,
