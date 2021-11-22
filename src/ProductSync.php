@@ -50,13 +50,7 @@ class ProductSync {
 	 */
 	public static function maybe_init() {
 
-		if ( ! self::is_product_sync_enabled() && FeedRegistration::get_registered_feed_id() ) {
-			self::initialize_feed_components();
-			self::deregister();
-		}
-
-		// Start Feed File Generator.
-
+		add_action( 'update_option_' . PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME, array( __class__, 'maybe_deregister' ), 10, 2 );
 		if ( ! self::is_product_sync_enabled() ) {
 			return;
 		}
@@ -70,6 +64,21 @@ class ProductSync {
 		if ( 'yes' === get_option( 'woocommerce_manage_stock' ) ) {
 			add_action( 'woocommerce_variation_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
 			add_action( 'woocommerce_product_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
+		}
+	}
+
+	/**
+	 * Observe pinterest option change and decide if we need to register of deregister.
+	 */
+	public static function maybe_deregister( $old_value, $value ) {
+		if ( ! is_array( $value ) ) {
+			return;
+		}
+
+		$product_sync_enabled = $value['product_sync_enabled'] ?? false;
+
+		if ( ! $product_sync_enabled ) {
+			self::deregister();
 		}
 	}
 
