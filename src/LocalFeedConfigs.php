@@ -17,7 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class LocalFeedConfigs {
 
 	/**
-	 * @var array of local feed configurations;
+	 * Array of local feed configurations.
+	 *
+	 * @var array $feeds_configurations
 	 */
 	private $feeds_configurations = null;
 
@@ -62,7 +64,7 @@ class LocalFeedConfigs {
 		array_walk(
 			$feed_ids,
 			function ( &$id, $location ) use ( $file_name_base, $url_base ) {
-				$id   = array(
+				$id = array(
 					'feed_id'   => $id,
 					'feed_file' => $file_name_base . $id . '-' . $location . '.xml',
 					'tmp_file'  => $file_name_base . $id . '-' . $location . '-tmp.xml',

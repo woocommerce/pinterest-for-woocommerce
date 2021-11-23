@@ -69,6 +69,11 @@ class ProductSync {
 
 	/**
 	 * Observe pinterest option change and decide if we need to deregister.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param array $old_value Option old value.
+	 * @param array $value     Option new value.
 	 */
 	public static function maybe_deregister( $old_value, $value ) {
 		if ( ! is_array( $value ) ) {

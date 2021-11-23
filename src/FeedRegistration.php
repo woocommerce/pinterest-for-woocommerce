@@ -111,7 +111,7 @@ class FeedRegistration {
 	 * $feed_args.
 	 *
 	 * @param array $feed_args The arguments used to create the feed.
-	 * @param array $locations List of served locations.
+	 * @param array $location List of served locations.
 	 *
 	 * @return boolean|string
 	 *
@@ -241,7 +241,6 @@ class FeedRegistration {
 
 	/**
 	 * Cleanup registration data.
-	 *
 	 */
 	public static function deregister() {
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
