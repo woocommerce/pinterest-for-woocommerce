@@ -62,6 +62,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public $version = PINTEREST_FOR_WOOCOMMERCE_VERSION;
 
 		/**
+		 * Pinterest For WooCommerce version option name.
+		 *
+		 * @var string;
+		 */
+		const PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME = 'pinterest-for-woocommerce-version';
+
+		/**
 		 * The single instance of the class.
 		 *
 		 * @var Pinterest_For_Woocommerce
@@ -138,6 +145,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public function __wakeup() {
 			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'pinterest-for-woocommerce' ), '1.0.0' );
+		}
+
+		/**
+		 * Pinterest For WooCommerce plugin update initializer.
+		 */
+		public function maybe_update_plugin() {
+			// 1.0.1 marks the addition of the update feature.
+			$previous_version = get_option( self::PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME, '1.0.1' );
+			if ( version_compare( $this->version, $previous_version, '>' ) ) {
+				Pinterest\PluginUpdate::update( $previous_version );
+				update_option( self::PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME, $this->version );
+			}
 		}
 
 		/**
@@ -230,8 +249,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
 			add_action( 'wp_head', array( Pinterest\RichPins::class, 'maybe_inject_rich_pins_opengraph_tags' ) );
 			add_action( 'wp', array( Pinterest\SaveToPinterest::class, 'maybe_init' ) );
+			add_action( 'init', array( $this, 'maybe_update_plugin' ) );
 			add_action( 'init', array( Pinterest\Tracking::class, 'maybe_init' ) );
-			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
+			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ), 20 ); // Wait for possible update before starting sync.
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 
