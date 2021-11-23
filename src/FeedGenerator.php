@@ -5,6 +5,7 @@
  * @package     Pinterest_For_WooCommerce/Classes/
  * @since       x.x.x
  */
+
 namespace Automattic\WooCommerce\Pinterest;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -181,7 +182,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @param array $items The items of the current batch.
 	 * @param array $args  The args for the job.
 	 *
-	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
+	 * @throws \Throwable On error. The failure will be logged by Action Scheduler and the job chain will stop.
 	 */
 	protected function process_items( array $items, array $args ) {
 		try {

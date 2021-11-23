@@ -1,4 +1,11 @@
 <?php
+/**
+ * Pinterest for WooCommerce Feed Logger
+ *
+ * @package     Pinterest_For_WooCommerce/Classes/
+ * @since       x.x.x
+ */
+
 declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Utilities;

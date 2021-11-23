@@ -5,6 +5,7 @@
  * @package     Pinterest_For_WooCommerce/Classes/
  * @version     x.x.x
  */
+
 namespace Automattic\WooCommerce\Pinterest;
 
 use Automattic\WooCommerce\Pinterest\Utilities\FeedLogger;
@@ -13,6 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Class Handling feed files registration.
+ */
 class FeedRegistration {
 
 	use FeedLogger;
@@ -107,6 +111,7 @@ class FeedRegistration {
 	 * $feed_args.
 	 *
 	 * @param array $feed_args The arguments used to create the feed.
+	 * @param array $locations List of served locations.
 	 *
 	 * @return boolean|string
 	 *
@@ -242,5 +247,4 @@ class FeedRegistration {
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
 		as_unschedule_all_actions( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 	}
-
 }
