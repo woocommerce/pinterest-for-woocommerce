@@ -88,7 +88,7 @@ class ProductSync {
 	}
 
 	/**
-	 * Initialize components of the synchronisation process.
+	 * Initialize components of the synchronization process.
 	 *
 	 * @since x.x.x
 	 */
