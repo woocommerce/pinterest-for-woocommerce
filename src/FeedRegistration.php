@@ -214,23 +214,6 @@ class FeedRegistration {
 	}
 
 	/**
-	 * If the feed is not already registered, schedules an async action to register it asap.
-	 *
-	 * @return void
-	 */
-	public static function trigger_async_feed_registration_asap() {
-
-		if ( self::get_registered_feed_id() ) {
-			return;
-		}
-
-		self::log( 'running trigger_async_feed_registration_asap' );
-
-		as_unschedule_all_actions( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		as_schedule_recurring_action( time(), 10 * MINUTE_IN_SECONDS, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-	}
-
-	/**
 	 * Returns the feed profile ID if it's registered. Returns `false` otherwise.
 	 *
 	 * @return string|boolean
