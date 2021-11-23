@@ -62,7 +62,7 @@ class FeedGenerator extends AbstractChainedJob {
 
 		add_action( self::ACTION_START_FEED_GENERATOR, array( $this, 'start_generation' ) );
 		if ( false === as_has_scheduled_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			as_schedule_recurring_action( time() + 10, DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+			$this->schedule_next_generator_start( time() );
 		}
 	}
 
@@ -72,11 +72,11 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since x.x.x
 	 * @param integer $timestamp Next feed generator timestamp.
 	 */
-	public function reschedule_next_generator_start( $timestamp ) {
+	public function schedule_next_generator_start( $timestamp ) {
 		as_unschedule_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		as_schedule_recurring_action( $timestamp, DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		/* translators: time in the format hours:minutes:seconds */
-		self::log( sprintf( __( 'Feed rescheduled to run at %s.', 'pinterest-for-woocommerce' ), gmdate( 'H:i:s', $timestamp ) ) );
+		self::log( sprintf( __( 'Feed scheduled to run at %s.', 'pinterest-for-woocommerce' ), gmdate( 'H:i:s', $timestamp ) ) );
 	}
 
 	/**
@@ -85,10 +85,13 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since x.x.x
 	 */
 	public function start_generation() {
-		if ( ! $this->is_running() ) {
-			$this->queue_start();
+		if ( $this->is_running() ) {
+			return;
 		}
+
+		$this->queue_start();
 		ProductFeedStatus::set( array( 'status' => 'scheduled_for_generation' ) );
+		self::log( __( 'Feed generation queued.', 'pinterest-for-woocommerce' ) );
 	}
 
 	/**
@@ -99,20 +102,19 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws \Throwable Related to issues possible when creating an empty feed temp file and populating the header.
 	 */
 	protected function handle_start() {
-
+		self::log( __( 'Feed generation start. Preparing temporary files.', 'pinterest-for-woocommerce' ) );
 		try {
 			$this->prepare_temporary_files();
+			ProductFeedStatus::set(
+				array(
+					'status'        => 'in_progress',
+					'product_count' => 0,
+				)
+			);
 		} catch ( \Throwable $th ) {
 			$this->handle_error( $th );
 			throw $th;
 		}
-
-		ProductFeedStatus::set(
-			array(
-				'status'        => 'in_progress',
-				'product_count' => 0,
-			)
-		);
 	}
 
 	/**
@@ -124,6 +126,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws \Throwable Related to issues possible when adding the footer or renaming the files.
 	 */
 	protected function handle_end() {
+		self::log( __( 'Feed generation end. Moving files to the final destination.', 'pinterest-for-woocommerce' ) );
 		try {
 			$this->add_footer_to_temporary_feed_files();
 			$this->rename_temporary_feed_files_to_final();
@@ -132,11 +135,11 @@ class FeedGenerator extends AbstractChainedJob {
 			throw $th;
 		}
 		ProductFeedStatus::set( array( 'status' => 'generated' ) );
-
+		self::log( __( 'Feed generated successfully.', 'pinterest-for-woocommerce' ) );
 		// Check if feed is dirty and reschedule in necessary.
 		if ( Pinterest_For_Woocommerce()::get_data( 'feed_dirty' ) ) {
 			Pinterest_For_Woocommerce()::save_data( 'feed_dirty', false );
-			$this->reschedule_next_generator_start( time() );
+			$this->schedule_next_generator_start( time() );
 		}
 	}
 
@@ -327,7 +330,7 @@ class FeedGenerator extends AbstractChainedJob {
 		);
 
 		self::log( $th->getMessage(), 'error' );
-		$this->reschedule_next_generator_start( time() + self::WAIT_ON_ERROR_BEFORE_RETRY );
+		$this->schedule_next_generator_start( time() + self::WAIT_ON_ERROR_BEFORE_RETRY );
 	}
 
 	/**
