@@ -153,5 +153,4 @@ class ProductSync {
 		Pinterest_For_Woocommerce()::save_data( 'feed_dirty', true );
 		self::log( 'Feed is dirty.' );
 	}
-
 }
