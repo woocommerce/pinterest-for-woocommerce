@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.8
 Requires PHP: 7.3
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -86,6 +86,14 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.0.1 - 2021-11-16 =
+* Fix - Add PHP, JS & CSS linting GH actions.
+* Fix - Enable enhanced match by default .
+* Fix - Fix error with WC Session when accessing REST API endpoints publicly.
+* Fix - Fix npm vulnerabilities.
+* Fix - Update, clean and make green CSS & JS linters.
+* Fix - Use Task List API to detect if we should show Pinterest onboarding tasks.
 
 = 1.0.0 - 2021-10-25 =
 - Initial release
