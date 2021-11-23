@@ -172,10 +172,9 @@ class FeedState extends VendorAPI {
 				$status       = 'pending';
 				$status_label = esc_html__( 'Feed generation in progress.', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
-					/* Translators: %1$s Time string, %2$s current index of written products, %3$s total number of products */
-					esc_html__( 'Last activity: %1$s ago - Wrote %2$s out of %3$s products to feed file.', 'pinterest-for-woocommerce' ),
+					/* Translators: %1$s Time string, %2$s number of products */
+					esc_html__( 'Last activity: %1$s ago - Wrote %2$s products to feed file.', 'pinterest-for-woocommerce' ),
 					human_time_diff( $state['last_activity'] ),
-					$state['current_index'],
 					$state['product_count']
 				);
 				break;
@@ -184,10 +183,9 @@ class FeedState extends VendorAPI {
 				$status       = 'success';
 				$status_label = esc_html__( 'Up to date', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
-					/* Translators: %1$s Time string, %2$s current index of written products, %3$s total number of products */
-					esc_html__( 'Successfully generated %1$s ago - Wrote %2$s out of %3$s products to feed file.', 'pinterest-for-woocommerce' ),
+					/* Translators: %1$s Time string, %2$s total number of products */
+					esc_html__( 'Successfully generated %1$s ago - Wrote %2$s products to feed file.', 'pinterest-for-woocommerce' ),
 					human_time_diff( $state['last_activity'] ),
-					$state['current_index'],
 					$state['product_count']
 				);
 				break;

@@ -19,7 +19,6 @@ class ProductFeedStatus {
 
 	const STATE_PROPS = array(
 		'status'        => 'pending_config',
-		'current_index' => false,
 		'last_activity' => 0,
 		'product_count' => 0,
 		'error_message' => '',
