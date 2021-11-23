@@ -58,7 +58,6 @@ class FeedGenerator extends AbstractChainedJob {
 	public function __construct( ActionSchedulerInterface $action_scheduler, $local_feeds_configurations ) {
 		parent::__construct( $action_scheduler );
 		$this->configurations = $local_feeds_configurations;
-		$this->prepare_feed_buffers( $local_feeds_configurations );
 
 		add_action( self::ACTION_START_FEED_GENERATOR, array( $this, 'start_generation' ) );
 		if ( false === as_has_scheduled_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
@@ -207,6 +206,8 @@ class FeedGenerator extends AbstractChainedJob {
 				)
 			);
 
+			$this->prepare_feed_buffers();
+
 			array_walk(
 				$products,
 				function ( $product ) {
@@ -217,17 +218,20 @@ class FeedGenerator extends AbstractChainedJob {
 			);
 
 			$this->write_buffers_to_temp_files();
-			$count = ProductFeedStatus::get()['product_count'] ?? 0;
+
 		} catch ( \Throwable $th ) {
 			$this->handle_error( $th );
 			throw $th;
 		}
 
+		$count = ProductFeedStatus::get()['product_count'] ?? 0;
 		ProductFeedStatus::set(
 			array(
 				'product_count' => $count + count( $products ),
 			)
 		);
+		/* translators: number of products */
+		self::log( sprintf( __( 'Feed batch generated. Wrote %s products to the feed file.', 'pinterest-for-woocommerce' ), count( $products ) ) );
 	}
 
 	/**
