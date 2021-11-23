@@ -214,7 +214,7 @@ class FeedRegistration {
 	}
 
 	/**
-	 * If the feed is not already registered, schedules an async action to registrer it asap.
+	 * If the feed is not already registered, schedules an async action to register it asap.
 	 *
 	 * @return void
 	 */
