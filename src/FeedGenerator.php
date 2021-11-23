@@ -72,10 +72,17 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @param integer $timestamp Next feed generator timestamp.
 	 */
 	public function schedule_next_generator_start( $timestamp ) {
-		as_unschedule_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_unschedule_all_actions( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		as_schedule_recurring_action( $timestamp, DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		/* translators: time in the format hours:minutes:seconds */
 		self::log( sprintf( __( 'Feed scheduled to run at %s.', 'pinterest-for-woocommerce' ), gmdate( 'H:i:s', $timestamp ) ) );
+	}
+
+	/**
+	 * Stop feed generator jobs.
+	 */
+	public static function cancel_jobs() {
+		as_unschedule_all_actions( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 	}
 
 	/**

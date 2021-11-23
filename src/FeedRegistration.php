@@ -223,10 +223,17 @@ class FeedRegistration {
 	}
 
 	/**
+	 * Stop feed generator jobs.
+	 */
+	public static function cancel_jobs() {
+		as_unschedule_all_actions( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+	}
+
+	/**
 	 * Cleanup registration data.
 	 */
 	public static function deregister() {
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
-		as_unschedule_all_actions( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		self::cancel_jobs();
 	}
 }

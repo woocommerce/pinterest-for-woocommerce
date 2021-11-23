@@ -131,6 +131,14 @@ class ProductSync {
 	}
 
 	/**
+	 * Stop jobs on deactivation.
+	 */
+	public static function cancel_jobs() {
+		FeedGenerator::cancel_jobs();
+		FeedRegistration::cancel_jobs();
+	}
+
+	/**
 	 * Check if Given ID is of a product and if yes, mark feed as dirty.
 	 *
 	 * @param integer $product_id The product ID.
