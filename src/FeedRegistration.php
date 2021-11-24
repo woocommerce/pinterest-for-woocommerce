@@ -21,7 +21,7 @@ class FeedRegistration {
 
 	use FeedLogger;
 
-	const ACTION_HANDLE_SYNC = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-handle-sync';
+	const ACTION_HANDLE_FEED_REGISTRATION = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-handle-feed-registration';
 
 	/**
 	 * Local Feed Configurations class.
@@ -48,9 +48,9 @@ class FeedRegistration {
 		$this->configurations = $local_feeds_configurations;
 		$this->feed_generator = $feed_generator;
 
-		add_action( self::ACTION_HANDLE_SYNC, array( $this, 'handle_feed_registration' ) );
-		if ( false === as_has_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			as_schedule_recurring_action( time() + 10, 10 * MINUTE_IN_SECONDS, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		add_action( self::ACTION_HANDLE_FEED_REGISTRATION, array( $this, 'handle_feed_registration' ) );
+		if ( false === as_has_scheduled_action( self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+			as_schedule_recurring_action( time() + 10, 10 * MINUTE_IN_SECONDS, self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 	}
 
@@ -226,7 +226,7 @@ class FeedRegistration {
 	 * Stop feed generator jobs.
 	 */
 	public static function cancel_jobs() {
-		as_unschedule_all_actions( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_unschedule_all_actions( self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 	}
 
 	/**
