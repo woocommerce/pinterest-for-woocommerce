@@ -45,7 +45,6 @@ const SyncState = () => {
 						{
 							adsManagerLink: (
 								<ExternalLink
-									className="link"
 									href={
 										wcSettings.pinterest_for_woocommerce
 											.pinterestLinks.adsManager
