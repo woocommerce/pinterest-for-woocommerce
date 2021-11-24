@@ -36,6 +36,8 @@ class PluginUpdate {
 	 * @return void
 	 */
 	public static function update_to_2_0_0() {
-		true;
+		as_unschedule_all_actions( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-handle-sync', array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_unschedule_all_actions( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-feed-generation', array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		$feed_id = Pinterest_For_Woocommerce()::get_data( 'local_feed_id' );
 	}
 }
