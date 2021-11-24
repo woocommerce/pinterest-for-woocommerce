@@ -66,7 +66,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @var string;
 		 */
-		const PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME = 'pinterest-for-woocommerce-version';
+		const PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-version';
 
 		/**
 		 * The single instance of the class.
