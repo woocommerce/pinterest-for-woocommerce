@@ -60,7 +60,7 @@ class PluginUpdate {
 			);
 
 			if ( file_exists( $old_config['feed_file'] ) ) {
-				rename( $old_config['feed_file']['tmp_file'], $new_config['feed_file'] );
+				rename( $old_config['feed_file'], $new_config['feed_file'] );
 			}
 			if ( file_exists( $old_config['tmp_file'] ) ) {
 				unlink( $old_config['feed_file'] );
@@ -95,8 +95,6 @@ class PluginUpdate {
 			 * 2-c. PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' transient will be removed deleted after WEEK_IN_SECONDS.
 			 */
 		}
-
-
 
 		/*
 		 * 3. Clear data.

@@ -62,13 +62,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public $version = PINTEREST_FOR_WOOCOMMERCE_VERSION;
 
 		/**
-		 * Pinterest For WooCommerce version option name.
-		 *
-		 * @var string;
-		 */
-		const PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-version';
-
-		/**
 		 * The single instance of the class.
 		 *
 		 * @var Pinterest_For_Woocommerce
@@ -152,10 +145,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public function maybe_update_plugin() {
 			// 1.0.1 marks the addition of the update feature.
-			$previous_version = get_option( self::PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME, '1.0.1' );
+			$previous_version = get_option( PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME, '1.0.1' );
 			if ( version_compare( $this->version, $previous_version, '>' ) ) {
 				Pinterest\PluginUpdate::update( $previous_version );
-				update_option( self::PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME, $this->version );
+				update_option( PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME, $this->version );
 			}
 		}
 
@@ -195,6 +188,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_VERSION', '1' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT', 'oauth/callback' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_AUTH', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_auth_key' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-version' );
 		}
 
 
