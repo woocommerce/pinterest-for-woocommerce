@@ -409,6 +409,24 @@ class Base {
 
 		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
+		$args_to_remove = apply_filters(
+			'pinterest_for_woocommerce_create_merchant_args',
+			array(
+				'feed_location',
+				'feed_format',
+				'feed_default_currency',
+				'default_availability_type',
+				'country',
+				'locale',
+			)
+		);
+
+		foreach ( $args_to_remove as $arg_key ) {
+			if ( isset( $args[ $arg_key ] ) || null === $args[ $arg_key ] ) {
+				unset( $args[ $arg_key ] );
+			}
+		}
+
 		$args = wp_parse_args(
 			$args,
 			array(
