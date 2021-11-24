@@ -22,6 +22,7 @@ import StepOverview from '../components/StepOverview';
 import AccountConnection from '../components/Account/Connection';
 import BusinessAccountSelection from '../components/Account/BusinessAccountSelection';
 import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
+import documentationLinkProps from '../helpers/documentation-link-props';
 
 /**
  * Clicking on "… create a new Pinterest account" button.
@@ -133,54 +134,32 @@ const SetupAccount = ( {
 									// Disabling no-content rule - content is interpolated from above string.
 									// eslint-disable-next-line jsx-a11y/anchor-has-content
 									<a
-										href={
-											wcSettings.pinterest_for_woocommerce
-												.pinterestLinks.adGuidelines
-										}
-										target="_blank"
-										rel="noreferrer"
-										onClick={ () =>
-											recordEvent(
-												'pfw_documentation_link_click',
-												{
-													link_id: 'ad-guidelines',
-													context: 'setup-account',
-													href:
-														wcSettings
-															.pinterest_for_woocommerce
-															.pinterestLinks
-															.adGuidelines,
-												}
-											)
-										}
+										{ ...documentationLinkProps( {
+											href:
+												wcSettings
+													.pinterest_for_woocommerce
+													.pinterestLinks
+													.adGuidelines,
+											linkId: 'ad-guidelines',
+											context: 'setup-account',
+											rel: 'noreferrer',
+										} ) }
 									/>
 								),
 								merchantGuidelinesLink: (
 									// Disabling no-content rule - content is interpolated from above string.
 									// eslint-disable-next-line jsx-a11y/anchor-has-content
 									<a
-										href={
-											wcSettings.pinterest_for_woocommerce
-												.pinterestLinks
-												.merchantGuidelines
-										}
-										target="_blank"
-										rel="noreferrer"
-										onClick={ () =>
-											recordEvent(
-												'pfw_documentation_link_click',
-												{
-													link_id:
-														'merchant-guidelines',
-													context: 'setup-account',
-													href:
-														wcSettings
-															.pinterest_for_woocommerce
-															.pinterestLinks
-															.merchantGuidelines,
-												}
-											)
-										}
+										{ ...documentationLinkProps( {
+											href:
+												wcSettings
+													.pinterest_for_woocommerce
+													.pinterestLinks
+													.merchantGuidelines,
+											linkId: 'merchant-guidelines',
+											context: 'setup-account',
+											rel: 'noreferrer',
+										} ) }
 									/>
 								),
 							}

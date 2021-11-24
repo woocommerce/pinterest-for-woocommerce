@@ -20,6 +20,7 @@ import {
  * Internal dependencies
  */
 import PrelaunchNotice from '../../../components/prelaunch-notice';
+import documentationLinkProps from '../helpers/documentation-link-props';
 
 const tosHref = 'https://business.pinterest.com/business-terms-of-service/';
 
@@ -80,19 +81,12 @@ const WelcomeSection = () => {
 									// Disabling no-content rule - content is interpolated from above string.
 									// eslint-disable-next-line jsx-a11y/anchor-has-content
 									<a
-										href={ tosHref }
-										target="_blank"
-										rel="noreferrer"
-										onClick={ () =>
-											recordEvent(
-												'pfw_documentation_link_click',
-												{
-													link_id: 'terms-of-service',
-													context: 'welcome-section',
-													href: tosHref,
-												}
-											)
-										}
+										{ ...documentationLinkProps( {
+											href: tosHref,
+											linkId: 'terms-of-service',
+											context: 'welcome-section',
+											rel: 'noreferrer',
+										} ) }
 									/>
 								),
 							}
