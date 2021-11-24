@@ -401,6 +401,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'merchantGuidelines'     => 'https://policy.pinterest.com/en/merchant-guidelines',
 					'convertToBusinessAcct'  => 'https://help.pinterest.com/en/business/article/get-a-business-account#section-15096',
 					'appealDeclinedMerchant' => 'https://www.pinterest.com/product-catalogs/data-source/?showModal=true',
+					'installTag'             => 'https://help.pinterest.com/en/business/article/install-the-pinterest-tag',
 				),
 				'isSetupComplete'          => Pinterest_For_Woocommerce()::is_setup_complete(),
 				'countryTos'               => Pinterest_For_Woocommerce()::get_applicable_tos(),
