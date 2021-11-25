@@ -28,6 +28,8 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
+    "@testing-library/react": "^12.1.2",
+    "@types/jest": "^27.0.3",
     "@woocommerce/dependency-extraction-webpack-plugin": "^1.7.0",
     "@woocommerce/eslint-plugin": "^1.2.0",
     "@wordpress/base-styles": "^3.6.0",
@@ -59,6 +61,7 @@
     "gulp-util": "^3.0.8",
     "gulp-vinyl-zip": "^2.1.2",
     "gulp-wp-pot": "^2.3.4",
+    "jest": "^25.5.4",
     "md5": "^2.3.0",
     "merge-stream": "^1.0.1",
     "node-sass": "^4.14.1",
@@ -94,7 +97,6 @@
     }
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "wp-scripts build && gulp build",
     "prebuild": "composer install --no-dev",
     "build": "wp-scripts build && gulp build && gulp package",
@@ -106,7 +108,9 @@
     "lint:css": "wp-scripts lint-style ./assets/source",
     "lint:php": "composer run-script phpcs ./",
     "lint:css:fix": "wp-scripts lint-style ./assets/source --fix",
-    "build:zip": "npm run build"
+    "build:zip": "npm run build",
+    "test-unit": "wp-scripts test-unit-js --coverage",
+    "test-unit:watch": "npm run test-unit -- --watch"
   },
   "browserslist": [
     "last 5 versions",
