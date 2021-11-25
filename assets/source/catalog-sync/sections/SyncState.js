@@ -3,9 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { createInterpolateElement } from '@wordpress/element';
+import { Icon, trendingUp as trendingUpIcon } from '@wordpress/icons';
 import {
 	Card,
 	CardHeader,
+	CardFooter,
+	ExternalLink,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
@@ -30,6 +34,27 @@ const SyncState = () => {
 			</CardHeader>
 			<SyncStateSummary overview={ feedState?.overview } />
 			<SyncStateTable workflow={ feedState?.workflow } />
+			<CardFooter justify="flex-start">
+				<Icon icon={ trendingUpIcon } />
+				<Text>
+					{ createInterpolateElement(
+						__(
+							'Set up and manage ads to increase your reach with <adsManagerLink>Pinterest ads manager</adsManagerLink>',
+							'pinterest-for-woocommerce'
+						),
+						{
+							adsManagerLink: (
+								<ExternalLink
+									href={
+										wcSettings.pinterest_for_woocommerce
+											.pinterestLinks.adsManager
+									}
+								/>
+							),
+						}
+					) }
+				</Text>
+			</CardFooter>
 		</Card>
 	);
 };

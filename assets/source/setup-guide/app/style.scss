@@ -590,6 +590,18 @@ $root: ".woocommerce-setup-guide";
 			display: none;
 		}
 
+		.components-card__footer {
+			flex-direction: row;
+
+			.components-external-link {
+				text-decoration: none;
+
+				&:hover {
+					text-decoration: underline;
+				}
+			}
+		}
+
 		th:first-child {
 			width: 1%;
 			min-width: 175px;
