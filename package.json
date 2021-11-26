@@ -28,6 +28,7 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.15.1",
     "@testing-library/react": "^12.1.2",
     "@types/jest": "^27.0.3",
     "@woocommerce/dependency-extraction-webpack-plugin": "^1.7.0",
