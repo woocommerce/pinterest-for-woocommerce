@@ -15,7 +15,7 @@ describe( 'SyncState component', () => {
 
 		expect( getByRole( 'heading' ) ).toHaveTextContent( 'Overview' );
 		expect( getByRole( 'link' ) ).toHaveTextContent(
-			'Pinterest ads manager'
+			'Pinterest ads manager(opens in a new tab)'
 		);
 	} );
 } );
