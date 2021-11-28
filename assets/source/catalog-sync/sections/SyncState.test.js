@@ -18,4 +18,16 @@ describe( 'SyncState component', () => {
 			'Pinterest ads manager(opens in a new tab)'
 		);
 	} );
+
+	test( 'should render SyncStateSummary', () => {
+		const { getAllByTestId } = render( <SyncState /> );
+
+		expect( getAllByTestId( 'summary-placeholder' ) ).toBeTruthy();
+	} );
+
+	test( 'should render SyncStateTable', () => {
+		const { getByText } = render( <SyncState /> );
+
+		expect( getByText( 'Property' ) ).toBeTruthy();
+	} );
 } );
