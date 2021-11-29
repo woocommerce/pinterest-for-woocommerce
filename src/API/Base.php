@@ -405,10 +405,8 @@ class Base {
 	 */
 	public static function maybe_create_merchant() {
 
-		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
-
 		$args = array(
-			'display_name'                      => $merchant_name,
+			'display_name'                      => apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) ),
 			'return_merchant_if_already_exists' => true,
 		);
 
