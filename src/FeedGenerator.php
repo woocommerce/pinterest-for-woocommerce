@@ -195,14 +195,21 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	protected function process_items( array $items, array $args ) {
 		try {
+			/**
+			 * Prepare allowed product types.
+			 * For variations:
+			 * We just want variations ( variable children ) but not parents ( variable ).
+			 */
+			$included_product_types = array_merge( array_keys( wc_get_product_types() ), array( 'variation' ) );
 			$excluded_product_types = apply_filters(
 				'pinterest_for_woocommerce_excluded_product_types',
 				array(
 					'grouped',
+					'variable',
 				)
 			);
 
-			$types = array_diff( array_merge( array_keys( wc_get_product_types() ) ), $excluded_product_types );
+			$types = array_diff( $included_product_types, $excluded_product_types );
 
 			$products = wc_get_products(
 				array(
