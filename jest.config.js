@@ -27,7 +27,11 @@ module.exports = {
 	testPathIgnorePatterns: [ '/node_modules/' ],
 	globals: {
 		wcSettings: {
-			pinterest_for_woocommerce: {},
+			pinterest_for_woocommerce: {
+				pinterestLinks: {
+					adsManager: 'https://example.com',
+				},
+			},
 		},
 	},
 };
