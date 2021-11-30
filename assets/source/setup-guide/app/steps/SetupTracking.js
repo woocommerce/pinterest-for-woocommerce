@@ -40,7 +40,7 @@ import documentationLinkProps from '../helpers/documentation-link-props';
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-guidelines', context: 'wizard'|'settings' }`
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
- * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'setup-tracking', context: 'wizard'|'settings' }`
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
  *
  *
  * @param {Object} props React props.
@@ -352,8 +352,8 @@ const SetupTracking = ( { view = 'settings' } ) => {
 						readMore={ documentationLinkProps( {
 							href:
 								wcSettings.pinterest_for_woocommerce
-									.pinterestLinks.SetupTracking,
-							linkId: 'setup-tracking',
+									.pinterestLinks.installTag,
+							linkId: 'install-tag',
 							context: view,
 						} ) }
 					/>
