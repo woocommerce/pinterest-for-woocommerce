@@ -226,7 +226,7 @@ const HealthCheck = () => {
 
 	const notice = notices[ healthStatus.status ] || notices.error;
 
-	if ( notice.status === 'error' ) {
+	if ( notice.status === 'error' && ! notice.message ) {
 		notice.message =
 			healthStatus.message ||
 			__(

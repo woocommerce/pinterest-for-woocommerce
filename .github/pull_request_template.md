@@ -1,23 +1,36 @@
-<!-- You can erase any parts of this template not applicable to your pull request. -->
+### Changes proposed in this Pull Request:
 
-<!-- Reference issue(s) that this PR fixes or addresses -->
-Closes # 
+<!-- You can erase any parts of this template not applicable to your Pull Request. -->
 
-### Changes proposed in this pull request
-<!-- Explain what this PR adds or changes, why, and how this will impact users. -->
+Closes # .
 
-#### Screenshots
+_Replace this with a good description of your changes & reasoning._
+
+
+### Screenshots:
+
 <!--- Optional --->
 
-### Detailed test instructions
-<!-- Add steps to confirm the fix or change. -->
+
+### Detailed test instructions:
+
 1. 
 2. 
 3. 
 
-<!-- Please add details of other areas that might be impacted by the change. -->
 
-### Changelog note
-<!-- Changelog notes highlight what's fixed or added in a release. -->
+<!--
+Optional.
+Enter a summary of all changes in this Pull Request, which will be added to the changelog if accepted.
+Each line should start with `(Fix|Add|Tweak|Update) - `, for example:
+> Fix - I took care of something that wasn't working.
+> Add - I added something new that's pretty cool.
+> Tweak - I made a small change.
+> Update - I made big changes to something that wasn't broken.
 
-> Fix|New|Dev: Add suggested changelog note here
+Leave the "Changelog entry" header in place completely empty, without any summary if no changelog entry is needed.
+If you remove the "Changelog entry" header, the title of Pull Request will be used as the changelog entry.
+-->
+### Changelog entry
+
+>

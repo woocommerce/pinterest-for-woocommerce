@@ -376,6 +376,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		 * @return array
 		 */
 		private function get_component_settings() {
+			$store_country = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
 
 			return array(
 				'pluginVersion'            => PINTEREST_FOR_WOOCOMMERCE_VERSION,
@@ -384,6 +385,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				'createBusinessAccountUrl' => $this->get_create_business_account_url(),
 				'switchBusinessAccountUrl' => $this->get_switch_business_account_url(),
 				'domainToVerify'           => wp_parse_url( home_url(), PHP_URL_HOST ),
+				'storeCountry'             => $store_country,
+				'isAdsSupportedCountry'    => in_array( $store_country, $this->get_ads_supported_countries(), true ),
 				'isConnected'              => ! empty( Pinterest_For_Woocommerce()::is_connected() ),
 				'isBusinessConnected'      => ! empty( Pinterest_For_Woocommerce()::is_business_connected() ),
 				'businessAccounts'         => Pinterest_For_Woocommerce()::get_linked_businesses(),
@@ -394,7 +397,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'newAccount'             => 'https://business.pinterest.com/',
 					'claimWebsite'           => 'https://help.pinterest.com/en/business/article/claim-your-website',
 					'richPins'               => 'https://help.pinterest.com/en/business/article/rich-pins',
-					'enhancedMatch'          => 'https://help.pinterest.com/en/business/article/enhanced-match',
 					'createAdvertiser'       => 'https://help.pinterest.com/en/business/article/create-an-advertiser-account',
 					'adGuidelines'           => 'https://policy.pinterest.com/en/advertising-guidelines',
 					'adDataTerms'            => 'https://policy.pinterest.com/en/ad-data-terms',
@@ -402,6 +404,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'convertToBusinessAcct'  => 'https://help.pinterest.com/en/business/article/get-a-business-account#section-15096',
 					'appealDeclinedMerchant' => 'https://www.pinterest.com/product-catalogs/data-source/?showModal=true',
 					'installTag'             => 'https://help.pinterest.com/en/business/article/install-the-pinterest-tag',
+					'adsManager'             => 'https://ads.pinterest.com/',
 				),
 				'isSetupComplete'          => Pinterest_For_Woocommerce()::is_setup_complete(),
 				'countryTos'               => Pinterest_For_Woocommerce()::get_applicable_tos(),
@@ -522,6 +525,48 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			$allowed_hosts[] = wp_parse_url( $service_domain, PHP_URL_HOST );
 
 			return $allowed_hosts;
+		}
+
+
+		/**
+		 * Get the alpha-2 country codes where Pinterest advertises.
+		 *
+		 * @see https://help.pinterest.com/en/business/availability/ads-availability
+		 *
+		 * @return string[]
+		 */
+		private function get_ads_supported_countries() {
+			return array(
+				'AU', // Australia.
+				'AT', // Austria.
+				'BE', // Belgium.
+				'BR', // Brazil.
+				'CA', // Canada.
+				'CY', // Cyprus.
+				'CZ', // Czech Republic.
+				'DK', // Denmark.
+				'FI', // Finland.
+				'FR', // France.
+				'DE', // Germany.
+				'GR', // Greece.
+				'HU', // Hungary.
+				'IE', // Ireland.
+				'IT', // Italy.
+				'LU', // Luxembourg.
+				'MT', // Malta.
+				'NL', // Netherlands.
+				'NZ', // New Zealand.
+				'NO', // Norway.
+				'PL', // Poland.
+				'PT', // Portugal.
+				'RO', // Romania.
+				'SK', // Slovakia.
+				'ES', // Spain.
+				'SE', // Sweden.
+				'CH', // Switzerland.
+				'GB', // United Kingdom (UK).
+				'US', // United States (US).
+			);
 		}
 	}
 

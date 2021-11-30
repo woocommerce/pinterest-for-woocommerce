@@ -21,6 +21,18 @@ class ProductSync {
 	const ACTION_FEED_GENERATION = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-feed-generation';
 
 	/**
+	 * The time in seconds to consider the feed expired,
+	 * and schedule regeneration.
+	 */
+	const FEED_EXPIRY = DAY_IN_SECONDS;
+
+	/**
+	 * The time in seconds to wait after a failed feed generation attempt,
+	 * before attempting a retry.
+	 */
+	const WAIT_ON_ERROR_BEFORE_RETRY = HOUR_IN_SECONDS;
+
+	/**
 	 * The number of products to process on each Iteration of the scheduled task.
 	 * A high number increases the time it takes to complete the iteration, risking a PHP timeout.
 	 *
@@ -57,6 +69,8 @@ class ProductSync {
 	 */
 	private static $iteration_buffer_size = 0;
 
+
+
 	/**
 	 * Initiate class.
 	 */
@@ -70,14 +84,17 @@ class ProductSync {
 		add_action( self::ACTION_HANDLE_SYNC, array( __CLASS__, 'handle_feed_registration' ) );
 		add_action( self::ACTION_FEED_GENERATION, array( __CLASS__, 'handle_feed_generation' ) );
 
-		// Schedule the main feed control task.
-		if ( false === as_next_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			$interval = 10 * MINUTE_IN_SECONDS;
-			as_schedule_recurring_action( time() + 10, $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		}
-
 		if ( self::is_product_sync_enabled() ) {
-			$state = self::feed_job_status();
+
+			// Schedule the main feed control task.
+			if ( false === as_next_scheduled_action( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+				$interval = 10 * MINUTE_IN_SECONDS;
+				as_schedule_recurring_action( time() + 10, $interval, self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+			}
+
+			self::reschedule_if_expired();
+			self::reschedule_if_errored();
+			$state = ProductFeedStatus::get();
 
 			if ( $state ) {
 				// If local is not generated, or needs to be regenerated, schedule regeneration.
@@ -101,8 +118,13 @@ class ProductSync {
 			// If feed is dirty on completion of feed generation, reschedule it.
 			add_action( 'pinterest_for_woocommerce_feed_generated', array( __CLASS__, 'reschedule_if_dirty' ) );
 
+			add_action( 'pinterest_for_woocommerce_feed_generated', array( __NAMESPACE__ . '\ProductFeedStatus', 'feed_data_cleanup' ) );
+			add_action( 'pinterest_for_woocommerce_feed_error', array( __NAMESPACE__ . '\ProductFeedStatus', 'feed_data_cleanup' ) );
+
 			// If feed is generated, but not yet registered, register it as soon as possible using an async task.
 			add_action( 'pinterest_for_woocommerce_feed_generated', array( __CLASS__, 'trigger_async_feed_registration_asap' ) );
+		} else {
+			self::handle_feed_deregistration();
 		}
 	}
 
@@ -114,20 +136,22 @@ class ProductSync {
 	 */
 	public static function feed_reset() {
 
-		$state = Pinterest_For_Woocommerce()::get_data( 'feed_job' ) ?? array();
+		$local_feed = ProductFeedStatus::get_local_feed();
 
-		if ( isset( $state['feed_file'] ) && file_exists( $state['feed_file'] ) ) {
-			unlink( $state['feed_file'] );
+		if ( isset( $local_feed['feed_file'] ) && file_exists( $local_feed['feed_file'] ) ) {
+			unlink( $local_feed['feed_file'] );
 		}
 
-		if ( isset( $state['tmp_file'] ) && file_exists( $state['tmp_file'] ) ) {
-			unlink( $state['tmp_file'] );
+		if ( isset( $local_feed['tmp_file'] ) && file_exists( $local_feed['tmp_file'] ) ) {
+			unlink( $local_feed['tmp_file'] );
 		}
 
-		Pinterest_For_Woocommerce()::save_data( 'feed_job', false );
+		ProductFeedStatus::feed_transients_cleanup( $local_feed['feed_id'] );
+
+		Pinterest_For_Woocommerce()::save_data( 'local_feed_id', false );
 		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', false );
 
-		self::log( 'Product feed reset and file deleted.' );
+		self::log( 'Product feed reset and files deleted.' );
 	}
 
 
@@ -140,9 +164,9 @@ class ProductSync {
 	 */
 	public static function feed_file_exists() {
 
-		$state = Pinterest_For_Woocommerce()::get_data( 'feed_job' ) ?? array();
+		$local_feed = ProductFeedStatus::get_local_feed();
 
-		return isset( $state['feed_file'] ) && file_exists( $state['feed_file'] );
+		return isset( $local_feed['feed_file'] ) && file_exists( $local_feed['feed_file'] );
 	}
 
 
@@ -155,21 +179,23 @@ class ProductSync {
 	 */
 	public static function feed_reschedule( $force = false ) {
 
-		$feed_job = Pinterest_For_Woocommerce()::get_data( 'feed_job' ) ?? array();
+		$state = ProductFeedStatus::get();
 
-		if ( ! $force && isset( $feed_job['status'] ) && in_array( $feed_job['status'], array( 'in_progress', 'starting' ), true ) ) {
+		if ( ! $force && isset( $state['status'] ) && in_array( $state['status'], array( 'in_progress', 'starting' ), true ) ) {
 			return;
 		}
 
-		$feed_job['status'] = 'scheduled_for_generation';
-		if ( isset( $feed_job['finished'] ) ) {
-			unset( $feed_job['finished'] );
+		if ( 'scheduled_for_generation' !== $state['status'] ) {
+			ProductFeedStatus::set(
+				array(
+					'status' => 'scheduled_for_generation',
+				)
+			);
 		}
 
-		Pinterest_For_Woocommerce()::save_data( 'feed_job', $feed_job );
-		self::trigger_async_feed_generation( $force );
-
-		self::log( 'Feed generation (re)scheduled.' );
+		if ( self::trigger_async_feed_generation( $force ) ) {
+			self::log( 'Feed generation (re)scheduled.' );
+		}
 	}
 
 
@@ -225,33 +251,22 @@ class ProductSync {
 	 */
 	public static function handle_feed_registration() {
 
-		$state = self::feed_job_status( 'check_registration' );
-
 		if ( ! self::feed_file_exists() ) {
 			self::log( 'Feed didn\'t fully generate yet. Retrying later.', 'debug' );
 			// Feed is not generated yet, lets wait a bit longer.
 			return true;
 		}
 
+		$local_feed = ProductFeedStatus::get_local_feed();
+
 		$feed_args = array(
-			'feed_location'             => $state['feed_url'],
+			'feed_location'             => $local_feed['feed_url'],
 			'feed_format'               => 'XML',
 			'feed_default_currency'     => get_woocommerce_currency(),
 			'default_availability_type' => 'IN_STOCK',
 			'country'                   => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
 			'locale'                    => str_replace( '_', '-', determine_locale() ),
 		);
-
-		$registered = self::get_registered_feed_id();
-
-		if ( ! self::is_product_sync_enabled() ) {
-			// Handle feed deregistration.
-			if ( $registered ) {
-				self::handle_feed_deregistration();
-			}
-
-			return false;
-		}
 
 		try {
 			$registered = self::register_feed( $feed_args );
@@ -279,9 +294,9 @@ class ProductSync {
 	 * @return void
 	 */
 	private static function handle_feed_deregistration() {
-		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
-
 		self::feed_reset();
+		self::cancel_jobs();
+		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
 	}
 
 
@@ -296,7 +311,7 @@ class ProductSync {
 	 */
 	public static function handle_feed_generation() {
 
-		$state = self::feed_job_status();
+		$state = ProductFeedStatus::get();
 		$start = microtime( true );
 
 		if ( $state && 'generated' === $state['status'] || ! self::is_product_sync_enabled() ) {
@@ -312,22 +327,24 @@ class ProductSync {
 				return; // No need to perform any action.
 			}
 
-			$state = self::feed_job_status(
-				'starting',
+			ProductFeedStatus::set(
 				array(
-					'dataset'       => $product_ids,
+					'status'        => 'starting',
 					'current_index' => 0,
+					'product_count' => count( $product_ids ),
 				)
 			);
 
+			ProductFeedStatus::store_dataset( $product_ids );
 			self::$current_index = 0;
 		}
 
 		try {
 
 			if ( 'in_progress' === $state['status'] ) {
-				$product_ids         = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state['job_id'] );
-				self::$current_index = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state['job_id'] );
+
+				$product_ids         = ProductFeedStatus::retrieve_dataset();
+				self::$current_index = $state['current_index'];
 				self::$current_index = false === self::$current_index ? self::$current_index : ( (int) self::$current_index ) + 1; // Start on the next item.
 			}
 
@@ -335,7 +352,8 @@ class ProductSync {
 				throw new \Exception( esc_html__( 'Something went wrong while attempting to generate the feed.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$target_file = $state['tmp_file'];
+			$local_feed  = ProductFeedStatus::get_local_feed();
+			$target_file = $local_feed['tmp_file'];
 			$xml_file    = fopen( $target_file, ( 'in_progress' === $state['status'] ? 'a' : 'w' ) );
 
 			if ( ! $xml_file ) {
@@ -364,7 +382,7 @@ class ProductSync {
 				self::$iteration_buffer_size++;
 
 				if ( self::$iteration_buffer_size >= self::$products_per_write || self::$current_index >= $products_count ) {
-					self::write_iteration_buffer( $xml_file, $state );
+					self::write_iteration_buffer( $xml_file, $local_feed );
 				}
 
 				$step_index++;
@@ -383,16 +401,15 @@ class ProductSync {
 				fwrite( $xml_file, ProductsXmlFeed::get_xml_footer() );
 				fclose( $xml_file );
 
-				self::feed_job_status( 'generated' );
-
-				if ( ! rename( $state['tmp_file'], $state['feed_file'] ) ) {
+				if ( ! rename( $local_feed['tmp_file'], $local_feed['feed_file'] ) ) {
 					/* Translators: the path of the file */
-					throw new \Exception( sprintf( esc_html__( 'Could not write feed to file: %s.', 'pinterest-for-woocommerce' ), $state['feed_file'] ), 400 );
+					throw new \Exception( sprintf( esc_html__( 'Could not write feed to file: %s.', 'pinterest-for-woocommerce' ), $local_feed['feed_file'] ), 400 );
 				}
 
-				$target_file = $state['feed_file'];
+				$target_file = $local_feed['feed_file'];
 
-				do_action( 'pinterest_for_woocommerce_feed_generated', $state );
+				ProductFeedStatus::set( array( 'status' => 'generated' ) );
+
 			} else {
 				// We got more products left. Schedule next iteration.
 				fclose( $xml_file );
@@ -413,7 +430,13 @@ class ProductSync {
 				return;
 			}
 
-			self::feed_job_status( 'error', array( 'progress' => $th->getMessage() ) );
+			ProductFeedStatus::set(
+				array(
+					'status'        => 'error',
+					'error_message' => $th->getMessage(),
+				)
+			);
+
 			self::log( $th->getMessage(), 'error' );
 		}
 	}
@@ -422,37 +445,29 @@ class ProductSync {
 	/**
 	 * Writes the iteration_buffer to the given file.
 	 *
-	 * @param resource $xml_file The file handle.
-	 * @param array    $state    The array holding the feed_state values.
+	 * @param resource $xml_file   The file handle.
+	 * @param array    $local_feed The array holding the feed attributes.
 	 *
 	 * @return void
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
-	private static function write_iteration_buffer( $xml_file, $state ) {
+	private static function write_iteration_buffer( $xml_file, $local_feed ) {
 
 		if ( false !== fwrite( $xml_file, self::$iteration_buffer ) ) {
 			self::$iteration_buffer      = '';
 			self::$iteration_buffer_size = 0;
 
-			self::feed_job_status(
-				'in_progress',
+			ProductFeedStatus::set(
 				array(
+					'status'        => 'in_progress',
 					'current_index' => self::$current_index,
-					'progress'      => sprintf(
-						/* Translators: %1$s number of products written, %2$s total number of products, %3$s hyperlink open tag, %4$s hyperlink close tag */
-						esc_html__( 'Wrote %1$s out of %2$s products to %3$sfeed file%4$s.', 'pinterest-for-woocommerce' ),
-						self::$current_index,
-						$state['products_count'],
-						'<a href="' . $state['feed_url'] . '" target="_blank">',
-						'</a>'
-					),
 				)
 			);
 
 		} else {
 			/* Translators: the path of the file */
-			throw new \Exception( sprintf( esc_html__( 'Could not write to file: %s.', 'pinterest-for-woocommerce' ), $state['tmp_file'] ), 400 );
+			throw new \Exception( sprintf( esc_html__( 'Could not write to file: %s.', 'pinterest-for-woocommerce' ), $local_feed['tmp_file'] ), 400 );
 		}
 	}
 
@@ -462,13 +477,15 @@ class ProductSync {
 	 *
 	 * @param boolean $force When true, overrides the check for already scheduled task.
 	 *
-	 * @return void
+	 * @return boolean true if rescheduled, false otherwise.
 	 */
 	private static function trigger_async_feed_generation( $force = false ) {
 
 		if ( $force || false === as_next_scheduled_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			as_enqueue_async_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+			return 0 !== as_enqueue_async_action( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
+
+		return false;
 	}
 
 
@@ -640,108 +657,6 @@ class ProductSync {
 
 
 	/**
-	 * Saves or returns the Current state of the Feed generation job.
-	 * Status can be one of the following:
-	 *
-	 * - starting                 The feed job is being initialized. A new JobID will be assigned if none exists.
-	 * - check_registration       If a JobID already exists, it is returned, otherwise a new one will be assigned.
-	 * - in_progress              Signifies that we are between iterations and generating the feed.
-	 * - generated                The feed is generated, no further action will be taken.
-	 * - scheduled_for_generation The feed needs to be (re)generated. If this status is set, the next run of __CLASS__::handle_feed_generation() will start the generation process.
-	 * - pending_config           The feed was reset or was never configured.
-	 * - error                    The generation process returned an error.
-	 *
-	 * @param string $status The status of the feed's generation process. See above.
-	 * @param array  $args   The arguments that go along with the given status.
-	 *
-	 * @return array
-	 */
-	public static function feed_job_status( $status = null, $args = null ) {
-
-		$state_data = Pinterest_For_Woocommerce()::get_data( 'feed_job' );
-
-		if ( ! is_null( $state_data ) ) {
-			$expired = ( 'generated' === $state_data['status'] && $state_data['finished'] < ( time() - DAY_IN_SECONDS ) );
-
-			if ( $expired ) {
-				$state_data['status'] = 'scheduled_for_generation';
-				if ( isset( $state_data['finished'] ) ) {
-					unset( $state_data['finished'] );
-				}
-				Pinterest_For_Woocommerce()::save_data( 'feed_job', $state_data );
-			}
-		}
-
-		if ( is_null( $status ) || ( ! is_null( $status ) && 'check_registration' === $status && ! empty( $state_data['job_id'] ) ) ) {
-			return $state_data;
-		}
-
-		if ( ! isset( $state_data['status'] ) ) {
-			$state_data['status'] = 'pending_config';
-		}
-
-		$state_data     = empty( $state_data ) ? array() : $state_data;
-		$initial_status = $state_data['status'];
-
-		if ( 'starting' === $status || 'check_registration' === $status ) {
-
-			if ( 'check_registration' !== $status ) {
-				$state_data['status']  = $status;
-				$state_data['started'] = time();
-			}
-
-			if ( empty( $state_data['job_id'] ) ) {
-				$state_data['job_id'] = wp_generate_password( 6, false, false );
-			}
-
-			$upload_dir = wp_get_upload_dir();
-
-			$state_data['feed_file'] = trailingslashit( $upload_dir['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-' . $state_data['job_id'] . '.xml';
-			$state_data['tmp_file']  = trailingslashit( $upload_dir['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-' . $state_data['job_id'] . '-tmp.xml';
-			$state_data['feed_url']  = trailingslashit( $upload_dir['baseurl'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-' . $state_data['job_id'] . '.xml';
-
-			if ( isset( $args, $args['dataset'] ) ) {
-				set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state_data['job_id'], $args['dataset'], WEEK_IN_SECONDS );
-			}
-		} elseif ( 'in_progress' === $status ) {
-			$state_data['status']        = 'in_progress';
-			$state_data['finished']      = 0;
-			$state_data['last_activity'] = time();
-			$state_data['progress']      = $args['progress'];
-
-			if ( isset( $args, $args['current_index'] ) ) {
-				set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state_data['job_id'], $args['current_index'], WEEK_IN_SECONDS );
-			}
-		} elseif ( 'generated' === $status ) {
-			$state_data['status']   = 'generated';
-			$state_data['finished'] = time();
-
-			// Cleanup.
-			delete_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state_data['job_id'] );
-			delete_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state_data['job_id'] );
-
-		} elseif ( 'error' === $status ) {
-			$state_data['status']        = 'error';
-			$state_data['last_activity'] = time();
-			$state_data['progress']      = $args['progress'];
-
-			// Cleanup.
-			delete_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' . $state_data['job_id'] );
-			delete_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_current_index_' . $state_data['job_id'] );
-		}
-
-		Pinterest_For_Woocommerce()::save_data( 'feed_job', $state_data );
-
-		if ( $initial_status !== $state_data['status'] ) {
-			self::log( 'Feed status set to: ' . $state_data['status'] );
-		}
-
-		return $state_data;
-
-	}
-
-
-	/**
 	 * Check if Given ID is of a product and if yes, mark feed as dirty.
 	 *
 	 * @param integer $product_id The product ID.
@@ -771,6 +686,36 @@ class ProductSync {
 		}
 	}
 
+
+	/**
+	 * Check if feed is expired, and reschedule feed generation.
+	 *
+	 * @return void
+	 */
+	public static function reschedule_if_expired() {
+
+		$state = ProductFeedStatus::get();
+
+		if ( ( 'generated' === $state['status'] && $state['last_activity'] < ( time() - self::FEED_EXPIRY ) ) ) {
+			self::log( 'Feed is expired.' );
+			self::feed_reschedule();
+		}
+	}
+
+	/**
+	 * Check if feed is expired, and reschedule feed generation.
+	 *
+	 * @return void
+	 */
+	public static function reschedule_if_errored() {
+
+		$state = ProductFeedStatus::get();
+
+		if ( ( 'error' === $state['status'] && $state['last_activity'] < ( time() - self::WAIT_ON_ERROR_BEFORE_RETRY ) ) ) {
+			self::log( 'Retrying feed generation after error.' );
+			self::feed_reschedule();
+		}
+	}
 
 	/**
 	 * Cancels the scheduled product sync jobs.
