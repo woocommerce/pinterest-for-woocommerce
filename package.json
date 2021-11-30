@@ -107,6 +107,7 @@
     "format:js": "wp-scripts format ./assets/source",
     "lint:css": "wp-scripts lint-style ./assets/source",
     "lint:php": "composer run-script phpcs ./",
+    "test:php": "composer test-unit",
     "lint:css:fix": "wp-scripts lint-style ./assets/source --fix",
     "build:zip": "npm run build",
     "test-unit": "wp-scripts test-unit-js --coverage",
