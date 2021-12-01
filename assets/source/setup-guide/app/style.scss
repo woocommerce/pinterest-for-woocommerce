@@ -345,8 +345,12 @@ $root: ".woocommerce-setup-guide";
 
 				.components-card__body {
 
-					> *:not(:last-child) {
-						margin-bottom: 16px;
+					> *:not(:first-child) {
+						margin-bottom: var(--main-gap);
+					}
+
+					> *:first-child {
+						margin-bottom: $grid-unit-10;
 					}
 				}
 

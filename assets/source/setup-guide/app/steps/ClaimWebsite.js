@@ -13,6 +13,7 @@ import {
 	Button,
 	Card,
 	CardBody,
+	Flex,
 	Notice,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
@@ -20,9 +21,11 @@ import {
 /**
  * Internal dependencies
  */
+import { PROCESS_STATUS as STATUS, LABEL_STATUS } from '../constants';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
-import StepStatus from '../components/StepStatus';
+import UrlInputControl from '../components/UrlInputControl';
+import StatusLabel from '../components/StatusLabel';
 import {
 	useSettingsSelect,
 	useSettingsDispatch,
@@ -67,6 +70,7 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
 	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
+	const pfwSettings = wcSettings.pinterest_for_woocommerce;
 
 	useEffect( () => {
 		if ( status !== 'pending' && isDomainVerified ) {
@@ -104,24 +108,25 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 		}
 	};
 
-	const StepButton = () => {
+	const VerifyButton = () => {
 		const buttonLabels = {
-			idle: __( 'Start Verification', 'pinterest-for-woocommerce' ),
-			pending: __( 'Verifying Domain', 'pinterest-for-woocommerce' ),
-			error: __( 'Try Again', 'pinterest-for-woocommerce' ),
-			success: __( 'Continue', 'pinterest-for-woocommerce' ),
+			[ STATUS.IDLE ]: __(
+				'Start verification',
+				'pinterest-for-woocommerce'
+			),
+			[ STATUS.PENDING ]: __( 'Verifying…', 'pinterest-for-woocommerce' ),
+			[ STATUS.ERROR ]: __( 'Try again', 'pinterest-for-woocommerce' ),
+			[ STATUS.SUCCESS ]: __( 'Verified', 'pinterest-for-woocommerce' ),
 		};
 
+		const text = buttonLabels[ status ];
+
+		if ( Object.values( LABEL_STATUS ).includes( status ) ) {
+			return <StatusLabel status={ status } text={ text } />;
+		}
+
 		return (
-			<Button
-				isPrimary
-				disabled={ status === 'pending' }
-				onClick={
-					status === 'success' ? goToNextStep : handleClaimWebsite
-				}
-			>
-				{ buttonLabels[ status ] }
-			</Button>
+			<Button isSecondary text={ text } onClick={ handleClaimWebsite } />
 		);
 	};
 
@@ -177,19 +182,15 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 									) }
 								</Text>
 
-								<StepStatus
-									label={
-										wcSettings.pinterest_for_woocommerce
-											.homeUrlToVerify
-									}
-									status={ status }
-								/>
+								<Flex gap={ 6 }>
+									<UrlInputControl
+										disabled
+										value={ pfwSettings.homeUrlToVerify }
+									/>
+									<VerifyButton />
+								</Flex>
 
 								<StaticError reqError={ reqError } />
-
-								{ view === 'settings' && ! isDomainVerified && (
-									<StepButton />
-								) }
 							</CardBody>
 						) : (
 							<CardBody size="large">
@@ -200,7 +201,15 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 
 					{ view === 'wizard' && (
 						<div className="woocommerce-setup-guide__footer-button">
-							<StepButton />
+							<Button
+								isPrimary
+								disabled={ status !== STATUS.SUCCESS }
+								onClick={ goToNextStep }
+								text={ __(
+									'Continue',
+									'pinterest-for-woocommerce'
+								) }
+							/>
 						</div>
 					) }
 				</div>
