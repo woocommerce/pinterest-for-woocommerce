@@ -1,14 +1,19 @@
 /**
  * External dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import {
+	useEffect,
+	useState,
+	createInterpolateElement,
+} from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@woocommerce/components';
 import {
 	Button,
 	Card,
 	CardBody,
+	Notice,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
@@ -35,10 +40,24 @@ const StaticError = ( { reqError } ) => {
 		return null;
 	}
 
+	const message = createInterpolateElement(
+		sprintf(
+			// translators: %s: error reason returned by Pinterest when verifying website claim fail.
+			__(
+				'<strong>We were unable to verify this domain.</strong> %s',
+				'pinterest-for-woocommerce'
+			),
+			reqError.message
+		),
+		{
+			strong: <strong />,
+		}
+	);
+
 	return (
-		<Text variant="body" className="claim-error">
-			{ reqError.message }
-		</Text>
+		<Notice status="error" isDismissible={ false }>
+			{ message }
+		</Notice>
 	);
 };
 

@@ -377,8 +377,9 @@ $root: ".woocommerce-setup-guide";
 					}
 				}
 
-				.claim-error {
-					color: var(--wc-red);
+				.components-notice.is-error {
+					margin: 0;
+					background-color: #f8ebea;
 				}
 			}
 
