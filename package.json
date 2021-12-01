@@ -98,23 +98,23 @@
     }
   },
   "scripts": {
-    "dev": "wp-scripts build && gulp build",
     "prebuild": "composer install --no-dev",
     "build": "wp-scripts build && gulp build && gulp package",
     "postbuild": "composer install",
-    "start": "wp-scripts start",
-    "lint:js": "wp-scripts lint-js ./assets/source",
-    "lint:js:fix": "wp-scripts lint-js ./assets/source --fix",
+    "build:zip": "npm run build",
+    "dev": "wp-scripts build && gulp build",
     "format:js": "wp-scripts format ./assets/source",
     "lint:css": "wp-scripts lint-style ./assets/source",
-    "lint:php": "composer run-script phpcs ./",
-    "test:php-prepare": "./bin/install-wp-tests.sh",
-    "test:php-run": "composer test-unit",
-    "test:php": "npm run test:php-prepare -- wordpress_test root root localhost && npm run test:php-run",
     "lint:css:fix": "wp-scripts lint-style ./assets/source --fix",
-    "build:zip": "npm run build",
+    "lint:js": "wp-scripts lint-js ./assets/source",
+    "lint:js:fix": "wp-scripts lint-js ./assets/source --fix",
+    "lint:php": "composer run-script phpcs ./",
+    "start": "wp-scripts start",
     "test:js": "wp-scripts test-unit-js --coverage",
-    "test:js:watch": "npm run test:js -- --watch"
+    "test:js:watch": "npm run test:js -- --watch",
+    "test:php": "npm run test:php-prepare -- wordpress_test root root localhost && npm run test:php-run",
+    "test:php-prepare": "./bin/install-wp-tests.sh",
+    "test:php-run": "composer test-unit"
   },
   "browserslist": [
     "last 5 versions",
