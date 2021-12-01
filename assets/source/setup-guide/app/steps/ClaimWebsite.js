@@ -64,8 +64,17 @@ const StaticError = ( { reqError } ) => {
 	);
 };
 
+/**
+ * Renders a UI with section block and <Card> to claim website (if not yet completed) and display its status.
+ *
+ * @param {Object} props React props.
+ * @param {'wizard'|'settings'} props.view Indicate which view this component is rendered on.
+ * @param {Function} [props.goToNextStep]
+ *   When the website claim is complete, called when clicking the "Continue" button.
+ *   The "Continue" button is only displayed when `props.view` is 'wizard'.
+ */
 const ClaimWebsite = ( { goToNextStep, view } ) => {
-	const [ status, setStatus ] = useState( 'idle' );
+	const [ status, setStatus ] = useState( STATUS.IDLE );
 	const [ reqError, setReqError ] = useState();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
 	const setAppSettings = useSettingsDispatch( view === 'wizard' );
@@ -73,32 +82,30 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 	const pfwSettings = wcSettings.pinterest_for_woocommerce;
 
 	useEffect( () => {
-		if ( status !== 'pending' && isDomainVerified ) {
-			setStatus( 'success' );
+		if ( status !== STATUS.PENDING && isDomainVerified ) {
+			setStatus( STATUS.SUCCESS );
 		}
 	}, [ status, isDomainVerified ] );
 
 	const handleClaimWebsite = async () => {
-		setStatus( 'pending' );
+		setStatus( STATUS.PENDING );
 		setReqError();
 
 		try {
 			const results = await apiFetch( {
-				path:
-					wcSettings.pinterest_for_woocommerce.apiRoute +
-					'/domain_verification',
+				path: pfwSettings.apiRoute + '/domain_verification',
 				method: 'POST',
 			} );
 
 			await setAppSettings( { account_data: results.account_data } );
 
-			setStatus( 'success' );
+			setStatus( STATUS.SUCCESS );
 		} catch ( error ) {
-			setStatus( 'error' );
+			setStatus( STATUS.ERROR );
 			setReqError( error );
 
 			createNotice(
-				'error',
+				STATUS.ERROR,
 				error.message ||
 					__(
 						'Couldn’t verify your domain.',
@@ -159,10 +166,7 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 						description={ __(
 							'Claim your website to get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of your content.'
 						) }
-						link={
-							wcSettings.pinterest_for_woocommerce.pinterestLinks
-								.claimWebsite
-						}
+						link={ pfwSettings.pinterestLinks.claimWebsite }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
