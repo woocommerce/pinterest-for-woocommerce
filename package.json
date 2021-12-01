@@ -113,8 +113,8 @@
     "test:php": "npm run test:php-prepare -- wordpress_test root root localhost && npm run test:php-run",
     "lint:css:fix": "wp-scripts lint-style ./assets/source --fix",
     "build:zip": "npm run build",
-    "test-unit": "wp-scripts test-unit-js --coverage",
-    "test-unit:watch": "npm run test-unit -- --watch"
+    "test:js": "wp-scripts test-unit-js --coverage",
+    "test:js:watch": "npm run test:js -- --watch"
   },
   "browserslist": [
     "last 5 versions",
