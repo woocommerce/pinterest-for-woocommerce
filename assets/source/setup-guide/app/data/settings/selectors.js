@@ -59,9 +59,10 @@ export const isDomainVerified = ( state ) => {
 		return false;
 	}
 
-	return state?.settings?.account_data?.verified_domains.includes(
-		wcSettings.pinterest_for_woocommerce.domainToVerify
+	const { hostname } = new URL(
+		wcSettings.pinterest_for_woocommerce.homeUrlToVerify
 	);
+	return state?.settings?.account_data?.verified_domains.includes( hostname );
 };
 
 /**

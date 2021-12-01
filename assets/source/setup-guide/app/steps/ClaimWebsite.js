@@ -161,7 +161,7 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 								<StepStatus
 									label={
 										wcSettings.pinterest_for_woocommerce
-											.domainToVerify
+											.homeUrlToVerify
 									}
 									status={ status }
 								/>
