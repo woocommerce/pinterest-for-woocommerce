@@ -66,6 +66,17 @@ class ProductSync {
 			add_action( 'woocommerce_variation_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
 			add_action( 'woocommerce_product_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
 		}
+
+		/**
+		 * Mark feed as needing re-generation on changes to the woocommerce_hide_out_of_stock_items setting
+		 */
+		add_action(
+			'update_option_woocommerce_hide_out_of_stock_items',
+			function () {
+				Pinterest_For_Woocommerce()::save_data( 'feed_dirty', true );
+				self::log( 'Feed is dirty.' );
+			}
+		);
 	}
 
 	/**

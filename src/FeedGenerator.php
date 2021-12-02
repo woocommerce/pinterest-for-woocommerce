@@ -211,14 +211,20 @@ class FeedGenerator extends AbstractChainedJob {
 
 			$types = array_diff( $included_product_types, $excluded_product_types );
 
-			$products = wc_get_products(
-				array(
-					'type'    => $types,
-					'include' => $items,
-					'orderby' => 'none',
-					'limit'   => $this->get_batch_size(),
-				)
+			$products_query_args = array(
+				'type'       => $types,
+				'include'    => $items,
+				'visibility' => 'catalog',
+				'orderby'    => 'none',
+				'limit'      => $this->get_batch_size(),
 			);
+
+			// Do not sync out of stock products if woocommerce_hide_out_of_stock_items is set.
+			if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) ) {
+				$products_query_args['stock_status'] = 'instock';
+			}
+
+			$products = wc_get_products( $products_query_args );
 
 			$this->prepare_feed_buffers();
 
