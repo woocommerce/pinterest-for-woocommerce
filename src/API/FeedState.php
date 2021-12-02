@@ -247,11 +247,12 @@ class FeedState extends VendorAPI {
 	private function add_feed_registration_state( $result ) {
 
 		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
+		$feed_id     = Pinterest_For_Woocommerce()::get_data( 'feed_registered' );
 		$extra_info  = '';
 
 		try {
 
-			if ( empty( $merchant_id ) ) {
+			if ( empty( $merchant_id ) || empty( $feed_id ) ) {
 				throw new \Exception( esc_html__( 'Product feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' ), 200 );
 			}
 
@@ -261,7 +262,29 @@ class FeedState extends VendorAPI {
 				throw new \Exception( esc_html__( 'Could not get merchant info.', 'pinterest-for-woocommerce' ) );
 			}
 
-			if ( 'ACTIVE' !== $merchant['data']->product_pin_feed_profile->feed_status ) {
+			$feed = Base::get_merchant_feeds( $merchant_id );
+
+			if ( 'success' !== $feed['status'] ) {
+				throw new \Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
+			}
+
+			if ( is_array( $feed['data'] ) ) {
+
+				foreach ( $feed['data'] as $feed_profile ) {
+
+					if ( $feed_id === $feed_profile->id ) {
+						$feed_object = $feed_profile;
+					}
+				}
+			} else {
+				$feed_object = $feed['data'];
+			}
+
+			if ( ! $feed_object ) {
+				throw new \Exception( esc_html__( 'Product feed not found in merchant.', 'pinterest-for-woocommerce' ) );
+			}
+
+			if ( 'ACTIVE' !== $feed_object->feed_status ) {
 				throw new \Exception( esc_html__( 'Product feed not active.', 'pinterest-for-woocommerce' ) );
 			}
 
@@ -272,13 +295,13 @@ class FeedState extends VendorAPI {
 					$status       = 'success';
 					$status_label = esc_html__( 'Product feed configured for ingestion on Pinterest', 'pinterest-for-woocommerce' );
 
-					if ( ! empty( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq ) ) {
+					if ( ! empty( $feed_object->location_config->full_feed_fetch_freq ) ) {
 						$extra_info = wp_kses_post(
 							sprintf(
 								/* Translators: %1$s The URL of the product feed, %2$s Time string */
 								__( 'Pinterest will fetch your <a href="%1$s" target="_blank">product feed</a> every %2$s', 'pinterest-for-woocommerce' ),
-								$merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location,
-								human_time_diff( 0, ( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq / 1000 ) )
+								$feed_object->location_config->full_feed_fetch_location,
+								human_time_diff( 0, ( $feed_object->location_config->full_feed_fetch_freq / 1000 ) )
 							)
 						);
 					}
