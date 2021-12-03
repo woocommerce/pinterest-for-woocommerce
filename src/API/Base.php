@@ -478,6 +478,10 @@ class Base {
 				throw new \Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
 			}
 
+			if ( ! is_array( $feeds['data'] ) ) {
+				throw new \Exception( esc_html__( 'Wrong feed info.', 'pinterest-for-woocommerce' ) );
+			}
+
 			$feed_object = null;
 
 			foreach ( $feeds['data'] as $feed_profile ) {
