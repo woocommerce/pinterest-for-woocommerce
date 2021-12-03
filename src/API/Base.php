@@ -460,7 +460,43 @@ class Base {
 
 
 	/**
-	 * Get a specific merchant's feeds using the given arguments.
+	 * Get a specific merchant feed using the given arguments.
+	 *
+	 * @param string $merchant_id The merchant ID the feed belongs to.
+	 * @param string $feed_id     The ID of the feed.
+	 *
+	 * @return mixed|null
+	 */
+	public static function get_merchant_feed( $merchant_id, $feed_id ) {
+		$feeds = self::get_merchant_feeds( $merchant_id );
+
+		if ( 'success' !== $feeds['status'] ) {
+			return null;
+		}
+
+		$feed_object = null;
+
+		if ( is_array( $feeds['data'] ) ) {
+
+			foreach ( $feeds['data'] as $feed_profile ) {
+
+				if ( $feed_id === $feed_profile->id ) {
+					$feed_object = $feed_profile;
+				}
+			}
+		} else {
+
+			if ( $feed_id === $feeds['data'] ) {
+				$feed_object = $feeds['data'];
+			}
+		}
+
+		return $feed_object;
+	}
+
+
+	/**
+	 * Get a merchant's feeds.
 	 *
 	 * @param string $merchant_id The merchant ID the feed belongs to.
 	 *
