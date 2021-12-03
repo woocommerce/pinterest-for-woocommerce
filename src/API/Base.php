@@ -466,6 +466,8 @@ class Base {
 	 * @param string $feed_id     The ID of the feed.
 	 *
 	 * @return mixed|null
+	 *
+	 * @throws \Exception PHP Exception.
 	 */
 	public static function get_merchant_feed( $merchant_id, $feed_id ) {
 		try {
@@ -494,6 +496,7 @@ class Base {
 			}
 
 			return $feed_object;
+
 		} catch ( \Exception $e ) {
 
 			Logger::log( $e->getMessage(), 'error' );
