@@ -475,7 +475,7 @@ class Base {
 			$feeds = self::get_merchant_feeds( $merchant_id );
 
 			if ( 'success' !== $feeds['status'] ) {
-				return null;
+				throw new \Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
 			}
 
 			$feed_object = null;
