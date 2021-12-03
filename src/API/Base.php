@@ -468,30 +468,38 @@ class Base {
 	 * @return mixed|null
 	 */
 	public static function get_merchant_feed( $merchant_id, $feed_id ) {
-		$feeds = self::get_merchant_feeds( $merchant_id );
+		try {
 
-		if ( 'success' !== $feeds['status'] ) {
-			return null;
-		}
+			$feeds = self::get_merchant_feeds( $merchant_id );
 
-		$feed_object = null;
+			if ( 'success' !== $feeds['status'] ) {
+				return null;
+			}
 
-		if ( is_array( $feeds['data'] ) ) {
+			$feed_object = null;
 
-			foreach ( $feeds['data'] as $feed_profile ) {
+			if ( is_array( $feeds['data'] ) ) {
 
-				if ( $feed_id === $feed_profile->id ) {
-					$feed_object = $feed_profile;
+				foreach ( $feeds['data'] as $feed_profile ) {
+
+					if ( $feed_id === $feed_profile->id ) {
+						$feed_object = $feed_profile;
+					}
+				}
+			} else {
+
+				if ( $feed_id === $feeds['data'] ) {
+					$feed_object = $feeds['data'];
 				}
 			}
-		} else {
 
-			if ( $feed_id === $feeds['data'] ) {
-				$feed_object = $feeds['data'];
-			}
+			return $feed_object;
+		} catch ( \Exception $e ) {
+
+			Logger::log( $e->getMessage(), 'error' );
+
+			throw $e;
 		}
-
-		return $feed_object;
 	}
 
 
