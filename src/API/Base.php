@@ -480,18 +480,10 @@ class Base {
 
 			$feed_object = null;
 
-			if ( is_array( $feeds['data'] ) ) {
+			foreach ( $feeds['data'] as $feed_profile ) {
 
-				foreach ( $feeds['data'] as $feed_profile ) {
-
-					if ( $feed_id === $feed_profile->id ) {
-						$feed_object = $feed_profile;
-					}
-				}
-			} else {
-
-				if ( $feed_id === $feeds['data'] ) {
-					$feed_object = $feeds['data'];
+				if ( $feed_id === $feed_profile->id ) {
+					$feed_object = $feed_profile;
 				}
 			}
 
