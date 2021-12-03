@@ -44,12 +44,29 @@ const PinterestLogo = () => {
  *
  * @event wcadmin_pfw_account_disconnect_button_click
  */
+/**
+ * Opening a modal.
+ *
+ * @event wcadmin_pfw_modal_open
+ * @property {string} context Indicate which modal this is for.
+ */
+/**
+ * Closing a modal.
+ *
+ * @event wcadmin_pfw_modal_closed
+ * @property {string} context Indicate which modal this is for.
+ * @property {string} action
+ * 				`confirm` - When the final "got it" button is clicked.
+ * 				`dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
+ */
 
 /**
  * Pinterest account connection component.
  *
  * @fires wcadmin_pfw_account_connect_button_click
  * @fires wcadmin_pfw_account_disconnect_button_click
+ * @fires wcadmin_pfw_modal_open with `context: 'account-disconnection'`
+ * @fires wcadmin_pfw_modal_closed with `context: 'account-disconnection'`
  *
  * @param {Object} props React props.
  * @param {boolean} props.isConnected
@@ -59,18 +76,25 @@ const PinterestLogo = () => {
  */
 const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 	const createNotice = useCreateNotice();
+	const modalContext = 'account-disconnection';
 
 	const [ isConfirmationModalOpen, setIsConfirmationModalOpen ] = useState(
 		false
 	);
 
 	const openConfirmationModal = () => {
-		setIsConfirmationModalOpen( true );
 		recordEvent( 'pfw_account_disconnect_button_click' );
+		setIsConfirmationModalOpen( true );
+		recordEvent( 'pfw_modal_open', { context: modalContext } );
 	};
 
-	const closeConfirmationModal = () => {
+	const closeConfirmationModal = ( event, isConfirmed ) => {
 		setIsConfirmationModalOpen( false );
+
+		recordEvent( 'pfw_modal_closed', {
+			context: modalContext,
+			action: isConfirmed ? 'confirm' : 'dismiss',
+		} );
 	};
 
 	const renderConfirmationModal = () => {
@@ -110,7 +134,7 @@ const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 	};
 
 	const handleDisconnectAccount = async () => {
-		closeConfirmationModal();
+		closeConfirmationModal( undefined, true );
 
 		try {
 			await apiFetch( {

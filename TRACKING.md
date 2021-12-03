@@ -17,7 +17,7 @@ Do not edit it manually!
 ### [`wcadmin_pfw_account_connect_button_click`](assets/source/setup-guide/app/components/Account/Connection.js#L37)
 Clicking on "Connect" Pinterest account button.
 #### Emitters
-- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L60)
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L77)
 
 ### [`wcadmin_pfw_account_convert_button_click`](assets/source/setup-guide/app/steps/SetupAccount.js#L32)
 Clicking on "… convert your personal account" button.
@@ -32,7 +32,7 @@ Clicking on "… create a new Pinterest account" button.
 ### [`wcadmin_pfw_account_disconnect_button_click`](assets/source/setup-guide/app/components/Account/Connection.js#L42)
 Clicking on "Disconnect" Pinterest account button during account setup.
 #### Emitters
-- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L60)
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L77)
 
 ### [`wcadmin_pfw_business_account_connect_button_click`](assets/source/setup-guide/app/components/Account/BusinessAccountSelection.js#L24)
 Clicking on "Connect" business account button.
@@ -62,10 +62,10 @@ Clicking on an external documentation link.
 	- with `{ link_id: 'ad-guidelines', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
-	- with `{ link_id: 'setup-tracking', context: 'wizard'|'settings' }`
-- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L35) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
+	- with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
+- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L36) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
 
-### [`wcadmin_pfw_get_started_faq`](assets/source/setup-guide/app/views/LandingPageApp.js#L207)
+### [`wcadmin_pfw_get_started_faq`](assets/source/setup-guide/app/views/LandingPageApp.js#L208)
 Clicking on getting started page faq item to collapse or expand it.
 #### Properties
 |   |   |   |
@@ -73,7 +73,26 @@ Clicking on getting started page faq item to collapse or expand it.
 `action` | `string` | `'expand' \| 'collapse'` What action was initiated.
 `question_id` | `string` | Identifier of the clicked question.
 #### Emitters
-- [`FaqQuestion`](assets/source/setup-guide/app/views/LandingPageApp.js#L226) whenever the FAQ is toggled.
+- [`FaqQuestion`](assets/source/setup-guide/app/views/LandingPageApp.js#L227) whenever the FAQ is toggled.
+
+### [`wcadmin_pfw_modal_closed`](assets/source/setup-guide/app/components/Account/Connection.js#L53)
+Closing a modal.
+#### Properties
+|   |   |   |
+|---|---|---|
+`context` | `string` | Indicate which modal this is for.
+`action` | `string` | `confirm` - When the final "got it" button is clicked. <br> `dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
+#### Emitters
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L77) with `context: 'account-disconnection'`
+
+### [`wcadmin_pfw_modal_open`](assets/source/setup-guide/app/components/Account/Connection.js#L47)
+Opening a modal.
+#### Properties
+|   |   |   |
+|---|---|---|
+`context` | `string` | Indicate which modal this is for.
+#### Emitters
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L77) with `context: 'account-disconnection'`
 
 <!---
 End of `woo-tracking-jsdoc`-generated content.
