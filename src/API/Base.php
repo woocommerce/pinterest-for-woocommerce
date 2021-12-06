@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Base {
 
 	const API_DOMAIN  = 'https://api.pinterest.com';
-	const API_VERSION = 3;
+	const API_VERSION = 4;
 
 	/**
 	 * Holds the instance of the class.
