@@ -482,16 +482,15 @@ class Base {
 				throw new \Exception( esc_html__( 'Wrong feed info.', 'pinterest-for-woocommerce' ) );
 			}
 
-			$feed_object = null;
-
 			foreach ( $feeds['data'] as $feed_profile ) {
 
 				if ( $feed_id === $feed_profile->id ) {
-					$feed_object = $feed_profile;
+					return $feed_profile;
 				}
 			}
 
-			return $feed_object;
+			// No feed found.
+			throw new \Exception( esc_html__( 'No feed found with the requested ID.', 'pinterest-for-woocommerce' ) );
 
 		} catch ( \Exception $e ) {
 
