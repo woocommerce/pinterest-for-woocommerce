@@ -341,7 +341,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_advertiser_tags( $advertiser_id ) {
-		return self::make_request( 'advertisers/' . $advertiser_id . '/tags/', 'GET', array(), 'ads' );
+		return self::make_request( 'advertisers/' . $advertiser_id . '/conversion_tags/', 'GET', array(), 'ads' );
 	}
 
 
