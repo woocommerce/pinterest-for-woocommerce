@@ -357,11 +357,10 @@ class Base {
 		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		return self::make_request(
-			'tags/',
+			"advertisers/{$advertiser_id}/conversion_tags",
 			'POST',
 			array(
-				'advertiser' => $advertiser_id,
-				'name'       => $tag_name,
+				'name' => $tag_name,
 			),
 			'ads'
 		);
