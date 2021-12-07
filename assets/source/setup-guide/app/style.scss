@@ -300,11 +300,11 @@ $root: ".woocommerce-setup-guide";
 
 				.components-card__body {
 
-					> *:not(:first-child) {
+					> :not(:last-child) {
 						margin-bottom: var(--main-gap);
 					}
 
-					> *:first-child {
+					> :first-child {
 						margin-bottom: $grid-unit-10;
 					}
 				}
