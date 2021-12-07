@@ -562,7 +562,7 @@ class ProductSync {
 			if ( false !== $prev_registered ) {
 				try {
 					$feed                        = API\Base::get_merchant_feed( $merchant['data']->id, $prev_registered );
-					$product_pin_feed_profile_id = $feed['data']->feed_profile_id;
+					$product_pin_feed_profile_id = $feed['data']->id;
 				} catch ( \Throwable $e ) {
 					$product_pin_feed_profile_id = false;
 				}
