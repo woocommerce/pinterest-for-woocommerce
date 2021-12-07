@@ -105,7 +105,7 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 			setReqError( error );
 
 			createNotice(
-				STATUS.ERROR,
+				'error',
 				error.message ||
 					__(
 						'Couldn’t verify your domain.',
