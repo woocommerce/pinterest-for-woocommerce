@@ -519,6 +519,27 @@ class Base {
 
 
 	/**
+	 * Get a specific merchant's feed using the given arguments.
+	 *
+	 * @param string $merchant_id The merchant ID the feed belongs to.
+	 * @param string $feed_id     The ID of the feed.
+	 *
+	 * @return mixed
+	 */
+	public static function get_merchant_feed_report( $merchant_id, $feed_id ) {
+		return self::make_request(
+			"catalogs/datasource/feed_report/{$merchant_id}/",
+			'GET',
+			array(
+				'feed_profile' => $feed_id,
+			),
+			'',
+			MINUTE_IN_SECONDS
+		);
+	}
+
+
+	/**
 	 * Request the managed map representing all of the error, recommendation, and status messages for catalogs.
 	 *
 	 * @return mixed
