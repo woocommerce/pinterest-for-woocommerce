@@ -254,7 +254,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function disconnect_merchat() {
-		return self::make_request( 'catalogs/partner/connect', 'POST' );
+		return self::make_request( 'catalogs/partner/disconnect', 'POST' );
 	}
 
 	/**
