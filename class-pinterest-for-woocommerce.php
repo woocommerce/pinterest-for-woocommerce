@@ -580,8 +580,21 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Cancel scheduled jobs.
 			Pinterest\ProductSync::cancel_jobs();
 
-			// At this point we're disconnected.
-			return true;
+			// Disconnect merchant from Pinterest.
+			try {
+				$result = Pinterest\API\Base::disconnect_merchat();
+
+				if ( 'success' !== $result['status'] ) {
+					throw new \Exception( esc_html__( 'Response error on disconnect', 'pinterest-for-woocommerce' ), 400 );
+				}
+
+				// At this point we're disconnected.
+				return true;
+
+			} catch ( \Exception $th ) {
+				// There was an error disconnecting merchant.
+				return false;
+			}
 		}
 
 

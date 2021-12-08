@@ -249,6 +249,15 @@ class Base {
 
 
 	/**
+	 * Disconnect the merchant from the Pinterest platform.
+	 *
+	 * @return mixed
+	 */
+	public static function disconnect_merchat() {
+		return self::make_request( 'catalogs/partner/connect', 'POST' );
+	}
+
+	/**
 	 * Request the verification data from the API and return the response.
 	 *
 	 * @return mixed
