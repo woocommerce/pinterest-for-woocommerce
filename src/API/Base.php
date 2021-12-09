@@ -22,8 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Base {
 
-	const API_DOMAIN  = 'https://api.pinterest.com';
-	const API_VERSION = 4;
+	const API_DOMAIN      = 'https://api.pinterest.com';
+	const API_VERSION     = 3;
+	const API_ADS_VERSION = 4;
 
 	/**
 	 * Holds the instance of the class.
@@ -88,9 +89,11 @@ class Base {
 		}
 
 		try {
-			$api     = empty( $api ) ? '' : trailingslashit( $api );
+			$api         = empty( $api ) ? '' : trailingslashit( $api );
+			$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
+
 			$request = array(
-				'url'    => self::API_DOMAIN . '/' . $api . 'v' . self::API_VERSION . '/' . $endpoint,
+				'url'    => self::API_DOMAIN . '/' . $api . 'v' . $api_version . '/' . $endpoint,
 				'method' => $method,
 				'args'   => $payload,
 			);
