@@ -42,6 +42,14 @@ const settingsReducer = (
 				isUpdating: false,
 			};
 			break;
+		case TYPES.SET_UPDATED_DATA:
+			state = {
+				...state,
+				updatedData: action.reset
+					? {}
+					: { ...state.updatedData, ...action.data },
+			};
+			break;
 	}
 	return state;
 };

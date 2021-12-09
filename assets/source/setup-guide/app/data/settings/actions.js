@@ -40,7 +40,30 @@ export function setIsUpdating( isUpdating ) {
 	};
 }
 
+/**
+ * Saves the data to be updated in the store
+ *
+ * @param {Object} data The data to be updated
+ * @param {boolean} reset True if we want to empty the updatedData prop (normally after DB store)
+ * @return {Object} The reducer definition
+ */
+export function setUpdatedData( data, reset = false ) {
+	return {
+		type: TYPES.SET_UPDATED_DATA,
+		data,
+		reset,
+	};
+}
+
+/**
+ * Update the settings in the store or in DB
+ *
+ * @param {Object} data The data to be updated
+ * @param {boolean} saveToDb If true it persists the changes in DB and empties the updateData prop in the store
+ * @return {Generator<{success}, void, ?>} A generator for the data update
+ */
 export function* updateSettings( data, saveToDb = false ) {
+	yield setUpdatedData( data, saveToDb );
 	yield receiveSettings( data );
 
 	if ( ! saveToDb ) {
