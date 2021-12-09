@@ -407,62 +407,30 @@ class Base {
 
 
 	/**
-	 * Creates a merchant for the authenticated user or returns the existing one.
-	 *
-	 * @param array $args The arguments to be passed to the API request.
+	 * Creates a merchant for the authenticated user or updates the existing one.
 	 *
 	 * @return mixed
 	 */
-	public static function maybe_create_merchant( $args = array() ) {
+	public static function update_or_create_merchant() {
+
+		$local_feed = ProductFeedStatus::get_local_feed();
 
 		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
-		$args = wp_parse_args(
+		$args = array(
+			'merchant_domains' => get_home_url(),
+			'feed_location'    => $local_feed['feed_url'],
+			'feed_format'      => 'XML',
+			'country'          => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
+			'locale'           => str_replace( '_', '-', determine_locale() ),
+			'currency'         => get_woocommerce_currency(),
+			'merchant_name'    => $merchant_name,
+		);
+
+		return self::make_request(
+			'catalogs/partner/connect/',
+			'POST',
 			$args,
-			array(
-				'display_name'                      => $merchant_name,
-				'return_merchant_if_already_exists' => true,
-			)
-		);
-
-		return self::make_request(
-			add_query_arg( $args, 'commerce/product_pin_merchants/' ),
-			'POST'
-		);
-	}
-
-
-	/**
-	 * Adds the merchant's feed using the given arguments.
-	 *
-	 * @param string $merchant_id The merchant ID the feed belongs to.
-	 * @param array  $args        The arguments to be passed to the API request.
-	 *
-	 * @return mixed
-	 */
-	public static function add_merchant_feed( $merchant_id, $args ) {
-
-		return self::make_request(
-			add_query_arg( $args, 'commerce/product_pin_merchants/' . $merchant_id . '/feed/' ),
-			'POST'
-		);
-	}
-
-
-	/**
-	 * Updates the merchant's feed using the given arguments.
-	 *
-	 * @param string $merchant_id The merchant ID the feed belongs to.
-	 * @param string $feed_id     The ID of the feed to be updated.
-	 * @param array  $args        The arguments to be passed to the API request.
-	 *
-	 * @return mixed
-	 */
-	public static function update_merchant_feed( $merchant_id, $feed_id, $args ) {
-
-		return self::make_request(
-			add_query_arg( $args, 'commerce/product_pin_merchants/' . $merchant_id . '/feed/' . $feed_id . '/' ),
-			'PUT'
 		);
 	}
 
@@ -499,6 +467,48 @@ class Base {
 
 			// No feed found.
 			throw new \Exception( esc_html__( 'No feed found with the requested ID.', 'pinterest-for-woocommerce' ) );
+
+		} catch ( \Exception $e ) {
+
+			Logger::log( $e->getMessage(), 'error' );
+
+			throw $e;
+		}
+	}
+
+
+	/**
+	 * Get merchant's feed based on feed location
+	 *
+	 * @param string $merchant_id   The merchant ID.
+	 * @param string $feed_location The feed full location.
+	 *
+	 * @return mixed
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
+	public static function get_merchant_feed_by_location( $merchant_id, $feed_location ) {
+		try {
+
+			$feeds = self::get_merchant_feeds( $merchant_id );
+
+			if ( 'success' !== $feeds['status'] ) {
+				throw new \Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
+			}
+
+			if ( ! is_array( $feeds['data'] ) ) {
+				throw new \Exception( esc_html__( 'Wrong feed info.', 'pinterest-for-woocommerce' ) );
+			}
+
+			foreach ( $feeds['data'] as $feed_profile ) {
+
+				if ( $feed_location === $feed_profile->location_config->full_feed_fetch_location ) {
+					return $feed_profile;
+				}
+			}
+
+			// No feed found.
+			throw new \Exception( esc_html__( 'No feed found with the requested location.', 'pinterest-for-woocommerce' ) );
 
 		} catch ( \Exception $e ) {
 

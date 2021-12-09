@@ -30,11 +30,10 @@ class Merchants {
 	 * @throws \Throwable PHP Exception.
 	 * @throws \Exception PHP Exception.
 	 */
-	public static function get_merchant( $feed_args = array() ) {
+	public static function get_merchant() {
 
-		$merchant          = false;
-		$merchant_id       = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-		$saved_merchant_id = $merchant_id;
+		$merchant    = false;
+		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
 
 		if ( empty( $merchant_id ) ) {
 			// Get merchant from advertiser object.
@@ -53,26 +52,46 @@ class Merchants {
 
 		if ( ! empty( $merchant_id ) ) {
 
-			try {
-				$merchant = API\Base::get_merchant( $merchant_id );
-				if ( $saved_merchant_id !== $merchant_id ) {
-					Pinterest_For_Woocommerce()::save_data( 'merchant_id', $merchant['data']->id );
-				}
-			} catch ( \Throwable $th ) {
-				$merchant = false;
-			}
+			$merchant = self::get_merchant_object( $merchant_id );
 		}
 
 		if ( ! $merchant || ( 'success' !== $merchant['status'] && 650 === $merchant['code'] ) ) {  // https://developers.pinterest.com/docs/redoc/#tag/API-Response-Codes Merchant not found 650.
 			// Try creating one.
-			$merchant = API\Base::maybe_create_merchant( $feed_args );
-			if ( 'success' === $merchant['status'] ) {
-				Pinterest_For_Woocommerce()::save_data( 'merchant_id', $merchant['data']->id );
+			$response = API\Base::update_or_create_merchant();
+
+			if ( 'success' !== $response['status'] ) {
+				throw new \Exception( __( 'Response error when trying create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
 			}
+
+			$merchant = self::get_merchant_object( $response['data'] );
 		}
 
 		if ( ! $merchant || 'success' !== $merchant['status'] ) {
-			throw new \Exception( __( 'Response error when trying create a merchant or get the existing one.', 'pinterest-for-woocommerce' ), 400 );
+			throw new \Exception( __( 'Response error when trying create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
+		}
+
+		return $merchant;
+	}
+
+
+	/**
+	 * Get merchant object using the merchant ID.
+	 *
+	 * @param string $merchant_id The merchant ID.
+	 *
+	 * @return mixed|boolean
+	 */
+	private static function get_merchant_object( $merchant_id ) {
+		$merchant          = false;
+		$saved_merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
+
+		try {
+			$merchant = API\Base::get_merchant( $merchant_id );
+			if ( $saved_merchant_id !== $merchant_id ) {
+				Pinterest_For_Woocommerce()::save_data( 'merchant_id', $merchant['data']->id );
+			}
+		} catch ( \Throwable $th ) {
+			$merchant = false;
 		}
 
 		return $merchant;
