@@ -234,8 +234,6 @@ const SetupTracking = ( { view } ) => {
 		setIsFetching( true );
 
 		try {
-			setTagsList();
-
 			const results = await apiFetch( {
 				path:
 					wcSettings.pinterest_for_woocommerce.apiRoute +
