@@ -94,15 +94,10 @@ class Base {
 			$api         = empty( $api ) ? '' : trailingslashit( $api );
 			$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
 
-			$headers = array();
-			if ( $is_json_payload ) {
-				$headers['Content-Type'] = 'application/json';
-			}
-
 			$request = array(
 				'url'     => self::API_DOMAIN . '/' . $api . 'v' . $api_version . '/' . $endpoint,
 				'method'  => $method,
-				'headers' => $headers,
+				'json'    => $is_json_payload,
 				'args'    => $payload,
 			);
 
@@ -163,6 +158,10 @@ class Base {
 
 			if ( $request['auth_header'] ) {
 				$request['headers']['Authorization'] = 'Bearer ' . self::$token['access_token'];
+			}
+
+			if ( $request['json'] ) {
+				$request['headers']['Content-Type'] = 'application/json';
 			}
 
 			$request_args = array(
@@ -352,9 +351,9 @@ class Base {
 		return self::make_request(
 			'advertisers/' . $advertiser_id . '/connect/',
 			'POST',
-			array(
+			wp_json_encode( array(
 				'tag_id' => $tag_id,
-			),
+			) ),
 			'ads',
 			false,
 			true
@@ -374,9 +373,9 @@ class Base {
 		return self::make_request(
 			'advertisers/' . $advertiser_id . '/disconnect/',
 			'POST',
-			array(
+			wp_json_encode( array(
 				'tag_id' => $tag_id,
-			),
+			) ),
 			'ads',
 			false,
 			true
