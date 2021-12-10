@@ -9,6 +9,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
 
@@ -416,7 +417,7 @@ class Base {
 	 */
 	public static function update_or_create_merchant() {
 
-		$local_feed = ProductFeedStatus::get_local_feed();
+		$local_feed = Pinterest\ProductFeedStatus::get_local_feed();
 
 		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
