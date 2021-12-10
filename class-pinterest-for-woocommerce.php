@@ -569,17 +569,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function disconnect() {
 
-			// Flush the whole data option.
-			delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
-
-			// Remove settings that may cause issues if stale on disconnect.
-			self::save_setting( 'account_data', null );
-			self::save_setting( 'tracking_advertiser', null );
-			self::save_setting( 'tracking_tag', null );
-
-			// Cancel scheduled jobs.
-			Pinterest\ProductSync::cancel_jobs();
-
 			// Disconnect merchant from Pinterest.
 			try {
 				$result = Pinterest\API\Base::disconnect_merchat();
@@ -587,6 +576,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				if ( 'success' !== $result['status'] ) {
 					throw new \Exception( esc_html__( 'Response error on disconnect', 'pinterest-for-woocommerce' ), 400 );
 				}
+
+				// Flush the whole data option.
+				delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+
+				// Remove settings that may cause issues if stale on disconnect.
+				self::save_setting( 'account_data', null );
+				self::save_setting( 'tracking_advertiser', null );
+				self::save_setting( 'tracking_tag', null );
+
+				// Cancel scheduled jobs.
+				Pinterest\ProductSync::cancel_jobs();
 
 				// At this point we're disconnected.
 				return true;
