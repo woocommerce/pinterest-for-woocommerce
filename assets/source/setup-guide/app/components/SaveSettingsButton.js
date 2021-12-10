@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { recordEvent } from '@woocommerce/tracks';
-import { getPath } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
@@ -14,6 +13,7 @@ import {
 	useSettingsDispatch,
 	useCreateNotice,
 } from '../helpers/effects';
+import getContextByPath from '../helpers/get-context-by-path';
 
 const SaveSettingsButton = () => {
 	const isSaving = useSettingsSelect( 'isSettingsUpdating' );
@@ -22,11 +22,9 @@ const SaveSettingsButton = () => {
 	const createNotice = useCreateNotice();
 
 	const saveSettings = async () => {
-		const path = getPath();
-
 		recordEvent( 'pfw_save_changes_button_click', {
 			updatedData,
-			context: path.substring( 1 ).replace( '/', '_' ),
+			context: getContextByPath(),
 		} );
 
 		try {
