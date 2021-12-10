@@ -146,7 +146,7 @@ class FeedState extends VendorAPI {
 		} catch ( \Throwable $th ) {
 
 			/* Translators: The error description as returned from the API */
-			$error_message = sprintf( esc_html__( 'Error getting feed\'s state. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
+			$error_message = sprintf( esc_html__( 'Error getting feed state. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
 
 			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_state_error', $error_message, array( 'status' => $th->getCode() ) );
 		}
@@ -246,16 +246,11 @@ class FeedState extends VendorAPI {
 	 */
 	private function add_feed_registration_state( $result ) {
 
-		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-		$extra_info  = '';
+		$extra_info = '';
 
 		try {
 
-			if ( empty( $merchant_id ) ) {
-				throw new \Exception( esc_html__( 'Product feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' ), 200 );
-			}
-
-			$merchant = Base::get_merchant( $merchant_id );
+			$merchant = Pinterest\Merchants::get_merchant();
 
 			if ( 'success' !== $merchant['status'] ) {
 				throw new \Exception( esc_html__( 'Could not get merchant info.', 'pinterest-for-woocommerce' ) );
