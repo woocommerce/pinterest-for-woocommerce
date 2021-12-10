@@ -262,10 +262,6 @@ class FeedState extends VendorAPI {
 
 			$feed = Base::get_merchant_feed( $merchant_id, $feed_id );
 
-			if ( ! $feed ) {
-				throw new \Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
-			}
-
 			if ( 'ACTIVE' !== $feed->feed_status ) {
 				throw new \Exception( esc_html__( 'Product feed not active.', 'pinterest-for-woocommerce' ) );
 			}
