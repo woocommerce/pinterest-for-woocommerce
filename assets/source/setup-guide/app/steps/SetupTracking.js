@@ -203,6 +203,12 @@ const SetupTracking = ( { view } ) => {
 				await setAppSettings( {
 					[ name ]: value ?? ! appSettings[ name ],
 				} );
+				if (
+					appSettings?.tracking_advertiser &&
+					appSettings?.tracking_tag
+				) {
+					await connectAdvertiser();
+				}
 			} catch ( error ) {
 				createNotice(
 					'error',
@@ -215,8 +221,64 @@ const SetupTracking = ( { view } ) => {
 
 			setIsSaving( false );
 		},
-		[ appSettings, setIsSaving, setAppSettings, createNotice ]
+		[
+			appSettings,
+			setIsSaving,
+			setAppSettings,
+			connectAdvertiser,
+			createNotice,
+		]
 	);
+
+	const connectAdvertiser = useCallback( async () => {
+		setIsFetching( true );
+
+		try {
+			setTagsList();
+
+			const results = await apiFetch( {
+				path:
+					wcSettings.pinterest_for_woocommerce.apiRoute +
+					'/tagowner/?advrtsr_id=' +
+					appSettings.tracking_advertiser +
+					'&tag_id=' +
+					appSettings.tracking_tag,
+				method: 'GET',
+			} );
+
+			if ( appSettings.tracking_advertiser === results.connected ) {
+				setStatus( 'success' );
+				createNotice(
+					'success',
+					__(
+						'Advertiser connected successfully.',
+						'pinterest-for-woocommerce'
+					)
+				);
+			} else {
+				setStatus( 'error' );
+				createNotice(
+					'error',
+					__(
+						'Couldn’t connect advertiser.',
+						'pinterest-for-woocommerce'
+					)
+				);
+			}
+		} catch ( error ) {
+			setStatus( 'error' );
+			createNotice(
+				'error',
+				error.message ||
+					__(
+						'Couldn’t connect advertiser.',
+						'pinterest-for-woocommerce'
+					)
+			);
+		}
+
+		setIsFetching( false );
+	}, [ appSettings, createNotice ] );
 
 	const handleTryAgain = () => {
 		setStatus( 'idle' );

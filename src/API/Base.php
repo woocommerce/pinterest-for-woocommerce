@@ -341,6 +341,50 @@ class Base {
 
 
 	/**
+	 * Connect the advertiser with the platform.
+	 *
+	 * @param string $advertiser_id The advertiser ID.
+	 * @param string $tag_id        The tag ID.
+	 *
+	 * @return mixed
+	 */
+	public static function connect_advertiser( $advertiser_id, $tag_id ) {
+		return self::make_request(
+			'advertisers/' . $advertiser_id . '/connect/',
+			'POST',
+			array(
+				'tag_id' => $tag_id,
+			),
+			'ads',
+			false,
+			true
+		);
+	}
+
+
+	/**
+	 * Disconnect advertiser from the platform.
+	 *
+	 * @param string $advertiser_id The advertiser ID.
+	 * @param string $tag_id        The tag ID.
+	 *
+	 * @return mixed
+	 */
+	public static function disonnect_advertiser( $advertiser_id, $tag_id ) {
+		return self::make_request(
+			'advertisers/' . $advertiser_id . '/disconnect/',
+			'POST',
+			array(
+				'tag_id' => $tag_id,
+			),
+			'ads',
+			false,
+			true
+		);
+	}
+
+
+	/**
 	 * Get the advertiser object from the Pinterest API for the given User ID.
 	 *
 	 * @param string $pinterest_user the user to request the Advertiser for.
