@@ -465,7 +465,7 @@ class Base {
 	 * @param string $merchant_id The merchant ID the feed belongs to.
 	 * @param string $feed_id     The ID of the feed.
 	 *
-	 * @return mixed
+	 * @return object
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
