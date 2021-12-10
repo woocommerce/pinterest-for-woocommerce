@@ -574,7 +574,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Disconnect merchant from Pinterest.
 			try {
-				$result = Pinterest\API\Base::disconnect_merchat();
+				$result = Pinterest\API\Base::disconnect_merchant();
 
 				if ( 'success' !== $result['status'] ) {
 					throw new \Exception( esc_html__( 'Response error on disconnect', 'pinterest-for-woocommerce' ), 400 );
