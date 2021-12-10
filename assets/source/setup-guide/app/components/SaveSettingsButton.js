@@ -15,6 +15,19 @@ import {
 } from '../helpers/effects';
 import getContextByPath from '../helpers/get-context-by-path';
 
+/**
+ * Clicking on "… Save changes" button.
+ *
+ * @event wcadmin_pfw_save_changes_button_click
+ */
+
+/**
+ * Save Settings button component
+ *
+ * @fires wcadmin_pfw_save_changes_button_click
+ *
+ * @return {JSX.Element} Rendered element
+ */
 const SaveSettingsButton = () => {
 	const isSaving = useSettingsSelect( 'isSettingsUpdating' );
 	const updatedData = useSettingsSelect( 'getUpdatedData' );
