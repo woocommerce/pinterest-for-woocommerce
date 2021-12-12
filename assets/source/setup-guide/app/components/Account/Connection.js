@@ -56,7 +56,7 @@ const PinterestLogo = () => {
  * @event wcadmin_pfw_modal_closed
  * @property {string} context Indicate which modal this is for.
  * @property {string} action
- * 				`confirm` - When the final "got it" button is clicked.
+ * 				`confirm` - When the final "Yes, I'm sure" button is clicked.
  * 				`dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
  */
 

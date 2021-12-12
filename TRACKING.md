@@ -81,7 +81,7 @@ Closing a modal.
 |   |   |   |
 |---|---|---|
 `context` | `string` | Indicate which modal this is for.
-`action` | `string` | `confirm` - When the final "got it" button is clicked. <br> `dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
+`action` | `string` | `confirm` - When the final "Yes, I'm sure" button is clicked. <br> `dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L77) with `context: 'account-disconnection'`
 
