@@ -83,7 +83,7 @@ exports.publish = function ( data ) {
 					mdResult += `\`${
 						property.name
 					}\` | \`${ type }\` | ${ description.replace(
-						/\s*\n\s*/,
+						/\s*\n\s*/g,
 						' <br> '
 					) }\n`;
 				} );
