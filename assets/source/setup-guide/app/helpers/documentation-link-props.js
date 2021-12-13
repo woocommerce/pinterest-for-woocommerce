@@ -11,6 +11,7 @@ import { recordEvent } from '@woocommerce/tracks';
  * @property {string} link_id Identifier of the link.
  * @property {string} context What action was initiated.
  * @property {string} href Href to which the user was navigated to.
+ * @property {string} eventName (Optional) The name of the event to be recorded, documentation_link_click by default
  */
 
 /**
@@ -21,17 +22,18 @@ import { recordEvent } from '@woocommerce/tracks';
  *
  * Please be careful not to overwrite the `onClick` handler coincidently.
  *
- * @fires wcadmin_pfw_documentation_link_click on click, with given `linkId` and `context`.
+ * Notice documentation_link_click is the default eventName and pfw_ is not required
  *
+ * @fires wcadmin_pfw_documentation_link_click on click, with given `linkId` and `context`.
  * @param {Object} props React props.
  * @param {string} props.href Href to used by link and in track event.
- * @param {string} props.linkId Forwarded to {@link wcadmin_pfw_documentation_link_click}
- * @param {string} props.context Forwarded to {@link wcadmin_pfw_documentation_link_click}
+ * @param {string} props.linkId Forwarded to {@see wcadmin_pfw_documentation_link_click}
+ * @param {string} props.context Forwarded to {@see wcadmin_pfw_documentation_link_click}
  * @param {string} [props.target='_blank']
  * @param {string} [props.rel='noopener']
  * @param {Function} [props.onClick] onClick event handler to be decorated with firing Track event.
+ * @param {string} props.eventName The name of the event to be recorded
  * @param {...import('react').AnchorHTMLAttributes} props.props
- *
  * @return {{herf: string, target: string, rel: string, onClick: Function, props}} Documentation link props.
  */
 function documentationLinkProps( {
@@ -41,6 +43,7 @@ function documentationLinkProps( {
 	target = '_blank',
 	rel = 'noopener',
 	onClick,
+	eventName = 'documentation_link_click',
 	...props
 } ) {
 	return {
@@ -53,7 +56,7 @@ function documentationLinkProps( {
 				onClick( event );
 			}
 			if ( ! event.defaultPrevented ) {
-				recordEvent( 'pfw_documentation_link_click', {
+				recordEvent( `pfw_${ eventName }`, {
 					link_id: linkId,
 					context,
 					href,
