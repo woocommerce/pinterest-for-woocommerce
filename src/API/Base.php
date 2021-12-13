@@ -95,10 +95,10 @@ class Base {
 			$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
 
 			$request = array(
-				'url'     => self::API_DOMAIN . '/' . $api . 'v' . $api_version . '/' . $endpoint,
-				'method'  => $method,
-				'json'    => $is_json_payload,
-				'args'    => $payload,
+				'url'    => self::API_DOMAIN . '/' . $api . 'v' . $api_version . '/' . $endpoint,
+				'method' => $method,
+				'json'   => $is_json_payload,
+				'args'   => $payload,
 			);
 
 			$response = self::handle_request( $request );
@@ -351,9 +351,11 @@ class Base {
 		return self::make_request(
 			'advertisers/' . $advertiser_id . '/connect/',
 			'POST',
-			wp_json_encode( array(
-				'tag_id' => $tag_id,
-			) ),
+			wp_json_encode(
+				array(
+					'tag_id' => $tag_id,
+				)
+			),
 			'ads',
 			false,
 			true
@@ -373,9 +375,11 @@ class Base {
 		return self::make_request(
 			'advertisers/' . $advertiser_id . '/disconnect/',
 			'POST',
-			wp_json_encode( array(
-				'tag_id' => $tag_id,
-			) ),
+			wp_json_encode(
+				array(
+					'tag_id' => $tag_id,
+				)
+			),
 			'ads',
 			false,
 			true
