@@ -23,8 +23,6 @@ class Merchants {
 	 * returned by the Advertisers endpoint, it will be used, otherwise an
 	 * attempt to create a new one is made.
 	 *
-	 * @param array $feed_args The arguments used to create the feed.
-	 *
 	 * @return array
 	 *
 	 * @throws \Throwable PHP Exception.
