@@ -297,7 +297,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @since x.x.x
 	 */
-	public function prepare_temporary_files(): void {
+	private function prepare_temporary_files(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
 			$bytes_written = file_put_contents(
 				$config['tmp_file'],
@@ -313,7 +313,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @since x.x.x
 	 */
-	public function add_footer_to_temporary_feed_files(): void {
+	private function add_footer_to_temporary_feed_files(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
 			$bytes_written = file_put_contents(
 				$config['tmp_file'],
@@ -335,7 +335,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @throws Exception Can't open or write to the file.
 	 */
-	public function check_write_for_io_errors( $bytes_written, $file ): void {
+	private function check_write_for_io_errors( $bytes_written, $file ): void {
 
 		if ( false === $bytes_written ) {
 			throw new Exception(
@@ -364,7 +364,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since x.x.x
 	 * @param \Throwable $th Exception handled.
 	 */
-	public function handle_error( $th ) {
+	private function handle_error( $th ) {
 		ProductFeedStatus::set(
 			array(
 				'status'        => 'error',
@@ -383,7 +383,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since x.x.x
 	 * @throws \Exception Renaming not possible.
 	 */
-	public function rename_temporary_feed_files_to_final(): void {
+	private function rename_temporary_feed_files_to_final(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
 			$status = rename( $config['tmp_file'], $config['feed_file'] );
 			if ( false === $status ) {
