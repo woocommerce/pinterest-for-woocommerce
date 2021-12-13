@@ -522,7 +522,7 @@ class ProductSync {
 
 			if ( ! $prev_registered ) {
 
-				$response = API\Base::update_or_create_merchant();
+				$response = Merchants::update_or_create_merchant();
 
 				if ( 'success' !== $response['status'] ) {
 					throw new \Exception( esc_html__( 'Could not update feed info.', 'pinterest-for-woocommerce' ) );

@@ -56,10 +56,10 @@ class Merchants {
 
 		if ( ! $merchant || ( 'success' !== $merchant['status'] && 650 === $merchant['code'] ) ) {  // https://developers.pinterest.com/docs/redoc/#tag/API-Response-Codes Merchant not found 650.
 			// Try creating one.
-			$response = API\Base::update_or_create_merchant();
+			$response = self::update_or_create_merchant();
 
-			if ( 'success' !== $response['status'] ) {
-				throw new \Exception( __( 'Response error when trying create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
+			if ( ! $response['data'] ) {
+				throw new \Exception( __( 'Wrong response when trying to create or update merchant.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
 			$merchant = self::get_merchant_object( $response['data'] );
@@ -119,6 +119,39 @@ class Merchants {
 		}
 
 		return $advertiser->merchant_id;
+	}
+
+
+	/**
+	 * Creates a merchant for the authenticated user or updates the existing one.
+	 *
+	 * @return mixed
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
+	public static function update_or_create_merchant() {
+
+		$local_feed = ProductFeedStatus::get_local_feed();
+
+		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
+
+		$args = array(
+			'merchant_domains' => get_home_url(),
+			'feed_location'    => $local_feed['feed_url'],
+			'feed_format'      => 'XML',
+			'country'          => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
+			'locale'           => str_replace( '_', '-', determine_locale() ),
+			'currency'         => get_woocommerce_currency(),
+			'merchant_name'    => $merchant_name,
+		);
+
+		$response = API\Base::update_or_create_merchant( $args );
+
+		if ( 'success' !== $response['status'] ) {
+			throw new \Exception( __( 'Response error when trying create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
+		}
+
+		return $response;
 	}
 
 }

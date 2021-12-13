@@ -467,24 +467,11 @@ class Base {
 	/**
 	 * Creates a merchant for the authenticated user or updates the existing one.
 	 *
+	 * @param array $args Payload to be sent to the request.
+	 *
 	 * @return mixed
 	 */
-	public static function update_or_create_merchant() {
-
-		$local_feed = Pinterest\ProductFeedStatus::get_local_feed();
-
-		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
-
-		$args = array(
-			'merchant_domains' => get_home_url(),
-			'feed_location'    => $local_feed['feed_url'],
-			'feed_format'      => 'XML',
-			'country'          => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
-			'locale'           => str_replace( '_', '-', determine_locale() ),
-			'currency'         => get_woocommerce_currency(),
-			'merchant_name'    => $merchant_name,
-		);
-
+	public static function update_or_create_merchant( $args ) {
 		return self::make_request(
 			'catalogs/partner/connect/',
 			'POST',
