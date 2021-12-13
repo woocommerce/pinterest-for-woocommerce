@@ -9,6 +9,7 @@ jest.mock( '@woocommerce/tracks', () => {
  */
 import { recordEvent } from '@woocommerce/tracks';
 import { render, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 
 /**
  * Internal dependencies
@@ -25,5 +26,11 @@ describe( 'PreLaunch Notice Component', () => {
 		expect( recordEvent.mock.calls[ 0 ][ 0 ] ).toBe(
 			'pfw_get_started_notice_link_click'
 		);
+	} );
+
+	it( 'Contains href attribute', () => {
+		const { getByText } = render( <PrelaunchNotice /> );
+		const link = getByText( 'Click here for more information.' );
+		expect( link ).toHaveAttribute( 'href' );
 	} );
 } );
