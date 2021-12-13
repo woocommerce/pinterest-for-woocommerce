@@ -592,67 +592,7 @@ class Base {
 
 
 	/**
-	 * Get a specific merchant feed using the given arguments.
-	 *
-	 * @param string $merchant_id The merchant ID the feed belongs to.
-	 * @param string $feed_id     The ID of the feed.
-	 *
-	 * @return object
-	 *
-	 * @throws \Exception PHP Exception.
-	 */
-	public static function get_merchant_feed( $merchant_id, $feed_id ) {
-		try {
-
-			$feeds = self::get_merchant_feeds( $merchant_id );
-
-			if ( 'success' !== $feeds['status'] ) {
-				throw new \Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
-			}
-
-			if ( ! is_array( $feeds['data'] ) ) {
-				throw new \Exception( esc_html__( 'Wrong feed info.', 'pinterest-for-woocommerce' ) );
-			}
-
-			foreach ( $feeds['data'] as $feed_profile ) {
-
-				if ( $feed_id === $feed_profile->id ) {
-					return $feed_profile;
-				}
-			}
-
-			// No feed found.
-			throw new \Exception( esc_html__( 'No feed found with the requested ID.', 'pinterest-for-woocommerce' ) );
-
-		} catch ( \Exception $e ) {
-
-			Logger::log( $e->getMessage(), 'error' );
-
-			throw $e;
-		}
-	}
-
-
-	/**
-	 * Get a merchant's feeds.
-	 *
-	 * @param string $merchant_id The merchant ID the feed belongs to.
-	 *
-	 * @return mixed
-	 */
-	public static function get_merchant_feed_report( $merchant_id, $feed_id ) {
-		return self::make_request(
-			"catalogs/{$merchant_id}/feed_profiles/",
-			'GET',
-			array(),
-			'',
-			MINUTE_IN_SECONDS
-		);
-	}
-
-
-	/**
-	 * Get a specific merchant's feed report using the given arguments.
+	 * Get a specific merchant's feed using the given arguments.
 	 *
 	 * @param string $merchant_id The merchant ID the feed belongs to.
 	 * @param string $feed_id     The ID of the feed.
