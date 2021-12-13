@@ -46,7 +46,7 @@ class PluginUpdate {
 		 * 2. Move feed file to a new location.
 		 */
 		$feed_id          = Pinterest_For_Woocommerce()::get_data( 'local_feed_id' );
-		$default_location = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
+		$default_location = array( Pinterest_For_Woocommerce()::get_base_country() ?? 'US' );
 		if ( $feed_id ) {
 			// Generate new configurations.
 			$new_configs = ( new LocalFeedConfigs( $default_location ) )->get_configurations();
