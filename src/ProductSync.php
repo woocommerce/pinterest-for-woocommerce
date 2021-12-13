@@ -520,8 +520,10 @@ class ProductSync {
 
 			$prev_registered = self::get_registered_feed_id();
 
+			// Update feed if there was no registered previously.
 			if ( ! $prev_registered ) {
 
+				// The response only contains the merchant id.
 				$response = Merchants::update_or_create_merchant();
 
 				if ( 'success' !== $response['status'] ) {
@@ -531,7 +533,8 @@ class ProductSync {
 
 			$local_feed = ProductFeedStatus::get_local_feed();
 
-			$feed = API\Base::get_merchant_feed_by_location( $merchant['data']->id, $local_feed['feed_url'] );
+			// We need to fetch the feed using the local feed location.
+			$feed = Feeds::get_merchant_feed_by_location( $merchant['data']->id, $local_feed['feed_url'] );
 
 			$configured_path = dirname( $feed->location_config->full_feed_fetch_location );
 			$local_path      = dirname( $local_feed['feed_url'] );
@@ -545,6 +548,7 @@ class ProductSync {
 			}
 		}
 
+		// Update the registered feed id setting.
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $registered );
 
 		return $registered;
