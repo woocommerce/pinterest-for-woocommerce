@@ -70,7 +70,7 @@ class FeedRegistration {
 	public function handle_feed_registration() {
 
 		if ( ! $this->feed_file_exists() ) {
-			self::log( 'Feed didn\'t fully generate yet. Retrying later.', 'debug' );
+			self::log( "Feed didn't fully generate yet. Retrying later.", 'debug' );
 			// Feed is not generated yet, lets wait a bit longer.
 			return true;
 		}
