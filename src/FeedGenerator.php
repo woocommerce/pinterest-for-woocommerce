@@ -61,7 +61,22 @@ class FeedGenerator extends AbstractChainedJob {
 		parent::__construct( $action_scheduler );
 		$this->configurations = $local_feeds_configurations;
 
-		add_action( self::ACTION_START_FEED_GENERATOR, array( $this, 'start_generation' ) );
+		$this->init();
+	}
+
+	/**
+	 * Initialize FeedGenerator actions and Action Scheduler hooks.
+	 *
+	 * @since x.x.x
+	 */
+	public function init() {
+		add_action(
+			self::ACTION_START_FEED_GENERATOR,
+			function () {
+				$this->start_generation();
+			}
+		);
+
 		if ( false === as_has_scheduled_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			$this->schedule_next_generator_start( time() );
 		}
@@ -92,7 +107,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @since x.x.x
 	 */
-	public function start_generation() {
+	private function start_generation() {
 		if ( $this->is_running() ) {
 			return;
 		}
