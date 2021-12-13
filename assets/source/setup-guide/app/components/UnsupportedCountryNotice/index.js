@@ -21,15 +21,6 @@ import './style.scss';
 import documentationLinkProps from '../../helpers/documentation-link-props';
 
 /**
- * Clicking on the link inside the notice.
- *
- * @event wcadmin_pfw_get_started_notice_link_click
- *
- * {@see documentationLinkProps}
- *
- */
-
-/**
  * Renders an unsupported country <Notice> with warning appearance.
  *
  * @fires wcadmin_pfw_get_started_notice_link_click
@@ -37,7 +28,7 @@ import documentationLinkProps from '../../helpers/documentation-link-props';
  * @param {Object} props React props.
  * @param {string} props.countryCode The alpha-2 country code to map the country name.
  */
-export default function UnsupportedCountryNotice( { countryCode } ) {
+function UnsupportedCountryNotice( { countryCode } ) {
 	const countryName = getSetting( 'countries', {} )[ countryCode ];
 
 	if ( ! countryName ) {
@@ -87,3 +78,5 @@ export default function UnsupportedCountryNotice( { countryCode } ) {
 		</Notice>
 	);
 }
+
+export default UnsupportedCountryNotice;

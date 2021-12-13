@@ -11,7 +11,18 @@ import { recordEvent } from '@woocommerce/tracks';
  * @property {string} link_id Identifier of the link.
  * @property {string} context What action was initiated.
  * @property {string} href Href to which the user was navigated to.
- * @property {string} eventName (Optional) The name of the event to be recorded, documentation_link_click by default
+ */
+
+/**
+ * Clicking on the link inside the notice.
+ *
+ * @event wcadmin_pfw_get_started_notice_link_click
+ *
+ * @property {string} link_id Identifier of the link.
+ * @property {string} context What action was initiated.
+ * @property {string} href Href to which the user was navigated to.
+ *
+ *
  */
 
 /**

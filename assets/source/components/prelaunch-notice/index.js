@@ -10,18 +10,9 @@ import { Notice } from '@wordpress/components';
 import documentationLinkProps from '../../setup-guide/app/helpers/documentation-link-props';
 
 /**
- * Clicking on the link inside the notice.
- *
- * @event wcadmin_pfw_get_started_notice_link_click
- *
- * {@see documentationLinkProps}
- *
- */
-
-/**
  * Renders a notice for Beta versions
  *
- * @fires wcadmin_pfw_get_started_notice_link_click on click
+ * @fires wcadmin_pfw_get_started_notice_link_click `{ link_id: 'claim-website', context: 'claim-website' }`
  * @return {JSX.Element} The rendered component
  */
 const PrelaunchNotice = () => {
