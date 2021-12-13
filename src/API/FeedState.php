@@ -391,6 +391,12 @@ class FeedState extends VendorAPI {
 					$status_label = esc_html__( 'Feed is under review.', 'pinterest-for-woocommerce' );
 					break;
 
+				case 'QUEUED_FOR_PROCESSING':
+					$status       = 'pending';
+					$status_label = esc_html__( 'The feed is queued for processing.', 'pinterest-for-woocommerce' );
+
+					break;
+
 				case 'FAILED':
 					$status       = 'error';
 					$status_label = esc_html__( 'Feed ingestion failed.', 'pinterest-for-woocommerce' );
