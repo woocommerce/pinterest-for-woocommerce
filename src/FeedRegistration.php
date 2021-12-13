@@ -47,7 +47,15 @@ class FeedRegistration {
 	public function __construct( $local_feeds_configurations, $feed_generator ) {
 		$this->configurations = $local_feeds_configurations;
 		$this->feed_generator = $feed_generator;
+		$this->init();
+	}
 
+	/**
+	 * Initialize FeedRegistration actions and Action Scheduler hooks.
+	 *
+	 * @since x.x.x
+	 */
+	public function init() {
 		add_action( self::ACTION_HANDLE_FEED_REGISTRATION, array( $this, 'handle_feed_registration' ) );
 		if ( false === as_has_scheduled_action( self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			as_schedule_recurring_action( time() + 10, 10 * MINUTE_IN_SECONDS, self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
