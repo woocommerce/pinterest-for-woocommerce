@@ -66,9 +66,9 @@ class LocalFeedConfigs {
 			function ( &$id, $location ) use ( $file_name_base, $url_base ) {
 				$id = array(
 					'feed_id'   => $id,
-					'feed_file' => $file_name_base . $id . '-' . $location . '.xml',
-					'tmp_file'  => $file_name_base . $id . '-' . $location . '-tmp.xml',
-					'feed_url'  => $url_base . $id . '-' . $location . '.xml',
+					'feed_file' => "{$file_name_base}{$id}-{$location}.xml",
+					'tmp_file'  => "{$file_name_base}{$id}-{$location}-tmp.xml",
+					'feed_url'  => "{$url_base}{$id}-{$location}.xml",
 				);
 			}
 		);
