@@ -30,6 +30,7 @@ module.exports = {
 			pinterest_for_woocommerce: {
 				pinterestLinks: {
 					adsManager: 'https://example.com',
+					preLaunchNotice: 'https://example.com',
 				},
 			},
 		},
