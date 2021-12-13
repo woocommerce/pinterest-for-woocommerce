@@ -405,6 +405,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'appealDeclinedMerchant' => 'https://www.pinterest.com/product-catalogs/data-source/?showModal=true',
 					'installTag'             => 'https://help.pinterest.com/en/business/article/install-the-pinterest-tag',
 					'adsManager'             => 'https://ads.pinterest.com/',
+					'preLaunchNotice'    	 => 'https://help.pinterest.com/en-gb/business/article/get-a-business-profile/',
+					'adsAvailability'    	 => 'https://help.pinterest.com/en/business/availability/ads-availability',
 				),
 				'isSetupComplete'          => Pinterest_For_Woocommerce()::is_setup_complete(),
 				'countryTos'               => Pinterest_For_Woocommerce()::get_applicable_tos(),
@@ -491,7 +493,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' ] ) || ! wp_verify_nonce( sanitize_key( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' ] ), 'go_to_middleware_url' ) || ! current_user_can( 'manage_woocommerce' ) ) {
 				wp_die( esc_html__( 'Cheatin&#8217; huh?', 'pinterest-for-woocommerce' ) );
-				return;
 			}
 
 			$context = 'login';
