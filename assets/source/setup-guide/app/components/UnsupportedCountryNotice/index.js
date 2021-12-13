@@ -18,9 +18,21 @@ import { getSetting } from '@woocommerce/settings'; // eslint-disable-line impor
  * Internal dependencies
  */
 import './style.scss';
+import documentationLinkProps from '../../helpers/documentation-link-props';
+
+/**
+ * Clicking on the link inside the notice.
+ *
+ * @event wcadmin_pfw_get_started_notice_link_click
+ *
+ * {@see documentationLinkProps}
+ *
+ */
 
 /**
  * Renders an unsupported country <Notice> with warning appearance.
+ *
+ * @fires wcadmin_pfw_get_started_notice_link_click
  *
  * @param {Object} props React props.
  * @param {string} props.countryCode The alpha-2 country code to map the country name.
@@ -47,15 +59,27 @@ export default function UnsupportedCountryNotice( { countryCode } ) {
 					country: <strong>{ countryName }</strong>,
 					settingsLink: (
 						<Link
+							{ ...documentationLinkProps( {
+								href: '/wp-admin/admin.php?page=wc-settings',
+								eventName: 'get_started_notice_link_click',
+								linkId: 'unsupported-country-link',
+								context: 'pinterest-landing', //todo: Use helper function to get context from path see https://github.com/woocommerce/pinterest-for-woocommerce/pull/295
+							} ) }
 							className="pins-for-woo-unsupported-country-notice__link"
 							type="wp-admin"
-							href="/wp-admin/admin.php?page=wc-settings"
 						/>
 					),
 					supportedCountriesLink: (
 						<ExternalLink
+							{ ...documentationLinkProps( {
+								href:
+									wcSettings.pinterest_for_woocommerce
+										.pinterestLinks.adsAvailability,
+								eventName: 'get_started_notice_link_click',
+								linkId: 'ads-availability',
+								context: 'pinterest-landing', //todo: Use helper function to get context from path see https://github.com/woocommerce/pinterest-for-woocommerce/pull/295
+							} ) }
 							className="pins-for-woo-unsupported-country-notice__link"
-							href="https://help.pinterest.com/en/business/availability/ads-availability"
 						/>
 					),
 				}
