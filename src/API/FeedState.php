@@ -250,6 +250,7 @@ class FeedState extends VendorAPI {
 
 		try {
 
+			// Get the merchant object.
 			$merchant = Pinterest\Merchants::get_merchant();
 
 			if ( 'success' !== $merchant['status'] ) {

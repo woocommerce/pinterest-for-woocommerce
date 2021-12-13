@@ -51,6 +51,7 @@ class Merchants {
 
 		if ( ! empty( $merchant_id ) ) {
 
+			// Get merchant if a merchant id was found.
 			$merchant = self::get_merchant_object( $merchant_id );
 		}
 

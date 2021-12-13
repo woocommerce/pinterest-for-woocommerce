@@ -518,9 +518,10 @@ class ProductSync {
 
 		} else {
 
+			// Check if there is a registered feed id.
 			$prev_registered = self::get_registered_feed_id();
 
-			// Update feed if there was no registered previously.
+			// Update feed if there was no one registered previously.
 			if ( ! $prev_registered ) {
 
 				// The response only contains the merchant id.
@@ -533,7 +534,7 @@ class ProductSync {
 
 			$local_feed = ProductFeedStatus::get_local_feed();
 
-			// We need to fetch the feed using the local feed location.
+			// We need to fetch the feed object using the local feed location.
 			$feed = Feeds::get_merchant_feed_by_location( $merchant['data']->id, $local_feed['feed_url'] );
 
 			$configured_path = dirname( $feed->location_config->full_feed_fetch_location );

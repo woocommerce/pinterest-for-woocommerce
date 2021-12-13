@@ -30,6 +30,7 @@ class Feeds {
 	public static function get_merchant_feed( $merchant_id, $feed_id ) {
 		try {
 
+			// Get the feeds of the merchant.
 			$feeds = API\Base::get_merchant_feeds( $merchant_id );
 
 			if ( 'success' !== $feeds['status'] ) {
@@ -42,6 +43,7 @@ class Feeds {
 
 			foreach ( $feeds['data'] as $feed_profile ) {
 
+				// Get the feed with the requested id if exists.
 				if ( $feed_id === $feed_profile->id ) {
 					return $feed_profile;
 				}
@@ -72,6 +74,7 @@ class Feeds {
 	public static function get_merchant_feed_by_location( $merchant_id, $feed_location ) {
 		try {
 
+			// Get the feeds of the merchant.
 			$feeds = API\Base::get_merchant_feeds( $merchant_id );
 
 			if ( 'success' !== $feeds['status'] ) {
@@ -84,6 +87,7 @@ class Feeds {
 
 			foreach ( $feeds['data'] as $feed_profile ) {
 
+				// Get the feed with the requested location if exists.
 				if ( $feed_location === $feed_profile->location_config->full_feed_fetch_location ) {
 					return $feed_profile;
 				}
