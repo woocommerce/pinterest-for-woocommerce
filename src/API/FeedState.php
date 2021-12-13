@@ -256,7 +256,9 @@ class FeedState extends VendorAPI {
 				throw new \Exception( esc_html__( 'Could not get merchant info.', 'pinterest-for-woocommerce' ) );
 			}
 
-			if ( 'ACTIVE' !== $merchant['data']->product_pin_feed_profile->feed_status ) {
+			$feed = Base::get_merchant_feed( $merchant_id, $feed_id );
+
+			if ( 'ACTIVE' !== $feed->feed_status ) {
 				throw new \Exception( esc_html__( 'Product feed not active.', 'pinterest-for-woocommerce' ) );
 			}
 
@@ -267,13 +269,13 @@ class FeedState extends VendorAPI {
 					$status       = 'success';
 					$status_label = esc_html__( 'Product feed configured for ingestion on Pinterest', 'pinterest-for-woocommerce' );
 
-					if ( ! empty( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq ) ) {
+					if ( ! empty( $feed->location_config->full_feed_fetch_freq ) ) {
 						$extra_info = wp_kses_post(
 							sprintf(
 								/* Translators: %1$s The URL of the product feed, %2$s Time string */
 								__( 'Pinterest will fetch your <a href="%1$s" target="_blank">product feed</a> every %2$s', 'pinterest-for-woocommerce' ),
-								$merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location,
-								human_time_diff( 0, ( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq / 1000 ) )
+								$feed->location_config->full_feed_fetch_location,
+								human_time_diff( 0, ( $feed->location_config->full_feed_fetch_freq / 1000 ) )
 							)
 						);
 					}
