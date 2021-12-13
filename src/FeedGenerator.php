@@ -16,6 +16,8 @@ use Automattic\WooCommerce\ActionSchedulerJobFramework\Utilities\BatchQueryOffse
 use Automattic\WooCommerce\ActionSchedulerJobFramework\AbstractChainedJob;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
 use Automattic\WooCommerce\Pinterest\Utilities\FeedLogger;
+use Exception;
+
 /**
  * Class Handling feed files generation.
  */
@@ -158,6 +160,8 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @param int   $batch_number The batch number increments for each new batch in the job cycle.
 	 * @param array $args         The args for the job.
 	 *
+	 * @return array Items ids.
+	 *
 	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
 	 */
 	protected function get_items_for_batch( int $batch_number, array $args ): array {
@@ -186,7 +190,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Processes a batch of items. The middle part of the generation process.
 	 * Can run multiple times depending on the catalog size.
 	 *
-	 * @since 1.1.0
+	 * @since x.x.x
 	 *
 	 * @param array $items The items of the current batch.
 	 * @param array $args  The args for the job.
@@ -314,12 +318,12 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @param integer $bytes_written How much data was written to the file.
 	 * @param string  $file          File location.
 	 *
-	 * @throws \Exception Can't open or write to the file.
+	 * @throws Exception Can't open or write to the file.
 	 */
 	public function check_write_for_io_errors( $bytes_written, $file ): void {
 
 		if ( false === $bytes_written ) {
-			throw new \Exception(
+			throw new Exception(
 				sprintf(
 					/* translators: error message with file path */
 					__( 'Could not open temporary file %s for writing', 'pinterest-for-woocommerce' ),
@@ -329,7 +333,7 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 
 		if ( 0 === $bytes_written ) {
-			throw new \Exception(
+			throw new Exception(
 				sprintf(
 					/* translators: error message with file path */
 					__( 'Temporary file: %s is not writeable.', 'pinterest-for-woocommerce' ),
@@ -368,7 +372,7 @@ class FeedGenerator extends AbstractChainedJob {
 		foreach ( $this->configurations->get_configurations() as $config ) {
 			$status = rename( $config['tmp_file'], $config['feed_file'] );
 			if ( false === $status ) {
-				throw new \Exception(
+				throw new Exception(
 					sprintf(
 						/* translators: 1: temporary file name 2: final file name */
 						__( 'Could not rename %1$s to %2$s', 'pinterest-for-woocommerce' ),
