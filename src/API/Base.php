@@ -371,7 +371,7 @@ class Base {
 	 *
 	 * @return mixed
 	 */
-	public static function disonnect_advertiser( $advertiser_id, $tag_id ) {
+	public static function disconnect_advertiser( $advertiser_id, $tag_id ) {
 		return self::make_request(
 			'advertisers/' . $advertiser_id . '/disconnect/',
 			'POST',

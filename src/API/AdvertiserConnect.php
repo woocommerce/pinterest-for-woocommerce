@@ -103,7 +103,7 @@ class AdvertiserConnect extends VendorAPI {
 		if ( $connected_advertiser && $connected_tag ) {
 			try {
 
-				$response = Base::disonnect_advertiser( $connected_advertiser, $connected_tag );
+				$response = Base::disconnect_advertiser( $connected_advertiser, $connected_tag );
 
 				if ( 'success' !== $response['status'] ) {
 					throw new \Exception( esc_html__( 'The advertiser could not be disconnected from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
