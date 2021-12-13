@@ -4,6 +4,26 @@
 import { __ } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+import documentationLinkProps from '../../setup-guide/app/helpers/documentation-link-props';
+
+/**
+ * Clicking on the link inside the notice.
+ *
+ * @event wcadmin_pfw_get_started_notice_link_click
+ *
+ * {@see documentationLinkProps}
+ *
+ */
+
+/**
+ * Renders a notice for Beta versions
+ *
+ * @fires wcadmin_pfw_get_started_notice_link_click on click
+ * @return {JSX.Element} The rendered component
+ */
 const PrelaunchNotice = () => {
 	return (
 		<Notice
@@ -25,9 +45,15 @@ const PrelaunchNotice = () => {
 			</p>
 			<p>
 				<a
-					href="https://help.pinterest.com/en-gb/business/article/get-a-business-profile"
-					target="_blank"
-					rel="noreferrer"
+					{ ...documentationLinkProps( {
+						href:
+							wcSettings.pinterest_for_woocommerce.pinterestLinks
+								.preLaunchNotice,
+						eventName: 'get_started_notice_link_click',
+						linkId: 'prelaunch-notice',
+						context: 'pinterest-landing', //todo: Use helper function to get context from path see https://github.com/woocommerce/pinterest-for-woocommerce/pull/295
+						rel: 'noreferrer',
+					} ) }
 				>
 					{ __(
 						'Click here for more information.',
