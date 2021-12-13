@@ -24,6 +24,8 @@ class ProductFeedStatus {
 		'error_message' => '',
 	);
 
+	const PINTEREST_FOR_WOOCOMMERCE_DATA_PREFIX = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feeds_';
+
 	/**
 	 * The array that holds the state of the feed, used as cache.
 	 *
@@ -45,12 +47,10 @@ class ProductFeedStatus {
 	 */
 	public static function get() {
 
-		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feeds_';
-
 		foreach ( self::STATE_PROPS as $key => $default_value ) {
 
 			if ( ! isset( self::$state[ $key ] ) || null === self::$state[ $key ] ) {
-				self::$state[ $key ] = get_transient( $data_prefix . $key );
+				self::$state[ $key ] = get_transient( self::PINTEREST_FOR_WOOCOMMERCE_DATA_PREFIX . $key );
 			}
 
 			if ( false === self::$state[ $key ] ) {
@@ -72,13 +72,11 @@ class ProductFeedStatus {
 	 */
 	public static function set( $state ) {
 
-		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feeds_';
-
 		$state['last_activity'] = time();
 
 		foreach ( $state as $key => $value ) {
 			self::$state[ $key ] = $value;
-			set_transient( $data_prefix . $key, ( false === $value ? null : $value ) ); // No expiration.
+			set_transient( self::PINTEREST_FOR_WOOCOMMERCE_DATA_PREFIX . $key, ( false === $value ? null : $value ) ); // No expiration.
 		}
 
 		if ( ! empty( $state['status'] ) ) {
@@ -93,10 +91,8 @@ class ProductFeedStatus {
 	 */
 	public static function deregister() {
 
-		$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feeds_';
-
 		foreach ( self::STATE_PROPS as $key => $default_value ) {
-			delete_transient( $data_prefix . $key );
+			delete_transient( self::PINTEREST_FOR_WOOCOMMERCE_DATA_PREFIX . $key );
 		}
 	}
 }
