@@ -9,6 +9,7 @@
 namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Pinterest\FeedRegistration;
 
 use \WP_REST_Server;
 
@@ -325,7 +326,7 @@ class FeedState extends VendorAPI {
 	 */
 	private function add_feed_sync_status( $result ) {
 
-		$feed_id = Pinterest\FeedRegistration::get_registered_feed_id();
+		$feed_id = FeedRegistration::get_registered_feed_id();
 		if ( ! $feed_id ) {
 			throw new \Exception( esc_html__( 'Feed is not registered with Pinterest.', 'pinterest-for-woocommerce' ) );
 		}
