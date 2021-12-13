@@ -22,6 +22,8 @@ module.exports = {
 	moduleNameMapper: {
 		// Transform our `.~/` alias.
 		'^\\.~/(.*)$': '<rootDir>/assets/source/$1',
+		'@woocommerce/settings':
+			'<rootDir>/assets/source/tests/dependencies/woocommerce/settings',
 	},
 	// Exclude e2e tests from unit testing.
 	testPathIgnorePatterns: [ '/node_modules/' ],
@@ -31,6 +33,7 @@ module.exports = {
 				pinterestLinks: {
 					adsManager: 'https://example.com',
 					preLaunchNotice: 'https://example.com',
+					adsAvailability: 'https://example.com',
 				},
 			},
 		},
