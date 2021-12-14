@@ -354,8 +354,7 @@ class Base {
 					'tag_id' => $tag_id,
 				)
 			),
-			'ads',
-			false
+			'ads'
 		);
 	}
 
@@ -377,8 +376,7 @@ class Base {
 					'tag_id' => $tag_id,
 				)
 			),
-			'ads',
-			false
+			'ads'
 		);
 	}
 
