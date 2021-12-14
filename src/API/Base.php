@@ -420,7 +420,7 @@ class Base {
 		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		return self::make_request(
-			"advertisers/{$advertiser_id}/conversion_tags",
+			'advertisers/' . $advertiser_id . '/conversion_tags',
 			'POST',
 			array(
 				'name' => $tag_name,
@@ -485,7 +485,7 @@ class Base {
 	 */
 	public static function get_merchant_feeds( $merchant_id ) {
 		return self::make_request(
-			"catalogs/{$merchant_id}/feed_profiles/",
+			'catalogs/' . $merchant_id . '/feed_profiles/',
 			'GET',
 			array(),
 			'',
@@ -504,7 +504,7 @@ class Base {
 	 */
 	public static function get_merchant_feed_report( $merchant_id, $feed_id ) {
 		return self::make_request(
-			"catalogs/datasource/feed_report/{$merchant_id}/",
+			'catalogs/datasource/feed_report/' . $merchant_id . '/',
 			'GET',
 			array(
 				'feed_profile' => $feed_id,
