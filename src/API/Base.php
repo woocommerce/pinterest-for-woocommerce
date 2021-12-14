@@ -93,14 +93,15 @@ class Base {
 			$api         = empty( $api ) ? '' : trailingslashit( $api );
 			$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
 
-			$is_json_payload = 'ads/' === $api && 'POST' === $method ? true : false;
-
 			$request = array(
 				'url'    => self::API_DOMAIN . '/' . $api . 'v' . $api_version . '/' . $endpoint,
 				'method' => $method,
-				'json'   => $is_json_payload,
 				'args'   => $payload,
 			);
+
+			if ( 'ads/' === $api && 'POST' === $method ) {
+				$request['headers']['Content-Type'] = 'application/json';
+			}
 
 			$response = self::handle_request( $request );
 
@@ -159,10 +160,6 @@ class Base {
 
 			if ( $request['auth_header'] ) {
 				$request['headers']['Authorization'] = 'Bearer ' . self::$token['access_token'];
-			}
-
-			if ( $request['json'] ) {
-				$request['headers']['Content-Type'] = 'application/json';
 			}
 
 			$request_args = array(
