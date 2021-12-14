@@ -8,6 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -79,11 +81,31 @@ class ProductsXmlFeed {
 			}
 		}
 
+		$xml .= self::get_attributes_xml( $product, "\t\t\t" );
+
 		$xml .= "\t\t</item>" . PHP_EOL;
 
 		return apply_filters( 'pinterest_for_woocommerce_feed_item_xml', $xml, $product );
 	}
 
+	/**
+	 * Get the XML for all the product attributes.
+	 *
+	 * @param WC_Product $product WooCommerce product.
+	 * @param string     $indent  Line indentation string.
+	 * @return string XML string.
+	 */
+	private static function get_attributes_xml( $product, $indent ) {
+		$attribute_manager = AttributeManager::instance();
+		$attributes        = $attribute_manager->get_all_values( $product );
+		$xml               = '';
+
+		foreach ( $attributes as $property => $value ) {
+			$xml .= "{$indent}<{$property}>{$value}</{$property}>" . PHP_EOL;
+		}
+
+		return $xml;
+	}
 
 	/**
 	 * Returns the Product ID.
