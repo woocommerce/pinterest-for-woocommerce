@@ -34,6 +34,34 @@ class Admin {
 	}
 
 	/**
+	 * Register a service.
+	 */
+	public function register(): void {
+		add_action(
+			'admin_enqueue_scripts',
+			function() {
+				$this->enqueue_assets();
+			}
+		);
+	}
+
+	/**
+	 * Enqueues any assets.
+	 */
+	protected function enqueue_assets() {
+		$screen = get_current_screen();
+
+		if ( $screen && 'product' === $screen->id ) {
+			wp_enqueue_style(
+				'pinterest-product-attributes-css',
+				Pinterest_For_Woocommerce()->plugin_url() . '/assets/product-attributes/index.css',
+				array(),
+				PINTEREST_FOR_WOOCOMMERCE_VERSION
+			);
+		}
+	}
+
+	/**
 	 * Get the admin view.
 	 *
 	 * @param string $view              Name of the view.

@@ -267,6 +267,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$attributes_tab       = new Pinterest\Admin\Product\Attributes\AttributesTab( $admin );
 			$variation_attributes = new Pinterest\Admin\Product\Attributes\VariationsAttributes( $admin );
 
+			$admin->register();
 			$attributes_tab->register();
 			$variation_attributes->register();
 		}
