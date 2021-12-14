@@ -518,11 +518,9 @@ class ProductSync {
 
 		} else {
 
-			// Check if there is a registered feed id.
-			$prev_registered = self::get_registered_feed_id();
-
-			// Update feed if there was no one registered previously.
-			if ( ! $prev_registered ) {
+			// Update feed if we don't have a feed_id saved.
+			// for cases where the already existed in the API.
+			if ( ! self::get_registered_feed_id() ) {
 
 				// The response only contains the merchant id.
 				$response = Merchants::update_or_create_merchant();
