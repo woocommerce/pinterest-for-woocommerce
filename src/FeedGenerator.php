@@ -60,8 +60,6 @@ class FeedGenerator extends AbstractChainedJob {
 	public function __construct( ActionSchedulerInterface $action_scheduler, $local_feeds_configurations ) {
 		parent::__construct( $action_scheduler );
 		$this->configurations = $local_feeds_configurations;
-
-		$this->init();
 	}
 
 	/**

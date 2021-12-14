@@ -47,7 +47,6 @@ class FeedRegistration {
 	public function __construct( $local_feeds_configurations, $feed_generator ) {
 		$this->configurations = $local_feeds_configurations;
 		$this->feed_generator = $feed_generator;
-		$this->init();
 	}
 
 	/**

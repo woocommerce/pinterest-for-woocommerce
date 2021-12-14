@@ -110,7 +110,10 @@ class ProductSync {
 		self::$configurations    = new LocalFeedConfigs( $locations );
 		self::$feed_generator    = new FeedGenerator( $action_scheduler, self::$configurations );
 		self::$feed_registration = new FeedRegistration( self::$configurations, self::$feed_generator );
+
+		self::$feed_registration->init();
 		self::$feed_generator->init();
+
 	}
 
 	/**
