@@ -45,10 +45,19 @@ const StaticError = ( { reqError } ) => {
 };
 
 /**
+ * Clicking on an external documentation link.
+ *
+ * @event wcadmin_pfw_domain_verify_failure
+ *
+ * @property {string} step Identifier of the step when verification failed.
+ */
+
+/**
  * Claim Website step component.
  *
  * To be used in onboarding setup stepper.
  *
+ * @fires wcadmin_pfw_domain_verify_failure
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'claim-website', context: 'claim-website' }`
  * @param {Object} props React props.
  * @param {Function} props.goToNextStep
