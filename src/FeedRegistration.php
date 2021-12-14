@@ -118,7 +118,7 @@ class FeedRegistration {
 	 * $feed_args.
 	 *
 	 * @param array $feed_args The arguments used to create the feed.
-	 * @param array $location List of served locations.
+	 * @param string $location Location for which we set up the feed.
 	 *
 	 * @return boolean|string
 	 *
