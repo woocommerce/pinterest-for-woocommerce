@@ -68,11 +68,11 @@ class Base {
 	 * Request parameter:
 	 * $endpoint
 	 *
-	 * @param string  $endpoint        the endpoint to perform the request on.
-	 * @param string  $method          eg, POST, GET, PUT etc.
-	 * @param array   $payload         Payload to be sent on the request's body.
-	 * @param string  $api             The specific Endpoints subset.
-	 * @param int     $cache_expiry    When set, enables caching on the request and the value is used as the cache's TTL (in seconds).
+	 * @param string $endpoint        the endpoint to perform the request on.
+	 * @param string $method          eg, POST, GET, PUT etc.
+	 * @param array  $payload         Payload to be sent on the request's body.
+	 * @param string $api             The specific Endpoints subset.
+	 * @param int    $cache_expiry    When set, enables caching on the request and the value is used as the cache's TTL (in seconds).
 	 *
 	 * @return array
 	 *
