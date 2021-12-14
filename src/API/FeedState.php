@@ -146,7 +146,7 @@ class FeedState extends VendorAPI {
 		} catch ( \Throwable $th ) {
 
 			/* Translators: The error description as returned from the API */
-			$error_message = sprintf( esc_html__( 'Error getting feed state. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
+			$error_message = sprintf( esc_html__( 'Error getting feed\'s state. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
 
 			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_state_error', $error_message, array( 'status' => $th->getCode() ) );
 		}
