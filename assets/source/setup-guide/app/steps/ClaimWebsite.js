@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { recordEvent } from '@woocommerce/tracks';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
@@ -78,7 +79,6 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 					'/domain_verification',
 				method: 'POST',
 			} );
-
 			await setAppSettings( { account_data: results.account_data } );
 
 			setStatus( 'success' );
@@ -94,6 +94,13 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 						'pinterest-for-woocommerce'
 					)
 			);
+
+			recordEvent( 'pfw_domain_verify_failure', {
+				step:
+					wcSettings.pinterest_for_woocommerce
+						.claimWebsiteErrorStatus[ error?.data?.status ] ||
+					'unknown',
+			} );
 		}
 	};
 
