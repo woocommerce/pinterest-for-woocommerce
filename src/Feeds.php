@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Handling registration & generation of the XML product feed.
+ * Class handling fetch methods for feed profiles.
  */
 class Feeds {
 
@@ -28,6 +28,7 @@ class Feeds {
 	 * @throws \Exception PHP Exception.
 	 */
 	public static function get_merchant_feed( $merchant_id, $feed_id ) {
+
 		try {
 
 			// Get the feeds of the merchant.
@@ -72,6 +73,7 @@ class Feeds {
 	 * @throws \Exception PHP Exception.
 	 */
 	public static function get_merchant_feed_by_location( $merchant_id, $feed_location ) {
+
 		try {
 
 			// Get the feeds of the merchant.
