@@ -358,8 +358,7 @@ class Base {
 				)
 			),
 			'ads',
-			false,
-			true
+			false
 		);
 	}
 
@@ -382,8 +381,7 @@ class Base {
 				)
 			),
 			'ads',
-			false,
-			true
+			false
 		);
 	}
 
