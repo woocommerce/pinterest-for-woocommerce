@@ -466,7 +466,7 @@ class Base {
 
 
 	/**
-	 * Creates a merchant for the authenticated user or updates the existing one.
+	 * Creates a merchant for the authenticated user or updates the existing one. On success the Merchant ID is returned instead of the full merchant object.
 	 *
 	 * @param array $args Payload to be sent to the request.
 	 *
