@@ -226,6 +226,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$this->includes();
 
 			add_action( 'init', array( $this, 'init' ), 0 );
+			add_action( 'admin_init', array( $this, 'admin_init' ), 0 );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
 			add_action( 'wp_head', array( Pinterest\RichPins::class, 'maybe_inject_rich_pins_opengraph_tags' ) );
@@ -257,6 +258,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			do_action( 'pinterest_for_woocommerce_init' );
 		}
 
+		/**
+		 * Init classes for admin interface.
+		 */
+		public function admin_init() {
+			$view_factory         = new Pinterest\View\PHPViewFactory();
+			$admin                = new Pinterest\Admin\Admin( $view_factory );
+			$attributes_manager   = new Pinterest\Product\Attributes\AttributeManager();
+			$attributes_tab       = new Pinterest\Admin\Product\Attributes\AttributesTab( $admin, $attributes_manager );
+			$variation_attributes = new Pinterest\Admin\Product\Attributes\VariationsAttributes( $admin, $attributes_manager );
+
+			$attributes_tab->register();
+			$variation_attributes->register();
+		}
 
 		/**
 		 * Checks all plugin requirements. If run in admin context also adds a notice.
