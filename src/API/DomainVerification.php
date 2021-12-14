@@ -72,11 +72,11 @@ class DomainVerification extends VendorAPI {
 					return array_merge( (array) $result['data'], array( 'account_data' => $account_data ) );
 				}
 
-				throw new \Exception("Meta tag verification failed", 409);
+				throw new \Exception( 'Meta tag verification failed', 409 );
 
 			}
 
-			throw new \Exception("Domain verification failed", 406);
+			throw new \Exception( 'Domain verification failed', 406 );
 
 		} catch ( \Throwable $th ) {
 
