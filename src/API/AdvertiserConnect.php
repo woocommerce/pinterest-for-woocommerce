@@ -53,6 +53,7 @@ class AdvertiserConnect extends VendorAPI {
 				throw new \Exception( esc_html__( 'Missing advertiser or tag parameters.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
+			$connected_advertiser = Pinterest_For_Woocommerce()::get_data( 'tracking_advertiser' );
 			$connected_tag        = Pinterest_For_Woocommerce()::get_data( 'tracking_tag' );
 
 			// Check if advertiser is already connected.
@@ -61,7 +62,9 @@ class AdvertiserConnect extends VendorAPI {
 			}
 
 			// Disconnect if advertiser or tag are different.
-			self::disconnect_advertiser( $connected_advertiser, $connected_tag );
+			if ( $connected_advertiser && $connected_tag ) {
+				self::disconnect_advertiser( $connected_advertiser, $connected_tag );
+			}
 
 			// Connect new advertiser.
 			$response = Base::connect_advertiser( $advertiser_id, $tag_id );
@@ -99,20 +102,19 @@ class AdvertiserConnect extends VendorAPI {
 	 */
 	private static function disconnect_advertiser( $connected_advertiser, $connected_tag ) {
 
-		if ( $connected_advertiser && $connected_tag ) {
-			try {
+		try {
 
-				$response = Base::disconnect_advertiser( $connected_advertiser, $connected_tag );
+			$response = Base::disconnect_advertiser( $connected_advertiser, $connected_tag );
 
-				if ( 'success' !== $response['status'] ) {
-					throw new \Exception( esc_html__( 'The advertiser could not be disconnected from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
-				}
+			if ( 'success' !== $response['status'] ) {
+				throw new \Exception( esc_html__( 'The advertiser could not be disconnected from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
+			}
 
 			Pinterest_For_Woocommerce()::save_data( 'tracking_advertiser', false );
 			Pinterest_For_Woocommerce()::save_data( 'tracking_tag', false );
+		} catch ( \Exception $e ) {
 
-				throw new \Exception( esc_html__( 'The advertiser could not be disconnected from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
-			}
+			throw new \Exception( esc_html__( 'The advertiser could not be disconnected from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
 		}
 	}
 }
