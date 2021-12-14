@@ -73,13 +73,12 @@ class Base {
 	 * @param array   $payload         Payload to be sent on the request's body.
 	 * @param string  $api             The specific Endpoints subset.
 	 * @param int     $cache_expiry    When set, enables caching on the request and the value is used as the cache's TTL (in seconds).
-	 * @param boolean $is_json_payload Specify if the request body is JSON formatted.
 	 *
 	 * @return array
 	 *
 	 * @throws \Exception PHP exception.
 	 */
-	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false, $is_json_payload = false ) {
+	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 
 		if ( ! empty( $cache_expiry ) ) {
 			$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( $endpoint . $method . wp_json_encode( $payload ) . $api );
@@ -93,6 +92,8 @@ class Base {
 		try {
 			$api         = empty( $api ) ? '' : trailingslashit( $api );
 			$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
+
+			$is_json_payload = 'ads/' === $api && 'POST' === $method ? true : false;
 
 			$request = array(
 				'url'    => self::API_DOMAIN . '/' . $api . 'v' . $api_version . '/' . $endpoint,
