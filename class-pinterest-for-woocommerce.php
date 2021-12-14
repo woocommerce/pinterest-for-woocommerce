@@ -572,12 +572,24 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function disconnect() {
 
-			// Disconnect merchant from Pinterest.
 			try {
+				// Disconnect merchant from Pinterest.
 				$result = Pinterest\API\Base::disconnect_merchant();
 
 				if ( 'success' !== $result['status'] ) {
-					throw new \Exception( esc_html__( 'Response error on disconnect', 'pinterest-for-woocommerce' ), 400 );
+					throw new \Exception( esc_html__( 'Response error on disconnect merchant.', 'pinterest-for-woocommerce' ), 400 );
+				}
+
+				// Disconnect the advertiser from Pinterest.
+				$connected_advertiser = self::get_setting( 'tracking_advertiser', null );
+				$connected_tag        = self::get_setting( 'tracking_tag', null );
+
+				if ( $connected_advertiser && $connected_tag ) {
+					$result = Pinterest\API\Base::disconnect_advertiser( $connected_advertiser, $connected_tag );
+
+					if ( 'success' !== $result['status'] ) {
+						throw new \Exception( esc_html__( 'Response error on disconnect advertiser.', 'pinterest-for-woocommerce' ), 400 );
+					}
 				}
 
 				// Flush the whole data option.
