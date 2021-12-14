@@ -71,9 +71,12 @@ class DomainVerification extends VendorAPI {
 					$account_data = Pinterest_For_Woocommerce()::update_account_data();
 					return array_merge( (array) $result['data'], array( 'account_data' => $account_data ) );
 				}
+
+				throw new \Exception("Meta tag verification failed", 409);
+
 			}
 
-			throw new \Exception();
+			throw new \Exception("Domain verification failed", 406);
 
 		} catch ( \Throwable $th ) {
 
