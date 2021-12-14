@@ -264,9 +264,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public function admin_init() {
 			$view_factory         = new Pinterest\View\PHPViewFactory();
 			$admin                = new Pinterest\Admin\Admin( $view_factory );
-			$attributes_manager   = new Pinterest\Product\Attributes\AttributeManager();
-			$attributes_tab       = new Pinterest\Admin\Product\Attributes\AttributesTab( $admin, $attributes_manager );
-			$variation_attributes = new Pinterest\Admin\Product\Attributes\VariationsAttributes( $admin, $attributes_manager );
+			$attributes_tab       = new Pinterest\Admin\Product\Attributes\AttributesTab( $admin );
+			$variation_attributes = new Pinterest\Admin\Product\Attributes\VariationsAttributes( $admin );
 
 			$attributes_tab->register();
 			$variation_attributes->register();

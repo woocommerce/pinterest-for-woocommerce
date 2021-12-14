@@ -37,12 +37,11 @@ class AttributesTab {
 	/**
 	 * AttributesTab constructor.
 	 *
-	 * @param Admin            $admin             Admin class.
-	 * @param AttributeManager $attribute_manager Attribute manager.
+	 * @param Admin $admin Admin class.
 	 */
-	public function __construct( Admin $admin, AttributeManager $attribute_manager ) {
+	public function __construct( Admin $admin ) {
 		$this->admin             = $admin;
-		$this->attribute_manager = $attribute_manager;
+		$this->attribute_manager = AttributeManager::instance();
 	}
 
 	/**

@@ -25,6 +25,13 @@ class AttributeManager {
 	use PluginHelper;
 	use ValidateInterface;
 
+	/**
+	 * The single instance of the class.
+	 *
+	 * @var AttributeManager
+	 */
+	protected static $instance = null;
+
 	protected const ATTRIBUTES = array(
 		Condition::class,
 	);
@@ -35,6 +42,18 @@ class AttributeManager {
 	 * @var array
 	 */
 	protected $attribute_types_map;
+
+	/**
+	 * Load single instance of class.
+	 *
+	 * @return AttributeManager Main instance.
+	 */
+	public static function instance() {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
 
 	/**
 	 * Update product attribute.
