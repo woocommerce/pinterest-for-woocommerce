@@ -46,10 +46,10 @@ class PluginUpdate {
 		 * 2. Move feed file to a new location.
 		 */
 		$feed_id          = Pinterest_For_Woocommerce()::get_data( 'local_feed_id' );
-		$default_location = array( Pinterest_For_Woocommerce()::get_base_country() ?? 'US' );
+		$default_location = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
 		if ( $feed_id ) {
 			// Generate new configurations.
-			$new_configs = ( new LocalFeedConfigs( $default_location ) )->get_configurations();
+			$new_configs = ( new LocalFeedConfigs( array( $default_location ) ) )->get_configurations();
 			// We only migrate the default location, other configs do not exist at this stage.
 			$new_config = $new_configs[ $default_location ];
 
@@ -92,7 +92,7 @@ class PluginUpdate {
 			ProductFeedStatus::set( $old_state );
 
 			/*
-			 * 2-c. PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' transient will be removed deleted after WEEK_IN_SECONDS.
+			 * 2-c. PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' transient will be removed after WEEK_IN_SECONDS.
 			 */
 		}
 
