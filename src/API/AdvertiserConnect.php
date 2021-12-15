@@ -58,7 +58,10 @@ class AdvertiserConnect extends VendorAPI {
 
 			// Check if advertiser is already connected.
 			if ( $connected_advertiser === $advertiser_id && $connected_tag === $tag_id ) {
-				return array( 'connected' => $advertiser_id );
+				return array(
+					'connected'   => $advertiser_id,
+					'reconnected' => false,
+				);
 			}
 
 			// Disconnect if advertiser or tag are different.
@@ -80,7 +83,10 @@ class AdvertiserConnect extends VendorAPI {
 			Pinterest_For_Woocommerce()::save_data( 'tracking_advertiser', $advertiser_id );
 			Pinterest_For_Woocommerce()::save_data( 'tracking_tag', $tag_id );
 
-			return array( 'connected' => $response['data']->advertiser_id );
+			return array(
+				'connected'   => $response['data']->advertiser_id,
+				'reconnected' => true,
+			);
 
 		} catch ( \Throwable $th ) {
 

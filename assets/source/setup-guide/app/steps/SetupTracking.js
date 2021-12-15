@@ -246,13 +246,16 @@ const SetupTracking = ( { view } ) => {
 
 			if ( appSettings.tracking_advertiser === results.connected ) {
 				setStatus( 'success' );
-				createNotice(
-					'success',
-					__(
-						'Advertiser connected successfully.',
-						'pinterest-for-woocommerce'
-					)
-				);
+
+				if ( results.reconnected ) {
+					createNotice(
+						'success',
+						__(
+							'Advertiser connected successfully.',
+							'pinterest-for-woocommerce'
+						)
+					);
+				}
 			} else {
 				setStatus( 'error' );
 				createNotice(
