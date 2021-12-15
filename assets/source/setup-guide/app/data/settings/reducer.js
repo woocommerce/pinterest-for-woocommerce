@@ -8,6 +8,7 @@ const settingsReducer = (
 		settings: {},
 		isUpdating: false,
 		requestingErrors: {},
+		updatedData: {},
 	},
 	action
 ) => {
