@@ -96,7 +96,12 @@ class PHPView implements View {
 			);
 		}
 
-		return ob_get_clean() ?: '';
+		$output = ob_get_clean();
+		if ( ! $output ) {
+			$output = '';
+		}
+
+		return $output;
 	}
 
 	/**
@@ -116,7 +121,11 @@ class PHPView implements View {
 	 * @throws ViewException If the view could not be loaded or the provided path was not valid.
 	 */
 	public function render_partial( string $path, array $context = null ): string {
-		return $this->view_factory->create( $path )->render( $context ?: $this->context );
+		if ( ! $context ) {
+			$context = $this->context;
+		}
+
+		return $this->view_factory->create( $path )->render( $context );
 	}
 
 	/**
