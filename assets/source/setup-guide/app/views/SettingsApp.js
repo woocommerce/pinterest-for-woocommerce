@@ -18,11 +18,10 @@ import {
 	useBodyClasses,
 	useCreateNotice,
 } from '../helpers/effects';
-
+import { SETTINGS_VIEW } from '../helpers/views';
 import NavigationClassic from '../../../components/navigation-classic';
 
 const SettingsApp = () => {
-	const VIEW_NAME = 'settings';
 	const appSettings = useSettingsSelect();
 
 	useBodyClasses();
@@ -37,10 +36,10 @@ const SettingsApp = () => {
 			{ appSettings ? (
 				<div className="woocommerce-setup-guide__container">
 					<>
-						<SetupProductSync view={ VIEW_NAME } />
-						<SetupPins view={ VIEW_NAME } />
-						<AdvancedSettings view={ VIEW_NAME } />
-						<SaveSettingsButton view={ VIEW_NAME } />
+						<SetupProductSync view={ SETTINGS_VIEW } />
+						<SetupPins view={ SETTINGS_VIEW } />
+						<AdvancedSettings view={ SETTINGS_VIEW } />
+						<SaveSettingsButton />
 					</>
 				</div>
 			) : (
