@@ -100,8 +100,9 @@ class ProductsXmlFeed {
 		$attributes        = $attribute_manager->get_all_values( $product );
 		$xml               = '';
 
-		foreach ( $attributes as $property => $value ) {
-			$xml .= "{$indent}<{$property}>{$value}</{$property}>" . PHP_EOL;
+		foreach ( $attributes as $name => $value ) {
+			$property = "g:{$name}";
+			$xml     .= "{$indent}<{$property}>{$value}</{$property}>" . PHP_EOL;
 		}
 
 		return $xml;
