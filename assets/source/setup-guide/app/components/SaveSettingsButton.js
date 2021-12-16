@@ -13,7 +13,6 @@ import {
 	useSettingsDispatch,
 	useCreateNotice,
 } from '../helpers/effects';
-import getContextByPath from '../helpers/get-context-by-path';
 
 /**
  * Clicking on "… Save changes" button.
@@ -24,11 +23,11 @@ import getContextByPath from '../helpers/get-context-by-path';
 /**
  * Save Settings button component
  *
+ * @param {string} view The view in which the button is located
  * @fires wcadmin_pfw_save_changes_button_click
- *
  * @return {JSX.Element} Rendered element
  */
-const SaveSettingsButton = () => {
+const SaveSettingsButton = ( { view = '' } ) => {
 	const isSaving = useSettingsSelect( 'isSettingsUpdating' );
 	const updatedData = useSettingsSelect( 'getUpdatedData' );
 	const setAppSettings = useSettingsDispatch( true );
@@ -37,7 +36,7 @@ const SaveSettingsButton = () => {
 	const saveSettings = async () => {
 		recordEvent( 'pfw_save_changes_button_click', {
 			updatedData,
-			context: getContextByPath(),
+			context: `pinterest_${ view }`,
 		} );
 
 		try {

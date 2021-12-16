@@ -62,7 +62,9 @@ const SettingsApp = () => {
 
 					{ isGroup1Visible && <ClaimWebsite view="settings" /> }
 					{ isGroup2Visible && <SetupTracking view="settings" /> }
-					{ isGroup2Visible && <SaveSettingsButton /> }
+					{ isGroup2Visible && (
+						<SaveSettingsButton view="connection" />
+					) }
 				</div>
 			) : (
 				<Spinner />

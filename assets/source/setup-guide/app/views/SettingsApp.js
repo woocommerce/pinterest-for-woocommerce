@@ -22,6 +22,7 @@ import {
 import NavigationClassic from '../../../components/navigation-classic';
 
 const SettingsApp = () => {
+	const VIEW_NAME = 'settings';
 	const appSettings = useSettingsSelect();
 
 	useBodyClasses();
@@ -36,10 +37,10 @@ const SettingsApp = () => {
 			{ appSettings ? (
 				<div className="woocommerce-setup-guide__container">
 					<>
-						<SetupProductSync view="settings" />
-						<SetupPins view="settings" />
-						<AdvancedSettings view="settings" />
-						<SaveSettingsButton />
+						<SetupProductSync view={ VIEW_NAME } />
+						<SetupPins view={ VIEW_NAME } />
+						<AdvancedSettings view={ VIEW_NAME } />
+						<SaveSettingsButton view={ VIEW_NAME } />
 					</>
 				</div>
 			) : (
