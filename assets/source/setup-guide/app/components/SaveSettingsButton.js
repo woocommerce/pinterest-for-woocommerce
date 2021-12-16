@@ -13,6 +13,7 @@ import {
 	useSettingsDispatch,
 	useCreateNotice,
 } from '../helpers/effects';
+import prepareForTracking from '../helpers/prepare-for-tracking';
 
 /**
  * Clicking on "… Save changes" button.
@@ -23,20 +24,19 @@ import {
 /**
  * Save Settings button component
  *
- * @param {string} view The view in which the button is located
  * @fires wcadmin_pfw_save_changes_button_click
  * @return {JSX.Element} Rendered element
  */
-const SaveSettingsButton = ( { view = '' } ) => {
+const SaveSettingsButton = () => {
 	const isSaving = useSettingsSelect( 'isSettingsUpdating' );
-	const updatedData = useSettingsSelect( 'getUpdatedData' );
+	const settings = useSettingsSelect( 'getSettings' );
 	const setAppSettings = useSettingsDispatch( true );
 	const createNotice = useCreateNotice();
 
 	const saveSettings = async () => {
 		recordEvent( 'pfw_save_changes_button_click', {
-			updatedData,
-			context: `pinterest_${ view }`,
+			...prepareForTracking( settings ),
+			context: `pinterest_settings`,
 		} );
 
 		try {

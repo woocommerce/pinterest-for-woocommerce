@@ -78,12 +78,3 @@ export const isTrackingConfigured = ( state ) => {
 		state?.settings?.tracking_advertiser && state?.settings?.tracking_tag
 	);
 };
-
-/**
- * Get the updated data to be stored in database.
- *
- * @param {Object} state - Reducer state
- */
-export const getUpdatedData = ( state ) => {
-	return state.updatedData;
-};

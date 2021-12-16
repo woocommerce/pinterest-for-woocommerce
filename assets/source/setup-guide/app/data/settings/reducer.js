@@ -8,7 +8,6 @@ const settingsReducer = (
 		settings: {},
 		isUpdating: false,
 		requestingErrors: {},
-		updatedData: {},
 	},
 	action
 ) => {
@@ -41,14 +40,6 @@ const settingsReducer = (
 				...state,
 				updatingError: action.error,
 				isUpdating: false,
-			};
-			break;
-		case TYPES.SET_UPDATED_DATA:
-			state = {
-				...state,
-				updatedData: action.reset
-					? {}
-					: { ...state.updatedData, ...action.data },
 			};
 			break;
 	}
