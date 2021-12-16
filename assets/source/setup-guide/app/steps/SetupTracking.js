@@ -143,7 +143,11 @@ const SetupTracking = ( { view } ) => {
 						typeof results[ appSettings?.tracking_tag ] ===
 							'undefined'
 					) {
-						handleOptionChange( 'tracking_tag', results[ 0 ].id );
+						const tagsKeys = Object.keys( results );
+						handleOptionChange(
+							'tracking_tag',
+							results[ tagsKeys[ 0 ] ].id
+						);
 					}
 				} else {
 					setStatus( 'error' );
