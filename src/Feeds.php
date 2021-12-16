@@ -106,4 +106,35 @@ class Feeds {
 		}
 	}
 
+
+	/**
+	 * Verify if the local feed is already registered to the merchant
+	 *
+	 * @param string $merchant_id The merchant ID.
+	 *
+	 * @return string|false Returns the ID of the feed if properly registered or false otherwise.
+	 */
+	public static function is_local_feed_registered( $merchant_id ) {
+
+		$local_feed = ProductFeedStatus::get_local_feed();
+
+		// We need to fetch the feed object using the local feed location.
+		$feed = self::get_merchant_feed_by_location( $merchant_id, $local_feed['feed_url'] );
+
+		$configured_path = dirname( $feed->location_config->full_feed_fetch_location );
+		$local_path      = dirname( $local_feed['feed_url'] );
+		$local_country   = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
+		$local_locale    = str_replace( '_', '-', determine_locale() );
+
+		$registered_feed = false;
+
+		if ( $configured_path === $local_path && $local_country === $feed->country && $local_locale === $feed->locale ) {
+
+			// We can assume we're on the same site.
+			$registered_feed = $feed->id;
+		}
+
+		return $registered_feed;
+	}
+
 }

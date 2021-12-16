@@ -59,11 +59,11 @@ class Merchants {
 			// Try creating one.
 			$response = self::update_or_create_merchant();
 
-			if ( ! $response['data'] ) {
+			if ( ! $response['merchant_id'] ) {
 				throw new \Exception( __( 'Wrong response when trying to create or update merchant.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$merchant = self::get_merchant_object( $response['data'] );
+			$merchant = self::get_merchant_object( $response['merchant_id'] );
 		}
 
 		if ( ! $merchant || 'success' !== $merchant['status'] || ! $merchant['data'] ) {
@@ -125,8 +125,9 @@ class Merchants {
 
 	/**
 	 * Creates a merchant for the authenticated user or updates the existing one.
+	 * Returns an array with the merchant_id and the registered feed_id.
 	 *
-	 * @return mixed
+	 * @return array
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
@@ -146,13 +147,22 @@ class Merchants {
 			'merchant_name'    => $merchant_name,
 		);
 
+		// The response only contains the merchant id.
 		$response = API\Base::update_or_create_merchant( $args );
 
 		if ( 'success' !== $response['status'] ) {
 			throw new \Exception( __( 'Response error when trying create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
-		return $response;
+		$registered_feed = Feeds::is_local_feed_registered( $response['data'] );
+
+		// Update the registered feed id setting.
+		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $registered_feed );
+
+		return array(
+			'merchant_id' => $response['data'],
+			'feed_id'     => $registered_feed,
+		);
 	}
 
 }

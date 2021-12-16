@@ -520,35 +520,17 @@ class ProductSync {
 
 			// Update feed if we don't have a feed_id saved.
 			// for cases where the already existed in the API.
-			if ( ! self::get_registered_feed_id() ) {
+			$registered = self::get_registered_feed_id();
+
+			if ( ! $registered ) {
 
 				// The response only contains the merchant id.
 				$response = Merchants::update_or_create_merchant();
 
-				if ( 'success' !== $response['status'] ) {
-					throw new \Exception( esc_html__( 'Could not update feed info.', 'pinterest-for-woocommerce' ) );
-				}
-			}
-
-			$local_feed = ProductFeedStatus::get_local_feed();
-
-			// We need to fetch the feed object using the local feed location.
-			$feed = Feeds::get_merchant_feed_by_location( $merchant['data']->id, $local_feed['feed_url'] );
-
-			$configured_path = dirname( $feed->location_config->full_feed_fetch_location );
-			$local_path      = dirname( $local_feed['feed_url'] );
-			$local_country   = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
-			$local_locale    = str_replace( '_', '-', determine_locale() );
-
-			if ( $configured_path === $local_path && $local_country === $feed->country && $local_locale === $feed->locale ) {
-				// We can assume we're on the same site.
-
-				$registered = $feed->id;
+				// The response contains an array with the ID of merchant and feed.
+				$registered = $response['feed_id'];
 			}
 		}
-
-		// Update the registered feed id setting.
-		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $registered );
 
 		return $registered;
 	}
