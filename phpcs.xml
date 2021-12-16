@@ -24,6 +24,7 @@
 	<!-- Specific excludes -->
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
 		<exclude-pattern>src/*</exclude-pattern>
+		<exclude-pattern>bin/*</exclude-pattern>
 	</rule>
 
 	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
