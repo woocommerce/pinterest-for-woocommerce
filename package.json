@@ -145,6 +145,7 @@
     "version_replace_paths": [
       "includes",
       "src",
+      "bin",
       "class-pinterest-for-woocommerce.php",
       "pinterest-for-woocommerce.php",
       "uninstall.php"
