@@ -53,21 +53,14 @@ class AdvertiserConnect extends VendorAPI {
 				throw new \Exception( esc_html__( 'Missing advertiser or tag parameters.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$is_connected         = Pinterest_For_Woocommerce()::get_setting( 'is_advertiser_connected' );
-			$connected_advertiser = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
-			$connected_tag        = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
+			$is_connected = Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' );
 
 			// Check if advertiser is already connected.
-			if ( $is_connected && $connected_advertiser === $advertiser_id && $connected_tag === $tag_id ) {
+			if ( $is_connected ) {
 				return array(
 					'connected'   => $advertiser_id,
 					'reconnected' => false,
 				);
-			}
-
-			// Disconnect if advertiser or tag are different.
-			if ( $connected_advertiser && $connected_tag ) {
-				self::disconnect_advertiser( $connected_advertiser, $connected_tag );
 			}
 
 			// Connect new advertiser and tag.
@@ -103,9 +96,7 @@ class AdvertiserConnect extends VendorAPI {
 			throw new \Exception( esc_html__( 'Incorrect advertiser ID.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
-		Pinterest_For_Woocommerce()::save_setting( 'is_advertiser_connected', true );
-		Pinterest_For_Woocommerce()::save_setting( 'tracking_advertiser', $advertiser_id );
-		Pinterest_For_Woocommerce()::save_setting( 'tracking_tag', $tag_id );
+		Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', true );
 
 		return array(
 			'connected'   => $response['data']->advertiser_id,
@@ -122,7 +113,7 @@ class AdvertiserConnect extends VendorAPI {
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
-	private static function disconnect_advertiser( $connected_advertiser, $connected_tag ) {
+	public static function disconnect_advertiser( $connected_advertiser, $connected_tag ) {
 
 		try {
 
@@ -132,9 +123,7 @@ class AdvertiserConnect extends VendorAPI {
 				throw new \Exception( esc_html__( 'The advertiser could not be disconnected from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			Pinterest_For_Woocommerce()::save_setting( 'is_advertiser_connected', false );
-			Pinterest_For_Woocommerce()::save_setting( 'tracking_advertiser', false );
-			Pinterest_For_Woocommerce()::save_setting( 'tracking_tag', false );
+			Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', false );
 		} catch ( \Exception $e ) {
 
 			throw new \Exception( esc_html__( 'The advertiser could not be disconnected from Pinterest.', 'pinterest-for-woocommerce' ), 400 );

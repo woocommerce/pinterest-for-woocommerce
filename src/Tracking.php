@@ -502,7 +502,7 @@ class Tracking {
 	 */
 	private static function maybe_connect_advertiser_tag() {
 
-		$is_connected         = Pinterest_For_Woocommerce()::get_setting( 'is_advertiser_connected' );
+		$is_connected         = Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' );
 		$connected_advertiser = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
 		$connected_tag        = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
 

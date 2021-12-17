@@ -240,6 +240,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Allow access to our option through the REST API.
 			add_filter( 'woocommerce_rest_api_option_permissions', array( $this, 'add_option_permissions' ), 10, 1 );
+
+			// Disconnect advertiser if advertiser or tag change.
+			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
 		}
 
 
@@ -612,6 +615,41 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 		}
 
+
+		/**
+		 * Disconnect advertiser from the platform if advertiser or tag change.
+		 *
+		 * @param array $old_value The old value of the option.
+		 * @param array $new_value The new value of the option.
+		 */
+		public static function maybe_disconnect_advertiser( $old_value, $new_value ) {
+
+			if ( ! is_array( $old_value ) || ! is_array( $new_value ) ) {
+				return;
+			}
+
+			if (
+				! isset( $old_value['tracking_advertiser'] ) ||
+				! isset( $old_value['tracking_tag'] ) ||
+				! isset( $new_value['tracking_advertiser'] ) ||
+				! isset( $new_value['tracking_tag'] )
+			) {
+				return;
+			}
+
+			// Disconnect merchant if old values are different than new ones.
+			if ( $old_value['tracking_advertiser'] !== $new_value['tracking_advertiser'] || $old_value['tracking_tag'] !== $new_value['tracking_tag'] ) {
+
+				try {
+
+					Pinterest\API\AdvertiserConnect::disconnect_advertiser( $old_value['tracking_advertiser'], $old_value['tracking_tag'] );
+
+				} catch ( \Exception $th ) {
+
+					Pinterest\Logger::log( esc_html__( 'There was an error disconnecting the Advertiser. Please try again.', 'pinterest-for-woocommerce' ) );
+				}
+			}
+		}
 
 		/**
 		 * Return WooConnect Bridge URL
