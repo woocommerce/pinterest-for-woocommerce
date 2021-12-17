@@ -44,7 +44,7 @@ export function setIsUpdating( isUpdating ) {
  * Update the settings in the store or in DB
  *
  * @param {Object} data The data to be updated
- * @param {boolean} saveToDb If true it persists the changes in DB
+ * @param {boolean} [saveToDb=false] If true it persists the changes in DB
  * @return {Generator<{success}, void, ?>} A generator for the data update
  */
 export function* updateSettings( data, saveToDb = false ) {
