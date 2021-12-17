@@ -48,7 +48,7 @@ const StaticError = ( { reqError } ) => {
  *
  * To be used in onboarding setup stepper.
  *
- * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'claim-website', context: 'claim-website' }`
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'claim-website', context: props.view }`
  * @param {Object} props React props.
  * @param {Function} props.goToNextStep
  * @param {string} props.view
@@ -152,7 +152,7 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 								wcSettings.pinterest_for_woocommerce
 									.pinterestLinks.claimWebsite,
 							linkId: 'claim-website',
-							context: 'claim-website',
+							context: view,
 						} ) }
 					/>
 				</div>
