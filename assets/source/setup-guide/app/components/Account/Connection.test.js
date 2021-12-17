@@ -6,6 +6,7 @@ jest.mock( '@woocommerce/tracks' );
  */
 import { recordEvent } from '@woocommerce/tracks';
 import { fireEvent, render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -19,23 +20,85 @@ afterEach( () => {
 } );
 
 describe( 'AccountConnection component', () => {
-	it( 'Should call `pfw_modal_open { name: \'account-disconnection\', context}` track event once "Disconnect" button is clicked', () => {
-		// Render connected component.
-		const { getByRole } = render(
-			<AccountConnection
-				isConnected={ true }
-				accountData={ { id: 123 } }
-				context="foo"
-			/>
-		);
-		// Find & click the Disconnect button.
-		const disconnectButton = getByRole( 'button', { name: 'Disconnect' } );
-		fireEvent.click( disconnectButton );
+	describe( 'when rendered with account data', () => {
+		let getByRole;
+		beforeEach( () => {
+			// Render connected component.
+			getByRole = render(
+				<AccountConnection
+					isConnected={ true }
+					accountData={ { id: 123 } }
+					context="foo"
+				/>
+			).getByRole;
+		} );
+		describe( 'once "Disconnect" button is clicked', () => {
+			beforeEach( () => {
+				// Find & click the Disconnect button.
+				const disconnectButton = getByRole( 'button', {
+					name: 'Disconnect',
+				} );
+				fireEvent.click( disconnectButton );
+			} );
 
-		// Assert fired event.
-		expect( recordEvent ).toHaveBeenCalledWith( 'pfw_modal_open', {
-			context: 'foo',
-			name: 'account-disconnection',
+			it( "Should call `pfw_modal_open { name: 'account-disconnection', context}` track event", () => {
+				// Assert fired event.
+				expect( recordEvent ).toHaveBeenCalledWith( 'pfw_modal_open', {
+					context: 'foo',
+					name: 'account-disconnection',
+				} );
+			} );
+
+			it( "then \"Cancel\" button is clicked, should call `pfw_modal_closed { name: 'account-disconnection', action: 'dismiss', context}` track event", () => {
+				// Find & click the Cancel button.
+				const cancelButton = getByRole( 'button', {
+					name: 'Cancel',
+				} );
+				fireEvent.click( cancelButton );
+
+				// Assert fired event.
+				expect( recordEvent ).toHaveBeenCalledWith(
+					'pfw_modal_closed',
+					{
+						action: 'dismiss',
+						context: 'foo',
+						name: 'account-disconnection',
+					}
+				);
+			} );
+
+			it( "then \"X\" button is clicked, should call `pfw_modal_closed { name: 'account-disconnection', action: 'dismiss', context}` track event", () => {
+				// Find & click the Cancel button.
+				const cancelButton = getByRole( 'button', {
+					name: 'Close dialog',
+				} );
+				fireEvent.click( cancelButton );
+
+				// Assert fired event.
+				expect( recordEvent ).toHaveBeenCalledWith(
+					'pfw_modal_closed',
+					{
+						action: 'dismiss',
+						context: 'foo',
+						name: 'account-disconnection',
+					}
+				);
+			} );
+
+			it( "then \"Esc\" key is pressed, should call `pfw_modal_closed { name: 'account-disconnection', action: 'dismiss', context}` track event", () => {
+				// Press Esc.
+				userEvent.keyboard( '{esc}' );
+
+				// Assert fired event.
+				expect( recordEvent ).toHaveBeenCalledWith(
+					'pfw_modal_closed',
+					{
+						action: 'dismiss',
+						context: 'foo',
+						name: 'account-disconnection',
+					}
+				);
+			} );
 		} );
 	} );
 } );
