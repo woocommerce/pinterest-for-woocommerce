@@ -53,11 +53,12 @@ class AdvertiserConnect extends VendorAPI {
 				throw new \Exception( esc_html__( 'Missing advertiser or tag parameters.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
+			$is_connected         = Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' );
 			$connected_advertiser = Pinterest_For_Woocommerce()::get_data( 'tracking_advertiser' );
 			$connected_tag        = Pinterest_For_Woocommerce()::get_data( 'tracking_tag' );
 
 			// Check if advertiser is already connected.
-			if ( $connected_advertiser === $advertiser_id && $connected_tag === $tag_id ) {
+			if ( $is_connected && $connected_advertiser === $advertiser_id && $connected_tag === $tag_id ) {
 				return array(
 					'connected'   => $advertiser_id,
 					'reconnected' => false,
@@ -69,24 +70,8 @@ class AdvertiserConnect extends VendorAPI {
 				self::disconnect_advertiser( $connected_advertiser, $connected_tag );
 			}
 
-			// Connect new advertiser.
-			$response = Base::connect_advertiser( $advertiser_id, $tag_id );
-
-			if ( 'success' !== $response['status'] ) {
-				throw new \Exception( esc_html__( 'The advertiser could not be connected to Pinterest.', 'pinterest-for-woocommerce' ), 400 );
-			}
-
-			if ( $advertiser_id !== $response['data']->advertiser_id ) {
-				throw new \Exception( esc_html__( 'Incorrect advertiser ID.', 'pinterest-for-woocommerce' ), 400 );
-			}
-
-			Pinterest_For_Woocommerce()::save_data( 'tracking_advertiser', $advertiser_id );
-			Pinterest_For_Woocommerce()::save_data( 'tracking_tag', $tag_id );
-
-			return array(
-				'connected'   => $response['data']->advertiser_id,
-				'reconnected' => true,
-			);
+			// Connect new advertiser and tag.
+			return self::connect_advertiser_and_tag( $advertiser_id, $tag_id );
 
 		} catch ( \Throwable $th ) {
 
@@ -95,6 +80,37 @@ class AdvertiserConnect extends VendorAPI {
 
 			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_advertiser_connect_error', $error_message, array( 'status' => $th->getCode() ) );
 		}
+	}
+
+
+	/**
+	 * Connect an advertiser and a tag to the platform.
+	 *
+	 * @param string $advertiser_id The ID of the advertiser.
+	 * @param string $tag_id        The ID of the tag.
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
+	public static function connect_advertiser_and_tag( $advertiser_id, $tag_id ) {
+
+		$response = Base::connect_advertiser( $advertiser_id, $tag_id );
+
+		if ( 'success' !== $response['status'] ) {
+			throw new \Exception( esc_html__( 'The advertiser could not be connected to Pinterest.', 'pinterest-for-woocommerce' ), 400 );
+		}
+
+		if ( $advertiser_id !== $response['data']->advertiser_id ) {
+			throw new \Exception( esc_html__( 'Incorrect advertiser ID.', 'pinterest-for-woocommerce' ), 400 );
+		}
+
+		Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', true );
+		Pinterest_For_Woocommerce()::save_data( 'tracking_advertiser', $advertiser_id );
+		Pinterest_For_Woocommerce()::save_data( 'tracking_tag', $tag_id );
+
+		return array(
+			'connected'   => $response['data']->advertiser_id,
+			'reconnected' => true,
+		);
 	}
 
 
@@ -116,6 +132,7 @@ class AdvertiserConnect extends VendorAPI {
 				throw new \Exception( esc_html__( 'The advertiser could not be disconnected from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
+			Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', false );
 			Pinterest_For_Woocommerce()::save_data( 'tracking_advertiser', false );
 			Pinterest_For_Woocommerce()::save_data( 'tracking_tag', false );
 		} catch ( \Exception $e ) {
