@@ -111,6 +111,7 @@ class Tracking {
 			self::maybe_connect_advertiser_tag();
 		} catch ( \Exception $e ) {
 
+			/* Translators: The error description */
 			Logger::log( sprintf( esc_html__( 'Could not connect the advertiser. Try to connect from the connection tab. [%s]', 'pinterest-for-woocommerce' ), $e->getMessage() ), 'error' );
 		}
 	}
