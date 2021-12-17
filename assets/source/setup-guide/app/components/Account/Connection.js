@@ -48,13 +48,15 @@ const PinterestLogo = () => {
  * Opening a modal.
  *
  * @event wcadmin_pfw_modal_open
- * @property {string} context Indicate which modal this is for.
+ * @property {string} name Which modal is it?
+ * @property {string} context `'settings' | 'wizard'` In which context it was used?
  */
 /**
  * Closing a modal.
  *
  * @event wcadmin_pfw_modal_closed
- * @property {string} context Indicate which modal this is for.
+ * @property {string} name Which modal is it?
+ * @property {string} context `'settings' | 'wizard'` In which context it was used?
  * @property {string} action
  * 				`confirm` - When the final "Yes, I'm sure" button is clicked.
  * 				`dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
@@ -65,18 +67,23 @@ const PinterestLogo = () => {
  *
  * @fires wcadmin_pfw_account_connect_button_click
  * @fires wcadmin_pfw_account_disconnect_button_click
- * @fires wcadmin_pfw_modal_open with `context: 'account-disconnection'`
- * @fires wcadmin_pfw_modal_closed with `context: 'account-disconnection'`
- *
+ * @fires wcadmin_pfw_modal_open with `{ name: 'account-disconnection', … }`
+ * @fires wcadmin_pfw_modal_closed with `{ name: 'account-disconnection', … }`
  * @param {Object} props React props.
  * @param {boolean} props.isConnected
  * @param {Function} props.setIsConnected
  * @param {Object} props.accountData
+ * @param {string} props.context Context in which the component is used, to be forwarded to fired Track Events.
  * @return {JSX.Element} Rendered element.
  */
-const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
+const AccountConnection = ( {
+	isConnected,
+	setIsConnected,
+	accountData,
+	context,
+} ) => {
 	const createNotice = useCreateNotice();
-	const modalContext = 'account-disconnection';
+	const modalName = 'account-disconnection';
 
 	const [ isConfirmationModalOpen, setIsConfirmationModalOpen ] = useState(
 		false
@@ -85,15 +92,16 @@ const AccountConnection = ( { isConnected, setIsConnected, accountData } ) => {
 	const openConfirmationModal = () => {
 		recordEvent( 'pfw_account_disconnect_button_click' );
 		setIsConfirmationModalOpen( true );
-		recordEvent( 'pfw_modal_open', { context: modalContext } );
+		recordEvent( 'pfw_modal_open', { context, name: modalName } );
 	};
 
 	const closeConfirmationModal = ( event, isConfirmed ) => {
 		setIsConfirmationModalOpen( false );
 
 		recordEvent( 'pfw_modal_closed', {
-			context: modalContext,
 			action: isConfirmed ? 'confirm' : 'dismiss',
+			context,
+			name: modalName,
 		} );
 	};
 
