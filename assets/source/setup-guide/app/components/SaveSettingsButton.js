@@ -34,20 +34,8 @@ import prepareForTracking from '../helpers/prepare-for-tracking';
 /**
  * Save Settings button component
  *
- * @fires wcadmin_pfw_save_changes_button_click with
- * ```
- * {
- * 	enable_debug_logging: true|false,
- *	enhanced_match_support: true|false,
- *	erase_plugin_data: true|false,
- *	product_sync_enabled: true|false,
- *	rich_pins_on_posts: true|false,
- *	rich_pins_on_products: true|false,
- *	save_to_pinterest: true|false,
- *	track_conversions: true|false,
- * 	context: 'pinterest_settings'
- * }
- * ```
+ * @fires wcadmin_pfw_save_changes_button_click with `{ context: 'pinterest_settings', … }`
+ *
  * @return {JSX.Element} Rendered element
  */
 const SaveSettingsButton = () => {
