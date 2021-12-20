@@ -35,10 +35,10 @@ import prepareForTracking from '../helpers/prepare-for-tracking';
  * Save Settings button component
  *
  * @fires wcadmin_pfw_save_changes_button_click with `{ context: 'pinterest_settings', … }`
- *
+ * @param {string} view The view in which this component is being rendered
  * @return {JSX.Element} Rendered element
  */
-const SaveSettingsButton = () => {
+const SaveSettingsButton = ( { view } ) => {
 	const isSaving = useSettingsSelect( 'isSettingsUpdating' );
 	const settings = useSettingsSelect( 'getSettings' );
 	const setAppSettings = useSettingsDispatch( true );
@@ -47,7 +47,7 @@ const SaveSettingsButton = () => {
 	const saveSettings = async () => {
 		recordEvent( 'pfw_save_changes_button_click', {
 			...prepareForTracking( settings ),
-			context: `pinterest_settings`,
+			context: view,
 		} );
 
 		try {

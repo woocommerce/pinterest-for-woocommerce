@@ -67,7 +67,9 @@ const SettingsApp = () => {
 					{ isGroup2Visible && (
 						<SetupTracking view={ SETTINGS_VIEW } />
 					) }
-					{ isGroup2Visible && <SaveSettingsButton /> }
+					{ isGroup2Visible && (
+						<SaveSettingsButton view={ SETTINGS_VIEW } />
+					) }
 				</div>
 			) : (
 				<Spinner />

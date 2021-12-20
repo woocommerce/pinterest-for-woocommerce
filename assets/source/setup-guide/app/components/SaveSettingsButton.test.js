@@ -7,7 +7,7 @@ jest.mock( '../helpers/effects', () => {
 } );
 jest.mock( '@woocommerce/tracks', () => {
 	return {
-		recordEvent: jest.fn(),
+		recordEvent: jest.fn().mockName( 'recordEvent' ),
 	};
 } );
 
@@ -29,14 +29,20 @@ afterEach( () => {
 describe( 'Save Settings function', () => {
 	const eventName = 'pfw_save_changes_button_click';
 
-	it( `${ eventName } is called on Save settings`, () => {
-		const { getByRole } = render( <SaveSettingsButton /> );
-		const saveSettingsBtn = getByRole( 'button' );
+	const views = [ 'pinterest_settings', 'pinterest_connection' ];
 
-		fireEvent.click( saveSettingsBtn );
-		expect( recordEvent.mock.calls[ 0 ][ 0 ] ).toBe( eventName );
-		expect( recordEvent.mock.calls[ 0 ][ 1 ].context ).toBe(
-			'pinterest_settings'
-		);
-	} );
+	it.each( views )(
+		`${ eventName } is called on Save Settings in "%s" view.`,
+		( view ) => {
+			const { getByRole } = render(
+				<SaveSettingsButton view={ view } />
+			);
+			const saveSettingsBtn = getByRole( 'button' );
+
+			fireEvent.click( saveSettingsBtn );
+			expect( recordEvent ).toHaveBeenCalledWith( eventName, {
+				context: view,
+			} );
+		}
+	);
 } );
