@@ -67,7 +67,7 @@ const StaticError = ( { reqError } ) => {
 };
 
 /**
- * Clicking on an external documentation link.
+ * Triggered when domain verification fails.
  *
  * @event wcadmin_pfw_domain_verify_failure
  *
