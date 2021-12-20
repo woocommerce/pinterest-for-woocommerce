@@ -35,8 +35,9 @@ describe( 'Component Records Events', () => {
 
 		fireEvent.click( getByText( 'Change your store’s country here' ) );
 
-		expect( recordEvent.mock.calls[ 0 ][ 0 ] ).toBe(
-			'pfw_get_started_notice_link_click'
+		expect( recordEvent ).toHaveBeenCalledWith(
+			'pfw_get_started_notice_link_click',
+			expect.any( Object )
 		);
 	} );
 
@@ -45,8 +46,9 @@ describe( 'Component Records Events', () => {
 
 		fireEvent.click( getByText( 'Click here for more information.' ) );
 
-		expect( recordEvent.mock.calls[ 0 ][ 0 ] ).toBe(
-			'pfw_get_started_notice_link_click'
+		expect( recordEvent ).toHaveBeenCalledWith(
+			'pfw_get_started_notice_link_click',
+			expect.any( Object )
 		);
 	} );
 } );
