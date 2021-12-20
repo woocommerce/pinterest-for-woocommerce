@@ -493,6 +493,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' ] ) || ! wp_verify_nonce( sanitize_key( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' ] ), 'go_to_middleware_url' ) || ! current_user_can( 'manage_woocommerce' ) ) {
 				wp_die( esc_html__( 'Cheatin&#8217; huh?', 'pinterest-for-woocommerce' ) );
+				return;
 			}
 
 			$context = 'login';
