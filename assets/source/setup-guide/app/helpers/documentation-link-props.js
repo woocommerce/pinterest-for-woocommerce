@@ -43,7 +43,7 @@ import { recordEvent } from '@woocommerce/tracks';
  * @param {string} [props.target='_blank']
  * @param {string} [props.rel='noopener']
  * @param {Function} [props.onClick] onClick event handler to be decorated with firing Track event.
- * @param {string} [props.eventName=pfw_documentation_link_click] The name of the event to be recorded
+ * @param {string} [props.eventName='pfw_documentation_link_click'] The name of the event to be recorded
  * @param {...import('react').AnchorHTMLAttributes} props.props
  * @return {{href: string, target: string, rel: string, onClick: Function, props}} Documentation link props.
  */
