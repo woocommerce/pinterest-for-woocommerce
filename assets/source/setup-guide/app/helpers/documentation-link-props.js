@@ -43,9 +43,9 @@ import { recordEvent } from '@woocommerce/tracks';
  * @param {string} [props.target='_blank']
  * @param {string} [props.rel='noopener']
  * @param {Function} [props.onClick] onClick event handler to be decorated with firing Track event.
- * @param {string} props.eventName The name of the event to be recorded
+ * @param {string} [props.eventName=pfw_documentation_link_click] The name of the event to be recorded
  * @param {...import('react').AnchorHTMLAttributes} props.props
- * @return {{herf: string, target: string, rel: string, onClick: Function, props}} Documentation link props.
+ * @return {{href: string, target: string, rel: string, onClick: Function, props}} Documentation link props.
  */
 function documentationLinkProps( {
 	href,
@@ -54,7 +54,7 @@ function documentationLinkProps( {
 	target = '_blank',
 	rel = 'noopener',
 	onClick,
-	eventName = 'documentation_link_click',
+	eventName = 'pfw_documentation_link_click',
 	...props
 } ) {
 	return {
@@ -67,7 +67,7 @@ function documentationLinkProps( {
 				onClick( event );
 			}
 			if ( ! event.defaultPrevented ) {
-				recordEvent( `pfw_${ eventName }`, {
+				recordEvent( eventName, {
 					link_id: linkId,
 					context,
 					href,

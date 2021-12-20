@@ -52,9 +52,9 @@ function UnsupportedCountryNotice( { countryCode } ) {
 						<Link
 							{ ...documentationLinkProps( {
 								href: '/wp-admin/admin.php?page=wc-settings',
-								eventName: 'get_started_notice_link_click',
+								eventName: 'pfw_get_started_notice_link_click',
 								linkId: 'unsupported-country-link',
-								context: 'pinterest-landing', //todo: Use helper function to get context from path see https://github.com/woocommerce/pinterest-for-woocommerce/pull/295
+								context: 'pinterest-landing',
 							} ) }
 							className="pins-for-woo-unsupported-country-notice__link"
 							type="wp-admin"
@@ -66,9 +66,9 @@ function UnsupportedCountryNotice( { countryCode } ) {
 								href:
 									wcSettings.pinterest_for_woocommerce
 										.pinterestLinks.adsAvailability,
-								eventName: 'get_started_notice_link_click',
+								eventName: 'pfw_get_started_notice_link_click',
 								linkId: 'ads-availability',
-								context: 'pinterest-landing', //todo: Use helper function to get context from path see https://github.com/woocommerce/pinterest-for-woocommerce/pull/295
+								context: 'pinterest-landing',
 							} ) }
 							className="pins-for-woo-unsupported-country-notice__link"
 						/>
