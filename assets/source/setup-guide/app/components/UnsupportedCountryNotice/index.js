@@ -23,7 +23,7 @@ import documentationLinkProps from '../../helpers/documentation-link-props';
 /**
  * Renders an unsupported country <Notice> with warning appearance.
  *
- * @fires wcadmin_pfw_get_started_notice_link_click
+ * @fires wcadmin_pfw_get_started_notice_link_click with `{ context: 'pinterest-landing', linkId: 'ads-availability' | 'unsupported-country-link' }`
  *
  * @param {Object} props React props.
  * @param {string} props.countryCode The alpha-2 country code to map the country name.
