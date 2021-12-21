@@ -33,7 +33,6 @@ import { recordEvent } from '@woocommerce/tracks';
  *
  * Please be careful not to overwrite the `onClick` handler coincidently.
  *
- * Notice documentation_link_click is the default eventName and pfw_ is not required
  *
  * @fires wcadmin_pfw_documentation_link_click on click, with given `linkId` and `context`.
  * @param {Object} props React props.
