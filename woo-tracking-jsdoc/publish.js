@@ -80,7 +80,12 @@ exports.publish = function ( data ) {
 						/\|/g,
 						'\\|'
 					);
-					mdResult += `\`${ property.name }\` | \`${ type }\` | ${ description }\n`;
+					mdResult += `\`${
+						property.name
+					}\` | \`${ type }\` | ${ description.replace(
+						/\s*\n\s*/g,
+						' <br> '
+					) }\n`;
 				} );
 			}
 

@@ -23,14 +23,12 @@ class Merchants {
 	 * returned by the Advertisers endpoint, it will be used, otherwise an
 	 * attempt to create a new one is made.
 	 *
-	 * @param array $feed_args The arguments used to create the feed.
-	 *
 	 * @return array
 	 *
 	 * @throws \Throwable PHP Exception.
 	 * @throws \Exception PHP Exception.
 	 */
-	public static function get_merchant( $feed_args = array() ) {
+	public static function get_merchant() {
 
 		$merchant          = false;
 		$merchant_id       = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
@@ -65,7 +63,7 @@ class Merchants {
 
 		if ( ! $merchant || ( 'success' !== $merchant['status'] && 650 === $merchant['code'] ) ) {  // https://developers.pinterest.com/docs/redoc/#tag/API-Response-Codes Merchant not found 650.
 			// Try creating one.
-			$merchant = API\Base::maybe_create_merchant( $feed_args );
+			$merchant = API\Base::maybe_create_merchant();
 			if ( 'success' === $merchant['status'] ) {
 				Pinterest_For_Woocommerce()::save_data( 'merchant_id', $merchant['data']->id );
 			}
