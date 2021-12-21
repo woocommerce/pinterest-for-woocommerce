@@ -12,7 +12,7 @@ import documentationLinkProps from '../../setup-guide/app/helpers/documentation-
 /**
  * Renders a notice for Beta versions
  *
- * @fires wcadmin_pfw_get_started_notice_link_click `{ link_id: 'claim-website', context: 'claim-website' }`
+ * @fires wcadmin_pfw_get_started_notice_link_click `{ context: 'pinterest-landing', link_id: 'prelaunch-notice' }`
  * @return {JSX.Element} The rendered component
  */
 const PrelaunchNotice = () => {
