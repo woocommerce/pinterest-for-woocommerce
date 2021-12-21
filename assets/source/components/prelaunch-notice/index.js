@@ -4,6 +4,17 @@
 import { __ } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+import documentationLinkProps from '../../setup-guide/app/helpers/documentation-link-props';
+
+/**
+ * Renders a notice for Beta versions
+ *
+ * @fires wcadmin_pfw_get_started_notice_link_click `{ context: 'pinterest-landing', link_id: 'prelaunch-notice' }`
+ * @return {JSX.Element} The rendered component
+ */
 const PrelaunchNotice = () => {
 	return (
 		<Notice
@@ -25,9 +36,15 @@ const PrelaunchNotice = () => {
 			</p>
 			<p>
 				<a
-					href="https://help.pinterest.com/en-gb/business/article/get-a-business-profile"
-					target="_blank"
-					rel="noreferrer"
+					{ ...documentationLinkProps( {
+						href:
+							wcSettings.pinterest_for_woocommerce.pinterestLinks
+								.preLaunchNotice,
+						eventName: 'get_started_notice_link_click',
+						linkId: 'prelaunch-notice',
+						context: 'pinterest-landing',
+						rel: 'noreferrer',
+					} ) }
 				>
 					{ __(
 						'Click here for more information.',
