@@ -42,7 +42,7 @@ const PrelaunchNotice = () => {
 								.preLaunchNotice,
 						eventName: 'get_started_notice_link_click',
 						linkId: 'prelaunch-notice',
-						context: 'pinterest-landing', //todo: Use helper function to get context from path see https://github.com/woocommerce/pinterest-for-woocommerce/pull/295
+						context: 'pinterest-landing',
 						rel: 'noreferrer',
 					} ) }
 				>
