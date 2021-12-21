@@ -34,7 +34,7 @@ import prepareForTracking from '../helpers/prepare-for-tracking';
 /**
  * Save Settings button component
  *
- * @fires wcadmin_pfw_save_changes_button_click with `{ context: 'pinterest_settings', … }`
+ * @fires wcadmin_pfw_save_changes_button_click with `{ context: view, … }`
  * @param {string} view The view in which this component is being rendered
  * @return {JSX.Element} Rendered element
  */
