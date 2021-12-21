@@ -384,7 +384,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				'serviceLoginUrl'          => $this->get_service_login_url(),
 				'createBusinessAccountUrl' => $this->get_create_business_account_url(),
 				'switchBusinessAccountUrl' => $this->get_switch_business_account_url(),
-				'domainToVerify'           => wp_parse_url( home_url(), PHP_URL_HOST ),
+				'homeUrlToVerify'          => home_url(),
 				'storeCountry'             => $store_country,
 				'isAdsSupportedCountry'    => in_array( $store_country, $this->get_ads_supported_countries(), true ),
 				'isConnected'              => ! empty( Pinterest_For_Woocommerce()::is_connected() ),

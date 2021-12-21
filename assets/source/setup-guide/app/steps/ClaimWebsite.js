@@ -1,23 +1,31 @@
 /**
  * External dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import {
+	useEffect,
+	useState,
+	createInterpolateElement,
+} from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@woocommerce/components';
 import {
 	Button,
 	Card,
 	CardBody,
+	Flex,
+	Notice,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import { PROCESS_STATUS as STATUS, LABEL_STATUS } from '../constants';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
-import StepStatus from '../components/StepStatus';
+import UrlInputControl from '../components/UrlInputControl';
+import StatusLabel from '../components/StatusLabel';
 import {
 	useSettingsSelect,
 	useSettingsDispatch,
@@ -36,54 +44,70 @@ const StaticError = ( { reqError } ) => {
 		return null;
 	}
 
+	const message = createInterpolateElement(
+		sprintf(
+			// translators: %s: error reason returned by Pinterest when verifying website claim fail.
+			__(
+				'<strong>We were unable to verify this domain.</strong> %s',
+				'pinterest-for-woocommerce'
+			),
+			reqError.message
+		),
+		{
+			strong: <strong />,
+		}
+	);
+
 	return (
-		<Text variant="body" className="claim-error">
-			{ reqError.message }
-		</Text>
+		<Notice status="error" isDismissible={ false }>
+			{ message }
+		</Notice>
 	);
 };
 
 /**
  * Claim Website step component.
+ * Renders a UI with section block and <Card> to claim website (if not yet completed) and display its status.
  *
  * To be used in onboarding setup stepper.
  *
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'claim-website', context: props.view }`
  * @param {Object} props React props.
- * @param {Function} props.goToNextStep
- * @param {string} props.view
+ * @param {'wizard'|'settings'} props.view Indicate which view this component is rendered on.
+ * @param {Function} [props.goToNextStep]
+ *   When the website claim is complete, called when clicking the "Continue" button.
+ *   The "Continue" button is only displayed when `props.view` is 'wizard'.
  * @return {JSX.Element} Rendered component.
  */
 const ClaimWebsite = ( { goToNextStep, view } ) => {
-	const [ status, setStatus ] = useState( 'idle' );
+	const [ status, setStatus ] = useState( STATUS.IDLE );
 	const [ reqError, setReqError ] = useState();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
 	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
+	const pfwSettings = wcSettings.pinterest_for_woocommerce;
 
 	useEffect( () => {
-		if ( status !== 'pending' && isDomainVerified ) {
-			setStatus( 'success' );
+		if ( status !== STATUS.PENDING && isDomainVerified ) {
+			setStatus( STATUS.SUCCESS );
 		}
 	}, [ status, isDomainVerified ] );
 
 	const handleClaimWebsite = async () => {
-		setStatus( 'pending' );
+		setStatus( STATUS.PENDING );
 		setReqError();
 
 		try {
 			const results = await apiFetch( {
-				path:
-					wcSettings.pinterest_for_woocommerce.apiRoute +
-					'/domain_verification',
+				path: pfwSettings.apiRoute + '/domain_verification',
 				method: 'POST',
 			} );
 
 			await setAppSettings( { account_data: results.account_data } );
 
-			setStatus( 'success' );
+			setStatus( STATUS.SUCCESS );
 		} catch ( error ) {
-			setStatus( 'error' );
+			setStatus( STATUS.ERROR );
 			setReqError( error );
 
 			createNotice(
@@ -97,24 +121,25 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 		}
 	};
 
-	const StepButton = () => {
+	const VerifyButton = () => {
 		const buttonLabels = {
-			idle: __( 'Start Verification', 'pinterest-for-woocommerce' ),
-			pending: __( 'Verifying Domain', 'pinterest-for-woocommerce' ),
-			error: __( 'Try Again', 'pinterest-for-woocommerce' ),
-			success: __( 'Continue', 'pinterest-for-woocommerce' ),
+			[ STATUS.IDLE ]: __(
+				'Start verification',
+				'pinterest-for-woocommerce'
+			),
+			[ STATUS.PENDING ]: __( 'Verifying…', 'pinterest-for-woocommerce' ),
+			[ STATUS.ERROR ]: __( 'Try again', 'pinterest-for-woocommerce' ),
+			[ STATUS.SUCCESS ]: __( 'Verified', 'pinterest-for-woocommerce' ),
 		};
 
+		const text = buttonLabels[ status ];
+
+		if ( Object.values( LABEL_STATUS ).includes( status ) ) {
+			return <StatusLabel status={ status } text={ text } />;
+		}
+
 		return (
-			<Button
-				isPrimary
-				disabled={ status === 'pending' }
-				onClick={
-					status === 'success' ? goToNextStep : handleClaimWebsite
-				}
-			>
-				{ buttonLabels[ status ] }
-			</Button>
+			<Button isSecondary text={ text } onClick={ handleClaimWebsite } />
 		);
 	};
 
@@ -148,9 +173,7 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 							'Claim your website to get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of your content.'
 						) }
 						readMore={ documentationLinkProps( {
-							href:
-								wcSettings.pinterest_for_woocommerce
-									.pinterestLinks.claimWebsite,
+							href: pfwSettings.pinterestLinks.claimWebsite,
 							linkId: 'claim-website',
 							context: view,
 						} ) }
@@ -173,19 +196,15 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 									) }
 								</Text>
 
-								<StepStatus
-									label={
-										wcSettings.pinterest_for_woocommerce
-											.domainToVerify
-									}
-									status={ status }
-								/>
+								<Flex gap={ 6 }>
+									<UrlInputControl
+										disabled
+										value={ pfwSettings.homeUrlToVerify }
+									/>
+									<VerifyButton />
+								</Flex>
 
 								<StaticError reqError={ reqError } />
-
-								{ view === 'settings' && ! isDomainVerified && (
-									<StepButton />
-								) }
 							</CardBody>
 						) : (
 							<CardBody size="large">
@@ -196,7 +215,15 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 
 					{ view === 'wizard' && (
 						<div className="woocommerce-setup-guide__footer-button">
-							<StepButton />
+							<Button
+								isPrimary
+								disabled={ status !== STATUS.SUCCESS }
+								onClick={ goToNextStep }
+								text={ __(
+									'Continue',
+									'pinterest-for-woocommerce'
+								) }
+							/>
 						</div>
 					) }
 				</div>
