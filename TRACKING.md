@@ -17,7 +17,7 @@ Do not edit it manually!
 ### [`wcadmin_pfw_account_connect_button_click`](assets/source/setup-guide/app/components/Account/Connection.js#L37)
 Clicking on "Connect" Pinterest account button.
 #### Emitters
-- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L60)
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L79)
 
 ### [`wcadmin_pfw_account_convert_button_click`](assets/source/setup-guide/app/steps/SetupAccount.js#L32)
 Clicking on "… convert your personal account" button.
@@ -32,7 +32,7 @@ Clicking on "… create a new Pinterest account" button.
 ### [`wcadmin_pfw_account_disconnect_button_click`](assets/source/setup-guide/app/components/Account/Connection.js#L42)
 Clicking on "Disconnect" Pinterest account button during account setup.
 #### Emitters
-- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L60)
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L79)
 
 ### [`wcadmin_pfw_business_account_connect_button_click`](assets/source/setup-guide/app/components/Account/BusinessAccountSelection.js#L24)
 Clicking on "Connect" business account button.
@@ -50,22 +50,22 @@ Clicking on an external documentation link.
 |   |   |   |
 |---|---|---|
 `link_id` | `string` | Identifier of the link.
-`context` | `string` | What action was initiated.
+`context` | `string` | `'settings' \| 'welcome-section' \| 'wizard'` In which context the link was placed?
 `href` | `string` | Href to which the user was navigated to.
 #### Emitters
-- [`documentationLinkProps`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L37) on click, with given `linkId` and `context`.
-- [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L57) with `{ link_id: 'claim-website', context: 'claim-website' }`
+- [`documentationLinkProps`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L49) on click, with given `linkId` and `context`.
+- [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L82) with `{ link_id: 'claim-website', context: props.view }`
 - [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L54)
-	- with `{ link_id: 'ad-guidelines', context: 'setup-account' }`
-	- with `{ link_id: 'merchant-guidelines', context: 'setup-account' }`
+	- with `{ link_id: 'ad-guidelines', context: props.view }`
+	- with `{ link_id: 'merchant-guidelines', context: props.view }`
 - [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L50)
 	- with `{ link_id: 'ad-guidelines', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
-	- with `{ link_id: 'setup-tracking', context: 'wizard'|'settings' }`
-- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L35) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
+	- with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
+- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L36) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
 
-### [`wcadmin_pfw_get_started_faq`](assets/source/setup-guide/app/views/LandingPageApp.js#L207)
+### [`wcadmin_pfw_get_started_faq`](assets/source/setup-guide/app/views/LandingPageApp.js#L208)
 Clicking on getting started page faq item to collapse or expand it.
 #### Properties
 |   |   |   |
@@ -73,7 +73,57 @@ Clicking on getting started page faq item to collapse or expand it.
 `action` | `string` | `'expand' \| 'collapse'` What action was initiated.
 `question_id` | `string` | Identifier of the clicked question.
 #### Emitters
-- [`FaqQuestion`](assets/source/setup-guide/app/views/LandingPageApp.js#L226) whenever the FAQ is toggled.
+- [`FaqQuestion`](assets/source/setup-guide/app/views/LandingPageApp.js#L227) whenever the FAQ is toggled.
+
+### [`wcadmin_pfw_get_started_notice_link_click`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L16)
+Clicking on the link inside the notice.
+#### Properties
+|   |   |   |
+|---|---|---|
+`link_id` | `string` | Identifier of the link.
+`context` | `string` | What action was initiated.
+`href` | `string` | Href to which the user was navigated to.
+#### Emitters
+- [`PrelaunchNotice`](assets/source/components/prelaunch-notice/index.js#L18) `{ context: 'pinterest-landing', link_id: 'prelaunch-notice' }`
+- [`UnsupportedCountryNotice`](assets/source/setup-guide/app/components/UnsupportedCountryNotice/index.js#L31) with `{ context: 'pinterest-landing', linkId: 'ads-availability' | 'unsupported-country-link' }`
+
+### [`wcadmin_pfw_modal_closed`](assets/source/setup-guide/app/components/Account/Connection.js#L54)
+Closing a modal.
+#### Properties
+|   |   |   |
+|---|---|---|
+`name` | `string` | Which modal is it?
+`context` | `string` | `'settings' \| 'wizard'` In which context it was used?
+`action` | `string` | `confirm` - When the final "Yes, I'm sure" button is clicked. <br> `dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
+#### Emitters
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L79) with `{ name: 'account-disconnection', … }`
+
+### [`wcadmin_pfw_modal_open`](assets/source/setup-guide/app/components/Account/Connection.js#L47)
+Opening a modal.
+#### Properties
+|   |   |   |
+|---|---|---|
+`name` | `string` | Which modal is it?
+`context` | `string` | `'settings' \| 'wizard'` In which context it was used?
+#### Emitters
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L79) with `{ name: 'account-disconnection', … }`
+
+### [`wcadmin_pfw_save_changes_button_click`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L18)
+Clicking on "… Save changes" button.
+#### Properties
+|   |   |   |
+|---|---|---|
+`enable_debug_logging` | `boolean` | Indicates if Enable debug logging option is checked
+`enhanced_match_support` | `boolean` | Indicates if Enhanced Match Support option is checked
+`erase_plugin_data` | `boolean` | Indicates if Erase Plugin Data option is checked
+`product_sync_enabled` | `boolean` | Indicates if Enable Product Sync option is checked
+`rich_pins_on_posts` | `boolean` | Indicates if Add Rich Pins for Posts option is checked
+`rich_pins_on_products` | `boolean` | Indicates if Add Rich Pins for Products option is checked
+`save_to_pinterest` | `boolean` | Indicates if Save to Pinterest option is checked
+`track_conversions` | `boolean` | Indicates if Track Conversion option is checked
+`context` | `string` | The context in which the event is recorded
+#### Emitters
+- [`SaveSettingsButton`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L41) with `{ context: view, … }`
 
 <!---
 End of `woo-tracking-jsdoc`-generated content.

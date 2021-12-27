@@ -40,8 +40,8 @@ import documentationLinkProps from '../helpers/documentation-link-props';
  *
  * @fires wcadmin_pfw_account_create_button_click
  * @fires wcadmin_pfw_account_convert_button_click
- * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-guidelines', context: 'setup-account' }`
- * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'merchant-guidelines', context: 'setup-account' }`
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-guidelines', context: props.view }`
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'merchant-guidelines', context: props.view }`
  *
  * @param {Object} props React props
  * @param {Function} props.goToNextStep
@@ -58,6 +58,7 @@ const SetupAccount = ( {
 	setIsConnected,
 	isBusinessConnected,
 } ) => {
+	const context = view;
 	const createNotice = useCreateNotice();
 	const appSettings = useSettingsSelect();
 	const [ businessAccounts, setBusinessAccounts ] = useState(
@@ -141,7 +142,7 @@ const SetupAccount = ( {
 													.pinterestLinks
 													.adGuidelines,
 											linkId: 'ad-guidelines',
-											context: 'setup-account',
+											context,
 											rel: 'noreferrer',
 										} ) }
 									/>
@@ -157,7 +158,7 @@ const SetupAccount = ( {
 													.pinterestLinks
 													.merchantGuidelines,
 											linkId: 'merchant-guidelines',
-											context: 'setup-account',
+											context,
 											rel: 'noreferrer',
 										} ) }
 									/>
@@ -169,6 +170,7 @@ const SetupAccount = ( {
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
 						<AccountConnection
+							context={ context }
 							isConnected={ isConnected }
 							setIsConnected={ setIsConnected }
 							accountData={ appSettings.account_data }

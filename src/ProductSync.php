@@ -542,7 +542,7 @@ class ProductSync {
 	private static function register_feed( $feed_args ) {
 
 		// Get merchant object.
-		$merchant   = Merchants::get_merchant( $feed_args );
+		$merchant   = Merchants::get_merchant();
 		$registered = false;
 
 		if ( ! empty( $merchant['data']->id ) && 'declined' === $merchant['data']->product_pin_approval_status ) {

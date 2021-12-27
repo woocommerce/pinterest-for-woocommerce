@@ -192,51 +192,6 @@ $root: ".woocommerce-setup-guide";
 					}
 				}
 
-				&-status {
-					--bg-color: transparent;
-					--border-color: #ddd;
-					padding: 8px;
-					display: flex;
-
-					&.has-error {
-						--border-color: var(--wc-red);
-						--bg-color: var(--border-color);
-					}
-
-					&.has-pending,
-					&.has-success {
-						--border-color: var(--wp-admin-theme-color);
-						--bg-color: var(--border-color);
-					}
-
-					&__icon {
-						align-items: center;
-						background-color: var(--bg-color);
-						border: 1px solid var(--border-color);
-						border-radius: 50%;
-						color: #fff;
-						display: inline-flex;
-						font-size: 16px;
-						height: 22px;
-						justify-content: center;
-						margin-right: 12px;
-						min-width: 22px;
-						width: 22px;
-
-						.woocommerce-spinner {
-							border-radius: 50%;
-							display: block;
-							max-height: 22px;
-							min-width: 22px;
-							width: 22px;
-
-							&__circle {
-								stroke: #fff;
-							}
-						}
-					}
-				}
-
 				&-columns {
 
 					@include break-medium() {
@@ -345,40 +300,17 @@ $root: ".woocommerce-setup-guide";
 
 				.components-card__body {
 
-					> *:not(:last-child) {
-						margin-bottom: 16px;
+					> :not(:last-child) {
+						margin-bottom: var(--main-gap);
+					}
+
+					> :first-child {
+						margin-bottom: $grid-unit-10;
 					}
 				}
 
-				#{$root} {
-
-					&__step {
-
-						&-status {
-							padding: 0;
-						}
-					}
-				}
-
-				.is-verified {
-
-					> * {
-						margin: 8px 0;
-					}
-				}
-
-				.has-idle {
-
-					#{$root} {
-
-						&__step-status__icon {
-							display: none;
-						}
-					}
-				}
-
-				.claim-error {
-					color: var(--wc-red);
+				.components-notice.is-error {
+					margin: 0;
 				}
 			}
 
