@@ -30,6 +30,7 @@ module.exports = {
 	globals: {
 		wcSettings: {
 			pinterest_for_woocommerce: {
+				claimWebsiteErrorStatus: [],
 				pinterestLinks: {
 					adsManager: 'https://example.com',
 					preLaunchNotice: 'https://example.com',
