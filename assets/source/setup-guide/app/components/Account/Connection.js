@@ -65,6 +65,8 @@ const PinterestLogo = () => {
 /**
  * Pinterest account connection component.
  *
+ * This renders the body of `SetupAccount` card, to connect or disconnect Pinterest account.
+ *
  * @fires wcadmin_pfw_account_connect_button_click
  * @fires wcadmin_pfw_account_disconnect_button_click
  * @fires wcadmin_pfw_modal_open with `{ name: 'account-disconnection', … }`
@@ -172,15 +174,14 @@ const AccountConnection = ( {
 
 	return (
 		<CardBody size="large">
-			{ isConnected === true ? ( // eslint-disable-line no-nested-ternary --- Code is reasonable readable
-				<Flex direction="row" className="connection-info">
-					{ accountData?.id ? (
-						<>
-							<FlexItem className="logo">
-								<PinterestLogo />
-							</FlexItem>
-
-							<FlexBlock className="account-label">
+			<Flex direction="row" className="connection-info">
+				<FlexItem className="logo">
+					<PinterestLogo />
+				</FlexItem>
+				{ isConnected === true ? ( // eslint-disable-line no-nested-ternary --- Code is reasonable readable
+					<>
+						<FlexBlock className="account-label">
+							{ accountData?.id ? (
 								<Text variant="body">
 									{ accountData.username }
 
@@ -198,61 +199,56 @@ const AccountConnection = ( {
 										{ ')' }
 									</span>
 								</Text>
-							</FlexBlock>
-
-							<FlexItem>
-								<Button
-									isLink
-									isDestructive
-									onClick={ openConfirmationModal }
-								>
-									{ __(
-										'Disconnect',
-										'pinterest-for-woocommerce'
-									) }
-								</Button>
-							</FlexItem>
-						</>
-					) : (
-						<Spinner />
-					) }
-				</Flex>
-			) : isConnected === false ? (
-				<Flex direction="row" className="connection-info">
-					<FlexItem className="logo">
-						<PinterestLogo />
-					</FlexItem>
-
-					<FlexBlock>
-						<Text variant="subtitle">
-							{ __(
-								'Connect your Pinterest Account',
-								'pinterest-for-woocommerce'
+							) : (
+								<div className="connection-info__placeholder"></div>
 							) }
-						</Text>
-					</FlexBlock>
+						</FlexBlock>
 
-					<FlexItem>
-						<Button
-							isSecondary
-							href={
-								wcSettings.pinterest_for_woocommerce
-									.serviceLoginUrl
-							}
-							onClick={ () =>
-								recordEvent(
-									'pfw_account_connect_button_click'
-								)
-							}
-						>
-							{ __( 'Connect', 'pinterest-for-woocommerce' ) }
-						</Button>
-					</FlexItem>
-				</Flex>
-			) : (
-				<Spinner />
-			) }
+						<FlexItem>
+							<Button
+								isLink
+								isDestructive
+								onClick={ openConfirmationModal }
+							>
+								{ __(
+									'Disconnect',
+									'pinterest-for-woocommerce'
+								) }
+							</Button>
+						</FlexItem>
+					</>
+				) : isConnected === false ? (
+					<>
+						<FlexBlock>
+							<Text variant="subtitle">
+								{ __(
+									'Connect your Pinterest Account',
+									'pinterest-for-woocommerce'
+								) }
+							</Text>
+						</FlexBlock>
 
+						<FlexItem>
+							<Button
+								isSecondary
+								href={
+									wcSettings.pinterest_for_woocommerce
+										.serviceLoginUrl
+								}
+								onClick={ () =>
+									recordEvent(
+										'pfw_account_connect_button_click'
+									)
+								}
+							>
+								{ __( 'Connect', 'pinterest-for-woocommerce' ) }
+							</Button>
+						</FlexItem>
+					</>
+				) : (
+					<Spinner className="connection-info__preloader" />
+				) }
+			</Flex>
 			{ isConfirmationModalOpen && renderConfirmationModal() }
 		</CardBody>
 	);
