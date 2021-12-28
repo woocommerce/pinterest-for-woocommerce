@@ -1,4 +1,4 @@
-jest.mock( '../setup-guide/app/helpers/effects', () => {
+jest.mock( '../helpers/effects', () => {
 	return {
 		useCreateNotice: () => () => {},
 		useSettingsSelect: () => {
@@ -42,7 +42,7 @@ describe( 'Claim Website Record Events', () => {
 			<ClaimWebsite goToNextStep={ () => {} } view="wizard" />
 		);
 
-		fireEvent.click( getByText( 'Start Verification' ) );
+		fireEvent.click( getByText( 'Start verification' ) );
 		expect( recordEvent ).toHaveBeenCalledWith(
 			'pfw_domain_verify_failure',
 			expect.any( Object )
