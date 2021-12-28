@@ -4,4 +4,4 @@ export function getSetting() {
 	};
 }
 
-export default getSetting();
+export default getSetting;
