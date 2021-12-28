@@ -258,7 +258,7 @@ $root: ".woocommerce-setup-guide";
 
 				.connection-info {
 					// Set minimum height to the height of the spinner preloader.
-					min-height: calc( 40px );
+					min-height: calc(40px);
 
 					.logo {
 						display: flex;
@@ -266,6 +266,7 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					.connection-info__placeholder {
+
 						@include placeholder();
 						width: 50%;
 						min-width: 10em;
