@@ -410,7 +410,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				),
 				'isSetupComplete'          => Pinterest_For_Woocommerce()::is_setup_complete(),
 				'countryTos'               => Pinterest_For_Woocommerce()::get_applicable_tos(),
-
+				'claimWebsiteErrorStatus'  => array(
+					401 => 'token',
+					403 => 'connection',
+					406 => 'domain verification',
+					409 => 'meta-tag',
+					),
 			);
 		}
 

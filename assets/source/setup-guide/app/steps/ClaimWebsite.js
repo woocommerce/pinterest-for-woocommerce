@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { recordEvent } from '@woocommerce/tracks';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useEffect,
@@ -66,11 +67,20 @@ const StaticError = ( { reqError } ) => {
 };
 
 /**
+ * Triggered when domain verification fails.
+ *
+ * @event wcadmin_pfw_domain_verify_failure
+ *
+ * @property {string} step Identifier of the step when verification failed.
+ */
+
+/**
  * Claim Website step component.
  * Renders a UI with section block and <Card> to claim website (if not yet completed) and display its status.
  *
  * To be used in onboarding setup stepper.
  *
+ * @fires wcadmin_pfw_domain_verify_failure
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'claim-website', context: props.view }`
  * @param {Object} props React props.
  * @param {'wizard'|'settings'} props.view Indicate which view this component is rendered on.
@@ -102,7 +112,6 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 				path: pfwSettings.apiRoute + '/domain_verification',
 				method: 'POST',
 			} );
-
 			await setAppSettings( { account_data: results.account_data } );
 
 			setStatus( STATUS.SUCCESS );
@@ -118,6 +127,13 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 						'pinterest-for-woocommerce'
 					)
 			);
+
+			recordEvent( 'pfw_domain_verify_failure', {
+				step:
+					wcSettings.pinterest_for_woocommerce
+						.claimWebsiteErrorStatus[ error?.data?.status ] ||
+					'unknown',
+			} );
 		}
 	};
 
