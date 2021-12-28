@@ -26,14 +26,41 @@ import UnsupportedCountryNotice from '../components/UnsupportedCountryNotice';
 const tosHref = 'https://business.pinterest.com/business-terms-of-service/';
 
 /**
+ * Triggered on events during setup,
+ * like starting, ending, or navigating between steps.
+ *
+ * @event wcadmin_pfw_setup
+ *
+ * @property {string} target Setup phase that the user navigates to.
+ * @property {string} trigger UI element that triggered the action, e.g. `wizard-stepper` or `get-started` button.
+ */
+
+/**
  * Welcome Section Card.
  * To be used in getting started page.
  *
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
+ * @fires wcadmin_pfw_setup with `{ target: 'onboarding', trigger: 'get-started' }` when "Get started" button is clicked for incomplete setup.
  *
  * @return {JSX.Element} Rendered element.
  */
 const WelcomeSection = () => {
+	const handleGetStarted = () => {
+		if ( ! wcSettings.pinterest_for_woocommerce.isSetupComplete ) {
+			recordEvent( 'pfw_setup', {
+				target: 'onboarding',
+				trigger: 'get-started',
+			} );
+		}
+		getHistory().push(
+			getNewPath(
+				{},
+				wcSettings.pinterest_for_woocommerce.isSetupComplete
+					? '/pinterest/catalog'
+					: '/pinterest/onboarding'
+			)
+		);
+	};
 	return (
 		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__welcome-section">
 			<Flex>
@@ -53,20 +80,7 @@ const WelcomeSection = () => {
 					</Text>
 
 					<Text variant="body">
-						<Button
-							isPrimary
-							onClick={ () =>
-								getHistory().push(
-									getNewPath(
-										{},
-										wcSettings.pinterest_for_woocommerce
-											.isSetupComplete
-											? '/pinterest/catalog'
-											: '/pinterest/onboarding'
-									)
-								)
-							}
-						>
+						<Button isPrimary onClick={ handleGetStarted }>
 							{ __( 'Get started', 'pinterest-for-woocommerce' ) }
 						</Button>
 					</Text>

@@ -58,14 +58,14 @@ Clicking on an external documentation link.
 - [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L54)
 	- with `{ link_id: 'ad-guidelines', context: props.view }`
 	- with `{ link_id: 'merchant-guidelines', context: props.view }`
-- [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L50)
+- [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L53)
 	- with `{ link_id: 'ad-guidelines', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
-- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L36) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
+- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L47) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
 
-### [`wcadmin_pfw_get_started_faq`](assets/source/setup-guide/app/views/LandingPageApp.js#L208)
+### [`wcadmin_pfw_get_started_faq`](assets/source/setup-guide/app/views/LandingPageApp.js#L222)
 Clicking on getting started page faq item to collapse or expand it.
 #### Properties
 |   |   |   |
@@ -73,7 +73,7 @@ Clicking on getting started page faq item to collapse or expand it.
 `action` | `string` | `'expand' \| 'collapse'` What action was initiated.
 `question_id` | `string` | Identifier of the clicked question.
 #### Emitters
-- [`FaqQuestion`](assets/source/setup-guide/app/views/LandingPageApp.js#L227) whenever the FAQ is toggled.
+- [`FaqQuestion`](assets/source/setup-guide/app/views/LandingPageApp.js#L241) whenever the FAQ is toggled.
 
 ### [`wcadmin_pfw_get_started_notice_link_click`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L16)
 Clicking on the link inside the notice.
@@ -124,6 +124,24 @@ Clicking on "… Save changes" button.
 `context` | `string` | The context in which the event is recorded
 #### Emitters
 - [`SaveSettingsButton`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L41) with `{ context: view, … }`
+
+### [`wcadmin_pfw_setup`](assets/source/setup-guide/app/views/LandingPageApp.js#L28)
+Triggered on events during setup,
+like starting, ending, or navigating between steps.
+#### Properties
+|   |   |   |
+|---|---|---|
+`target` | `string` | Setup phase that the user navigates to.
+`trigger` | `string` | UI element that triggered the action, e.g. `wizard-stepper` or `get-started` button.
+#### Emitters
+- [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L53)
+	- with `{ target: 'complete', trigger: 'setup-tracking-complete' }` when "Complete setup" button is clicked.
+	- with `{ target: 'fetch-tags' | 'fetch-advertisers', trigger: 'setup-tracking-try-again' }` when "Try again" button is clicked.
+- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L47) with `{ target: 'onboarding', trigger: 'get-started' }` when "Get started" button is clicked for incomplete setup.
+- [`WizardApp`](assets/source/setup-guide/app/views/WizardApp.js#L38)
+	- with `{ target: 'setup-account' | 'claim-website' | 'setup-tracking', trigger: 'wizard-stepper' }` when wizard's header step is clicked.
+	- with `{ target: 'claim-website' , trigger: 'setup-account-continue' }` when continue button is clicked.
+	- with `{ target: 'setup-tracking', trigger: 'claim-website-continue' }` when continue button is clicked.
 
 <!---
 End of `woo-tracking-jsdoc`-generated content.

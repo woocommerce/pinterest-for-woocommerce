@@ -11,6 +11,7 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@woocommerce/components';
 import { getNewPath } from '@woocommerce/navigation';
+import { recordEvent } from '@woocommerce/tracks';
 import {
 	Button,
 	Card,
@@ -42,6 +43,8 @@ import documentationLinkProps from '../helpers/documentation-link-props';
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
  *
+ * @fires wcadmin_pfw_setup with `{ target: 'complete', trigger: 'setup-tracking-complete' }` when "Complete setup" button is clicked.
+ * @fires wcadmin_pfw_setup with `{ target: 'fetch-tags' | 'fetch-advertisers', trigger: 'setup-tracking-try-again' }` when "Try again" button is clicked.
  *
  * @param {Object} props React props.
  * @param {string} [props.view='settings'] `'wizard'|'settings'` Kind of view to render.
@@ -241,8 +244,16 @@ const SetupTracking = ( { view = 'settings' } ) => {
 		setStatus( 'idle' );
 
 		if ( appSettings.tracking_advertiser ) {
+			recordEvent( 'pfw_setup', {
+				target: 'fetch-tags',
+				trigger: 'setup-tracking-try-again',
+			} );
 			fetchTags( appSettings.tracking_advertiser );
 		} else {
+			recordEvent( 'pfw_setup', {
+				target: 'fetch-advertisers',
+				trigger: 'setup-tracking-try-again',
+			} );
 			fetchAdvertisers();
 		}
 	};
@@ -272,6 +283,10 @@ const SetupTracking = ( { view = 'settings' } ) => {
 	};
 
 	const handleCompleteSetup = async () => {
+		recordEvent( 'pfw_setup', {
+			target: 'complete',
+			trigger: 'setup-tracking-complete',
+		} );
 		// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
 		const path = getNewPath( {}, '/pinterest/settings', {} );
 
