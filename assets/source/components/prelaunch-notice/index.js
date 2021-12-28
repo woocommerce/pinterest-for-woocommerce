@@ -40,7 +40,7 @@ const PrelaunchNotice = () => {
 						href:
 							wcSettings.pinterest_for_woocommerce.pinterestLinks
 								.preLaunchNotice,
-						eventName: 'get_started_notice_link_click',
+						eventName: 'pfw_get_started_notice_link_click',
 						linkId: 'prelaunch-notice',
 						context: 'pinterest-landing',
 						rel: 'noreferrer',

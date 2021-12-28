@@ -24,6 +24,8 @@ module.exports = {
 		'^\\.~/(.*)$': '<rootDir>/assets/source/$1',
 		'@woocommerce/settings':
 			'<rootDir>/assets/source/tests/dependencies/woocommerce/settings',
+		'@woocommerce/tracks':
+			'<rootDir>/assets/source/tests/dependencies/woocommerce/tracks',
 	},
 	// Exclude e2e tests from unit testing.
 	testPathIgnorePatterns: [ '/node_modules/' ],

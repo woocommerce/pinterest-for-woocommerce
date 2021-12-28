@@ -1,3 +1,7 @@
-export default function getSettings() {
-	return {};
+export function getSetting() {
+	return {
+		es: 'Spain',
+	};
 }
+
+export default getSetting();
