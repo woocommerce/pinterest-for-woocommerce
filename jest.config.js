@@ -36,6 +36,7 @@ module.exports = {
 		wcSettings: {
 			pinterest_for_woocommerce: {
 				claimWebsiteErrorStatus: [],
+				pluginVersion: '1.2.3',
 				pinterestLinks: {
 					adsManager: 'https://example.com',
 					preLaunchNotice: 'https://example.com',
