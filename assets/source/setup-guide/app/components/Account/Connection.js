@@ -40,9 +40,10 @@ const PinterestLogo = () => {
  * @event wcadmin_pfw_account_connect_button_click
  */
 /**
- * Clicking on "Disconnect" Pinterest account button during account setup.
+ * Clicking on "Disconnect" Pinterest account button.
  *
  * @event wcadmin_pfw_account_disconnect_button_click
+ * @property {string} context `'settings' | 'wizard'` In which context it was used?
  */
 /**
  * Opening a modal.
@@ -66,7 +67,7 @@ const PinterestLogo = () => {
  * Pinterest account connection component.
  *
  * @fires wcadmin_pfw_account_connect_button_click
- * @fires wcadmin_pfw_account_disconnect_button_click
+ * @fires wcadmin_pfw_account_disconnect_button_click with the given `{ context }`
  * @fires wcadmin_pfw_modal_open with `{ name: 'account-disconnection', … }`
  * @fires wcadmin_pfw_modal_closed with `{ name: 'account-disconnection', … }`
  * @param {Object} props React props.
@@ -90,7 +91,7 @@ const AccountConnection = ( {
 	);
 
 	const openConfirmationModal = () => {
-		recordEvent( 'pfw_account_disconnect_button_click' );
+		recordEvent( 'pfw_account_disconnect_button_click', { context } );
 		setIsConfirmationModalOpen( true );
 		recordEvent( 'pfw_modal_open', { context, name: modalName } );
 	};

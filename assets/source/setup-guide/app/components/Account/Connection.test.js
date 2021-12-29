@@ -41,6 +41,16 @@ describe( 'AccountConnection component', () => {
 				fireEvent.click( disconnectButton );
 			} );
 
+			it( 'Should call `pfw_account_disconnect_button_click { context }` track event', () => {
+				// Assert fired event.
+				expect( recordEvent ).toHaveBeenCalledWith(
+					'pfw_account_disconnect_button_click',
+					{
+						context: 'foo',
+					}
+				);
+			} );
+
 			it( "Should call `pfw_modal_open { name: 'account-disconnection', context}` track event", () => {
 				// Assert fired event.
 				expect( recordEvent ).toHaveBeenCalledWith( 'pfw_modal_open', {
