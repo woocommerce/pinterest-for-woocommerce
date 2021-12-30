@@ -16,6 +16,7 @@ jest.mock( '@woocommerce/tracks', () => {
 
 jest.mock( '@wordpress/api-fetch', () => {
 	return {
+		__esModule: true,
 		default: jest.fn(),
 	};
 } );
@@ -34,7 +35,7 @@ import ClaimWebsite from './ClaimWebsite';
 
 describe( 'Claim Website Record Events', () => {
 	it( 'pfw_domain_verify_failure is called on domain verification failure', () => {
-		apiFetch.default.mockImplementation( async () => {
+		apiFetch.mockImplementation( () => {
 			throw 'Ups';
 		} );
 
