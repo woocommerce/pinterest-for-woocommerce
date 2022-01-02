@@ -26,16 +26,12 @@ jest.mock( '@wordpress/api-fetch', () => {
  */
 import { recordEvent } from '@woocommerce/tracks';
 import apiFetch from '@wordpress/api-fetch';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import ClaimWebsite from './ClaimWebsite';
-
-async function sleep( ms ) {
-	return new Promise( ( resolve ) => setTimeout( resolve, ms ) );
-}
 
 describe( 'Claim Website Record Events', () => {
 	afterEach( () => {
@@ -70,12 +66,10 @@ describe( 'Claim Website Record Events', () => {
 		fireEvent.click( getByText( 'Start verification' ) );
 
 		// Wait for async click handler and apiFetch resolution.
-		const delay = sleep( 1 );
-		jest.runAllTimers();
-		await delay;
-
-		expect( recordEvent ).toHaveBeenCalledWith(
-			'pfw_domain_verify_success'
+		await waitFor( () =>
+			expect( recordEvent ).toHaveBeenCalledWith(
+				'pfw_domain_verify_success'
+			)
 		);
 	} );
 } );
