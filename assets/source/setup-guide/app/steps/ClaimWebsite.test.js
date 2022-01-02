@@ -8,12 +8,6 @@ jest.mock( '../helpers/effects', () => {
 	};
 } );
 
-jest.mock( '@woocommerce/tracks', () => {
-	return {
-		recordEvent: jest.fn(),
-	};
-} );
-
 jest.mock( '@wordpress/api-fetch', () => {
 	return {
 		__esModule: true,
