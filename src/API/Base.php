@@ -94,7 +94,7 @@ class Base {
 			$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
 
 			$request = array(
-				'url'    => self::API_DOMAIN . '/' . $api . 'v' . $api_version . '/' . $endpoint,
+				'url'    => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
 				'method' => $method,
 				'args'   => $payload,
 			);
@@ -287,7 +287,7 @@ class Base {
 	public static function trigger_verification( $allow_multiple = true ) {
 
 		$domain      = wp_parse_url( home_url(), PHP_URL_HOST );
-		$request_url = 'domains/' . $domain . '/verification/metatag/realtime/';
+		$request_url = "domains/{$domain}/verification/metatag/realtime/";
 
 		if ( $allow_multiple ) {
 			$request_url = add_query_arg( 'can_claim_multiple', 'true', $request_url );
@@ -350,7 +350,7 @@ class Base {
 	 */
 	public static function connect_advertiser( $advertiser_id, $tag_id ) {
 		return self::make_request(
-			'advertisers/' . $advertiser_id . '/connect/',
+			"advertisers/{$advertiser_id}/connect/",
 			'POST',
 			array(
 				'tag_id' => $tag_id,
@@ -370,7 +370,7 @@ class Base {
 	 */
 	public static function disconnect_advertiser( $advertiser_id, $tag_id ) {
 		return self::make_request(
-			'advertisers/' . $advertiser_id . '/disconnect/',
+			"advertisers/{$advertiser_id}/disconnect/",
 			'POST',
 			array(
 				'tag_id' => $tag_id,
@@ -389,7 +389,7 @@ class Base {
 	 */
 	public static function get_advertisers( $pinterest_user = null ) {
 		$pinterest_user = ! is_null( $pinterest_user ) ? $pinterest_user : Pinterest_For_Woocommerce()::get_account_id();
-		return self::make_request( 'advertisers/?owner_user_id=' . $pinterest_user, 'GET', array(), 'ads' );
+		return self::make_request( "advertisers/?owner_user_id={$pinterest_user}", 'GET', array(), 'ads' );
 	}
 
 
@@ -401,7 +401,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_advertiser_tags( $advertiser_id ) {
-		return self::make_request( 'advertisers/' . $advertiser_id . '/conversion_tags/', 'GET', array(), 'ads' );
+		return self::make_request( "advertisers/{$advertiser_id}/conversion_tags/", 'GET', array(), 'ads' );
 	}
 
 
@@ -417,7 +417,7 @@ class Base {
 		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		return self::make_request(
-			'advertisers/' . $advertiser_id . '/conversion_tags',
+			"advertisers/{$advertiser_id}/conversion_tags",
 			'POST',
 			array(
 				'name' => $tag_name,
@@ -441,7 +441,7 @@ class Base {
 			return false;
 		}
 
-		return self::make_request( 'tags/' . $tag_id . '/configs/', 'PUT', $config, 'ads' );
+		return self::make_request( "tags/{$tag_id}/configs/", 'PUT', $config, 'ads' );
 	}
 
 
@@ -453,7 +453,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_merchant( $merchant_id ) {
-		return self::make_request( 'commerce/product_pin_merchants/' . $merchant_id . '/', 'GET' );
+		return self::make_request( "commerce/product_pin_merchants/{$merchant_id}/", 'GET' );
 	}
 
 
@@ -482,7 +482,7 @@ class Base {
 	 */
 	public static function get_merchant_feeds( $merchant_id ) {
 		return self::make_request(
-			'catalogs/' . $merchant_id . '/feed_profiles/',
+			"catalogs/{$merchant_id}/feed_profiles/",
 			'GET',
 			array(),
 			'',
@@ -501,7 +501,7 @@ class Base {
 	 */
 	public static function get_merchant_feed_report( $merchant_id, $feed_id ) {
 		return self::make_request(
-			'catalogs/datasource/feed_report/' . $merchant_id . '/',
+			"catalogs/datasource/feed_report/{$merchant_id}/",
 			'GET',
 			array(
 				'feed_profile' => $feed_id,
