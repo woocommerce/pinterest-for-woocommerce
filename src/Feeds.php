@@ -26,7 +26,7 @@ class Feeds {
 	 * @param string $merchant_id The merchant ID the feed belongs to.
 	 * @param string $feed_id     The ID of the feed.
 	 *
-	 * @return mixed
+	 * @return object The feed profile object.
 	 *
 	 * @throws Exception PHP Exception.
 	 */
@@ -71,7 +71,7 @@ class Feeds {
 	 * @param string $merchant_id   The merchant ID.
 	 * @param string $feed_location The feed full location.
 	 *
-	 * @return mixed
+	 * @return object The feed profile object.
 	 *
 	 * @throws Exception PHP Exception.
 	 */
