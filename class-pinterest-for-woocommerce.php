@@ -588,10 +588,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				$connected_tag        = self::get_setting( 'tracking_tag', null );
 
 				if ( $connected_advertiser && $connected_tag ) {
-					$result = Pinterest\API\Base::disconnect_advertiser( $connected_advertiser, $connected_tag );
 
-					if ( 'success' !== $result['status'] ) {
-						throw new \Exception( esc_html__( 'Response error on disconnect advertiser.', 'pinterest-for-woocommerce' ), 400 );
+					try {
+
+						Pinterest\API\AdvertiserConnect::disconnect_advertiser( $connected_advertiser, $connected_tag );
+
+					} catch ( \Exception $th ) {
+
+						Pinterest\Logger::log( esc_html__( 'There was an error disconnecting the Advertiser.', 'pinterest-for-woocommerce' ) );
+
+						throw new \Exception( esc_html__( 'There was an error disconnecting the Advertiser. Please try again.', 'pinterest-for-woocommerce' ), 400 );
 					}
 				}
 
