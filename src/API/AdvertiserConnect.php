@@ -28,7 +28,7 @@ class AdvertiserConnect extends VendorAPI {
 
 		$this->base              = 'tagowner';
 		$this->endpoint_callback = 'connect_advertiser';
-		$this->methods           = WP_REST_Server::READABLE;
+		$this->methods           = WP_REST_Server::CREATABLE;
 
 		$this->register_routes();
 	}

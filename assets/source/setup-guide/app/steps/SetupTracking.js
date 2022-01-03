@@ -211,7 +211,10 @@ const SetupTracking = ( { view } ) => {
 					appSettings?.tracking_advertiser &&
 					appSettings?.tracking_tag
 				) {
-					await connectAdvertiser();
+					await connectAdvertiser(
+						appSettings.tracking_advertiser,
+						appSettings.tracking_tag
+					);
 				}
 			} catch ( error ) {
 				createNotice(
@@ -234,56 +237,58 @@ const SetupTracking = ( { view } ) => {
 		]
 	);
 
-	const connectAdvertiser = useCallback( async () => {
-		setIsFetching( true );
+	const connectAdvertiser = useCallback(
+		async ( trackingAdvertiser, trackingTag ) => {
+			setIsFetching( true );
 
-		try {
-			const results = await apiFetch( {
-				path:
-					wcSettings.pinterest_for_woocommerce.apiRoute +
-					'/tagowner/?advrtsr_id=' +
-					appSettings.tracking_advertiser +
-					'&tag_id=' +
-					appSettings.tracking_tag,
-				method: 'GET',
-			} );
+			try {
+				const results = await apiFetch( {
+					path: `${ wcSettings.pinterest_for_woocommerce.apiRoute }/tagowner/`,
+					data: {
+						advrtsr_id: trackingAdvertiser,
+						tag_id: trackingTag,
+					},
+					method: 'POST',
+				} );
 
-			if ( appSettings.tracking_advertiser === results.connected ) {
-				setStatus( 'success' );
+				if ( trackingAdvertiser === results.connected ) {
+					setStatus( 'success' );
 
-				if ( results.reconnected ) {
+					if ( results.reconnected ) {
+						createNotice(
+							'success',
+							__(
+								'Advertiser connected successfully.',
+								'pinterest-for-woocommerce'
+							)
+						);
+					}
+				} else {
+					setStatus( 'error' );
 					createNotice(
-						'success',
+						'error',
 						__(
-							'Advertiser connected successfully.',
+							'Couldn’t connect advertiser.',
 							'pinterest-for-woocommerce'
 						)
 					);
 				}
-			} else {
+			} catch ( error ) {
 				setStatus( 'error' );
 				createNotice(
 					'error',
-					__(
-						'Couldn’t connect advertiser.',
-						'pinterest-for-woocommerce'
-					)
+					error.message ||
+						__(
+							'Couldn’t connect advertiser.',
+							'pinterest-for-woocommerce'
+						)
 				);
 			}
-		} catch ( error ) {
-			setStatus( 'error' );
-			createNotice(
-				'error',
-				error.message ||
-					__(
-						'Couldn’t connect advertiser.',
-						'pinterest-for-woocommerce'
-					)
-			);
-		}
 
-		setIsFetching( false );
-	}, [ appSettings, createNotice ] );
+			setIsFetching( false );
+		},
+		[ createNotice ]
+	);
 
 	const handleTryAgain = () => {
 		setStatus( 'idle' );
