@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Automattic\WooCommerce\Pinterest\API\Base;
 use \Exception;
 use \Throwable;
 
@@ -55,7 +56,11 @@ class Merchants {
 		if ( ! empty( $merchant_id ) ) {
 
 			// Get merchant if a merchant id was found.
-			$merchant = self::get_merchant_object( $merchant_id );
+			try {
+				$merchant = Base::get_merchant( $merchant_id );
+			} catch ( Throwable $th ) {
+				throw new Exception( __( 'There was an error trying to get the merchant object.', 'pinterest-for-woocommerce' ), 400 );
+			}
 		}
 
 		if ( ! $merchant || ( 'success' !== $merchant['status'] && 650 === $merchant['code'] ) ) {  // https://developers.pinterest.com/docs/redoc/#tag/API-Response-Codes Merchant not found 650.
@@ -66,7 +71,11 @@ class Merchants {
 				throw new Exception( __( 'Wrong response when trying to create or update merchant.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$merchant = self::get_merchant_object( $response['merchant_id'] );
+			try {
+				$merchant = Base::get_merchant( $merchant_id );
+			} catch ( Throwable $th ) {
+				throw new Exception( __( 'There was an error trying to get the merchant object.', 'pinterest-for-woocommerce' ), 400 );
+			}
 		}
 
 		if ( ! $merchant || 'success' !== $merchant['status'] || ! $merchant['data'] ) {
@@ -76,26 +85,6 @@ class Merchants {
 		// Update merchant id if it is different from the stored in DB.
 		if ( $saved_merchant_id !== $merchant['data']->id ) {
 			Pinterest_For_Woocommerce()::save_data( 'merchant_id', $merchant['data']->id );
-		}
-
-		return $merchant;
-	}
-
-
-	/**
-	 * Get merchant object using the merchant ID.
-	 *
-	 * @param string $merchant_id The merchant ID.
-	 *
-	 * @return mixed|boolean
-	 */
-	private static function get_merchant_object( $merchant_id ) {
-		$merchant = false;
-
-		try {
-			$merchant = API\Base::get_merchant( $merchant_id );
-		} catch ( Throwable $th ) {
-			$merchant = false;
 		}
 
 		return $merchant;
