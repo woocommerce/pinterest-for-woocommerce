@@ -115,7 +115,7 @@ class Feeds {
 	 *
 	 * @param string $merchant_id The merchant ID.
 	 *
-	 * @return string|false Returns the ID of the feed if properly registered or false otherwise.
+	 * @return string Returns the ID of the feed if properly registered or an empty string otherwise.
 	 */
 	public static function is_local_feed_registered( $merchant_id ) {
 
@@ -129,7 +129,7 @@ class Feeds {
 		$local_country   = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
 		$local_locale    = str_replace( '_', '-', determine_locale() );
 
-		$registered_feed = false;
+		$registered_feed = '';
 
 		if ( $configured_path === $local_path && $local_country === $feed->country && $local_locale === $feed->locale ) {
 
