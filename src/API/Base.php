@@ -12,6 +12,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
+use \Exception;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -76,7 +77,7 @@ class Base {
 	 *
 	 * @return array
 	 *
-	 * @throws \Exception PHP exception.
+	 * @throws Exception PHP exception.
 	 */
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 
@@ -113,7 +114,7 @@ class Base {
 			}
 
 			return $response;
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 
 			Logger::log( $e->getMessage(), 'error' );
 
@@ -140,7 +141,7 @@ class Base {
 	 *
 	 * @return array
 	 *
-	 * @throws \Exception PHP exception.
+	 * @throws Exception PHP exception.
 	 * @throws ApiException PHP exception.
 	 */
 	public static function handle_request( $request ) {
@@ -181,7 +182,7 @@ class Base {
 			if ( is_wp_error( $response ) ) {
 				$error_message = ( is_wp_error( $response ) ) ? $response->get_error_message() : $response['body'];
 
-				throw new \Exception( $error_message, 1 );
+				throw new Exception( $error_message, 1 );
 			}
 
 			// Log response.
@@ -189,15 +190,15 @@ class Base {
 
 			$body = self::parse_response( $response );
 
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 
-			throw new \Exception( $e->getMessage(), $e->getCode() );
+			throw new Exception( $e->getMessage(), $e->getCode() );
 		}
 
 		$response_code = absint( wp_remote_retrieve_response_code( $response ) );
 
 		if ( 401 === $response_code ) {
-			throw new \Exception( __( 'Reconnect to your Pinterest account', 'pinterest-for-woocommerce' ), 401 );
+			throw new Exception( __( 'Reconnect to your Pinterest account', 'pinterest-for-woocommerce' ), 401 );
 		}
 
 		if ( ! in_array( absint( $response_code ), array( 200, 201, 204 ), true ) ) {
@@ -247,12 +248,12 @@ class Base {
 	 *
 	 * @return array
 	 *
-	 * @throws \Exception PHP exception.
+	 * @throws Exception PHP exception.
 	 */
 	protected static function parse_response( $response ) {
 
 		if ( ! array_key_exists( 'body', (array) $response ) ) {
-			throw new \Exception( __( 'Empty body', 'pinterest-for-woocommerce' ), 204 );
+			throw new Exception( __( 'Empty body', 'pinterest-for-woocommerce' ), 204 );
 		}
 
 		return (array) json_decode( $response['body'] );

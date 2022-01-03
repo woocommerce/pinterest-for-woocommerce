@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use \Exception;
+use \Throwable;
+
 /**
  * Class Handling registration & generation of the XML product feed.
  */
@@ -25,8 +28,8 @@ class Merchants {
 	 *
 	 * @return array
 	 *
-	 * @throws \Throwable PHP Exception.
-	 * @throws \Exception PHP Exception.
+	 * @throws Throwable PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	public static function get_merchant() {
 
@@ -39,7 +42,7 @@ class Merchants {
 
 			try {
 				$merchant_id = self::get_merchant_id_from_advertiser();
-			} catch ( \Throwable $th ) {
+			} catch ( Throwable $th ) {
 
 				if ( 404 !== $th->getCode() ) {
 					throw $th;
@@ -60,14 +63,14 @@ class Merchants {
 			$response = self::update_or_create_merchant();
 
 			if ( ! $response['merchant_id'] ) {
-				throw new \Exception( __( 'Wrong response when trying to create or update merchant.', 'pinterest-for-woocommerce' ), 400 );
+				throw new Exception( __( 'Wrong response when trying to create or update merchant.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
 			$merchant = self::get_merchant_object( $response['merchant_id'] );
 		}
 
 		if ( ! $merchant || 'success' !== $merchant['status'] || ! $merchant['data'] ) {
-			throw new \Exception( __( 'Response error when trying create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
+			throw new Exception( __( 'Response error when trying create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
 		// Update merchant id if it is different from the stored in DB.
@@ -91,7 +94,7 @@ class Merchants {
 
 		try {
 			$merchant = API\Base::get_merchant( $merchant_id );
-		} catch ( \Throwable $th ) {
+		} catch ( Throwable $th ) {
 			$merchant = false;
 		}
 
@@ -104,19 +107,19 @@ class Merchants {
 	 *
 	 * @return string
 	 *
-	 * @throws \Exception PHP exception.
+	 * @throws Exception PHP exception.
 	 */
 	private static function get_merchant_id_from_advertiser() {
 		$advertisers = API\Base::get_advertisers();
 
 		if ( 'success' !== $advertisers['status'] ) {
-			throw new \Exception( __( 'Response error when trying to get advertisers.', 'pinterest-for-woocommerce' ), 400 );
+			throw new Exception( __( 'Response error when trying to get advertisers.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
 		$advertiser = reset( $advertisers['data'] ); // All advertisers assigned to a user share the same merchant_id.
 
 		if ( empty( $advertiser->merchant_id ) ) {
-			throw new \Exception( __( 'No merchant returned in the advertiser\'s response.', 'pinterest-for-woocommerce' ), 404 );
+			throw new Exception( __( 'No merchant returned in the advertiser\'s response.', 'pinterest-for-woocommerce' ), 404 );
 		}
 
 		return $advertiser->merchant_id;
@@ -129,7 +132,7 @@ class Merchants {
 	 *
 	 * @return array
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	public static function update_or_create_merchant() {
 
@@ -151,7 +154,7 @@ class Merchants {
 		$response = API\Base::update_or_create_merchant( $args );
 
 		if ( 'success' !== $response['status'] ) {
-			throw new \Exception( __( 'Response error when trying create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
+			throw new Exception( __( 'Response error when trying create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
 		$registered_feed = Feeds::is_local_feed_registered( $response['data'] );

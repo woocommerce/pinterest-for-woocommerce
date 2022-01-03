@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Automattic\WooCommerce\Pinterest\API\Base;
+use \Exception;
+
 /**
  * Class handling fetch methods for feed profiles.
  */
@@ -25,21 +28,21 @@ class Feeds {
 	 *
 	 * @return mixed
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	public static function get_merchant_feed( $merchant_id, $feed_id ) {
 
 		try {
 
 			// Get the feeds of the merchant.
-			$feeds = API\Base::get_merchant_feeds( $merchant_id );
+			$feeds = Base::get_merchant_feeds( $merchant_id );
 
 			if ( 'success' !== $feeds['status'] ) {
-				throw new \Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
+				throw new Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
 			}
 
 			if ( ! is_array( $feeds['data'] ) ) {
-				throw new \Exception( esc_html__( 'Wrong feed info.', 'pinterest-for-woocommerce' ) );
+				throw new Exception( esc_html__( 'Wrong feed info.', 'pinterest-for-woocommerce' ) );
 			}
 
 			foreach ( $feeds['data'] as $feed_profile ) {
@@ -51,9 +54,9 @@ class Feeds {
 			}
 
 			// No feed found.
-			throw new \Exception( esc_html__( 'No feed found with the requested ID.', 'pinterest-for-woocommerce' ) );
+			throw new Exception( esc_html__( 'No feed found with the requested ID.', 'pinterest-for-woocommerce' ) );
 
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 
 			Logger::log( $e->getMessage(), 'error' );
 
@@ -70,7 +73,7 @@ class Feeds {
 	 *
 	 * @return mixed
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	public static function get_merchant_feed_by_location( $merchant_id, $feed_location ) {
 
@@ -80,11 +83,11 @@ class Feeds {
 			$feeds = API\Base::get_merchant_feeds( $merchant_id );
 
 			if ( 'success' !== $feeds['status'] ) {
-				throw new \Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
+				throw new Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
 			}
 
 			if ( ! is_array( $feeds['data'] ) ) {
-				throw new \Exception( esc_html__( 'Wrong feed info.', 'pinterest-for-woocommerce' ) );
+				throw new Exception( esc_html__( 'Wrong feed info.', 'pinterest-for-woocommerce' ) );
 			}
 
 			foreach ( $feeds['data'] as $feed_profile ) {
@@ -96,9 +99,9 @@ class Feeds {
 			}
 
 			// No feed found.
-			throw new \Exception( esc_html__( 'No feed found with the requested location.', 'pinterest-for-woocommerce' ) );
+			throw new Exception( esc_html__( 'No feed found with the requested location.', 'pinterest-for-woocommerce' ) );
 
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 
 			Logger::log( $e->getMessage(), 'error' );
 

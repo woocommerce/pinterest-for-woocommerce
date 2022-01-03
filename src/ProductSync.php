@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use \Exception;
+use \Throwable;
+
 /**
  * Class Handling registration & generation of the XML product feed.
  */
@@ -247,7 +250,7 @@ class ProductSync {
 	 *
 	 * @return mixed
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	public static function handle_feed_registration() {
 
@@ -264,9 +267,9 @@ class ProductSync {
 				return true;
 			}
 
-			throw new \Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
+			throw new Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
 
-		} catch ( \Throwable $th ) {
+		} catch ( Throwable $th ) {
 			self::log( $th->getMessage(), 'error' );
 			return false;
 		}
@@ -295,7 +298,7 @@ class ProductSync {
 	 *
 	 * @return void
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	public static function handle_feed_generation() {
 
@@ -337,7 +340,7 @@ class ProductSync {
 			}
 
 			if ( false === self::$current_index || empty( $product_ids ) ) {
-				throw new \Exception( esc_html__( 'Something went wrong while attempting to generate the feed.', 'pinterest-for-woocommerce' ), 400 );
+				throw new Exception( esc_html__( 'Something went wrong while attempting to generate the feed.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
 			$local_feed  = ProductFeedStatus::get_local_feed();
@@ -346,7 +349,7 @@ class ProductSync {
 
 			if ( ! $xml_file ) {
 				/* Translators: the path of the file */
-				throw new \Exception( sprintf( esc_html__( 'Could not open file: %s.', 'pinterest-for-woocommerce' ), $target_file ), 400 );
+				throw new Exception( sprintf( esc_html__( 'Could not open file: %s.', 'pinterest-for-woocommerce' ), $target_file ), 400 );
 			}
 
 			self::log( 'Generating feed for ' . count( $product_ids ) . ' products' );
@@ -391,7 +394,7 @@ class ProductSync {
 
 				if ( ! rename( $local_feed['tmp_file'], $local_feed['feed_file'] ) ) {
 					/* Translators: the path of the file */
-					throw new \Exception( sprintf( esc_html__( 'Could not write feed to file: %s.', 'pinterest-for-woocommerce' ), $local_feed['feed_file'] ), 400 );
+					throw new Exception( sprintf( esc_html__( 'Could not write feed to file: %s.', 'pinterest-for-woocommerce' ), $local_feed['feed_file'] ), 400 );
 				}
 
 				$target_file = $local_feed['feed_file'];
@@ -408,7 +411,7 @@ class ProductSync {
 			self::log( 'Feed step generation completed in ' . round( ( $end - $start ) * 1000 ) . 'ms. Current Index: ' . self::$current_index . ' / ' . $products_count );
 			self::log( 'Wrote ' . $step_index . ' products to file: ' . $target_file );
 
-		} catch ( \Throwable $th ) {
+		} catch ( Throwable $th ) {
 
 			if ( 'error' === $state['status'] ) {
 				// Already errored at once. Restart job.
@@ -438,7 +441,7 @@ class ProductSync {
 	 *
 	 * @return void
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	private static function write_iteration_buffer( $xml_file, $local_feed ) {
 
@@ -455,7 +458,7 @@ class ProductSync {
 
 		} else {
 			/* Translators: the path of the file */
-			throw new \Exception( sprintf( esc_html__( 'Could not write to file: %s.', 'pinterest-for-woocommerce' ), $local_feed['tmp_file'] ), 400 );
+			throw new Exception( sprintf( esc_html__( 'Could not write to file: %s.', 'pinterest-for-woocommerce' ), $local_feed['tmp_file'] ), 400 );
 		}
 	}
 
@@ -503,7 +506,7 @@ class ProductSync {
 	 *
 	 * @return boolean|string
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	private static function register_feed() {
 
