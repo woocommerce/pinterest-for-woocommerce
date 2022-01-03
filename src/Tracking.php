@@ -12,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Automattic\WooCommerce\Pinterest\API\AdvertiserConnect;
+
 /**
  * Class adding Save Pin support.
  */
@@ -107,7 +109,6 @@ class Tracking {
 
 		// Verify if advertiser and tag need to be connected due to a plugin upgrade.
 		try {
-
 			self::maybe_connect_advertiser_tag();
 		} catch ( \Exception $e ) {
 
@@ -508,7 +509,7 @@ class Tracking {
 
 		// Check if advertiser is already connected.
 		if ( ! $is_connected && $connected_advertiser && $connected_tag ) {
-			API\AdvertiserConnect::connect_advertiser_and_tag( $connected_advertiser, $connected_tag );
+			AdvertiserConnect::connect_advertiser_and_tag( $connected_advertiser, $connected_tag );
 		}
 	}
 }
