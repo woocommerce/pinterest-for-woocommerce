@@ -75,12 +75,19 @@ const StaticError = ( { reqError } ) => {
  */
 
 /**
+ * Triggered when a site is successfully verified.
+ *
+ * @event wcadmin_pfw_domain_verify_success
+ */
+
+/**
  * Claim Website step component.
  * Renders a UI with section block and <Card> to claim website (if not yet completed) and display its status.
  *
  * To be used in onboarding setup stepper.
  *
  * @fires wcadmin_pfw_domain_verify_failure
+ * @fires wcadmin_pfw_domain_verify_success
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'claim-website', context: props.view }`
  * @param {Object} props React props.
  * @param {'wizard'|'settings'} props.view Indicate which view this component is rendered on.
@@ -113,6 +120,8 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 				method: 'POST',
 			} );
 			await setAppSettings( { account_data: results.account_data } );
+
+			recordEvent( 'pfw_domain_verify_success' );
 
 			setStatus( STATUS.SUCCESS );
 		} catch ( error ) {

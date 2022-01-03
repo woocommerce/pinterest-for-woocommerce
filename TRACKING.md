@@ -17,7 +17,7 @@ Do not edit it manually!
 ### [`wcadmin_pfw_account_connect_button_click`](assets/source/setup-guide/app/components/Account/Connection.js#L37)
 Clicking on "Connect" Pinterest account button.
 #### Emitters
-- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L79)
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L80)
 
 ### [`wcadmin_pfw_account_convert_button_click`](assets/source/setup-guide/app/steps/SetupAccount.js#L32)
 Clicking on "… convert your personal account" button.
@@ -30,9 +30,13 @@ Clicking on "… create a new Pinterest account" button.
 - [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L54)
 
 ### [`wcadmin_pfw_account_disconnect_button_click`](assets/source/setup-guide/app/components/Account/Connection.js#L42)
-Clicking on "Disconnect" Pinterest account button during account setup.
+Clicking on "Disconnect" Pinterest account button.
+#### Properties
+|   |   |   |
+|---|---|---|
+`context` | `string` | `'settings' \| 'wizard'` In which context it was used?
 #### Emitters
-- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L79)
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L80) with the given `{ context }`
 
 ### [`wcadmin_pfw_business_account_connect_button_click`](assets/source/setup-guide/app/components/Account/BusinessAccountSelection.js#L24)
 Clicking on "Connect" business account button.
@@ -54,7 +58,7 @@ Clicking on an external documentation link.
 `href` | `string` | Href to which the user was navigated to.
 #### Emitters
 - [`documentationLinkProps`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L49) on click, with given `linkId` and `context`.
-- [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L82) with `{ link_id: 'claim-website', context: props.view }`
+- [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L99) with `{ link_id: 'claim-website', context: props.view }`
 - [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L54)
 	- with `{ link_id: 'ad-guidelines', context: props.view }`
 	- with `{ link_id: 'merchant-guidelines', context: props.view }`
@@ -64,6 +68,20 @@ Clicking on an external documentation link.
 	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
 - [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L47) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
+
+### [`wcadmin_pfw_domain_verify_failure`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L69)
+Triggered when domain verification fails.
+#### Properties
+|   |   |   |
+|---|---|---|
+`step` | `string` | Identifier of the step when verification failed.
+#### Emitters
+- [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L99)
+
+### [`wcadmin_pfw_domain_verify_success`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L77)
+Triggered when a site is successfully verified.
+#### Emitters
+- [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L99)
 
 ### [`wcadmin_pfw_get_started_faq`](assets/source/setup-guide/app/views/LandingPageApp.js#L222)
 Clicking on getting started page faq item to collapse or expand it.
@@ -87,7 +105,7 @@ Clicking on the link inside the notice.
 - [`PrelaunchNotice`](assets/source/components/prelaunch-notice/index.js#L18) `{ context: 'pinterest-landing', link_id: 'prelaunch-notice' }`
 - [`UnsupportedCountryNotice`](assets/source/setup-guide/app/components/UnsupportedCountryNotice/index.js#L31) with `{ context: 'pinterest-landing', linkId: 'ads-availability' | 'unsupported-country-link' }`
 
-### [`wcadmin_pfw_modal_closed`](assets/source/setup-guide/app/components/Account/Connection.js#L54)
+### [`wcadmin_pfw_modal_closed`](assets/source/setup-guide/app/components/Account/Connection.js#L55)
 Closing a modal.
 #### Properties
 |   |   |   |
@@ -96,9 +114,9 @@ Closing a modal.
 `context` | `string` | `'settings' \| 'wizard'` In which context it was used?
 `action` | `string` | `confirm` - When the final "Yes, I'm sure" button is clicked. <br> `dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
 #### Emitters
-- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L79) with `{ name: 'account-disconnection', … }`
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L80) with `{ name: 'account-disconnection', … }`
 
-### [`wcadmin_pfw_modal_open`](assets/source/setup-guide/app/components/Account/Connection.js#L47)
+### [`wcadmin_pfw_modal_open`](assets/source/setup-guide/app/components/Account/Connection.js#L48)
 Opening a modal.
 #### Properties
 |   |   |   |
@@ -106,7 +124,7 @@ Opening a modal.
 `name` | `string` | Which modal is it?
 `context` | `string` | `'settings' \| 'wizard'` In which context it was used?
 #### Emitters
-- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L79) with `{ name: 'account-disconnection', … }`
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L80) with `{ name: 'account-disconnection', … }`
 
 ### [`wcadmin_pfw_save_changes_button_click`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L18)
 Clicking on "… Save changes" button.
