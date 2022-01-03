@@ -10,6 +10,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 
 use \WP_REST_Server;
 use \WP_REST_Request;
+use \WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -71,7 +72,7 @@ class AdvertiserConnect extends VendorAPI {
 			/* Translators: The error description as returned from the API */
 			$error_message = sprintf( esc_html__( 'Could not connect advertiser with Pinterest. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
 
-			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_advertiser_connect_error', $error_message, array( 'status' => $th->getCode() ) );
+			return new WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_advertiser_connect_error', $error_message, array( 'status' => $th->getCode() ) );
 		}
 	}
 
