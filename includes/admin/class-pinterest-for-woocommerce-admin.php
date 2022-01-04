@@ -521,7 +521,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		 *
 		 * @return string[]
 		 */
-		private function get_ads_supported_countries() {
+		static function get_ads_supported_countries() {
 			return array(
 				'AU', // Australia.
 				'AT', // Austria.

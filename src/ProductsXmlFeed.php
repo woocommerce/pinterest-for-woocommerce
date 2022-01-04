@@ -43,6 +43,8 @@ class ProductsXmlFeed {
 		'g:additional_image_link',
 	);
 
+	private static $shipping = null;
+
 
 	/**
 	 * Returns the XML header to be printed.
@@ -359,6 +361,10 @@ class ProductsXmlFeed {
 		return '<' . $property . '><![CDATA[' . implode( ',', $images ) . ']]></' . $property . '>';
 	}
 
+	private static function get_property_g_shipping( $product, $property ) {
+		$column        = self::prepare_shipping_column( $product );
+		return '<' . $property . '>' . $column . '</' . $property . '>';
+	}
 
 	/**
 	 * Helper method to return the taxonomies of the product in a useful format.
@@ -377,4 +383,85 @@ class ProductsXmlFeed {
 
 		return wp_list_pluck( $terms, 'name' );
 	}
+
+	private static function prepare_shipping_column( $product ) {
+		$shipping = self::get_shipping_config();
+		$lines    = array();
+		foreach ( $shipping as $zone ) {
+			$best_shipping = self::get_best_shipping_with_cost( $zone, $product );
+			foreach( $zone->locations as $location ) {
+				$currency = get_woocommerce_currency();
+				$lines[]  = "$location->country:$location->state:$best_shipping->name:$best_shipping->cost $currency";
+			}
+		}
+		return implode( ",", $lines );
+	}
+
+	private static function get_shipping_config() {
+		if ( null !== self::$shipping ) {
+			return self::$shipping;
+		}
+		$shipping       = new Shipping();
+		self::$shipping = $shipping->get_shipping();
+		return self::$shipping;
+	}
+
+	private static function get_best_shipping_with_cost( $zone, $product ) {
+		$package = self::put_product_into_a_shipping_package( $product, reset( $zone->locations ) );
+		$rates   = array();
+		foreach ( $zone->shipping_methods as $shipping_method ) {
+				// Use + instead of array_merge to maintain numeric keys.
+				$rates += $shipping_method->get_rates_for_package( $package );
+		}
+
+		$best_cost = INF;
+		$best_name = '';
+		foreach ( $rates as $rate ) {
+			$cost = $rate->get_cost();
+			if ( $cost < $best_cost ) {
+				$best_cost = $cost;
+				$best_name = $rate->get_label();
+			}
+			$best_cost = $cost < $best_cost ? $cost : $best_cost;
+
+		}
+		return (object) array(
+			'cost' => $best_cost,
+			'name' => $best_name,
+		);
+	}
+
+	public static function put_product_into_a_shipping_package( $product, $location ) {
+		include_once WC_ABSPATH . 'includes/wc-cart-functions.php';
+		$cart_item = array(
+			'key'          => 0,
+			'product_id'   => $product->get_id(),
+			'variation_id' => null,
+			'variation'    => null,
+			'quantity'     => 1,
+			'data'         => $product,
+			'data_hash'    => wc_get_cart_item_data_hash( $product ),
+			'line_total'   => wc_remove_number_precision( (float) $product->get_price() ),
+		);
+
+		return array(
+			'contents'        => array( $cart_item ),
+			'contents_cost'   => (float) $product->get_price(),
+			'applied_coupons' => array(),
+			'user'            => array(
+				'ID' => get_current_user_id(),
+			),
+			'destination'     => array(
+				'country'   => $location->country,
+				'state'     => $location->state,
+				'postcode'  => '',
+				'city'      => '',
+				'address'   => '',
+				'address_1' => '',
+				'address_2' => '',
+			),
+			'cart_subtotal'   => (float) $product->get_price(),
+		);
+	}
+
 }

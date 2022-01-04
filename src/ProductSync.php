@@ -82,7 +82,12 @@ class ProductSync {
 		if ( ! self::is_product_sync_enabled() && ! self::get_registered_feed_id() ) {
 			return;
 		}
-
+		ProductFeedStatus::set(
+			array(
+				'status' => 'scheduled_for_generation',
+			)
+		);
+		self::handle_feed_generation();
 		// Hook the Scheduled actions.
 		add_action( self::ACTION_HANDLE_SYNC, array( __CLASS__, 'handle_feed_registration' ) );
 		add_action( self::ACTION_FEED_GENERATION, array( __CLASS__, 'handle_feed_generation' ) );
@@ -305,9 +310,9 @@ class ProductSync {
 		$state = ProductFeedStatus::get();
 		$start = microtime( true );
 
-		if ( $state && 'generated' === $state['status'] || ! self::is_product_sync_enabled() ) {
-			return; // No need to perform any action.
-		}
+		// if ( $state && 'generated' === $state['status'] || ! self::is_product_sync_enabled() ) {
+		// 	return; // No need to perform any action.
+		// }
 
 		if ( ! $state || ( $state && 'scheduled_for_generation' === $state['status'] ) ) {
 			// We need to start a generation from scratch.
