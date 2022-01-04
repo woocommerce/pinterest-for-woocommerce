@@ -207,15 +207,6 @@ const SetupTracking = ( { view } ) => {
 				await setAppSettings( {
 					[ name ]: value ?? ! appSettings[ name ],
 				} );
-				if (
-					appSettings?.tracking_advertiser &&
-					appSettings?.tracking_tag
-				) {
-					await connectAdvertiser(
-						appSettings.tracking_advertiser,
-						appSettings.tracking_tag
-					);
-				}
 			} catch ( error ) {
 				createNotice(
 					'error',
@@ -228,19 +219,11 @@ const SetupTracking = ( { view } ) => {
 
 			setIsSaving( false );
 		},
-		[
-			appSettings,
-			setIsSaving,
-			setAppSettings,
-			connectAdvertiser,
-			createNotice,
-		]
+		[ appSettings, setIsSaving, setAppSettings, createNotice ]
 	);
 
 	const connectAdvertiser = useCallback(
 		async ( trackingAdvertiser, trackingTag ) => {
-			setIsFetching( true );
-
 			try {
 				const results = await apiFetch( {
 					path: `${ wcSettings.pinterest_for_woocommerce.apiRoute }/tagowner/`,
@@ -284,8 +267,6 @@ const SetupTracking = ( { view } ) => {
 						)
 				);
 			}
-
-			setIsFetching( false );
 		},
 		[ createNotice ]
 	);
@@ -325,6 +306,11 @@ const SetupTracking = ( { view } ) => {
 	};
 
 	const handleCompleteSetup = async () => {
+		await connectAdvertiser(
+			appSettings.tracking_advertiser,
+			appSettings.tracking_tag
+		);
+
 		// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
 		const path = getNewPath( {}, '/pinterest/settings', {} );
 

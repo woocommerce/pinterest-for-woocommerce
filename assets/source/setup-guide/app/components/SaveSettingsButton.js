@@ -4,6 +4,9 @@
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 
+import { useCallback } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
+
 /**
  * Internal dependencies
  */
@@ -17,6 +20,7 @@ const SaveSettingsButton = () => {
 	const isSaving = useSettingsSelect( 'isSettingsUpdating' );
 	const setAppSettings = useSettingsDispatch( true );
 	const createNotice = useCreateNotice();
+	const appSettings = useSettingsSelect();
 
 	const saveSettings = async () => {
 		try {
@@ -29,6 +33,16 @@ const SaveSettingsButton = () => {
 					'pinterest-for-woocommerce'
 				)
 			);
+
+			if (
+				appSettings?.tracking_advertiser &&
+				appSettings?.tracking_tag
+			) {
+				await connectAdvertiser(
+					appSettings.tracking_advertiser,
+					appSettings.tracking_tag
+				);
+			}
 		} catch ( error ) {
 			createNotice(
 				'error',
@@ -39,6 +53,51 @@ const SaveSettingsButton = () => {
 			);
 		}
 	};
+
+	const connectAdvertiser = useCallback(
+		async ( trackingAdvertiser, trackingTag ) => {
+			try {
+				const results = await apiFetch( {
+					path: `${ wcSettings.pinterest_for_woocommerce.apiRoute }/tagowner/`,
+					data: {
+						advrtsr_id: trackingAdvertiser,
+						tag_id: trackingTag,
+					},
+					method: 'POST',
+				} );
+
+				if ( trackingAdvertiser === results.connected ) {
+					if ( results.reconnected ) {
+						createNotice(
+							'success',
+							__(
+								'Advertiser connected successfully.',
+								'pinterest-for-woocommerce'
+							)
+						);
+					}
+				} else {
+					createNotice(
+						'error',
+						__(
+							'Couldn’t connect advertiser.',
+							'pinterest-for-woocommerce'
+						)
+					);
+				}
+			} catch ( error ) {
+				createNotice(
+					'error',
+					error.message ||
+						__(
+							'Couldn’t connect advertiser.',
+							'pinterest-for-woocommerce'
+						)
+				);
+			}
+		},
+		[ createNotice ]
+	);
 
 	return (
 		<div className="woocommerce-setup-guide__footer-button">
