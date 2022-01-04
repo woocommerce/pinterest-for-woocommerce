@@ -29,6 +29,7 @@ import {
 	useSettingsSelect,
 	useSettingsDispatch,
 	useCreateNotice,
+	useConnectAdvertiser,
 } from '../helpers/effects';
 
 const SetupTracking = ( { view } ) => {
@@ -41,6 +42,7 @@ const SetupTracking = ( { view } ) => {
 	const appSettings = useSettingsSelect();
 	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
+	const connectAdvertiser = useConnectAdvertiser();
 
 	useEffect( () => {
 		if (
@@ -220,55 +222,6 @@ const SetupTracking = ( { view } ) => {
 			setIsSaving( false );
 		},
 		[ appSettings, setIsSaving, setAppSettings, createNotice ]
-	);
-
-	const connectAdvertiser = useCallback(
-		async ( trackingAdvertiser, trackingTag ) => {
-			try {
-				const results = await apiFetch( {
-					path: `${ wcSettings.pinterest_for_woocommerce.apiRoute }/tagowner/`,
-					data: {
-						advrtsr_id: trackingAdvertiser,
-						tag_id: trackingTag,
-					},
-					method: 'POST',
-				} );
-
-				if ( trackingAdvertiser === results.connected ) {
-					setStatus( 'success' );
-
-					if ( results.reconnected ) {
-						createNotice(
-							'success',
-							__(
-								'Advertiser connected successfully.',
-								'pinterest-for-woocommerce'
-							)
-						);
-					}
-				} else {
-					setStatus( 'error' );
-					createNotice(
-						'error',
-						__(
-							'Couldn’t connect advertiser.',
-							'pinterest-for-woocommerce'
-						)
-					);
-				}
-			} catch ( error ) {
-				setStatus( 'error' );
-				createNotice(
-					'error',
-					error.message ||
-						__(
-							'Couldn’t connect advertiser.',
-							'pinterest-for-woocommerce'
-						)
-				);
-			}
-		},
-		[ createNotice ]
 	);
 
 	const handleTryAgain = () => {
