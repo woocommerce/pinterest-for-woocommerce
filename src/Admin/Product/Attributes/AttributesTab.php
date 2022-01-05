@@ -188,9 +188,8 @@ class AttributesTab {
 	 */
 	protected function update_data( WC_Product $product, array $data ): void {
 		foreach ( $this->attribute_manager->get_attribute_types_for_product( $product ) as $attribute_id => $attribute_type ) {
-			if ( isset( $data[ $attribute_id ] ) ) {
-				$this->attribute_manager->update( $product, new $attribute_type( $data[ $attribute_id ] ) );
-			}
+			$value = isset( $data[ $attribute_id ] ) ? $data[ $attribute_id ] : null;
+			$this->attribute_manager->update( $product, new $attribute_type( $value ) );
 		}
 	}
 
