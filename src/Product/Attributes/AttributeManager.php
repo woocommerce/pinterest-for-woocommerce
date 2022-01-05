@@ -34,6 +34,7 @@ class AttributeManager {
 
 	protected const ATTRIBUTES = array(
 		Condition::class,
+		GoogleCategory::class,
 	);
 
 	/**
