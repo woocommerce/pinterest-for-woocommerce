@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { recordEvent } from '@woocommerce/tracks';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useEffect,
@@ -31,6 +32,7 @@ import {
 	useSettingsDispatch,
 	useCreateNotice,
 } from '../helpers/effects';
+import documentationLinkProps from '../helpers/documentation-link-props';
 
 const StaticError = ( { reqError } ) => {
 	if ( reqError?.data?.pinterest_code === undefined ) {
@@ -65,13 +67,34 @@ const StaticError = ( { reqError } ) => {
 };
 
 /**
+ * Triggered when domain verification fails.
+ *
+ * @event wcadmin_pfw_domain_verify_failure
+ *
+ * @property {string} step Identifier of the step when verification failed.
+ */
+
+/**
+ * Triggered when a site is successfully verified.
+ *
+ * @event wcadmin_pfw_domain_verify_success
+ */
+
+/**
+ * Claim Website step component.
  * Renders a UI with section block and <Card> to claim website (if not yet completed) and display its status.
  *
+ * To be used in onboarding setup stepper.
+ *
+ * @fires wcadmin_pfw_domain_verify_failure
+ * @fires wcadmin_pfw_domain_verify_success
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'claim-website', context: props.view }`
  * @param {Object} props React props.
  * @param {'wizard'|'settings'} props.view Indicate which view this component is rendered on.
  * @param {Function} [props.goToNextStep]
  *   When the website claim is complete, called when clicking the "Continue" button.
  *   The "Continue" button is only displayed when `props.view` is 'wizard'.
+ * @return {JSX.Element} Rendered component.
  */
 const ClaimWebsite = ( { goToNextStep, view } ) => {
 	const [ status, setStatus ] = useState( STATUS.IDLE );
@@ -96,8 +119,9 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 				path: pfwSettings.apiRoute + '/domain_verification',
 				method: 'POST',
 			} );
-
 			await setAppSettings( { account_data: results.account_data } );
+
+			recordEvent( 'pfw_domain_verify_success' );
 
 			setStatus( STATUS.SUCCESS );
 		} catch ( error ) {
@@ -112,6 +136,13 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 						'pinterest-for-woocommerce'
 					)
 			);
+
+			recordEvent( 'pfw_domain_verify_failure', {
+				step:
+					wcSettings.pinterest_for_woocommerce
+						.claimWebsiteErrorStatus[ error?.data?.status ] ||
+					'unknown',
+			} );
 		}
 	};
 
@@ -166,7 +197,11 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 						description={ __(
 							'Claim your website to get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of your content.'
 						) }
-						link={ pfwSettings.pinterestLinks.claimWebsite }
+						readMore={ documentationLinkProps( {
+							href: pfwSettings.pinterestLinks.claimWebsite,
+							linkId: 'claim-website',
+							context: view,
+						} ) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">

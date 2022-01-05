@@ -11,6 +11,7 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@woocommerce/components';
 import { getNewPath } from '@woocommerce/navigation';
+import { recordEvent } from '@woocommerce/tracks';
 import {
 	Button,
 	Card,
@@ -31,8 +32,26 @@ import {
 	useCreateNotice,
 	useConnectAdvertiser,
 } from '../helpers/effects';
+import documentationLinkProps from '../helpers/documentation-link-props';
 
-const SetupTracking = ( { view } ) => {
+/**
+ * Tracking setup component.
+ *
+ * To be used in onboarding stepper.
+ *
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-guidelines', context: 'wizard'|'settings' }`
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
+ *
+ * @fires wcadmin_pfw_setup with `{ target: 'complete', trigger: 'setup-tracking-complete' }` when "Complete setup" button is clicked.
+ * @fires wcadmin_pfw_setup with `{ target: 'fetch-tags' | 'fetch-advertisers', trigger: 'setup-tracking-try-again' }` when "Try again" button is clicked.
+ *
+ * @param {Object} props React props.
+ * @param {string} [props.view='settings'] `'wizard'|'settings'` Kind of view to render.
+ * @return {JSX.Element} rendered component
+ */
+const SetupTracking = ( { view = 'settings' } ) => {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isFetching, setIsFetching ] = useState( false );
 	const [ status, setStatus ] = useState( 'idle' );
@@ -228,8 +247,16 @@ const SetupTracking = ( { view } ) => {
 		setStatus( 'idle' );
 
 		if ( appSettings.tracking_advertiser ) {
+			recordEvent( 'pfw_setup', {
+				target: 'fetch-tags',
+				trigger: 'setup-tracking-try-again',
+			} );
 			fetchTags( appSettings.tracking_advertiser );
 		} else {
+			recordEvent( 'pfw_setup', {
+				target: 'fetch-advertisers',
+				trigger: 'setup-tracking-try-again',
+			} );
 			fetchAdvertisers();
 		}
 	};
@@ -263,6 +290,11 @@ const SetupTracking = ( { view } ) => {
 			appSettings.tracking_advertiser,
 			appSettings.tracking_tag
 		);
+
+		recordEvent( 'pfw_setup', {
+			target: 'complete',
+			trigger: 'setup-tracking-complete',
+		} );
 
 		// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
 		const path = getNewPath( {}, '/pinterest/settings', {} );
@@ -310,11 +342,13 @@ const SetupTracking = ( { view } ) => {
 								) }{ ' ' }
 								<Button
 									isLink
-									href={
-										wcSettings.pinterest_for_woocommerce
-											.pinterestLinks.adGuidelines
-									}
-									target="_blank"
+									{ ...documentationLinkProps( {
+										href:
+											wcSettings.pinterest_for_woocommerce
+												.pinterestLinks.adGuidelines,
+										linkId: 'ad-guidelines',
+										context: view,
+									} ) }
 								>
 									{ __(
 										'Ad Guidelines',
@@ -324,11 +358,13 @@ const SetupTracking = ( { view } ) => {
 								{ __( 'and', 'pinterest-for-woocommerce' ) }{ ' ' }
 								<Button
 									isLink
-									href={
-										wcSettings.pinterest_for_woocommerce
-											.pinterestLinks.adDataTerms
-									}
-									target="_blank"
+									{ ...documentationLinkProps( {
+										href:
+											wcSettings.pinterest_for_woocommerce
+												.pinterestLinks.adDataTerms,
+										linkId: 'ad-data-terms',
+										context: view,
+									} ) }
 								>
 									{ __(
 										'Ad Data Terms',
@@ -337,10 +373,13 @@ const SetupTracking = ( { view } ) => {
 								</Button>
 							</>
 						}
-						link={
-							wcSettings.pinterest_for_woocommerce.pinterestLinks
-								.SetupTracking
-						}
+						readMore={ documentationLinkProps( {
+							href:
+								wcSettings.pinterest_for_woocommerce
+									.pinterestLinks.installTag,
+							linkId: 'install-tag',
+							context: view,
+						} ) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
@@ -451,13 +490,18 @@ const SetupTracking = ( { view } ) => {
 													link: (
 														<Button
 															isLink
-															href={
-																wcSettings
-																	.pinterest_for_woocommerce
-																	.countryTos
-																	.terms_url
-															}
-															target="_blank"
+															{ ...documentationLinkProps(
+																{
+																	href:
+																		wcSettings
+																			.pinterest_for_woocommerce
+																			.countryTos
+																			.terms_url,
+																	linkId:
+																		'ad-terms-of-service',
+																	context: view,
+																}
+															) }
 														></Button>
 													),
 												}

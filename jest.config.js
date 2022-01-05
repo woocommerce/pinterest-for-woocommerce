@@ -13,6 +13,12 @@ const wcPackagesNeedTransform = [
 	'experimental',
 ].join( '|' );
 
+// Insert here a package you want to mock. Then, add it inside tests/dependencies
+const packagesNeedMocking = [
+	'@woocommerce/settings',
+	'@woocommerce/tracks',
+].join( '|' );
+
 module.exports = {
 	...defaultConfig,
 	// Workaround https://github.com/woocommerce/woocommerce-admin/issues/6483.
@@ -22,14 +28,19 @@ module.exports = {
 	moduleNameMapper: {
 		// Transform our `.~/` alias.
 		'^\\.~/(.*)$': '<rootDir>/assets/source/$1',
+		[ `(${ packagesNeedMocking })` ]: '<rootDir>/assets/source/tests/dependencies/$1',
 	},
 	// Exclude e2e tests from unit testing.
 	testPathIgnorePatterns: [ '/node_modules/' ],
 	globals: {
 		wcSettings: {
 			pinterest_for_woocommerce: {
+				claimWebsiteErrorStatus: [],
+				pluginVersion: '1.2.3',
 				pinterestLinks: {
 					adsManager: 'https://example.com',
+					preLaunchNotice: 'https://example.com',
+					adsAvailability: 'https://example.com',
 				},
 			},
 		},

@@ -18,14 +18,17 @@ import { getSetting } from '@woocommerce/settings'; // eslint-disable-line impor
  * Internal dependencies
  */
 import './style.scss';
+import documentationLinkProps from '../../helpers/documentation-link-props';
 
 /**
  * Renders an unsupported country <Notice> with warning appearance.
  *
+ * @fires wcadmin_pfw_get_started_notice_link_click with `{ context: 'pinterest-landing', linkId: 'ads-availability' | 'unsupported-country-link' }`
+ *
  * @param {Object} props React props.
  * @param {string} props.countryCode The alpha-2 country code to map the country name.
  */
-export default function UnsupportedCountryNotice( { countryCode } ) {
+function UnsupportedCountryNotice( { countryCode } ) {
 	const countryName = getSetting( 'countries', {} )[ countryCode ];
 
 	if ( ! countryName ) {
@@ -47,15 +50,27 @@ export default function UnsupportedCountryNotice( { countryCode } ) {
 					country: <strong>{ countryName }</strong>,
 					settingsLink: (
 						<Link
+							{ ...documentationLinkProps( {
+								href: '/wp-admin/admin.php?page=wc-settings',
+								eventName: 'pfw_get_started_notice_link_click',
+								linkId: 'unsupported-country-link',
+								context: 'pinterest-landing',
+							} ) }
 							className="pins-for-woo-unsupported-country-notice__link"
 							type="wp-admin"
-							href="/wp-admin/admin.php?page=wc-settings"
 						/>
 					),
 					supportedCountriesLink: (
 						<ExternalLink
+							{ ...documentationLinkProps( {
+								href:
+									wcSettings.pinterest_for_woocommerce
+										.pinterestLinks.adsAvailability,
+								eventName: 'pfw_get_started_notice_link_click',
+								linkId: 'ads-availability',
+								context: 'pinterest-landing',
+							} ) }
 							className="pins-for-woo-unsupported-country-notice__link"
-							href="https://help.pinterest.com/en/business/availability/ads-availability"
 						/>
 					),
 				}
@@ -63,3 +78,5 @@ export default function UnsupportedCountryNotice( { countryCode } ) {
 		</Notice>
 	);
 }
+
+export default UnsupportedCountryNotice;

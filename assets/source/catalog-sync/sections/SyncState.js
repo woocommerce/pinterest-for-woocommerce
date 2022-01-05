@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { recordEvent } from '@woocommerce/tracks';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
@@ -20,6 +21,18 @@ import { REPORTS_STORE_NAME } from '../data';
 import SyncStateSummary from './SyncStateSummary';
 import SyncStateTable from './SyncStateTable';
 
+/**
+ * Clicking on the "Pinterest ads manager" link.
+ *
+ * @event wcadmin_pfw_ads_manager_link_click
+ */
+
+/**
+ * Catalog cync state overview component.
+ *
+ * @fires wcadmin_pfw_ads_manager_link_click
+ * @return {JSX.Element} Rendered component.
+ */
 const SyncState = () => {
 	const feedState = useSelect( ( select ) =>
 		select( REPORTS_STORE_NAME ).getFeedState()
@@ -49,6 +62,11 @@ const SyncState = () => {
 										wcSettings.pinterest_for_woocommerce
 											.pinterestLinks.adsManager
 									}
+									onClick={ () => {
+										recordEvent(
+											'pfw_ads_manager_link_click'
+										);
+									} }
 								/>
 							),
 						}
