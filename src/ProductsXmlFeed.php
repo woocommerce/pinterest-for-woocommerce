@@ -102,6 +102,7 @@ class ProductsXmlFeed {
 
 		foreach ( $attributes as $name => $value ) {
 			$property = "g:{$name}";
+			$value    = esc_html( $value );
 			$xml     .= "{$indent}<{$property}>{$value}</{$property}>" . PHP_EOL;
 		}
 
