@@ -38,6 +38,11 @@ Clicking on "Disconnect" Pinterest account button.
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L80) with the given `{ context }`
 
+### [`wcadmin_pfw_ads_manager_link_click`](assets/source/catalog-sync/sections/SyncState.js#L24)
+Clicking on the "Pinterest ads manager" link.
+#### Emitters
+- [`SyncState`](assets/source/catalog-sync/sections/SyncState.js#L36)
+
 ### [`wcadmin_pfw_business_account_connect_button_click`](assets/source/setup-guide/app/components/Account/BusinessAccountSelection.js#L24)
 Clicking on "Connect" business account button.
 #### Emitters
