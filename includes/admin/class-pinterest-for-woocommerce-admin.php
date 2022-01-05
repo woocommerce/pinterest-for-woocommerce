@@ -403,11 +403,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'merchantGuidelines'     => 'https://policy.pinterest.com/en/merchant-guidelines',
 					'convertToBusinessAcct'  => 'https://help.pinterest.com/en/business/article/get-a-business-account#section-15096',
 					'appealDeclinedMerchant' => 'https://www.pinterest.com/product-catalogs/data-source/?showModal=true',
+					'installTag'             => 'https://help.pinterest.com/en/business/article/install-the-pinterest-tag',
 					'adsManager'             => 'https://ads.pinterest.com/',
+					'preLaunchNotice'        => 'https://help.pinterest.com/en-gb/business/article/get-a-business-profile/',
+					'adsAvailability'        => 'https://help.pinterest.com/en/business/availability/ads-availability',
 				),
 				'isSetupComplete'          => Pinterest_For_Woocommerce()::is_setup_complete(),
 				'countryTos'               => Pinterest_For_Woocommerce()::get_applicable_tos(),
-
+				'claimWebsiteErrorStatus'  => array(
+					401 => 'token',
+					403 => 'connection',
+					406 => 'domain verification',
+					409 => 'meta-tag',
+					),
 			);
 		}
 

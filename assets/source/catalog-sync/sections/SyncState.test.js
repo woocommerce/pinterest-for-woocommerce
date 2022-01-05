@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { recordEvent } from '@woocommerce/tracks';
 
 /**
  * Internal dependencies
@@ -29,5 +30,15 @@ describe( 'SyncState component', () => {
 		const { getByText } = render( <SyncState /> );
 
 		expect( getByText( 'Property' ) ).toBeTruthy();
+	} );
+
+	test( 'should fire `pfw_ads_manager_link_click` when "Pinterest ads manager" is clicked', () => {
+		const { getByText } = render( <SyncState /> );
+
+		fireEvent.click( getByText( 'Pinterest ads manager' ) );
+
+		expect( recordEvent ).toHaveBeenCalledWith(
+			'pfw_ads_manager_link_click'
+		);
 	} );
 } );
