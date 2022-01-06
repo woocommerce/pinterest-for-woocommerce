@@ -286,20 +286,40 @@ const SetupTracking = ( { view = 'settings' } ) => {
 	};
 
 	const handleCompleteSetup = async () => {
-		await connectAdvertiser(
-			appSettings.tracking_advertiser,
-			appSettings.tracking_tag
-		);
+		try {
+			const result = await connectAdvertiser(
+				appSettings.tracking_advertiser,
+				appSettings.tracking_tag
+			);
 
-		recordEvent( 'pfw_setup', {
-			target: 'complete',
-			trigger: 'setup-tracking-complete',
-		} );
+			if ( result ) {
+				createNotice(
+					'success',
+					__(
+						'The advertiser was connected successfully.',
+						'pinterest-for-woocommerce'
+					)
+				);
+			}
 
-		// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
-		const path = getNewPath( {}, '/pinterest/settings', {} );
+			recordEvent( 'pfw_setup', {
+				target: 'complete',
+				trigger: 'setup-tracking-complete',
+			} );
 
-		window.location = new URL( wcSettings.adminUrl + path );
+			// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
+			const path = getNewPath( {}, '/pinterest/settings', {} );
+
+			window.location = new URL( wcSettings.adminUrl + path );
+		} catch ( error ) {
+			createNotice(
+				'error',
+				__(
+					'There was a problem connecting the advertiser.',
+					'pinterest-for-woocommerce'
+				)
+			);
+		}
 	};
 
 	return (

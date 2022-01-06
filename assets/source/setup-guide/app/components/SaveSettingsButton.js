@@ -56,6 +56,26 @@ const SaveSettingsButton = ( { view } ) => {
 		try {
 			await setAppSettings( {} );
 
+			if (
+				appSettings?.tracking_advertiser &&
+				appSettings?.tracking_tag
+			) {
+				const result = await connectAdvertiser(
+					appSettings.tracking_advertiser,
+					appSettings.tracking_tag
+				);
+
+				if ( result.reconnected ) {
+					createNotice(
+						'success',
+						__(
+							'The advertiser was connected successfully.',
+							'pinterest-for-woocommerce'
+						)
+					);
+				}
+			}
+
 			createNotice(
 				'success',
 				__(
@@ -63,16 +83,6 @@ const SaveSettingsButton = ( { view } ) => {
 					'pinterest-for-woocommerce'
 				)
 			);
-
-			if (
-				appSettings?.tracking_advertiser &&
-				appSettings?.tracking_tag
-			) {
-				await connectAdvertiser(
-					appSettings.tracking_advertiser,
-					appSettings.tracking_tag
-				);
-			}
 		} catch ( error ) {
 			createNotice(
 				'error',

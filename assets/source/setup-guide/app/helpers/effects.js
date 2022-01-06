@@ -3,7 +3,6 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -58,50 +57,24 @@ export const useBodyClasses = ( style ) => {
 };
 
 export const useConnectAdvertiser = () => {
-	const createNotice = useCreateNotice();
+	return useCallback( async ( trackingAdvertiser, trackingTag ) => {
+		try {
+			const results = await apiFetch( {
+				path: `${ wcSettings.pinterest_for_woocommerce.apiRoute }/tagowner/`,
+				data: {
+					advrtsr_id: trackingAdvertiser,
+					tag_id: trackingTag,
+				},
+				method: 'POST',
+			} );
 
-	return useCallback(
-		async ( trackingAdvertiser, trackingTag ) => {
-			try {
-				const results = await apiFetch( {
-					path: `${ wcSettings.pinterest_for_woocommerce.apiRoute }/tagowner/`,
-					data: {
-						advrtsr_id: trackingAdvertiser,
-						tag_id: trackingTag,
-					},
-					method: 'POST',
-				} );
-
-				if ( trackingAdvertiser === results.connected ) {
-					if ( results.reconnected ) {
-						createNotice(
-							'success',
-							__(
-								'Advertiser connected successfully.',
-								'pinterest-for-woocommerce'
-							)
-						);
-					}
-				} else {
-					createNotice(
-						'error',
-						__(
-							'Couldn’t connect advertiser.',
-							'pinterest-for-woocommerce'
-						)
-					);
-				}
-			} catch ( error ) {
-				createNotice(
-					'error',
-					error.message ||
-						__(
-							'Couldn’t connect advertiser.',
-							'pinterest-for-woocommerce'
-						)
-				);
+			if ( trackingAdvertiser === results.connected ) {
+				return true;
+			} else {
+				return false;
 			}
-		},
-		[ createNotice ]
-	);
+		} catch ( error ) {
+			throw error;
+		}
+	}, [] );
 };
