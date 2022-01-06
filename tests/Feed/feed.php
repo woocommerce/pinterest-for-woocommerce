@@ -91,5 +91,33 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 
 	}
 
+	/**
+	 * @group feed
+	 */
+	public function testDescription() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$product  = \WC_Helper_Product::create_simple_product();
+		$xml      = $description_method( $product );
+		$this->assertEquals( '', $xml );
+	}
+
+	/**
+	 * Gets the property method. Just pass the product and voila.
+	 *
+	 * @param string $attribute
+	 * @return function
+	 */
+	public function getProductsXmlFeedAttributeMethod( $attribute ) {
+		$method_name = 'get_property_' . str_replace( ':', '_', $attribute );
+		$class       = new \ReflectionClass('Automattic\WooCommerce\Pinterest\ProductsXmlFeed');
+		$method      = $class->getMethod( $method_name );
+		$method->setAccessible(true);
+
+		return function( $product ) use ( $method, $attribute ) {
+			return $method->invoke( null, $product, $attribute );
+		};
+	}
+
 }
 
