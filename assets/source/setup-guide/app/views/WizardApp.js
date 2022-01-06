@@ -11,6 +11,7 @@ import {
 	getQuery,
 	updateQueryString,
 } from '@woocommerce/navigation';
+import { useRef } from 'react';
 
 /**
  * Internal dependencies
@@ -45,13 +46,22 @@ const WizardApp = () => {
 		wcSettings.pinterest_for_woocommerce.isBusinessConnected
 	);
 
+	const appSettings = useSettingsSelect();
+	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
+	const isTrackingConfigured = useSettingsSelect( 'isTrackingConfigured' );
+	const mounted = useRef( false );
+
 	useEffect( () => {
+		mounted.current = true;
+
 		if ( ! isConnected ) {
 			setIsBusinessConnected( false );
 		}
-	}, [ isConnected, setIsBusinessConnected ] );
 
-	const appSettings = useSettingsSelect();
+		return () => {
+			mounted.current = false;
+		};
+	}, [ isConnected, setIsBusinessConnected ] );
 
 	useBodyClasses( 'wizard' );
 	useCreateNotice()( wcSettings.pinterest_for_woocommerce.error );
@@ -70,11 +80,13 @@ const WizardApp = () => {
 				setIsBusinessConnected,
 				isBusinessConnected,
 			},
+			isCompleted: isBusinessConnected,
 		},
 		{
 			key: 'claim-website',
 			container: ClaimWebsite,
 			label: __( 'Claim your website', 'pinterest-for-woocommerce' ),
+			isCompleted: isDomainVerified,
 		},
 		{
 			key: 'setup-tracking',
@@ -83,11 +95,12 @@ const WizardApp = () => {
 				'Track conversions with the Pinterest tag',
 				'pinterest-for-woocommerce'
 			),
+			isCompleted: isTrackingConfigured,
 		},
 	];
 
 	const getSteps = () => {
-		return steps.map( ( step, index ) => {
+		return steps.map( ( step ) => {
 			const container = createElement( step.container, {
 				query: getQuery(),
 				step,
@@ -104,8 +117,7 @@ const WizardApp = () => {
 				</div>
 			);
 
-			const previousStep = steps[ index - 1 ];
-			if ( ! previousStep || previousStep.isComplete ) {
+			if ( step.isCompleted ) {
 				step.onClick = ( key ) => {
 					recordEvent( 'pfw_setup', {
 						target: key,
@@ -147,7 +159,10 @@ const WizardApp = () => {
 	};
 
 	getHistory().listen( () => {
-		setCurrentStep( getCurrentStep() );
+		//prevent to update the state on an unmounted component
+		if ( mounted.current ) {
+			setCurrentStep( getCurrentStep() );
+		}
 	} );
 
 	if ( ! currentStep ) {
