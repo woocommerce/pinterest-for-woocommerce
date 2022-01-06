@@ -35,6 +35,7 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	public function testSimpleProductXmlItem() {
 		$product  = \WC_Helper_Product::create_simple_product();
 
+		// We need header and footer so we can process XML directly.
 		$xml      = ProductsXmlFeed::get_xml_header();
 		$xml     .= ProductsXmlFeed::get_xml_item( $product );
 		$xml     .= ProductsXmlFeed::get_xml_footer();
