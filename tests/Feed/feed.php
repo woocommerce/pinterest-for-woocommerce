@@ -97,9 +97,20 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	public function testDescription() {
 		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
 
+		// No description set.
 		$product  = \WC_Helper_Product::create_simple_product();
 		$xml      = $description_method( $product );
 		$this->assertEquals( '', $xml );
+
+		// Product with description
+		$product_with_description = \WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'short_description' => 'Test description'
+			)
+		);
+		$xml = $description_method( $product_with_description );
+		$this->assertEquals( "<description><![CDATA[Test description]]></description>", $xml );
 	}
 
 	/**
