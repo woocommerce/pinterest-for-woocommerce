@@ -3,7 +3,6 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useCallback } from '@wordpress/element';
-
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
