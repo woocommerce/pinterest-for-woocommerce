@@ -49,6 +49,7 @@ class VariationsAttributes {
 	 * Register a service.
 	 */
 	public function register(): void {
+		// Priority 90 to render after regular variation attributes.
 		add_action(
 			'woocommerce_product_after_variable_attributes',
 			function ( int $variation_index, array $variation_data, WP_Post $variation ) {
