@@ -129,7 +129,7 @@ class Form implements FormInterface {
 			throw FormException::cannot_modify_submitted();
 		}
 
-		if ( isset( $this->children[ $name ] ) ) {
+		if ( $this->has( $name ) ) {
 			$this->children[ $name ]->set_parent( null );
 			unset( $this->children[ $name ] );
 		}
