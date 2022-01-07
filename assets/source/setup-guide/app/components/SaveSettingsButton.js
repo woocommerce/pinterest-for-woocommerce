@@ -65,7 +65,7 @@ const SaveSettingsButton = ( { view } ) => {
 					appSettings.tracking_tag
 				);
 
-				if ( result.reconnected ) {
+				if ( result ) {
 					createNotice(
 						'success',
 						__(
