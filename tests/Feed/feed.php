@@ -94,7 +94,7 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 */
-	public function testDescription() {
+	public function testDescriptionForSimpleProduct() {
 		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
 
 		// No description set.
@@ -102,15 +102,42 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 		$xml      = $description_method( $product );
 		$this->assertEquals( '', $xml );
 
+		$desc = 'Test description.';
 		// Product with description
 		$product_with_description = \WC_Helper_Product::create_simple_product(
 			true,
 			array(
-				'short_description' => 'Test description'
+				'short_description' => $desc
 			)
 		);
 		$xml = $description_method( $product_with_description );
-		$this->assertEquals( "<description><![CDATA[Test description]]></description>", $xml );
+		$this->assertEquals( "<description><![CDATA[{$desc}]]></description>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testDescriptionForVariableProduct() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		// By passing manually created Variable Product the create_variation_product will add children to it.
+		$product            = new \WC_Product_Variable();
+		$variation_product  = \WC_Helper_Product::create_variation_product( $product );
+		$child_id           = $variation_product->get_children()[0];
+		$child_product      = wc_get_product( $child_id );
+		$xml                = $description_method( $child_product );
+		$this->assertEquals( '', $xml );
+
+		$desc = 'Test description.';
+		// Product with description
+		$product_with_description = \WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'short_description' => $desc
+			)
+		);
+		$xml = $description_method( $product_with_description );
+		$this->assertEquals( "<description><![CDATA[{$desc}]]></description>", $xml );
 	}
 
 	/**
