@@ -90,6 +90,8 @@ class ProductsXmlFeed {
 
 	/**
 	 * Get the XML for all the product attributes.
+	 * Will only return the attributes which have been set
+	 * or are available for the product type.
 	 *
 	 * @param WC_Product $product WooCommerce product.
 	 * @param string     $indent  Line indentation string.
