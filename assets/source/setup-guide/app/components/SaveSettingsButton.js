@@ -12,8 +12,8 @@ import {
 	useSettingsSelect,
 	useSettingsDispatch,
 	useCreateNotice,
-	useConnectAdvertiser,
 } from '../helpers/effects';
+import connectAdvertiser from '../helpers/connect-advertiser';
 import prepareForTracking from '../helpers/prepare-for-tracking';
 
 /**
@@ -45,7 +45,6 @@ const SaveSettingsButton = ( { view } ) => {
 	const setAppSettings = useSettingsDispatch( true );
 	const createNotice = useCreateNotice();
 	const appSettings = useSettingsSelect();
-	const connectAdvertiser = useConnectAdvertiser();
 
 	const saveSettings = async () => {
 		recordEvent( 'pfw_save_changes_button_click', {

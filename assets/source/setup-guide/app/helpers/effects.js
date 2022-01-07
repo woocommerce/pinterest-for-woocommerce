@@ -3,7 +3,6 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useCallback } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -54,27 +53,4 @@ export const useBodyClasses = ( style ) => {
 			}
 		};
 	}, [ style ] );
-};
-
-export const useConnectAdvertiser = () => {
-	return useCallback( async ( trackingAdvertiser, trackingTag ) => {
-		try {
-			const results = await apiFetch( {
-				path: `${ wcSettings.pinterest_for_woocommerce.apiRoute }/tagowner/`,
-				data: {
-					advrtsr_id: trackingAdvertiser,
-					tag_id: trackingTag,
-				},
-				method: 'POST',
-			} );
-
-			if ( trackingAdvertiser === results.connected ) {
-				return true;
-			} else {
-				return false;
-			}
-		} catch ( error ) {
-			throw error;
-		}
-	}, [] );
 };

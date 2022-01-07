@@ -30,8 +30,8 @@ import {
 	useSettingsSelect,
 	useSettingsDispatch,
 	useCreateNotice,
-	useConnectAdvertiser,
 } from '../helpers/effects';
+import connectAdvertiser from '../helpers/connect-advertiser';
 import documentationLinkProps from '../helpers/documentation-link-props';
 
 /**
@@ -61,7 +61,6 @@ const SetupTracking = ( { view = 'settings' } ) => {
 	const appSettings = useSettingsSelect();
 	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
-	const connectAdvertiser = useConnectAdvertiser();
 
 	useEffect( () => {
 		if (
