@@ -123,20 +123,25 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 		// By passing manually created Variable Product the create_variation_product will add children to it.
 		$product            = new \WC_Product_Variable();
 		$variation_product  = \WC_Helper_Product::create_variation_product( $product );
+		// create_variation_product creates multiple children, picking up the first one
 		$child_id           = $variation_product->get_children()[0];
 		$child_product      = wc_get_product( $child_id );
 		$xml                = $description_method( $child_product );
-		$this->assertEquals( '', $xml );
 
+		/*
+		 * With no description set the code will use the excerpt.
+		 * The excerpt for the product variation is build from the attributes summary.
+		 */
+		$attributes_summary = $child_product->get_attribute_summary( 'edit' );
+		$this->assertEquals( "<description><![CDATA[{$attributes_summary}]]></description>", $xml );
+
+		// Get the next variable product for tests with description set.
+		$child_id      = $variation_product->get_children()[1];
+		$child_product = wc_get_product( $child_id );
 		$desc = 'Test description.';
-		// Product with description
-		$product_with_description = \WC_Helper_Product::create_simple_product(
-			true,
-			array(
-				'short_description' => $desc
-			)
-		);
-		$xml = $description_method( $product_with_description );
+		$child_product->set_description( $desc );
+		$child_product->save();
+		$xml = $description_method( $child_product );
 		$this->assertEquals( "<description><![CDATA[{$desc}]]></description>", $xml );
 	}
 
