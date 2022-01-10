@@ -94,7 +94,7 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 */
-	public function testDescriptionForSimpleProduct() {
+	public function testDescriptionForSimpleProductXML() {
 		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
 
 		// No description set.
@@ -117,7 +117,7 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 */
-	public function testDescriptionForVariableProduct() {
+	public function testDescriptionForVariableProductXML() {
 		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
 
 		// By passing manually created Variable Product the create_variation_product will add children to it.
@@ -143,6 +143,17 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 		$child_product->save();
 		$xml = $description_method( $child_product );
 		$this->assertEquals( "<description><![CDATA[{$desc}]]></description>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testProductIdXML() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'g:id' );
+		$product    = \WC_Helper_Product::create_simple_product();
+		$product_id = $product->get_id();
+		$xml      = $description_method( $product );
+		$this->assertEquals( "<g:id>{$product_id}</g:id>", $xml );
 	}
 
 	/**
