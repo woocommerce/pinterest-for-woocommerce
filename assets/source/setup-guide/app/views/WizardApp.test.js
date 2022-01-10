@@ -28,6 +28,10 @@ jest.mock( '../steps/SetupAccount', () => () => null );
 jest.mock( '../steps/ClaimWebsite', () => () => null );
 jest.mock( '../steps/SetupTracking', () => () => null );
 
+const stepOne = /Set up your business account/;
+const stepTwo = /Claim your website/;
+const stepThree = /Track conversions/;
+
 afterEach( () => {
 	jest.clearAllMocks();
 } );
@@ -41,15 +45,9 @@ describe( 'WizardApp component', () => {
 			rendered = render( <WizardApp /> );
 		} );
 		test( 'should show all options and not clickables button in the Stepper', () => {
-			expect(
-				rendered.getByText( /Set up your business account/ )
-			).toBeInTheDocument();
-			expect(
-				rendered.getByText( /Claim your website/ )
-			).toBeInTheDocument();
-			expect(
-				rendered.getByText( /Track conversions/ )
-			).toBeInTheDocument();
+			expect( rendered.getByText( stepOne ) ).toBeInTheDocument();
+			expect( rendered.getByText( stepTwo ) ).toBeInTheDocument();
+			expect( rendered.getByText( stepThree ) ).toBeInTheDocument();
 
 			expect( rendered.queryAllByRole( 'button' ).length ).toBe( 0 );
 		} );
@@ -63,11 +61,16 @@ describe( 'WizardApp component', () => {
 			rendered = render( <WizardApp /> );
 		} );
 
-		test( 'should only the first step button be shown in the Stepper', () => {
-			expect( rendered.queryAllByRole( 'button' ).length ).toBe( 1 );
+		test( 'should step 1 & 2 be clickable in the stepper', () => {
+			expect( rendered.queryAllByRole( 'button' ).length ).toBe( 2 );
 			expect(
 				rendered.getByRole( 'button', {
-					name: /Set up your business account/,
+					name: stepOne,
+				} )
+			).toBeInTheDocument();
+			expect(
+				rendered.getByRole( 'button', {
+					name: stepTwo,
 				} )
 			).toBeInTheDocument();
 		} );
@@ -82,14 +85,14 @@ describe( 'WizardApp component', () => {
 			rendered = render( <WizardApp /> );
 		} );
 
-		test( 'should only the first 2 steps button be shown in the Stepper', () => {
-			expect( rendered.queryAllByRole( 'button' ).length ).toBe( 2 );
+		test( 'should 3 steps button be clickable in the stepper', () => {
+			expect( rendered.queryAllByRole( 'button' ).length ).toBe( 3 );
 
 			const setUpButton = rendered.getByRole( 'button', {
-				name: /Set up your business account/,
+				name: stepOne,
 			} );
 			const claimButton = rendered.getByRole( 'button', {
-				name: /Claim your website/,
+				name: stepTwo,
 			} );
 
 			expect( setUpButton ).toBeInTheDocument();
@@ -97,7 +100,7 @@ describe( 'WizardApp component', () => {
 		} );
 		test( 'should event tracking be = setup-account after click', () => {
 			const setUpButton = rendered.getByRole( 'button', {
-				name: /Set up your business account/,
+				name: stepOne,
 			} );
 
 			fireEvent.click( setUpButton );
@@ -131,19 +134,19 @@ describe( 'WizardApp component', () => {
 
 			expect(
 				rendered.getByRole( 'button', {
-					name: /Set up your business account/,
+					name: stepOne,
 					exact: false,
 				} )
 			).toBeInTheDocument();
 			expect(
 				rendered.getByRole( 'button', {
-					name: /Claim your website/,
+					name: stepTwo,
 					exact: false,
 				} )
 			).toBeInTheDocument();
 			expect(
 				rendered.getByRole( 'button', {
-					name: /Track conversions/,
+					name: stepThree,
 					exact: false,
 				} )
 			).toBeInTheDocument();
@@ -152,7 +155,7 @@ describe( 'WizardApp component', () => {
 		test( 'should event tracking be = claim-website after click', () => {
 			fireEvent.click(
 				rendered.getByRole( 'button', {
-					name: /Claim your website/,
+					name: stepTwo,
 				} )
 			);
 
@@ -172,7 +175,7 @@ describe( 'WizardApp component', () => {
 		test( 'should event tracking be = setup-tracking after click', () => {
 			fireEvent.click(
 				rendered.getByRole( 'button', {
-					name: /Track conversions/,
+					name: stepThree,
 				} )
 			);
 
