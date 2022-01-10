@@ -266,6 +266,39 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	}
 
 	/**
+	 * @group feed
+	 */
+	public function testPropertyPriceXML() {
+		$price_method = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
+		$product      = \WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
+		$xml          = $price_method( $product );
+		$this->assertEquals( "<g:price>15USD</g:price>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testPropertySalePriceXML() {
+		$sale_price_method = $this->getProductsXmlFeedAttributeMethod( 'sale_price' );
+
+		// No sale price is set.
+		$product = \WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
+		$xml     = $sale_price_method( $product );
+		$this->assertEquals( "", $xml );
+
+		// Sale price set.
+		$product = \WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				"regular_price" => 15,
+				"sale_price"    => 5
+			)
+		);
+		$xml     = $sale_price_method( $product );
+		$this->assertEquals( "<g:price>5USD</g:price>", $xml );
+	}
+
+	/**
 	 * Gets the property method. Just pass the product and voila.
 	 *
 	 * @param string $attribute
