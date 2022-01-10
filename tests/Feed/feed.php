@@ -149,10 +149,10 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	 * @group feed
 	 */
 	public function testProductIdXML() {
-		$description_method = $this->getProductsXmlFeedAttributeMethod( 'g:id' );
+		$id_method  = $this->getProductsXmlFeedAttributeMethod( 'g:id' );
 		$product    = \WC_Helper_Product::create_simple_product();
 		$product_id = $product->get_id();
-		$xml      = $description_method( $product );
+		$xml        = $id_method( $product );
 		$this->assertEquals( "<g:id>{$product_id}</g:id>", $xml );
 	}
 
@@ -160,11 +160,10 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	 * @group feed
 	 */
 	public function testPropertyIdSimpleProductXML() {
-		$description_method = $this->getProductsXmlFeedAttributeMethod( 'item_group_id' );
-		$product    = \WC_Helper_Product::create_simple_product();
-		$product_id = $product->get_id();
-		$xml        = $description_method( $product );
-		// Simple products have no parents.
+		$id_method = $this->getProductsXmlFeedAttributeMethod( 'item_group_id' );
+		$product   = \WC_Helper_Product::create_simple_product();
+		$xml       = $id_method( $product );
+		// Simple products have no parents so they don't have group id.
 		$this->assertEquals( "", $xml );
 	}
 
@@ -172,15 +171,14 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	 * @group feed
 	 */
 	public function testPropertyIdVariableProductXML() {
-		$description_method = $this->getProductsXmlFeedAttributeMethod( 'item_group_id' );
-
+		$group_id_method   = $this->getProductsXmlFeedAttributeMethod( 'item_group_id' );
 		$product           = new \WC_Product_Variable();
 		$variation_product = \WC_Helper_Product::create_variation_product( $product );
 		$child_product_id  = $variation_product->get_children()[0];
 		$child_product     = wc_get_product( $child_product_id );
 
 		$parent_product_id = $product->get_id();
-		$xml               = $description_method( $child_product );
+		$xml               = $group_id_method( $child_product );
 		// Item group id should be the parent product id.
 		$this->assertEquals( "<item_group_id>{$parent_product_id}</item_group_id>", $xml );
 	}
@@ -189,9 +187,9 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	 * @group feed
 	 */
 	public function testPropertyTitleXML() {
-		$description_method = $this->getProductsXmlFeedAttributeMethod( 'title' );
-		$product    = \WC_Helper_Product::create_simple_product();
-		$xml        = $description_method( $product );
+		$title_method = $this->getProductsXmlFeedAttributeMethod( 'title' );
+		$product      = \WC_Helper_Product::create_simple_product();
+		$xml          = $title_method( $product );
 		// create_simple_product gives the product `Dummy Product` title.
 		$this->assertEquals( "<title><![CDATA[Dummy Product]]></title>", $xml );
 	}
@@ -200,11 +198,22 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	 * @group feed
 	 */
 	public function testPropertyProductTypeXML() {
-		$description_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
-		$product    = \WC_Helper_Product::create_simple_product();
-		$xml        = $description_method( $product );
+		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
+		$product             = \WC_Helper_Product::create_simple_product();
+		$xml                 = $product_type_method( $product );
 		// create_simple_product gives the product 'Uncategorized' type.
 		$this->assertEquals( "<g:product_type>Uncategorized</g:product_type>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testPropertyLinkXML() {
+		$link_method = $this->getProductsXmlFeedAttributeMethod( 'link' );
+		$product     = \WC_Helper_Product::create_simple_product();
+		$xml         = $link_method( $product );
+		// create_simple_product gives the product 'Uncategorized' type.
+		$this->assertEquals( "<link><![CDATA[http://example.org/?product=dummy-product]]></link>", $xml );
 	}
 
 	/**
