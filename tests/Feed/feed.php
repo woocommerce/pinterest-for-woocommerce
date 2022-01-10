@@ -319,6 +319,41 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	}
 
 	/**
+	 * @group feed
+	 */
+	public function testPropertyAdditionalImageLinkXML() {
+		$additional_image_link_method = $this->getProductsXmlFeedAttributeMethod( 'g:additional_image_link' );
+		$product                      = \WC_Helper_Product::create_simple_product();
+
+		$xml = $additional_image_link_method( $product );
+		// By default no galery images are set.
+		$this->assertEquals( "", $xml );
+
+		// Add dummy image entry.
+		$attachment = array(
+			'post_mime_type' => 'image/png'
+		,   'post_title'     => 'product image 1'
+		);
+		$attachment_id_1 = wp_insert_attachment( $attachment, 'product_image_1.png', $product->get_id() );
+		// Product needs main image to use gallery so lets set this up here.
+		$product->set_image_id( $attachment_id_1 );
+
+		// Add second dummy image entry.
+		$attachment_id_2 = array(
+			'post_mime_type' => 'image/png'
+		,   'post_title'     => 'product image 2'
+		);
+		$attachment_id_2 = wp_insert_attachment( $attachment, 'product_image_2.png', $product->get_id() );
+
+		// Add attachment id as product image id.
+		$product->set_gallery_image_ids( [ $attachment_id_1, $attachment_id_2 ] );
+		$product->save();
+
+		$xml = $additional_image_link_method( $product );
+		$this->assertEquals( "<g:additional_image_link><![CDATA[http://example.org/wp-content/uploads/product_image_1.png,http://example.org/wp-content/uploads/product_image_2.png]]></g:additional_image_link>", $xml );
+	}
+
+	/**
 	 * Gets the property method. Just pass the product and voila.
 	 *
 	 * @param string $attribute
