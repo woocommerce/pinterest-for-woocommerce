@@ -295,7 +295,17 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 			)
 		);
 		$xml     = $sale_price_method( $product );
-		$this->assertEquals( "<g:price>5USD</g:price>", $xml );
+		$this->assertEquals( "<sale_price>5USD</sale_price>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testPropertySalePriceVariableProductXML() {
+		$this->markTestSkipped(
+			'Build this after resolving https://github.com/woocommerce/pinterest-for-woocommerce/issues/319'
+		  );
+
 	}
 
 	/**
