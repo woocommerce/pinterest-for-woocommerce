@@ -217,6 +217,32 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	}
 
 	/**
+	 * @group feed
+	 */
+	public function testPropertyImageLinkXML() {
+		$image_link_method = $this->getProductsXmlFeedAttributeMethod( 'g:image_link' );
+		$product           = \WC_Helper_Product::create_simple_product();
+
+		$xml = $image_link_method( $product );
+		// By default no image link is set.
+		$this->assertEquals( "", $xml );
+
+		// Add dummy image entry.
+		$attachment = array(
+			'post_mime_type' => 'image/png'
+		,   'post_title'     => 'product image'
+		);
+		$attachment_id = wp_insert_attachment( $attachment, 'product_image.png', $product->get_id() );
+
+		// Add attachment id as product image id.
+		$product->set_image_id( $attachment_id );
+		$product->save();
+
+		$xml = $image_link_method( $product );
+		$this->assertEquals( "<g:image_link><![CDATA[http://example.org/wp-content/uploads/product_image.png]]></g:image_link>", $xml );
+	}
+
+	/**
 	 * Gets the property method. Just pass the product and voila.
 	 *
 	 * @param string $attribute
