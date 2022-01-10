@@ -14,11 +14,7 @@ const connectAdvertiser = async ( trackingAdvertiser, trackingTag ) => {
 			method: 'POST',
 		} );
 
-		if ( trackingAdvertiser === results.connected ) {
-			return true;
-		}
-
-		return false;
+		return results.reconnected;
 	} catch ( error ) {
 		throw error;
 	}
