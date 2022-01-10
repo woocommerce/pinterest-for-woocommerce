@@ -6,7 +6,7 @@ import apiFetch from '@wordpress/api-fetch';
 const connectAdvertiser = async ( trackingAdvertiser, trackingTag ) => {
 	try {
 		const results = await apiFetch( {
-			path: `${ wcSettings.pinterest_for_woocommerce.apiRoute }/tagowner/`,
+			path: `${ wcSettings.pinterest_for_woocommerce.apiRoute }/tagowner`,
 			data: {
 				advrtsr_id: trackingAdvertiser,
 				tag_id: trackingTag,
