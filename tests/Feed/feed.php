@@ -243,6 +243,29 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	}
 
 	/**
+	 * @group feed
+	 */
+	public function testPropertyAvailabiltiyXML() {
+		$availability_method = $this->getProductsXmlFeedAttributeMethod( 'g:availability' );
+		$product             = \WC_Helper_Product::create_simple_product();
+
+		// Set different statuses and test.
+		$product->set_stock_status( 'instock' );
+		$xml = $availability_method( $product );
+		$this->assertEquals( "<g:availability>in stock</g:availability>", $xml );
+
+		$product->set_stock_status( 'outofstock' );
+		$xml = $availability_method( $product );
+		// create_simple_product gives the product 'Uncategorized' type.
+		$this->assertEquals( "<g:availability>out of stock</g:availability>", $xml );
+
+		$product->set_stock_status( 'onbackorder' );
+		$xml = $availability_method( $product );
+		// create_simple_product gives the product 'Uncategorized' type.
+		$this->assertEquals( "<g:availability>preorder</g:availability>", $xml );
+	}
+
+	/**
 	 * Gets the property method. Just pass the product and voila.
 	 *
 	 * @param string $attribute
