@@ -208,6 +208,20 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 */
+	public function testPropertyProductTypeVariableProductXML() {
+		$product_type_method  = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
+		$product              = new \WC_Product_Variable();
+		$variation_product    = \WC_Helper_Product::create_variation_product( $product );
+		$variation_product_id = $variation_product->get_children()[0];
+		$variation_product    = wc_get_product( $variation_product_id );
+		$xml                  = $product_type_method( $variation_product );
+		// create_simple_product gives the product 'Uncategorized' type.
+		$this->assertEquals( "<g:product_type>Uncategorized</g:product_type>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
 	public function testPropertyLinkXML() {
 		$link_method = $this->getProductsXmlFeedAttributeMethod( 'link' );
 		$product     = \WC_Helper_Product::create_simple_product();
