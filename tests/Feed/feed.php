@@ -168,7 +168,6 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 		$this->assertEquals( "", $xml );
 	}
 
-
 	/**
 	 * @group feed
 	 */
@@ -184,6 +183,28 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 		$xml               = $description_method( $child_product );
 		// Item group id should be the parent product id.
 		$this->assertEquals( "<item_group_id>{$parent_product_id}</item_group_id>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testPropertyTitleXML() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'title' );
+		$product    = \WC_Helper_Product::create_simple_product();
+		$xml        = $description_method( $product );
+		// create_simple_product gives the product `Dummy Product` title.
+		$this->assertEquals( "<title><![CDATA[Dummy Product]]></title>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testPropertyProductTypeXML() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
+		$product    = \WC_Helper_Product::create_simple_product();
+		$xml        = $description_method( $product );
+		// create_simple_product gives the product 'Uncategorized' type.
+		$this->assertEquals( "<g:product_type>Uncategorized</g:product_type>", $xml );
 	}
 
 	/**
