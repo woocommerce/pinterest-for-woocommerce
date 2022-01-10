@@ -157,6 +157,36 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	}
 
 	/**
+	 * @group feed
+	 */
+	public function testPropertyIdSimpleProductXML() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'item_group_id' );
+		$product    = \WC_Helper_Product::create_simple_product();
+		$product_id = $product->get_id();
+		$xml        = $description_method( $product );
+		// Simple products have no parents.
+		$this->assertEquals( "", $xml );
+	}
+
+
+	/**
+	 * @group feed
+	 */
+	public function testPropertyIdVariableProductXML() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'item_group_id' );
+
+		$product           = new \WC_Product_Variable();
+		$variation_product = \WC_Helper_Product::create_variation_product( $product );
+		$child_product_id  = $variation_product->get_children()[0];
+		$child_product     = wc_get_product( $child_product_id );
+
+		$parent_product_id = $product->get_id();
+		$xml               = $description_method( $child_product );
+		// Item group id should be the parent product id.
+		$this->assertEquals( "<item_group_id>{$parent_product_id}</item_group_id>", $xml );
+	}
+
+	/**
 	 * Gets the property method. Just pass the product and voila.
 	 *
 	 * @param string $attribute
