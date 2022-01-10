@@ -308,6 +308,16 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 
 	}
 
+		/**
+	 * @group feed
+	 */
+	public function testPropertyMpnXML() {
+		$mpn_method = $this->getProductsXmlFeedAttributeMethod( 'g:mpn' );
+		$product    = \WC_Helper_Product::create_simple_product();
+		$xml        = $mpn_method( $product );
+		$this->assertEquals( "<g:mpn>DUMMY SKU</g:mpn>", $xml );
+	}
+
 	/**
 	 * Gets the property method. Just pass the product and voila.
 	 *
