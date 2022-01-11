@@ -9,6 +9,7 @@
 namespace Automattic\WooCommerce\Pinterest;
 
 use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
+use WC_Product_Variation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -102,8 +103,16 @@ class ProductsXmlFeed {
 		$attributes        = $attribute_manager->get_all_values( $product );
 		$xml               = '';
 
+		// Merge with parent's attributes if it's a variation product.
+		if ( $product instanceof WC_Product_Variation ) {
+			$parent_product    = wc_get_product( $product->get_parent_id() );
+			$parent_attributes = $attribute_manager->get_all_values( $parent_product );
+			$attributes        = array_merge( $parent_attributes, $attributes );
+		}
+
 		foreach ( $attributes as $name => $value ) {
 			$property = "g:{$name}";
+			$value    = esc_html( $value );
 			$xml     .= "{$indent}<{$property}>{$value}</{$property}>" . PHP_EOL;
 		}
 

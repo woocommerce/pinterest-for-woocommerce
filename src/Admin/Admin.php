@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Admin;
 
+use Automattic\WooCommerce\Pinterest\Product\GoogleCategorySearch;
 use Automattic\WooCommerce\Pinterest\View\ViewException;
 use Automattic\WooCommerce\Pinterest\View\ViewFactory;
 
@@ -43,6 +44,8 @@ class Admin {
 				$this->enqueue_assets();
 			}
 		);
+
+		( new GoogleCategorySearch() )->register();
 	}
 
 	/**
