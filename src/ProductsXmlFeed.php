@@ -194,7 +194,8 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_g_product_type( $product, $property ) {
 
-		$taxonomies = self::get_taxonomies( $product->get_id() );
+		$id         = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
+		$taxonomies = self::get_taxonomies( $id );
 
 		if ( empty( $taxonomies ) ) {
 			return;
