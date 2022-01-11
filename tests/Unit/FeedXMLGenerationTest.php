@@ -1,7 +1,10 @@
 <?php
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Feed;
+
 use \WC_Unit_Test_Case;
+use \WC_Product_Variable;
+use \WC_Helper_Product;
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
 /**
  * Feed file generation testing class.
@@ -42,7 +45,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 * @group feed
 	 */
 	public function testSimpleProductXmlItem() {
-		$product  = \WC_Helper_Product::create_simple_product();
+		$product  = WC_Helper_Product::create_simple_product();
 
 		// We need header and footer so we can process XML directly.
 		$xml      = ProductsXmlFeed::get_xml_header();
@@ -107,13 +110,13 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
 
 		// No description set.
-		$product  = \WC_Helper_Product::create_simple_product();
+		$product  = WC_Helper_Product::create_simple_product();
 		$xml      = $description_method( $product );
 		$this->assertEquals( '', $xml );
 
 		$desc = 'Test description.';
 		// Product with description
-		$product_with_description = \WC_Helper_Product::create_simple_product(
+		$product_with_description = WC_Helper_Product::create_simple_product(
 			true,
 			array(
 				'short_description' => $desc
@@ -130,8 +133,8 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
 
 		// By passing manually created Variable Product the create_variation_product will add children to it.
-		$product            = new \WC_Product_Variable();
-		$variation_product  = \WC_Helper_Product::create_variation_product( $product );
+		$product            = new WC_Product_Variable();
+		$variation_product  = WC_Helper_Product::create_variation_product( $product );
 		// create_variation_product creates multiple children, picking up the first one
 		$child_id           = $variation_product->get_children()[0];
 		$child_product      = wc_get_product( $child_id );
@@ -159,7 +162,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testProductIdXML() {
 		$id_method  = $this->getProductsXmlFeedAttributeMethod( 'g:id' );
-		$product    = \WC_Helper_Product::create_simple_product();
+		$product    = WC_Helper_Product::create_simple_product();
 		$product_id = $product->get_id();
 		$xml        = $id_method( $product );
 		$this->assertEquals( "<g:id>{$product_id}</g:id>", $xml );
@@ -170,7 +173,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyIdSimpleProductXML() {
 		$id_method = $this->getProductsXmlFeedAttributeMethod( 'item_group_id' );
-		$product   = \WC_Helper_Product::create_simple_product();
+		$product   = WC_Helper_Product::create_simple_product();
 		$xml       = $id_method( $product );
 		// Simple products have no parents so they don't have group id.
 		$this->assertEquals( "", $xml );
@@ -181,8 +184,8 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyIdVariableProductXML() {
 		$group_id_method   = $this->getProductsXmlFeedAttributeMethod( 'item_group_id' );
-		$product           = new \WC_Product_Variable();
-		$variation_product = \WC_Helper_Product::create_variation_product( $product );
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
 		$child_product_id  = $variation_product->get_children()[0];
 		$child_product     = wc_get_product( $child_product_id );
 
@@ -197,7 +200,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyTitleXML() {
 		$title_method = $this->getProductsXmlFeedAttributeMethod( 'title' );
-		$product      = \WC_Helper_Product::create_simple_product();
+		$product      = WC_Helper_Product::create_simple_product();
 		$xml          = $title_method( $product );
 		// create_simple_product gives the product `Dummy Product` title.
 		$this->assertEquals( "<title><![CDATA[Dummy Product]]></title>", $xml );
@@ -208,7 +211,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyProductTypeXML() {
 		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
-		$product             = \WC_Helper_Product::create_simple_product();
+		$product             = WC_Helper_Product::create_simple_product();
 		$xml                 = $product_type_method( $product );
 		// create_simple_product gives the product 'Uncategorized' type.
 		$this->assertEquals( "<g:product_type>Uncategorized</g:product_type>", $xml );
@@ -219,8 +222,8 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyProductTypeVariableProductXML() {
 		$product_type_method  = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
-		$product              = new \WC_Product_Variable();
-		$variation_product    = \WC_Helper_Product::create_variation_product( $product );
+		$product              = new WC_Product_Variable();
+		$variation_product    = WC_Helper_Product::create_variation_product( $product );
 		$variation_product_id = $variation_product->get_children()[0];
 		$variation_product    = wc_get_product( $variation_product_id );
 		$xml                  = $product_type_method( $variation_product );
@@ -234,7 +237,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyLinkXML() {
 		$link_method = $this->getProductsXmlFeedAttributeMethod( 'link' );
-		$product     = \WC_Helper_Product::create_simple_product();
+		$product     = WC_Helper_Product::create_simple_product();
 		$xml         = $link_method( $product );
 		// create_simple_product gives the product 'Uncategorized' type.
 		$this->assertEquals( "<link><![CDATA[http://example.org/?product=dummy-product]]></link>", $xml );
@@ -245,7 +248,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyImageLinkXML() {
 		$image_link_method = $this->getProductsXmlFeedAttributeMethod( 'g:image_link' );
-		$product           = \WC_Helper_Product::create_simple_product();
+		$product           = WC_Helper_Product::create_simple_product();
 
 		$xml = $image_link_method( $product );
 		// By default no image link is set.
@@ -271,7 +274,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyAvailabiltiyXML() {
 		$availability_method = $this->getProductsXmlFeedAttributeMethod( 'g:availability' );
-		$product             = \WC_Helper_Product::create_simple_product();
+		$product             = WC_Helper_Product::create_simple_product();
 
 		// Set different statuses and test.
 		$product->set_stock_status( 'instock' );
@@ -294,7 +297,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyPriceXML() {
 		$price_method = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
-		$product      = \WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
+		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
 		$xml          = $price_method( $product );
 		$this->assertEquals( "<g:price>15USD</g:price>", $xml );
 	}
@@ -306,12 +309,12 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$sale_price_method = $this->getProductsXmlFeedAttributeMethod( 'sale_price' );
 
 		// No sale price is set.
-		$product = \WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
+		$product = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
 		$xml     = $sale_price_method( $product );
 		$this->assertEquals( "", $xml );
 
 		// Sale price set.
-		$product = \WC_Helper_Product::create_simple_product(
+		$product = WC_Helper_Product::create_simple_product(
 			true,
 			array(
 				"regular_price" => 15,
@@ -327,8 +330,8 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertySalePriceVariableProductXML() {
 		$price_method      = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
-		$product           = new \WC_Product_Variable();
-		$variation_product = \WC_Helper_Product::create_variation_product( $product );
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
 		/* In UT flow we need to fetch the product again from the DB after creation.
 		 * This ensures correct initialization of visible variations.
 		 * Without that the variable price methods think that we don't have visible children.
@@ -345,7 +348,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyMpnXML() {
 		$mpn_method = $this->getProductsXmlFeedAttributeMethod( 'g:mpn' );
-		$product    = \WC_Helper_Product::create_simple_product();
+		$product    = WC_Helper_Product::create_simple_product();
 		$xml        = $mpn_method( $product );
 		$this->assertEquals( "<g:mpn>DUMMY SKU</g:mpn>", $xml );
 	}
@@ -355,7 +358,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyAdditionalImageLinkXML() {
 		$additional_image_link_method = $this->getProductsXmlFeedAttributeMethod( 'g:additional_image_link' );
-		$product                      = \WC_Helper_Product::create_simple_product();
+		$product                      = WC_Helper_Product::create_simple_product();
 
 		$xml = $additional_image_link_method( $product );
 		// By default no galery images are set.
