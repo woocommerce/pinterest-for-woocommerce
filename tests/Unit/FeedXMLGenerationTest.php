@@ -228,7 +228,6 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$variation_product    = wc_get_product( $variation_product_id );
 		$xml                  = $product_type_method( $variation_product );
 		// create_simple_product gives the product 'Uncategorized' type.
-		$this->markTestSkipped( "Wating for https://github.com/woocommerce/pinterest-for-woocommerce/pull/320");
 		$this->assertEquals( "<g:product_type>Uncategorized</g:product_type>", $xml );
 	}
 
