@@ -1,10 +1,12 @@
 <?php
 
-namespace Automattic\WooCommerce\Pinterest;
+namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Feed;
+use \WC_Unit_Test_Case;
+use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
 /**
  * Feed file generation testing class.
  */
-class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
+class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 	/**
 	 * @group feed
