@@ -5,6 +5,7 @@ import '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { createElement, useState, useEffect } from '@wordpress/element';
 import { Spinner, Stepper } from '@woocommerce/components';
+import { recordEvent } from '@woocommerce/tracks';
 import {
 	getHistory,
 	getQuery,
@@ -25,6 +26,15 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 
+/**
+ * Onboarding Wizard component.
+ *
+ * @fires wcadmin_pfw_setup with `{ target: 'setup-account' | 'claim-website' | 'setup-tracking', trigger: 'wizard-stepper' }` when wizard's header step is clicked.
+ * @fires wcadmin_pfw_setup with `{ target: 'claim-website' , trigger: 'setup-account-continue' }` when continue button is clicked.
+ * @fires wcadmin_pfw_setup with `{ target: 'setup-tracking', trigger: 'claim-website-continue' }` when continue button is clicked.
+ *
+ * @return {JSX.Element} Rendered element.
+ */
 const WizardApp = () => {
 	const [ currentStep, setCurrentStep ] = useState();
 	const [ isConnected, setIsConnected ] = useState(
@@ -95,9 +105,14 @@ const WizardApp = () => {
 			);
 
 			const previousStep = steps[ index - 1 ];
-
 			if ( ! previousStep || previousStep.isComplete ) {
-				step.onClick = ( key ) => updateQueryString( { step: key } );
+				step.onClick = ( key ) => {
+					recordEvent( 'pfw_setup', {
+						target: key,
+						trigger: 'wizard-stepper',
+					} );
+					updateQueryString( { step: key } );
+				};
 			}
 
 			return step;
@@ -119,6 +134,10 @@ const WizardApp = () => {
 		const currentStepIndex = steps.findIndex( ( s ) => s.key === step.key );
 
 		const nextStep = steps[ currentStepIndex + 1 ];
+		recordEvent( 'pfw_setup', {
+			target: nextStep.key,
+			trigger: step.key + '-continue',
+		} );
 
 		if ( typeof nextStep === 'undefined' ) {
 			return;
