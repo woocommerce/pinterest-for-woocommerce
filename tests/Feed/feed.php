@@ -1,8 +1,11 @@
 <?php
 
 namespace Automattic\WooCommerce\Pinterest;
-
+/**
+ * Feed file generation testing class.
+ */
 class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
+
 	/**
 	 * @group feed
 	 */
@@ -30,6 +33,10 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	}
 
 	/**
+	 * This is more like an integration test than a UT.
+	 * It checks the general execution of the XML generation for a hypothetical feed with just one product.
+	 * All individual functions are tested separately this just roughly tests the structure.
+	 *
 	 * @group feed
 	 */
 	public function testSimpleProductXmlItem() {
@@ -377,7 +384,8 @@ class Pinterest_Test_Feed extends \WC_Unit_Test_Case {
 	}
 
 	/**
-	 * Gets the property method. Just pass the product and voila.
+	 * Helper function for extracting the static private members of the ProductsXmlFeed class.
+	 * Gets the property method then just pass the product and voila.
 	 *
 	 * @param string $attribute
 	 * @return function
