@@ -6,7 +6,10 @@ use \WC_Unit_Test_Case;
 use \WC_Product_Variable;
 use \WC_Helper_Product;
 use \ReflectionClass;
+
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
+use Automattic\WooCommerce\Pinterest\Product\Attributes\Condition;
+use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
 /**
  * Feed file generation testing class.
  */
@@ -102,6 +105,8 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// g:additional_image_link.
 		$this->assertArrayNotHasKey( 'additional_image_link', $g_children, 'By default we don\'t have additional image links.' );
 
+		// Condition is not set by default.
+		$this->assertArrayNotHasKey( 'condition', $g_children, 'By default we don\'t have the condition set.' );
 	}
 
 	/**
@@ -387,6 +392,27 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		$xml = $additional_image_link_method( $product );
 		$this->assertEquals( '<g:additional_image_link><![CDATA[http://example.org/wp-content/uploads/product_image_1.png,http://example.org/wp-content/uploads/product_image_2.png]]></g:additional_image_link>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testAttributesXML() {
+		$method = ( new ReflectionClass( ProductsXmlFeed::class ) )->getMethod( 'get_attributes_xml' );
+		$method->setAccessible( true );
+
+		$product = WC_Helper_Product::create_simple_product();
+		$xml = $method->invoke( null, $product, '\t' );
+		// No attributes set, output should be empty.
+		$this->assertEquals( '', $xml );
+
+		$condition         = new Condition( 'new' );
+		$attribute_manager = AttributeManager::instance();
+		$attribute_manager->update( $product, $condition );
+
+		$xml = $method->invoke( null, $product, '' );
+		// Condition attribute was set, we should see it in the output.
+		$this->assertEquals( '<g:condition>new</g:condition>' . PHP_EOL, $xml );
 	}
 
 	/**
