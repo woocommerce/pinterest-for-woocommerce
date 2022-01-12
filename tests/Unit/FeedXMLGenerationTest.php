@@ -176,7 +176,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product   = WC_Helper_Product::create_simple_product();
 		$xml       = $id_method( $product );
 		// Simple products have no parents so they don't have group id.
-		$this->assertEquals( "", $xml );
+		$this->assertEquals( '', $xml );
 	}
 
 	/**
@@ -251,7 +251,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		$xml = $image_link_method( $product );
 		// By default no image link is set.
-		$this->assertEquals( "", $xml );
+		$this->assertEquals( '', $xml );
 
 		// Add dummy image entry.
 		$attachment = array(
@@ -310,7 +310,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// No sale price is set.
 		$product = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
 		$xml     = $sale_price_method( $product );
-		$this->assertEquals( "", $xml );
+		$this->assertEquals( '', $xml );
 
 		// Sale price set.
 		$product = WC_Helper_Product::create_simple_product(
@@ -362,12 +362,12 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		$xml = $additional_image_link_method( $product );
 		// By default no galery images are set.
-		$this->assertEquals( "", $xml );
+		$this->assertEquals( '', $xml );
 
 		// Add dummy image entry.
 		$attachment = array(
-			'post_mime_type' => 'image/png'
-		,   'post_title'     => 'product image 1'
+			'post_mime_type' => 'image/png',
+			'post_title'     => 'product image 1',
 		);
 		$attachment_id_1 = wp_insert_attachment( $attachment, 'product_image_1.png', $product->get_id() );
 		// Product needs main image to use gallery so lets set this up here.
