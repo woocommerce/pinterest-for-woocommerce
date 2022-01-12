@@ -440,7 +440,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$taxonomy                  = GoogleProductTaxonomy::TAXONOMY[502979]; // Randomly selected category - i just made sure that it has parent.
 		$full_taxonomy_name        = $full_category_name_method->invoke( new GoogleCategorySearch(), $taxonomy );
 		$condition                 = new GoogleCategory( $full_taxonomy_name );
-		$attribute_manager = AttributeManager::instance();
+		$attribute_manager         = AttributeManager::instance();
 		$attribute_manager->update( $product, $condition );
 
 		$xml = $method->invoke( null, $product, '' );
