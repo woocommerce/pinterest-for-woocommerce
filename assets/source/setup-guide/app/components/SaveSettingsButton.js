@@ -13,6 +13,7 @@ import {
 	useSettingsDispatch,
 	useCreateNotice,
 } from '../helpers/effects';
+import connectAdvertiser from '../helpers/connect-advertiser';
 import prepareForTracking from '../helpers/prepare-for-tracking';
 
 /**
@@ -43,6 +44,7 @@ const SaveSettingsButton = ( { view } ) => {
 	const settings = useSettingsSelect( 'getSettings' );
 	const setAppSettings = useSettingsDispatch( true );
 	const createNotice = useCreateNotice();
+	const appSettings = useSettingsSelect();
 
 	const saveSettings = async () => {
 		recordEvent( 'pfw_save_changes_button_click', {
@@ -52,6 +54,26 @@ const SaveSettingsButton = ( { view } ) => {
 
 		try {
 			await setAppSettings( {} );
+
+			if (
+				appSettings?.tracking_advertiser &&
+				appSettings?.tracking_tag
+			) {
+				const result = await connectAdvertiser(
+					appSettings.tracking_advertiser,
+					appSettings.tracking_tag
+				);
+
+				if ( result ) {
+					createNotice(
+						'success',
+						__(
+							'The advertiser was connected successfully.',
+							'pinterest-for-woocommerce'
+						)
+					);
+				}
+			}
 
 			createNotice(
 				'success',

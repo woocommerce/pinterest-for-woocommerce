@@ -9,8 +9,10 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
+use \Exception;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,8 +24,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Base {
 
-	const API_DOMAIN  = 'https://api.pinterest.com';
-	const API_VERSION = 3;
+	const API_DOMAIN      = 'https://api.pinterest.com';
+	const API_VERSION     = 3;
+	const API_ADS_VERSION = 4;
 
 	/**
 	 * Holds the instance of the class.
@@ -66,15 +69,15 @@ class Base {
 	 * Request parameter:
 	 * $endpoint
 	 *
-	 * @param string $endpoint     the endpoint to perform the request on.
-	 * @param string $method       eg, POST, GET, PUT etc.
-	 * @param array  $payload      Payload to be sent on the request's body.
-	 * @param string $api          The specific Endpoints subset.
-	 * @param int    $cache_expiry When set, enables caching on the request and the value is used as the cache's TTL (in seconds).
+	 * @param string $endpoint        the endpoint to perform the request on.
+	 * @param string $method          eg, POST, GET, PUT etc.
+	 * @param array  $payload         Payload to be sent on the request's body.
+	 * @param string $api             The specific Endpoints subset.
+	 * @param int    $cache_expiry    When set, enables caching on the request and the value is used as the cache's TTL (in seconds).
 	 *
 	 * @return array
 	 *
-	 * @throws \Exception PHP exception.
+	 * @throws Exception PHP exception.
 	 */
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 
@@ -88,12 +91,21 @@ class Base {
 		}
 
 		try {
-			$api     = empty( $api ) ? '' : trailingslashit( $api );
+			$api         = empty( $api ) ? '' : trailingslashit( $api );
+			$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
+
 			$request = array(
-				'url'    => self::API_DOMAIN . '/' . $api . 'v' . self::API_VERSION . '/' . $endpoint,
+				'url'    => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
 				'method' => $method,
 				'args'   => $payload,
 			);
+
+			if ( 'ads/' === $api && 'POST' === $method ) {
+				// Force json content-type header and json encode payload.
+				$request['headers']['Content-Type'] = 'application/json';
+
+				$request['args'] = wp_json_encode( $payload );
+			}
 
 			$response = self::handle_request( $request );
 
@@ -102,7 +114,7 @@ class Base {
 			}
 
 			return $response;
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 
 			Logger::log( $e->getMessage(), 'error' );
 
@@ -129,7 +141,7 @@ class Base {
 	 *
 	 * @return array
 	 *
-	 * @throws \Exception PHP exception.
+	 * @throws Exception PHP exception.
 	 * @throws ApiException PHP exception.
 	 */
 	public static function handle_request( $request ) {
@@ -170,7 +182,7 @@ class Base {
 			if ( is_wp_error( $response ) ) {
 				$error_message = ( is_wp_error( $response ) ) ? $response->get_error_message() : $response['body'];
 
-				throw new \Exception( $error_message, 1 );
+				throw new Exception( $error_message, 1 );
 			}
 
 			// Log response.
@@ -178,15 +190,15 @@ class Base {
 
 			$body = self::parse_response( $response );
 
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 
-			throw new \Exception( $e->getMessage(), $e->getCode() );
+			throw new Exception( $e->getMessage(), $e->getCode() );
 		}
 
 		$response_code = absint( wp_remote_retrieve_response_code( $response ) );
 
 		if ( 401 === $response_code ) {
-			throw new \Exception( __( 'Reconnect to your Pinterest account', 'pinterest-for-woocommerce' ), 401 );
+			throw new Exception( __( 'Reconnect to your Pinterest account', 'pinterest-for-woocommerce' ), 401 );
 		}
 
 		if ( ! in_array( absint( $response_code ), array( 200, 201, 204 ), true ) ) {
@@ -236,17 +248,26 @@ class Base {
 	 *
 	 * @return array
 	 *
-	 * @throws \Exception PHP exception.
+	 * @throws Exception PHP exception.
 	 */
 	protected static function parse_response( $response ) {
 
 		if ( ! array_key_exists( 'body', (array) $response ) ) {
-			throw new \Exception( __( 'Empty body', 'pinterest-for-woocommerce' ), 204 );
+			throw new Exception( __( 'Empty body', 'pinterest-for-woocommerce' ), 204 );
 		}
 
 		return (array) json_decode( $response['body'] );
 	}
 
+
+	/**
+	 * Disconnect the merchant from the Pinterest platform.
+	 *
+	 * @return mixed
+	 */
+	public static function disconnect_merchant() {
+		return self::make_request( 'catalogs/partner/disconnect', 'POST' );
+	}
 
 	/**
 	 * Request the verification data from the API and return the response.
@@ -267,7 +288,7 @@ class Base {
 	public static function trigger_verification( $allow_multiple = true ) {
 
 		$domain      = wp_parse_url( home_url(), PHP_URL_HOST );
-		$request_url = 'domains/' . $domain . '/verification/metatag/realtime/';
+		$request_url = "domains/{$domain}/verification/metatag/realtime/";
 
 		if ( $allow_multiple ) {
 			$request_url = add_query_arg( 'can_claim_multiple', 'true', $request_url );
@@ -321,6 +342,46 @@ class Base {
 
 
 	/**
+	 * Connect the advertiser with the platform.
+	 *
+	 * @param string $advertiser_id The advertiser ID.
+	 * @param string $tag_id        The tag ID.
+	 *
+	 * @return mixed
+	 */
+	public static function connect_advertiser( $advertiser_id, $tag_id ) {
+		return self::make_request(
+			"advertisers/{$advertiser_id}/connect/",
+			'POST',
+			array(
+				'tag_id' => $tag_id,
+			),
+			'ads'
+		);
+	}
+
+
+	/**
+	 * Disconnect advertiser from the platform.
+	 *
+	 * @param string $advertiser_id The advertiser ID.
+	 * @param string $tag_id        The tag ID.
+	 *
+	 * @return mixed
+	 */
+	public static function disconnect_advertiser( $advertiser_id, $tag_id ) {
+		return self::make_request(
+			"advertisers/{$advertiser_id}/disconnect/",
+			'POST',
+			array(
+				'tag_id' => $tag_id,
+			),
+			'ads'
+		);
+	}
+
+
+	/**
 	 * Get the advertiser object from the Pinterest API for the given User ID.
 	 *
 	 * @param string $pinterest_user the user to request the Advertiser for.
@@ -329,7 +390,7 @@ class Base {
 	 */
 	public static function get_advertisers( $pinterest_user = null ) {
 		$pinterest_user = ! is_null( $pinterest_user ) ? $pinterest_user : Pinterest_For_Woocommerce()::get_account_id();
-		return self::make_request( 'advertisers/?owner_user_id=' . $pinterest_user, 'GET', array(), 'ads' );
+		return self::make_request( "advertisers/?owner_user_id={$pinterest_user}", 'GET', array(), 'ads' );
 	}
 
 
@@ -341,7 +402,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_advertiser_tags( $advertiser_id ) {
-		return self::make_request( 'advertisers/' . $advertiser_id . '/tags/', 'GET', array(), 'ads' );
+		return self::make_request( "advertisers/{$advertiser_id}/conversion_tags/", 'GET', array(), 'ads' );
 	}
 
 
@@ -357,11 +418,10 @@ class Base {
 		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		return self::make_request(
-			'tags/',
+			"advertisers/{$advertiser_id}/conversion_tags",
 			'POST',
 			array(
-				'advertiser' => $advertiser_id,
-				'name'       => $tag_name,
+				'name' => $tag_name,
 			),
 			'ads'
 		);
@@ -382,7 +442,7 @@ class Base {
 			return false;
 		}
 
-		return self::make_request( 'tags/' . $tag_id . '/configs/', 'PUT', $config, 'ads' );
+		return self::make_request( "tags/{$tag_id}/configs/", 'PUT', $config, 'ads' );
 	}
 
 
@@ -394,60 +454,40 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_merchant( $merchant_id ) {
-		return self::make_request( 'commerce/product_pin_merchants/' . $merchant_id . '/', 'GET' );
+		return self::make_request( "commerce/product_pin_merchants/{$merchant_id}/", 'GET' );
 	}
 
 
 	/**
-	 * Creates a merchant for the authenticated user or returns the existing one.
+	 * Creates a merchant for the authenticated user or updates the existing one. On success the Merchant ID is returned instead of the full merchant object.
+	 *
+	 * @param array $args Payload to be sent to the request.
 	 *
 	 * @return mixed
 	 */
-	public static function maybe_create_merchant() {
-
-		$args = array(
-			'display_name'                      => apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) ),
-			'return_merchant_if_already_exists' => true,
-		);
-
+	public static function update_or_create_merchant( $args ) {
 		return self::make_request(
-			add_query_arg( $args, 'commerce/product_pin_merchants/' ),
-			'POST'
+			'catalogs/partner/connect/',
+			'POST',
+			$args,
 		);
 	}
 
 
 	/**
-	 * Adds the merchant's feed using the given arguments.
+	 * Get a merchant's feeds.
 	 *
 	 * @param string $merchant_id The merchant ID the feed belongs to.
-	 * @param array  $args        The arguments to be passed to the API request.
 	 *
 	 * @return mixed
 	 */
-	public static function add_merchant_feed( $merchant_id, $args ) {
-
+	public static function get_merchant_feeds( $merchant_id ) {
 		return self::make_request(
-			add_query_arg( $args, 'commerce/product_pin_merchants/' . $merchant_id . '/feed/' ),
-			'POST'
-		);
-	}
-
-
-	/**
-	 * Updates the merchant's feed using the given arguments.
-	 *
-	 * @param string $merchant_id The merchant ID the feed belongs to.
-	 * @param string $feed_id     The ID of the feed to be updated.
-	 * @param array  $args        The arguments to be passed to the API request.
-	 *
-	 * @return mixed
-	 */
-	public static function update_merchant_feed( $merchant_id, $feed_id, $args ) {
-
-		return self::make_request(
-			add_query_arg( $args, 'commerce/product_pin_merchants/' . $merchant_id . '/feed/' . $feed_id . '/' ),
-			'PUT'
+			"catalogs/{$merchant_id}/feed_profiles/",
+			'GET',
+			array(),
+			'',
+			MINUTE_IN_SECONDS
 		);
 	}
 
@@ -460,7 +500,7 @@ class Base {
 	 *
 	 * @return mixed
 	 */
-	public static function get_merchant_feed( $merchant_id, $feed_id ) {
+	public static function get_merchant_feed_report( $merchant_id, $feed_id ) {
 		return self::make_request(
 			"catalogs/datasource/feed_report/{$merchant_id}/",
 			'GET',

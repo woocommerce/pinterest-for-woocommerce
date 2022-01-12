@@ -246,16 +246,12 @@ class FeedState extends VendorAPI {
 	 */
 	private function add_feed_registration_state( $result ) {
 
-		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-		$extra_info  = '';
+		$extra_info = '';
 
 		try {
 
-			if ( empty( $merchant_id ) ) {
-				throw new \Exception( esc_html__( 'Product feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' ), 200 );
-			}
-
-			$merchant = Base::get_merchant( $merchant_id );
+			// Get the merchant object.
+			$merchant = Pinterest\Merchants::get_merchant();
 
 			if ( 'success' !== $merchant['status'] ) {
 				throw new \Exception( esc_html__( 'Could not get merchant info.', 'pinterest-for-woocommerce' ) );
@@ -347,7 +343,7 @@ class FeedState extends VendorAPI {
 		try {
 
 			// Get feed ingestion status.
-			$feed_report = $merchant_id ? Base::get_merchant_feed( $merchant_id, $feed_id ) : false;
+			$feed_report = $merchant_id ? Base::get_merchant_feed_report( $merchant_id, $feed_id ) : false;
 
 			if ( ! $feed_report || 'success' !== $feed_report['status'] ) {
 				throw new \Exception( esc_html__( 'Response error when trying to get feed report from Pinterest.', 'pinterest-for-woocommerce' ) );
@@ -393,6 +389,12 @@ class FeedState extends VendorAPI {
 				case 'UNDER_REVIEW':
 					$status       = 'pending';
 					$status_label = esc_html__( 'Feed is under review.', 'pinterest-for-woocommerce' );
+					break;
+
+				case 'QUEUED_FOR_PROCESSING':
+					$status       = 'pending';
+					$status_label = esc_html__( 'The feed is queued for processing.', 'pinterest-for-woocommerce' );
+
 					break;
 
 				case 'FAILED':

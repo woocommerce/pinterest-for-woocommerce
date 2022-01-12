@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use \Exception;
+use \Throwable;
+
 /**
  * Class Handling registration & generation of the XML product feed.
  */
@@ -247,7 +250,7 @@ class ProductSync {
 	 *
 	 * @return mixed
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	public static function handle_feed_registration() {
 
@@ -257,27 +260,16 @@ class ProductSync {
 			return true;
 		}
 
-		$local_feed = ProductFeedStatus::get_local_feed();
-
-		$feed_args = array(
-			'feed_location'             => $local_feed['feed_url'],
-			'feed_format'               => 'XML',
-			'feed_default_currency'     => get_woocommerce_currency(),
-			'default_availability_type' => 'IN_STOCK',
-			'country'                   => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
-			'locale'                    => str_replace( '_', '-', determine_locale() ),
-		);
-
 		try {
-			$registered = self::register_feed( $feed_args );
+			$registered = self::register_feed();
 
 			if ( $registered ) {
 				return true;
 			}
 
-			throw new \Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
+			throw new Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
 
-		} catch ( \Throwable $th ) {
+		} catch ( Throwable $th ) {
 			self::log( $th->getMessage(), 'error' );
 			return false;
 		}
@@ -287,7 +279,6 @@ class ProductSync {
 
 	/**
 	 * Handles de-registration of the feed.
-	 * $feed_args are needed so that they are passed to update_merchant_feed() in order to perform the update.
 	 * Running this, sets the feed to 'DISABLED' in Pinterest, deletes the local XML file and the option holding the feed
 	 * status of the feed generation job.
 	 *
@@ -307,7 +298,7 @@ class ProductSync {
 	 *
 	 * @return void
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	public static function handle_feed_generation() {
 
@@ -349,7 +340,7 @@ class ProductSync {
 			}
 
 			if ( false === self::$current_index || empty( $product_ids ) ) {
-				throw new \Exception( esc_html__( 'Something went wrong while attempting to generate the feed.', 'pinterest-for-woocommerce' ), 400 );
+				throw new Exception( esc_html__( 'Something went wrong while attempting to generate the feed.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
 			$local_feed  = ProductFeedStatus::get_local_feed();
@@ -358,7 +349,7 @@ class ProductSync {
 
 			if ( ! $xml_file ) {
 				/* Translators: the path of the file */
-				throw new \Exception( sprintf( esc_html__( 'Could not open file: %s.', 'pinterest-for-woocommerce' ), $target_file ), 400 );
+				throw new Exception( sprintf( esc_html__( 'Could not open file: %s.', 'pinterest-for-woocommerce' ), $target_file ), 400 );
 			}
 
 			self::log( 'Generating feed for ' . count( $product_ids ) . ' products' );
@@ -403,7 +394,7 @@ class ProductSync {
 
 				if ( ! rename( $local_feed['tmp_file'], $local_feed['feed_file'] ) ) {
 					/* Translators: the path of the file */
-					throw new \Exception( sprintf( esc_html__( 'Could not write feed to file: %s.', 'pinterest-for-woocommerce' ), $local_feed['feed_file'] ), 400 );
+					throw new Exception( sprintf( esc_html__( 'Could not write feed to file: %s.', 'pinterest-for-woocommerce' ), $local_feed['feed_file'] ), 400 );
 				}
 
 				$target_file = $local_feed['feed_file'];
@@ -420,7 +411,7 @@ class ProductSync {
 			self::log( 'Feed step generation completed in ' . round( ( $end - $start ) * 1000 ) . 'ms. Current Index: ' . self::$current_index . ' / ' . $products_count );
 			self::log( 'Wrote ' . $step_index . ' products to file: ' . $target_file );
 
-		} catch ( \Throwable $th ) {
+		} catch ( Throwable $th ) {
 
 			if ( 'error' === $state['status'] ) {
 				// Already errored at once. Restart job.
@@ -450,7 +441,7 @@ class ProductSync {
 	 *
 	 * @return void
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	private static function write_iteration_buffer( $xml_file, $local_feed ) {
 
@@ -467,7 +458,7 @@ class ProductSync {
 
 		} else {
 			/* Translators: the path of the file */
-			throw new \Exception( sprintf( esc_html__( 'Could not write to file: %s.', 'pinterest-for-woocommerce' ), $local_feed['tmp_file'] ), 400 );
+			throw new Exception( sprintf( esc_html__( 'Could not write to file: %s.', 'pinterest-for-woocommerce' ), $local_feed['tmp_file'] ), 400 );
 		}
 	}
 
@@ -508,97 +499,41 @@ class ProductSync {
 
 
 	/**
-	 * Make API request to add_merchant_feed.
-	 *
-	 * @param string $merchant_id The merchant ID the feed belongs to.
-	 * @param array  $feed_args   The arguments used to create the feed.
-	 *
-	 * @return string|bool
-	 */
-	private static function do_add_merchant_feed( $merchant_id, $feed_args ) {
-		$feed = API\Base::add_merchant_feed( $merchant_id, $feed_args );
-
-		if ( $feed && 'success' === $feed['status'] && isset( $feed['data']->location_config->full_feed_fetch_location ) ) {
-			self::log( 'Added merchant feed: ' . $feed_args['feed_location'] );
-			return $feed['data']->id;
-		}
-
-		return false;
-	}
-
-
-	/**
 	 * Handles feed registration using the given arguments.
 	 * Will try to create a merchant if none exists.
 	 * Also if a different feed is registered, it will update using the URL in the
 	 * $feed_args.
 	 *
-	 * @param array $feed_args The arguments used to create the feed.
-	 *
 	 * @return boolean|string
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
-	private static function register_feed( $feed_args ) {
+	private static function register_feed() {
 
 		// Get merchant object.
 		$merchant   = Merchants::get_merchant();
 		$registered = false;
 
 		if ( ! empty( $merchant['data']->id ) && 'declined' === $merchant['data']->product_pin_approval_status ) {
+
 			$registered = false;
 			self::log( 'Pinterest returned a Declined status for product_pin_approval_status' );
-		} elseif ( ! empty( $merchant['data']->id ) && ! isset( $merchant['data']->product_pin_feed_profile ) ) {
-			// No feed registered, but we got a merchant.
-			$registered = self::do_add_merchant_feed( $merchant['data']->id, $feed_args );
-		} elseif ( $feed_args['feed_location'] === $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location ) {
-			// Feed registered.
-			$registered = $merchant['data']->product_pin_feed_profile->id;
-			self::log( 'Feed registered for merchant: ' . $feed_args['feed_location'] );
+
 		} else {
-			$product_pin_feed_profile    = $merchant['data']->product_pin_feed_profile;
-			$product_pin_feed_profile_id = false;
-			$prev_registered             = self::get_registered_feed_id();
-			if ( false !== $prev_registered ) {
-				try {
-					$feed                        = API\Base::get_merchant_feed( $merchant['data']->id, $prev_registered );
-					$product_pin_feed_profile_id = $feed['data']->feed_profile_id;
-				} catch ( \Throwable $e ) {
-					$product_pin_feed_profile_id = false;
-				}
-			}
 
-			if ( false === $product_pin_feed_profile_id ) {
-				$configured_path = dirname( $product_pin_feed_profile->location_config->full_feed_fetch_location );
-				$local_path      = dirname( $feed_args['feed_location'] );
+			// Update feed if we don't have a feed_id saved or if local feed is not properly registered.
+			// for cases where the already existed in the API.
+			$registered = self::get_registered_feed_id();
 
-				if ( $configured_path === $local_path && $feed_args['country'] === $product_pin_feed_profile->country && $feed_args['locale'] === $product_pin_feed_profile->locale ) {
-					// We can assume we're on the same site.
+			if ( ! $registered || ! Feeds::is_local_feed_registered( $merchant['data']->id ) ) {
 
-					$product_pin_feed_profile_id = $product_pin_feed_profile->id;
-				}
-			}
+				// The response only contains the merchant id.
+				$response = Merchants::update_or_create_merchant();
 
-			if ( false !== $product_pin_feed_profile_id ) { // We update a feed, if we have one matching our site.
-				// We cannot change the country or locale, so we remove that from the parameters to send.
-				$update_feed_args = $feed_args;
-				unset( $update_feed_args['country'] );
-				unset( $update_feed_args['locale'] );
-
-				// Actually do the update.
-				$feed = API\Base::update_merchant_feed( $product_pin_feed_profile->merchant_id, $product_pin_feed_profile_id, $update_feed_args );
-
-				if ( $feed && 'success' === $feed['status'] && isset( $feed['data']->location_config->full_feed_fetch_location ) ) {
-					$registered = $feed['data']->id;
-					self::log( 'Merchant\'s feed updated to current location: ' . $feed_args['feed_location'] );
-				}
-			} else {
-				// We cannot infer that a feed exists, therefore we create a new one.
-				$registered = self::do_add_merchant_feed( $merchant['data']->id, $feed_args );
+				// The response contains an array with the ID of merchant and feed.
+				$registered = $response['feed_id'];
 			}
 		}
-
-		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $registered );
 
 		return $registered;
 	}

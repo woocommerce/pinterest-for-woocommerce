@@ -31,6 +31,7 @@ import {
 	useSettingsDispatch,
 	useCreateNotice,
 } from '../helpers/effects';
+import connectAdvertiser from '../helpers/connect-advertiser';
 import documentationLinkProps from '../helpers/documentation-link-props';
 
 /**
@@ -162,9 +163,10 @@ const SetupTracking = ( { view = 'settings' } ) => {
 						typeof results[ appSettings?.tracking_tag ] ===
 							'undefined'
 					) {
+						const tagsKeys = Object.keys( results );
 						handleOptionChange(
 							'tracking_tag',
-							Object.keys( results )[ 0 ]
+							results[ tagsKeys[ 0 ] ].id
 						);
 					}
 				} else {
@@ -283,14 +285,40 @@ const SetupTracking = ( { view = 'settings' } ) => {
 	};
 
 	const handleCompleteSetup = async () => {
-		recordEvent( 'pfw_setup', {
-			target: 'complete',
-			trigger: 'setup-tracking-complete',
-		} );
-		// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
-		const path = getNewPath( {}, '/pinterest/settings', {} );
+		try {
+			const result = await connectAdvertiser(
+				appSettings.tracking_advertiser,
+				appSettings.tracking_tag
+			);
 
-		window.location = new URL( wcSettings.adminUrl + path );
+			if ( result ) {
+				createNotice(
+					'success',
+					__(
+						'The advertiser was connected successfully.',
+						'pinterest-for-woocommerce'
+					)
+				);
+			}
+
+			recordEvent( 'pfw_setup', {
+				target: 'complete',
+				trigger: 'setup-tracking-complete',
+			} );
+
+			// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
+			const path = getNewPath( {}, '/pinterest/settings', {} );
+
+			window.location = new URL( wcSettings.adminUrl + path );
+		} catch ( error ) {
+			createNotice(
+				'error',
+				__(
+					'There was a problem connecting the advertiser.',
+					'pinterest-for-woocommerce'
+				)
+			);
+		}
 	};
 
 	return (
