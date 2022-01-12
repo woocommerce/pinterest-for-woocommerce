@@ -5,6 +5,7 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Feed;
 use \WC_Unit_Test_Case;
 use \WC_Product_Variable;
 use \WC_Helper_Product;
+use \ReflectionClass;
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
 /**
  * Feed file generation testing class.
@@ -395,9 +396,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 * @param string $attribute
 	 * @return function
 	 */
-	public function getProductsXmlFeedAttributeMethod( $attribute ) {
+	private function getProductsXmlFeedAttributeMethod( $attribute ) {
 		$method_name = 'get_property_' . str_replace( ':', '_', $attribute );
-		$class       = new \ReflectionClass('Automattic\WooCommerce\Pinterest\ProductsXmlFeed');
+		$class       = new ReflectionClass( ProductsXmlFeed::class );
 		$method      = $class->getMethod( $method_name );
 		$method->setAccessible(true);
 
