@@ -444,7 +444,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$attribute_manager->update( $product, $condition );
 
 		$xml = $method->invoke( null, $product, '' );
-		// Condition attribute was set, we should see it in the output.
+		// Google product category attribute was set, we should see it in the output.
 		$this->assertEquals( '<g:google_product_category>Arts &amp; Entertainment &gt; Hobbies &amp; Creative Arts &gt; Arts &amp; Crafts &gt; Art &amp; Craft Kits &gt; Jewelry Making Kits</g:google_product_category>' . PHP_EOL, $xml );
 	}
 
