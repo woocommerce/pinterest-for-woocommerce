@@ -331,7 +331,8 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$price_method      = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
 		$product           = new WC_Product_Variable();
 		$variation_product = WC_Helper_Product::create_variation_product( $product );
-		/* In UT flow we need to fetch the product again from the DB after creation.
+		/*
+		 * In UT flow we need to fetch the product again from the DB after creation.
 		 * This ensures correct initialization of visible variations.
 		 * Without that the variable price methods think that we don't have visible children.
 		 * Quirk of create_variation_product.
