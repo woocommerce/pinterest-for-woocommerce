@@ -8,8 +8,13 @@ use \WC_Helper_Product;
 use \ReflectionClass;
 
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
+use Automattic\WooCommerce\Pinterest\Product\GoogleProductTaxonomy;
+use Automattic\WooCommerce\Pinterest\Product\GoogleCategorySearch;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\Condition;
+use Automattic\WooCommerce\Pinterest\Product\Attributes\GoogleCategory;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
+use ReflectionMethod;
+
 /**
  * Feed file generation testing class.
  */
@@ -397,7 +402,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 */
-	public function testAttributesXML() {
+	public function testAttributesConditionXML() {
 		$method = ( new ReflectionClass( ProductsXmlFeed::class ) )->getMethod( 'get_attributes_xml' );
 		$method->setAccessible( true );
 
@@ -413,6 +418,34 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$xml = $method->invoke( null, $product, '' );
 		// Condition attribute was set, we should see it in the output.
 		$this->assertEquals( '<g:condition>new</g:condition>' . PHP_EOL, $xml );
+	}
+
+	/**
+	 * @group feed
+	 *
+	 * Since GoogleCategory is not validated we would end up with yet another test like testAttributesConditionXML.
+	 * To make this a bit more useful this will be more of an integration test.
+	 */
+	public function testAttributesGoogleCategoryXML() {
+		$method = ( new ReflectionClass( ProductsXmlFeed::class ) )->getMethod( 'get_attributes_xml' );
+		$method->setAccessible( true );
+
+		$product = WC_Helper_Product::create_simple_product();
+		$xml = $method->invoke( null, $product, '\t' );
+		// No attributes set, output should be empty.
+		$this->assertEquals( '', $xml );
+
+		$full_category_name_method = new ReflectionMethod( GoogleCategorySearch::class, 'full_category_name' );
+		$full_category_name_method->setAccessible( true );
+		$taxonomy                  = GoogleProductTaxonomy::TAXONOMY[502979]; // Randomly selected category - i just made sure that it has parent.
+		$full_taxonomy_name        = $full_category_name_method->invoke( new GoogleCategorySearch(), $taxonomy );
+		$condition                 = new GoogleCategory( $full_taxonomy_name );
+		$attribute_manager = AttributeManager::instance();
+		$attribute_manager->update( $product, $condition );
+
+		$xml = $method->invoke( null, $product, '' );
+		// Condition attribute was set, we should see it in the output.
+		$this->assertEquals( '<g:google_product_category>Arts &amp; Entertainment &gt; Hobbies &amp; Creative Arts &gt; Arts &amp; Crafts &gt; Art &amp; Craft Kits &gt; Jewelry Making Kits</g:google_product_category>' . PHP_EOL, $xml );
 	}
 
 	/**
