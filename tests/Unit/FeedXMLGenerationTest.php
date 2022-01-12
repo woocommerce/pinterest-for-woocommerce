@@ -61,46 +61,46 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$this->assertEquals( $product->get_id(), $g_children['id']);
 
 		// Not a variation so no item group id.
-		$this->assertArrayNotHasKey( "item_group_id", $children, "Simple products should not have the item_group_id set." );
+		$this->assertArrayNotHasKey( 'item_group_id', $children, 'Simple products should not have the item_group_id set.' );
 
 		// From WC_Helper_Product.
-		$this->assertEquals( "Dummy Product", $children['title'] );
+		$this->assertEquals( 'Dummy Product', $children['title'] );
 
 		// No description set.
-		$this->assertArrayNotHasKey( "description", $children, "Description not set, the key should not be set." );
+		$this->assertArrayNotHasKey( 'description', $children, 'Description not set, the key should not be set.' );
 
 		// Product type not set.
-		$this->assertEquals( "Uncategorized", $g_children['product_type'] );
+		$this->assertEquals( 'Uncategorized', $g_children['product_type'] );
 
 		// This should be the permalink.
-		$this->assertEquals( "http://example.org/?product=dummy-product", $children['link'] );
+		$this->assertEquals( 'http://example.org/?product=dummy-product', $children['link'] );
 
 		// No description set.
-		$this->assertArrayNotHasKey( "image_link", $g_children, "By default product does not have an image link." );
+		$this->assertArrayNotHasKey( 'image_link', $g_children, 'By default product does not have an image link.' );
 
 		// Default availability from WC_Helper_Product.
-		$this->assertEquals( "in stock", $g_children['availability'] );
+		$this->assertEquals( 'in stock', $g_children['availability'] );
 
 		// Default price from WC_Helper_Product.
-		$this->assertEquals( "10USD", $g_children['price'] );
+		$this->assertEquals( '10USD', $g_children['price'] );
 
 		// No description set.
-		$this->assertArrayNotHasKey( "image_link", $g_children, "By default product does not have an image link." );
+		$this->assertArrayNotHasKey( 'image_link', $g_children, "By default product does not have an image link." );
 
 		// No sale price set.
-		$this->assertArrayNotHasKey( "sale_price", $children, "By default product does not have a sale price." );
+		$this->assertArrayNotHasKey( 'sale_price', $children, "By default product does not have a sale price." );
 
 		// Dummy SKU from WC_Helper_Product
-		$this->assertEquals( "DUMMY SKU", $g_children['mpn'] );
+		$this->assertEquals( 'DUMMY SKU', $g_children['mpn'] );
 
 		// We don't support tax collumn yet.
-		$this->assertArrayNotHasKey( "tax", $g_children, "When tax becomes supported this test should be updated." );
+		$this->assertArrayNotHasKey( 'tax', $g_children, 'When tax becomes supported this test should be updated.' );
 
 		// We don't support shipping collumn yet.
-		$this->assertArrayNotHasKey( "shipping", $g_children, "When shipping becomes supported this test should be updated." );
+		$this->assertArrayNotHasKey( 'shipping', $g_children, 'When shipping becomes supported this test should be updated.' );
 
 		// g:additional_image_link.
-		$this->assertArrayNotHasKey( "additional_image_link", $g_children, "By default we don't have additional image links." );
+		$this->assertArrayNotHasKey( 'additional_image_link', $g_children, 'By default we don\'t have additional image links.' );
 
 	}
 
@@ -204,7 +204,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product      = WC_Helper_Product::create_simple_product();
 		$xml          = $title_method( $product );
 		// create_simple_product gives the product `Dummy Product` title.
-		$this->assertEquals( "<title><![CDATA[Dummy Product]]></title>", $xml );
+		$this->assertEquals( '<title><![CDATA[Dummy Product]]></title>', $xml );
 	}
 
 	/**
@@ -215,7 +215,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product             = WC_Helper_Product::create_simple_product();
 		$xml                 = $product_type_method( $product );
 		// create_simple_product gives the product 'Uncategorized' type.
-		$this->assertEquals( "<g:product_type>Uncategorized</g:product_type>", $xml );
+		$this->assertEquals( '<g:product_type>Uncategorized</g:product_type>', $xml );
 	}
 
 	/**
@@ -229,7 +229,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$variation_product    = wc_get_product( $variation_product_id );
 		$xml                  = $product_type_method( $variation_product );
 		// create_simple_product gives the product 'Uncategorized' type.
-		$this->assertEquals( "<g:product_type>Uncategorized</g:product_type>", $xml );
+		$this->assertEquals( '<g:product_type>Uncategorized</g:product_type>', $xml );
 	}
 
 	/**
@@ -240,7 +240,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product     = WC_Helper_Product::create_simple_product();
 		$xml         = $link_method( $product );
 		// create_simple_product gives the product 'Uncategorized' type.
-		$this->assertEquals( "<link><![CDATA[http://example.org/?product=dummy-product]]></link>", $xml );
+		$this->assertEquals( '<link><![CDATA[http://example.org/?product=dummy-product]]></link>', $xml );
 	}
 
 	/**
@@ -266,7 +266,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product->save();
 
 		$xml = $image_link_method( $product );
-		$this->assertEquals( "<g:image_link><![CDATA[http://example.org/wp-content/uploads/product_image.png]]></g:image_link>", $xml );
+		$this->assertEquals( '<g:image_link><![CDATA[http://example.org/wp-content/uploads/product_image.png]]></g:image_link>', $xml );
 	}
 
 	/**
@@ -279,17 +279,17 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// Set different statuses and test.
 		$product->set_stock_status( 'instock' );
 		$xml = $availability_method( $product );
-		$this->assertEquals( "<g:availability>in stock</g:availability>", $xml );
+		$this->assertEquals( '<g:availability>in stock</g:availability>', $xml );
 
 		$product->set_stock_status( 'outofstock' );
 		$xml = $availability_method( $product );
 		// create_simple_product gives the product 'Uncategorized' type.
-		$this->assertEquals( "<g:availability>out of stock</g:availability>", $xml );
+		$this->assertEquals( '<g:availability>out of stock</g:availability>', $xml );
 
 		$product->set_stock_status( 'onbackorder' );
 		$xml = $availability_method( $product );
 		// create_simple_product gives the product 'Uncategorized' type.
-		$this->assertEquals( "<g:availability>preorder</g:availability>", $xml );
+		$this->assertEquals( '<g:availability>preorder</g:availability>', $xml );
 	}
 
 	/**
@@ -299,7 +299,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$price_method = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
 		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
 		$xml          = $price_method( $product );
-		$this->assertEquals( "<g:price>15USD</g:price>", $xml );
+		$this->assertEquals( '<g:price>15USD</g:price>', $xml );
 	}
 
 	/**
@@ -317,12 +317,12 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product = WC_Helper_Product::create_simple_product(
 			true,
 			array(
-				"regular_price" => 15,
-				"sale_price"    => 5
+				'regular_price' => 15,
+				'sale_price'    => 5,
 			)
 		);
 		$xml     = $sale_price_method( $product );
-		$this->assertEquals( "<sale_price>5USD</sale_price>", $xml );
+		$this->assertEquals( '<sale_price>5USD</sale_price>', $xml );
 	}
 
 	/**
@@ -341,7 +341,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product = wc_get_product( $variation_product->get_id() );
 		$xml     = $price_method( $product );
 		// 10.00USD is the cheapest variation created by create_variation_product
-		$this->assertEquals( "<g:price>10.00USD</g:price>", $xml );
+		$this->assertEquals( '<g:price>10.00USD</g:price>', $xml );
 	}
 
 	/**
@@ -351,7 +351,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$mpn_method = $this->getProductsXmlFeedAttributeMethod( 'g:mpn' );
 		$product    = WC_Helper_Product::create_simple_product();
 		$xml        = $mpn_method( $product );
-		$this->assertEquals( "<g:mpn>DUMMY SKU</g:mpn>", $xml );
+		$this->assertEquals( '<g:mpn>DUMMY SKU</g:mpn>', $xml );
 	}
 
 	/**
@@ -386,7 +386,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product->save();
 
 		$xml = $additional_image_link_method( $product );
-		$this->assertEquals( "<g:additional_image_link><![CDATA[http://example.org/wp-content/uploads/product_image_1.png,http://example.org/wp-content/uploads/product_image_2.png]]></g:additional_image_link>", $xml );
+		$this->assertEquals( '<g:additional_image_link><![CDATA[http://example.org/wp-content/uploads/product_image_1.png,http://example.org/wp-content/uploads/product_image_2.png]]></g:additional_image_link>', $xml );
 	}
 
 	/**
@@ -400,7 +400,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$method_name = 'get_property_' . str_replace( ':', '_', $attribute );
 		$class       = new ReflectionClass( ProductsXmlFeed::class );
 		$method      = $class->getMethod( $method_name );
-		$method->setAccessible(true);
+		$method->setAccessible( true );
 
 		return function( $product ) use ( $method, $attribute ) {
 			return $method->invoke( null, $product, $attribute );
