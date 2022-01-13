@@ -256,8 +256,8 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		// Add dummy image entry.
 		$attachment = array(
-			'post_mime_type' => 'image/png'
-		,   'post_title'     => 'product image'
+			'post_mime_type' => 'image/png',
+			'post_title'     => 'product image',
 		);
 		$attachment_id = wp_insert_attachment( $attachment, 'product_image.png', $product->get_id() );
 
