@@ -2,18 +2,18 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Feed;
 
+use ReflectionClass;
+use ReflectionMethod;
+use \WC_Helper_Product;
 use \WC_Unit_Test_Case;
 use \WC_Product_Variable;
-use \WC_Helper_Product;
-use \ReflectionClass;
 
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
-use Automattic\WooCommerce\Pinterest\Product\GoogleProductTaxonomy;
 use Automattic\WooCommerce\Pinterest\Product\GoogleCategorySearch;
+use Automattic\WooCommerce\Pinterest\Product\GoogleProductTaxonomy;
+use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\Condition;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\GoogleCategory;
-use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
-use ReflectionMethod;
 
 /**
  * Feed file generation testing class.
