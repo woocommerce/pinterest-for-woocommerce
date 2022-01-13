@@ -54,16 +54,8 @@ tests_add_filter( 'setup_theme', function () {
 // Start up the WP testing environment.
 require "{$wp_tests_dir}/includes/bootstrap.php";
 
-// Include WooCommerce test helpers
-$wc_tests_dir = $wc_dir . '/tests';
-if ( file_exists( $wc_dir . '/tests/legacy/bootstrap.php' ) ) {
-	$wc_tests_dir .= '/legacy';
-}
-require_once $wc_tests_dir . '/includes/wp-http-testcase.php';
-require_once $wc_tests_dir . '/framework/helpers/class-wc-helper-product.php';
-require_once $wc_tests_dir . '/framework/helpers/class-wc-helper-shipping.php';
-require_once $wc_tests_dir . '/framework/helpers/class-wc-helper-customer.php';
-require_once $wc_tests_dir . '/framework/vendor/class-wp-test-spy-rest-server.php';
+// Start up the WC testing environment.
+require_once $wc_dir . '/tests/legacy/bootstrap.php';
 
 /**
  * Load WooCommerce for testing
