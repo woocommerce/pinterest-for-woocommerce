@@ -119,4 +119,3 @@ register_deactivation_hook(
 		Automattic\WooCommerce\Pinterest\ProductSync::cancel_jobs();
 	}
 );
-
