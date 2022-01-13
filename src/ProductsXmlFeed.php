@@ -363,6 +363,10 @@ class ProductsXmlFeed {
 
 	private static function get_property_g_shipping( $product, $property ) {
 		$column        = self::prepare_shipping_column( $product );
+
+		if ( empty( $column ) ) {
+			return '';
+		}
 		return '<' . $property . '>' . $column . '</' . $property . '>';
 	}
 
