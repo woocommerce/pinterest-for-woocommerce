@@ -10,6 +10,7 @@ namespace Automattic\WooCommerce\Pinterest;
 
 use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
 use WC_Product_Variation;
+use WC_Product;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
