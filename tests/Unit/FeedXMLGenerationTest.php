@@ -407,7 +407,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$method->setAccessible( true );
 
 		$product = WC_Helper_Product::create_simple_product();
-		$xml = $method->invoke( null, $product, '\t' );
+		$xml = $method->invoke( null, $product, '' );
 		// No attributes set, output should be empty.
 		$this->assertEquals( '', $xml );
 
@@ -431,7 +431,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$method->setAccessible( true );
 
 		$product = WC_Helper_Product::create_simple_product();
-		$xml = $method->invoke( null, $product, '\t' );
+		$xml = $method->invoke( null, $product, '' );
 		// No attributes set, output should be empty.
 		$this->assertEquals( '', $xml );
 
