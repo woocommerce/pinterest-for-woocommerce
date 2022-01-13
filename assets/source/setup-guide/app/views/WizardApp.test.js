@@ -32,10 +32,6 @@ const stepOne = /Set up your business account/;
 const stepTwo = /Claim your website/;
 const stepThree = /Track conversions/;
 
-afterEach( () => {
-	jest.clearAllMocks();
-} );
-
 describe( 'WizardApp component', () => {
 	describe( 'First rendering', () => {
 		let rendered;
@@ -44,12 +40,12 @@ describe( 'WizardApp component', () => {
 			wcSettings.pinterest_for_woocommerce.isConnected = false;
 			rendered = render( <WizardApp /> );
 		} );
-		test( 'should show all options and not clickables button in the Stepper', () => {
+		test( 'should show all options and first step should be clickable', () => {
 			expect( rendered.getByText( stepOne ) ).toBeInTheDocument();
 			expect( rendered.getByText( stepTwo ) ).toBeInTheDocument();
 			expect( rendered.getByText( stepThree ) ).toBeInTheDocument();
 
-			expect( rendered.queryAllByRole( 'button' ).length ).toBe( 0 );
+			expect( rendered.queryAllByRole( 'button' ).length ).toBe( 1 );
 		} );
 	} );
 	describe( 'First step is completed', () => {
