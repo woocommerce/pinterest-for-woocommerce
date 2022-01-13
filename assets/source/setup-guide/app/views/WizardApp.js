@@ -47,7 +47,6 @@ const WizardApp = () => {
 
 	const appSettings = useSettingsSelect();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
-	const isTrackingConfigured = useSettingsSelect( 'isTrackingConfigured' );
 
 	//Subscribe history listening
 	useEffect( () => {
@@ -82,13 +81,13 @@ const WizardApp = () => {
 				setIsBusinessConnected,
 				isBusinessConnected,
 			},
-			isClickable: isBusinessConnected,
+			isClickable: true,
 		},
 		{
 			key: 'claim-website',
 			container: ClaimWebsite,
 			label: __( 'Claim your website', 'pinterest-for-woocommerce' ),
-			isClickable: isBusinessConnected || isDomainVerified,
+			isClickable: isBusinessConnected,
 		},
 		{
 			key: 'setup-tracking',
@@ -97,7 +96,7 @@ const WizardApp = () => {
 				'Track conversions with the Pinterest tag',
 				'pinterest-for-woocommerce'
 			),
-			isClickable: isDomainVerified || isTrackingConfigured,
+			isClickable: isBusinessConnected && isDomainVerified,
 		},
 	];
 
