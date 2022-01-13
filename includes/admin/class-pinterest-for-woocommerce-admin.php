@@ -365,7 +365,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				'switchBusinessAccountUrl' => $this->get_switch_business_account_url(),
 				'homeUrlToVerify'          => home_url(),
 				'storeCountry'             => $store_country,
-				'isAdsSupportedCountry'    => in_array( $store_country, $this->get_ads_supported_countries(), true ),
+				'isAdsSupportedCountry'    => in_array( $store_country, self::get_ads_supported_countries(), true ),
 				'isConnected'              => ! empty( Pinterest_For_Woocommerce()::is_connected() ),
 				'isBusinessConnected'      => ! empty( Pinterest_For_Woocommerce()::is_business_connected() ),
 				'businessAccounts'         => Pinterest_For_Woocommerce()::get_linked_businesses(),
@@ -521,7 +521,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		 *
 		 * @return string[]
 		 */
-		static function get_ads_supported_countries() {
+		public static function get_ads_supported_countries() {
 			return array(
 				'AU', // Australia.
 				'AT', // Austria.
