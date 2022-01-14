@@ -26,7 +26,7 @@ import {
  * Onboarding Wizard component.
  *
  * @param {Object} props React props.
- * @param {Object} [props.query] The current query string, parsed into an object, from history.
+ * @param {Object} props.query The current query string, parsed into an object, from the page URL.
  *
  * @fires wcadmin_pfw_setup with `{ target: 'setup-account' | 'claim-website' | 'setup-tracking', trigger: 'wizard-stepper' }` when wizard's header step is clicked.
  * @fires wcadmin_pfw_setup with `{ target: 'claim-website' , trigger: 'setup-account-continue' }` when continue button is clicked.
