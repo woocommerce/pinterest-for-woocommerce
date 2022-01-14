@@ -5,7 +5,9 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Feed;
 use ReflectionClass;
 use \WC_Cache_Helper;
 use \WC_Helper_Product;
+use \WC_Shipping_Rate;
 use \WC_Shipping_Zone;
+use \WC_Shipping_Zones;
 use \WC_Unit_Test_Case;
 
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
@@ -49,7 +51,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testPropertyShippingWithShippingZonesXML() {
+	public function testPropertyShippingWithFreeShippingXML() {
 		$product    = WC_Helper_Product::create_simple_product();
 
 		// US zone.
@@ -57,12 +59,50 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		$zone->set_zone_name( 'US' );
 		$zone->set_zone_order( 4 );
 		$zone->add_location( 'US', 'country' );
+		$zone->add_shipping_method( 'free_shipping' );
 		$zone->save();
-
-		$shipping_method_id = $zone->add_shipping_method( 'free_shipping' );
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( $product );
 		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD</g:shipping>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 * @group shipping
+	 */
+	public function testPropertyShippingWithFlatRateShippingXML() {
+		$product    = WC_Helper_Product::create_simple_product();
+
+		// US zone.
+		$zone = new WC_Shipping_Zone();
+		$zone->set_zone_name( 'US' );
+		$zone->set_zone_order( 4 );
+		$zone->add_location( 'US', 'country' );
+		$instance_id = $zone->add_shipping_method( 'flat_rate' );
+		$zone->save();
+
+		$shipping_method = WC_Shipping_Zones::get_shipping_method( $instance_id );
+
+		$shipping_method_configuration = array(
+			'woocommerce_flat_rate_title'         => 'Flat rate',
+			'woocommerce_flat_rate_tax_status'    => 'taxable',
+			'woocommerce_flat_rate_cost'          => '15',
+			'woocommerce_flat_rate_class_cost_19' => '',
+			'woocommerce_flat_rate_no_class_cost' => '',
+			'woocommerce_flat_rate_type'          => 'class',
+			'instance_id'                         => $instance_id
+		);
+
+		$shipping_method->set_post_data( $shipping_method_configuration );
+
+		// Cheat process_admin_options that this is a shipping method save request.
+		$_REQUEST['instance_id'] = $instance_id;
+		$shipping_method->process_admin_options();
+
+		WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' );
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( $product );
+		$this->assertEquals( '<g:shipping>US::Flat rate:15.00 USD</g:shipping>', $xml );
 	}
 
 	/**
