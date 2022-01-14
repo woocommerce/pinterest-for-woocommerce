@@ -10,6 +10,7 @@ jest.mock( '../data/settings/selectors', () => ( {
 import { recordEvent } from '@woocommerce/tracks';
 import '@testing-library/jest-dom';
 import { fireEvent, render } from '@testing-library/react';
+import { getQuery } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
@@ -38,7 +39,7 @@ describe( 'WizardApp component', () => {
 		beforeEach( () => {
 			wcSettings.pinterest_for_woocommerce.isBusinessConnected = false;
 			wcSettings.pinterest_for_woocommerce.isConnected = false;
-			rendered = render( <WizardApp /> );
+			rendered = render( <WizardApp query={ getQuery() } /> );
 		} );
 		test( 'should show all options and first step should be clickable', () => {
 			expect( rendered.getByText( stepOne ) ).toBeInTheDocument();
@@ -54,7 +55,7 @@ describe( 'WizardApp component', () => {
 		beforeEach( () => {
 			wcSettings.pinterest_for_woocommerce.isBusinessConnected = true;
 			wcSettings.pinterest_for_woocommerce.isConnected = true;
-			rendered = render( <WizardApp /> );
+			rendered = render( <WizardApp query={ getQuery() } /> );
 		} );
 
 		test( 'should step 1 & 2 be clickable in the stepper', () => {
@@ -78,7 +79,7 @@ describe( 'WizardApp component', () => {
 			wcSettings.pinterest_for_woocommerce.isBusinessConnected = true;
 			wcSettings.pinterest_for_woocommerce.isConnected = true;
 			isDomainVerified.mockImplementation( () => true );
-			rendered = render( <WizardApp /> );
+			rendered = render( <WizardApp query={ getQuery() } /> );
 		} );
 
 		test( 'should 3 steps button be clickable in the stepper', () => {
@@ -122,7 +123,7 @@ describe( 'WizardApp component', () => {
 			wcSettings.pinterest_for_woocommerce.isConnected = true;
 			isDomainVerified.mockImplementation( () => true );
 			isTrackingConfigured.mockImplementation( () => true );
-			rendered = render( <WizardApp /> );
+			rendered = render( <WizardApp query={ getQuery() } /> );
 		} );
 
 		test( 'should all three steps be clickable buttons', () => {

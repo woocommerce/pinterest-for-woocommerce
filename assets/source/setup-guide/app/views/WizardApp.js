@@ -6,11 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { createElement, useState, useEffect } from '@wordpress/element';
 import { Spinner, Stepper } from '@woocommerce/components';
 import { recordEvent } from '@woocommerce/tracks';
-import {
-	getHistory,
-	getQuery,
-	updateQueryString,
-} from '@woocommerce/navigation';
+import { updateQueryString } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
@@ -29,14 +25,16 @@ import {
 /**
  * Onboarding Wizard component.
  *
+ * @param {Object} props React props.
+ * @param {Object} [props.query] The current query string, parsed into an object, from history.
+ *
  * @fires wcadmin_pfw_setup with `{ target: 'setup-account' | 'claim-website' | 'setup-tracking', trigger: 'wizard-stepper' }` when wizard's header step is clicked.
  * @fires wcadmin_pfw_setup with `{ target: 'claim-website' , trigger: 'setup-account-continue' }` when continue button is clicked.
  * @fires wcadmin_pfw_setup with `{ target: 'setup-tracking', trigger: 'claim-website-continue' }` when continue button is clicked.
  *
  * @return {JSX.Element} Rendered element.
  */
-const WizardApp = () => {
-	const [ currentStep, setCurrentStep ] = useState();
+const WizardApp = ( { query } ) => {
 	const [ isConnected, setIsConnected ] = useState(
 		wcSettings.pinterest_for_woocommerce.isConnected
 	);
@@ -47,16 +45,6 @@ const WizardApp = () => {
 
 	const appSettings = useSettingsSelect();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
-
-	//Subscribe history listening
-	useEffect( () => {
-		const unlisten = getHistory().listen( () => {
-			setCurrentStep( getQuery().step );
-		} );
-
-		//cleanup function to avoid memory leaks
-		return unlisten;
-	}, [] );
 
 	useEffect( () => {
 		if ( ! isConnected ) {
@@ -103,7 +91,7 @@ const WizardApp = () => {
 	const getSteps = () => {
 		return steps.map( ( step ) => {
 			const container = createElement( step.container, {
-				query: getQuery(),
+				query,
 				step,
 				goToNextStep: () => goToNextStep( step ),
 				view: 'wizard',
@@ -133,7 +121,6 @@ const WizardApp = () => {
 	};
 
 	const getCurrentStep = () => {
-		const query = getQuery();
 		const step = steps.find( ( s ) => s.key === query.step );
 
 		if ( ! step ) {
@@ -159,11 +146,7 @@ const WizardApp = () => {
 		return updateQueryString( { step: nextStep.key } );
 	};
 
-	if ( ! currentStep ) {
-		setCurrentStep( getCurrentStep() );
-
-		return <Spinner />;
-	}
+	const currentStep = getCurrentStep();
 
 	return (
 		<>
