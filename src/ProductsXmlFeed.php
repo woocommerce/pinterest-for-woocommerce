@@ -43,7 +43,7 @@ class ProductsXmlFeed {
 		'g:additional_image_link',
 	);
 
-	private static $shipping = null;
+	static $shipping = null;
 
 
 	/**
