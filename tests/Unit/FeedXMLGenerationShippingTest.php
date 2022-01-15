@@ -123,6 +123,22 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * @group feed
+	 * @group shipping
+	 */
+	public function testPropertyShippingForContinentWithFlatRateShippingXML() {
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['NA', 'continent']
+			]
+		);
+		ShippingHelpers::addFlatRateShippingMethodToZone( $zone );
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '<g:shipping>CA::Flat rate:15.00 USD,US::Flat rate:15.00 USD</g:shipping>', $xml );
+	}
+
+	/**
 	 * Helper function for extracting the static private members of the ProductsXmlFeed class.
 	 * Gets the property method then just pass the product and voila.
 	 *
