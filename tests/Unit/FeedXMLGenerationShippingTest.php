@@ -89,13 +89,22 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		$this->assertEquals( '<g:shipping>US::Flat rate:15.00 USD</g:shipping>', $xml );
 	}
 
-	// /**
-	//  * @group feed
-	//  * @group shipping
-	//  */
-	// public function testMultipleCountriesNoShippingXML(){
-
-	// }
+	/**
+	 * @group feed
+	 * @group shipping
+	 */
+	public function testMultipleCountriesNoShippingXML(){
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['US', 'country'],
+				['UK', 'country'],
+				['IT', 'country'],
+			]
+		);
+		$zone->add_shipping_method( 'free_shipping' );
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD,IT::Free shipping:0.00 USD</g:shipping>', $xml );
+	}
 
 	/**
 	 * Helper function for extracting the static private members of the ProductsXmlFeed class.
