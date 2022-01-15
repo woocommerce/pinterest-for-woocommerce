@@ -47,4 +47,28 @@ class ShippingHelpers {
 
 		WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' );
 	}
+
+	/**
+	 * Adds a predefined flat rate shipping method to zone.
+	 * No additional settings.
+	 */
+	public static function addFreeShippingWithMinimumOrderAmount( $zone ) {
+		$instance_id = $zone->add_shipping_method( 'free_shipping' );
+		$shipping_method = WC_Shipping_Zones::get_shipping_method( $instance_id );
+
+		$shipping_method_configuration = array(
+			'woocommerce_free_shipping_title'      => 'Free shipping',
+			'woocommerce_free_shipping_requires'   => 'min_amount',
+			'woocommerce_free_shipping_min_amount' => 50,
+			'instance_id'                          => $instance_id
+		);
+
+		$shipping_method->set_post_data( $shipping_method_configuration );
+
+		// Cheat process_admin_options that this is a shipping method save request.
+		$_REQUEST['instance_id'] = $instance_id;
+		$shipping_method->process_admin_options();
+
+		WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' );
+	}
 }

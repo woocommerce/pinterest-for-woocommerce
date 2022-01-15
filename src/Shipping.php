@@ -15,6 +15,11 @@ use \WC_Data_Store;
  */
 class Shipping {
 
+	/**
+	 * Shipping supports:
+	 * - free shipping without additional settings.
+	 */
+
 	public function get_zones() {
 		$data_store = WC_Data_Store::load( 'shipping-zone' );
 		$raw_zones  = $data_store->get_zones();
