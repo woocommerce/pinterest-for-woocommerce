@@ -5,7 +5,7 @@ class ShippingHelpers {
 	public static function createZoneWithLocations( $locations ) {
 		// US zone.
 		$zone = new WC_Shipping_Zone();
-		$zone->set_zone_name( print_r( $locations, true ) );
+		$zone->set_zone_name( array_reduce( $locations, function( $c, $l ) { return $c . '_' . implode( '_', $l ); }, '' ) );
 		$zone->set_zone_order( 4 );
 		$shipping_locations = array_map(
 			function( $location ) {
