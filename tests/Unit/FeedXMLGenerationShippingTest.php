@@ -37,11 +37,14 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		$shipping = ( new ReflectionClass( ProductsXmlFeed::class ) )->getProperty( 'shipping' );
 		$shipping->setAccessible( 'true' );
 		$shipping->setValue( null );
+
+
+		$this->products[] = WC_Helper_Product::create_simple_product();
 	}
 
 	public function teardown() {
 		foreach( $this->products as $product ) {
-			$product->delete();
+			$product->delete( true );
 		}
 	}
 
@@ -50,7 +53,6 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 * @group shipping
 	 */
 	public function testPropertyShippingNoShippingZonesXML() {
-		$this->products[] = WC_Helper_Product::create_simple_product();
 		$xml        = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$this->assertEquals( '', $xml );
 	}
@@ -60,8 +62,6 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 * @group shipping
 	 */
 	public function testPropertyShippingWithFreeShippingXML() {
-		$product    = WC_Helper_Product::create_simple_product();
-
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['US', 'country']
@@ -69,7 +69,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		);
 		$zone->add_shipping_method( 'free_shipping' );
 
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( $product );
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD</g:shipping>', $xml );
 	}
 
@@ -78,8 +78,6 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 * @group shipping
 	 */
 	public function testPropertyShippingWithFlatRateShippingXML() {
-		$product    = WC_Helper_Product::create_simple_product();
-
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['US', 'country']
@@ -87,7 +85,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		);
 		ShippingHelpers::addFlatRateShippingMethodToZone( $zone );
 
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( $product );
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$this->assertEquals( '<g:shipping>US::Flat rate:15.00 USD</g:shipping>', $xml );
 	}
 
