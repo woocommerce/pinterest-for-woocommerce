@@ -141,7 +141,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testNotSupportedCountriesAreNotOnTheList() {
+	public function testNotSupportedCountries() {
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['PK', 'country']
