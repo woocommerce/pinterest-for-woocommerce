@@ -20,10 +20,10 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	private $products = array();
 
 	public static function setUpBeforeClass(): void
-    {
+	{
 		// Normally this would be loaded but not in the test scenario - so lets load it manually.
 		include_once 'includes/admin/class-pinterest-for-woocommerce-admin.php';
-    }
+	}
 
 	public function setUp() {
 		// Reset WooCommerce shipping data and cache.
@@ -34,10 +34,9 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' );
 
 		// Reset plugin shipping cache.
-		$shipping = ( new ReflectionClass( ProductsXmlFeed::class ) )->getProperty( 'shipping' );
-		$shipping->setAccessible( 'true' );
-		$shipping->setValue( null );
-
+		$shipping_zones = ( new ReflectionClass( ProductsXmlFeed::class ) )->getProperty( 'shipping_zones' );
+		$shipping_zones->setAccessible( 'true' );
+		$shipping_zones->setValue( null );
 
 		$this->products[] = WC_Helper_Product::create_simple_product();
 	}
@@ -52,7 +51,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testPropertyShippingNoShippingZonesXML() {
+	public function testPropertyShippingNoShippingZones() {
 		$xml        = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$this->assertEquals( '', $xml );
 	}
@@ -61,7 +60,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testPropertyShippingWithFreeShippingXML() {
+	public function testPropertyShippingWithFreeShipping() {
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['US', 'country']
@@ -77,7 +76,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testPropertyShippingWithFlatRateShippingXML() {
+	public function testPropertyShippingWithFlatRateShipping() {
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['US', 'country']
@@ -93,7 +92,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testMultipleCountriesNoShippingXML(){
+	public function testMultipleCountriesNoShipping(){
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['US', 'country'],
@@ -110,7 +109,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testPropertyShippingForStateWithFlatRateShippingXML() {
+	public function testPropertyShippingForStateWithFlatRateShipping() {
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['US:CA', 'state']
@@ -126,7 +125,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testPropertyShippingForContinentWithFlatRateShippingXML() {
+	public function testPropertyShippingForContinentWithFlatRateShipping() {
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['NA', 'continent']
@@ -136,6 +135,22 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$this->assertEquals( '<g:shipping>CA::Flat rate:15.00 USD,US::Flat rate:15.00 USD</g:shipping>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 * @group shipping
+	 */
+	public function testNotSupportedCountriesAreNotOnTheList() {
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['PK', 'country']
+			]
+		);
+		ShippingHelpers::addFlatRateShippingMethodToZone( $zone );
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '', $xml );
 	}
 
 	/**

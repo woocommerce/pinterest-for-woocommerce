@@ -43,7 +43,7 @@ class ProductsXmlFeed {
 		'g:additional_image_link',
 	);
 
-	static $shipping = null;
+	static $shipping_zones = null;
 
 
 	/**
@@ -389,11 +389,15 @@ class ProductsXmlFeed {
 	}
 
 	private static function prepare_shipping_column( $product ) {
-		$shipping = self::get_shipping_config();
-		$lines    = array();
-		foreach ( $shipping as $zone ) {
-			$best_shipping = self::get_best_shipping_with_cost( $zone, $product );
-			foreach( $zone->locations as $location ) {
+		$shipping_zones = self::get_shipping_zones();
+		$lines          = array();
+		foreach ( $shipping_zones as $zone ) {
+			$shipping_info = $zone->get_locations_with_shipping();
+			if ( is_null( $shipping_info ) ) {
+				continue;
+			}
+			$best_shipping = self::get_best_shipping_with_cost( $shipping_info, $product );
+			foreach( $shipping_info['locations'] as $location ) {
 				$currency = get_woocommerce_currency();
 				$lines[]  = "$location->country:$location->state:$best_shipping->name:$best_shipping->cost $currency";
 			}
@@ -401,19 +405,19 @@ class ProductsXmlFeed {
 		return implode( ",", $lines );
 	}
 
-	private static function get_shipping_config() {
-		if ( null !== self::$shipping ) {
-			return self::$shipping;
+	private static function get_shipping_zones() {
+		if ( null !== self::$shipping_zones ) {
+			return self::$shipping_zones;
 		}
-		$shipping       = new Shipping();
-		self::$shipping = $shipping->get_shipping();
-		return self::$shipping;
+		$shipping             = new Shipping();
+		self::$shipping_zones = $shipping->get_zones();
+		return self::$shipping_zones;
 	}
 
 	private static function get_best_shipping_with_cost( $zone, $product ) {
-		$package = self::put_product_into_a_shipping_package( $product, reset( $zone->locations ) );
+		$package = self::put_product_into_a_shipping_package( $product, reset( $zone['locations'] ) );
 		$rates   = array();
-		foreach ( $zone->shipping_methods as $shipping_method ) {
+		foreach ( $zone['shipping_methods'] as $shipping_method ) {
 				// Use + instead of array_merge to maintain numeric keys.
 				$rates += $shipping_method->get_rates_for_package( $package );
 		}

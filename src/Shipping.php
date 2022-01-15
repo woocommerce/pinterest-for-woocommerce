@@ -15,11 +15,7 @@ use \WC_Data_Store;
  */
 class Shipping {
 
-	private function map_zone( $zone ) {
-		return $zone->get_locations_with_shipping();
-	}
-
-	private function get_zones() {
+	public function get_zones() {
 		$data_store = WC_Data_Store::load( 'shipping-zone' );
 		$raw_zones  = $data_store->get_zones();
 		$zones      = array();
@@ -29,10 +25,4 @@ class Shipping {
 		}
 		return $zones;
 	}
-
-	public function get_shipping() {
-		$zones = $this->get_zones();
-		return array_map( array( $this, 'map_zone' ), $zones );
-	}
-
 }
