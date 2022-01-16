@@ -38,7 +38,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		$shipping_zones->setAccessible( 'true' );
 		$shipping_zones->setValue( null );
 
-		$this->products[] = WC_Helper_Product::create_simple_product();
+		$this->products[] = WC_Helper_Product::create_simple_product(  true, array( "regular_price" => 15 ) );
 	}
 
 	public function teardown() {
@@ -174,13 +174,29 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testIfFreeShippingMethodWithAdditionalSettingsIsDiscarded() {
+	public function testFreeShippingWithMinimumSetAndMet() {
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['US', 'country']
 			]
 		);
-		ShippingHelpers::addFreeShippingWithMinimumOrderAmount( $zone );
+		ShippingHelpers::addFreeShippingWithMinimumOrderAmount( $zone, 10 );
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD</g:shipping>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 * @group shipping
+	 */
+	public function testFreeShippingWithMinimumSetAndNotMet() {
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['US', 'country']
+			]
+		);
+		ShippingHelpers::addFreeShippingWithMinimumOrderAmount( $zone, 20 );
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$this->assertEquals( '', $xml );

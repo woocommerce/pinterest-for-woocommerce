@@ -115,9 +115,9 @@ class ShippingZone extends WC_Shipping_Zone {
 		}
 
 		// We don't support for now free shipping with additional requirements options.
-		if ( 'free_shipping' === $shipping_method->id and $shipping_method->requires !== '' ) {
-			return false;
-		}
+		// if ( 'free_shipping' === $shipping_method->id and $shipping_method->requires !== '' ) {
+		// 	return false;
+		// }
 
 		return true;
 	}
