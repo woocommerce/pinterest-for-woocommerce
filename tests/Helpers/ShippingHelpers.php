@@ -27,7 +27,7 @@ class ShippingHelpers {
 	 * Adds a predefined flat rate shipping method to zone.
 	 * No additional settings.
 	 */
-	public static function addFlatRateShippingMethodToZone( $zone, $no_class_cost = null ) {
+	public static function addFlatRateShippingMethodToZone( $zone, $no_class_cost = null, $shipping_classes_costs = array() ) {
 		$instance_id = $zone->add_shipping_method( 'flat_rate' );
 		$shipping_method = WC_Shipping_Zones::get_shipping_method( $instance_id );
 
@@ -41,6 +41,11 @@ class ShippingHelpers {
 
 		if ( $no_class_cost ) {
 			$shipping_method_configuration['woocommerce_flat_rate_no_class_cost'] = $no_class_cost;
+		}
+
+		foreach( $shipping_classes_costs as $id => $cost ) {
+			$entry = 'woocommerce_flat_rate_class_cost_' . (string) $id;
+			$shipping_method_configuration[ $entry ] = $cost;
 		}
 
 		$shipping_method->set_post_data( $shipping_method_configuration );
@@ -108,6 +113,8 @@ class ShippingHelpers {
 
 		$inserted_term = wp_insert_term( $name, 'product_shipping_class', $args );
 		$shipping_classes_ids[] = $inserted_term['term_id'];
+
+		return $inserted_term['term_id'];
 	}
 
 	public static function cleanupShippingClasses() {

@@ -223,7 +223,6 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 * @group shipping
-	 * @group failing
 	 */
 	public function testFlatRateShippingWithNoClassCost() {
 		$zone = ShippingHelpers::createZoneWithLocations(
@@ -237,11 +236,41 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		 * Without that the shipping class does not process the shipping classes when it is saved.
 		 */
 		ShippingHelpers::addShippingClass( 'heavy' );
-
 		ShippingHelpers::addFlatRateShippingMethodToZone( $zone, '10 * [qty]' );
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '<g:shipping>US::Flat rate:25.00 USD</g:shipping>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 * @group shipping
+	 */
+	public function testFlatRateShippingWithClassCost() {
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['US', 'country']
+			]
+		);
+
+		/**
+		 * Shipping class needs to be defined before we add shipping method.
+		 * Without that the shipping class does not process the shipping classes when it is saved.
+		 */
+		$class_id = ShippingHelpers::addShippingClass( 'heavy' );
+		ShippingHelpers::addFlatRateShippingMethodToZone( $zone, null, array( $class_id => 17 ) );
+
+		// Product has no class set.
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$this->assertEquals( '<g:shipping>US::Flat rate:15.00 USD</g:shipping>', $xml );
+
+		// Product has the shipping class set.
+		// Product has no class set.
+		$product = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
+		$product->set_shipping_class_id( $class_id );
+		$product->save();
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( $product );
+		$this->assertEquals( '<g:shipping>US::Flat rate:32.00 USD</g:shipping>', $xml );
 	}
 
 	/**
