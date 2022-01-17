@@ -1,5 +1,6 @@
 <?php
 
+use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
 class ShippingHelpers {
 
 	public static $shipping_classes_ids = array();
@@ -27,14 +28,14 @@ class ShippingHelpers {
 	 * Adds a predefined flat rate shipping method to zone.
 	 * No additional settings.
 	 */
-	public static function addFlatRateShippingMethodToZone( $zone, $no_class_cost = null, $shipping_classes_costs = array() ) {
+	public static function addFlatRateShippingMethodToZone( $zone, $cost = 15, $no_class_cost = null, $shipping_classes_costs = array() ) {
 		$instance_id = $zone->add_shipping_method( 'flat_rate' );
 		$shipping_method = WC_Shipping_Zones::get_shipping_method( $instance_id );
 
 		$shipping_method_configuration = array(
 			'woocommerce_flat_rate_title'         => 'Flat rate',
 			'woocommerce_flat_rate_tax_status'    => 'taxable',
-			'woocommerce_flat_rate_cost'          => '15',
+			'woocommerce_flat_rate_cost'          => $cost,
 			'woocommerce_flat_rate_type'          => 'class',
 			'instance_id'                         => $instance_id
 		);
@@ -112,14 +113,27 @@ class ShippingHelpers {
 		);
 
 		$inserted_term = wp_insert_term( $name, 'product_shipping_class', $args );
-		$shipping_classes_ids[] = $inserted_term['term_id'];
+		static::$shipping_classes_ids[] = $inserted_term['term_id'];
 
 		return $inserted_term['term_id'];
 	}
 
-	public static function cleanupShippingClasses() {
+	public static function cleanup() {
+		// Reset WooCommerce shipping data and cache.
+		global $wpdb;
+		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}woocommerce_shipping_zone_methods;" );
+		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}woocommerce_shipping_zone_locations;" );
+		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}woocommerce_shipping_zones;" );
+		WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' );
+
+		// Reset plugin shipping cache.
+		$shipping_zones = ( new ReflectionClass( ProductsXmlFeed::class ) )->getProperty( 'shipping_zones' );
+		$shipping_zones->setAccessible( 'true' );
+		$shipping_zones->setValue( null );
+
 		foreach ( static::$shipping_classes_ids as $id ) {
 			wp_delete_term( $id, 'product_shipping_class' );
 		}
+		WC()->shipping()->shipping_classes = array();;
 	}
 }
