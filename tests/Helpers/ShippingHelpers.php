@@ -2,6 +2,8 @@
 
 class ShippingHelpers {
 
+	public static $shipping_classes_ids = array();
+
 	public static function createZoneWithLocations( $locations ) {
 		// US zone.
 		$zone = new WC_Shipping_Zone();
@@ -25,7 +27,7 @@ class ShippingHelpers {
 	 * Adds a predefined flat rate shipping method to zone.
 	 * No additional settings.
 	 */
-	public static function addFlatRateShippingMethodToZone( $zone ) {
+	public static function addFlatRateShippingMethodToZone( $zone, $no_class_cost = null ) {
 		$instance_id = $zone->add_shipping_method( 'flat_rate' );
 		$shipping_method = WC_Shipping_Zones::get_shipping_method( $instance_id );
 
@@ -33,11 +35,13 @@ class ShippingHelpers {
 			'woocommerce_flat_rate_title'         => 'Flat rate',
 			'woocommerce_flat_rate_tax_status'    => 'taxable',
 			'woocommerce_flat_rate_cost'          => '15',
-			'woocommerce_flat_rate_class_cost_19' => '',
-			'woocommerce_flat_rate_no_class_cost' => '',
 			'woocommerce_flat_rate_type'          => 'class',
 			'instance_id'                         => $instance_id
 		);
+
+		if ( $no_class_cost ) {
+			$shipping_method_configuration['woocommerce_flat_rate_no_class_cost'] = $no_class_cost;
+		}
 
 		$shipping_method->set_post_data( $shipping_method_configuration );
 
@@ -89,5 +93,26 @@ class ShippingHelpers {
 		$shipping_method->process_admin_options();
 
 		WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' );
+	}
+
+	public static function addShippingClass( $name, $slug='', $description='' ) {
+		if ( empty( $slug ) ) {
+			$slug = sanitize_title( $name );
+		}
+
+		$args = array(
+			'name'        => $name,
+			'slug'        => $slug,
+			'description' => $description
+		);
+
+		$inserted_term = wp_insert_term( $name, 'product_shipping_class', $args );
+		$shipping_classes_ids[] = $inserted_term['term_id'];
+	}
+
+	public static function cleanupShippingClasses() {
+		foreach ( static::$shipping_classes_ids as $id ) {
+			wp_delete_term( $id, 'product_shipping_class' );
+		}
 	}
 }

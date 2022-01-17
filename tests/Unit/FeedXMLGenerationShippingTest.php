@@ -37,6 +37,8 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		$shipping_zones = ( new ReflectionClass( ProductsXmlFeed::class ) )->getProperty( 'shipping_zones' );
 		$shipping_zones->setAccessible( 'true' );
 		$shipping_zones->setValue( null );
+		// Reset shipping classes.
+		ShippingHelpers::cleanupShippingClasses();
 
 		$this->products[] = WC_Helper_Product::create_simple_product(  true, array( "regular_price" => 15 ) );
 	}
@@ -216,6 +218,30 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$this->assertEquals( '', $xml );
+	}
+
+	/**
+	 * @group feed
+	 * @group shipping
+	 * @group failing
+	 */
+	public function testFlatRateShippingWithNoClassCost() {
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['US', 'country']
+			]
+		);
+
+		/**
+		 * Shipping class needs to be defined before we add shipping method.
+		 * Without that the shipping class does not process the shipping classes when it is saved.
+		 */
+		ShippingHelpers::addShippingClass( 'heavy' );
+
+		ShippingHelpers::addFlatRateShippingMethodToZone( $zone, '10 * [qty]' );
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '<g:shipping>US::Flat rate:15.00 USD</g:shipping>', $xml );
 	}
 
 	/**
