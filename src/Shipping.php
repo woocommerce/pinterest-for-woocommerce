@@ -18,6 +18,7 @@ class Shipping {
 	/**
 	 * Shipping supports:
 	 * - free shipping without additional settings.
+	 * - free shipping with minimum order value. Minimum is tested over single item product. ( still, better than nothing )
 	 */
 
 	public function get_zones() {

@@ -53,15 +53,34 @@ class ShippingHelpers {
 	 * No additional settings.
 	 */
 	public static function addFreeShippingWithMinimumOrderAmount( $zone, $minimum = 10 ) {
+		self::addFreeShipping( $zone, 'min_amount', $minimum );
+	}
+
+	/**
+	 * Adds a predefined flat rate shipping method to zone.
+	 * No additional settings.
+	 */
+	public static function addFreeShippingWithCouponRequirement( $zone, $minimum = 10 ) {
+		self::addFreeShipping( $zone, 'either', $minimum );
+	}
+
+	/**
+	 * Adds a predefined flat rate shipping method to zone.
+	 * No additional settings.
+	 */
+	public static function addFreeShipping( $zone, $requires = null, $minimum = 10 ) {
 		$instance_id = $zone->add_shipping_method( 'free_shipping' );
 		$shipping_method = WC_Shipping_Zones::get_shipping_method( $instance_id );
 
 		$shipping_method_configuration = array(
 			'woocommerce_free_shipping_title'      => 'Free shipping',
-			'woocommerce_free_shipping_requires'   => 'min_amount',
-			'woocommerce_free_shipping_min_amount' => $minimum,
 			'instance_id'                          => $instance_id
 		);
+
+		if ( $requires ) {
+			$shipping_method_configuration['woocommerce_free_shipping_requires']   = $requires;
+			$shipping_method_configuration['woocommerce_free_shipping_min_amount'] = $minimum;
+		}
 
 		$shipping_method->set_post_data( $shipping_method_configuration );
 

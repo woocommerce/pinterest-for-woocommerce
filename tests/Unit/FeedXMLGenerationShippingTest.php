@@ -66,7 +66,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				['US', 'country']
 			]
 		);
-		$zone->add_shipping_method( 'free_shipping' );
+		ShippingHelpers::addFreeShipping( $zone );
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD</g:shipping>', $xml );
@@ -197,6 +197,22 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 			]
 		);
 		ShippingHelpers::addFreeShippingWithMinimumOrderAmount( $zone, 20 );
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '', $xml );
+	}
+
+	/**
+	 * @group feed
+	 * @group shipping
+	 */
+	public function testFreeShippingWithSettingsOtherThanMinimumIsDiscarded() {
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['US', 'country']
+			]
+		);
+		ShippingHelpers::addFreeShippingWithCouponRequirement( $zone, 5 );
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$this->assertEquals( '', $xml );
