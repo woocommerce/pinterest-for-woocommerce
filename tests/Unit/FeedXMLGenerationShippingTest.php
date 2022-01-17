@@ -230,7 +230,6 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 * @group shipping
-	 * @group current
 	 */
 	public function testFlatRateShippingWithClassCostNoClassSet() {
 		$zone = ShippingHelpers::createZoneWithLocations(
@@ -254,7 +253,6 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 * @group shipping
-	 * @group current
 	 */
 	public function testFlatRateShippingWithClassCostClassSet() {
 		$zone = ShippingHelpers::createZoneWithLocations(
@@ -271,12 +269,30 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		ShippingHelpers::addFlatRateShippingMethodToZone( $zone, 15, null, array( $class_id => 17 ) );
 
 		// Product has the shipping class set.
-		// Product has no class set.
 		$product = end( $this->products ) ;
 		$product->set_shipping_class_id( $class_id );
 		$product->save();
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( $product );
 		$this->assertEquals( '<g:shipping>US::Flat rate:32.00 USD</g:shipping>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 * @group shipping
+	 *
+	 * The continent NA location includes 'US' so we test if we don't end up with two US entires.
+	 */
+	public function testLocationHasNoDuplicateEntries() {
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['NA', 'continent'],
+				['US', 'country'],
+			]
+		);
+		ShippingHelpers::addFreeShipping( $zone );
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '<g:shipping>CA::Free shipping:0.00 USD,US::Free shipping:0.00 USD</g:shipping>', $xml );
 	}
 
 	/**
