@@ -4,6 +4,7 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Feed;
 
 use ReflectionClass;
 use ShippingHelpers;
+use WC_Product_Variable;
 use \WC_Helper_Product;
 use \WC_Unit_Test_Case;
 
@@ -293,6 +294,35 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$this->assertEquals( '<g:shipping>CA::Free shipping:0.00 USD,US::Free shipping:0.00 USD</g:shipping>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 * @group shipping
+	 */
+	public function testFreeShippingVariableProductWithMinimumOrder() {
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['US', 'country'],
+			]
+		);
+		ShippingHelpers::addFreeShippingWithMinimumOrderAmount( $zone, 12 );
+
+		// By passing manually created Variable Product the create_variation_product will add children to it.
+		$product            = new WC_Product_Variable();
+		$variation_product  = WC_Helper_Product::create_variation_product( $product );
+
+		// create_variation_product creates multiple children, picking first one's cost is 10 ( per create_variation_product )
+		$child_id_0    = $variation_product->get_children()[0];
+		$child_product = wc_get_product( $child_id_0 );
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( $child_product );
+		$this->assertEquals( '', $xml );
+
+		// create_variation_product creates multiple children, picking first one's cost is 15 ( per create_variation_product )
+		$child_id_1    = $variation_product->get_children()[1];
+		$child_product = wc_get_product( $child_id_1 );
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( $child_product );
+		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD</g:shipping>', $xml );
 	}
 
 	/**
