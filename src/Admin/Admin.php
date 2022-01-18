@@ -54,7 +54,7 @@ class Admin {
 		if ( $screen && 'product' === $screen->id ) {
 			wp_enqueue_style(
 				'pinterest-product-attributes-css',
-				Pinterest_For_Woocommerce()->plugin_url() . '/assets/product-attributes/index.css',
+				Pinterest_For_Woocommerce()->plugin_url() . '/assets/product-attributes/style-index.css',
 				array(),
 				PINTEREST_FOR_WOOCOMMERCE_VERSION
 			);

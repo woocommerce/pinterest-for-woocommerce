@@ -1,4 +1,4 @@
 /**
  * Internal dependencies
  */
-import './index.scss';
+import './style.scss';
