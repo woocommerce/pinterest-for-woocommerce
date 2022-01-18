@@ -299,6 +299,25 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 * @group shipping
+	 *
+	 * When mixing state and single country we only allow for state?
+	 */
+	public function testMixedStateAndCountryLocation() {
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['US:CA', 'state'],
+				['US', 'country'],
+			]
+		);
+		ShippingHelpers::addFreeShipping( $zone );
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '<g:shipping>CA::Free shipping:0.00 USD,US::Free shipping:0.00 USD</g:shipping>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 * @group shipping
 	 */
 	public function testFreeShippingVariableProductWithMinimumOrder() {
 		$zone = ShippingHelpers::createZoneWithLocations(

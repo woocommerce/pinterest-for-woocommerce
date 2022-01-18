@@ -19,8 +19,9 @@ class Shipping {
 	 * Shipping supports:
 	 * - free shipping without additional settings.
 	 * - free shipping with minimum order value. Minimum is tested over single item product. ( still, better than nothing )
+	 * - variable product
+	 * - locations mixing: continent + country + state
 	 */
-
 	public function get_zones() {
 		$data_store = WC_Data_Store::load( 'shipping-zone' );
 		$raw_zones  = $data_store->get_zones();
