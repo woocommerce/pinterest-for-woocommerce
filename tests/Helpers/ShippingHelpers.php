@@ -1,6 +1,6 @@
 <?php
 
-use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
+use Automattic\WooCommerce\Pinterest\Shipping;
 class ShippingHelpers {
 
 	public static $shipping_classes_ids = array();
@@ -127,7 +127,7 @@ class ShippingHelpers {
 		WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' );
 
 		// Reset plugin shipping cache.
-		$shipping_zones = ( new ReflectionClass( ProductsXmlFeed::class ) )->getProperty( 'shipping_zones' );
+		$shipping_zones = ( new ReflectionClass( Shipping::class ) )->getProperty( 'shipping_zones' );
 		$shipping_zones->setAccessible( 'true' );
 		$shipping_zones->setValue( null );
 
