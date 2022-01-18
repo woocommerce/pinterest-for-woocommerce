@@ -312,7 +312,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		ShippingHelpers::addFreeShipping( $zone );
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>CA::Free shipping:0.00 USD,US::Free shipping:0.00 USD</g:shipping>', $xml );
+		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD,US:CA:Free shipping:0.00 USD</g:shipping>', $xml );
 	}
 
 	/**
