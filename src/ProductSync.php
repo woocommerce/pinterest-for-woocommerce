@@ -310,9 +310,9 @@ class ProductSync {
 		$state = ProductFeedStatus::get();
 		$start = microtime( true );
 
-		// if ( $state && 'generated' === $state['status'] || ! self::is_product_sync_enabled() ) {
-		// 	return; // No need to perform any action.
-		// }
+		if ( $state && 'generated' === $state['status'] || ! self::is_product_sync_enabled() ) {
+			return; // No need to perform any action.
+		}
 
 		if ( ! $state || ( $state && 'scheduled_for_generation' === $state['status'] ) ) {
 			// We need to start a generation from scratch.
