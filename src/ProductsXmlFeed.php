@@ -389,7 +389,7 @@ class ProductsXmlFeed {
 	}
 
 	/**
-	 * Fetch shipping class that will aid with the shipping functionality
+	 * Fetch shipping object.
 	 *
 	 * @return Shipping
 	 */

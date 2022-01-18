@@ -41,18 +41,26 @@ class Shipping {
 		foreach ( $shipping_zones as $zone ) {
 			$shipping_info = $zone->get_locations_with_shipping();
 			if ( is_null( $shipping_info ) ) {
+				// No valid location in this shipping zone.
 				continue;
 			}
 			$best_shipping = self::get_best_shipping_with_cost( $shipping_info, $product );
 			if ( null === $best_shipping ) {
+				// No valid shipping option for shipping methods.
 				continue;
 			}
 			foreach ( $shipping_info['locations'] as $location ) {
-				$currency = get_woocommerce_currency();
-				$lines[]  = "$location->country:$location->state:$best_shipping->name:$best_shipping->cost $currency";
+				$currency         = get_woocommerce_currency();
+				$shipping_name    = $best_shipping['name'];
+				$shipping_cost    = $best_shipping['cost'];
+				$shipping_country = $location['country'];
+				$shipping_state   = $location['state'];
+
+				// Build shipping entry for the XML.
+				$lines[] = "$shipping_country:$shipping_state:$shipping_name:$shipping_cost $currency";
 			}
 		}
-		return implode( ",", $lines );
+		return implode( ',', $lines );
 	}
 
 	private static function get_shipping_zones() {
@@ -81,12 +89,22 @@ class Shipping {
 		return $has_met_min_amount;
 	}
 
-	private static function get_best_shipping_with_cost( $zone, $product ) {
-		$package = self::put_product_into_a_shipping_package( $product, reset( $zone['locations'] ) );
+	/**
+	 * Gets the best shipping method with associated cost for a product in a given shipping zone.
+	 *
+	 * @param  $zone
+	 * @param [type] $product
+	 * @return void
+	 */
+	private static function get_best_shipping_with_cost( $shipping_info, $product ) {
+
+		// Since in a shipping zone all locations are treated the same we will perform the calculations for the first one.
+		$package = self::put_product_into_a_shipping_package( $product, reset( $shipping_info['locations'] ) );
 		$rates   = array();
 
+		// By using the filter we can trick the get_rates_for_package to continue calculations even without having the Cart defined.
 		add_filter( 'woocommerce_shipping_free_shipping_is_available', array( static::class, 'is_free_shipping_available' ), 10, 3 );
-		foreach ( $zone['shipping_methods'] as $shipping_method ) {
+		foreach ( $shipping_info['shipping_methods'] as $shipping_method ) {
 				// Use + instead of array_merge to maintain numeric keys.
 				$rates += $shipping_method->get_rates_for_package( $package );
 		}
@@ -97,6 +115,18 @@ class Shipping {
 			return null;
 		}
 
+		$best_rate = self::calculate_best_rate( $rates );
+		return $best_rate;
+	}
+
+	/**
+	 * Get the best rate from an array of rates.
+	 *
+	 * @param  array $rates Array of rates for a package/destination combination.
+	 * @return array
+	 */
+	private static function calculate_best_rate( $rates ) {
+		// Loop over all of our rates to check if we have anything better than INF.
 		$best_cost = INF;
 		$best_name = '';
 		foreach ( $rates as $rate ) {
@@ -105,16 +135,21 @@ class Shipping {
 				$best_cost = $cost;
 				$best_name = $rate->get_label();
 			}
-			$best_cost = $cost < $best_cost ? $cost : $best_cost;
-
 		}
 
-		return (object) array(
+		return array(
 			'cost' => $best_cost,
 			'name' => $best_name,
 		);
 	}
 
+	/**
+	 * Helper function that packs products into a package structure required by the shipping methods.
+	 *
+	 * @param WC_Product $product  Product to package.
+	 * @param array      $location Product destination location.
+	 * @return array Poduct packed into a package for use by shipping methods.
+	 */
 	public static function put_product_into_a_shipping_package( $product, $location ) {
 		include_once WC_ABSPATH . 'includes/wc-cart-functions.php';
 		$cart_item = array(
@@ -136,8 +171,8 @@ class Shipping {
 				'ID' => get_current_user_id(),
 			),
 			'destination'     => array(
-				'country'   => $location->country,
-				'state'     => $location->state,
+				'country'   => $location['country'],
+				'state'     => $location['state'],
 				'postcode'  => '',
 				'city'      => '',
 				'address'   => '',

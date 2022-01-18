@@ -23,7 +23,7 @@ class ShippingZone extends WC_Shipping_Zone {
 		return array_filter(
 			$location_objects,
 			function ( $location ) use ( $allowed_countries ) {
-				return in_array( $location->country, $allowed_countries );
+				return in_array( $location['country'], $allowed_countries, true );
 			}
 		);
 	}
@@ -34,52 +34,63 @@ class ShippingZone extends WC_Shipping_Zone {
 		}
 
 		$all_continents = WC()->countries->get_continents();
-		$locations      = $this->get_zone_locations( $context );
-		$continents     = array_filter( $locations, array( $this, 'location_is_continent' ) );
-		$countries      = array_filter( $locations, array( $this, 'location_is_country' ) );
-		$states         = array_filter( $locations, array( $this, 'location_is_state' ) );
-		$postcodes      = array_filter( $locations, array( $this, 'location_is_postcode' ) );
-		$raw_countries  = array();
+		$zone_locations = $this->get_zone_locations( $context );
+		$continents     = array_filter( $zone_locations, array( $this, 'location_is_continent' ) );
+		$countries      = array_filter( $zone_locations, array( $this, 'location_is_country' ) );
+		$states         = array_filter( $zone_locations, array( $this, 'location_is_state' ) );
+		$postcodes      = array_filter( $zone_locations, array( $this, 'location_is_postcode' ) );
+		$locations      = array();
 
 		if ( ! empty( $postcodes ) ) {
-			// W don't process zones with postcodes, assuming empty;
+			// W don't process zones with postcodes, assuming empty.
 			$this->zone_countries_with_states = array();
 			return $this->zone_countries_with_states;
 		}
 
 		foreach ( $continents as $location ) {
-			$raw_countries += array_map(
-				array( $this, "map_country_to_location_object" ),
+			$locations += array_map(
+				array( $this, 'map_to_location' ),
 				$all_continents[ $location->code ]['countries'],
 			);
 		}
 
 		foreach ( $countries as $location ) {
-			$raw_countries[] = $this->map_country_to_location_object( $location->code );
+			$locations[] = $this->map_to_location( $location->code );
 		}
 
 		foreach ( $states as $location ) {
-			$location_codes         = explode( ':', $location->code );
-			$raw_countries[] = $this->map_country_to_location_object(
+			$location_codes = explode( ':', $location->code );
+			$locations[]    = $this->map_to_location(
 				$location_codes[0],
 				$location_codes[1]
 			);
 		}
 
-		$raw_countries = $this->filter_out_not_allowed_countries( $raw_countries );
-		$raw_countries = array_unique( $raw_countries, SORT_REGULAR);
-		return $this->zone_countries_with_states = $raw_countries;
+		$locations = $this->filter_out_not_allowed_countries( $locations );
+		$locations = $this->remove_duplicate_locations( $locations );
+
+		// Cache the locations.
+		$this->zone_countries_with_states = $locations;
+		return $this->zone_countries_with_states;
 	}
 
-	private function map_country_to_location_object( $country, $state = '' ) {
-		$obj = new class {
-			public function __toString() { // For SORT_REGULAR when removing duplications.
-				return $this->country;
-			}
-		};
-		$obj->country = $country;
-		$obj->state   = $state;
-		return $obj;
+	/**
+	 * Remove duplicated locations. Encapsulated into separate function
+	 * in case we will need to do more complicated filtering as this is
+	 * a multidimensional filtering. It will also allow unit testing.
+	 *
+	 * @param array $locations Array of locations.
+	 * @return array
+	 */
+	public function remove_duplicate_locations( $locations ) {
+		return array_unique( $locations, SORT_REGULAR );
+	}
+
+	private function map_to_location( $country, $state = '' ) {
+		return array(
+			'country' => $country,
+			'state'   => $state,
+		);
 	}
 
 	public function get_locations_with_shipping() {
