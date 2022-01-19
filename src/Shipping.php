@@ -44,7 +44,7 @@ class Shipping {
 				// No valid location in this shipping zone.
 				continue;
 			}
-			$best_shipping = self::get_best_shipping_with_cost( $shipping_info, $product );
+			$best_shipping = self::get_best_shipping_with_cost( reset( $shipping_info['locations'] ), $shipping_info['shipping_methods'], $product );
 			if ( null === $best_shipping ) {
 				// No valid shipping option for shipping methods.
 				continue;
@@ -96,15 +96,15 @@ class Shipping {
 	 * @param [type] $product
 	 * @return void
 	 */
-	private static function get_best_shipping_with_cost( $shipping_info, $product ) {
+	private static function get_best_shipping_with_cost( $shipping_location, $shipping_methods, $product ) {
 
 		// Since in a shipping zone all locations are treated the same we will perform the calculations for the first one.
-		$package = self::put_product_into_a_shipping_package( $product, reset( $shipping_info['locations'] ) );
+		$package = self::put_product_into_a_shipping_package( $product, $shipping_location );
 		$rates   = array();
 
 		// By using the filter we can trick the get_rates_for_package to continue calculations even without having the Cart defined.
 		add_filter( 'woocommerce_shipping_free_shipping_is_available', array( static::class, 'is_free_shipping_available' ), 10, 3 );
-		foreach ( $shipping_info['shipping_methods'] as $shipping_method ) {
+		foreach ( $shipping_methods as $shipping_method ) {
 				// Use + instead of array_merge to maintain numeric keys.
 				$rates += $shipping_method->get_rates_for_package( $package );
 		}

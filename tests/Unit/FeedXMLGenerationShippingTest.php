@@ -419,6 +419,38 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		$this->assertEquals( '<g:shipping>US::Flat rate:10.00 USD</g:shipping>', $xml );
 	}
 
+		/**
+	 * @group shipping
+	 * @group shipping_tax
+	 */
+	public function testTaxCalculationsAreOnlyAppliedToMatchingCountries() {
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['US', 'country'],
+				['CA', 'country']
+			]
+		);
+		ShippingHelpers::addFlatRateShippingMethodToZone( $zone, 10 );
+
+		$tax_rate    = array(
+			'tax_rate_country'  => 'CA',
+			'tax_rate_state'    => '',
+			'tax_rate'          => '20.0000',
+			'tax_rate_name'     => 'TAX20',
+			'tax_rate_priority' => '1',
+			'tax_rate_compound' => '0',
+			'tax_rate_shipping' => '1',
+			'tax_rate_order'    => '1',
+			'tax_rate_class'    => '20percent',
+		);
+		$tax_rate_20 = WC_Tax::_insert_tax_rate( $tax_rate );
+
+		update_option( 'woocommerce_calc_taxes', 'yes' );
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '<g:shipping>US::Flat rate:10.00 USD,CA::Flat rate:12.00 USD</g:shipping>', $xml );
+	}
+
 	/**
 	 * Helper function for extracting the static private members of the ProductsXmlFeed class.
 	 * Gets the property method then just pass the product and voila.
