@@ -384,7 +384,6 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 
 	/**
 	 * @group shipping
-	 * @group shipping_tax
 	 */
 	public function testTaxCalculationOnShippingTaxRateNotApplicableToShipping() {
 		$zone = ShippingHelpers::createZoneWithLocations(

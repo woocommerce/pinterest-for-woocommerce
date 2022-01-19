@@ -44,13 +44,14 @@ class Shipping {
 				// No valid location in this shipping zone.
 				continue;
 			}
-			$best_shipping = self::get_best_shipping_with_cost( reset( $shipping_info['locations'] ), $shipping_info['shipping_methods'], $product );
-			if ( null === $best_shipping ) {
-				// No valid shipping option for shipping methods.
-				continue;
-			}
+
+			$currency = get_woocommerce_currency();
 			foreach ( $shipping_info['locations'] as $location ) {
-				$currency         = get_woocommerce_currency();
+				$best_shipping = self::get_best_shipping_with_cost( $location, $shipping_info['shipping_methods'], $product );
+				if ( null === $best_shipping ) {
+					// No valid shipping option for shipping methods.
+					continue;
+				}
 				$shipping_name    = $best_shipping['name'];
 				$shipping_cost    = $best_shipping['cost'];
 				$shipping_country = $location['country'];
@@ -101,6 +102,10 @@ class Shipping {
 		// Since in a shipping zone all locations are treated the same we will perform the calculations for the first one.
 		$package = self::put_product_into_a_shipping_package( $product, $shipping_location );
 		$rates   = array();
+
+		// Substitute default customer location and billing for.
+		WC()->customer->set_billing_location( $shipping_location['country'], $shipping_location['state'] );
+		WC()->customer->set_shipping_location( $shipping_location['country'], $shipping_location['state'] );
 
 		// By using the filter we can trick the get_rates_for_package to continue calculations even without having the Cart defined.
 		add_filter( 'woocommerce_shipping_free_shipping_is_available', array( static::class, 'is_free_shipping_available' ), 10, 3 );
