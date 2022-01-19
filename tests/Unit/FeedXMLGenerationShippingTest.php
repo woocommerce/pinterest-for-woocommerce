@@ -8,6 +8,8 @@ use WC_Product_Variable;
 use \WC_Helper_Product;
 use \WC_Unit_Test_Case;
 
+use \WC_Tax;
+
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
 
 /**
@@ -342,6 +344,76 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		$child_product = wc_get_product( $child_id_1 );
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( $child_product );
 		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD</g:shipping>', $xml );
+	}
+
+	/**
+	 * @group shipping
+	 */
+	public function testTaxCalculationOnShipping() {
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['US', 'country'],
+			]
+		);
+		ShippingHelpers::addFlatRateShippingMethodToZone( $zone, 10 );
+
+		update_option( 'woocommerce_calc_taxes', 'no' );
+
+		$tax_rate    = array(
+			'tax_rate_country'  => '',
+			'tax_rate_state'    => '',
+			'tax_rate'          => '20.0000',
+			'tax_rate_name'     => 'TAX20',
+			'tax_rate_priority' => '1',
+			'tax_rate_compound' => '0',
+			'tax_rate_shipping' => '1',
+			'tax_rate_order'    => '1',
+			'tax_rate_class'    => '20percent',
+		);
+		$tax_rate_20 = WC_Tax::_insert_tax_rate( $tax_rate );
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '<g:shipping>US::Flat rate:10.00 USD</g:shipping>', $xml );
+
+		// Enable tax calculations.
+		update_option( 'woocommerce_calc_taxes', 'yes' );
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '<g:shipping>US::Flat rate:12.00 USD</g:shipping>', $xml );
+	}
+
+	/**
+	 * @group shipping
+	 * @group shipping_tax
+	 */
+	public function testTaxCalculationOnShippingTaxRateNotApplicableToShipping() {
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['US', 'country'],
+			]
+		);
+		ShippingHelpers::addFlatRateShippingMethodToZone( $zone, 10 );
+
+		update_option( 'woocommerce_calc_taxes', 'no' );
+
+		$tax_rate    = array(
+			'tax_rate_country'  => '',
+			'tax_rate_state'    => '',
+			'tax_rate'          => '20.0000',
+			'tax_rate_name'     => 'TAX20',
+			'tax_rate_priority' => '1',
+			'tax_rate_compound' => '0',
+			'tax_rate_shipping' => '0',
+			'tax_rate_order'    => '1',
+			'tax_rate_class'    => '20percent',
+		);
+		$tax_rate_20 = WC_Tax::_insert_tax_rate( $tax_rate );
+
+		// Enable tax calculations.
+		update_option( 'woocommerce_calc_taxes', 'yes' );
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '<g:shipping>US::Flat rate:10.00 USD</g:shipping>', $xml );
 	}
 
 	/**

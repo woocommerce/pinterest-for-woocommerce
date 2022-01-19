@@ -28,7 +28,7 @@ class ShippingHelpers {
 	 * Adds a predefined flat rate shipping method to zone.
 	 * No additional settings.
 	 */
-	public static function addFlatRateShippingMethodToZone( $zone, $cost = 15, $no_class_cost = null, $shipping_classes_costs = array() ) {
+	public static function addFlatRateShippingMethodToZone( $zone, $cost = 15, $no_class_cost = null, $shipping_classes_costs = array(), $tax_status = 'taxable' ) {
 		$instance_id = $zone->add_shipping_method( 'flat_rate' );
 		$shipping_method = WC_Shipping_Zones::get_shipping_method( $instance_id );
 
@@ -56,6 +56,10 @@ class ShippingHelpers {
 		$shipping_method->process_admin_options();
 
 		WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' );
+	}
+
+	public static function addNonTaxableFlatRate( $zone, $cost = 15, $no_class_cost = null, $shipping_classes_costs = array() ) {
+		self::addFlatRateShippingMethodToZone( $zone, $cost, $no_class_cost, $shipping_classes_costs, 'non-taxable' );
 	}
 
 	/**

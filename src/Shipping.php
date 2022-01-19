@@ -130,9 +130,11 @@ class Shipping {
 		$best_cost = INF;
 		$best_name = '';
 		foreach ( $rates as $rate ) {
-			$cost = $rate->get_cost();
+			$shipping_cost = (float) $rate->get_cost();
+			$shipping_tax  = (float) $rate->get_shipping_tax();
+			$cost          = $shipping_cost + $shipping_tax;
 			if ( $cost < $best_cost ) {
-				$best_cost = $cost;
+				$best_cost = wc_format_decimal( $cost, 2 );
 				$best_name = $rate->get_label();
 			}
 		}
