@@ -128,6 +128,7 @@ class ShippingHelpers {
 		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}woocommerce_shipping_zone_methods;" );
 		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}woocommerce_shipping_zone_locations;" );
 		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}woocommerce_shipping_zones;" );
+		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}woocommerce_tax_rates;" );
 		WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' );
 
 		// Reset plugin shipping cache.

@@ -394,8 +394,6 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		);
 		ShippingHelpers::addFlatRateShippingMethodToZone( $zone, 10 );
 
-		update_option( 'woocommerce_calc_taxes', 'no' );
-
 		$tax_rate    = array(
 			'tax_rate_country'  => '',
 			'tax_rate_state'    => '',
@@ -409,7 +407,12 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		);
 		$tax_rate_20 = WC_Tax::_insert_tax_rate( $tax_rate );
 
-		// Enable tax calculations.
+		update_option( 'woocommerce_calc_taxes', 'no' );
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$this->assertEquals( '<g:shipping>US::Flat rate:10.00 USD</g:shipping>', $xml );
+
+		// Enable tax calculations. We still should see flat rate original cost bc tax rate is not applicable to shipping.
 		update_option( 'woocommerce_calc_taxes', 'yes' );
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
