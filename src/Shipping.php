@@ -1,9 +1,11 @@
 <?php
 /**
- * Represents a single Pinterest shipping zone
+ * Utility class used by the Feed generation to create the shipping column.
  *
+ * @package Pinterest
  * @since   x.x.x
  */
+
 namespace Automattic\WooCommerce\Pinterest;
 
 defined( 'ABSPATH' ) || exit;
@@ -11,37 +13,48 @@ defined( 'ABSPATH' ) || exit;
 use \WC_Data_Store;
 
 /**
- * WC_Shipping_Zone class.
+ * Shipping class.
+ * Supported features:
+ * - Free shipping without additional settings.
+ * - Free shipping with minimum order value. Minimum is tested over single item product. ( still, better than nothing )
+ * - Flat rate shipping without additional settings.
+ * - Flat rate with classes: no shipping class and regular classes.
+ * - Shipping zone locations: single country, country + state, continent ( zip codes are not allowed).
+ * - Locations mixing: continent + country + state.
+ * - Taxes for shipping global.
+ * - Taxes for shipping for specific country.
+ * - Filtering of not supported countries.
+ * - Simple products.
+ * - Variable products.
+ *
+ * @since x.x.x
  */
 class Shipping {
 
-	static $shipping_zones = null;
+	/**
+	 * Local cache of shipping zones defined in WC settings.
+	 *
+	 * @var array|null $shipping_zones
+	 */
+	private static $shipping_zones = null;
 
 	/**
-	 * Shipping supports:
-	 * - free shipping without additional settings.
-	 * - free shipping with minimum order value. Minimum is tested over single item product. ( still, better than nothing )
-	 * - variable product
-	 * - locations mixing: continent + country + state
+	 * Prepare content of a shipping column entry for $product.
+	 * Entry is a comma separated string with values in the following format:
+	 *   COUNTRY:STATE:POST_CODE:SHIPPING_COST
+	 *
+	 * @since x.x.x
+	 *
+	 * @param  WC_Product $product Product for which we want to generate the shipping column.
+	 * @return string              Shipping column entry for $product.
 	 */
-	public static function get_zones() {
-		$data_store = WC_Data_Store::load( 'shipping-zone' );
-		$raw_zones  = $data_store->get_zones();
-		$zones      = array();
-
-		foreach ( $raw_zones as $raw_zone ) {
-			$zones[] = new PinterestShippingZone( $raw_zone );
-		}
-		return $zones;
-	}
-
 	public function prepare_shipping_column( $product ) {
 		$shipping_zones = self::get_shipping_zones();
 		$lines          = array();
 		foreach ( $shipping_zones as $zone ) {
 			$shipping_info = $zone->get_locations_with_shipping();
 			if ( is_null( $shipping_info ) ) {
-				// No valid location in this shipping zone.
+				// No valid location in this shipping zone. Skip to the next zone.
 				continue;
 			}
 
@@ -49,7 +62,7 @@ class Shipping {
 			foreach ( $shipping_info['locations'] as $location ) {
 				$best_shipping = self::get_best_shipping_with_cost( $location, $shipping_info['shipping_methods'], $product );
 				if ( null === $best_shipping ) {
-					// No valid shipping option for shipping methods.
+					// No valid shipping cost for $location. Skip to the next shipping destination.
 					continue;
 				}
 				$shipping_name    = $best_shipping['name'];
@@ -57,27 +70,52 @@ class Shipping {
 				$shipping_country = $location['country'];
 				$shipping_state   = $location['state'];
 
-				// Build shipping entry for the XML.
+				// Build shipping entry.
 				$lines[] = "$shipping_country:$shipping_state:$shipping_name:$shipping_cost $currency";
 			}
 		}
 		return implode( ',', $lines );
 	}
 
+	/**
+	 * Get shipping zones defined in WooCommerce settings.
+	 * Cache for efficiency - this information will not change between different products.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array Shipping zones.
+	 */
 	private static function get_shipping_zones() {
 		if ( null !== self::$shipping_zones ) {
 			return self::$shipping_zones;
 		}
-		self::$shipping_zones = self::get_zones();
+
+		$data_store           = WC_Data_Store::load( 'shipping-zone' );
+		$raw_zones            = $data_store->get_zones();
+		self::$shipping_zones = array();
+
+		foreach ( $raw_zones as $raw_zone ) {
+			self::$shipping_zones[] = new PinterestShippingZone( $raw_zone );
+		}
+
 		return self::$shipping_zones;
 	}
 
+	/**
+	 * Function used for the woocommerce_shipping_free_shipping_is_available filter.
+	 * This is added to verify if min_amount feature has met the free shipping criteria.
+	 * Normally this would be done by checking values in cart. Because we are not operating on cart we filter out
+	 * this value ourselves.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param bool                      $is_available    Wether this shipping method should be available.
+	 * @param array                     $package         Shipping package.
+	 * @param WC_Shipping_Free_Shipping $shipping_method Shipping method.
+	 * @return boolean
+	 */
 	public static function is_free_shipping_available( $is_available, $package, $shipping_method ) {
 		if ( $is_available ) {
-			return true;
-		}
-
-		if ( ! ( $shipping_method instanceof \WC_Shipping_Free_Shipping ) ) {
 			return $is_available;
 		}
 
@@ -91,11 +129,14 @@ class Shipping {
 	}
 
 	/**
-	 * Gets the best shipping method with associated cost for a product in a given shipping zone.
+	 * Get the lowest possible shipping cost for given location and shipping methods for that location.
 	 *
-	 * @param  $zone
-	 * @param [type] $product
-	 * @return void
+	 * @since x.x.x
+	 *
+	 * @param array      $shipping_location Country and state values of the location.
+	 * @param array      $shipping_methods  List of shippings methods we use to calculate the best rate.
+	 * @param WC_Product $product           Product for which we want to generate the shipping column.
+	 * @return array|null                   Name and cost for the best found rate or null in case nothing was found.
 	 */
 	private static function get_best_shipping_with_cost( $shipping_location, $shipping_methods, $product ) {
 
@@ -110,8 +151,7 @@ class Shipping {
 		// By using the filter we can trick the get_rates_for_package to continue calculations even without having the Cart defined.
 		add_filter( 'woocommerce_shipping_free_shipping_is_available', array( static::class, 'is_free_shipping_available' ), 10, 3 );
 		foreach ( $shipping_methods as $shipping_method ) {
-				// Use + instead of array_merge to maintain numeric keys.
-				$rates += $shipping_method->get_rates_for_package( $package );
+			$rates += $shipping_method->get_rates_for_package( $package );
 		}
 		remove_filter( 'woocommerce_shipping_free_shipping_is_available', array( static::class, 'is_free_shipping_available' ), 10 );
 
@@ -125,27 +165,28 @@ class Shipping {
 	}
 
 	/**
-	 * Get the best rate from an array of rates.
+	 * Pick the best rate from an array of rates.
 	 *
-	 * @param  array $rates Array of rates for a package/destination combination.
-	 * @return array
+	 * @since x.x.x
+	 *
+	 * @param  array $rates List of shipping rates.
+	 * @return array        Name and cost for the best found rate or null in case nothing was found.
 	 */
 	private static function calculate_best_rate( $rates ) {
-		// Loop over all of our rates to check if we have anything better than INF.
 		$best_cost = INF;
 		$best_name = '';
 		foreach ( $rates as $rate ) {
 			$shipping_cost = (float) $rate->get_cost();
 			$shipping_tax  = (float) $rate->get_shipping_tax();
-			$cost          = $shipping_cost + $shipping_tax;
-			if ( $cost < $best_cost ) {
-				$best_cost = wc_format_decimal( $cost, 2 );
+			$total_cost    = $shipping_cost + $shipping_tax;
+			if ( $total_cost < $best_cost ) {
+				$best_cost = $total_cost;
 				$best_name = $rate->get_label();
 			}
 		}
 
 		return array(
-			'cost' => $best_cost,
+			'cost' => wc_format_decimal( $best_cost, 2 ),
 			'name' => $best_name,
 		);
 	}
@@ -153,9 +194,11 @@ class Shipping {
 	/**
 	 * Helper function that packs products into a package structure required by the shipping methods.
 	 *
+	 * @since x.x.x
+	 *
 	 * @param WC_Product $product  Product to package.
 	 * @param array      $location Product destination location.
-	 * @return array Poduct packed into a package for use by shipping methods.
+	 * @return array               Product packed into a package for use by shipping methods.
 	 */
 	public static function put_product_into_a_shipping_package( $product, $location ) {
 		include_once WC_ABSPATH . 'includes/wc-cart-functions.php';
@@ -180,7 +223,7 @@ class Shipping {
 			'destination'     => array(
 				'country'   => $location['country'],
 				'state'     => $location['state'],
-				'postcode'  => '',
+				'postcode'  => '',  // May be used in the future.
 				'city'      => '',
 				'address'   => '',
 				'address_1' => '',

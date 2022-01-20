@@ -8,8 +8,6 @@ use WC_Product_Variable;
 use \WC_Helper_Product;
 use \WC_Unit_Test_Case;
 
-use \WC_Tax;
-
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
 
 /**
