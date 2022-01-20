@@ -1,10 +1,28 @@
 <?php
 
 use Automattic\WooCommerce\Pinterest\Shipping;
+
+/**
+ * ShippingHelpers class
+ *
+ * Utility class with tools that help in setting up the tests environment.
+ */
 class ShippingHelpers {
 
+	/**
+	 * Ids of shipping classes created using the helper functions.
+	 * Used by the cleanup method to delete the classes.
+	 *
+	 * @var array $shipping_classes_ids
+	 */
 	public static $shipping_classes_ids = array();
 
+	/**
+	 * For a given list of locations create a new shipping zone.
+	 *
+	 * @param array $locations Array of locations for then zone.
+	 * @return void
+	 */
 	public static function createZoneWithLocations( $locations ) {
 		// US zone.
 		$zone = new WC_Shipping_Zone();
@@ -27,6 +45,13 @@ class ShippingHelpers {
 	/**
 	 * Adds a predefined flat rate shipping method to zone.
 	 * No additional settings.
+	 *
+	 * @param WC_Shipping_Zone $zone                   Shipping zone to which add the shipping method.
+	 * @param integer          $cost                   Shipping cost.
+	 * @param integer|string   $no_class_cost          Cost to add when no classes are specified.
+	 * @param array            $shipping_classes_costs Cost associated with shipping classes.
+	 * @param string           $tax_status             Is this shipping method taxable or not.
+	 * @return void
 	 */
 	public static function addFlatRateShippingMethodToZone( $zone, $cost = 15, $no_class_cost = null, $shipping_classes_costs = array(), $tax_status = 'taxable' ) {
 		$instance_id = $zone->add_shipping_method( 'flat_rate' );
@@ -34,7 +59,7 @@ class ShippingHelpers {
 
 		$shipping_method_configuration = array(
 			'woocommerce_flat_rate_title'         => 'Flat rate',
-			'woocommerce_flat_rate_tax_status'    => 'taxable',
+			'woocommerce_flat_rate_tax_status'    => $tax_status,
 			'woocommerce_flat_rate_cost'          => $cost,
 			'woocommerce_flat_rate_type'          => 'class',
 			'instance_id'                         => $instance_id
@@ -58,29 +83,49 @@ class ShippingHelpers {
 		WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' );
 	}
 
+	/**
+	 * Adds a predefined flat rate shipping method to zone. No tax should be applied to the zone.
+	 * No additional settings.
+	 *
+	 * @param WC_Shipping_Zone $zone                   Shipping zone to which add the shipping method.
+	 * @param integer          $cost                   Shipping cost.
+	 * @param integer|string   $no_class_cost          Cost to add when no classes are specified.
+	 * @param array            $shipping_classes_costs Cost associated with shipping classes.
+	 * @return void
+	 */
 	public static function addNonTaxableFlatRate( $zone, $cost = 15, $no_class_cost = null, $shipping_classes_costs = array() ) {
 		self::addFlatRateShippingMethodToZone( $zone, $cost, $no_class_cost, $shipping_classes_costs, 'non-taxable' );
 	}
 
-	/**
-	 * Adds a predefined flat rate shipping method to zone.
-	 * No additional settings.
-	 */
+	 /**
+	  * Free shipping with minimum order value requirement.
+	  *
+	  * @param WC_Shipping_Zone $zone    Shipping zone to which add the shipping method.
+	  * @param integer          $minimum Required minimum value.
+	  * @return void
+	  */
 	public static function addFreeShippingWithMinimumOrderAmount( $zone, $minimum = 10 ) {
 		self::addFreeShipping( $zone, 'min_amount', $minimum );
 	}
 
 	/**
-	 * Adds a predefined flat rate shipping method to zone.
-	 * No additional settings.
+	 * Free shipping with minimum order or coupon requirement.
+	 *
+	 * @param WC_Shipping_Zone $zone    Shipping zone to which add the shipping method.
+	 * @param integer          $minimum Required minimum value.
+	 * @return void
 	 */
 	public static function addFreeShippingWithCouponRequirement( $zone, $minimum = 10 ) {
 		self::addFreeShipping( $zone, 'either', $minimum );
 	}
 
 	/**
-	 * Adds a predefined flat rate shipping method to zone.
-	 * No additional settings.
+	 * Adds a flat rate shipping method to zone.
+	 *
+     * @param WC_Shipping_Zone $zone     Shipping zone to which add the shipping method.
+	 * @param string           $requires Requirement.
+	 * @param integer          $minimum  Required minimum value.
+	 * @return void
 	 */
 	public static function addFreeShipping( $zone, $requires = null, $minimum = 10 ) {
 		$instance_id = $zone->add_shipping_method( 'free_shipping' );
@@ -105,6 +150,14 @@ class ShippingHelpers {
 		WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' );
 	}
 
+	/**
+	 * Add shipping class to the WooCommerce database.
+	 *
+	 * @param string $name        Shipping class name.
+	 * @param string $slug        Shipping class slug.
+	 * @param string $description Shipping class description.
+	 * @return integer Shipping class term id.
+	 */
 	public static function addShippingClass( $name, $slug='', $description='' ) {
 		if ( empty( $slug ) ) {
 			$slug = sanitize_title( $name );
@@ -122,6 +175,15 @@ class ShippingHelpers {
 		return $inserted_term['term_id'];
 	}
 
+	/**
+	 * Add a tax rate to the WooCommerce database.
+	 *
+	 * @param string $country          Tax rate country.
+	 * @param string $state            Tax rate state.
+	 * @param string $tax_rate         Tax rate value.
+	 * @param string $is_for_shipping  Is applicable to shipping.
+	 * @return void
+	 */
 	public static function addTaxRate( $country = '', $state = '', $tax_rate = '20.0000', $is_for_shipping = '0' ) {
 		$tax_rate    = array(
 			'tax_rate_country'  => $country,
@@ -138,6 +200,12 @@ class ShippingHelpers {
 		return $tax_rate_id;
 	}
 
+	/**
+	 * Used in the shipping tests tearDown.
+	 * This basically resets the DB to the clean state and makes it ready for the next test.
+	 *
+	 * @return void
+	 */
 	public static function cleanup() {
 		// Reset WooCommerce shipping data and cache.
 		global $wpdb;
