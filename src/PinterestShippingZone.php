@@ -3,7 +3,9 @@
  * Represents a single Pinterest shipping zone
  *
  * @since   x.x.x
+ * @package Automattic\WooCommerce\Pinterest
  */
+
 namespace Automattic\WooCommerce\Pinterest;
 
 defined( 'ABSPATH' ) || exit;
@@ -13,15 +15,36 @@ use \WC_Shipping_Zone;
 /**
  * WC_Shipping_Zone class.
  */
-class ShippingZone extends WC_Shipping_Zone {
+class PinterestShippingZone extends WC_Shipping_Zone {
 
+
+	/**
+	 * Caching for internal structure of locations.
+	 *
+	 * @var $zone_countries_with_states
+	 */
 	private $zone_countries_with_states = null;
+
+	/**
+	 * Caching for supported shipping methods.
+	 *
+	 * @var $zone_countries_with_states
+	 */
 	private $supported_shipping_methods = null;
 
-	private function filter_out_not_allowed_countries( $location_objects ) {
+
+	/**
+	 * From the list of countries filter out those which are not supported right now.
+	 *
+	 * @since   x.x.x
+	 *
+	 * @param  array $locations List of countries to filter.
+	 * @return array            List of filtered countries.
+	 */
+	private function filter_out_not_allowed_countries( $locations ) {
 		$allowed_countries = \Pinterest_For_Woocommerce_Admin::get_ads_supported_countries();
 		return array_filter(
-			$location_objects,
+			$locations,
 			function ( $location ) use ( $allowed_countries ) {
 				return in_array( $location['country'], $allowed_countries, true );
 			}

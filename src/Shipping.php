@@ -30,7 +30,7 @@ class Shipping {
 		$zones      = array();
 
 		foreach ( $raw_zones as $raw_zone ) {
-			$zones[] = new ShippingZone( $raw_zone );
+			$zones[] = new PinterestShippingZone( $raw_zone );
 		}
 		return $zones;
 	}
