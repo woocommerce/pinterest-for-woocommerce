@@ -103,7 +103,7 @@
   },
   "scripts": {
     "prebuild": "composer install --no-dev",
-    "build": "wp-scripts build && gulp build && gulp package",
+    "build": "wp-scripts build && gulp package",
     "postbuild": "composer install",
     "build:zip": "npm run build",
     "dev": "wp-scripts build && gulp build",
