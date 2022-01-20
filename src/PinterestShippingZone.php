@@ -13,10 +13,14 @@ defined( 'ABSPATH' ) || exit;
 use \WC_Shipping_Zone;
 
 /**
- * WC_Shipping_Zone class.
+ * PinterestShippingZone class.
+ *
+ * By extending WC_Shipping_Zone we are able to add functionality necessary for Pinterest shipping column generation.
+ * This allows us to operate on familiar interface which will be useful when we will continue to expand the functionality.
+ *
+ * @since x.x.x
  */
 class PinterestShippingZone extends WC_Shipping_Zone {
-
 
 	/**
 	 * Caching for internal structure of locations.
@@ -32,6 +36,15 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	 */
 	private $supported_shipping_methods = null;
 
+	/**
+	 * Types of allowed shipping methods.
+	 */
+	const ALLOWED_SHIPPING_METHODS = array( 'free_shipping', 'flat_rate' );
+
+	/**
+	 * Type of settings in the required field that we support.
+	 */
+	const ALLOWED_FREE_SHIPPING_REQUIRED_SETTINGS = array( '', 'min_amount' );
 
 	/**
 	 * From the list of countries filter out those which are not supported right now.
@@ -51,13 +64,22 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 		);
 	}
 
-	public function get_countries_with_states( $context = 'view' ) {
+	/**
+	 * From the zone settings generate a list of countries with states.
+	 * States are optional and added only if specified.
+	 * Countries are filtered to only include supported countries.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array Array of locations supported by this zone.
+	 */
+	public function get_countries_with_states() {
 		if ( null !== $this->zone_countries_with_states ) {
 			return $this->zone_countries_with_states;
 		}
 
 		$all_continents = WC()->countries->get_continents();
-		$zone_locations = $this->get_zone_locations( $context );
+		$zone_locations = $this->get_zone_locations();
 		$continents     = array_filter( $zone_locations, array( $this, 'location_is_continent' ) );
 		$countries      = array_filter( $zone_locations, array( $this, 'location_is_country' ) );
 		$states         = array_filter( $zone_locations, array( $this, 'location_is_state' ) );
@@ -65,7 +87,10 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 		$locations      = array();
 
 		if ( ! empty( $postcodes ) ) {
-			// W don't process zones with postcodes, assuming empty.
+			/**
+			 * W don't process zones with postcodes because Pinterest does not support postcode locations.
+			 * We need to act as if this zone is empty and it is not able to provide any shipping locations.
+			 */
 			$this->zone_countries_with_states = array();
 			return $this->zone_countries_with_states;
 		}
@@ -102,13 +127,26 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	 * in case we will need to do more complicated filtering as this is
 	 * a multidimensional filtering. It will also allow unit testing.
 	 *
+	 * Correctness of this approach is verified indirectly by shipping UT.
+	 *
+	 * @since x.x.x
+	 *
 	 * @param array $locations Array of locations.
-	 * @return array
+	 * @return array Array of locations with duplications removed.
 	 */
 	public function remove_duplicate_locations( $locations ) {
 		return array_unique( $locations, SORT_REGULAR );
 	}
 
+	/**
+	 * Turn country and state into location array.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $country Location country.
+	 * @param string $state   Location state.
+	 * @return array          Location array.
+	 */
 	private function map_to_location( $country, $state = '' ) {
 		return array(
 			'country' => $country,
@@ -116,6 +154,13 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 		);
 	}
 
+	/**
+	 * Combines zone locations with allowed shipping methods.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array Array with locations and allowed shipping methods.
+	 */
 	public function get_locations_with_shipping() {
 		$countries_with_states = $this->get_countries_with_states();
 		$shipping_methods      = $this->get_supported_shipping_methods();
@@ -129,6 +174,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 			'shipping_methods' => $shipping_methods,
 		);
 	}
+
 
 	private function get_supported_shipping_methods() {
 		if ( null !== $this->supported_shipping_methods ) {
@@ -144,14 +190,14 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	}
 
 	private function is_shipping_method_supported( $shipping_method ) {
-		if ( ! in_array( $shipping_method->id, [ 'free_shipping', 'flat_rate' ] ) ) {
+		if ( ! in_array( $shipping_method->id, self::ALLOWED_SHIPPING_METHODS, true ) ) {
 			return false;
 		}
 
-		// We don't support for now free shipping with additional requirements options.
-		// if ( 'free_shipping' === $shipping_method->id and $shipping_method->requires !== '' ) {
-		// 	return false;
-		// }
+		// We don't support for now free shipping with additional requirements options other than minimum.
+		if ( 'free_shipping' === $shipping_method->id && ! in_array( $shipping_method->requires, self::ALLOWED_FREE_SHIPPING_REQUIRED_SETTINGS, true ) ) {
+			return false;
+		}
 
 		return true;
 	}
