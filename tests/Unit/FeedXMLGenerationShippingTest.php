@@ -418,7 +418,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		$this->assertEquals( '<g:shipping>US::Flat rate:10.00 USD</g:shipping>', $xml );
 	}
 
-		/**
+	/**
 	 * @group shipping
 	 * @group shipping_tax
 	 */
