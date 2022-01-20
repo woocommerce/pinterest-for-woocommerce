@@ -176,6 +176,14 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	}
 
 
+	/**
+	 * Get shipping methods supported by the implementation.
+	 * Methods are filtered by allowed types and features.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array Supported shipping methods.
+	 */
 	private function get_supported_shipping_methods() {
 		if ( null !== $this->supported_shipping_methods ) {
 			return $this->supported_shipping_methods;
@@ -189,12 +197,19 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 		return $this->supported_shipping_methods;
 	}
 
+	/**
+	 * Verify if shipping method is supported.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param WC_Shipping_Method $shipping_method Shipping rate to verify.
+	 * @return boolean
+	 */
 	private function is_shipping_method_supported( $shipping_method ) {
 		if ( ! in_array( $shipping_method->id, self::ALLOWED_SHIPPING_METHODS, true ) ) {
 			return false;
 		}
 
-		// We don't support for now free shipping with additional requirements options other than minimum.
 		if ( 'free_shipping' === $shipping_method->id && ! in_array( $shipping_method->requires, self::ALLOWED_FREE_SHIPPING_REQUIRED_SETTINGS, true ) ) {
 			return false;
 		}
