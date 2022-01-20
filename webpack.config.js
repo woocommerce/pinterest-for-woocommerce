@@ -23,44 +23,19 @@ const ourPlugins = [
 	} ),
 ];
 
-// Webpack config for main admin app - onboarding and settings.
-const SetupGuide = {
+const webpackConfig = {
 	...defaultConfig,
 	plugins: ourPlugins,
 	entry: {
-		index: './assets/source/setup-guide/index.js',
-	},
-	output: {
-		...defaultConfig.output,
-		filename: '[name].js',
-		path: __dirname + '/assets/setup-guide',
-	},
-};
-
-// Webpack config for script to add our setup task.
-const SetupTask = {
-	...defaultConfig,
-	plugins: ourPlugins,
-	entry: {
-		index: './assets/source/setup-task/index.js',
+		'setup-guide': __dirname + '/assets/source/setup-guide/index.js',
+		'setup-task': __dirname + '/assets/source/setup-task/index.js',
+		'product-attributes':
+			__dirname + '/assets/source/product-attributes/index.js',
 	},
 	output: {
 		filename: '[name].js',
-		path: __dirname + '/assets/setup-task',
+		path: __dirname + '/assets/build',
 	},
 };
 
-// Webpack config for product-attributes.
-const ProductAttributes = {
-	...defaultConfig,
-	plugins: ourPlugins,
-	entry: {
-		index: './assets/source/product-attributes/index.js',
-	},
-	output: {
-		filename: '[name].js',
-		path: __dirname + '/assets/product-attributes',
-	},
-};
-
-module.exports = [ SetupGuide, SetupTask, ProductAttributes ];
+module.exports = webpackConfig;
