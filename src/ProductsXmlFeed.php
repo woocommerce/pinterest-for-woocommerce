@@ -360,6 +360,15 @@ class ProductsXmlFeed {
 		return '<' . $property . '><![CDATA[' . implode( ',', $images ) . ']]></' . $property . '>';
 	}
 
+	/**
+	 * Returns the product shipping information.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param WC_Product $product  The product.
+	 * @param string     $property The name of the property.
+	 * @return string
+	 */
 	private static function get_property_g_shipping( $product, $property ) {
 		$shipping = self::get_shipping();
 		$column   = $shipping->prepare_shipping_column( $product );
