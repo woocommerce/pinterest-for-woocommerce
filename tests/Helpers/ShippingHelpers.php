@@ -122,6 +122,22 @@ class ShippingHelpers {
 		return $inserted_term['term_id'];
 	}
 
+	public static function addTaxRate( $country = '', $state = '', $tax_rate = '20.0000', $is_for_shipping = '0' ) {
+		$tax_rate    = array(
+			'tax_rate_country'  => $country,
+			'tax_rate_state'    => $state,
+			'tax_rate'          => $tax_rate,
+			'tax_rate_name'     => ( (string) $tax_rate ) . 'percent',
+			'tax_rate_priority' => '1',
+			'tax_rate_compound' => '0',
+			'tax_rate_shipping' => $is_for_shipping,
+			'tax_rate_order'    => '1',
+			'tax_rate_class'    => ( (string) $tax_rate ) . 'percent',
+		);
+		$tax_rate_id = WC_Tax::_insert_tax_rate( $tax_rate );
+		return $tax_rate_id;
+	}
+
 	public static function cleanup() {
 		// Reset WooCommerce shipping data and cache.
 		global $wpdb;
