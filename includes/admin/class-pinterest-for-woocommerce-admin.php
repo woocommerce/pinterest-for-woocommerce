@@ -308,16 +308,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			);
 
 			wp_enqueue_style( $handle );
-
-			wp_register_style(
-				PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-catalog-sync',
-				Pinterest_For_Woocommerce()->plugin_url() . '/assets/catalog-sync/style-index.css',
-				array( 'wc-admin-app' ),
-				PINTEREST_FOR_WOOCOMMERCE_VERSION
-			);
-
-			wp_enqueue_style( $handle );
-
 		}
 
 		/**
