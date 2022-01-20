@@ -275,15 +275,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				);
 
 				wp_enqueue_script( $handle );
-
-				wp_register_style(
-					$handle,
-					Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/style-index.css',
-					array( 'wc-admin-app' ),
-					PINTEREST_FOR_WOOCOMMERCE_VERSION
-				);
-
-				wp_enqueue_style( $handle );
 			}
 
 			$build_path = '/assets/setup-guide';
