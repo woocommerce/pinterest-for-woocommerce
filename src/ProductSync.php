@@ -520,17 +520,6 @@ class ProductSync {
 			self::log( 'Pinterest returned a Declined status for product_pin_approval_status' );
 
 		} else {
-			$product_pin_feed_profile    = $merchant['data']->product_pin_feed_profile;
-			$product_pin_feed_profile_id = false;
-			$prev_registered             = self::get_registered_feed_id();
-			if ( false !== $prev_registered ) {
-				try {
-					$feed                        = API\Base::get_merchant_feed_report( $merchant['data']->id, $prev_registered );
-					$product_pin_feed_profile_id = $feed['data']->feed_profile_id;
-				} catch ( \Throwable $e ) {
-					$product_pin_feed_profile_id = false;
-				}
-			}
 
 			// Update feed if we don't have a feed_id saved or if local feed is not properly registered.
 			// for cases where the already existed in the API.

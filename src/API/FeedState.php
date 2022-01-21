@@ -246,29 +246,18 @@ class FeedState extends VendorAPI {
 	 */
 	private function add_feed_registration_state( $result ) {
 
-		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-		$feed_id     = Pinterest_For_Woocommerce()::get_data( 'feed_registered' );
-		$extra_info  = '';
+		$extra_info = '';
 
 		try {
 
-			if ( empty( $merchant_id ) || empty( $feed_id ) ) {
-				throw new \Exception( esc_html__( 'Product feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' ), 200 );
-			}
-
-			$merchant = Base::get_merchant( $merchant_id );
+			// Get the merchant object.
+			$merchant = Pinterest\Merchants::get_merchant();
 
 			if ( 'success' !== $merchant['status'] ) {
 				throw new \Exception( esc_html__( 'Could not get merchant info.', 'pinterest-for-woocommerce' ) );
 			}
 
-			$feed = Base::get_merchant_feed( $merchant_id, $feed_id );
-
-			if ( ! $feed ) {
-				throw new \Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
-			}
-
-			if ( 'ACTIVE' !== $feed->feed_status ) {
+			if ( 'ACTIVE' !== $merchant['data']->product_pin_feed_profile->feed_status ) {
 				throw new \Exception( esc_html__( 'Product feed not active.', 'pinterest-for-woocommerce' ) );
 			}
 
