@@ -43,6 +43,11 @@ class ProductsXmlFeed {
 		'g:additional_image_link',
 	);
 
+	/**
+	 * Shipping object. Used for caching between calls to the shipping column function.
+	 *
+	 * @var Shipping|null
+	 */
 	private static $shipping = null;
 
 	/**
@@ -399,6 +404,8 @@ class ProductsXmlFeed {
 
 	/**
 	 * Fetch shipping object.
+	 *
+	 * @since x.x.x
 	 *
 	 * @return Shipping
 	 */

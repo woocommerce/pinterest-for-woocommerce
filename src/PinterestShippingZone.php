@@ -188,7 +188,8 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 		if ( null !== $this->supported_shipping_methods ) {
 			return $this->supported_shipping_methods;
 		}
-		$active_shipping_methods = $this->get_shipping_methods( true );
+
+		$active_shipping_methods          = $this->get_shipping_methods( true );
 		$this->supported_shipping_methods = array_filter(
 			$active_shipping_methods,
 			array( $this, 'is_shipping_method_supported' )
