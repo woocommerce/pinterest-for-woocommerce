@@ -475,24 +475,6 @@ class Base {
 
 
 	/**
-	 * Get a merchant's feeds.
-	 *
-	 * @param string $merchant_id The merchant ID the feed belongs to.
-	 *
-	 * @return mixed
-	 */
-	public static function get_merchant_feeds( $merchant_id ) {
-		return self::make_request(
-			"catalogs/{$merchant_id}/feed_profiles/",
-			'GET',
-			array(),
-			'',
-			MINUTE_IN_SECONDS
-		);
-	}
-
-
-	/**
 	 * Updates the merchant's feed using the given arguments.
 	 *
 	 * @param string $merchant_id The merchant ID the feed belongs to.
