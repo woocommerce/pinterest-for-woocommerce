@@ -11,23 +11,38 @@ use \WC_Unit_Test_Case;
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
 
 /**
- * Feed file shipping generation testing class.
+ * Feed XML file shipping column generation test class.
  */
 class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 
 	// Holds products for the teardown action.
 	private $products = array();
 
+	/**
+	 * One time setup of the testing environment.
+	 *
+	 * @return void
+	 */
 	public static function setUpBeforeClass(): void
 	{
 		// Normally this would be loaded but not in the test scenario - so lets load it manually.
 		include_once 'includes/admin/class-pinterest-for-woocommerce-admin.php';
 	}
 
+	/**
+	 * Each test requires at least one product so lets prepare it here.
+	 *
+	 * @return void
+	 */
 	public function setUp() {
 		$this->products[] = WC_Helper_Product::create_simple_product(  true, array( "regular_price" => 15 ) );
 	}
 
+	/**
+	 * Delete products created for testing. And proceed with the cleanup.
+	 *
+	 * @return void
+	 */
 	public function tearDown() {
 		foreach( $this->products as $product ) {
 			$product->delete( true );
@@ -36,19 +51,23 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Check what happens when the user has no shipping zones defined.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testPropertyShippingNoShippingZones() {
+	public function testNoShippingZones() {
 		$xml        = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$this->assertEquals( '', $xml );
 	}
 
 	/**
+	 * Single shipping zone with free shipping for all destinations.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testPropertyShippingWithFreeShipping() {
+	public function testZoneWithFreeShipping() {
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['US', 'country']
@@ -61,10 +80,12 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Single shipping zone with flat rate shipping.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testPropertyShippingWithFlatRateShipping() {
+	public function testZoneWithFlatRateShipping() {
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['US', 'country']
@@ -77,10 +98,12 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Single shipping zone that has multiple countries and free shipping method.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testMultipleCountriesNoShipping(){
+	public function testZoneWithMultipleCountriesAndFreeShipping(){
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['US', 'country'],
@@ -94,10 +117,12 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Single zone with that has a country with state as location and flat rate shipping.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testPropertyShippingForStateWithFlatRateShipping() {
+	public function testZoneWithSingleCountryAndStateAndFlatRateShipping() {
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['US:CA', 'state']
@@ -110,10 +135,12 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Single shipping zone with a continent and flat rate shipping.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
-	public function testPropertyShippingForContinentWithFlatRateShipping() {
+	public function testZoneWithContinentAndFlatRateShipping() {
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['NA', 'continent']
@@ -126,6 +153,8 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Zone that has a country that is not supported.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
@@ -142,6 +171,8 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Zone that has a location with a post code.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
@@ -159,6 +190,8 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Zone with free shipping with a minimum required purchase and product that satisfies the condition.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
@@ -175,6 +208,8 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Zone with free shipping with a minimum required purchase and product that does not satisfies the condition.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
@@ -191,6 +226,8 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Check if we discard Free shipping method that has other requirements ( coupon ) than minimum purchase value.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
@@ -207,6 +244,8 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Flat rate shipping with no class cost.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
@@ -229,6 +268,8 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Flat rate shipping with no class cost and no class defined in WC.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
@@ -252,6 +293,8 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Flat rate shipping with class cost.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
@@ -278,10 +321,12 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * No duplicate locations.
+	 * The continent NA location includes 'US' so we test if we don't end up with two US entires.
+	 *
 	 * @group feed
 	 * @group shipping
 	 *
-	 * The continent NA location includes 'US' so we test if we don't end up with two US entires.
 	 */
 	public function testLocationHasNoDuplicateEntries() {
 		$zone = ShippingHelpers::createZoneWithLocations(
@@ -297,10 +342,10 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Mixing of country and the same country with state.
+	 *
 	 * @group feed
 	 * @group shipping
-	 *
-	 * When mixing state and single country we only allow for state?
 	 */
 	public function testMixedStateAndCountryLocation() {
 		$zone = ShippingHelpers::createZoneWithLocations(
@@ -316,6 +361,8 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Single zone, variable product and free shipping with minimum order value.
+	 *
 	 * @group feed
 	 * @group shipping
 	 */
@@ -328,8 +375,8 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		ShippingHelpers::addFreeShippingWithMinimumOrderAmount( $zone, 12 );
 
 		// By passing manually created Variable Product the create_variation_product will add children to it.
-		$product            = new WC_Product_Variable();
-		$variation_product  = WC_Helper_Product::create_variation_product( $product );
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
 
 		// create_variation_product creates multiple children, picking first one's cost is 10 ( per create_variation_product )
 		$child_id_0    = $variation_product->get_children()[0];
@@ -345,6 +392,9 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Shipping tax calculation.
+	 *
+	 * @group feed
 	 * @group shipping
 	 */
 	public function testTaxCalculationOnShipping() {
@@ -370,7 +420,11 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Shipping calculation if defined tax rate is not applicable to shipping.
+	 *
+	 * @group feed
 	 * @group shipping
+	 * @group shipping_tax
 	 */
 	public function testTaxCalculationOnShippingTaxRateNotApplicableToShipping() {
 		$zone = ShippingHelpers::createZoneWithLocations(
@@ -396,6 +450,9 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Tax calculation when tax specifies a country.
+	 *
+	 * @group feed
 	 * @group shipping
 	 * @group shipping_tax
 	 */

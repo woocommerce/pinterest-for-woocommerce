@@ -21,7 +21,7 @@ class ShippingHelpers {
 	 * For a given list of locations create a new shipping zone.
 	 *
 	 * @param array $locations Array of locations for then zone.
-	 * @return void
+	 * @return object Shipping zone.
 	 */
 	public static function createZoneWithLocations( $locations ) {
 		// US zone.
