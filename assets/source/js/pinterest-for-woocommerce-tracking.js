@@ -4,7 +4,8 @@
  * Bind to search form submit in order to track the search event.
  * Site search should use <form role='search'> to integrate with Pinterest for WooCommerce search event automatically.
  */
-window.onload = function () {
+// eslint-disable-next-line @wordpress/no-global-event-listener
+window.addEventListener( 'load', function () {
 	document
 		.querySelectorAll( "form[role='search']" )
 		.forEach( function ( form ) {
@@ -22,4 +23,4 @@ window.onload = function () {
 				}
 			} );
 		} );
-};
+} );
