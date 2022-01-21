@@ -46,7 +46,7 @@ class ProductsXmlFeed {
 	/**
 	 * Shipping object. Used for caching between calls to the shipping column function.
 	 *
-	 * @var Shipping|null
+	 * @var Shipping|null $shipping
 	 */
 	private static $shipping = null;
 
