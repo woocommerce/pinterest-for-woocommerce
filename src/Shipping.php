@@ -49,31 +49,48 @@ class Shipping {
 	 * @return string              Shipping column entry for $product.
 	 */
 	public function prepare_shipping_column( $product ) {
-		$shipping_zones = self::get_shipping_zones();
-		$lines          = array();
-		foreach ( $shipping_zones as $zone ) {
-			$shipping_info = $zone->get_locations_with_shipping();
-			if ( is_null( $shipping_info ) ) {
-				// No valid location in this shipping zone. Skip to the next zone.
-				continue;
-			}
+		$lines = array();
 
-			$currency = get_woocommerce_currency();
-			foreach ( $shipping_info['locations'] as $location ) {
-				$best_shipping = self::get_best_shipping_with_cost( $location, $shipping_info['shipping_methods'], $product );
-				if ( null === $best_shipping ) {
-					// No valid shipping cost for $location. Skip to the next shipping destination.
+		/**
+		 * Just to be sure that we are not obstructing the feed generation with shipping column calculation errors.
+		 * Catch everything and log. This is a safety measure for unpredicted behavior.
+		 */
+		try {
+			$shipping_zones = self::get_shipping_zones();
+
+			foreach ( $shipping_zones as $zone ) {
+				$shipping_info = $zone->get_locations_with_shipping();
+				if ( is_null( $shipping_info ) ) {
+					// No valid location in this shipping zone. Skip to the next zone.
 					continue;
 				}
-				$shipping_name    = $best_shipping['name'];
-				$shipping_cost    = $best_shipping['cost'];
-				$shipping_country = $location['country'];
-				$shipping_state   = $location['state'];
 
-				// Build shipping entry.
-				$lines[] = "$shipping_country:$shipping_state:$shipping_name:$shipping_cost $currency";
+				$currency = get_woocommerce_currency();
+				foreach ( $shipping_info['locations'] as $location ) {
+					$best_shipping = self::get_best_shipping_with_cost( $location, $shipping_info['shipping_methods'], $product );
+					if ( null === $best_shipping ) {
+						// No valid shipping cost for $location. Skip to the next shipping destination.
+						continue;
+					}
+					$shipping_name    = $best_shipping['name'];
+					$shipping_cost    = $best_shipping['cost'];
+					$shipping_country = $location['country'];
+					$shipping_state   = $location['state'];
+
+					// Build shipping entry.
+					$lines[] = "$shipping_country:$shipping_state:$shipping_name:$shipping_cost $currency";
+				}
 			}
+		} catch ( \Throwable $th ) {
+			Logger::log(
+				sprintf(
+					// translators: 1: error message.
+					esc_html__( "There was an error in shipping information generation for the feed file:\n%s", 'pinterest-for-woocommerce' ),
+					$th->getMessage()
+				)
+			);
 		}
+
 		return implode( ',', $lines );
 	}
 

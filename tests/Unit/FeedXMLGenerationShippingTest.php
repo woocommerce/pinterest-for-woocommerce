@@ -8,7 +8,9 @@ use WC_Product_Variable;
 use \WC_Helper_Product;
 use \WC_Unit_Test_Case;
 
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
+use Exception;
 
 /**
  * Feed XML file shipping column generation test class.
@@ -48,6 +50,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 			$product->delete( true );
 		}
 		ShippingHelpers::cleanup();
+		remove_action( 'woocommerce_flat_rate_shipping_add_rate', array( static::class, 'throwExceptionDuringAddRate' ), 10 );
 	}
 
 	/**
@@ -471,6 +474,53 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$this->assertEquals( '<g:shipping>US::Flat rate:10.00 USD,CA::Flat rate:12.00 USD</g:shipping>', $xml );
+	}
+
+	/**
+	 * @group exception
+	 *
+	 * @return void
+	 */
+	public function testCatchException() {
+
+		add_action( 'woocommerce_flat_rate_shipping_add_rate', array( static::class, 'throwExceptionDuringAddRate' ), 10 );
+
+		$zone = ShippingHelpers::createZoneWithLocations(
+			[
+				['US', 'country']
+			]
+		);
+
+		ShippingHelpers::addFlatRateShippingMethodToZone( $zone );
+
+		// Enable logging.
+		Pinterest_For_WooCommerce()::save_setting( 'enable_debug_logging', true );
+
+		/**
+		 * Mock logger object that will catch any logged messages.
+		 */
+		$mock_logger = new class {
+
+			static $message = '';
+			public function log( $level, $msg )
+			{
+				self::$message = $msg;
+			}
+		};
+
+		Logger::$logger = $mock_logger;
+
+		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+
+		// XML has no output;
+		$this->assertEquals( '', $xml );
+
+		// Exception was caught and logged;
+		$this->assertEquals( "There was an error in shipping information generation for the feed file:\nAdding rates failed.", $mock_logger::$message );
+	}
+
+	public static function throwExceptionDuringAddRate() {
+		throw new Exception( 'Adding rates failed.' );
 	}
 
 	/**
