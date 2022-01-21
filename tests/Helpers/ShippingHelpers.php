@@ -143,7 +143,7 @@ class ShippingHelpers {
 
 		$shipping_method->set_post_data( $shipping_method_configuration );
 
-		// Cheat process_admin_options that this is a shipping method save request.
+		// Cheat process_admin_options into thinking that this is a shipping method save request.
 		$_REQUEST['instance_id'] = $instance_id;
 		$shipping_method->process_admin_options();
 
