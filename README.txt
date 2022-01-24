@@ -107,6 +107,7 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 * Fix    - Fetch parent id for variable product during feed xml generation. ( [#320](https://github.com/wcommerce/pinterest-for-woocommerce/pull/320) )
 * Fix    - Plugin is blocking some 3rd party scripts. ( [#324](https://github.com/wcommerce/pinterest-for-woocommerce/pull/324) )
 * Fix    - Multiple catalog created on pinterest with no possibility to delete them. ( [#305](https://github.com/wcommerce/pinterest-for-woocommerce/pull/305) )
+* Fix    - Feed registration status is incorrect when user has more than one feed profile. ( [#335](https://github.com/wcommerce/pinterest-for-woocommerce/pull/335) )
 
 = 1.0.1 - 2021-11-16 =
 * Fix - Add PHP, JS & CSS linting GH actions.
