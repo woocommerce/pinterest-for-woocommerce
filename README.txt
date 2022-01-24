@@ -105,6 +105,7 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 * Add    - Product attribute for Google product category. ( [#317](https://github.com/wcommerce/pinterest-for-woocommerce/pull/317) )
 * Fix    - Onboarding wizard steps ( 2 and 3 ) are not clickable. ( [#318](https://github.com/wcommerce/pinterest-for-woocommerce/pull/318) )
 * Fix    - Fetch parent id for variable product during feed xml generation. ( [#320](https://github.com/wcommerce/pinterest-for-woocommerce/pull/320) )
+* Fix    - Plugin is blocking some 3rd party scripts. ( [#324](https://github.com/wcommerce/pinterest-for-woocommerce/pull/324) )
 
 = 1.0.1 - 2021-11-16 =
 * Fix - Add PHP, JS & CSS linting GH actions.
