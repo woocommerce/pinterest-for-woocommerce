@@ -87,7 +87,7 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
-= 1.0.1 - 2022-xx-xx =
+= 1.0.2 - 2022-xx-xx =
 * Fix    - Update and improve feedstate. ( [#240](https://github.com/woocommerce/pinterest-for-woocommerce/pull/240) )
 * Add    - Tooltips for the Publish Pins and Rich Pins options on the settings page. ( [#253](https://github.com/woocommerce/pinterest-for-woocommerce/pull/253) )
 * Add    - Merchant guidelines link in the setup page. ( [#255](https://github.com/woocommerce/pinterest-for-woocommerce/pull/255) )
