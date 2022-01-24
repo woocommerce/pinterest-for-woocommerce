@@ -246,18 +246,29 @@ class FeedState extends VendorAPI {
 	 */
 	private function add_feed_registration_state( $result ) {
 
-		$extra_info = '';
+		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
+		$feed_id     = Pinterest_For_Woocommerce()::get_data( 'feed_registered' );
+		$extra_info  = '';
 
 		try {
 
-			// Get the merchant object.
-			$merchant = Pinterest\Merchants::get_merchant();
+			if ( empty( $merchant_id ) || empty( $feed_id ) ) {
+				throw new \Exception( esc_html__( 'Product feed not yet configured on Pinterest.', 'pinterest-for-woocommerce' ), 200 );
+			}
+
+			$merchant = Base::get_merchant( $merchant_id );
 
 			if ( 'success' !== $merchant['status'] ) {
 				throw new \Exception( esc_html__( 'Could not get merchant info.', 'pinterest-for-woocommerce' ) );
 			}
 
-			if ( 'ACTIVE' !== $merchant['data']->product_pin_feed_profile->feed_status ) {
+			$feed = Pinterest\Feeds::get_merchant_feed( $merchant_id, $feed_id );
+
+			if ( ! $feed ) {
+				throw new \Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
+			}
+
+			if ( 'ACTIVE' !== $feed->feed_status ) {
 				throw new \Exception( esc_html__( 'Product feed not active.', 'pinterest-for-woocommerce' ) );
 			}
 
@@ -268,13 +279,13 @@ class FeedState extends VendorAPI {
 					$status       = 'success';
 					$status_label = esc_html__( 'Product feed configured for ingestion on Pinterest', 'pinterest-for-woocommerce' );
 
-					if ( ! empty( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq ) ) {
+					if ( ! empty( $feed->location_config->full_feed_fetch_freq ) ) {
 						$extra_info = wp_kses_post(
 							sprintf(
 								/* Translators: %1$s The URL of the product feed, %2$s Time string */
 								__( 'Pinterest will fetch your <a href="%1$s" target="_blank">product feed</a> every %2$s', 'pinterest-for-woocommerce' ),
-								$merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_location,
-								human_time_diff( 0, ( $merchant['data']->product_pin_feed_profile->location_config->full_feed_fetch_freq / 1000 ) )
+								$feed->location_config->full_feed_fetch_location,
+								human_time_diff( 0, ( $feed->location_config->full_feed_fetch_freq / 1000 ) )
 							)
 						);
 					}
