@@ -19,6 +19,7 @@ import {
 	useBodyClasses,
 	useCreateNotice,
 } from '../helpers/effects';
+import { SETTINGS_VIEW } from '../helpers/views';
 import NavigationClassic from '../../../components/navigation-classic';
 
 const SettingsApp = () => {
@@ -54,15 +55,21 @@ const SettingsApp = () => {
 			{ appSettings ? (
 				<div className="woocommerce-setup-guide__container">
 					<SetupAccount
-						view="settings"
+						view={ SETTINGS_VIEW }
 						setIsConnected={ setIsConnected }
 						isConnected={ isConnected }
 						isBusinessConnected={ isBusinessConnected }
 					/>
 
-					{ isGroup1Visible && <ClaimWebsite view="settings" /> }
-					{ isGroup2Visible && <SetupTracking view="settings" /> }
-					{ isGroup2Visible && <SaveSettingsButton /> }
+					{ isGroup1Visible && (
+						<ClaimWebsite view={ SETTINGS_VIEW } />
+					) }
+					{ isGroup2Visible && (
+						<SetupTracking view={ SETTINGS_VIEW } />
+					) }
+					{ isGroup2Visible && (
+						<SaveSettingsButton view={ SETTINGS_VIEW } />
+					) }
 				</div>
 			) : (
 				<Spinner />

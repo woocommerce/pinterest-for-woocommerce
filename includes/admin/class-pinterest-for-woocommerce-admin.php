@@ -384,7 +384,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				'serviceLoginUrl'          => $this->get_service_login_url(),
 				'createBusinessAccountUrl' => $this->get_create_business_account_url(),
 				'switchBusinessAccountUrl' => $this->get_switch_business_account_url(),
-				'domainToVerify'           => wp_parse_url( home_url(), PHP_URL_HOST ),
+				'homeUrlToVerify'          => home_url(),
 				'storeCountry'             => $store_country,
 				'isAdsSupportedCountry'    => in_array( $store_country, $this->get_ads_supported_countries(), true ),
 				'isConnected'              => ! empty( Pinterest_For_Woocommerce()::is_connected() ),
@@ -403,10 +403,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'merchantGuidelines'     => 'https://policy.pinterest.com/en/merchant-guidelines',
 					'convertToBusinessAcct'  => 'https://help.pinterest.com/en/business/article/get-a-business-account#section-15096',
 					'appealDeclinedMerchant' => 'https://www.pinterest.com/product-catalogs/data-source/?showModal=true',
+					'installTag'             => 'https://help.pinterest.com/en/business/article/install-the-pinterest-tag',
+					'adsManager'             => 'https://ads.pinterest.com/',
+					'preLaunchNotice'        => 'https://help.pinterest.com/en-gb/business/article/get-a-business-profile/',
+					'adsAvailability'        => 'https://help.pinterest.com/en/business/availability/ads-availability',
 				),
 				'isSetupComplete'          => Pinterest_For_Woocommerce()::is_setup_complete(),
 				'countryTos'               => Pinterest_For_Woocommerce()::get_applicable_tos(),
-
+				'claimWebsiteErrorStatus'  => array(
+					401 => 'token',
+					403 => 'connection',
+					406 => 'domain verification',
+					409 => 'meta-tag',
+					),
 			);
 		}
 

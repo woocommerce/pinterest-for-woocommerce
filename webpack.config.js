@@ -50,4 +50,17 @@ const SetupTask = {
 	},
 };
 
-module.exports = [ SetupGuide, SetupTask ];
+// Webpack config for product-attributes.
+const ProductAttributes = {
+	...defaultConfig,
+	plugins: ourPlugins,
+	entry: {
+		index: './assets/source/product-attributes/index.js',
+	},
+	output: {
+		filename: '[name].js',
+		path: __dirname + '/assets/product-attributes',
+	},
+};
+
+module.exports = [ SetupGuide, SetupTask, ProductAttributes ];

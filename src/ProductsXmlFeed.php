@@ -8,6 +8,10 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
+use WC_Product_Variation;
+use WC_Product;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -79,11 +83,42 @@ class ProductsXmlFeed {
 			}
 		}
 
+		$xml .= self::get_attributes_xml( $product, "\t\t\t" );
+
 		$xml .= "\t\t</item>" . PHP_EOL;
 
 		return apply_filters( 'pinterest_for_woocommerce_feed_item_xml', $xml, $product );
 	}
 
+	/**
+	 * Get the XML for all the product attributes.
+	 * Will only return the attributes which have been set
+	 * or are available for the product type.
+	 *
+	 * @param WC_Product $product WooCommerce product.
+	 * @param string     $indent  Line indentation string.
+	 * @return string XML string.
+	 */
+	private static function get_attributes_xml( $product, $indent ) {
+		$attribute_manager = AttributeManager::instance();
+		$attributes        = $attribute_manager->get_all_values( $product );
+		$xml               = '';
+
+		// Merge with parent's attributes if it's a variation product.
+		if ( $product instanceof WC_Product_Variation ) {
+			$parent_product    = wc_get_product( $product->get_parent_id() );
+			$parent_attributes = $attribute_manager->get_all_values( $parent_product );
+			$attributes        = array_merge( $parent_attributes, $attributes );
+		}
+
+		foreach ( $attributes as $name => $value ) {
+			$property = "g:{$name}";
+			$value    = esc_html( $value );
+			$xml     .= "{$indent}<{$property}>{$value}</{$property}>" . PHP_EOL;
+		}
+
+		return $xml;
+	}
 
 	/**
 	 * Returns the Product ID.
@@ -160,7 +195,8 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_g_product_type( $product, $property ) {
 
-		$taxonomies = self::get_taxonomies( $product->get_id() );
+		$id         = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
+		$taxonomies = self::get_taxonomies( $id );
 
 		if ( empty( $taxonomies ) ) {
 			return;
@@ -312,7 +348,7 @@ class ProductsXmlFeed {
 
 		if ( $attachment_ids && $product->get_image_id() ) {
 			foreach ( $attachment_ids as $attachment_id ) {
-				$images[] = wp_get_attachment_image_src( $attachment_id )[0];
+				$images[] = wp_get_attachment_image_src( $attachment_id, 'woocommerce_single' )[0];
 			}
 		}
 
