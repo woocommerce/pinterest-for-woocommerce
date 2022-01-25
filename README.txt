@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.8
 Requires PHP: 7.3
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -87,7 +87,7 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
-= 1.0.2 - 2022-xx-xx =
+= 1.0.2 - 2022-01-25 =
 * Fix    - Update and improve feedstate. ( [#240](https://github.com/woocommerce/pinterest-for-woocommerce/pull/240) )
 * Add    - Tooltips for the Publish Pins and Rich Pins options on the settings page. ( [#253](https://github.com/woocommerce/pinterest-for-woocommerce/pull/253) )
 * Add    - Merchant guidelines link in the setup page. ( [#255](https://github.com/woocommerce/pinterest-for-woocommerce/pull/255) )

@@ -13,7 +13,7 @@
 /**
  * Generate Categories class.
  *
- * @since x.x.x
+ * @since 1.0.2
  */
 class GenerateCategories {
 	const CATEGORIES_FILE_NAME = 'GoogleProductTaxonomy.php';
