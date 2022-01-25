@@ -243,6 +243,20 @@ class FeedGenerator extends AbstractChainedJob {
 
 			$products = wc_get_products( $products_query_args );
 
+			// Exclude products with zero price.
+			$products = array_filter(
+				$products,
+				function ( $product ) {
+					if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
+						$price = $product->get_variation_regular_price();
+					} else {
+						$price = $product->get_regular_price();
+					}
+
+					return ! ( empty( $price ) || empty( floatval( $price ) ) );
+				}
+			);
+
 			$this->prepare_feed_buffers();
 
 			array_walk(
