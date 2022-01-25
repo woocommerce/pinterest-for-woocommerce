@@ -59,7 +59,7 @@ class Merchants {
 			try {
 				$merchant = Base::get_merchant( $merchant_id );
 			} catch ( Throwable $th ) {
-				throw new Exception( __( 'There was an error trying to get the merchant object.', 'pinterest-for-woocommerce' ), 400 );
+				$merchant = false;
 			}
 		}
 
