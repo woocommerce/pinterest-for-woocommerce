@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.8
 Requires PHP: 7.3
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -86,6 +86,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.0.3 - 2022-01-25 =
+* Fix    - Allow proper setup for new merchants with no catalogs. ( [#339](https://github.com/woocommerce/pinterest-for-woocommerce/pull/339) )
 
 = 1.0.2 - 2022-01-25 =
 * Fix    - Update and improve feedstate. ( [#240](https://github.com/woocommerce/pinterest-for-woocommerce/pull/240) )
