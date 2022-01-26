@@ -251,12 +251,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				return;
 			}
 
+			$build_path = '/assets/build';
+
 			if ( Compat::should_show_tasks() ) {
 
-				$build_path = '/assets/setup-task';
-
-				$handle            = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE . '-setup-task';
-				$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/index.asset.php';
+				$handle            = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-task';
+				$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/setup-task.asset.php';
 				$script_info       = file_exists( $script_asset_path )
 					? include $script_asset_path
 					: array(
@@ -268,28 +268,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 				wp_register_script(
 					$handle,
-					Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/index.js',
+					Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/setup-task.js',
 					$script_info['dependencies'],
 					$script_info['version'],
 					true
 				);
 
 				wp_enqueue_script( $handle );
-
-				wp_register_style(
-					$handle,
-					Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/style-index.css',
-					array( 'wc-admin-app' ),
-					PINTEREST_FOR_WOOCOMMERCE_VERSION
-				);
-
-				wp_enqueue_style( $handle );
 			}
 
-			$build_path = '/assets/setup-guide';
-
-			$handle            = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE;
-			$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/index.asset.php';
+			$handle            = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide';
+			$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/setup-guide.asset.php';
 			$script_info       = file_exists( $script_asset_path )
 				? include $script_asset_path
 				: array(
@@ -301,7 +290,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 			wp_register_script(
 				$handle,
-				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/index.js',
+				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/setup-guide.js',
 				$script_info['dependencies'],
 				$script_info['version'],
 				true
@@ -311,22 +300,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 			wp_register_style(
 				$handle,
-				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/style-index.css',
+				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/style-setup-guide.css',
 				array( 'wc-admin-app' ),
 				PINTEREST_FOR_WOOCOMMERCE_VERSION
 			);
 
 			wp_enqueue_style( $handle );
-
-			wp_register_style(
-				PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-catalog-sync',
-				Pinterest_For_Woocommerce()->plugin_url() . '/assets/catalog-sync/style-index.css',
-				array( 'wc-admin-app' ),
-				PINTEREST_FOR_WOOCOMMERCE_VERSION
-			);
-
-			wp_enqueue_style( $handle );
-
 		}
 
 		/**

@@ -6,11 +6,6 @@ import { addFilter } from '@wordpress/hooks';
 import { getNewPath, getHistory } from '@woocommerce/navigation';
 
 /**
- * Internal dependencies
- */
-import '../setup-guide/app/style.scss';
-
-/**
  * Use the 'woocommerce_admin_onboarding_task_list' filter to add a task page.
  */
 addFilter(
