@@ -71,6 +71,8 @@ class Merchants {
 				throw new Exception( __( 'Wrong response when trying to create or update merchant.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
+			$merchant_id = $response['merchant_id'];
+
 			try {
 				$merchant = Base::get_merchant( $merchant_id );
 			} catch ( Throwable $th ) {
