@@ -4,7 +4,6 @@
  *
  * @package     Pinterest
  * @since x.x.x
- *
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
