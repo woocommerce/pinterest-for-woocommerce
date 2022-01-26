@@ -21,17 +21,6 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	private $products = array();
 
 	/**
-	 * One time setup of the testing environment.
-	 *
-	 * @return void
-	 */
-	public static function setUpBeforeClass(): void
-	{
-		// Normally this would be loaded but not in the test scenario - so lets load it manually.
-		include_once 'includes/admin/class-pinterest-for-woocommerce-admin.php';
-	}
-
-	/**
 	 * Each test requires at least one product so lets prepare it here.
 	 *
 	 * @return void

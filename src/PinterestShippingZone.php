@@ -55,7 +55,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	 * @return array            List of filtered countries.
 	 */
 	private function filter_out_not_allowed_countries( $locations ) {
-		$allowed_countries = \Pinterest_For_Woocommerce_Admin::get_ads_supported_countries();
+		$allowed_countries = \Pinterest_For_Woocommerce_Ads_Supported_Countries::get_countries();
 		return array_filter(
 			$locations,
 			function ( $location ) use ( $allowed_countries ) {

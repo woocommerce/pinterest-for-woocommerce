@@ -162,6 +162,7 @@ class Shipping {
 		$rates   = array();
 
 		// Substitute default customer location and billing for.
+		WC()->customer = new \WC_Customer( get_current_user_id() );
 		WC()->customer->set_billing_location( $shipping_location['country'], $shipping_location['state'] );
 		WC()->customer->set_shipping_location( $shipping_location['country'], $shipping_location['state'] );
 
