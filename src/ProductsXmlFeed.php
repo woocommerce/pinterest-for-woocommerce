@@ -412,6 +412,11 @@ class ProductsXmlFeed {
 	private static function get_shipping() {
 		if ( null === self::$shipping ) {
 			self::$shipping = new Shipping();
+			/**
+			 * When we start generating lets make sure that the cart is loaded.
+			 * Various shipping and tax functions are using elements of cart.
+			 */
+			wc_load_cart();
 		}
 		return self::$shipping;
 	}

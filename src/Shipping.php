@@ -219,7 +219,6 @@ class Shipping {
 	 * @return array               Product packed into a package for use by shipping methods.
 	 */
 	public static function put_product_into_a_shipping_package( $product, $location ) {
-		include_once WC_ABSPATH . 'includes/wc-cart-functions.php';
 		$cart_item = array(
 			'key'          => 0,
 			'product_id'   => $product->get_id(),
