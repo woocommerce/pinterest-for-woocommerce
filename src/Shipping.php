@@ -203,6 +203,10 @@ class Shipping {
 			}
 		}
 
+		if ( INF === $best_cost ) {
+			return null;
+		}
+
 		return array(
 			'cost' => wc_format_decimal( $best_cost, 2 ),
 			'name' => $best_name,
