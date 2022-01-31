@@ -292,7 +292,7 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '>' . $price . get_woocommerce_currency() . '</' . $property . '>';
+		return '<' . $property . '>' . wc_format_decimal( $price, wc_get_price_decimals() ) . get_woocommerce_currency() . '</' . $property . '>';
 	}
 
 	/**
@@ -317,7 +317,7 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '>' . $price . get_woocommerce_currency() . '</' . $property . '>';
+		return '<' . $property . '>' . wc_format_decimal( $price, wc_get_price_decimals() ) . get_woocommerce_currency() . '</' . $property . '>';
 	}
 
 	/**
