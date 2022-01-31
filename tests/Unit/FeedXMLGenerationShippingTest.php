@@ -99,13 +99,13 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		$zone = ShippingHelpers::createZoneWithLocations(
 			[
 				['US', 'country'],
-				['UK', 'country'],
+				['GB', 'country'],
 				['IT', 'country'],
 			]
 		);
 		$zone->add_shipping_method( 'free_shipping' );
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD,IT::Free shipping:0.00 USD</g:shipping>', $xml );
+		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD,GB::Free shipping:0.00 USD,IT::Free shipping:0.00 USD</g:shipping>', $xml );
 	}
 
 	/**
