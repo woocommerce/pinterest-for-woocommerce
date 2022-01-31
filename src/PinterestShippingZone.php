@@ -88,7 +88,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 
 		if ( ! empty( $postcodes ) ) {
 			/**
-			 * W don't process zones with postcodes because Pinterest does not support postcode locations.
+			 * We don't process zones with postcodes because Pinterest does not support postcode locations.
 			 * We need to act as if this zone is empty and it is not able to provide any shipping locations.
 			 */
 			$this->zone_countries_with_states = array();
