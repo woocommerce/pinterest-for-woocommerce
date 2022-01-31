@@ -42,6 +42,7 @@ class Shipping {
 	 * Prepare content of a shipping column entry for $product.
 	 * Entry is a comma separated string with values in the following format:
 	 *   COUNTRY:STATE:POST_CODE:SHIPPING_COST
+	 * This is the format used by the XML feed.
 	 *
 	 * @since x.x.x
 	 *
