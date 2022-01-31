@@ -375,13 +375,24 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_g_shipping( $product, $property ) {
-		$shipping = self::get_shipping();
-		$column   = $shipping->prepare_shipping_column( $product );
+		$currency      = get_woocommerce_currency();
+		$entries       = array();
+		$shipping      = self::get_shipping();
+		$shipping_info = $shipping->prepare_shipping_info( $product );
 
-		if ( empty( $column ) ) {
+		if ( empty( $shipping_info ) ) {
 			return '';
 		}
-		return '<' . $property . '>' . $column . '</' . $property . '>';
+
+		/*
+		 * Entry is a comma separated string with values in the following format:
+		 *   COUNTRY:STATE:POST_CODE:SHIPPING_COST
+		 */
+		foreach ( $shipping_info as $info ) {
+			$entries[] = "$info[country]:$info[state]:$info[name]:$info[cost] $currency";
+		}
+
+		return '<' . $property . '>' . implode( ',', $entries ) . '</' . $property . '>';
 	}
 
 	/**

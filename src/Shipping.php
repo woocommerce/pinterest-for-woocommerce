@@ -39,18 +39,15 @@ class Shipping {
 	private static $shipping_zones = null;
 
 	/**
-	 * Prepare content of a shipping column entry for $product.
-	 * Entry is a comma separated string with values in the following format:
-	 *   COUNTRY:STATE:POST_CODE:SHIPPING_COST
-	 * This is the format used by the XML feed.
+	 * Prepare shipping information for $product.
 	 *
 	 * @since x.x.x
 	 *
 	 * @param  WC_Product $product Product for which we want to generate the shipping column.
-	 * @return string              Shipping column entry for $product.
+	 * @return array               Shipping information $product.
 	 */
-	public function prepare_shipping_column( $product ) {
-		$lines = array();
+	public function prepare_shipping_info( $product ) {
+		$info = array();
 
 		/**
 		 * Just to be sure that we are not obstructing the feed generation with shipping column calculation errors.
@@ -66,20 +63,22 @@ class Shipping {
 					continue;
 				}
 
-				$currency = get_woocommerce_currency();
 				foreach ( $shipping_info['locations'] as $location ) {
 					$best_shipping = self::get_best_shipping_with_cost( $location, $shipping_info['shipping_methods'], $product );
 					if ( null === $best_shipping ) {
 						// No valid shipping cost for $location. Skip to the next shipping destination.
 						continue;
 					}
-					$shipping_name    = $best_shipping['name'];
-					$shipping_cost    = $best_shipping['cost'];
-					$shipping_country = $location['country'];
-					$shipping_state   = $location['state'];
+
+					$entry = array(
+						'country' => $location['country'],
+						'state'   => $location['state'],
+						'name'    => $best_shipping['name'],
+						'cost'    => $best_shipping['cost']
+					);
 
 					// Build shipping entry.
-					$lines[] = "$shipping_country:$shipping_state:$shipping_name:$shipping_cost $currency";
+					$info[] = $entry;
 				}
 			}
 		} catch ( \Throwable $th ) {
@@ -92,7 +91,7 @@ class Shipping {
 			);
 		}
 
-		return implode( ',', $lines );
+		return $info;
 	}
 
 	/**
