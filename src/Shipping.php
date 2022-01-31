@@ -74,7 +74,7 @@ class Shipping {
 						'country' => $location['country'],
 						'state'   => $location['state'],
 						'name'    => $best_shipping['name'],
-						'cost'    => $best_shipping['cost']
+						'cost'    => $best_shipping['cost'],
 					);
 
 					// Build shipping entry.
