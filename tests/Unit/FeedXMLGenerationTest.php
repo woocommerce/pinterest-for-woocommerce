@@ -90,7 +90,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$this->assertEquals( 'in stock', $g_children['availability'] );
 
 		// Default price from WC_Helper_Product.
-		$this->assertEquals( '10USD', $g_children['price'] );
+		$this->assertEquals( '10.00USD', $g_children['price'] );
 
 		// No description set.
 		$this->assertArrayNotHasKey( 'image_link', $g_children, "By default product does not have an image link." );
@@ -309,7 +309,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$price_method = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
 		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
 		$xml          = $price_method( $product );
-		$this->assertEquals( '<g:price>15USD</g:price>', $xml );
+		$this->assertEquals( '<g:price>15.00USD</g:price>', $xml );
 	}
 
 	/**
@@ -332,7 +332,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 			)
 		);
 		$xml     = $sale_price_method( $product );
-		$this->assertEquals( '<sale_price>5USD</sale_price>', $xml );
+		$this->assertEquals( '<sale_price>5.00USD</sale_price>', $xml );
 	}
 
 	/**
