@@ -159,7 +159,7 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_title( $product, $property ) {
-		return '<' . $property . '><![CDATA[' . $product->get_name() . ']]></' . $property . '>';
+		return '<' . $property . '><![CDATA[' . wp_strip_all_tags( $product->get_name() ) . ']]></' . $property . '>';
 	}
 
 	/**
@@ -182,7 +182,26 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '><![CDATA[' . $description . ']]></' . $property . '>';
+		/**
+		 * Filters whether the shortcodes should be applied for product descriptions when generating the feed or be stripped out.
+		 *
+		 * @param bool       $apply_shortcodes Shortcodes are applied if set to `true` and stripped out if set to `false`.
+		 * @param WC_Product $product          WooCommerce product object.
+		 */
+		$apply_shortcodes = apply_filters( 'pinterest_for_woocommerce_product_description_apply_shortcodes', false, $product );
+		if ( $apply_shortcodes ) {
+			// Apply active shortcodes.
+			$description = do_shortcode( $description );
+		} else {
+			// Strip out active shortcodes.
+			$description = strip_shortcodes( $description );
+		}
+
+		// Strip HTML tags from description.
+		$description = wp_strip_all_tags( $description );
+
+		// Limit the number of characters in the description to 10000.
+		return '<' . $property . '><![CDATA[' . substr( $description, 0, 10000 ) . ']]></' . $property . '>';
 	}
 
 	/**
