@@ -74,11 +74,15 @@ class ProductsXmlFeed {
 	/**
 	 * Returns the Item's XML for the given product.
 	 *
-	 * @param WC_Product $product The product to print the XML for.
+	 * @param WC_Product $product  The product to print the XML for.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public static function get_xml_item( $product ) {
+
+		if ( ! self::is_product_fit_for_feed( $product ) ) {
+			return null;
+		}
 
 		$xml = "\t\t<item>" . PHP_EOL;
 
@@ -96,6 +100,27 @@ class ProductsXmlFeed {
 
 		return apply_filters( 'pinterest_for_woocommerce_feed_item_xml', $xml, $product );
 	}
+
+
+	/**
+	 * Helper method to return if a product is fit for the feed profile.
+	 *
+	 * @param WC_Product $product The product.
+	 *
+	 * @return boolean
+	 */
+	private static function is_product_fit_for_feed( $product ) {
+
+		// Decide if product is fit for the feed based on price.
+		$price = self::get_product_regular_price( $product );
+
+		if ( empty( $price ) || empty( floatval( $price ) ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
 
 	/**
 	 * Get the XML for all the product attributes.
