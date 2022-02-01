@@ -87,6 +87,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.0.4 - 2022-xx-xx =
+* Fix - Store merchant id during the account creation. ( [#343](https://github.com/woocommerce/pinterest-for-woocommerce/pull/343) )
+
 = 1.0.3 - 2022-01-25 =
 * Fix    - Allow proper setup for new merchants with no catalogs. ( [#339](https://github.com/woocommerce/pinterest-for-woocommerce/pull/339) )
 
