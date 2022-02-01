@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
 use WC_Product_Variation;
 use WC_Product;
+use WC_Product_Variable;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -288,11 +289,7 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_g_price( $product, $property ) {
 
-		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
-			$price = $product->get_variation_regular_price();
-		} else {
-			$price = $product->get_regular_price();
-		}
+		$price = self::get_product_regular_price( $product );
 
 		if ( empty( $price ) ) {
 			return;
@@ -445,5 +442,22 @@ class ProductsXmlFeed {
 			wc_load_cart();
 		}
 		return self::$shipping;
+	}
+
+	/**
+	 * Helper method to return the regular price of a product.
+	 *
+	 * @param WC_Product|WC_Product_Variable $product The product.
+	 *
+	 * @return string
+	 */
+	private static function get_product_regular_price( $product ) {
+		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
+			$price = $product->get_variation_regular_price();
+		} else {
+			$price = $product->get_regular_price();
+		}
+
+		return $price;
 	}
 }
