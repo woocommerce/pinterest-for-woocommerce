@@ -18,11 +18,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ProductFeedStatus {
 
 	const STATE_PROPS = array(
-		'status'        => 'pending_config',
-		'current_index' => false,
-		'last_activity' => 0,
-		'product_count' => 0,
-		'error_message' => '',
+		'status'           => 'pending_config',
+		'current_index'    => false,
+		'current_products' => 0,
+		'last_activity'    => 0,
+		'product_count'    => 0,
+		'error_message'    => '',
 	);
 
 	/**

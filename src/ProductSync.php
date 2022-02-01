@@ -41,7 +41,7 @@ class ProductSync {
 	 *
 	 * @var integer
 	 */
-	private static $products_per_step = 500;
+	private static $products_per_step = 50;
 
 	/**
 	 * The number of products to hold in a buffer variable before writing their XML output to a file.
@@ -49,7 +49,7 @@ class ProductSync {
 	 *
 	 * @var integer
 	 */
-	private static $products_per_write = 100;
+	private static $products_per_write = 25;
 
 	/**
 	 * The current index of the loop iterating through feed creation steps.
@@ -57,6 +57,14 @@ class ProductSync {
 	 * @var integer
 	 */
 	private static $current_index = 0;
+
+	/**
+	 * The current number of products already added to the feed.
+	 * Using current_index to track this may lead to errors if some products not fit on the feed.
+	 *
+	 * @var integer
+	 */
+	private static $current_products = 0;
 
 	/**
 	 * The buffer used to hold XML markup to be printed to the XML file.
@@ -327,16 +335,18 @@ class ProductSync {
 			);
 
 			ProductFeedStatus::store_dataset( $product_ids );
-			self::$current_index = 0;
+			self::$current_index    = 0;
+			self::$current_products = 0;
 		}
 
 		try {
 
 			if ( 'in_progress' === $state['status'] ) {
 
-				$product_ids         = ProductFeedStatus::retrieve_dataset();
-				self::$current_index = $state['current_index'];
-				self::$current_index = false === self::$current_index ? self::$current_index : ( (int) self::$current_index ) + 1; // Start on the next item.
+				$product_ids            = ProductFeedStatus::retrieve_dataset();
+				self::$current_index    = $state['current_index'];
+				self::$current_index    = false === self::$current_index ? self::$current_index : ( (int) self::$current_index ) + 1; // Start on the next item.
+				self::$current_products = $state['current_products'];
 			}
 
 			if ( false === self::$current_index || empty( $product_ids ) ) {
@@ -362,15 +372,23 @@ class ProductSync {
 			self::$iteration_buffer      = '';
 			self::$iteration_buffer_size = 0;
 			$step_index                  = 0;
+			$step_fit_products           = 0;
 			$products_count              = count( $product_ids );
-			$state['products_count']     = $products_count;
+			$products_fit_count          = self::$current_products;
 
 			for ( self::$current_index; ( self::$current_index < $products_count ); self::$current_index++ ) {
 
 				$product_id = $product_ids[ self::$current_index ];
 
-				self::$iteration_buffer .= ProductsXmlFeed::get_xml_item( wc_get_product( $product_id ) );
-				self::$iteration_buffer_size++;
+				$xml_item = ProductsXmlFeed::get_xml_item( wc_get_product( $product_id ) );
+
+				if ( $xml_item ) {
+					$products_fit_count++;
+					$step_fit_products++;
+					self::$current_products++;
+					self::$iteration_buffer .= $xml_item;
+					self::$iteration_buffer_size++;
+				}
 
 				if ( self::$iteration_buffer_size >= self::$products_per_write || self::$current_index >= $products_count ) {
 					self::write_iteration_buffer( $xml_file, $local_feed );
@@ -382,6 +400,8 @@ class ProductSync {
 					break;
 				}
 			}
+
+			$state['products_count'] = $products_fit_count;
 
 			if ( ! empty( self::$iteration_buffer ) ) {
 				self::write_iteration_buffer( $xml_file, $state );
@@ -399,7 +419,12 @@ class ProductSync {
 
 				$target_file = $local_feed['feed_file'];
 
-				ProductFeedStatus::set( array( 'status' => 'generated' ) );
+				ProductFeedStatus::set(
+					array(
+						'status'        => 'generated',
+						'product_count' => $products_fit_count,
+					)
+				);
 
 			} else {
 				// We got more products left. Schedule next iteration.
@@ -409,7 +434,7 @@ class ProductSync {
 
 			$end = microtime( true );
 			self::log( 'Feed step generation completed in ' . round( ( $end - $start ) * 1000 ) . 'ms. Current Index: ' . self::$current_index . ' / ' . $products_count );
-			self::log( 'Wrote ' . $step_index . ' products to file: ' . $target_file );
+			self::log( 'Wrote ' . $step_fit_products . ' / ' . $step_index . ' products to file: ' . $target_file );
 
 		} catch ( Throwable $th ) {
 
@@ -451,8 +476,9 @@ class ProductSync {
 
 			ProductFeedStatus::set(
 				array(
-					'status'        => 'in_progress',
-					'current_index' => self::$current_index,
+					'status'           => 'in_progress',
+					'current_index'    => self::$current_index,
+					'current_products' => self::$current_products,
 				)
 			);
 
