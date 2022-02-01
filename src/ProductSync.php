@@ -41,7 +41,7 @@ class ProductSync {
 	 *
 	 * @var integer
 	 */
-	private static $products_per_step = 50;
+	private static $products_per_step = 500;
 
 	/**
 	 * The number of products to hold in a buffer variable before writing their XML output to a file.
@@ -49,7 +49,7 @@ class ProductSync {
 	 *
 	 * @var integer
 	 */
-	private static $products_per_write = 25;
+	private static $products_per_write = 100;
 
 	/**
 	 * The current index of the loop iterating through feed creation steps.
