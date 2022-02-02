@@ -292,7 +292,7 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '>' . wc_format_decimal( $price, wc_get_price_decimals() ) . get_woocommerce_currency() . '</' . $property . '>';
+		return '<' . $property . '>' . wc_format_decimal( $price, self::get_currency_decimals() ) . get_woocommerce_currency() . '</' . $property . '>';
 	}
 
 	/**
@@ -317,7 +317,7 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '>' . wc_format_decimal( $price, wc_get_price_decimals() ) . get_woocommerce_currency() . '</' . $property . '>';
+		return '<' . $property . '>' . wc_format_decimal( $price, self::get_currency_decimals() ) . get_woocommerce_currency() . '</' . $property . '>';
 	}
 
 	/**
@@ -376,5 +376,14 @@ class ProductsXmlFeed {
 		}
 
 		return wp_list_pluck( $terms, 'name' );
+	}
+
+	/**
+	 * Get locale currency decimals
+	 */
+	private static function get_currency_decimals() {
+		$locale = localeconv();
+
+		return $locale['num_decimals'] ?? wc_get_price_decimals();
 	}
 }
