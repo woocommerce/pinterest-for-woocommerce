@@ -220,6 +220,21 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 */
+	public function testStripHtmlTagsPropertyTitleXML() {
+		$title_method = $this->getProductsXmlFeedAttributeMethod( 'title' );
+		$product      = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'name' => 'Dummy Product <h1>Dummy Tag</h1>',
+			)
+		);
+		$xml          = $title_method( $product );
+		$this->assertEquals( '<title><![CDATA[Dummy Product Dummy Tag]]></title>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
 	public function testPropertyProductTypeXML() {
 		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
 		$product             = WC_Helper_Product::create_simple_product();
