@@ -250,6 +250,72 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 */
+	public function testStripShortcodesPropertyDescriptionXML() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		// Add simple shortcode to test.
+		add_shortcode(
+			'pinterest_for_woocommerce_sample_test_shortcode',
+			function () {
+				return 'sample-shortcode-rendered-result';
+			}
+		);
+
+		$description          = 'This product has a shortcode [pinterest_for_woocommerce_sample_test_shortcode] that will get stripped out.';
+		$expected_description = 'This product has a shortcode  that will get stripped out.';
+
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'short_description' => $description,
+			)
+		);
+
+		$xml = $description_method( $product );
+
+		$this->assertEquals( "<description><![CDATA[{$expected_description}]]></description>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testNoStripShortcodesPropertyDescriptionXML() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		// Add simple shortcode to test.
+		add_shortcode(
+			'pinterest_for_woocommerce_sample_test_shortcode',
+			function () {
+				return 'sample-shortcode-rendered-result';
+			}
+		);
+
+		// Add filter to apply shortcodes on description.
+		add_filter(
+			'pinterest_for_woocommerce_product_description_apply_shortcodes',
+			function() {
+				return true;
+			}
+		);
+
+		$description          = 'This product has a shortcode [pinterest_for_woocommerce_sample_test_shortcode] that will not get stripped out.';
+		$expected_description = 'This product has a shortcode sample-shortcode-rendered-result that will not get stripped out.';
+
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'short_description' => $description,
+			)
+		);
+
+		$xml = $description_method( $product );
+
+		$this->assertEquals( "<description><![CDATA[{$expected_description}]]></description>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
 	public function testPropertyProductTypeXML() {
 		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
 		$product             = WC_Helper_Product::create_simple_product();
@@ -494,6 +560,19 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		return function( $product ) use ( $method, $attribute ) {
 			return $method->invoke( null, $product, $attribute );
 		};
+	}
+
+	/**
+	 * Remove filters and shortcodes.
+	 */
+	public function tearDown() {
+		parent::tearDown();
+
+		// Remove any added filter.
+		remove_all_filters( 'pinterest_for_woocommerce_product_description_apply_shortcodes' );
+
+		// Remove added shortcodes.
+		remove_shortcode( 'pinterest_for_woocommerce_sample_test_shortcode' );
 	}
 
 }
