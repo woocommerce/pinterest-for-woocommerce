@@ -115,6 +115,24 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Test if a product with price set to 0 is skipped from the feed
+	 *
+	 * @group feed
+	 */
+	public function testSkipZeroPriceProductXML() {
+		// Create product with zero price
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'regular_price' => 0,
+			)
+		);
+
+		$xml = ProductsXmlFeed::get_xml_item( $product );
+		$this->assertEquals( null, $xml );
+	}
+
+	/**
 	 * @group feed
 	 */
 	public function testDescriptionForSimpleProductXML() {
