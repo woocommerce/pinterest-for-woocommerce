@@ -382,8 +382,9 @@ class ProductsXmlFeed {
 	 * Get locale currency decimals
 	 */
 	private static function get_currency_decimals() {
-		$locale = localeconv();
+		$locale_info = include WC()->plugin_path() . '/i18n/locale-info.php';
+		$country     = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
 
-		return $locale['num_decimals'] ?? wc_get_price_decimals();
+		return $locale_info[ $country ]['num_decimals'] ?? wc_get_price_decimals();
 	}
 }
