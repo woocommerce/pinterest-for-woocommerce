@@ -423,7 +423,7 @@ class ProductsXmlFeed {
 		return $locale_info[ $country ]['num_decimals'] ?? wc_get_price_decimals();
 	}
 
-	 * Fetch shipping object.
+	/** Fetch shipping object.
 	 *
 	 * @since x.x.x
 	 *
