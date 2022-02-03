@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.8
 Requires PHP: 7.3
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -87,7 +87,7 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
-= 1.0.4 - 2022-xx-xx =
+= 1.0.4 - 2022-02-03 =
 * Fix - Store merchant id during the account creation. ( [#343](https://github.com/woocommerce/pinterest-for-woocommerce/pull/343) )
 
 = 1.0.3 - 2022-01-25 =
