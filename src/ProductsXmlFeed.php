@@ -43,6 +43,12 @@ class ProductsXmlFeed {
 		'g:additional_image_link',
 	);
 
+	/**
+	 * Shipping object. Used for caching between calls to the shipping column function.
+	 *
+	 * @var Shipping|null $shipping
+	 */
+	private static $shipping = null;
 
 	/**
 	 * Returns the XML header to be printed.
@@ -359,6 +365,35 @@ class ProductsXmlFeed {
 		return '<' . $property . '><![CDATA[' . implode( ',', $images ) . ']]></' . $property . '>';
 	}
 
+	/**
+	 * Returns the product shipping information.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param WC_Product $product  The product.
+	 * @param string     $property The name of the property.
+	 * @return string
+	 */
+	private static function get_property_g_shipping( $product, $property ) {
+		$currency      = get_woocommerce_currency();
+		$entries       = array();
+		$shipping      = self::get_shipping();
+		$shipping_info = $shipping->prepare_shipping_info( $product );
+
+		if ( empty( $shipping_info ) ) {
+			return '';
+		}
+
+		/*
+		 * Entry is a comma separated string with values in the following format:
+		 *   COUNTRY:STATE:POST_CODE:SHIPPING_COST
+		 */
+		foreach ( $shipping_info as $info ) {
+			$entries[] = "$info[country]:$info[state]:$info[name]:$info[cost] $currency";
+		}
+
+		return '<' . $property . '>' . implode( ',', $entries ) . '</' . $property . '>';
+	}
 
 	/**
 	 * Helper method to return the taxonomies of the product in a useful format.
@@ -377,4 +412,24 @@ class ProductsXmlFeed {
 
 		return wp_list_pluck( $terms, 'name' );
 	}
+
+	/**
+	 * Fetch shipping object.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return Shipping
+	 */
+	private static function get_shipping() {
+		if ( null === self::$shipping ) {
+			self::$shipping = new Shipping();
+			/**
+			 * When we start generating lets make sure that the cart is loaded.
+			 * Various shipping and tax functions are using elements of cart.
+			 */
+			wc_load_cart();
+		}
+		return self::$shipping;
+	}
+
 }

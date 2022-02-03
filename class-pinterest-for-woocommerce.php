@@ -202,6 +202,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		private function includes() {
 
+			include_once 'includes/class-pinterest-for-woocommerce-ads-supported-countries.php';
+
 			if ( $this->is_request( 'admin' ) ) {
 				include_once 'includes/admin/class-pinterest-for-woocommerce-admin.php';
 			}
