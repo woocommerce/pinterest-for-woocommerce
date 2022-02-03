@@ -129,7 +129,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		);
 
 		$xml = ProductsXmlFeed::get_xml_item( $product );
-		$this->assertEquals( null, $xml );
+		$this->assertEquals( '', $xml );
 	}
 
 	/**

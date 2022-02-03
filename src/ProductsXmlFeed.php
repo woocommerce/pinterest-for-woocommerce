@@ -76,12 +76,12 @@ class ProductsXmlFeed {
 	 *
 	 * @param WC_Product $product  The product to print the XML for.
 	 *
-	 * @return string|null
+	 * @return string XML string
 	 */
 	public static function get_xml_item( $product ) {
 
 		if ( ! self::is_product_fit_for_feed( $product ) ) {
-			return null;
+			return '';
 		}
 
 		$xml = "\t\t<item>" . PHP_EOL;
