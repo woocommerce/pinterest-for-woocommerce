@@ -382,7 +382,7 @@ class ProductSync {
 
 				$xml_item = ProductsXmlFeed::get_xml_item( wc_get_product( $product_id ) );
 
-				if ( $xml_item ) {
+				if ( '' !== $xml_item ) {
 					$products_fit_count++;
 					$step_fit_products++;
 					self::$current_products++;
