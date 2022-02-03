@@ -1,5 +1,8 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.0.4 - 2022-02-03 =
+* Fix - Store merchant id during the account creation. ( [#343](https://github.com/woocommerce/pinterest-for-woocommerce/pull/343) )
+
 = 1.0.3 - 2022-01-25 =
 * Fix    - Allow proper setup for new merchants with no catalogs. ( [#339](https://github.com/woocommerce/pinterest-for-woocommerce/pull/339) )
 
