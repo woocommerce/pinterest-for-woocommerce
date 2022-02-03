@@ -365,7 +365,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				'switchBusinessAccountUrl' => $this->get_switch_business_account_url(),
 				'homeUrlToVerify'          => home_url(),
 				'storeCountry'             => $store_country,
-				'isAdsSupportedCountry'    => in_array( $store_country, $this->get_ads_supported_countries(), true ),
+				'isAdsSupportedCountry'    => in_array( $store_country, Pinterest_For_Woocommerce_Ads_Supported_Countries::get_countries(), true ),
 				'isConnected'              => ! empty( Pinterest_For_Woocommerce()::is_connected() ),
 				'isBusinessConnected'      => ! empty( Pinterest_For_Woocommerce()::is_business_connected() ),
 				'businessAccounts'         => Pinterest_For_Woocommerce()::get_linked_businesses(),
@@ -511,48 +511,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			$allowed_hosts[] = wp_parse_url( $service_domain, PHP_URL_HOST );
 
 			return $allowed_hosts;
-		}
-
-
-		/**
-		 * Get the alpha-2 country codes where Pinterest advertises.
-		 *
-		 * @see https://help.pinterest.com/en/business/availability/ads-availability
-		 *
-		 * @return string[]
-		 */
-		private function get_ads_supported_countries() {
-			return array(
-				'AU', // Australia.
-				'AT', // Austria.
-				'BE', // Belgium.
-				'BR', // Brazil.
-				'CA', // Canada.
-				'CY', // Cyprus.
-				'CZ', // Czech Republic.
-				'DK', // Denmark.
-				'FI', // Finland.
-				'FR', // France.
-				'DE', // Germany.
-				'GR', // Greece.
-				'HU', // Hungary.
-				'IE', // Ireland.
-				'IT', // Italy.
-				'LU', // Luxembourg.
-				'MT', // Malta.
-				'NL', // Netherlands.
-				'NZ', // New Zealand.
-				'NO', // Norway.
-				'PL', // Poland.
-				'PT', // Portugal.
-				'RO', // Romania.
-				'SK', // Slovakia.
-				'ES', // Spain.
-				'SE', // Sweden.
-				'CH', // Switzerland.
-				'GB', // United Kingdom (UK).
-				'US', // United States (US).
-			);
 		}
 	}
 

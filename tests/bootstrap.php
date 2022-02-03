@@ -57,6 +57,9 @@ require "{$wp_tests_dir}/includes/bootstrap.php";
 // Start up the WC testing environment.
 require_once $wc_dir . '/tests/legacy/bootstrap.php';
 
+// Add helpers for shipping tests.
+require_once PLUGIN_TESTS_DIR . '/Helpers/ShippingHelpers.php';
+
 /**
  * Load WooCommerce for testing
  *
