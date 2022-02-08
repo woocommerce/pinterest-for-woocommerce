@@ -247,6 +247,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Disconnect advertiser if advertiser or tag change.
 			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
+
+			// Enable customer session if tracking is enabled.
+			add_action( 'woocommerce_init', array( $this, 'enable_woocommerce_session' ) );
 		}
 
 
@@ -276,6 +279,21 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$admin->register();
 			$attributes_tab->register();
 			$variation_attributes->register();
+		}
+
+		/**
+		 * Enable WC_Sessions on woocommerce_init to track events for unauthorized users.
+		 *
+		 * @return void
+		 */
+		public function enable_woocommerce_session() {
+			if ( is_user_logged_in() || is_admin() || ! self::is_tracking_configured() ) {
+				return;
+			}
+
+			if ( isset( WC()->session ) && ! WC()->session->has_session() ) {
+				WC()->session->set_customer_session_cookie( true );
+			}
 		}
 
 		/**
