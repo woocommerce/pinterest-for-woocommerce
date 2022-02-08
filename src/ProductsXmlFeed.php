@@ -426,7 +426,7 @@ class ProductsXmlFeed {
 			set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_currencies_list', $currencies, DAY_IN_SECONDS );
 		}
 
-		return $currencies[ get_woocommerce_currency() ];
+		return $currencies[ get_woocommerce_currency() ] ?? 2;
 	}
 
 	/** Fetch shipping object.
