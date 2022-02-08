@@ -48,6 +48,14 @@ class Logger {
 			$allow_logging = Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' );
 		}
 
+		/*
+		 * When the integration is not connected force the logs.
+		 * This will allow to debug potential connection issues.
+		 */
+		if ( ! Pinterest_For_Woocommerce()::is_setup_complete() ) {
+			$allow_logging = true;
+		}
+
 		if ( empty( $allow_logging ) || ! function_exists( 'wc_get_logger' ) ) {
 			return;
 		}
