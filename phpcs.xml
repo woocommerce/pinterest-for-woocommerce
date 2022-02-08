@@ -10,6 +10,7 @@
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/*.asset.php</exclude-pattern>
+	<exclude-pattern>./tests/*</exclude-pattern>
 
 	<!-- Configs -->
 	<config name="minimum_supported_wp_version" value="5.6" />
@@ -23,6 +24,7 @@
 	<!-- Specific excludes -->
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
 		<exclude-pattern>src/*</exclude-pattern>
+		<exclude-pattern>bin/*</exclude-pattern>
 	</rule>
 
 	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
@@ -35,9 +37,7 @@
 		</properties>
 	</rule>
 
-	<rule ref="PHPCompatibility">
-		<exclude-pattern>tests/</exclude-pattern>
-	</rule>
+	<rule ref="PHPCompatibility" />
 
 	<rule ref="Squiz.Commenting.FileComment.Missing">
 		<exclude-pattern>index.asset.php</exclude-pattern>

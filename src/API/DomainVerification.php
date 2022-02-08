@@ -71,9 +71,12 @@ class DomainVerification extends VendorAPI {
 					$account_data = Pinterest_For_Woocommerce()::update_account_data();
 					return array_merge( (array) $result['data'], array( 'account_data' => $account_data ) );
 				}
+
+				throw new \Exception( 'Meta tag verification failed', 409 );
+
 			}
 
-			throw new \Exception();
+			throw new \Exception( 'Domain verification failed', 406 );
 
 		} catch ( \Throwable $th ) {
 
@@ -86,10 +89,14 @@ class DomainVerification extends VendorAPI {
 				return call_user_func( __METHOD__ );
 			}
 
-			/* Translators: The error description as returned from the API */
-			$error_message = sprintf( esc_html__( 'Your domain could not be automatically verified. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
-
-			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_verification_error', $error_message, array( 'status' => $error_code ) );
+			return new \WP_Error(
+				\PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_verification_error',
+				$th->getMessage(),
+				array(
+					'status'         => $error_code,
+					'pinterest_code' => method_exists( $th, 'get_pinterest_code' ) ? $th->get_pinterest_code() : 0,
+				)
+			);
 
 		}
 	}

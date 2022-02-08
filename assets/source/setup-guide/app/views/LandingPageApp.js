@@ -3,7 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { getNewPath, getHistory } from '@woocommerce/navigation';
-import { createInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement, useCallback } from '@wordpress/element';
+import { recordEvent } from '@woocommerce/tracks';
 import {
 	Button,
 	Card,
@@ -19,41 +20,67 @@ import {
  * Internal dependencies
  */
 import PrelaunchNotice from '../../../components/prelaunch-notice';
+import documentationLinkProps from '../helpers/documentation-link-props';
+import UnsupportedCountryNotice from '../components/UnsupportedCountryNotice';
 
+const tosHref = 'https://business.pinterest.com/business-terms-of-service/';
+
+/**
+ * Triggered on events during setup,
+ * like starting, ending, or navigating between steps.
+ *
+ * @event wcadmin_pfw_setup
+ *
+ * @property {string} target Setup phase that the user navigates to.
+ * @property {string} trigger UI element that triggered the action, e.g. `wizard-stepper` or `get-started` button.
+ */
+
+/**
+ * Welcome Section Card.
+ * To be used in getting started page.
+ *
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
+ * @fires wcadmin_pfw_setup with `{ target: 'onboarding', trigger: 'get-started' }` when "Get started" button is clicked for incomplete setup.
+ *
+ * @return {JSX.Element} Rendered element.
+ */
 const WelcomeSection = () => {
+	const handleGetStarted = () => {
+		if ( ! wcSettings.pinterest_for_woocommerce.isSetupComplete ) {
+			recordEvent( 'pfw_setup', {
+				target: 'onboarding',
+				trigger: 'get-started',
+			} );
+		}
+		getHistory().push(
+			getNewPath(
+				{},
+				wcSettings.pinterest_for_woocommerce.isSetupComplete
+					? '/pinterest/catalog'
+					: '/pinterest/onboarding'
+			)
+		);
+	};
 	return (
 		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__welcome-section">
 			<Flex>
 				<FlexBlock className="content-block">
 					<Text variant="title.medium">
 						{ __(
-							'Get your products in front of more than 475M people on Pinterest',
+							'Get your products in front of more than 400M people on Pinterest',
 							'pinterest-for-woocommerce'
 						) }
 					</Text>
 
 					<Text variant="body">
 						{ __(
-							'Pinterest is a visual discovery engine people use to find inspiration for their lives! More than 475 million people have saved more than 300 billion Pins, making it easier to turn inspiration into their next purchase.',
+							'Pinterest is a visual discovery engine people use to find inspiration for their lives! More than 400 million people have saved more than 300 billion Pins, making it easier to turn inspiration into their next purchase.',
 							'pinterest-for-woocommerce'
 						) }
 					</Text>
 
 					<Text variant="body">
-						<Button
-							isPrimary
-							onClick={ () =>
-								getHistory().push(
-									getNewPath(
-										{},
-										wcSettings.pinterest_for_woocommerce
-											.isSetupComplete
-											? '/pinterest/catalog'
-											: '/pinterest/onboarding'
-									)
-								)
-							}
-						>
+						<Button isPrimary onClick={ handleGetStarted }>
 							{ __( 'Get started', 'pinterest-for-woocommerce' ) }
 						</Button>
 					</Text>
@@ -69,9 +96,12 @@ const WelcomeSection = () => {
 									// Disabling no-content rule - content is interpolated from above string.
 									// eslint-disable-next-line jsx-a11y/anchor-has-content
 									<a
-										href="https://business.pinterest.com/business-terms-of-service/"
-										target="_blank"
-										rel="noreferrer"
+										{ ...documentationLinkProps( {
+											href: tosHref,
+											linkId: 'terms-of-service',
+											context: 'welcome-section',
+											rel: 'noreferrer',
+										} ) }
 									/>
 								),
 							}
@@ -163,6 +193,7 @@ const FaqSection = () => {
 				) }
 			>
 				<FaqQuestion
+					questionId={ 'why-account-not-connected-error' }
 					question={ __(
 						'Why am I getting an “Account not connected” error message?',
 						'pinterest-for-woocommerce'
@@ -173,6 +204,7 @@ const FaqSection = () => {
 					) }
 				/>
 				<FaqQuestion
+					questionId={ 'can-i-connect-to-multiple-accounts' }
 					question={ __(
 						'I have more than one Pinterest Advertiser account. Can I connect my WooCommerce store to multiple Pinterest Advertiser accounts?',
 						'pinterest-for-woocommerce'
@@ -187,16 +219,53 @@ const FaqSection = () => {
 	);
 };
 
-const FaqQuestion = ( { question, answer } ) => {
+/**
+ * Clicking on getting started page faq item to collapse or expand it.
+ *
+ * @event wcadmin_pfw_get_started_faq
+ *
+ * @property {string} action `'expand' | 'collapse'` What action was initiated.
+ * @property {string} question_id Identifier of the clicked question.
+ */
+
+/**
+ * FAQ component.
+ *
+ * @fires wcadmin_pfw_get_started_faq whenever the FAQ is toggled.
+ * @param {Object} props React props
+ * @param {string} props.questionId Question identifier, to be forwarded to the trackign event.
+ * @param {string} props.question Text of the question.
+ * @param {string} props.answer Text of the answer.
+ * @return {JSX.Element} FAQ component.
+ */
+const FaqQuestion = ( { questionId, question, answer } ) => {
+	const panelToggled = useCallback(
+		( isOpened ) => {
+			recordEvent( 'pfw_get_started_faq', {
+				question_id: questionId,
+				action: isOpened ? 'expand' : 'collapse',
+			} );
+		},
+		[ questionId ]
+	);
+
 	return (
-		<PanelBody title={ question } initialOpen={ false }>
+		<PanelBody
+			title={ question }
+			initialOpen={ false }
+			onToggle={ panelToggled }
+		>
 			<PanelRow>{ answer }</PanelRow>
 		</PanelBody>
 	);
 };
 
 const LandingPageApp = () => {
-	const { pluginVersion } = wcSettings.pinterest_for_woocommerce;
+	const {
+		pluginVersion,
+		isAdsSupportedCountry,
+		storeCountry,
+	} = wcSettings.pinterest_for_woocommerce;
 
 	// Only show the pre-launch beta notice if the plugin version is a beta.
 	const prelaunchNotice = pluginVersion.includes( 'beta' ) ? (
@@ -207,6 +276,9 @@ const LandingPageApp = () => {
 		<>
 			{ prelaunchNotice }
 			<div className="pinterest-for-woocommerce-landing-page">
+				{ ! isAdsSupportedCountry && (
+					<UnsupportedCountryNotice countryCode={ storeCountry } />
+				) }
 				<WelcomeSection />
 				<FeaturesSection />
 				<FaqSection />

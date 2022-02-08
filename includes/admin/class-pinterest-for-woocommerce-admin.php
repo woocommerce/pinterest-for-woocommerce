@@ -9,10 +9,10 @@
 use Automattic\WooCommerce\Admin\Features\Features;
 use Automattic\WooCommerce\Admin\Features\Navigation\Menu;
 use Automattic\WooCommerce\Admin\Features\Navigation\Screen;
-use Automattic\WooCommerce\Admin\Features\Onboarding;
 use Automattic\WooCommerce\Admin\Loader;
 use Automattic\WooCommerce\Blocks\Package;
 use Automattic\WooCommerce\Blocks\Assets\AssetDataRegistry;
+use Automattic\WooCommerce\Pinterest\Compat;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -251,12 +251,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				return;
 			}
 
-			if ( Onboarding::should_show_tasks() ) {
+			$build_path = '/assets/build';
 
-				$build_path = '/assets/setup-task';
+			if ( Compat::should_show_tasks() ) {
 
-				$handle            = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE . '-setup-task';
-				$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/index.asset.php';
+				$handle            = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-task';
+				$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/setup-task.asset.php';
 				$script_info       = file_exists( $script_asset_path )
 					? include $script_asset_path
 					: array(
@@ -268,28 +268,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 				wp_register_script(
 					$handle,
-					Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/index.js',
+					Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/setup-task.js',
 					$script_info['dependencies'],
 					$script_info['version'],
 					true
 				);
 
 				wp_enqueue_script( $handle );
-
-				wp_register_style(
-					$handle,
-					Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/style-index.css',
-					array( 'wc-admin-app' ),
-					PINTEREST_FOR_WOOCOMMERCE_VERSION
-				);
-
-				wp_enqueue_style( $handle );
 			}
 
-			$build_path = '/assets/setup-guide';
-
-			$handle            = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE;
-			$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/index.asset.php';
+			$handle            = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide';
+			$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/setup-guide.asset.php';
 			$script_info       = file_exists( $script_asset_path )
 				? include $script_asset_path
 				: array(
@@ -301,7 +290,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 			wp_register_script(
 				$handle,
-				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/index.js',
+				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/setup-guide.js',
 				$script_info['dependencies'],
 				$script_info['version'],
 				true
@@ -311,22 +300,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 			wp_register_style(
 				$handle,
-				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/style-index.css',
+				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/style-setup-guide.css',
 				array( 'wc-admin-app' ),
 				PINTEREST_FOR_WOOCOMMERCE_VERSION
 			);
 
 			wp_enqueue_style( $handle );
-
-			wp_register_style(
-				PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-catalog-sync',
-				Pinterest_For_Woocommerce()->plugin_url() . '/assets/catalog-sync/style-index.css',
-				array( 'wc-admin-app' ),
-				PINTEREST_FOR_WOOCOMMERCE_VERSION
-			);
-
-			wp_enqueue_style( $handle );
-
 		}
 
 		/**
@@ -339,7 +318,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			if (
 				! class_exists( Loader::class ) ||
 				! Loader::is_admin_page() ||
-				! Onboarding::should_show_tasks()
+				! Compat::should_show_tasks()
 			) {
 				return $registered_tasks_list_items;
 			}
@@ -376,6 +355,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		 * @return array
 		 */
 		private function get_component_settings() {
+			$store_country = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
 
 			return array(
 				'pluginVersion'            => PINTEREST_FOR_WOOCOMMERCE_VERSION,
@@ -383,7 +363,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				'serviceLoginUrl'          => $this->get_service_login_url(),
 				'createBusinessAccountUrl' => $this->get_create_business_account_url(),
 				'switchBusinessAccountUrl' => $this->get_switch_business_account_url(),
-				'domainToVerify'           => wp_parse_url( home_url(), PHP_URL_HOST ),
+				'homeUrlToVerify'          => home_url(),
+				'storeCountry'             => $store_country,
+				'isAdsSupportedCountry'    => in_array( $store_country, Pinterest_For_Woocommerce_Ads_Supported_Countries::get_countries(), true ),
 				'isConnected'              => ! empty( Pinterest_For_Woocommerce()::is_connected() ),
 				'isBusinessConnected'      => ! empty( Pinterest_For_Woocommerce()::is_business_connected() ),
 				'businessAccounts'         => Pinterest_For_Woocommerce()::get_linked_businesses(),
@@ -391,17 +373,28 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				'optionsName'              => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,
 				'error'                    => isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				'pinterestLinks'           => array(
-					'newAccount'            => 'https://business.pinterest.com/',
-					'claimWebsite'          => 'https://help.pinterest.com/en/business/article/claim-your-website',
-					'richPins'              => 'https://help.pinterest.com/en/business/article/rich-pins',
-					'enhancedMatch'         => 'https://help.pinterest.com/en/business/article/enhanced-match',
-					'createAdvertiser'      => 'https://help.pinterest.com/en/business/article/create-an-advertiser-account',
-					'adGuidelines'          => 'https://policy.pinterest.com/en/advertising-guidelines',
-					'adDataTerms'           => 'https://policy.pinterest.com/en/ad-data-terms',
-					'convertToBusinessAcct' => 'https://help.pinterest.com/en/business/article/get-a-business-account#section-15096',
+					'newAccount'             => 'https://business.pinterest.com/',
+					'claimWebsite'           => 'https://help.pinterest.com/en/business/article/claim-your-website',
+					'richPins'               => 'https://help.pinterest.com/en/business/article/rich-pins',
+					'createAdvertiser'       => 'https://help.pinterest.com/en/business/article/create-an-advertiser-account',
+					'adGuidelines'           => 'https://policy.pinterest.com/en/advertising-guidelines',
+					'adDataTerms'            => 'https://policy.pinterest.com/en/ad-data-terms',
+					'merchantGuidelines'     => 'https://policy.pinterest.com/en/merchant-guidelines',
+					'convertToBusinessAcct'  => 'https://help.pinterest.com/en/business/article/get-a-business-account#section-15096',
+					'appealDeclinedMerchant' => 'https://www.pinterest.com/product-catalogs/data-source/?showModal=true',
+					'installTag'             => 'https://help.pinterest.com/en/business/article/install-the-pinterest-tag',
+					'adsManager'             => 'https://ads.pinterest.com/',
+					'preLaunchNotice'        => 'https://help.pinterest.com/en-gb/business/article/get-a-business-profile/',
+					'adsAvailability'        => 'https://help.pinterest.com/en/business/availability/ads-availability',
 				),
 				'isSetupComplete'          => Pinterest_For_Woocommerce()::is_setup_complete(),
 				'countryTos'               => Pinterest_For_Woocommerce()::get_applicable_tos(),
+				'claimWebsiteErrorStatus'  => array(
+					401 => 'token',
+					403 => 'connection',
+					406 => 'domain verification',
+					409 => 'meta-tag',
+					),
 				'wpDebug'                  => defined( 'WP_DEBUG' ) && WP_DEBUG,
 
 			);

@@ -39,7 +39,11 @@ As per [WordPress Core Handbook](https://make.wordpress.org/core/handbook/best-p
 
 ## Development
 
-After cloning the repo, install dependencies:
+After cloning the repo. Remember to use the appropiate node version
+
+- `nvm use` to autoselect the node version based on `.nvmrc` file.
+
+Then, install dependencies:
 
 -   `npm install` to install JavaScript dependencies.
 -   `composer install` to gather PHP dependencies.
@@ -66,8 +70,61 @@ Please use these tools to ensure your code changes are consistent with the rest 
 
 This repository includes an [`EditorConfig`](https://editorconfig.org/) to automate basic code formatting. Please install the appropriate plugin for your editor.
 
+
+## PHPUnit
+
+### Prerequisites
+
+Install [`composer`](https://getcomposer.org/), `git`, `svn`, and either `wget` or `curl`.
+
+Change to the plugin root directory and type:
+
+```bash
+$ composer install
+```
+
+
+### Install Test Dependencies
+
+To run the unit tests you need WordPress, [WooCommerce](https://github.com/woocommerce/woocommerce), and the WordPress Unit Test lib (included in the [core development repository](https://make.wordpress.org/core/handbook/testing/automated-testing/phpunit/)).
+
+Install them using the `install-wp-tests.sh` script:
+
+```bash
+$ ./bin/install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host>
+```
+
+Example:
+
+```bash
+$ ./bin/install-wp-tests.sh wordpress_tests root root localhost
+```
+
+This script installs the test dependencies into your system's temporary directory and also creates a test database.
+
+You can also specify the path to their directories by setting the following environment variables:
+
+-   `WP_TESTS_DIR`: WordPress Unit Test lib directory
+-   `WP_CORE_DIR`: WordPress core directory
+-   `WC_DIR`: WooCommerce directory
+
+### Running Tests
+
+Change to the plugin root directory and type:
+
+```bash
+$ vendor/bin/phpunit
+```
+
+The tests will execute and you'll be presented with a summary.
+
+### Unit Tests and PHP 8
+
+We currently do not support running unit tests on PHP 8..
+
 <p align="center">
 	<br/><br/>
 	Made with 💜 by <a href="https://woocommerce.com/">WooCommerce</a>.<br/>
 	<a href="https://woocommerce.com/careers/">We're hiring</a>! Come work with us!
 </p>
+

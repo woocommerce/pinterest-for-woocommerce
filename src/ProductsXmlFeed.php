@@ -8,6 +8,10 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
+use WC_Product_Variation;
+use WC_Product;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -39,6 +43,12 @@ class ProductsXmlFeed {
 		'g:additional_image_link',
 	);
 
+	/**
+	 * Shipping object. Used for caching between calls to the shipping column function.
+	 *
+	 * @var Shipping|null $shipping
+	 */
+	private static $shipping = null;
 
 	/**
 	 * Returns the XML header to be printed.
@@ -79,11 +89,42 @@ class ProductsXmlFeed {
 			}
 		}
 
+		$xml .= self::get_attributes_xml( $product, "\t\t\t" );
+
 		$xml .= "\t\t</item>" . PHP_EOL;
 
 		return apply_filters( 'pinterest_for_woocommerce_feed_item_xml', $xml, $product );
 	}
 
+	/**
+	 * Get the XML for all the product attributes.
+	 * Will only return the attributes which have been set
+	 * or are available for the product type.
+	 *
+	 * @param WC_Product $product WooCommerce product.
+	 * @param string     $indent  Line indentation string.
+	 * @return string XML string.
+	 */
+	private static function get_attributes_xml( $product, $indent ) {
+		$attribute_manager = AttributeManager::instance();
+		$attributes        = $attribute_manager->get_all_values( $product );
+		$xml               = '';
+
+		// Merge with parent's attributes if it's a variation product.
+		if ( $product instanceof WC_Product_Variation ) {
+			$parent_product    = wc_get_product( $product->get_parent_id() );
+			$parent_attributes = $attribute_manager->get_all_values( $parent_product );
+			$attributes        = array_merge( $parent_attributes, $attributes );
+		}
+
+		foreach ( $attributes as $name => $value ) {
+			$property = "g:{$name}";
+			$value    = esc_html( $value );
+			$xml     .= "{$indent}<{$property}>{$value}</{$property}>" . PHP_EOL;
+		}
+
+		return $xml;
+	}
 
 	/**
 	 * Returns the Product ID.
@@ -160,7 +201,8 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_g_product_type( $product, $property ) {
 
-		$taxonomies = self::get_taxonomies( $product->get_id() );
+		$id         = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
+		$taxonomies = self::get_taxonomies( $id );
 
 		if ( empty( $taxonomies ) ) {
 			return;
@@ -312,7 +354,7 @@ class ProductsXmlFeed {
 
 		if ( $attachment_ids && $product->get_image_id() ) {
 			foreach ( $attachment_ids as $attachment_id ) {
-				$images[] = wp_get_attachment_image_src( $attachment_id )[0];
+				$images[] = wp_get_attachment_image_src( $attachment_id, 'woocommerce_single' )[0];
 			}
 		}
 
@@ -323,6 +365,35 @@ class ProductsXmlFeed {
 		return '<' . $property . '><![CDATA[' . implode( ',', $images ) . ']]></' . $property . '>';
 	}
 
+	/**
+	 * Returns the product shipping information.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param WC_Product $product  The product.
+	 * @param string     $property The name of the property.
+	 * @return string
+	 */
+	private static function get_property_g_shipping( $product, $property ) {
+		$currency      = get_woocommerce_currency();
+		$entries       = array();
+		$shipping      = self::get_shipping();
+		$shipping_info = $shipping->prepare_shipping_info( $product );
+
+		if ( empty( $shipping_info ) ) {
+			return '';
+		}
+
+		/*
+		 * Entry is a comma separated string with values in the following format:
+		 *   COUNTRY:STATE:POST_CODE:SHIPPING_COST
+		 */
+		foreach ( $shipping_info as $info ) {
+			$entries[] = "$info[country]:$info[state]:$info[name]:$info[cost] $currency";
+		}
+
+		return '<' . $property . '>' . implode( ',', $entries ) . '</' . $property . '>';
+	}
 
 	/**
 	 * Helper method to return the taxonomies of the product in a useful format.
@@ -341,4 +412,24 @@ class ProductsXmlFeed {
 
 		return wp_list_pluck( $terms, 'name' );
 	}
+
+	/**
+	 * Fetch shipping object.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return Shipping
+	 */
+	private static function get_shipping() {
+		if ( null === self::$shipping ) {
+			self::$shipping = new Shipping();
+			/**
+			 * When we start generating lets make sure that the cart is loaded.
+			 * Various shipping and tax functions are using elements of cart.
+			 */
+			wc_load_cart();
+		}
+		return self::$shipping;
+	}
+
 }

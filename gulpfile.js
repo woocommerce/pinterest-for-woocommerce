@@ -23,7 +23,7 @@ CONFIG = {
 	noprefix: ! ! $.util.env.noprefix
 };
 
-// Here are defined relateve paths for source files, dest paths and maps
+// Here are defined relative paths for source files, dest paths and maps
 // Change them if you know what you are doing or just stick to folder structure convention
 PATHS = {
 	assets: '/assets',
@@ -186,13 +186,9 @@ gulp.task(
 				}
 				return gulp.src(
 					[
-						folder + '/**/*',
-						'!**/node_modules/**',
-						'!**/gulpfile.js',
-						'!**/.DS_Store',
-						'!**/package.json',
-						'!**/package-lock.json',
-						'!**/.git/**'
+						`${folder}/{assets,i18n,includes,src,vendor,views}/**/*`,
+						`${folder}/*.{php,txt,md}`,
+						'LICENSE'
 					],
 					{
 						base: path.join( folder, '..' ),
