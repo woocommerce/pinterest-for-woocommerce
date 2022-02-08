@@ -418,9 +418,15 @@ class ProductsXmlFeed {
 	 */
 	private static function get_currency_decimals() {
 		$locale_info = include WC()->plugin_path() . '/i18n/locale-info.php';
-		$country     = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
 
-		return $locale_info[ $country ]['num_decimals'] ?? wc_get_price_decimals();
+		$currencies = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_currencies_list' );
+
+		if ( ! $currencies ) {
+			$currencies = wp_list_pluck( $locale_info, 'num_decimals', 'currency_code' );
+			set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_currencies_list', $currencies, DAY_IN_SECONDS );
+		}
+
+		return $currencies[ get_woocommerce_currency() ];
 	}
 
 	/** Fetch shipping object.
