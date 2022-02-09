@@ -769,13 +769,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				$data = array_intersect_key(
 					(array) $account_data['data'],
 					array(
-						'verified_domains' => '',
-						'domain_verified'  => '',
-						'username'         => '',
-						'full_name'        => '',
-						'id'               => '',
-						'image_medium_url' => '',
-						'is_partner'       => '',
+						'verified_user_websites' => '',
+						'domain_verified'        => '',
+						'username'               => '',
+						'full_name'              => '',
+						'id'                     => '',
+						'image_medium_url'       => '',
+						'is_partner'             => '',
 					)
 				);
 
