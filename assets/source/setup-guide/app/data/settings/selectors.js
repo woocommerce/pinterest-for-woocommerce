@@ -55,14 +55,16 @@ export const isDomainVerified = ( state ) => {
 		return;
 	}
 
-	if ( undefined === state?.settings?.account_data?.verified_domains ) {
+	if ( undefined === state?.settings?.account_data?.verified_user_websites ) {
 		return false;
 	}
 
 	const { hostname } = new URL(
 		wcSettings.pinterest_for_woocommerce.homeUrlToVerify
 	);
-	return state?.settings?.account_data?.verified_domains.includes( hostname );
+	return state?.settings?.account_data?.verified_user_websites.includes(
+		hostname
+	);
 };
 
 /**
