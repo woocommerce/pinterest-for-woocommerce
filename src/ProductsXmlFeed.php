@@ -200,6 +200,9 @@ class ProductsXmlFeed {
 		// Strip HTML tags from description.
 		$description = wp_strip_all_tags( $description );
 
+		// Strip [&hellip] character from description.
+		$description = str_replace( '[&hellip;]', '...', $description );
+
 		// Limit the number of characters in the description to 10000.
 		return '<' . $property . '><![CDATA[' . substr( $description, 0, 10000 ) . ']]></' . $property . '>';
 	}
