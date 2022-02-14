@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
 use WC_Product_Variation;
 use WC_Product;
+use Automattic\WooCommerce\Pinterest\Logger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -42,6 +43,14 @@ class ProductsXmlFeed {
 		'g:shipping',
 		'g:additional_image_link',
 	);
+
+
+	/**
+	 * Limit of characters allowed by Pinterest in the product description.
+	 *
+	 * @var int
+	 */
+	private static $limit_chars_product_description = 10000;
 
 
 	/**
@@ -204,7 +213,12 @@ class ProductsXmlFeed {
 		$description = str_replace( '[&hellip;]', '...', $description );
 
 		// Limit the number of characters in the description to 10000.
-		return '<' . $property . '><![CDATA[' . substr( $description, 0, 10000 ) . ']]></' . $property . '>';
+		if ( strlen( $description ) > 10000 ) {
+			Logger::log( sprintf( esc_html__( 'The product [%s] has a description longer than the allowed limit.', 'pinterest-for-woocommerce' ), $product->get_id() ) );
+		}
+		$description = substr( $description, 0, self::$limit_chars_product_description );
+
+		return '<' . $property . '><![CDATA[' . $description . ']]></' . $property . '>';
 	}
 
 	/**
