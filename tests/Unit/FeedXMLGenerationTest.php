@@ -310,6 +310,17 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
 		$xml          = $price_method( $product );
 		$this->assertEquals( '<g:price>15.00USD</g:price>', $xml );
+
+		// Test with another currency.
+		$old_currency = get_woocommerce_currency();
+		update_option( 'woocommerce_currency', 'JPY' );
+		$price_method = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
+		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
+		$xml          = $price_method( $product );
+		$this->assertEquals( '<g:price>15JPY</g:price>', $xml );
+
+		// Update again the currency to the old currency.
+		update_option( 'woocommerce_currency', $old_currency );
 	}
 
 	/**
