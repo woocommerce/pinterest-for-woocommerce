@@ -8,6 +8,7 @@ use \WC_Helper_Product;
 use \WC_Unit_Test_Case;
 use \WC_Product_Variable;
 
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
 use Automattic\WooCommerce\Pinterest\Product\GoogleCategorySearch;
 use Automattic\WooCommerce\Pinterest\Product\GoogleProductTaxonomy;
@@ -333,6 +334,49 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 	/**
 	 * @group feed
+	 *
+	 * @return void
+	 */
+	public function testDescriptionClipping() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+		/**
+		 * Mock logger object that will catch any logged messages.
+		 */
+		$mock_logger = new class {
+
+			static $message = '';
+			public function log( $level, $msg )
+			{
+				self::$message = $msg;
+			}
+		};
+
+		Logger::$logger = $mock_logger;
+
+		/**
+		 * Generate a description string too big for the feed.
+		 * The limit is 10K so we generate 1010 char length string.
+		 */
+		$description          = str_repeat( 'abcdefghij', 1000 + 1 );
+		$expected_description = str_repeat( 'abcdefghij', 1000 );
+
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'short_description' => $description,
+			)
+		);
+
+		$xml = $description_method( $product );
+
+		$this->assertEquals( "<description><![CDATA[{$expected_description}]]></description>", $xml );
+
+		// Information about size limit exceeded has been logged.
+		$this->assertEquals( "The product [{$product->get_id()}] has a description longer than the allowed limit.", $mock_logger::$message );
+	}
+
+	/**
+	 * @group feed
 	 */
 	public function testPropertyProductTypeXML() {
 		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
@@ -602,6 +646,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		// Remove added shortcodes.
 		remove_shortcode( 'pinterest_for_woocommerce_sample_test_shortcode' );
+
+		// Reset logger.
+		Logger::$logger = null;
 	}
 
 }
