@@ -3,7 +3,7 @@
  * Ads supported countries.
  *
  * @package     Pinterest
- * @since x.x.x
+ * @since 1.0.5
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
