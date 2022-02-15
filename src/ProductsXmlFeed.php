@@ -247,7 +247,7 @@ class ProductsXmlFeed {
 
 		// Limit the number of characters in the description to 10000.
 		if ( strlen( $description ) > self::DESCRIPTION_SIZE_CHARS_LIMIT ) {
-			/* Translators: Warning for long description */
+			/* translators: %s product id */
 			Logger::log( sprintf( esc_html__( 'The product [%s] has a description longer than the allowed limit.', 'pinterest-for-woocommerce' ), $product->get_id() ) );
 		}
 		$description = substr( $description, 0, self::DESCRIPTION_SIZE_CHARS_LIMIT );
