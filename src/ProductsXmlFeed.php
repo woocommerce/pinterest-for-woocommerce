@@ -428,7 +428,7 @@ class ProductsXmlFeed {
 	/**
 	 * Returns the product shipping information.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @param WC_Product $product  The product.
 	 * @param string     $property The name of the property.
@@ -491,7 +491,7 @@ class ProductsXmlFeed {
 
 	/** Fetch shipping object.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @return Shipping
 	 */

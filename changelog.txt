@@ -1,6 +1,6 @@
 *** Pinterest for WooCommerce Changelog ***
 
-= 1.0.5 - 2022-xx-xx =
+= 1.0.5 - 2022-02-15 =
 * Add – Shipping column for developers and testers.
 
 = 1.0.4 - 2022-02-03 =
