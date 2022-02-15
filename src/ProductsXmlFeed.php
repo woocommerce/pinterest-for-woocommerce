@@ -298,7 +298,7 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '>' . $price . get_woocommerce_currency() . '</' . $property . '>';
+		return '<' . $property . '>' . wc_format_decimal( $price, self::get_currency_decimals() ) . get_woocommerce_currency() . '</' . $property . '>';
 	}
 
 	/**
@@ -323,7 +323,7 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '>' . $price . get_woocommerce_currency() . '</' . $property . '>';
+		return '<' . $property . '>' . wc_format_decimal( $price, self::get_currency_decimals() ) . get_woocommerce_currency() . '</' . $property . '>';
 	}
 
 	/**
@@ -414,7 +414,22 @@ class ProductsXmlFeed {
 	}
 
 	/**
-	 * Fetch shipping object.
+	 * Get locale currency decimals
+	 */
+	private static function get_currency_decimals() {
+		$currencies = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_currencies_list' );
+
+		if ( ! $currencies ) {
+			$locale_info = include WC()->plugin_path() . '/i18n/locale-info.php';
+
+			$currencies = wp_list_pluck( $locale_info, 'num_decimals', 'currency_code' );
+			set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_currencies_list', $currencies, DAY_IN_SECONDS );
+		}
+
+		return $currencies[ get_woocommerce_currency() ] ?? 2;
+	}
+
+	/** Fetch shipping object.
 	 *
 	 * @since x.x.x
 	 *
@@ -431,5 +446,4 @@ class ProductsXmlFeed {
 		}
 		return self::$shipping;
 	}
-
 }
