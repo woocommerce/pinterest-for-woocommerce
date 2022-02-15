@@ -8,10 +8,12 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
-use WC_Product_Variation;
+
 use WC_Product;
 use WC_Product_Variable;
+use WC_Product_Variation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -50,6 +52,14 @@ class ProductsXmlFeed {
 	 * @var Shipping|null $shipping
 	 */
 	private static $shipping = null;
+
+	/**
+	 * Limit of characters allowed by Pinterest in the product description.
+	 *
+	 * @var int
+	 */
+	const DESCRIPTION_SIZE_CHARS_LIMIT = 10000;
+
 
 	/**
 	 * Returns the XML header to be printed.
@@ -191,7 +201,7 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_title( $product, $property ) {
-		return '<' . $property . '><![CDATA[' . $product->get_name() . ']]></' . $property . '>';
+		return '<' . $property . '><![CDATA[' . wp_strip_all_tags( $product->get_name() ) . ']]></' . $property . '>';
 	}
 
 	/**
@@ -213,6 +223,34 @@ class ProductsXmlFeed {
 		if ( empty( $description ) ) {
 			return;
 		}
+
+		/**
+		 * Filters whether the shortcodes should be applied for product descriptions when generating the feed or be stripped out.
+		 *
+		 * @param bool       $apply_shortcodes Shortcodes are applied if set to `true` and stripped out if set to `false`.
+		 * @param WC_Product $product          WooCommerce product object.
+		 */
+		$apply_shortcodes = apply_filters( 'pinterest_for_woocommerce_product_description_apply_shortcodes', false, $product );
+		if ( $apply_shortcodes ) {
+			// Apply active shortcodes.
+			$description = do_shortcode( $description );
+		} else {
+			// Strip out active shortcodes.
+			$description = strip_shortcodes( $description );
+		}
+
+		// Strip HTML tags from description.
+		$description = wp_strip_all_tags( $description );
+
+		// Strip [&hellip] character from description.
+		$description = str_replace( '[&hellip;]', '...', $description );
+
+		// Limit the number of characters in the description to 10000.
+		if ( strlen( $description ) > self::DESCRIPTION_SIZE_CHARS_LIMIT ) {
+			/* translators: %s product id */
+			Logger::log( sprintf( esc_html__( 'The product [%s] has a description longer than the allowed limit.', 'pinterest-for-woocommerce' ), $product->get_id() ) );
+		}
+		$description = substr( $description, 0, self::DESCRIPTION_SIZE_CHARS_LIMIT );
 
 		return '<' . $property . '><![CDATA[' . $description . ']]></' . $property . '>';
 	}

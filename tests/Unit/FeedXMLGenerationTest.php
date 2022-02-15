@@ -8,6 +8,7 @@ use \WC_Helper_Product;
 use \WC_Unit_Test_Case;
 use \WC_Product_Variable;
 
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
 use Automattic\WooCommerce\Pinterest\Product\GoogleCategorySearch;
 use Automattic\WooCommerce\Pinterest\Product\GoogleProductTaxonomy;
@@ -233,6 +234,145 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$xml          = $title_method( $product );
 		// create_simple_product gives the product `Dummy Product` title.
 		$this->assertEquals( '<title><![CDATA[Dummy Product]]></title>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testStripHtmlTagsPropertyTitleXML() {
+		$title_method = $this->getProductsXmlFeedAttributeMethod( 'title' );
+		$product      = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'name' => 'Dummy Product <h1>Dummy Tag</h1>',
+			)
+		);
+		$xml          = $title_method( $product );
+		$this->assertEquals( '<title><![CDATA[Dummy Product Dummy Tag]]></title>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testStripHtmlTagsPropertyDescriptionXML() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+		$product            = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'short_description' => 'Dummy Description <h1>Dummy Tag</h1>',
+			)
+		);
+		$xml                = $description_method( $product );
+		$this->assertEquals( '<description><![CDATA[Dummy Description Dummy Tag]]></description>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testStripShortcodesPropertyDescriptionXML() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		// Add simple shortcode to test.
+		add_shortcode(
+			'pinterest_for_woocommerce_sample_test_shortcode',
+			function () {
+				return 'sample-shortcode-rendered-result';
+			}
+		);
+
+		$description          = 'This product has a shortcode [pinterest_for_woocommerce_sample_test_shortcode] that will get stripped out.';
+		$expected_description = 'This product has a shortcode  that will get stripped out.';
+
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'short_description' => $description,
+			)
+		);
+
+		$xml = $description_method( $product );
+
+		$this->assertEquals( "<description><![CDATA[{$expected_description}]]></description>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testNoStripShortcodesPropertyDescriptionXML() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		// Add simple shortcode to test.
+		add_shortcode(
+			'pinterest_for_woocommerce_sample_test_shortcode',
+			function () {
+				return 'sample-shortcode-rendered-result';
+			}
+		);
+
+		// Add filter to apply shortcodes on description.
+		add_filter(
+			'pinterest_for_woocommerce_product_description_apply_shortcodes',
+			function() {
+				return true;
+			}
+		);
+
+		$description          = 'This product has a shortcode [pinterest_for_woocommerce_sample_test_shortcode] that will not get stripped out.';
+		$expected_description = 'This product has a shortcode sample-shortcode-rendered-result that will not get stripped out.';
+
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'short_description' => $description,
+			)
+		);
+
+		$xml = $description_method( $product );
+
+		$this->assertEquals( "<description><![CDATA[{$expected_description}]]></description>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 *
+	 * @return void
+	 */
+	public function testDescriptionClipping() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+		/**
+		 * Mock logger object that will catch any logged messages.
+		 */
+		$mock_logger = new class {
+
+			static $message = '';
+			public function log( $level, $msg )
+			{
+				self::$message = $msg;
+			}
+		};
+
+		Logger::$logger = $mock_logger;
+
+		/**
+		 * Generate a description string too big for the feed.
+		 * The limit is 10K so we generate 1010 char length string.
+		 */
+		$description          = str_repeat( 'abcdefghij', 1000 + 1 );
+		$expected_description = str_repeat( 'abcdefghij', 1000 );
+
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'short_description' => $description,
+			)
+		);
+
+		$xml = $description_method( $product );
+
+		$this->assertEquals( "<description><![CDATA[{$expected_description}]]></description>", $xml );
+
+		// Information about size limit exceeded has been logged.
+		$this->assertEquals( "The product [{$product->get_id()}] has a description longer than the allowed limit.", $mock_logger::$message );
 	}
 
 	/**
@@ -493,6 +633,22 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		return function( $product ) use ( $method, $attribute ) {
 			return $method->invoke( null, $product, $attribute );
 		};
+	}
+
+	/**
+	 * Remove filters and shortcodes.
+	 */
+	public function tearDown() {
+		parent::tearDown();
+
+		// Remove any added filter.
+		remove_all_filters( 'pinterest_for_woocommerce_product_description_apply_shortcodes' );
+
+		// Remove added shortcodes.
+		remove_shortcode( 'pinterest_for_woocommerce_sample_test_shortcode' );
+
+		// Reset logger.
+		Logger::$logger = null;
 	}
 
 }
