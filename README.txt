@@ -87,6 +87,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.0.5 - 2022-xx-xx =
+* Add – Shipping column for developers and testers.
+
 = 1.0.4 - 2022-02-03 =
 * Fix - Store merchant id during the account creation. ( [#343](https://github.com/woocommerce/pinterest-for-woocommerce/pull/343) )
 
