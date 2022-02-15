@@ -180,7 +180,7 @@ class FeedState extends VendorAPI {
 					/* Translators: %1$s Time string, %2$s current index of written products, %3$s total number of products, %4$s Opening link tag, %5$s closing link tag */
 					esc_html__( 'Last activity: %1$s ago - Wrote %2$s out of %3$s products to %4$sfeed file%5$s.', 'pinterest-for-woocommerce' ),
 					human_time_diff( $state['last_activity'] ),
-					$state['current_index'],
+					$state['current_products'],
 					$state['product_count'],
 					'<a href="' . $local_feed['feed_url'] . '" target="_blank">',
 					'</a>',
@@ -194,7 +194,7 @@ class FeedState extends VendorAPI {
 					/* Translators: %1$s Time string, %2$s current index of written products, %3$s total number of products, %4$s Opening link tag, %5$s closing link tag */
 					esc_html__( 'Successfully generated %1$s ago - Wrote %2$s out of %3$s products to %4$sfeed file%5$s.', 'pinterest-for-woocommerce' ),
 					human_time_diff( $state['last_activity'] ),
-					$state['current_index'],
+					$state['current_products'],
 					$state['product_count'],
 					'<a href="' . $local_feed['feed_url'] . '" target="_blank">',
 					'</a>',
