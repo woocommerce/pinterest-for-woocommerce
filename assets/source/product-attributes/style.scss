@@ -40,8 +40,11 @@
 	}
 }
 
-.gla-channel-visibility-box .form-row > select {
-	display: block;
-	margin: 8px 0;
-	max-width: 100%;
+#woocommerce-product-data ul.wc-tabs li.pinterest_attributes_tab {
+
+	a::before {
+
+		content: "\f192";
+
+	}
 }

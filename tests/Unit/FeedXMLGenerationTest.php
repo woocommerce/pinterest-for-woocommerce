@@ -90,7 +90,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$this->assertEquals( 'in stock', $g_children['availability'] );
 
 		// Default price from WC_Helper_Product.
-		$this->assertEquals( '10USD', $g_children['price'] );
+		$this->assertEquals( '10.00USD', $g_children['price'] );
 
 		// No description set.
 		$this->assertArrayNotHasKey( 'image_link', $g_children, "By default product does not have an image link." );
@@ -112,6 +112,24 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		// Condition is not set by default.
 		$this->assertArrayNotHasKey( 'condition', $g_children, 'By default we don\'t have the condition set.' );
+	}
+
+	/**
+	 * Test if a product with price set to 0 is skipped from the feed
+	 *
+	 * @group feed
+	 */
+	public function testSkipZeroPriceProductXML() {
+		// Create product with zero price
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'regular_price' => 0,
+			)
+		);
+
+		$xml = ProductsXmlFeed::get_xml_item( $product );
+		$this->assertEquals( '', $xml );
 	}
 
 	/**
@@ -405,7 +423,18 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$price_method = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
 		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
 		$xml          = $price_method( $product );
-		$this->assertEquals( '<g:price>15USD</g:price>', $xml );
+		$this->assertEquals( '<g:price>15.00USD</g:price>', $xml );
+
+		// Test with another currency.
+		$old_currency = get_woocommerce_currency();
+		update_option( 'woocommerce_currency', 'JPY' );
+		$price_method = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
+		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
+		$xml          = $price_method( $product );
+		$this->assertEquals( '<g:price>15JPY</g:price>', $xml );
+
+		// Update again the currency to the old currency.
+		update_option( 'woocommerce_currency', $old_currency );
 	}
 
 	/**
@@ -428,7 +457,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 			)
 		);
 		$xml     = $sale_price_method( $product );
-		$this->assertEquals( '<sale_price>5USD</sale_price>', $xml );
+		$this->assertEquals( '<sale_price>5.00USD</sale_price>', $xml );
 	}
 
 	/**

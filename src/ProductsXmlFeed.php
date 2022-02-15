@@ -8,10 +8,12 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
-use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
-use WC_Product_Variation;
-use WC_Product;
 use Automattic\WooCommerce\Pinterest\Logger;
+use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
+
+use WC_Product;
+use WC_Product_Variable;
+use WC_Product_Variation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -44,6 +46,12 @@ class ProductsXmlFeed {
 		'g:additional_image_link',
 	);
 
+	/**
+	 * Shipping object. Used for caching between calls to the shipping column function.
+	 *
+	 * @var Shipping|null $shipping
+	 */
+	private static $shipping = null;
 
 	/**
 	 * Limit of characters allowed by Pinterest in the product description.
@@ -76,11 +84,15 @@ class ProductsXmlFeed {
 	/**
 	 * Returns the Item's XML for the given product.
 	 *
-	 * @param WC_Product $product The product to print the XML for.
+	 * @param WC_Product $product  The product to print the XML for.
 	 *
-	 * @return string
+	 * @return string XML string
 	 */
 	public static function get_xml_item( $product ) {
+
+		if ( ! self::is_product_fit_for_feed( $product ) ) {
+			return '';
+		}
 
 		$xml = "\t\t<item>" . PHP_EOL;
 
@@ -98,6 +110,27 @@ class ProductsXmlFeed {
 
 		return apply_filters( 'pinterest_for_woocommerce_feed_item_xml', $xml, $product );
 	}
+
+
+	/**
+	 * Helper method to return if a product is fit for the feed profile.
+	 *
+	 * @param WC_Product $product The product.
+	 *
+	 * @return boolean
+	 */
+	private static function is_product_fit_for_feed( $product ) {
+
+		// Decide if product is fit for the feed based on price.
+		$price = self::get_product_regular_price( $product );
+
+		if ( empty( $price ) || empty( floatval( $price ) ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
 
 	/**
 	 * Get the XML for all the product attributes.
@@ -319,17 +352,13 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_g_price( $product, $property ) {
 
-		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
-			$price = $product->get_variation_regular_price();
-		} else {
-			$price = $product->get_regular_price();
-		}
+		$price = self::get_product_regular_price( $product );
 
 		if ( empty( $price ) ) {
 			return;
 		}
 
-		return '<' . $property . '>' . $price . get_woocommerce_currency() . '</' . $property . '>';
+		return '<' . $property . '>' . wc_format_decimal( $price, self::get_currency_decimals() ) . get_woocommerce_currency() . '</' . $property . '>';
 	}
 
 	/**
@@ -354,7 +383,7 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '>' . $price . get_woocommerce_currency() . '</' . $property . '>';
+		return '<' . $property . '>' . wc_format_decimal( $price, self::get_currency_decimals() ) . get_woocommerce_currency() . '</' . $property . '>';
 	}
 
 	/**
@@ -396,6 +425,35 @@ class ProductsXmlFeed {
 		return '<' . $property . '><![CDATA[' . implode( ',', $images ) . ']]></' . $property . '>';
 	}
 
+	/**
+	 * Returns the product shipping information.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param WC_Product $product  The product.
+	 * @param string     $property The name of the property.
+	 * @return string
+	 */
+	private static function get_property_g_shipping( $product, $property ) {
+		$currency      = get_woocommerce_currency();
+		$entries       = array();
+		$shipping      = self::get_shipping();
+		$shipping_info = $shipping->prepare_shipping_info( $product );
+
+		if ( empty( $shipping_info ) ) {
+			return '';
+		}
+
+		/*
+		 * Entry is a comma separated string with values in the following format:
+		 *   COUNTRY:STATE:POST_CODE:SHIPPING_COST
+		 */
+		foreach ( $shipping_info as $info ) {
+			$entries[] = "$info[country]:$info[state]:$info[name]:$info[cost] $currency";
+		}
+
+		return '<' . $property . '>' . implode( ',', $entries ) . '</' . $property . '>';
+	}
 
 	/**
 	 * Helper method to return the taxonomies of the product in a useful format.
@@ -413,5 +471,56 @@ class ProductsXmlFeed {
 		}
 
 		return wp_list_pluck( $terms, 'name' );
+	}
+
+	/**
+	 * Get locale currency decimals
+	 */
+	private static function get_currency_decimals() {
+		$currencies = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_currencies_list' );
+
+		if ( ! $currencies ) {
+			$locale_info = include WC()->plugin_path() . '/i18n/locale-info.php';
+
+			$currencies = wp_list_pluck( $locale_info, 'num_decimals', 'currency_code' );
+			set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_currencies_list', $currencies, DAY_IN_SECONDS );
+		}
+
+		return $currencies[ get_woocommerce_currency() ] ?? 2;
+	}
+
+	/** Fetch shipping object.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return Shipping
+	 */
+	private static function get_shipping() {
+		if ( null === self::$shipping ) {
+			self::$shipping = new Shipping();
+			/**
+			 * When we start generating lets make sure that the cart is loaded.
+			 * Various shipping and tax functions are using elements of cart.
+			 */
+			wc_load_cart();
+		}
+		return self::$shipping;
+	}
+
+	/**
+	 * Helper method to return the regular price of a product.
+	 *
+	 * @param WC_Product|WC_Product_Variable $product The product.
+	 *
+	 * @return string
+	 */
+	private static function get_product_regular_price( $product ) {
+		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
+			$price = $product->get_variation_regular_price();
+		} else {
+			$price = $product->get_regular_price();
+		}
+
+		return $price;
 	}
 }
