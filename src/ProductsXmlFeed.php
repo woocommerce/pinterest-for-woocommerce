@@ -58,7 +58,7 @@ class ProductsXmlFeed {
 	 *
 	 * @var int
 	 */
-	private static $limit_chars_product_description = 10000;
+	const DESCRIPTION_SIZE_CHARS_LIMIT = 10000;
 
 
 	/**
@@ -246,11 +246,11 @@ class ProductsXmlFeed {
 		$description = str_replace( '[&hellip;]', '...', $description );
 
 		// Limit the number of characters in the description to 10000.
-		if ( strlen( $description ) > 10000 ) {
+		if ( strlen( $description ) > self::DESCRIPTION_SIZE_CHARS_LIMIT ) {
 			/* Translators: Warning for long description */
 			Logger::log( sprintf( esc_html__( 'The product [%s] has a description longer than the allowed limit.', 'pinterest-for-woocommerce' ), $product->get_id() ) );
 		}
-		$description = substr( $description, 0, self::$limit_chars_product_description );
+		$description = substr( $description, 0, self::DESCRIPTION_SIZE_CHARS_LIMIT );
 
 		return '<' . $property . '><![CDATA[' . $description . ']]></' . $property . '>';
 	}
