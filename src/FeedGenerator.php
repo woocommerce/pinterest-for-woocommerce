@@ -245,11 +245,17 @@ class FeedGenerator extends AbstractChainedJob {
 
 			$this->prepare_feed_buffers();
 
+			$processed_products = 0;
 			array_walk(
 				$products,
-				function ( $product ) {
+				function ( $product ) use ( $processed_products ) {
 					foreach ( $this->get_locations() as $location ) {
-						$this->buffers[ $location ] .= ProductsXmlFeed::get_xml_item( $product, $location );
+						$product_xml = ProductsXmlFeed::get_xml_item( $product, $location );
+						if ( $product_xml === '' ) {
+							continue;
+						}
+						$this->buffers[ $location ] .= $product_xml;
+						$processed_products += 1;
 					}
 				}
 			);
@@ -264,7 +270,7 @@ class FeedGenerator extends AbstractChainedJob {
 		$count = ProductFeedStatus::get()['product_count'] ?? 0;
 		ProductFeedStatus::set(
 			array(
-				'product_count' => $count + count( $products ),
+				'product_count' => $count + $processed_products,
 			)
 		);
 		/* translators: number of products */
