@@ -87,7 +87,14 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.0.6 - 2022-xx-xx =
+* Fix – Fix the changelog for the 1.0.5 release by adding omitted changes.
+
 = 1.0.5 - 2022-02-15 =
+* Fix - Strip HTML shortcodes from feed.
+* Fix - Make the price format consistent in the feed.
+* Fix - Exclude zero price items from product feed.
+* Tweak - Force logging to be enabled when setup is not complete.
 * Add – Shipping column for developers and testers.
 
 = 1.0.4 - 2022-02-03 =
