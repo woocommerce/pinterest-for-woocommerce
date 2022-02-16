@@ -77,7 +77,7 @@ const SyncStateTable = ( { workflow } ) => {
 			showMenu={ false }
 		/>
 	) : (
-		<TablePlaceholder headers={ headers } numberOfRows={ 3 } />
+		<TablePlaceholder headers={ headers } numberOfRows={ 3 } caption="" />
 	);
 };
 

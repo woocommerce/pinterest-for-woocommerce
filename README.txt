@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.8
 Requires PHP: 7.3
-Stable tag: 1.0.1
+Stable tag: 1.0.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -86,6 +86,37 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.0.5 - 2022-02-15 =
+* Add – Shipping column for developers and testers.
+
+= 1.0.4 - 2022-02-03 =
+* Fix - Store merchant id during the account creation. ( [#343](https://github.com/woocommerce/pinterest-for-woocommerce/pull/343) )
+
+= 1.0.3 - 2022-01-25 =
+* Fix    - Allow proper setup for new merchants with no catalogs. ( [#339](https://github.com/woocommerce/pinterest-for-woocommerce/pull/339) )
+
+= 1.0.2 - 2022-01-25 =
+* Fix    - Update and improve feedstate. ( [#240](https://github.com/woocommerce/pinterest-for-woocommerce/pull/240) )
+* Add    - Tooltips for the Publish Pins and Rich Pins options on the settings page. ( [#253](https://github.com/woocommerce/pinterest-for-woocommerce/pull/253) )
+* Add    - Merchant guidelines link in the setup page. ( [#255](https://github.com/woocommerce/pinterest-for-woocommerce/pull/255) )
+* Add    - Show a notice on the landing page if this extension does not support store country. ( [#256](https://github.com/woocommerce/pinterest-for-woocommerce/pull/256) )
+* Update - Adjust image size for additional images. ( [#268](https://github.com/woocommerce/pinterest-for-woocommerce/pull/268) )
+* Fix    - Error message for merchants with declined status. ( [#272](https://github.com/woocommerce/pinterest-for-woocommerce/pull/272) )
+* Add    - Pinterest Ads Manager Call To Action UI. ( [#273](https://github.com/woocommerce/pinterest-for-woocommerce/pull/273) )
+* Update - Tweak the UI of claim website. ( [#286](https://github.com/woocommerce/pinterest-for-woocommerce/pull/286) )
+* Update - Remove unused parameters sent in create merchant request. ( [#294](https://github.com/woocommerce/pinterest-for-woocommerce/pull/294) )
+* Add    - Adding Woo Tracker for Usage Tracking. ( [#301](https://github.com/woocommerce/pinterest-for-woocommerce/pull/301) )
+* Add    - Implement Events Tracking. ( [#296](https://github.com/woocommerce/pinterest-for-woocommerce/pull/296) )
+* Add    - Product Attributes. ( [#303](https://github.com/woocommerce/pinterest-for-woocommerce/pull/303) )
+* Update - API to v4. ( [#305](https://github.com/woocommerce/pinterest-for-woocommerce/pull/305) )
+* Update - Refactor AccountConnection component. ( [#312](https://github.com/woocommerce/pinterest-for-woocommerce/pull/312) )
+* Add    - Product attribute for Google product category. ( [#317](https://github.com/woocommerce/pinterest-for-woocommerce/pull/317) )
+* Fix    - Onboarding wizard steps ( 2 and 3 ) are not clickable. ( [#318](https://github.com/woocommerce/pinterest-for-woocommerce/pull/318) )
+* Fix    - Fetch parent id for variable product during feed xml generation. ( [#320](https://github.com/woocommerce/pinterest-for-woocommerce/pull/320) )
+* Fix    - Plugin is blocking some 3rd party scripts. ( [#324](https://github.com/woocommerce/pinterest-for-woocommerce/pull/324) )
+* Fix    - Multiple catalog created on pinterest with no possibility to delete them. ( [#305](https://github.com/woocommerce/pinterest-for-woocommerce/pull/305) )
+* Fix    - Feed registration status is incorrect when user has more than one feed profile. ( [#335](https://github.com/woocommerce/pinterest-for-woocommerce/pull/335) )
 
 = 1.0.1 - 2021-11-16 =
 * Fix - Add PHP, JS & CSS linting GH actions.

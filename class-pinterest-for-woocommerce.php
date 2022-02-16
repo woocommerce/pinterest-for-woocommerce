@@ -180,8 +180,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest_for_woocommerce' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_DATA_NAME', 'pinterest_for_woocommerce_data' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide' );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_CATALOG_SYNC', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-catalog-sync' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.com/' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE', 'pinterestv3native' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE', 'pinterest' );
@@ -189,6 +187,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT', 'oauth/callback' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_AUTH', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_auth_key' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-version' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX', 'pfw' );
 		}
 
 
@@ -216,6 +215,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		private function includes() {
 
+			include_once 'includes/class-pinterest-for-woocommerce-ads-supported-countries.php';
+
 			if ( $this->is_request( 'admin' ) ) {
 				include_once 'includes/admin/class-pinterest-for-woocommerce-admin.php';
 			}
@@ -239,6 +240,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$this->includes();
 
 			add_action( 'init', array( $this, 'init' ), 0 );
+			add_action( 'admin_init', array( $this, 'admin_init' ), 0 );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
 			add_action( 'wp_head', array( Pinterest\RichPins::class, 'maybe_inject_rich_pins_opengraph_tags' ) );
@@ -246,6 +248,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'plugins_loaded', array( $this, 'maybe_update_plugin' ) );
 			add_action( 'init', array( Pinterest\Tracking::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
+			add_action( 'init', array( Pinterest\TrackerSnapshot::class, 'maybe_init' ) );
+
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 
@@ -254,6 +258,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Allow access to our option through the REST API.
 			add_filter( 'woocommerce_rest_api_option_permissions', array( $this, 'add_option_permissions' ), 10, 1 );
+
+			// Disconnect advertiser if advertiser or tag change.
+			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
 		}
 
 
@@ -271,6 +278,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			do_action( 'pinterest_for_woocommerce_init' );
 		}
 
+		/**
+		 * Init classes for admin interface.
+		 */
+		public function admin_init() {
+			$view_factory         = new Pinterest\View\PHPViewFactory();
+			$admin                = new Pinterest\Admin\Admin( $view_factory );
+			$attributes_tab       = new Pinterest\Admin\Product\Attributes\AttributesTab( $admin );
+			$variation_attributes = new Pinterest\Admin\Product\Attributes\VariationsAttributes( $admin );
+
+			$admin->register();
+			$attributes_tab->register();
+			$variation_attributes->register();
+		}
 
 		/**
 		 * Checks all plugin requirements. If run in admin context also adds a notice.
@@ -515,6 +535,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public function init_api_endpoints() {
 			new Pinterest\API\Advertisers();
+			new Pinterest\API\AdvertiserConnect();
 			new Pinterest\API\Auth();
 			new Pinterest\API\AuthDisconnect();
 			new Pinterest\API\Businesses();
@@ -580,24 +601,92 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.0.0
 		 *
 		 * @return boolean True if disconnection was successful.
+		 *
+		 * @throws \Exception PHP Exception.
 		 */
 		public static function disconnect() {
 
-			// Flush the whole data option.
-			delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+			try {
+				// Disconnect merchant from Pinterest.
+				$result = Pinterest\API\Base::disconnect_merchant();
 
-			// Remove settings that may cause issues if stale on disconnect.
-			self::save_setting( 'account_data', null );
-			self::save_setting( 'tracking_advertiser', null );
-			self::save_setting( 'tracking_tag', null );
+				if ( 'success' !== $result['status'] ) {
+					throw new \Exception( esc_html__( 'Response error on disconnect merchant.', 'pinterest-for-woocommerce' ), 400 );
+				}
 
-			// Cancel scheduled jobs.
-			Pinterest\ProductSync::cancel_jobs();
+				// Disconnect the advertiser from Pinterest.
+				$connected_advertiser = self::get_setting( 'tracking_advertiser', null );
+				$connected_tag        = self::get_setting( 'tracking_tag', null );
 
-			// At this point we're disconnected.
-			return true;
+				if ( $connected_advertiser && $connected_tag ) {
+
+					try {
+
+						Pinterest\API\AdvertiserConnect::disconnect_advertiser( $connected_advertiser, $connected_tag );
+
+					} catch ( \Exception $th ) {
+
+						Pinterest\Logger::log( esc_html__( 'There was an error disconnecting the Advertiser.', 'pinterest-for-woocommerce' ) );
+
+						throw new \Exception( esc_html__( 'There was an error disconnecting the Advertiser. Please try again.', 'pinterest-for-woocommerce' ), 400 );
+					}
+				}
+
+				// Flush the whole data option.
+				delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+
+				// Remove settings that may cause issues if stale on disconnect.
+				self::save_setting( 'account_data', null );
+				self::save_setting( 'tracking_advertiser', null );
+				self::save_setting( 'tracking_tag', null );
+
+				// Cancel scheduled jobs.
+				Pinterest\ProductSync::cancel_jobs();
+
+				// At this point we're disconnected.
+				return true;
+
+			} catch ( \Exception $th ) {
+				// There was an error disconnecting merchant.
+				return false;
+			}
 		}
 
+
+		/**
+		 * Disconnect advertiser from the platform if advertiser or tag change.
+		 *
+		 * @param array $old_value The old value of the option.
+		 * @param array $new_value The new value of the option.
+		 */
+		public static function maybe_disconnect_advertiser( $old_value, $new_value ) {
+
+			if ( ! is_array( $old_value ) || ! is_array( $new_value ) ) {
+				return;
+			}
+
+			if (
+				! isset( $old_value['tracking_advertiser'] ) ||
+				! isset( $old_value['tracking_tag'] ) ||
+				! isset( $new_value['tracking_advertiser'] ) ||
+				! isset( $new_value['tracking_tag'] )
+			) {
+				return;
+			}
+
+			// Disconnect merchant if old values are different than new ones.
+			if ( $old_value['tracking_advertiser'] !== $new_value['tracking_advertiser'] || $old_value['tracking_tag'] !== $new_value['tracking_tag'] ) {
+
+				try {
+
+					Pinterest\API\AdvertiserConnect::disconnect_advertiser( $old_value['tracking_advertiser'], $old_value['tracking_tag'] );
+
+				} catch ( \Exception $th ) {
+
+					Pinterest\Logger::log( esc_html__( 'There was an error disconnecting the Advertiser. Please try again.', 'pinterest-for-woocommerce' ) );
+				}
+			}
+		}
 
 		/**
 		 * Return WooConnect Bridge URL

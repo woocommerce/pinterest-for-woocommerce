@@ -251,12 +251,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				return;
 			}
 
+			$build_path = '/assets/build';
+
 			if ( Compat::should_show_tasks() ) {
 
-				$build_path = '/assets/setup-task';
-
-				$handle            = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE . '-setup-task';
-				$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/index.asset.php';
+				$handle            = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-task';
+				$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/setup-task.asset.php';
 				$script_info       = file_exists( $script_asset_path )
 					? include $script_asset_path
 					: array(
@@ -268,28 +268,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 				wp_register_script(
 					$handle,
-					Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/index.js',
+					Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/setup-task.js',
 					$script_info['dependencies'],
 					$script_info['version'],
 					true
 				);
 
 				wp_enqueue_script( $handle );
-
-				wp_register_style(
-					$handle,
-					Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/style-index.css',
-					array( 'wc-admin-app' ),
-					PINTEREST_FOR_WOOCOMMERCE_VERSION
-				);
-
-				wp_enqueue_style( $handle );
 			}
 
-			$build_path = '/assets/setup-guide';
-
-			$handle            = PINTEREST_FOR_WOOCOMMERCE_SETUP_GUIDE;
-			$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/index.asset.php';
+			$handle            = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide';
+			$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/setup-guide.asset.php';
 			$script_info       = file_exists( $script_asset_path )
 				? include $script_asset_path
 				: array(
@@ -301,7 +290,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 			wp_register_script(
 				$handle,
-				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/index.js',
+				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/setup-guide.js',
 				$script_info['dependencies'],
 				$script_info['version'],
 				true
@@ -311,22 +300,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 			wp_register_style(
 				$handle,
-				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/style-index.css',
+				Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/style-setup-guide.css',
 				array( 'wc-admin-app' ),
 				PINTEREST_FOR_WOOCOMMERCE_VERSION
 			);
 
 			wp_enqueue_style( $handle );
-
-			wp_register_style(
-				PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-catalog-sync',
-				Pinterest_For_Woocommerce()->plugin_url() . '/assets/catalog-sync/style-index.css',
-				array( 'wc-admin-app' ),
-				PINTEREST_FOR_WOOCOMMERCE_VERSION
-			);
-
-			wp_enqueue_style( $handle );
-
 		}
 
 		/**
@@ -384,9 +363,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				'serviceLoginUrl'          => $this->get_service_login_url(),
 				'createBusinessAccountUrl' => $this->get_create_business_account_url(),
 				'switchBusinessAccountUrl' => $this->get_switch_business_account_url(),
-				'domainToVerify'           => wp_parse_url( home_url(), PHP_URL_HOST ),
+				'homeUrlToVerify'          => home_url(),
 				'storeCountry'             => $store_country,
-				'isAdsSupportedCountry'    => in_array( $store_country, $this->get_ads_supported_countries(), true ),
+				'isAdsSupportedCountry'    => in_array( $store_country, Pinterest_For_Woocommerce_Ads_Supported_Countries::get_countries(), true ),
 				'isConnected'              => ! empty( Pinterest_For_Woocommerce()::is_connected() ),
 				'isBusinessConnected'      => ! empty( Pinterest_For_Woocommerce()::is_business_connected() ),
 				'businessAccounts'         => Pinterest_For_Woocommerce()::get_linked_businesses(),
@@ -403,10 +382,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'merchantGuidelines'     => 'https://policy.pinterest.com/en/merchant-guidelines',
 					'convertToBusinessAcct'  => 'https://help.pinterest.com/en/business/article/get-a-business-account#section-15096',
 					'appealDeclinedMerchant' => 'https://www.pinterest.com/product-catalogs/data-source/?showModal=true',
+					'installTag'             => 'https://help.pinterest.com/en/business/article/install-the-pinterest-tag',
+					'adsManager'             => 'https://ads.pinterest.com/',
+					'preLaunchNotice'        => 'https://help.pinterest.com/en-gb/business/article/get-a-business-profile/',
+					'adsAvailability'        => 'https://help.pinterest.com/en/business/availability/ads-availability',
 				),
 				'isSetupComplete'          => Pinterest_For_Woocommerce()::is_setup_complete(),
 				'countryTos'               => Pinterest_For_Woocommerce()::get_applicable_tos(),
-
+				'claimWebsiteErrorStatus'  => array(
+					401 => 'token',
+					403 => 'connection',
+					406 => 'domain verification',
+					409 => 'meta-tag',
+					),
 			);
 		}
 
@@ -523,48 +511,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			$allowed_hosts[] = wp_parse_url( $service_domain, PHP_URL_HOST );
 
 			return $allowed_hosts;
-		}
-
-
-		/**
-		 * Get the alpha-2 country codes where Pinterest advertises.
-		 *
-		 * @see https://help.pinterest.com/en/business/availability/ads-availability
-		 *
-		 * @return string[]
-		 */
-		private function get_ads_supported_countries() {
-			return array(
-				'AU', // Australia.
-				'AT', // Austria.
-				'BE', // Belgium.
-				'BR', // Brazil.
-				'CA', // Canada.
-				'CY', // Cyprus.
-				'CZ', // Czech Republic.
-				'DK', // Denmark.
-				'FI', // Finland.
-				'FR', // France.
-				'DE', // Germany.
-				'GR', // Greece.
-				'HU', // Hungary.
-				'IE', // Ireland.
-				'IT', // Italy.
-				'LU', // Luxembourg.
-				'MT', // Malta.
-				'NL', // Netherlands.
-				'NZ', // New Zealand.
-				'NO', // Norway.
-				'PL', // Poland.
-				'PT', // Portugal.
-				'RO', // Romania.
-				'SK', // Slovakia.
-				'ES', // Spain.
-				'SE', // Sweden.
-				'CH', // Switzerland.
-				'GB', // United Kingdom (UK).
-				'US', // United States (US).
-			);
 		}
 	}
 

@@ -4,6 +4,23 @@ $root: ".woocommerce-setup-guide";
 @import "~@wordpress/base-styles/mixins";
 @import "~@wordpress/base-styles/breakpoints";
 
+// Adds animation to placeholder section
+// Copied from WC-admin
+// https://github.com/woocommerce/woocommerce-admin/blob/9f68059c7df466ee7a559c555bcb5a7b9e421e6d/packages/style-build/abstracts/_mixins.scss#L22-L35
+@mixin placeholder( $lighten-percentage: 30% ) {
+	animation: loading-fade 1.6s ease-in-out infinite;
+	background-color: $gray-100;
+	color: transparent;
+
+	&::after {
+		content: "\00a0";
+	}
+
+	@media screen and ( prefers-reduced-motion: reduce ) {
+		animation: none;
+	}
+}
+
 #{$root} {
 
 	&__body {
@@ -192,51 +209,6 @@ $root: ".woocommerce-setup-guide";
 					}
 				}
 
-				&-status {
-					--bg-color: transparent;
-					--border-color: #ddd;
-					padding: 8px;
-					display: flex;
-
-					&.has-error {
-						--border-color: var(--wc-red);
-						--bg-color: var(--border-color);
-					}
-
-					&.has-pending,
-					&.has-success {
-						--border-color: var(--wp-admin-theme-color);
-						--bg-color: var(--border-color);
-					}
-
-					&__icon {
-						align-items: center;
-						background-color: var(--bg-color);
-						border: 1px solid var(--border-color);
-						border-radius: 50%;
-						color: #fff;
-						display: inline-flex;
-						font-size: 16px;
-						height: 22px;
-						justify-content: center;
-						margin-right: 12px;
-						min-width: 22px;
-						width: 22px;
-
-						.woocommerce-spinner {
-							border-radius: 50%;
-							display: block;
-							max-height: 22px;
-							min-width: 22px;
-							width: 22px;
-
-							&__circle {
-								stroke: #fff;
-							}
-						}
-					}
-				}
-
 				&-columns {
 
 					@include break-medium() {
@@ -285,9 +257,24 @@ $root: ".woocommerce-setup-guide";
 			&__setup-account {
 
 				.connection-info {
+					// Set minimum height to the height of the spinner preloader.
+					min-height: 40px;
 
 					.logo {
 						display: flex;
+						justify-self: start;
+					}
+
+					.connection-info__placeholder {
+
+						@include placeholder();
+						width: 50%;
+						min-width: 10em;
+						display: inline-block;
+					}
+
+					.connection-info__preloader {
+						flex: 1;
 					}
 
 					.account-label {
@@ -345,40 +332,17 @@ $root: ".woocommerce-setup-guide";
 
 				.components-card__body {
 
-					> *:not(:last-child) {
-						margin-bottom: 16px;
+					> :not(:last-child) {
+						margin-bottom: var(--main-gap);
+					}
+
+					> :first-child {
+						margin-bottom: $grid-unit-10;
 					}
 				}
 
-				#{$root} {
-
-					&__step {
-
-						&-status {
-							padding: 0;
-						}
-					}
-				}
-
-				.is-verified {
-
-					> * {
-						margin: 8px 0;
-					}
-				}
-
-				.has-idle {
-
-					#{$root} {
-
-						&__step-status__icon {
-							display: none;
-						}
-					}
-				}
-
-				.claim-error {
-					color: var(--wc-red);
+				.components-notice.is-error {
+					margin: 0;
 				}
 			}
 
@@ -588,6 +552,18 @@ $root: ".woocommerce-setup-guide";
 
 		.woocommerce-table__header {
 			display: none;
+		}
+
+		.components-card__footer {
+			flex-direction: row;
+
+			.components-external-link {
+				text-decoration: none;
+
+				&:hover {
+					text-decoration: underline;
+				}
+			}
 		}
 
 		th:first-child {

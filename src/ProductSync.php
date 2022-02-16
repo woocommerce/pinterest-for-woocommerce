@@ -16,6 +16,9 @@ use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\API\FeedIssues;
 use Automattic\WooCommerce\Pinterest\Utilities\FeedLogger;
 
+use \Exception;
+use \Throwable;
+
 /**
  * Class Handling registration & generation of the XML product feed.
  */

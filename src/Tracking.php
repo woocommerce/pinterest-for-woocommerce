@@ -12,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Automattic\WooCommerce\Pinterest\API\AdvertiserConnect;
+
 /**
  * Class adding Save Pin support.
  */
@@ -104,6 +106,8 @@ class Tracking {
 
 		// Print to head.
 		add_action( 'wp_head', array( __CLASS__, 'print_script' ) );
+
+		add_action( 'admin_init', array( __CLASS__, 'verify_advertiser_connection' ) );
 	}
 
 
@@ -481,6 +485,42 @@ class Tracking {
 				echo '<script>' . implode( PHP_EOL, self::$events ) . '</script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
 				self::$events = array();
 			}
+		}
+	}
+
+
+	/**
+	 * Verify if the advertiser is properly connected to the platform.
+	 */
+	public function verify_advertiser_connection() {
+		// Verify if advertiser and tag need to be connected due to a plugin upgrade.
+		try {
+			self::maybe_connect_advertiser_tag();
+
+			/* Translators: The error description */
+			Logger::log( esc_html__( 'Advertiser connected successfully', 'pinterest-for-woocommerce' ) );
+
+		} catch ( \Exception $e ) {
+
+			/* Translators: The error description */
+			Logger::log( sprintf( esc_html__( 'Could not connect the advertiser. Try to connect from the connection tab. [%s]', 'pinterest-for-woocommerce' ), $e->getMessage() ), 'error' );
+		}
+	}
+
+	/**
+	 * Call connect advertiser method if needed after plugin upgrade.
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
+	private static function maybe_connect_advertiser_tag() {
+
+		$is_connected         = Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' );
+		$connected_advertiser = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
+		$connected_tag        = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
+
+		// Check if advertiser is already connected.
+		if ( ! $is_connected && $connected_advertiser && $connected_tag ) {
+			AdvertiserConnect::connect_advertiser_and_tag( $connected_advertiser, $connected_tag );
 		}
 	}
 }
