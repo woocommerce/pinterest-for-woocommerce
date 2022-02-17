@@ -105,7 +105,7 @@ class Tracking {
 		add_action( 'shutdown', array( __CLASS__, 'save_async_events' ) );
 
 		// Print to head.
-		add_action( 'wp_head', array( __CLASS__, 'print_script' ), 10 );
+		add_action( 'wp_head', array( __CLASS__, 'print_script' ) );
 
 		add_action( 'admin_init', array( __CLASS__, 'verify_advertiser_connection' ) );
 	}
