@@ -84,7 +84,7 @@ class Tracking {
 		if ( function_exists( 'WC' ) ) {
 
 			if ( ! wp_doing_ajax() ) {
-				add_action( 'wp', array( __CLASS__, 'late_events_handling' ) );
+				add_action( 'wp_head', array( __CLASS__, 'late_events_handling' ), 20 );
 			}
 
 			// AddToCart - ajax.
@@ -105,7 +105,7 @@ class Tracking {
 		add_action( 'shutdown', array( __CLASS__, 'save_async_events' ) );
 
 		// Print to head.
-		add_action( 'wp_head', array( __CLASS__, 'print_script' ) );
+		add_action( 'wp_head', array( __CLASS__, 'print_script' ), 10 );
 
 		add_action( 'admin_init', array( __CLASS__, 'verify_advertiser_connection' ) );
 	}
