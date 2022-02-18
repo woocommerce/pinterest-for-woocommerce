@@ -443,7 +443,8 @@ class ProductsXmlFeed {
 			return '';
 		}
 
-		$shipping_nodes = [];
+		$shipping_nodes = array();
+
 		/*
 		 * Entry is a one or multiple XML nodes in the following format:
 		 *  <g:shipping>
@@ -455,7 +456,7 @@ class ProductsXmlFeed {
 		 */
 		foreach ( $shipping_info as $info ) {
 			$shipping_nodes[] =
-				"<g:shipping>" . PHP_EOL .
+				'<g:shipping>' . PHP_EOL .
 					"\t\t\t\t<g:country>$info[country]</g:country>" . PHP_EOL .
 					( $info['state'] ? "\t\t\t\t<g:region>$info[state]</g:region>" . PHP_EOL : '' ) .
 					"\t\t\t\t<g:service>$info[name]</g:service>" . PHP_EOL .
