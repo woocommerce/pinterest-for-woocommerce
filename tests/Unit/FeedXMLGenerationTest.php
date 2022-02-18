@@ -533,6 +533,22 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$this->assertEquals( '<g:mpn>DUMMY SKU</g:mpn>', $xml );
 	}
 
+
+	/**
+	 * @group feed
+	 */
+	public function testEscapeSpecialCharsInSKUForMpnXML() {
+		$mpn_method = $this->getProductsXmlFeedAttributeMethod( 'g:mpn' );
+		$product    = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'sku' => "invalid&sku"
+			)
+		 );
+		$xml        = $mpn_method( $product );
+		$this->assertEquals( '<g:mpn>invalid&amp;sku</g:mpn>', $xml );
+	}
+
 	/**
 	 * @group feed
 	 */
