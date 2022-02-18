@@ -395,7 +395,7 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_g_mpn( $product, $property ) {
-		return '<' . $property . '>' . $product->get_sku() . '</' . $property . '>';
+		return '<' . $property . '>' . esc_xml( $product->get_sku() ) . '</' . $property . '>';
 	}
 
 
