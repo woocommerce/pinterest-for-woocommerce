@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.8
 Requires PHP: 7.3
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -87,7 +87,7 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
-= 1.0.7 - 2022-xx-xx =
+= 1.0.7 - 2022-02-24 =
 * Fix - Critical error on Jetpack sites.
 
 = 1.0.6 - 2022-02-16 =
