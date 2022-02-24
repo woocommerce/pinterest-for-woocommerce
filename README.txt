@@ -87,6 +87,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.0.7 - 2022-xx-xx =
+* Fix - Critical error on Jetpack sites.
+
 = 1.0.6 - 2022-02-16 =
 * Fix – Fix the changelog for the 1.0.5 release by adding omitted changes.
 
