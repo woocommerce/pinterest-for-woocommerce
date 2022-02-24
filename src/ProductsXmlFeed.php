@@ -42,7 +42,7 @@ class ProductsXmlFeed {
 		'sale_price',
 		'g:mpn',
 		'g:tax',
-		'g:shipping',
+		// 'g:shipping',
 		'g:additional_image_link',
 	);
 
