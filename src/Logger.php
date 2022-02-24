@@ -49,7 +49,7 @@ class Logger {
 			$allow_logging = Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' );
 		}
 
-		if ( $force) {
+		if ( $force ) {
 			$allow_logging = true;
 		}
 
