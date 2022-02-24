@@ -99,7 +99,8 @@ class Auth extends VendorAPI {
 
 		if ( ! empty( $error ) ) {
 			$error_args = '&error=' . $error;
-			Logger::log( wp_json_encode( $error ), 'error' );
+			// Force the logs to debug the connection procedure.
+			Logger::log( wp_json_encode( $error ), 'error', null, true );
 		}
 
 		// Save token information.
