@@ -464,7 +464,7 @@ class ProductsXmlFeed {
 				"\t\t\t</g:shipping>";
 		}
 
-		return implode( "\t\t\t", $shipping_nodes );
+		return implode( PHP_EOL . "\t\t\t", $shipping_nodes );
 	}
 
 	/**
