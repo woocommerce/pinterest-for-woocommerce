@@ -72,7 +72,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>US</g:country>
 				<g:service>Free shipping</g:service>
 				<g:price>0.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 
 		$this->assertEquals( $expected, $xml );
 	}
@@ -96,7 +96,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>US</g:country>
 				<g:service>Flat rate</g:service>
 				<g:price>15.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 
 		$this->assertEquals( $expected, $xml );
 	}
@@ -131,7 +131,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>IT</g:country>
 				<g:service>Free shipping</g:service>
 				<g:price>0.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 
 		$this->assertEquals( $expected, $xml );
 	}
@@ -156,7 +156,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:region>CA</g:region>
 				<g:service>Flat rate</g:service>
 				<g:price>15.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 		$this->assertEquals( $expected, $xml );
 	}
 
@@ -184,7 +184,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>US</g:country>
 				<g:service>Flat rate</g:service>
 				<g:price>15.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 
 		$this->assertEquals( $expected, $xml );
 	}
@@ -245,7 +245,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>US</g:country>
 				<g:service>Free shipping</g:service>
 				<g:price>0.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 
 		$this->assertEquals( $expected, $xml );
 	}
@@ -311,7 +311,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>US</g:country>
 				<g:service>Flat rate</g:service>
 				<g:price>29.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 
 		$this->assertEquals( $expected, $xml );
 	}
@@ -342,7 +342,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>US</g:country>
 				<g:service>Flat rate</g:service>
 				<g:price>15.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 
 		$this->assertEquals( $expected, $xml );
 	}
@@ -377,7 +377,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>US</g:country>
 				<g:service>Flat rate</g:service>
 				<g:price>32.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 		$this->assertEquals( $expected, $xml );
 	}
 
@@ -408,7 +408,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>US</g:country>
 				<g:service>Free shipping</g:service>
 				<g:price>0.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 
 		$this->assertEquals( $expected, $xml );
 	}
@@ -439,7 +439,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:region>CA</g:region>
 				<g:service>Free shipping</g:service>
 				<g:price>0.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 
 		$this->assertEquals( $expected, $xml );
 	}
@@ -476,7 +476,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>US</g:country>
 				<g:service>Free shipping</g:service>
 				<g:price>0.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 
 		$this->assertEquals( $expected, $xml );
 	}
@@ -504,7 +504,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>US</g:country>
 				<g:service>Flat rate</g:service>
 				<g:price>10.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 
 		$this->assertEquals( $expected, $xml );
 
@@ -516,7 +516,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>US</g:country>
 				<g:service>Flat rate</g:service>
 				<g:price>12.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 		$this->assertEquals( $expected, $xml );
 	}
 
@@ -545,7 +545,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>US</g:country>
 				<g:service>Flat rate</g:service>
 				<g:price>10.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 
 		$this->assertEquals( $expected, $xml );
 
@@ -586,7 +586,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:country>CA</g:country>
 				<g:service>Flat rate</g:service>
 				<g:price>12.00 USD</g:price>
-			</g:shipping>\n";
+			</g:shipping>";
 
 		$this->assertEquals( $expected, $xml );
 
