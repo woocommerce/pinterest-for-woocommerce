@@ -461,7 +461,7 @@ class ProductsXmlFeed {
 					( $info['state'] ? "\t\t\t\t<g:region>$info[state]</g:region>" . PHP_EOL : '' ) .
 					"\t\t\t\t<g:service>$info[name]</g:service>" . PHP_EOL .
 					"\t\t\t\t<g:price>$info[cost] $currency</g:price>" . PHP_EOL .
-				"\t\t\t</g:shipping>" . PHP_EOL;
+				"\t\t\t</g:shipping>";
 		}
 
 		return implode( "\t\t\t", $shipping_nodes );
