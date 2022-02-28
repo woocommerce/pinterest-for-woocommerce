@@ -59,11 +59,15 @@ export const isDomainVerified = ( state ) => {
 		return false;
 	}
 
-	const { hostname } = new URL(
+	const { hostname, pathname } = new URL(
 		wcSettings.pinterest_for_woocommerce.homeUrlToVerify
 	);
+
+	// Build url for single site and multisite.
+	const urlToVerify = pathname !== '/' ? hostname + pathname : hostname;
+
 	return state?.settings?.account_data?.verified_user_websites.includes(
-		hostname
+		urlToVerify
 	);
 };
 
