@@ -690,6 +690,5 @@ class ProductSync {
 
 		as_unschedule_all_actions( self::ACTION_HANDLE_SYNC, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		as_unschedule_all_actions( self::ACTION_FEED_GENERATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		
 	}
 }
