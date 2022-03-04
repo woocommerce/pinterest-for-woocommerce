@@ -596,7 +596,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Just need to clean account data in these cases.
 			if ( ! self::is_business_connected() ) {
 
-				self::clean_options_on_disconnect();
+				self::flush_options();
 
 				// At this point we're disconnected.
 				return true;
@@ -628,7 +628,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					}
 				}
 
-				self::clean_options_on_disconnect();
+				self::flush_options();
 
 				// At this point we're disconnected.
 				return true;
@@ -645,7 +645,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @return void
 		 */
-		private static function clean_options_on_disconnect() {
+		private static function flush_options() {
 
 			// Flush the whole data option.
 			delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
