@@ -93,7 +93,7 @@ class Tracking {
 			}
 
 			// AddToCart - non-ajax.
-			add_action( 'woocommerce_add_to_cart', array( __CLASS__, 'hook_add_to_cart_event' ), 10, 4 );
+			add_action( 'woocommerce_add_to_cart', array( __CLASS__, 'hook_add_to_cart_event' ), 20, 4 );
 
 			// Checkout.
 			add_action( 'woocommerce_before_thankyou', array( __CLASS__, 'hook_checkout_event' ), 10, 1 );
