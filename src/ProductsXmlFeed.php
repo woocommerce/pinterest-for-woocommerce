@@ -304,7 +304,7 @@ class ProductsXmlFeed {
 			return '';
 		}
 
-		$image = wp_get_attachment_image_src( $image_id, 'woocommerce_single' );
+		$image = wp_get_attachment_image_src( $image_id, 'full' );
 
 		if ( ! $image ) {
 			return;
@@ -414,7 +414,7 @@ class ProductsXmlFeed {
 
 		if ( $attachment_ids && $product->get_image_id() ) {
 			foreach ( $attachment_ids as $attachment_id ) {
-				$images[] = wp_get_attachment_image_src( $attachment_id, 'woocommerce_single' )[0];
+				$images[] = wp_get_attachment_image_src( $attachment_id, 'full' )[0];
 			}
 		}
 
