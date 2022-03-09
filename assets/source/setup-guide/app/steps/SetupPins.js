@@ -11,6 +11,7 @@ import {
 	Icon,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
+import classnames from 'classnames';
 
 /**
  * Internal dependencies
@@ -112,7 +113,7 @@ const SetupPins = ( {} ) => {
 										help={
 											<HelpTooltip
 												text={ __(
-													'Matches conversion data with the person responsible for the conversion and lets you track cross-device checkouts.',
+													'Matches conversion data with the person responsible for the conversion and lets you track cross-device checkouts. Requires Track Conversion option to be enabled.',
 													'pinterest-for-woocommerce'
 												) }
 											/>
@@ -120,7 +121,15 @@ const SetupPins = ( {} ) => {
 										checked={
 											appSettings.enhanced_match_support
 										}
-										className="woocommerce-setup-guide__checkbox-group"
+										className = {
+											classnames(
+												'woocommerce-setup-guide__checkbox-group',
+												{
+													'pinterest-for-woocommerce-settings-checkbox-disabled' : ! appSettings.track_conversions
+												}
+											)
+										}
+										disabled = { ! appSettings.track_conversions }
 										onChange={ () =>
 											handleOptionChange(
 												'enhanced_match_support'
