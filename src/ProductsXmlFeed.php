@@ -553,7 +553,8 @@ class ProductsXmlFeed {
 	 * @return array|false
 	 */
 	private static function get_product_image( $image_id ) {
-		$image = wp_get_attachment_image_src( $image_id, 'full' );
+		// Get the image with a filter for default size.
+		$image = wp_get_attachment_image_src( $image_id, apply_filters( 'pinterest_for_woocommerce_feed_image_size', 'full' ) );
 
 		if ( ! $image ) {
 			return false;
