@@ -60,6 +60,13 @@ class ProductsXmlFeed {
 	 */
 	const DESCRIPTION_SIZE_CHARS_LIMIT = 10000;
 
+	/**
+	 * Max image resolution (5000px*5000px).
+	 *
+	 * @var int
+	 */
+	const IMAGE_MAX_RESOLUTION = 5000 * 5000;
+
 
 	/**
 	 * Returns the XML header to be printed.
@@ -304,7 +311,7 @@ class ProductsXmlFeed {
 			return '';
 		}
 
-		$image = wp_get_attachment_image_src( $image_id, 'full' );
+		$image = self::get_product_image( $image_id );
 
 		if ( ! $image ) {
 			return;
@@ -414,7 +421,9 @@ class ProductsXmlFeed {
 
 		if ( $attachment_ids && $product->get_image_id() ) {
 			foreach ( $attachment_ids as $attachment_id ) {
-				$images[] = wp_get_attachment_image_src( $attachment_id, 'full' )[0];
+				$image = self::get_product_image( $attachment_id );
+
+				$images[] = $image ? $image[0] : false;
 			}
 		}
 
@@ -534,5 +543,27 @@ class ProductsXmlFeed {
 		}
 
 		return $price;
+	}
+
+	/**
+	 * Helper method to return an image taking into account the limit on resolution 5000x5000.
+	 *
+	 * @param int $image_id The ID of the image.
+	 *
+	 * @return array|false
+	 */
+	private static function get_product_image( $image_id ) {
+		$image = wp_get_attachment_image_src( $image_id, 'full' );
+
+		if ( ! $image ) {
+			return false;
+		}
+
+		if ( $image[1] * $image[2] > self::IMAGE_MAX_RESOLUTION ) {
+
+			$image = wp_get_attachment_image_src( $image_id, 'woocommerce_single' );
+		}
+
+		return $image ?? false;
 	}
 }
