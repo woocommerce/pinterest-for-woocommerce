@@ -311,7 +311,8 @@ class ProductsXmlFeed {
 			return '';
 		}
 
-		$image = self::get_product_image( $image_id );
+		// Get the image with a filter for default size.
+		$image = wp_get_attachment_image_src( $image_id, apply_filters( 'pinterest_for_woocommerce_feed_image_size', 'full' ) );
 
 		if ( ! $image ) {
 			return;
@@ -421,7 +422,8 @@ class ProductsXmlFeed {
 
 		if ( $attachment_ids && $product->get_image_id() ) {
 			foreach ( $attachment_ids as $attachment_id ) {
-				$image = self::get_product_image( $attachment_id );
+				// Get the image with a filter for default size.
+				$image = wp_get_attachment_image_src( $attachment_id, apply_filters( 'pinterest_for_woocommerce_feed_image_size', 'full' ) );
 
 				$images[] = $image ? $image[0] : false;
 			}
@@ -543,28 +545,5 @@ class ProductsXmlFeed {
 		}
 
 		return $price;
-	}
-
-	/**
-	 * Helper method to return an image taking into account the limit on resolution 5000x5000.
-	 *
-	 * @param int $image_id The ID of the image.
-	 *
-	 * @return array|false
-	 */
-	private static function get_product_image( $image_id ) {
-		// Get the image with a filter for default size.
-		$image = wp_get_attachment_image_src( $image_id, apply_filters( 'pinterest_for_woocommerce_feed_image_size', 'full' ) );
-
-		if ( ! $image ) {
-			return false;
-		}
-
-		if ( $image[1] * $image[2] > self::IMAGE_MAX_RESOLUTION ) {
-
-			$image = wp_get_attachment_image_src( $image_id, 'woocommerce_single' );
-		}
-
-		return $image ?? false;
 	}
 }
