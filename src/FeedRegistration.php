@@ -117,7 +117,7 @@ class FeedRegistration {
 	 * Also if a different feed is registered, it will update using the URL in the
 	 * $feed_args.
 	 *
-	 * @param array $feed_args The arguments used to create the feed.
+	 * @param array  $feed_args The arguments used to create the feed.
 	 * @param string $location Location for which we set up the feed.
 	 *
 	 * @return boolean|string
