@@ -591,9 +591,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @throws \Exception PHP Exception.
 		 */
 		public static function disconnect() {
-
-			// If there is no business connected, disconnecting merchant will throw error.
-			// Just need to clean account data in these cases.
+			/*
+			 * If there is no business connected, disconnecting merchant will throw error.
+			 * Just need to clean account data in these cases.
+			 */
 			if ( ! self::is_business_connected() ) {
 
 				self::flush_options();
