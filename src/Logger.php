@@ -38,21 +38,18 @@ class Logger {
 	 * @param string $message The message to be logged.
 	 * @param string $level   The level/context of the message.
 	 * @param string $feature Used to direct logs to a separate file.
+	 * @param string $force   Used to bypass system settings and force the logs.
 	 *
 	 * @return string
 	 */
-	public static function log( $message, $level = 'debug', $feature = null ) {
+	public static function log( $message, $level = 'debug', $feature = null, $force = false ) {
 
 		$allow_logging = true;
 		if ( 'debug' === $level ) {
 			$allow_logging = Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' );
 		}
 
-		/*
-		 * When the integration is not connected force the logs.
-		 * This will allow to debug potential connection issues.
-		 */
-		if ( ! Pinterest_For_Woocommerce()::is_setup_complete() ) {
+		if ( $force ) {
 			$allow_logging = true;
 		}
 

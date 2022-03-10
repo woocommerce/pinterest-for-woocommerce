@@ -67,8 +67,14 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		);
 		ShippingHelpers::addFreeShipping( $zone );
 
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD</g:shipping>', $xml );
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Free shipping</g:service>
+				<g:price>0.00 USD</g:price>
+			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -85,8 +91,14 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		);
 		ShippingHelpers::addFlatRateShippingMethodToZone( $zone );
 
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US::Flat rate:15.00 USD</g:shipping>', $xml );
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Flat rate</g:service>
+				<g:price>15.00 USD</g:price>
+			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -104,8 +116,24 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 			]
 		);
 		$zone->add_shipping_method( 'free_shipping' );
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD,GB::Free shipping:0.00 USD,IT::Free shipping:0.00 USD</g:shipping>', $xml );
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Free shipping</g:service>
+				<g:price>0.00 USD</g:price>
+			</g:shipping>
+			<g:shipping>
+				<g:country>GB</g:country>
+				<g:service>Free shipping</g:service>
+				<g:price>0.00 USD</g:price>
+			</g:shipping>
+			<g:shipping>
+				<g:country>IT</g:country>
+				<g:service>Free shipping</g:service>
+				<g:price>0.00 USD</g:price>
+			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -123,7 +151,13 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		ShippingHelpers::addFlatRateShippingMethodToZone( $zone );
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US:CA:Flat rate:15.00 USD</g:shipping>', $xml );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:region>CA</g:region>
+				<g:service>Flat rate</g:service>
+				<g:price>15.00 USD</g:price>
+			</g:shipping>";
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -140,8 +174,19 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		);
 		ShippingHelpers::addFlatRateShippingMethodToZone( $zone );
 
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>CA::Flat rate:15.00 USD,US::Flat rate:15.00 USD</g:shipping>', $xml );
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = "<g:shipping>
+				<g:country>CA</g:country>
+				<g:service>Flat rate</g:service>
+				<g:price>15.00 USD</g:price>
+			</g:shipping>
+			<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Flat rate</g:service>
+				<g:price>15.00 USD</g:price>
+			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -195,8 +240,14 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		);
 		ShippingHelpers::addFreeShippingWithMinimumOrderAmount( $zone, 10 );
 
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD</g:shipping>', $xml );
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Free shipping</g:service>
+				<g:price>0.00 USD</g:price>
+			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -255,8 +306,14 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		ShippingHelpers::addShippingClass( 'heavy' );
 		ShippingHelpers::addFlatRateShippingMethodToZone( $zone, 19, '10 * [qty]' );
 
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US::Flat rate:29.00 USD</g:shipping>', $xml );
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Flat rate</g:service>
+				<g:price>29.00 USD</g:price>
+			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -280,8 +337,14 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		ShippingHelpers::addFlatRateShippingMethodToZone( $zone, 15, null, array( $class_id => 17 ) );
 
 		// Product has no class set.
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US::Flat rate:15.00 USD</g:shipping>', $xml );
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Flat rate</g:service>
+				<g:price>15.00 USD</g:price>
+			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -308,8 +371,14 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		$product = end( $this->products ) ;
 		$product->set_shipping_class_id( $class_id );
 		$product->save();
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( $product );
-		$this->assertEquals( '<g:shipping>US::Flat rate:32.00 USD</g:shipping>', $xml );
+
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Flat rate</g:service>
+				<g:price>32.00 USD</g:price>
+			</g:shipping>";
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -329,8 +398,19 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		);
 		ShippingHelpers::addFreeShipping( $zone );
 
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>CA::Free shipping:0.00 USD,US::Free shipping:0.00 USD</g:shipping>', $xml );
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = "<g:shipping>
+				<g:country>CA</g:country>
+				<g:service>Free shipping</g:service>
+				<g:price>0.00 USD</g:price>
+			</g:shipping>
+			<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Free shipping</g:service>
+				<g:price>0.00 USD</g:price>
+			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -348,8 +428,20 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		);
 		ShippingHelpers::addFreeShipping( $zone );
 
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD,US:CA:Free shipping:0.00 USD</g:shipping>', $xml );
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Free shipping</g:service>
+				<g:price>0.00 USD</g:price>
+			</g:shipping>
+			<g:shipping>
+				<g:country>US</g:country>
+				<g:region>CA</g:region>
+				<g:service>Free shipping</g:service>
+				<g:price>0.00 USD</g:price>
+			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -380,7 +472,13 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		$child_id_1    = $variation_product->get_children()[1];
 		$child_product = wc_get_product( $child_id_1 );
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( $child_product );
-		$this->assertEquals( '<g:shipping>US::Free shipping:0.00 USD</g:shipping>', $xml );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Free shipping</g:service>
+				<g:price>0.00 USD</g:price>
+			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -401,14 +499,25 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 
 		ShippingHelpers::addTaxRate( '', '', '20', '1' );
 
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US::Flat rate:10.00 USD</g:shipping>', $xml );
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Flat rate</g:service>
+				<g:price>10.00 USD</g:price>
+			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
 
 		// Enable tax calculations.
 		update_option( 'woocommerce_calc_taxes', 'yes' );
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US::Flat rate:12.00 USD</g:shipping>', $xml );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Flat rate</g:service>
+				<g:price>12.00 USD</g:price>
+			</g:shipping>";
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -431,14 +540,20 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 
 		update_option( 'woocommerce_calc_taxes', 'no' );
 
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US::Flat rate:10.00 USD</g:shipping>', $xml );
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Flat rate</g:service>
+				<g:price>10.00 USD</g:price>
+			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
 
 		// Enable tax calculations. We still should see flat rate original cost bc tax rate is not applicable to shipping.
 		update_option( 'woocommerce_calc_taxes', 'yes' );
 
 		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US::Flat rate:10.00 USD</g:shipping>', $xml );
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -461,8 +576,20 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 
 		update_option( 'woocommerce_calc_taxes', 'yes' );
 
-		$xml = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
-		$this->assertEquals( '<g:shipping>US::Flat rate:10.00 USD,CA::Flat rate:12.00 USD</g:shipping>', $xml );
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = "<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Flat rate</g:service>
+				<g:price>10.00 USD</g:price>
+			</g:shipping>
+			<g:shipping>
+				<g:country>CA</g:country>
+				<g:service>Flat rate</g:service>
+				<g:price>12.00 USD</g:price>
+			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
+
 	}
 
 	/**
@@ -522,8 +649,8 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	private function ProductsXmlFeed__get_property_g_shipping( $product ) {
 		$method = ( new ReflectionClass( ProductsXmlFeed::class ) )->getMethod( 'get_property_g_shipping' );
 		$method->setAccessible( true );
-
-		return $method->invoke( null, $product, 'g:shipping');
+		$value = $method->invoke( null, $product, 'g:shipping');
+		return $value;
 	}
 
 }
