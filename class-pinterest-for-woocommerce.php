@@ -591,6 +591,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @throws \Exception PHP Exception.
 		 */
 		public static function disconnect() {
+			/*
+			 * If there is no business connected, disconnecting merchant will throw error.
+			 * Just need to clean account data in these cases.
+			 */
+			if ( ! self::is_business_connected() ) {
+
+				self::flush_options();
+
+				// At this point we're disconnected.
+				return true;
+			}
 
 			try {
 				// Disconnect merchant from Pinterest.
@@ -618,16 +629,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					}
 				}
 
-				// Flush the whole data option.
-				delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
-
-				// Remove settings that may cause issues if stale on disconnect.
-				self::save_setting( 'account_data', null );
-				self::save_setting( 'tracking_advertiser', null );
-				self::save_setting( 'tracking_tag', null );
-
-				// Cancel scheduled jobs.
-				Pinterest\ProductSync::cancel_jobs();
+				self::flush_options();
 
 				// At this point we're disconnected.
 				return true;
@@ -636,6 +638,26 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				// There was an error disconnecting merchant.
 				return false;
 			}
+		}
+
+
+		/**
+		 * Flush data option and remove settings.
+		 *
+		 * @return void
+		 */
+		private static function flush_options() {
+
+			// Flush the whole data option.
+			delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+
+			// Remove settings that may cause issues if stale on disconnect.
+			self::save_setting( 'account_data', null );
+			self::save_setting( 'tracking_advertiser', null );
+			self::save_setting( 'tracking_tag', null );
+
+			// Cancel scheduled jobs.
+			Pinterest\ProductSync::cancel_jobs();
 		}
 
 
