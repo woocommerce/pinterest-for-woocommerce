@@ -60,13 +60,6 @@ class ProductsXmlFeed {
 	 */
 	const DESCRIPTION_SIZE_CHARS_LIMIT = 10000;
 
-	/**
-	 * Max image resolution (5000px*5000px).
-	 *
-	 * @var int
-	 */
-	const IMAGE_MAX_RESOLUTION = 5000 * 5000;
-
 
 	/**
 	 * Returns the XML header to be printed.
