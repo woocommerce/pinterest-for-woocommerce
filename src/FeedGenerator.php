@@ -218,6 +218,13 @@ class FeedGenerator extends AbstractChainedJob {
 			 * We just want variations ( variable children ) but not parents ( variable ).
 			 */
 			$included_product_types = array_merge( array_keys( wc_get_product_types() ), array( 'variation' ) );
+
+			/**
+			 * Filter excluded product types.
+			 *
+			 * @since x.x.x
+			 * @param array Array of excluded product types.
+			 */
 			$excluded_product_types = apply_filters(
 				'pinterest_for_woocommerce_excluded_product_types',
 				array(
