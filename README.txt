@@ -87,6 +87,15 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.0.8 - 2022-xx-xx =
+* Update - Shipping column format. ( [#370](https://github.com/woocommerce/pinterest-for-woocommerce/pull/370) )
+* Fix    - Escape XML special chars in SKU for the XML MPN section. ( [#371](https://github.com/woocommerce/pinterest-for-woocommerce/pull/371) )
+* Fix    - Clean account data if user Disconnect during the onboarding process with a personal account. ( [#381](https://github.com/woocommerce/pinterest-for-woocommerce/pull/381) )
+* Fix    - Do not create merchant on get_feed_state. ( [#353](https://github.com/woocommerce/pinterest-for-woocommerce/pull/353) )
+* Update - Disable enhanced match support when tracking is disabled. ( [#386](https://github.com/woocommerce/pinterest-for-woocommerce/pull/386) )
+* Tweak  - Take full size images for the feed. ( [#383](https://github.com/woocommerce/pinterest-for-woocommerce/pull/383) )
+* Update - Enable shipping column in the feed. ( [#388](https://github.com/woocommerce/pinterest-for-woocommerce/pull/388) )
+
 = 1.0.7 - 2022-02-24 =
 * Fix - Critical error on Jetpack sites.
 
