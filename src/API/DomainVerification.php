@@ -27,7 +27,7 @@ class DomainVerification extends VendorAPI {
 	 *
 	 * @var integer
 	 */
-	private $verification_attempts_remaining = 3;
+	private static $verification_attempts_remaining = 3;
 
 	/**
 	 * Initialize class
@@ -93,9 +93,9 @@ class DomainVerification extends VendorAPI {
 
 			$error_code = $th->getCode() >= 400 ? $th->getCode() : 400;
 
-			if ( 403 === $error_code && $this->verification_attempts_remaining > 0 ) {
-				$this->verification_attempts_remaining--;
-				Logger::log( sprintf( 'Retrying domain verification in 5 seconds. Attempts left: %d', $this->verification_attempts_remaining ), 'debug' );
+			if ( 403 === $error_code && self::$verification_attempts_remaining > 0 ) {
+				self::$verification_attempts_remaining--;
+				Logger::log( sprintf( 'Retrying domain verification in 5 seconds. Attempts left: %d', self::$verification_attempts_remaining ), 'debug' );
 				sleep( 5 );
 				return call_user_func( __METHOD__ );
 			}
