@@ -941,7 +941,29 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function is_domain_verified() {
 			$account_data = self::get_setting( 'account_data' );
+
+			if ( isset( $account_data['domain_verified'] ) && isset( $account_data['verified_domains'] ) ) {
+				$verification_response = self::migrate_domain_to_website_verification_data();
+
+				if ( ! is_wp_error( $verification_response ) ) {
+					// Successful verification, cleaning old data.
+					unset( $account_data['domain_verified'] );
+					unset( $account_data['verified_domains'] );
+				} else {
+					// There was an error, returning old data.
+					return isset( $account_data['verified_domains'] ) ? (bool) $account_data['verified_domains'] : false;
+				}
+			}
+
 			return isset( $account_data['is_any_website_verified'] ) ? (bool) $account_data['is_any_website_verified'] : false;
+		}
+
+
+		/**
+		 * Migrate the old domain verification to website verification
+		 */
+		private static function migrate_domain_to_website_verification_data() {
+			return Pinterest\API\DomainVerification::trigger_domain_verification();
 		}
 
 

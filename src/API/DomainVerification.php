@@ -51,7 +51,18 @@ class DomainVerification extends VendorAPI {
 	 * @throws \Exception PHP Exception.
 	 */
 	public function handle_verification() {
+		return self::trigger_domain_verification();
+	}
 
+
+	/**
+	 * Triggers the realtime verification process using the Pinterst API.
+	 *
+	 * @return mixed
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
+	public static function trigger_domain_verification() {
 		static $verification_data;
 
 		try {
