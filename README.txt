@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.8
 Requires PHP: 7.3
-Stable tag: 1.0.7
+Stable tag: 1.0.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -87,7 +87,7 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
-= 1.0.8 - 2022-xx-xx =
+= 1.0.8 - 2022-03-11 =
 * Update - Shipping column format. ( [#370](https://github.com/woocommerce/pinterest-for-woocommerce/pull/370) )
 * Fix    - Escape XML special chars in SKU for the XML MPN section. ( [#371](https://github.com/woocommerce/pinterest-for-woocommerce/pull/371) )
 * Fix    - Clean account data if user Disconnect during the onboarding process with a personal account. ( [#381](https://github.com/woocommerce/pinterest-for-woocommerce/pull/381) )
