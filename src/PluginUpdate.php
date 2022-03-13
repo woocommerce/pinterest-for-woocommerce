@@ -34,10 +34,10 @@ class PluginUpdate {
 	 * @since x.x.x
 	 * @return boolean
 	 */
-	public static function plugin_is_up_to_date(): bool {
+	public function plugin_is_up_to_date(): bool {
 		return version_compare(
-			self::get_plugin_update_version(),
-			self::get_plugin_current_version(),
+			$this->get_plugin_update_version(),
+			$this->get_plugin_current_version(),
 			'=='
 		);
 	}
@@ -49,9 +49,9 @@ class PluginUpdate {
 	 * @param string $version Version string for which we check if update is needed.
 	 * @return boolean
 	 */
-	private static function version_needs_update( string $version ): bool {
+	private function version_needs_update( string $version ): bool {
 		return version_compare(
-			self::get_plugin_update_version(),
+			$this->get_plugin_update_version(),
 			$version,
 			'<'
 		);
@@ -65,7 +65,7 @@ class PluginUpdate {
 	 * @since x.x.x
 	 * @return string
 	 */
-	private static function get_plugin_update_version(): string {
+	private function get_plugin_update_version(): string {
 		return get_option( self::PLUGIN_UPDATE_VERSION_OPTION, '1.0.0' );
 	}
 
@@ -75,7 +75,7 @@ class PluginUpdate {
 	 * @since x.x.x
 	 * @return string
 	 */
-	private static function get_plugin_current_version(): string {
+	private function get_plugin_current_version(): string {
 		return PINTEREST_FOR_WOOCOMMERCE_VERSION;
 	}
 
@@ -86,17 +86,17 @@ class PluginUpdate {
 	 * @since x.x.x
 	 * @return void
 	 */
-	private static function update_plugin_update_version_option(): void {
+	private function update_plugin_update_version_option(): void {
 		update_option(
 			self::PLUGIN_UPDATE_VERSION_OPTION,
-			self::get_plugin_current_version()
+			$this->get_plugin_current_version()
 		);
 
 		Logger::log(
 			sprintf(
 				// translators: plugin version.
 				__( 'Plugin updated to version: %s.', 'pinterest-for-woocommerce' ),
-				self::get_plugin_current_version()
+				$this->get_plugin_current_version()
 			)
 		);
 	}
@@ -107,21 +107,21 @@ class PluginUpdate {
 	 * @since x.x.x
 	 * @return void
 	 */
-	public static function maybe_update(): void {
+	public function maybe_update(): void {
 
 		// Return if the plugin is up to date.
-		if ( self::plugin_is_up_to_date() ) {
+		if ( $this->plugin_is_up_to_date() ) {
 			return;
 		}
 
 		try {
-			self::perform_plugin_updates();
+			$this->perform_plugin_updates();
 		} catch ( Throwable $th ) {
 			Logger::log(
 				sprintf(
 					// translators: 1: plugin version, 2: error message.
 					__( 'Plugin update to version %1$s error: %2$s', 'pinterest-for-woocommerce' ),
-					self::get_plugin_current_version(),
+					$this->get_plugin_current_version(),
 					$th->getMessage()
 				),
 				'error',
@@ -131,10 +131,13 @@ class PluginUpdate {
 		}
 
 		/**
-		 * Even if the update procedure has errored we still want to update the update version.
-		 * This avoids
+		 * Even if the update procedure has errored we still want to
+		 * update the update version. This avoids problems where the
+		 * update procedure will be called again and again. Update
+		 * problems will need to be fixed in the next patch release
+		 * in this case.
 		 */
-		self::update_plugin_update_version_option();
+		$this->update_plugin_update_version_option();
 	}
 
 	/**
@@ -144,8 +147,8 @@ class PluginUpdate {
 	 * @throws Throwable Update procedure failures.
 	 * @return void
 	 */
-	private static function perform_plugin_updates(): void {
-		self::update_to_1_0_9();
+	private function perform_plugin_updates(): void {
+		$this->update_to_1_0_9();
 	}
 
 	/**
@@ -154,8 +157,8 @@ class PluginUpdate {
 	 * @since x.x.x
 	 * @return void
 	 */
-	private static function update_to_1_0_9(): void {
-		if ( ! self::version_needs_update( '1.0.9' ) ) {
+	private function update_to_1_0_9(): void {
+		if ( ! $this->version_needs_update( '1.0.9' ) ) {
 			return;
 		}
 	}
