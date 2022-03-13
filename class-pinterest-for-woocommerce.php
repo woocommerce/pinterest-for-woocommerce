@@ -235,7 +235,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'init', array( Pinterest\Tracking::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\TrackerSnapshot::class, 'maybe_init' ) );
-			add_action( 'plugins_loaded', array( Pinterest\PluginUpdate::class, 'maybe_update_plugin' ) );
+			add_action( 'plugins_loaded', array( $this, 'maybe_update_plugin' ) );
 
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
@@ -331,6 +331,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 
 			return false;
+		}
+
+		/**
+		 * Plugin update entry point.
+		 *
+		 * @since x.x.x
+		 * @return void
+		 */
+		public function maybe_update_plugin() {
+			$plugin_update = new Pinterest\PluginUpdate();
+			$plugin_update->maybe_update();
 		}
 
 		/**
