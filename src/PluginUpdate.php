@@ -52,7 +52,7 @@ class PluginUpdate {
 	private static function version_needs_update( string $version ): bool {
 		return version_compare(
 			self::get_plugin_update_version(),
-			'1.0.9',
+			$version,
 			'<'
 		);
 	}
