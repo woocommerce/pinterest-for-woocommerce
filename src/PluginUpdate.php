@@ -43,6 +43,21 @@ class PluginUpdate {
 	}
 
 	/**
+	 * Helper function to check if update to $version is needed.
+	 *
+	 * @since x.x.x
+	 * @param string $version Version string for which we check if update is needed.
+	 * @return boolean
+	 */
+	private static function version_needs_update( string $version ): bool {
+		return version_compare(
+			self::get_plugin_update_version(),
+			'1.0.9',
+			'<'
+		);
+	}
+
+	/**
 	 * Gets the previous version of the plugin. The one before the update has
 	 * happened. After the update procedure this will return the same version
 	 * as get_plugin_current_version().
@@ -62,21 +77,6 @@ class PluginUpdate {
 	 */
 	private static function get_plugin_current_version(): string {
 		return PINTEREST_FOR_WOOCOMMERCE_VERSION;
-	}
-
-	/**
-	 * Helper function to check if update to $version is needed.
-	 *
-	 * @since x.x.x
-	 * @param string $version Version string for which we check if update is needed.
-	 * @return boolean
-	 */
-	private static function version_needs_update( string $version ): bool {
-		return version_compare(
-			self::get_plugin_update_version(),
-			'1.0.9',
-			'<'
-		);
 	}
 
 	/**
