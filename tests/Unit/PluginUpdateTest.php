@@ -43,10 +43,10 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 		 */
 		$this->mock_logger = new class {
 
-			static $message = '';
+			public $message = array();
 			public function log( $level, $msg )
 			{
-				self::$message = $msg;
+				$this->message[] = $msg;
 			}
 		};
 		Logger::$logger = $this->mock_logger;
@@ -122,12 +122,12 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 		$mock_plugin_update->maybe_update();
 
 		// No exception generated, logger message should be empty.
-		$this->assertEmpty( $this->mock_logger::$message );
+		$this->assertEquals( 'Plugin updated to version: 1.0.8.', $this->mock_logger->message[0] );
 
 		$this->assertTrue( $this->plugin_update->plugin_is_up_to_date() );
 	}
 
-		/**
+	/**
 	 * Test main update flow.
 	 * perform_plugin_updates does not throw.
 	 *
@@ -141,13 +141,16 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 			->getMock();
 
 		$ex = new Exception( 'Veni, vidi, error!' );
-		$mock_plugin_update->method('perform_plugin_updates')
+		$mock_plugin_update->method( 'perform_plugin_updates' )
 			->willThrowException( $ex );
 
 		$mock_plugin_update->maybe_update();
 
-		// Exception was caught and logged;
-		$this->assertEquals( "Plugin update to version 1.0.8 error: Veni, vidi, error!", $this->mock_logger::$message );
+		// Exception was caught and logged.
+		$this->assertEquals( "Plugin update to version 1.0.8 error: Veni, vidi, error!", $this->mock_logger->message[0] );
+
+		// Plugin update message logged.
+		$this->assertEquals( 'Plugin updated to version: 1.0.8.', $this->mock_logger->message[1] );
 
 		/**
 		 * Plugin should be marked as up to date. To avoid update loop.
