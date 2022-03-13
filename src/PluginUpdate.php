@@ -67,6 +67,7 @@ class PluginUpdate {
 	/**
 	 * Helper function to check if update to $version is needed.
 	 *
+	 * @since x.x.x
 	 * @param string $version Version string for which we check if update is needed.
 	 * @return boolean
 	 */
