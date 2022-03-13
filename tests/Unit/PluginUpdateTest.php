@@ -30,7 +30,7 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 	private $mock_logger = null;
 
 	/**
-	 * Clear =the update version option used to detect if the plugin has been updated.
+	 * Clear the update version option used to detect if the plugin has been updated.
 	 *
 	 * @return void
 	 */
