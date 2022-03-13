@@ -34,7 +34,7 @@ class PluginUpdate {
 	 * @since x.x.x
 	 * @return boolean
 	 */
-	private static function plugin_is_up_to_date(): bool {
+	public static function plugin_is_up_to_date(): bool {
 		return version_compare(
 			self::get_plugin_update_version(),
 			self::get_plugin_current_version(),
@@ -85,7 +85,7 @@ class PluginUpdate {
 	 * @since x.x.x
 	 * @return void
 	 */
-	private static function update_plugin_previous_version(): void {
+	private static function update_plugin_update_version_option(): void {
 		update_option(
 			self::PLUGIN_UPDATE_VERSION_OPTION,
 			self::get_plugin_current_version()
@@ -133,7 +133,7 @@ class PluginUpdate {
 		 * Even if the update procedure has errored we still want to update the update version.
 		 * This avoids
 		 */
-		self::update_plugin_previous_version();
+		self::update_plugin_update_version_option();
 	}
 
 	/**
