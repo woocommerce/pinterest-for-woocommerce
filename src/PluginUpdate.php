@@ -147,7 +147,7 @@ class PluginUpdate {
 	 * @throws Throwable Update procedure failures.
 	 * @return void
 	 */
-	private function perform_plugin_updates(): void {
+	protected function perform_plugin_updates(): void {
 		$this->update_to_1_0_9();
 	}
 
