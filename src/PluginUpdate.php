@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Exception;
 use Throwable;
 /**
  * Class PluginUpdate
@@ -155,6 +156,7 @@ class PluginUpdate {
 	 * Update procedure for the 1.0.9 version of the plugin.
 	 *
 	 * @since x.x.x
+	 * @throws Exception Verification error.
 	 * @return void
 	 */
 	private function update_to_1_0_9(): void {
@@ -162,7 +164,19 @@ class PluginUpdate {
 			// Already up to date.
 			return;
 		}
-		// Perform update.
-	}
+		$account_data = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
 
+		/**
+		 * Trigger update only if the user has performed verification
+		 * procedure already. Otherwise we rely on the setup wizard process.
+		 */
+		if ( ! ( isset( $account_data['domain_verified'] ) && isset( $account_data['verified_domains'] ) ) ) {
+			return;
+		}
+
+		$response = API\DomainVerification::trigger_domain_verification();
+		if ( is_wp_error( $response ) ) {
+			throw new Exception( $response->get_error_message() );
+		}
+	}
 }
