@@ -159,8 +159,10 @@ class PluginUpdate {
 	 */
 	private function update_to_1_0_9(): void {
 		if ( ! $this->version_needs_update( '1.0.9' ) ) {
+			// Already up to date.
 			return;
 		}
+		// Perform update.
 	}
 
 }
