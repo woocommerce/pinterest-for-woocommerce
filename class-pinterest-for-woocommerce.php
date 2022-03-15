@@ -247,6 +247,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Disconnect advertiser if advertiser or tag change.
 			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
+
+			$this->maybe_update_plugin();
 		}
 
 
@@ -330,6 +332,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 
 			return false;
+		}
+
+		/**
+		 * Plugin update entry point.
+		 *
+		 * @since x.x.x
+		 * @return void
+		 */
+		public function maybe_update_plugin() {
+			$plugin_update = new Pinterest\PluginUpdate();
+			$plugin_update->maybe_update();
 		}
 
 		/**
