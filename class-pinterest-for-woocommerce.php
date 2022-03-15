@@ -261,6 +261,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Disconnect advertiser if advertiser or tag change.
 			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
+
+			$this->maybe_update_plugin();
 		}
 
 
@@ -344,6 +346,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 
 			return false;
+		}
+
+		/**
+		 * Plugin update entry point.
+		 *
+		 * @since x.x.x
+		 * @return void
+		 */
+		public function maybe_update_plugin() {
+			$plugin_update = new Pinterest\PluginUpdate();
+			$plugin_update->maybe_update();
 		}
 
 		/**
@@ -605,6 +618,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @throws \Exception PHP Exception.
 		 */
 		public static function disconnect() {
+			/*
+			 * If there is no business connected, disconnecting merchant will throw error.
+			 * Just need to clean account data in these cases.
+			 */
+			if ( ! self::is_business_connected() ) {
+
+				self::flush_options();
+
+				// At this point we're disconnected.
+				return true;
+			}
 
 			try {
 				// Disconnect merchant from Pinterest.
@@ -632,16 +656,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					}
 				}
 
-				// Flush the whole data option.
-				delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
-
-				// Remove settings that may cause issues if stale on disconnect.
-				self::save_setting( 'account_data', null );
-				self::save_setting( 'tracking_advertiser', null );
-				self::save_setting( 'tracking_tag', null );
-
-				// Cancel scheduled jobs.
-				Pinterest\ProductSync::cancel_jobs();
+				self::flush_options();
 
 				// At this point we're disconnected.
 				return true;
@@ -650,6 +665,26 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				// There was an error disconnecting merchant.
 				return false;
 			}
+		}
+
+
+		/**
+		 * Flush data option and remove settings.
+		 *
+		 * @return void
+		 */
+		private static function flush_options() {
+
+			// Flush the whole data option.
+			delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+
+			// Remove settings that may cause issues if stale on disconnect.
+			self::save_setting( 'account_data', null );
+			self::save_setting( 'tracking_advertiser', null );
+			self::save_setting( 'tracking_tag', null );
+
+			// Cancel scheduled jobs.
+			Pinterest\ProductSync::cancel_jobs();
 		}
 
 
@@ -783,13 +818,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				$data = array_intersect_key(
 					(array) $account_data['data'],
 					array(
-						'verified_domains' => '',
-						'domain_verified'  => '',
-						'username'         => '',
-						'full_name'        => '',
-						'id'               => '',
-						'image_medium_url' => '',
-						'is_partner'       => '',
+						'verified_user_websites'  => '',
+						'is_any_website_verified' => '',
+						'username'                => '',
+						'full_name'               => '',
+						'id'                      => '',
+						'image_medium_url'        => '',
+						'is_partner'              => '',
 					)
 				);
 
@@ -955,7 +990,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function is_domain_verified() {
 			$account_data = self::get_setting( 'account_data' );
-			return isset( $account_data['domain_verified'] ) ? (bool) $account_data['domain_verified'] : false;
+			return isset( $account_data['is_any_website_verified'] ) ? (bool) $account_data['is_any_website_verified'] : false;
 		}
 
 
