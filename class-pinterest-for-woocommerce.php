@@ -141,18 +141,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Pinterest For WooCommerce plugin update initializer.
-		 */
-		public function maybe_update_plugin() {
-			// 1.0.1 marks the addition of the update feature.
-			$previous_version = get_option( PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME, '1.0.1' );
-			if ( version_compare( $this->version, $previous_version, '>' ) ) {
-				Pinterest\PluginUpdate::update( $previous_version );
-				update_option( PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME, $this->version );
-			}
-		}
-
-		/**
 		 * Pinterest_For_Woocommerce Initializer.
 		 */
 		public function maybe_init_plugin() {
@@ -186,7 +174,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_VERSION', '1' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT', 'oauth/callback' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_AUTH', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_auth_key' );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION_OPTION_NAME', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-version' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX', 'pfw' );
 		}
 
@@ -245,7 +232,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
 			add_action( 'wp_head', array( Pinterest\RichPins::class, 'maybe_inject_rich_pins_opengraph_tags' ) );
 			add_action( 'wp', array( Pinterest\SaveToPinterest::class, 'maybe_init' ) );
-			add_action( 'plugins_loaded', array( $this, 'maybe_update_plugin' ) );
 			add_action( 'init', array( Pinterest\Tracking::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\TrackerSnapshot::class, 'maybe_init' ) );
