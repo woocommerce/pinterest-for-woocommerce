@@ -804,13 +804,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				$data = array_intersect_key(
 					(array) $account_data['data'],
 					array(
-						'verified_domains' => '',
-						'domain_verified'  => '',
-						'username'         => '',
-						'full_name'        => '',
-						'id'               => '',
-						'image_medium_url' => '',
-						'is_partner'       => '',
+						'verified_user_websites'  => '',
+						'is_any_website_verified' => '',
+						'username'                => '',
+						'full_name'               => '',
+						'id'                      => '',
+						'image_medium_url'        => '',
+						'is_partner'              => '',
 					)
 				);
 
@@ -976,7 +976,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function is_domain_verified() {
 			$account_data = self::get_setting( 'account_data' );
-			return isset( $account_data['domain_verified'] ) ? (bool) $account_data['domain_verified'] : false;
+			return isset( $account_data['is_any_website_verified'] ) ? (bool) $account_data['is_any_website_verified'] : false;
 		}
 
 
