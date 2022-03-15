@@ -3,7 +3,6 @@
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit\PluginUpdate;
 
 use ReflectionClass;
-use \WC_Unit_Test_Case;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 use Automattic\WooCommerce\Pinterest\Logger;
@@ -28,6 +27,14 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 	 * @var object|null Mocked logger object.
 	 */
 	private $mock_logger = null;
+
+	/**
+	 * Current plugin version.
+	 * Used to make test version agnostic.
+	 *
+	 * @var string Plugin version string.
+	 */
+	private $current_version = PINTEREST_FOR_WOOCOMMERCE_VERSION;
 
 	/**
 	 * Clear the update version option used to detect if the plugin has been updated.
@@ -83,7 +90,7 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 		$method = ( new ReflectionClass( PluginUpdate::class ) )->getMethod( 'version_needs_update' );
 		$method->setAccessible( true );
 		$this->assertTrue(
-			$method->invoke( $this->plugin_update, PINTEREST_FOR_WOOCOMMERCE_VERSION )
+			$method->invoke( $this->plugin_update, $this->current_version )
 		);
 	}
 
@@ -99,7 +106,7 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 		$method = ( new ReflectionClass( PluginUpdate::class ) )->getMethod( 'version_needs_update' );
 		$method->setAccessible( true );
 		$this->assertFalse(
-			$method->invoke( $this->plugin_update, PINTEREST_FOR_WOOCOMMERCE_VERSION )
+			$method->invoke( $this->plugin_update, $this->current_version )
 		);
 	}
 
@@ -122,7 +129,7 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 		$mock_plugin_update->maybe_update();
 
 		// No exception generated, logger message should be empty.
-		$this->assertEquals( 'Plugin updated to version: 1.0.8.', $this->mock_logger->message[0] );
+		$this->assertEquals( "Plugin updated to version: {$this->current_version}.", $this->mock_logger->message[0] );
 
 		$this->assertTrue( $this->plugin_update->plugin_is_up_to_date() );
 	}
@@ -147,16 +154,47 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 		$mock_plugin_update->maybe_update();
 
 		// Exception was caught and logged.
-		$this->assertEquals( "Plugin update to version 1.0.8 error: Veni, vidi, error!", $this->mock_logger->message[0] );
+		$this->assertEquals( "Plugin update to version {$this->current_version} error: Veni, vidi, error!", $this->mock_logger->message[0] );
 
 		// Plugin update message logged.
-		$this->assertEquals( 'Plugin updated to version: 1.0.8.', $this->mock_logger->message[1] );
+		$this->assertEquals( "Plugin updated to version: {$this->current_version}.", $this->mock_logger->message[1] );
 
 		/**
 		 * Plugin should be marked as up to date. To avoid update loop.
 		 * Check maybe_update for explanation why.
 		 */
 		$this->assertTrue( $this->plugin_update->plugin_is_up_to_date() );
+	}
+
+	/**
+	 * Test that the update flow happens only one for one plugin version.
+	 *
+	 * @group update
+	 * @return void
+	 */
+	public function testAfterUpdateTheUpdateIsNotExecutedAgain() {
+
+		$mock_plugin_update = $this->getMockBuilder( PluginUpdate::class )
+			->setMethods( ['perform_plugin_updates'] )
+			->getMock();
+
+		$mock_plugin_update->method('perform_plugin_updates')
+			->willReturn( null );
+
+		$mock_plugin_update->maybe_update();
+
+		// Plugin has been updated.
+		$this->assertEquals( "Plugin updated to version: {$this->current_version}.", $this->mock_logger->message[0] );
+
+		// Clear the Logger messages.
+		$this->mock_logger->message = array();
+
+		// Run update again.
+		$mock_plugin_update->maybe_update();
+
+		// No messages means that the update procedure exited early.
+		$this->assertEmpty( $this->mock_logger->message );
+
 	}
 
 	/**
