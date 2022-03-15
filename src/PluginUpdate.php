@@ -104,6 +104,19 @@ class PluginUpdate {
 	}
 
 	/**
+	 * List of update procedures
+	 *
+	 * @since x.x.x
+	 * @return array List of update procedures names.
+	 */
+	private function update_procedures() {
+		return array(
+			'domain_verification_migration',
+			'feed_generation_migration',
+		);
+	}
+
+	/**
 	 * Update procedures entry point.
 	 *
 	 * @since x.x.x
@@ -116,20 +129,9 @@ class PluginUpdate {
 			return;
 		}
 
-		try {
-			$this->perform_plugin_updates();
-		} catch ( Throwable $th ) {
-			Logger::log(
-				sprintf(
-					// translators: 1: plugin version, 2: error message.
-					__( 'Plugin update to version %1$s error: %2$s', 'pinterest-for-woocommerce' ),
-					$this->get_plugin_current_version(),
-					$th->getMessage()
-				),
-				'error',
-				null,
-				true
-			);
+		// Run the update procedures.
+		foreach ( $this->update_procedures() as $update_procedure ) {
+			$this->perform_plugin_update_procedure( $update_procedure );
 		}
 
 		/**
@@ -143,14 +145,28 @@ class PluginUpdate {
 	}
 
 	/**
-	 * Perform update procedures.
+	 * Perform update procedure.
 	 *
 	 * @since x.x.x
-	 * @throws Throwable Update procedure failures.
+	 * @param  string $update_procedure Name of the migration procedure.
 	 * @return void
 	 */
-	protected function perform_plugin_updates(): void {
-		$this->domain_migration_1_0_9();
+	protected function perform_plugin_update_procedure( $update_procedure ): void {
+		try {
+			$this->{$update_procedure}();
+		} catch ( Throwable $th ) {
+			Logger::log(
+				sprintf(
+					// translators: 1: plugin version, 2: error message.
+					__( 'Plugin update to version %1$s error: %2$s', 'pinterest-for-woocommerce' ),
+					$this->get_plugin_current_version(),
+					$th->getMessage()
+				),
+				'error',
+				null,
+				true
+			);
+		}
 	}
 
 	/**
@@ -160,7 +176,7 @@ class PluginUpdate {
 	 * @throws Exception Verification error.
 	 * @return void
 	 */
-	private function domain_migration_1_0_9(): void {
+	protected function domain_verification_migration(): void {
 		if ( ! $this->version_needs_update( '1.0.9' ) ) {
 			// Already up to date.
 			return;
@@ -186,7 +202,7 @@ class PluginUpdate {
 	 *
 	 * @return void
 	 */
-	public static function feed_generation_update_1_0_9(): void {
+	protected static function feed_generation_migration(): void {
 		/*
 		 * 1. Cancel old actions.
 		 */
