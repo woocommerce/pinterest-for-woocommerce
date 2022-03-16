@@ -10,7 +10,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
-
+use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use \WP_REST_Server;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -174,9 +174,11 @@ class FeedState extends VendorAPI {
 				$status_label = esc_html__( 'Feed generation in progress.', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
 					/* Translators: %1$s Time string, %2$s number of products */
-					esc_html__( 'Last activity: %1$s ago - Wrote %2$s products to feed file.', 'pinterest-for-woocommerce' ),
+					esc_html__( 'Last activity: %1$s ago - Wrote %2$s products to %3$sfeed file%4$s.', 'pinterest-for-woocommerce' ),
 					human_time_diff( $state['last_activity'] ),
-					$state['product_count']
+					$state['product_count'],
+					'<a href="' . $this->get_feed_url() . '" target="_blank">',
+					'</a>',
 				);
 				break;
 
@@ -185,9 +187,11 @@ class FeedState extends VendorAPI {
 				$status_label = esc_html__( 'Up to date', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
 					/* Translators: %1$s Time string, %2$s total number of products */
-					esc_html__( 'Successfully generated %1$s ago - Wrote %2$s products to feed file.', 'pinterest-for-woocommerce' ),
+					esc_html__( 'Successfully generated %1$s ago - Wrote %2$s products to feed %3$sfeed file%4$s', 'pinterest-for-woocommerce' ),
 					human_time_diff( $state['last_activity'] ),
-					$state['product_count']
+					$state['product_count'],
+					'<a href="' . $this->get_feed_url() . '" target="_blank">',
+					'</a>',
 				);
 				break;
 
@@ -513,5 +517,18 @@ class FeedState extends VendorAPI {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Helper function used for fetching local feed config file.
+	 *
+	 * This is temporary as we will need to operate on multiple feed files in the future.
+	 *
+	 * @return string
+	 */
+	private function get_feed_url() {
+		$configs = LocalFeedConfigs::get_instance()->get_configurations();
+		$config  = reset( $configs );
+		return $config['feed_url'];
 	}
 }

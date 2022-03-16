@@ -13,6 +13,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class Handling feed files generation.
+ *
+ * Singleton pattern used.
+ * Prevent application from having multiple instances of configuration.
+ * At the same time allow distributed use of configurations.
  */
 class LocalFeedConfigs {
 
@@ -24,12 +28,35 @@ class LocalFeedConfigs {
 	private $feeds_configurations = null;
 
 	/**
+	 * The Singleton's instance.
+	 *
+	 * @since x.x.x
+	 * @var null|LocalFeedConfigs Instance object.
+	 */
+	private static $instance = null;
+
+	/**
+	 * Singleton initialization and instance fetching method.
+	 *
+	 * @since x.x.x
+	 * @return LocalFeedConfigs Singleton instance.
+	 */
+	public static function get_instance(): LocalFeedConfigs {
+		$cls = static::class;
+		if ( null === self::$instance ) {
+			self::$instance = new static();
+		}
+
+		return self::$instance;
+	}
+
+	/**
 	 * Class responsible for local feed configurations and handling.
 	 *
 	 * @since x.x.x
-	 * @param array $locations Array of location to generate the feed files for.
 	 */
-	public function __construct( $locations ) {
+	protected function __construct() {
+		$locations = array( Pinterest_For_Woocommerce()::get_base_country() ?? 'US' ); // Replace with multiple countries array for multiple feed config.
 		$this->initialize_local_feeds_config( $locations );
 	}
 
@@ -57,18 +84,19 @@ class LocalFeedConfigs {
 			$feed_ids[ $location ] = wp_generate_password( 6, false, false );
 		}
 
+		// Store generated ids for each location.
 		Pinterest_For_Woocommerce()::save_data( 'local_feed_ids', $feed_ids );
 
 		$file_name_base = trailingslashit( wp_get_upload_dir()['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
 		$url_base       = trailingslashit( wp_get_upload_dir()['baseurl'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
 		array_walk(
 			$feed_ids,
-			function ( &$id, $location ) use ( $file_name_base, $url_base ) {
+			function ( &$id ) use ( $file_name_base, $url_base ) {
 				$id = array(
 					'feed_id'   => $id,
-					'feed_file' => "{$file_name_base}{$id}-{$location}.xml",
-					'tmp_file'  => "{$file_name_base}{$id}-{$location}-tmp.xml",
-					'feed_url'  => "{$url_base}{$id}-{$location}.xml",
+					'feed_file' => "{$file_name_base}{$id}.xml",
+					'tmp_file'  => "{$file_name_base}{$id}.xml",
+					'feed_url'  => "{$url_base}{$id}.xml",
 				);
 			}
 		);

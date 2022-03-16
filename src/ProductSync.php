@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use \Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\API\FeedIssues;
+use Automattic\WooCommerce\Pinterest\API\FeedState;
 use Automattic\WooCommerce\Pinterest\Utilities\FeedLogger;
 
 use \Exception;
@@ -108,9 +109,8 @@ class ProductSync {
 	 * @since x.x.x
 	 */
 	private static function initialize_feed_components() {
-		$locations               = array( Pinterest_For_Woocommerce()::get_base_country() ?? 'US' ); // Replace with multiple countries array for multiple feed config.
 		$action_scheduler        = new ActionSchedulerProxy();
-		self::$configurations    = new LocalFeedConfigs( $locations );
+		self::$configurations    = LocalFeedConfigs::get_instance();
 		self::$feed_generator    = new FeedGenerator( $action_scheduler, self::$configurations );
 		self::$feed_registration = new FeedRegistration( self::$configurations, self::$feed_generator );
 

@@ -210,32 +210,17 @@ class PluginUpdate {
 		as_unschedule_all_actions( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-feed-generation', array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 
 		/*
-		 * 2. Move feed file to a new location.
+		 * 2. Move feed file id to a new location.
 		 */
-		$feed_id          = Pinterest_For_Woocommerce()::get_data( 'local_feed_id' );
-		$default_location = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
-		if ( $feed_id ) {
-			// Generate new configurations.
-			$new_configs = ( new LocalFeedConfigs( array( $default_location ) ) )->get_configurations();
-			// We only migrate the default location, other configs do not exist at this stage.
-			$new_config = $new_configs[ $default_location ];
-
-			$upload_dir = wp_get_upload_dir();
-			$old_config = array(
-				'feed_file' => trailingslashit( $upload_dir['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-' . $feed_id . '.xml',
-				'tmp_file'  => trailingslashit( $upload_dir['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-' . $feed_id . '-tmp.xml',
-			);
-
-			if ( file_exists( $old_config['feed_file'] ) ) {
-				rename( $old_config['feed_file'], $new_config['feed_file'] );
-			}
-			if ( file_exists( $old_config['tmp_file'] ) ) {
-				unlink( $old_config['feed_file'] );
-			}
-
+		$feed_id = Pinterest_For_Woocommerce()::get_data( 'local_feed_id' );
+		if ( null !== $feed_id ) {
 			/*
-			 * 2-a Next call to FeedRegistration::register_feed() will handle the url change. So we can skip this step and rely on automation.
+			 * 2-a. Move location id to array of ids.
 			 */
+			$feed_ids = array(
+				Pinterest_For_Woocommerce()::get_base_country() ?? 'US' => $feed_id,
+			);
+			Pinterest_For_Woocommerce()::save_data( 'local_feed_ids', $feed_ids );
 
 			/*
 			 * 2-b. Move state.
