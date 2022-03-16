@@ -187,7 +187,7 @@ class FeedState extends VendorAPI {
 				$status_label = esc_html__( 'Up to date', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
 					/* Translators: %1$s Time string, %2$s total number of products */
-					esc_html__( 'Successfully generated %1$s ago - Wrote %2$s products to feed %3$sfeed file%4$s', 'pinterest-for-woocommerce' ),
+					esc_html__( 'Successfully generated %1$s ago - Wrote %2$s products to %3$sfeed file%4$s', 'pinterest-for-woocommerce' ),
 					human_time_diff( $state['last_activity'] ),
 					$state['product_count'],
 					'<a href="' . $this->get_feed_url() . '" target="_blank">',
