@@ -127,13 +127,14 @@ class Merchants {
 	 */
 	public static function update_or_create_merchant() {
 
-		$local_feed = ProductFeedStatus::get_local_feed();
+		$configs = LocalFeedConfigs::get_instance()->get_configurations();
+		$config  = reset( $configs );
 
 		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		$args = array(
 			'merchant_domains' => get_home_url(),
-			'feed_location'    => $local_feed['feed_url'],
+			'feed_location'    => $config['feed_url'],
 			'feed_format'      => 'XML',
 			'country'          => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
 			'locale'           => str_replace( '_', '-', determine_locale() ),
