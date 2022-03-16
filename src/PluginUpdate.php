@@ -202,7 +202,12 @@ class PluginUpdate {
 	 *
 	 * @return void
 	 */
-	protected static function feed_generation_migration(): void {
+	protected function feed_generation_migration(): void {
+		if ( ! $this->version_needs_update( '1.0.9' ) ) {
+			// Already up to date.
+			return;
+		}
+
 		/*
 		 * 1. Cancel old actions.
 		 */
