@@ -275,24 +275,21 @@ class Base {
 	 * @return mixed
 	 */
 	public static function domain_verification_data() {
-		return self::make_request( 'domains/verification', 'GET' );
+		return self::make_request( 'websites/verification', 'GET' );
 	}
 
 
 	/**
 	 * Trigger the (realtime) verification process using the API and return the response.
 	 *
-	 * @param boolean $allow_multiple Parameter passed to the API.
 	 * @return mixed
 	 */
-	public static function trigger_verification( $allow_multiple = true ) {
+	public static function trigger_verification() {
 
-		$domain      = wp_parse_url( home_url(), PHP_URL_HOST );
-		$request_url = "domains/{$domain}/verification/metatag/realtime/";
+		$request_url = 'websites/verification/metatag/realtime/';
 
-		if ( $allow_multiple ) {
-			$request_url = add_query_arg( 'can_claim_multiple', 'true', $request_url );
-		}
+		$parsed_website = wp_parse_url( get_home_url() );
+		$request_url    = add_query_arg( 'website', $parsed_website['host'] . $parsed_website['path'], $request_url );
 
 		return self::make_request( $request_url, 'POST' );
 	}

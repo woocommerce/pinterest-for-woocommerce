@@ -2,7 +2,7 @@
 /**
  * Represents a single Pinterest shipping zone
  *
- * @since   x.x.x
+ * @since   1.0.5
  * @package Automattic\WooCommerce\Pinterest
  */
 
@@ -18,7 +18,7 @@ use \WC_Shipping_Zone;
  * By extending WC_Shipping_Zone we are able to add functionality necessary for Pinterest shipping column generation.
  * This allows us to operate on familiar interface which will be useful when we will continue to expand the functionality.
  *
- * @since x.x.x
+ * @since 1.0.5
  */
 class PinterestShippingZone extends WC_Shipping_Zone {
 
@@ -49,7 +49,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	/**
 	 * From the list of countries filter out those which are not supported right now.
 	 *
-	 * @since   x.x.x
+	 * @since   1.0.5
 	 *
 	 * @param  array $locations List of countries to filter.
 	 * @return array            List of filtered countries.
@@ -69,7 +69,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	 * States are optional and added only if specified.
 	 * Countries are filtered to only include supported countries.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @return array Array of locations supported by this zone.
 	 */
@@ -129,7 +129,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	 *
 	 * Correctness of this approach is verified indirectly by shipping UT.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @param array $locations Array of locations.
 	 * @return array Array of locations with duplications removed.
@@ -141,7 +141,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	/**
 	 * Turn country and state into location array.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @param string $country Location country.
 	 * @param string $state   Location state.
@@ -157,7 +157,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	/**
 	 * Combines zone locations with allowed shipping methods.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @return array Array with locations and allowed shipping methods.
 	 */
@@ -180,7 +180,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	 * Get shipping methods supported by the implementation.
 	 * Methods are filtered by allowed types and features.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @return array Supported shipping methods.
 	 */
@@ -201,7 +201,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	/**
 	 * Verify if shipping method is supported.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @param WC_Shipping_Method $shipping_method Shipping rate to verify.
 	 * @return boolean

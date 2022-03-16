@@ -8,9 +8,12 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
-use WC_Product_Variation;
+
 use WC_Product;
+use WC_Product_Variable;
+use WC_Product_Variation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -51,6 +54,14 @@ class ProductsXmlFeed {
 	private static $shipping = null;
 
 	/**
+	 * Limit of characters allowed by Pinterest in the product description.
+	 *
+	 * @var int
+	 */
+	const DESCRIPTION_SIZE_CHARS_LIMIT = 10000;
+
+
+	/**
 	 * Returns the XML header to be printed.
 	 *
 	 * @return string
@@ -73,11 +84,15 @@ class ProductsXmlFeed {
 	/**
 	 * Returns the Item's XML for the given product.
 	 *
-	 * @param WC_Product $product The product to print the XML for.
+	 * @param WC_Product $product  The product to print the XML for.
 	 *
-	 * @return string
+	 * @return string XML string
 	 */
 	public static function get_xml_item( $product ) {
+
+		if ( ! self::is_product_fit_for_feed( $product ) ) {
+			return '';
+		}
 
 		$xml = "\t\t<item>" . PHP_EOL;
 
@@ -95,6 +110,27 @@ class ProductsXmlFeed {
 
 		return apply_filters( 'pinterest_for_woocommerce_feed_item_xml', $xml, $product );
 	}
+
+
+	/**
+	 * Helper method to return if a product is fit for the feed profile.
+	 *
+	 * @param WC_Product $product The product.
+	 *
+	 * @return boolean
+	 */
+	private static function is_product_fit_for_feed( $product ) {
+
+		// Decide if product is fit for the feed based on price.
+		$price = self::get_product_regular_price( $product );
+
+		if ( empty( $price ) || empty( floatval( $price ) ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
 
 	/**
 	 * Get the XML for all the product attributes.
@@ -165,7 +201,7 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_title( $product, $property ) {
-		return '<' . $property . '><![CDATA[' . $product->get_name() . ']]></' . $property . '>';
+		return '<' . $property . '><![CDATA[' . wp_strip_all_tags( $product->get_name() ) . ']]></' . $property . '>';
 	}
 
 	/**
@@ -187,6 +223,34 @@ class ProductsXmlFeed {
 		if ( empty( $description ) ) {
 			return;
 		}
+
+		/**
+		 * Filters whether the shortcodes should be applied for product descriptions when generating the feed or be stripped out.
+		 *
+		 * @param bool       $apply_shortcodes Shortcodes are applied if set to `true` and stripped out if set to `false`.
+		 * @param WC_Product $product          WooCommerce product object.
+		 */
+		$apply_shortcodes = apply_filters( 'pinterest_for_woocommerce_product_description_apply_shortcodes', false, $product );
+		if ( $apply_shortcodes ) {
+			// Apply active shortcodes.
+			$description = do_shortcode( $description );
+		} else {
+			// Strip out active shortcodes.
+			$description = strip_shortcodes( $description );
+		}
+
+		// Strip HTML tags from description.
+		$description = wp_strip_all_tags( $description );
+
+		// Strip [&hellip] character from description.
+		$description = str_replace( '[&hellip;]', '...', $description );
+
+		// Limit the number of characters in the description to 10000.
+		if ( strlen( $description ) > self::DESCRIPTION_SIZE_CHARS_LIMIT ) {
+			/* translators: %s product id */
+			Logger::log( sprintf( esc_html__( 'The product [%s] has a description longer than the allowed limit.', 'pinterest-for-woocommerce' ), $product->get_id() ) );
+		}
+		$description = substr( $description, 0, self::DESCRIPTION_SIZE_CHARS_LIMIT );
 
 		return '<' . $property . '><![CDATA[' . $description . ']]></' . $property . '>';
 	}
@@ -240,7 +304,8 @@ class ProductsXmlFeed {
 			return '';
 		}
 
-		$image = wp_get_attachment_image_src( $image_id, 'woocommerce_single' );
+		// Get the image with a filter for default size.
+		$image = wp_get_attachment_image_src( $image_id, apply_filters( 'pinterest_for_woocommerce_feed_image_size', 'full' ) );
 
 		if ( ! $image ) {
 			return;
@@ -288,17 +353,13 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_g_price( $product, $property ) {
 
-		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
-			$price = $product->get_variation_regular_price();
-		} else {
-			$price = $product->get_regular_price();
-		}
+		$price = self::get_product_regular_price( $product );
 
 		if ( empty( $price ) ) {
 			return;
 		}
 
-		return '<' . $property . '>' . $price . get_woocommerce_currency() . '</' . $property . '>';
+		return '<' . $property . '>' . wc_format_decimal( $price, self::get_currency_decimals() ) . get_woocommerce_currency() . '</' . $property . '>';
 	}
 
 	/**
@@ -323,7 +384,7 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '>' . $price . get_woocommerce_currency() . '</' . $property . '>';
+		return '<' . $property . '>' . wc_format_decimal( $price, self::get_currency_decimals() ) . get_woocommerce_currency() . '</' . $property . '>';
 	}
 
 	/**
@@ -335,7 +396,7 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_g_mpn( $product, $property ) {
-		return '<' . $property . '>' . $product->get_sku() . '</' . $property . '>';
+		return '<' . $property . '>' . esc_xml( $product->get_sku() ) . '</' . $property . '>';
 	}
 
 
@@ -354,7 +415,10 @@ class ProductsXmlFeed {
 
 		if ( $attachment_ids && $product->get_image_id() ) {
 			foreach ( $attachment_ids as $attachment_id ) {
-				$images[] = wp_get_attachment_image_src( $attachment_id, 'woocommerce_single' )[0];
+				// Get the image with a filter for default size.
+				$image = wp_get_attachment_image_src( $attachment_id, apply_filters( 'pinterest_for_woocommerce_feed_image_size', 'full' ) );
+
+				$images[] = $image ? $image[0] : false;
 			}
 		}
 
@@ -368,7 +432,7 @@ class ProductsXmlFeed {
 	/**
 	 * Returns the product shipping information.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @param WC_Product $product  The product.
 	 * @param string     $property The name of the property.
@@ -376,7 +440,6 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_g_shipping( $product, $property ) {
 		$currency      = get_woocommerce_currency();
-		$entries       = array();
 		$shipping      = self::get_shipping();
 		$shipping_info = $shipping->prepare_shipping_info( $product );
 
@@ -384,15 +447,28 @@ class ProductsXmlFeed {
 			return '';
 		}
 
+		$shipping_nodes = array();
+
 		/*
-		 * Entry is a comma separated string with values in the following format:
-		 *   COUNTRY:STATE:POST_CODE:SHIPPING_COST
+		 * Entry is a one or multiple XML nodes in the following format:
+		 *  <g:shipping>
+		 *		<g:country>...</g:country>
+		 *		<g:region>...</g:region>
+		 *		<g:service>...</g:service>
+		 *		<g:price>...</g:price>
+		 *	</g:shipping>
 		 */
 		foreach ( $shipping_info as $info ) {
-			$entries[] = "$info[country]:$info[state]:$info[name]:$info[cost] $currency";
+			$shipping_nodes[] =
+				'<g:shipping>' . PHP_EOL .
+					"\t\t\t\t<g:country>$info[country]</g:country>" . PHP_EOL .
+					( $info['state'] ? "\t\t\t\t<g:region>$info[state]</g:region>" . PHP_EOL : '' ) .
+					"\t\t\t\t<g:service>$info[name]</g:service>" . PHP_EOL .
+					"\t\t\t\t<g:price>$info[cost] $currency</g:price>" . PHP_EOL .
+				"\t\t\t</g:shipping>";
 		}
 
-		return '<' . $property . '>' . implode( ',', $entries ) . '</' . $property . '>';
+		return implode( PHP_EOL . "\t\t\t", $shipping_nodes );
 	}
 
 	/**
@@ -414,9 +490,24 @@ class ProductsXmlFeed {
 	}
 
 	/**
-	 * Fetch shipping object.
+	 * Get locale currency decimals
+	 */
+	private static function get_currency_decimals() {
+		$currencies = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_currencies_list' );
+
+		if ( ! $currencies ) {
+			$locale_info = include WC()->plugin_path() . '/i18n/locale-info.php';
+
+			$currencies = wp_list_pluck( $locale_info, 'num_decimals', 'currency_code' );
+			set_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_currencies_list', $currencies, DAY_IN_SECONDS );
+		}
+
+		return $currencies[ get_woocommerce_currency() ] ?? 2;
+	}
+
+	/** Fetch shipping object.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @return Shipping
 	 */
@@ -432,4 +523,20 @@ class ProductsXmlFeed {
 		return self::$shipping;
 	}
 
+	/**
+	 * Helper method to return the regular price of a product.
+	 *
+	 * @param WC_Product|WC_Product_Variable $product The product.
+	 *
+	 * @return string
+	 */
+	private static function get_product_regular_price( $product ) {
+		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
+			$price = $product->get_variation_regular_price();
+		} else {
+			$price = $product->get_regular_price();
+		}
+
+		return $price;
+	}
 }

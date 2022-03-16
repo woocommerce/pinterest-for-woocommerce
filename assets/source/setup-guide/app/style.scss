@@ -674,3 +674,7 @@ $root: ".woocommerce-setup-guide";
 	}
 }
 
+.pinterest-for-woocommerce-settings-checkbox-disabled {
+	color: $gray-700;
+	pointer-events: none;
+}

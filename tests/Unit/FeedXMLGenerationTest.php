@@ -8,6 +8,7 @@ use \WC_Helper_Product;
 use \WC_Unit_Test_Case;
 use \WC_Product_Variable;
 
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
 use Automattic\WooCommerce\Pinterest\Product\GoogleCategorySearch;
 use Automattic\WooCommerce\Pinterest\Product\GoogleProductTaxonomy;
@@ -90,7 +91,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$this->assertEquals( 'in stock', $g_children['availability'] );
 
 		// Default price from WC_Helper_Product.
-		$this->assertEquals( '10USD', $g_children['price'] );
+		$this->assertEquals( '10.00USD', $g_children['price'] );
 
 		// No description set.
 		$this->assertArrayNotHasKey( 'image_link', $g_children, "By default product does not have an image link." );
@@ -112,6 +113,24 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		// Condition is not set by default.
 		$this->assertArrayNotHasKey( 'condition', $g_children, 'By default we don\'t have the condition set.' );
+	}
+
+	/**
+	 * Test if a product with price set to 0 is skipped from the feed
+	 *
+	 * @group feed
+	 */
+	public function testSkipZeroPriceProductXML() {
+		// Create product with zero price
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'regular_price' => 0,
+			)
+		);
+
+		$xml = ProductsXmlFeed::get_xml_item( $product );
+		$this->assertEquals( '', $xml );
 	}
 
 	/**
@@ -220,6 +239,145 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 */
+	public function testStripHtmlTagsPropertyTitleXML() {
+		$title_method = $this->getProductsXmlFeedAttributeMethod( 'title' );
+		$product      = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'name' => 'Dummy Product <h1>Dummy Tag</h1>',
+			)
+		);
+		$xml          = $title_method( $product );
+		$this->assertEquals( '<title><![CDATA[Dummy Product Dummy Tag]]></title>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testStripHtmlTagsPropertyDescriptionXML() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+		$product            = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'short_description' => 'Dummy Description <h1>Dummy Tag</h1>',
+			)
+		);
+		$xml                = $description_method( $product );
+		$this->assertEquals( '<description><![CDATA[Dummy Description Dummy Tag]]></description>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testStripShortcodesPropertyDescriptionXML() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		// Add simple shortcode to test.
+		add_shortcode(
+			'pinterest_for_woocommerce_sample_test_shortcode',
+			function () {
+				return 'sample-shortcode-rendered-result';
+			}
+		);
+
+		$description          = 'This product has a shortcode [pinterest_for_woocommerce_sample_test_shortcode] that will get stripped out.';
+		$expected_description = 'This product has a shortcode  that will get stripped out.';
+
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'short_description' => $description,
+			)
+		);
+
+		$xml = $description_method( $product );
+
+		$this->assertEquals( "<description><![CDATA[{$expected_description}]]></description>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testNoStripShortcodesPropertyDescriptionXML() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		// Add simple shortcode to test.
+		add_shortcode(
+			'pinterest_for_woocommerce_sample_test_shortcode',
+			function () {
+				return 'sample-shortcode-rendered-result';
+			}
+		);
+
+		// Add filter to apply shortcodes on description.
+		add_filter(
+			'pinterest_for_woocommerce_product_description_apply_shortcodes',
+			function() {
+				return true;
+			}
+		);
+
+		$description          = 'This product has a shortcode [pinterest_for_woocommerce_sample_test_shortcode] that will not get stripped out.';
+		$expected_description = 'This product has a shortcode sample-shortcode-rendered-result that will not get stripped out.';
+
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'short_description' => $description,
+			)
+		);
+
+		$xml = $description_method( $product );
+
+		$this->assertEquals( "<description><![CDATA[{$expected_description}]]></description>", $xml );
+	}
+
+	/**
+	 * @group feed
+	 *
+	 * @return void
+	 */
+	public function testDescriptionClipping() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+		/**
+		 * Mock logger object that will catch any logged messages.
+		 */
+		$mock_logger = new class {
+
+			static $message = '';
+			public function log( $level, $msg )
+			{
+				self::$message = $msg;
+			}
+		};
+
+		Logger::$logger = $mock_logger;
+
+		/**
+		 * Generate a description string too big for the feed.
+		 * The limit is 10K so we generate 1010 char length string.
+		 */
+		$description          = str_repeat( 'abcdefghij', 1000 + 1 );
+		$expected_description = str_repeat( 'abcdefghij', 1000 );
+
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'short_description' => $description,
+			)
+		);
+
+		$xml = $description_method( $product );
+
+		$this->assertEquals( "<description><![CDATA[{$expected_description}]]></description>", $xml );
+
+		// Information about size limit exceeded has been logged.
+		$this->assertEquals( "The product [{$product->get_id()}] has a description longer than the allowed limit.", $mock_logger::$message );
+	}
+
+	/**
+	 * @group feed
+	 */
 	public function testPropertyProductTypeXML() {
 		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
 		$product             = WC_Helper_Product::create_simple_product();
@@ -309,7 +467,18 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$price_method = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
 		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
 		$xml          = $price_method( $product );
-		$this->assertEquals( '<g:price>15USD</g:price>', $xml );
+		$this->assertEquals( '<g:price>15.00USD</g:price>', $xml );
+
+		// Test with another currency.
+		$old_currency = get_woocommerce_currency();
+		update_option( 'woocommerce_currency', 'JPY' );
+		$price_method = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
+		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
+		$xml          = $price_method( $product );
+		$this->assertEquals( '<g:price>15JPY</g:price>', $xml );
+
+		// Update again the currency to the old currency.
+		update_option( 'woocommerce_currency', $old_currency );
 	}
 
 	/**
@@ -332,7 +501,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 			)
 		);
 		$xml     = $sale_price_method( $product );
-		$this->assertEquals( '<sale_price>5USD</sale_price>', $xml );
+		$this->assertEquals( '<sale_price>5.00USD</sale_price>', $xml );
 	}
 
 	/**
@@ -362,6 +531,22 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product    = WC_Helper_Product::create_simple_product();
 		$xml        = $mpn_method( $product );
 		$this->assertEquals( '<g:mpn>DUMMY SKU</g:mpn>', $xml );
+	}
+
+
+	/**
+	 * @group feed
+	 */
+	public function testEscapeSpecialCharsInSKUForMpnXML() {
+		$mpn_method = $this->getProductsXmlFeedAttributeMethod( 'g:mpn' );
+		$product    = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'sku' => "invalid&sku"
+			)
+		 );
+		$xml        = $mpn_method( $product );
+		$this->assertEquals( '<g:mpn>invalid&amp;sku</g:mpn>', $xml );
 	}
 
 	/**
@@ -464,6 +649,22 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		return function( $product ) use ( $method, $attribute ) {
 			return $method->invoke( null, $product, $attribute );
 		};
+	}
+
+	/**
+	 * Remove filters and shortcodes.
+	 */
+	public function tearDown() {
+		parent::tearDown();
+
+		// Remove any added filter.
+		remove_all_filters( 'pinterest_for_woocommerce_product_description_apply_shortcodes' );
+
+		// Remove added shortcodes.
+		remove_shortcode( 'pinterest_for_woocommerce_sample_test_shortcode' );
+
+		// Reset logger.
+		Logger::$logger = null;
 	}
 
 }

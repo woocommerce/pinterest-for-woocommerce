@@ -3,7 +3,7 @@
  * Utility class used by the Feed generation to create the shipping column.
  *
  * @package Pinterest
- * @since   x.x.x
+ * @since   1.0.5
  */
 
 namespace Automattic\WooCommerce\Pinterest;
@@ -27,7 +27,7 @@ use \WC_Data_Store;
  * - Simple products.
  * - Variable products.
  *
- * @since x.x.x
+ * @since 1.0.5
  */
 class Shipping {
 
@@ -41,7 +41,7 @@ class Shipping {
 	/**
 	 * Prepare shipping information for $product.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @param  WC_Product $product Product for which we want to generate the shipping column.
 	 * @return array               Shipping information $product.
@@ -98,7 +98,7 @@ class Shipping {
 	 * Get shipping zones defined in WooCommerce settings.
 	 * Cache for efficiency - this information will not change between different products.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @return array Shipping zones.
 	 */
@@ -124,7 +124,7 @@ class Shipping {
 	 * Normally this would be done by checking values in cart. Because we are not operating on cart we filter out
 	 * this value ourselves.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @param bool                      $is_available    Wether this shipping method should be available.
 	 * @param array                     $package         Shipping package.
@@ -148,7 +148,7 @@ class Shipping {
 	/**
 	 * Get the lowest possible shipping cost for given location and shipping methods for that location.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @param array      $shipping_location Country and state values of the location.
 	 * @param array      $shipping_methods  List of shippings methods we use to calculate the best rate.
@@ -185,7 +185,7 @@ class Shipping {
 	/**
 	 * Pick the best rate from an array of rates.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @param  array $rates List of shipping rates.
 	 * @return array        Name and cost for the best found rate or null in case nothing was found.
@@ -216,7 +216,7 @@ class Shipping {
 	/**
 	 * Helper function that packs products into a package structure required by the shipping methods.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.5
 	 *
 	 * @param WC_Product $product  Product to package.
 	 * @param array      $location Product destination location.
