@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.8
 Requires PHP: 7.3
-Stable tag: 1.0.5
+Stable tag: 1.0.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -87,7 +87,26 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.0.8 - 2022-03-11 =
+* Update - Shipping column format. ( [#370](https://github.com/woocommerce/pinterest-for-woocommerce/pull/370) )
+* Fix    - Escape XML special chars in SKU for the XML MPN section. ( [#371](https://github.com/woocommerce/pinterest-for-woocommerce/pull/371) )
+* Fix    - Clean account data if user Disconnect during the onboarding process with a personal account. ( [#381](https://github.com/woocommerce/pinterest-for-woocommerce/pull/381) )
+* Fix    - Do not create merchant on get_feed_state. ( [#353](https://github.com/woocommerce/pinterest-for-woocommerce/pull/353) )
+* Update - Disable enhanced match support when tracking is disabled. ( [#386](https://github.com/woocommerce/pinterest-for-woocommerce/pull/386) )
+* Tweak  - Take full size images for the feed. ( [#383](https://github.com/woocommerce/pinterest-for-woocommerce/pull/383) )
+* Update - Enable shipping column in the feed. ( [#388](https://github.com/woocommerce/pinterest-for-woocommerce/pull/388) )
+
+= 1.0.7 - 2022-02-24 =
+* Fix - Critical error on Jetpack sites.
+
+= 1.0.6 - 2022-02-16 =
+* Fix – Fix the changelog for the 1.0.5 release by adding omitted changes.
+
 = 1.0.5 - 2022-02-15 =
+* Fix - Strip HTML shortcodes from feed.
+* Fix - Make the price format consistent in the feed.
+* Fix - Exclude zero price items from product feed.
+* Tweak - Force logging to be enabled when setup is not complete.
 * Add – Shipping column for developers and testers.
 
 = 1.0.4 - 2022-02-03 =

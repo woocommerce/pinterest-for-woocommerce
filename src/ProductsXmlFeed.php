@@ -304,7 +304,8 @@ class ProductsXmlFeed {
 			return '';
 		}
 
-		$image = wp_get_attachment_image_src( $image_id, 'woocommerce_single' );
+		// Get the image with a filter for default size.
+		$image = wp_get_attachment_image_src( $image_id, apply_filters( 'pinterest_for_woocommerce_feed_image_size', 'full' ) );
 
 		if ( ! $image ) {
 			return;
@@ -395,7 +396,7 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_g_mpn( $product, $property ) {
-		return '<' . $property . '>' . $product->get_sku() . '</' . $property . '>';
+		return '<' . $property . '>' . esc_xml( $product->get_sku() ) . '</' . $property . '>';
 	}
 
 
@@ -414,7 +415,10 @@ class ProductsXmlFeed {
 
 		if ( $attachment_ids && $product->get_image_id() ) {
 			foreach ( $attachment_ids as $attachment_id ) {
-				$images[] = wp_get_attachment_image_src( $attachment_id, 'woocommerce_single' )[0];
+				// Get the image with a filter for default size.
+				$image = wp_get_attachment_image_src( $attachment_id, apply_filters( 'pinterest_for_woocommerce_feed_image_size', 'full' ) );
+
+				$images[] = $image ? $image[0] : false;
 			}
 		}
 
@@ -436,7 +440,6 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_g_shipping( $product, $property ) {
 		$currency      = get_woocommerce_currency();
-		$entries       = array();
 		$shipping      = self::get_shipping();
 		$shipping_info = $shipping->prepare_shipping_info( $product );
 
@@ -444,15 +447,28 @@ class ProductsXmlFeed {
 			return '';
 		}
 
+		$shipping_nodes = array();
+
 		/*
-		 * Entry is a comma separated string with values in the following format:
-		 *   COUNTRY:STATE:POST_CODE:SHIPPING_COST
+		 * Entry is a one or multiple XML nodes in the following format:
+		 *  <g:shipping>
+		 *		<g:country>...</g:country>
+		 *		<g:region>...</g:region>
+		 *		<g:service>...</g:service>
+		 *		<g:price>...</g:price>
+		 *	</g:shipping>
 		 */
 		foreach ( $shipping_info as $info ) {
-			$entries[] = "$info[country]:$info[state]:$info[name]:$info[cost] $currency";
+			$shipping_nodes[] =
+				'<g:shipping>' . PHP_EOL .
+					"\t\t\t\t<g:country>$info[country]</g:country>" . PHP_EOL .
+					( $info['state'] ? "\t\t\t\t<g:region>$info[state]</g:region>" . PHP_EOL : '' ) .
+					"\t\t\t\t<g:service>$info[name]</g:service>" . PHP_EOL .
+					"\t\t\t\t<g:price>$info[cost] $currency</g:price>" . PHP_EOL .
+				"\t\t\t</g:shipping>";
 		}
 
-		return '<' . $property . '>' . implode( ',', $entries ) . '</' . $property . '>';
+		return implode( PHP_EOL . "\t\t\t", $shipping_nodes );
 	}
 
 	/**
