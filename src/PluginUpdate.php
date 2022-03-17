@@ -88,18 +88,10 @@ class PluginUpdate {
 	 * @since x.x.x
 	 * @return void
 	 */
-	private function update_plugin_update_version_option(): void {
+	public function update_plugin_update_version_option(): void {
 		update_option(
 			self::PLUGIN_UPDATE_VERSION_OPTION,
 			$this->get_plugin_current_version()
-		);
-
-		Logger::log(
-			sprintf(
-				// translators: plugin version.
-				__( 'Plugin updated to version: %s.', 'pinterest-for-woocommerce' ),
-				$this->get_plugin_current_version()
-			)
 		);
 	}
 
@@ -142,6 +134,14 @@ class PluginUpdate {
 		 * in this case.
 		 */
 		$this->update_plugin_update_version_option();
+
+		Logger::log(
+			sprintf(
+				// translators: plugin version.
+				__( 'Plugin updated to version: %s.', 'pinterest-for-woocommerce' ),
+				$this->get_plugin_current_version()
+			)
+		);
 	}
 
 	/**
