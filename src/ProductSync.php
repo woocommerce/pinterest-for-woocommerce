@@ -152,6 +152,10 @@ class ProductSync {
 	 * Stop jobs on deactivation.
 	 */
 	public static function cancel_jobs() {
+		if ( ! function_exists( 'as_unschedule_all_actions' ) ) {
+			return;
+		}
+
 		FeedGenerator::cancel_jobs();
 		FeedRegistration::cancel_jobs();
 	}
