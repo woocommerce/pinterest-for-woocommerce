@@ -112,6 +112,15 @@ function Pinterest_For_Woocommerce() { // phpcs:ignore WordPress.NamingConventio
 // Initiate the plugin.
 Pinterest_For_Woocommerce();
 
+// Register activation hook.
+register_activation_hook(
+	__FILE__,
+	function () {
+		// Initialize update engine on activation. This prevents update procedures from running on first activation.
+		( new Automattic\WooCommerce\Pinterest\PluginUpdate() )->update_plugin_update_version_option();
+	}
+);
+
 // Register deactivation hook.
 register_deactivation_hook(
 	PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE,
