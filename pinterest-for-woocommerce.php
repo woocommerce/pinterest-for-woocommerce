@@ -128,3 +128,13 @@ register_deactivation_hook(
 		Automattic\WooCommerce\Pinterest\ProductSync::cancel_jobs();
 	}
 );
+
+// Register deactivation hook for WooCommerce.
+if ( defined( 'WC_PLUGIN_FILE' ) ) {
+	register_deactivation_hook(
+		WC_PLUGIN_FILE,
+		function () {
+			Automattic\WooCommerce\Pinterest\ProductSync::cancel_jobs();
+		}
+	);
+}
