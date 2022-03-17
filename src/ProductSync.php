@@ -278,6 +278,11 @@ class ProductSync {
 			throw new Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
 
 		} catch ( Throwable $th ) {
+			if ( 4163 === $th->get_pinterest_code() ) {
+				// Save the error to read it during the Health Check.
+				Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', true );
+			}
+
 			self::log( $th->getMessage(), 'error' );
 			return false;
 		}
