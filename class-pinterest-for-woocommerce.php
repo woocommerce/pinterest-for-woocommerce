@@ -226,12 +226,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$this->includes();
 
-			add_action( 'init', array( $this, 'init' ), 0 );
 			add_action( 'admin_init', array( $this, 'admin_init' ), 0 );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
 			add_action( 'wp_head', array( Pinterest\RichPins::class, 'maybe_inject_rich_pins_opengraph_tags' ) );
 			add_action( 'wp', array( Pinterest\SaveToPinterest::class, 'maybe_init' ) );
+
+			add_action( 'init', array( $this, 'init' ), 0 );
+
+			// ActionScheduler is activated on init 1 so lets make sure we are updating after that.
+			add_action( 'init', array( $this, 'maybe_update_plugin' ), 5 );
 			add_action( 'init', array( Pinterest\Tracking::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\TrackerSnapshot::class, 'maybe_init' ) );
