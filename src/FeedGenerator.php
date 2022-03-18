@@ -68,6 +68,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since x.x.x
 	 */
 	public function init() {
+		// Initialize the action handlers.
 		parent::init();
 
 		add_action(
