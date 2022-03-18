@@ -255,7 +255,7 @@ class FeedGenerator extends AbstractChainedJob {
 			$processed_products = 0;
 			array_walk(
 				$products,
-				function ( $product ) use ( $processed_products ) {
+				function ( $product ) use ( &$processed_products ) {
 					foreach ( $this->get_locations() as $location ) {
 						$product_xml = ProductsXmlFeed::get_xml_item( $product, $location );
 						if ( '' === $product_xml ) {

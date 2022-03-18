@@ -118,8 +118,8 @@ class Feeds {
 	 * @return string Returns the ID of the feed if properly registered or an empty string otherwise.
 	 */
 	public static function is_local_feed_registered( $merchant_id ) {
-
-		$local_feed = ProductFeedStatus::get_local_feed();
+		$configs    = LocalFeedConfigs::get_instance()->get_configurations();
+		$local_feed = reset( $configs );
 
 		// We need to fetch the feed object using the local feed location.
 		$feed = self::get_merchant_feed_by_location( $merchant_id, $local_feed['feed_url'] );
