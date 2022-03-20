@@ -343,7 +343,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @return bool Indicates if feed is dirty or not.
 	 */
 	public function feed_is_dirty(): bool {
-		return ( bool ) Pinterest_For_Woocommerce()::get_data( 'feed_dirty' );
+		return (bool) Pinterest_For_Woocommerce()::get_data( 'feed_dirty' );
 	}
 
 	/**
