@@ -17,6 +17,7 @@ use Automattic\WooCommerce\ActionSchedulerJobFramework\AbstractChainedJob;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
 use Automattic\WooCommerce\Pinterest\Utilities\FeedLogger;
 use Exception;
+use Throwable;
 
 /**
  * Class Handling feed files generation.
@@ -123,7 +124,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @since x.x.x
 	 *
-	 * @throws \Throwable Related to issues possible when creating an empty feed temp file and populating the header.
+	 * @throws Throwable Related to issues possible when creating an empty feed temp file and populating the header.
 	 */
 	protected function handle_start() {
 		self::log( __( 'Feed generation start. Preparing temporary files.', 'pinterest-for-woocommerce' ) );
@@ -135,7 +136,7 @@ class FeedGenerator extends AbstractChainedJob {
 					'product_count' => 0,
 				)
 			);
-		} catch ( \Throwable $th ) {
+		} catch ( Throwable $th ) {
 			$this->handle_error( $th );
 			throw $th;
 		}
@@ -147,22 +148,25 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @since x.x.x
 	 *
-	 * @throws \Throwable Related to issues possible when adding the footer or renaming the files.
+	 * @throws Throwable Related to issues possible when adding the footer or renaming the files.
 	 */
 	protected function handle_end() {
 		self::log( __( 'Feed generation end. Moving files to the final destination.', 'pinterest-for-woocommerce' ) );
+
 		try {
 			$this->add_footer_to_temporary_feed_files();
 			$this->rename_temporary_feed_files_to_final();
-		} catch ( \Throwable $th ) {
+		} catch ( Throwable $th ) {
 			$this->handle_error( $th );
 			throw $th;
 		}
+
 		ProductFeedStatus::set( array( 'status' => 'generated' ) );
 		self::log( __( 'Feed generated successfully.', 'pinterest-for-woocommerce' ) );
+
 		// Check if feed is dirty and reschedule in necessary.
-		if ( Pinterest_For_Woocommerce()::get_data( 'feed_dirty' ) ) {
-			Pinterest_For_Woocommerce()::save_data( 'feed_dirty', false );
+		if ( $this->feed_is_dirty() ) {
+			$this->mark_feed_clean();
 			$this->schedule_next_generator_start( time() );
 		}
 	}
@@ -211,7 +215,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @param array $items The items of the current batch.
 	 * @param array $args  The args for the job.
 	 *
-	 * @throws \Throwable On error. The failure will be logged by Action Scheduler and the job chain will stop.
+	 * @throws Throwable On error. The failure will be logged by Action Scheduler and the job chain will stop.
 	 */
 	protected function process_items( array $items, array $args ) {
 		try {
@@ -272,7 +276,7 @@ class FeedGenerator extends AbstractChainedJob {
 
 			$this->write_buffers_to_temp_files();
 
-		} catch ( \Throwable $th ) {
+		} catch ( Throwable $th ) {
 			$this->handle_error( $th );
 			throw $th;
 		}
@@ -303,6 +307,43 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	public function get_plugin_name(): string {
 		return 'pinterest';
+	}
+
+	/**
+	 * Marks feed as dirty.
+	 *
+	 * @since x.x.x
+	 */
+	public function mark_feed_dirty(): void {
+		Pinterest_For_Woocommerce()::save_data( 'feed_dirty', true );
+		self::log( 'Feed is dirty.' );
+
+		if ( $this->is_running() ) {
+			// New generation will be started at the end of current one.
+			return;
+		}
+
+		// Start new feed generation cycle now.
+		$this->schedule_next_generator_start( time() );
+	}
+
+	/**
+	 * Marks feed as clean.
+	 *
+	 * @since x.x.x
+	 */
+	public function mark_feed_clean(): void {
+		Pinterest_For_Woocommerce()::save_data( 'feed_dirty', false );
+	}
+
+	/**
+	 * Check if feed is dirty.
+	 *
+	 * @since x.x.x
+	 * @return bool Indicates if feed is dirty or not.
+	 */
+	public function feed_is_dirty(): bool {
+		return ( bool ) Pinterest_For_Woocommerce()::get_data( 'feed_dirty' );
 	}
 
 	/**
@@ -376,7 +417,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * React to errors during feed files generation process.
 	 *
 	 * @since x.x.x
-	 * @param \Throwable $th Exception handled.
+	 * @param Throwable $th Exception handled.
 	 */
 	private function handle_error( $th ) {
 		ProductFeedStatus::set(

@@ -73,8 +73,7 @@ class ProductSync {
 		add_action(
 			'update_option_woocommerce_hide_out_of_stock_items',
 			function () {
-				Pinterest_For_Woocommerce()::save_data( 'feed_dirty', true );
-				self::log( 'Feed is dirty.' );
+				self::$feed_generator->mark_feed_dirty();
 			}
 		);
 	}
@@ -168,7 +167,6 @@ class ProductSync {
 			return;
 		}
 
-		Pinterest_For_Woocommerce()::save_data( 'feed_dirty', true );
-		self::log( 'Feed is dirty.' );
+		self::$feed_generator->mark_feed_dirty();
 	}
 }
