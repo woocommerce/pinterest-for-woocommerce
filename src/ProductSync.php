@@ -80,7 +80,7 @@ class ProductSync {
 	}
 
 	/**
-	 * Observe pinterest option change and decide if we need to deregister.
+	 * Observe Pinterest option change and decide if we need to deregister.
 	 *
 	 * @since x.x.x
 	 *
