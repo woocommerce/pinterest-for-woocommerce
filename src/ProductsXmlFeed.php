@@ -201,7 +201,8 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_title( $product, $property ) {
-		return '<' . $property . '><![CDATA[' . wp_strip_all_tags( $product->get_name() ) . ']]></' . $property . '>';
+		$title = wp_strip_all_tags( $product->get_name() );
+		return '<' . $property . '><![CDATA[' .  self::sanitize(( $title )) . ']]></' . $property . '>';
 	}
 
 	/**
@@ -252,7 +253,7 @@ class ProductsXmlFeed {
 		}
 		$description = substr( $description, 0, self::DESCRIPTION_SIZE_CHARS_LIMIT );
 
-		return '<' . $property . '><![CDATA[' . $description . ']]></' . $property . '>';
+		return '<' . $property . '><![CDATA[' . self::sanitize( $description ) . ']]></' . $property . '>';
 	}
 
 	/**
@@ -538,5 +539,33 @@ class ProductsXmlFeed {
 		}
 
 		return $price;
+	}
+
+	/**
+	 * Sanitize XML.
+	 * After this method the string should be a valid XML string to fit inside
+	 * a XML tag directly or in CDATA enclosing tag.
+	 *
+	 * This operation consist of two steps:
+	 *
+	 * 1. First a standardized esc_xml WordPress method is used.
+	 *    This escapes XML control characters inside the text block.
+	 *
+	 * 2. Remove all UTF-8 characters that are not part of the XML specification.
+	 *    We search the whole string and remove the not-allowed chars. Since XML
+	 *    does not understand them removing is the only operation that we can do
+	 *    that will produce a valid XML.
+	 *    For information about allowed UTF-8 characters please go to
+	 *    https://www.w3.org/TR/xml/ documentation, section charsets.
+	 *
+	 *
+	 * @since x.x.x
+	 * @param string XML fragment for sanitization.
+	 * @return string Sanitized XML fragment.
+	*/
+	private static function sanitize( $string ) {
+		return esc_xml(
+			preg_replace('/[^\\x0009\\x000A\\x000D\\x0020-\\xD7FF\\xE000-\\xFFFD\\x10000-\\x10FFFF]/', ' ', $string )
+		);
 	}
 }
