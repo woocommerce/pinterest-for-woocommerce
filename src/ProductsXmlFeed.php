@@ -202,7 +202,7 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_title( $product, $property ) {
 		$title = wp_strip_all_tags( $product->get_name() );
-		return '<' . $property . '><![CDATA[' .  self::sanitize(( $title )) . ']]></' . $property . '>';
+		return '<' . $property . '><![CDATA[' . self::sanitize( $title ) . ']]></' . $property . '>';
 	}
 
 	/**
@@ -558,14 +558,13 @@ class ProductsXmlFeed {
 	 *    For information about allowed UTF-8 characters please go to
 	 *    https://www.w3.org/TR/xml/ documentation, section charsets.
 	 *
-	 *
 	 * @since x.x.x
-	 * @param string  $xml_fragment XML fragment for sanitization.
+	 * @param string $xml_fragment XML fragment for sanitization.
 	 * @return string               Sanitized XML fragment.
-	*/
+	 */
 	private static function sanitize( $xml_fragment ) {
 		return esc_xml(
-			preg_replace( '/[^\\x0009\\x000A\\x000D\\x0020-\\xD7FF\\xE000-\\xFFFD]/' , ' ', $xml_fragment )
+			preg_replace( '/[^\\x0009\\x000A\\x000D\\x0020-\\xD7FF\\xE000-\\xFFFD]/', ' ', $xml_fragment )
 		);
 	}
 }
