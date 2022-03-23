@@ -202,7 +202,7 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_title( $product, $property ) {
 		$title = wp_strip_all_tags( $product->get_name() );
-		return '<' . $property . '><![CDATA[' . self::sanitize( $title ) . ']]></' . $property . '>';
+		return "<$property>" . self::sanitize( '<![CDATA[' . $title  . ']]>' ) . "</$property>";
 	}
 
 	/**
@@ -253,7 +253,7 @@ class ProductsXmlFeed {
 		}
 		$description = substr( $description, 0, self::DESCRIPTION_SIZE_CHARS_LIMIT );
 
-		return '<' . $property . '><![CDATA[' . self::sanitize( $description ) . ']]></' . $property . '>';
+		return "<$property>" . self::sanitize( '<![CDATA[' . $description . ']]>' ) . "</$property>";
 	}
 
 	/**
@@ -544,7 +544,8 @@ class ProductsXmlFeed {
 	/**
 	 * Sanitize XML.
 	 * After this method the string should be a valid XML string to fit inside
-	 * a XML tag directly or in CDATA enclosing tag.
+	 * a XML tag directly. If a CDATA markup is used it also needs to be passed
+	 * along the string.
 	 *
 	 * This operation consist of two steps:
 	 *
@@ -564,7 +565,7 @@ class ProductsXmlFeed {
 	 */
 	private static function sanitize( $xml_fragment ) {
 		return esc_xml(
-			preg_replace( '/[^\\x0009\\x000A\\x000D\\x0020-\\xD7FF\\xE000-\\xFFFD]/', ' ', $xml_fragment )
+			preg_replace( '/[^\x{9}\x{A}\x{D}\x{20}-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]/u', ' ', $xml_fragment )
 		);
 	}
 }
