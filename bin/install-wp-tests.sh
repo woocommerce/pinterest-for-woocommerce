@@ -183,13 +183,12 @@ install_wc() {
   if [ ! -d "$WC_DIR" ]; then
     # set up testing suite
     mkdir -p "$WC_DIR"
-    echo "Installing WooCommerce ($WC_VERSION)."
+    LATEST_WC_VERSION=$( php -r 'print json_decode( file_get_contents("https://api.wordpress.org/plugins/info/1.0/woocommerce.json") )->version;' )
+    echo "Installing WooCommerce ($LATEST_WC_VERSION)."
     # Grab the necessary plugins.
     if [ $WC_VERSION == 'trunk' ]; then
-      $wc_json = file_get_contents("https://api.wordpress.org/plugins/info/1.0/woocommerce.json");
-      $latest_wc_version = json_decode( $wc_json )->version;
       rm -rf "$TMPDIR"/woocommerce-trunk
-      git clone --quiet --depth=1 --branch="$latest_wc_version" https://github.com/woocommerce/woocommerce.git "${TMPDIR}/woocommerce-trunk"
+      git clone --quiet --depth=1 --branch="$LATEST_WC_VERSION" https://github.com/woocommerce/woocommerce.git "${TMPDIR}/woocommerce-trunk"
       mv "$TMPDIR"/woocommerce-trunk/plugins/woocommerce/* "$WC_DIR"
     else
       echo "Test with specified WooCommerce version ${WC_VERSION} is not yet supported."
