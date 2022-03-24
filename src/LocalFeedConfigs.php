@@ -25,7 +25,7 @@ class LocalFeedConfigs {
 	 *
 	 * @var array $feeds_configurations
 	 */
-	private $feeds_configurations = [];
+	private $feeds_configurations = array();
 
 	/**
 	 * The Singleton's instance.
