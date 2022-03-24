@@ -91,7 +91,7 @@ class LocalFeedConfigs {
 				$id = array(
 					'feed_id'   => $id,
 					'feed_file' => "{$file_name_base}{$id}.xml",
-					'tmp_file'  => "{$file_name_base}{$id}.xml",
+					'tmp_file'  => "{$file_name_base}{$id}-tmp.xml",
 					'feed_url'  => "{$url_base}{$id}.xml",
 				);
 			}
