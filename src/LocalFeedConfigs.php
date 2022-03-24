@@ -67,10 +67,6 @@ class LocalFeedConfigs {
 	 */
 	private function initialize_local_feeds_config( $locations ) {
 
-		if ( $this->feeds_configurations ) {
-			return;
-		}
-
 		$feed_ids = Pinterest_For_Woocommerce()::get_data( 'local_feed_ids' ) ?? array();
 
 		foreach ( $locations as $location ) {
