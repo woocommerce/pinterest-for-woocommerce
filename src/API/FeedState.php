@@ -190,7 +190,7 @@ class FeedState extends VendorAPI {
 					esc_html__( 'Successfully generated %1$s ago - Wrote %2$s products to %3$sfeed file%4$s', 'pinterest-for-woocommerce' ),
 					human_time_diff( $state['last_activity'] ),
 					$state['product_count'],
-					'<a href="' . $this->get_feed_url() . '" target="_blank">',
+					sprintf( '<a href="%s" target="_blank">', esc_url( $this->get_feed_url() ) ),
 					'</a>',
 				);
 				break;
