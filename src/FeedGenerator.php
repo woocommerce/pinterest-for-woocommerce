@@ -460,8 +460,8 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @since x.x.x
 	 */
-	public function deregister(): void {
-		foreach ( $this->configurations->get_configurations() as $config ) {
+	public static function deregister(): void {
+		foreach ( LocalFeedConfigs::get_instance()->get_configurations() as $config ) {
 			if ( isset( $config['feed_file'] ) && file_exists( $config['feed_file'] ) ) {
 				unlink( $config['feed_file'] );
 			}

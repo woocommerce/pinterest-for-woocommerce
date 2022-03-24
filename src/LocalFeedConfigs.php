@@ -98,9 +98,9 @@ class LocalFeedConfigs {
 	/**
 	 * Cleanup local feed configs.
 	 */
-	public function deregister() {
+	public static function deregister() {
 		Pinterest_For_Woocommerce()::save_data( 'local_feed_ids', false );
-		$this->feeds_configurations = array();
+		self::$instance = null;
 	}
 
 	/**
