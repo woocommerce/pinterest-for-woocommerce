@@ -118,7 +118,6 @@ class FeedRegistration {
 
 		if ( ! empty( $merchant['data']->id ) && 'declined' === $merchant['data']->product_pin_approval_status ) {
 
-			$registered = false;
 			self::log( 'Pinterest returned a Declined status for product_pin_approval_status' );
 
 		} else {
