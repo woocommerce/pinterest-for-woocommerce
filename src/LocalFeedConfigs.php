@@ -100,6 +100,7 @@ class LocalFeedConfigs {
 	 */
 	public function deregister() {
 		Pinterest_For_Woocommerce()::save_data( 'local_feed_ids', false );
+		$this->feeds_configurations = [];
 	}
 
 	/**
