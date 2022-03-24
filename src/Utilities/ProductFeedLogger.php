@@ -13,11 +13,11 @@ namespace Automattic\WooCommerce\Pinterest\Utilities;
 use Automattic\WooCommerce\Pinterest\Logger;
 
 /**
- * Trait FeedLogger
+ * Trait ProductFeedLogger
  *
  * @since x.x.x
  */
-trait FeedLogger {
+trait ProductFeedLogger {
 
 	/**
 	 * Logs Sync related messages separately.

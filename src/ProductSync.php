@@ -14,14 +14,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 use \Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\API\FeedIssues;
-use Automattic\WooCommerce\Pinterest\Utilities\FeedLogger;
+use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
 
 /**
  * Class Handling registration & generation of the XML product feed.
  */
 class ProductSync {
 
-	use FeedLogger;
+	use ProductFeedLogger;
 
 	/**
 	 * Feed File Generator Instance

@@ -10,7 +10,7 @@ namespace Automattic\WooCommerce\Pinterest;
 
 use Exception;
 use Throwable;
-use Automattic\WooCommerce\Pinterest\Utilities\FeedLogger;
+use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class FeedRegistration {
 
-	use FeedLogger;
+	use ProductFeedLogger;
 
 	const ACTION_HANDLE_FEED_REGISTRATION = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-handle-feed-registration';
 

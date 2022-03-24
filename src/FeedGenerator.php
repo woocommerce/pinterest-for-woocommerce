@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Utilities\BatchQueryOffset;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\AbstractChainedJob;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
-use Automattic\WooCommerce\Pinterest\Utilities\FeedLogger;
+use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
 use Exception;
 use Throwable;
 
@@ -25,7 +25,7 @@ use Throwable;
 class FeedGenerator extends AbstractChainedJob {
 
 	use BatchQueryOffset;
-	use FeedLogger;
+	use ProductFeedLogger;
 
 	const ACTION_START_FEED_GENERATOR = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-start-feed-generation';
 
