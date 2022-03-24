@@ -85,9 +85,7 @@ class FeedRegistration {
 		}
 
 		try {
-			$registered = self::register_feed();
-
-			if ( $registered ) {
+			if ( self::register_feed() ) {
 				return true;
 			}
 
