@@ -42,7 +42,6 @@ class LocalFeedConfigs {
 	 * @return LocalFeedConfigs Singleton instance.
 	 */
 	public static function get_instance(): LocalFeedConfigs {
-		$cls = static::class;
 		if ( null === self::$instance ) {
 			self::$instance = new static();
 		}
