@@ -202,7 +202,7 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_title( $product, $property ) {
 		$title = wp_strip_all_tags( $product->get_name() );
-		return "<$property>" . self::sanitize( '<![CDATA[' . $title  . ']]>' ) . "</$property>";
+		return "<$property>" . self::sanitize( '<![CDATA[' . $title . ']]>' ) . "</$property>";
 	}
 
 	/**
