@@ -99,7 +99,7 @@ class ProductsXmlFeed {
 		/**
 		 * Filter that controls the attributes that will be added to the product XML file.
 		 *
-		 * @since x.x.x
+		 * @since 0.5.0
 		 * @param array      XML fields to add.
 		 * @param WC_Product Product for which the XML is being generated.
 		 */
