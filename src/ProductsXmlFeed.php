@@ -464,7 +464,7 @@ class ProductsXmlFeed {
 				'<g:shipping>' . PHP_EOL .
 					"\t\t\t\t<g:country>$info[country]</g:country>" . PHP_EOL .
 					( $info['state'] ? "\t\t\t\t<g:region>$info[state]</g:region>" . PHP_EOL : '' ) .
-					"\t\t\t\t<g:service>$info[name]</g:service>" . PHP_EOL .
+					"\t\t\t\t<g:service>" . self::sanitize( $info['name'] ) . "</g:service>" . PHP_EOL .
 					"\t\t\t\t<g:price>$info[cost] $currency</g:price>" . PHP_EOL .
 				"\t\t\t</g:shipping>";
 		}
