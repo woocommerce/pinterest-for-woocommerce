@@ -252,11 +252,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Disconnect advertiser if advertiser or tag change.
 			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
 
-			// Unschedule tasks if woocommerce is deactivated.
-			if ( defined( 'WC_PLUGIN_FILE' ) ) {
-				register_deactivation_hook( WC_PLUGIN_FILE, array( Pinterest\ProductSync::class, 'cancel_jobs' ) );
-			}
-
 		}
 
 
