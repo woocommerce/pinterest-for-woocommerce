@@ -226,6 +226,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$this->includes();
 
+			// Start the heartbeat.
+			$this->heartbeat = new Pinterest\Heartbeat( WC()->queue() );
+			$this->heartbeat->init();
+
 			add_action( 'admin_init', array( $this, 'admin_init' ), 0 );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
@@ -251,6 +255,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Disconnect advertiser if advertiser or tag change.
 			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
+
+			// Init marketing notifications.
+			add_action( Pinterest\Heartbeat::HOURLY, array( $this, 'init_marketing_notifications') );
 
 		}
 
@@ -281,6 +288,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$admin->register();
 			$attributes_tab->register();
 			$variation_attributes->register();
+		}
+
+		/**
+		 * Init marketing notifications.
+		 *
+		 * @since x.x.x
+		 */
+		public function init_marketing_notifications(){
+			$notifications =  new Pinterest\Notes\MarketingNotifications();
+			$notifications->init_notifications();
 		}
 
 		/**
@@ -981,7 +998,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$account_data = self::get_setting( 'account_data' );
 			return isset( $account_data['is_any_website_verified'] ) ? (bool) $account_data['is_any_website_verified'] : false;
 		}
-
 
 		/**
 		 * Checks if tracking is configured properly and enabled.
