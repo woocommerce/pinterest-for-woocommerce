@@ -1,6 +1,6 @@
 *** Pinterest for WooCommerce Changelog ***
 
-= 1.0.9 - 2022-xx-xx =
+= 1.0.9 - 2022-03-29 =
 * Add    - Plugin update framework. ( [#390](https://github.com/woocommerce/pinterest-for-woocommerce/pull/390 ) )
 * Tweak  - Use website verification instead of domains. ( [#391](https://github.com/woocommerce/pinterest-for-woocommerce/pull/391) )
 * Tweak  - Move deactivation hook to plugin file ( [#397](https://github.com/woocommerce/pinterest-for-woocommerce/pull/397) )
