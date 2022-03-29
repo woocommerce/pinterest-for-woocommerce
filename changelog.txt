@@ -1,5 +1,12 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.0.9 - 2022-03-29 =
+* Add    - Plugin update framework. ( [#390](https://github.com/woocommerce/pinterest-for-woocommerce/pull/390 ) )
+* Tweak  - Use website verification instead of domains. ( [#391](https://github.com/woocommerce/pinterest-for-woocommerce/pull/391) )
+* Tweak  - Move deactivation hook to plugin file ( [#397](https://github.com/woocommerce/pinterest-for-woocommerce/pull/397) )
+* Update - Add np:woocomerce param to partner data in the tag. ( [#404](https://github.com/woocommerce/pinterest-for-woocommerce/pull/404) )
+* Fix    - Remove invalid XML characters from feed. ( [#409](https://github.com/woocommerce/pinterest-for-woocommerce/pull/409) )
+
 = 1.0.8 - 2022-03-11 =
 * Update - Shipping column format. ( [#370](https://github.com/woocommerce/pinterest-for-woocommerce/pull/370) )
 * Fix    - Escape XML special chars in SKU for the XML MPN section. ( [#371](https://github.com/woocommerce/pinterest-for-woocommerce/pull/371) )

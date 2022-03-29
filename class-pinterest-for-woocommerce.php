@@ -340,7 +340,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Plugin update entry point.
 		 *
-		 * @since x.x.x
+		 * @since 1.0.9
 		 * @return void
 		 */
 		public function maybe_update_plugin() {
