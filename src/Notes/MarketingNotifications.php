@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class responsible for displaying inbox notifications for the merchant.
  *
  * In the specification for the notes we have that the notification should
- * be sent some time after the plugin installation. There is no retroacive
+ * be sent some time after the plugin installation. There is no retroactive
  * way of figuring out when the plugin was first installed. So we count
  * @since x.x.x
  */
@@ -28,40 +28,38 @@ class MarketingNotifications {
 	// Timestamp option marking the moment we start to count time.
 	const INIT_TIMESTAMP = self::OPTIONS_PREFIX . '-init-timestamp';
 
-	// Indicates if the complete onboarding note has been sent.
-	const COMPLETE_ONBOARDING = self::OPTIONS_PREFIX . '-complete-onboarding';
-
 	// True if all marketing notices have been sent.
 	const COMPLETED = self::OPTIONS_PREFIX . 'completed';
 
+	// List of marketing notifications that we want to send.
+	const NOTES = array(
+		'CompleteOnboardingAfterThreeDays',
+	);
+
 	public function init_notifications() {
 		// Check if we are not done.
-		if ( (bool) get_option( self::COMPLETED ) ){
+		if ( $this->is_completed() ) {
 			return;
 		}
 
-
+		foreach ( self::NOTES as $note ) {
+			$notification = new $note();
+			if ( ! $notification->should_be_added() ) {
+				continue;
+			}
+			$notification
+				->prepare_note()
+				->save();
+		}
 	}
 
 	/**
-	 * Maybe send complete_onboarding_note
-	 * Sent 3 days after the init timestamp when the user hasn’t completed
-	 * Pinterest setup & store has more than 5+ sales.
+	 * Check if notifications process is completed.
 	 *
-	 * @since x.x.x
-	 * @return bool;
+	 * @return boolean
 	 */
-	private function maybe_schedule_complete_onboarding_note() {
-		// Check if we are not done.
-		if ( (bool) get_option( self::COMPLETE_ONBOARDING ) ){
-			return;
-		}
-
-
-		// Are we there yet?
-		if ( time() < ( DAY_IN_SECONDS * 3 + $this->get_init_timestamp() ) ) {
-			return
-		}
+	private function is_completed() {
+		return true === (bool) get_option( self::COMPLETED );
 	}
 
 	/**
@@ -71,7 +69,7 @@ class MarketingNotifications {
 	 * @since x.x.x
 	 * @return int Initialization timestamp.
 	 */
-	private function get_init_timestamp(): int {
+	public static function get_init_timestamp(): int {
 		$timestamp = get_option( self::INIT_TIMESTAMP );
 		if ( false !== $timestamp ) {
 			// Timestamp already init, return.

@@ -257,7 +257,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
 
 			// Init marketing notifications.
-			add_action( Pinterest\Heartbeat::HOURLY, array( $this, 'init_marketing_notifications') );
+			add_action( Pinterest\Heartbeat::DAILY, array( $this, 'init_marketing_notifications') );
 
 		}
 
