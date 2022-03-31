@@ -1,5 +1,8 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.0.10 - 2022-xx-xx =
+* Update - Feed Refactor with Action Scheduler Framework. ( [#368](https://github.com/woocommerce/pinterest-for-woocommerce/pull/368) )
+
 = 1.0.9 - 2022-03-29 =
 * Add    - Plugin update framework. ( [#390](https://github.com/woocommerce/pinterest-for-woocommerce/pull/390 ) )
 * Tweak  - Use website verification instead of domains. ( [#391](https://github.com/woocommerce/pinterest-for-woocommerce/pull/391) )
