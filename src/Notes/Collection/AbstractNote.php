@@ -3,7 +3,7 @@ declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
 use Automattic\WooCommerce\Admin\Notes\Note;
-use Automattic\WooCommerce\Admin\Notes\NoteTraits;
+use Automattic\WooCommerce\Admin\Notes\Notes;
 
 
 use WC_Data_Store;
@@ -20,7 +20,16 @@ defined( 'ABSPATH' ) || exit;
  */
 abstract class AbstractNote {
 
-	use NoteTraits;
+	/**
+	 * Check if the note has been previously added.
+	 *
+	 * @throws NotesUnavailableException Throws exception when notes are unavailable.
+	 */
+	public static function note_exists() {
+		$data_store = Notes::load_data_store();
+		$note_ids   = $data_store->get_notes_with_name( static::NOTE_NAME );
+		return ! empty( $note_ids );
+	}
 
 	/**
 	 * NOTE_NAME const needs to be defined in subclass.
@@ -29,7 +38,7 @@ abstract class AbstractNote {
 	/**
 	 * Get the note entry.
 	 */
-	protected function prepare_note() {
+	public function prepare_note() {
 		$note = new Note();
 		$this->fill_in_note_details( $note );
 		return $note;
@@ -65,7 +74,7 @@ abstract class AbstractNote {
 	 * @return string
 	 */
 	protected function get_name(): string {
-		return self::NOTE_NAME;
+		return static::NOTE_NAME;
 	}
 
 	/**

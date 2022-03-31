@@ -6,7 +6,7 @@
  * @since   x.x.x
  */
 
-namespace Automattic\WooCommerce\Pinterest;
+namespace Automattic\WooCommerce\Pinterest\Notes;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -43,6 +43,7 @@ class MarketingNotifications {
 		}
 
 		foreach ( self::NOTES as $note ) {
+			$note = 'Automattic\WooCommerce\Pinterest\Notes\Collection\\' . $note ;
 			$notification = new $note();
 			if ( ! $notification->should_be_added() ) {
 				continue;

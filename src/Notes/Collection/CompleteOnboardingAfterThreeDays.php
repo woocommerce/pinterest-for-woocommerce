@@ -4,7 +4,8 @@ namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
 
 class CompleteOnboardingAfterThreeDays extends AbstractCompleteOnboarding {
 
-	const DELAY = 3;
+	const DELAY = 0;
+	const NOTE_NAME = 'complete-onboarding-note-after-' . self::DELAY . '-days';
 
 	protected function get_note_title(): string {
 		return __( 'Reach more shoppers by connecting with Pinterest', 'pinterest-for-woocommerce' );
