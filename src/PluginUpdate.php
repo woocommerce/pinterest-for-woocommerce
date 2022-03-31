@@ -205,7 +205,7 @@ class PluginUpdate {
 	 * @return void
 	 */
 	protected function feed_generation_migration(): void {
-		if ( ! $this->version_needs_update( '1.0.9' ) ) {
+		if ( ! $this->version_needs_update( '1.0.10' ) ) {
 			// Already up to date.
 			return;
 		}
