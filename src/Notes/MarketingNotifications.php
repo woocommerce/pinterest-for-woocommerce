@@ -34,6 +34,9 @@ class MarketingNotifications {
 	// List of marketing notifications that we want to send.
 	const NOTES = array(
 		'CompleteOnboardingAfterThreeDays',
+		'CompleteOnboardingReminderAfterSevenDays',
+		'CompleteOnboardingReminderAfterFourteenDays',
+		'CompleteOnboardingReminderAfterThirtyDays',
 	);
 
 	public function init_notifications() {
