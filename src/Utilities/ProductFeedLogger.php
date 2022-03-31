@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Feed Logger
  *
  * @package     Pinterest_For_WooCommerce/Classes/
- * @since       x.x.x
+ * @since       1.0.10
  */
 
 declare( strict_types=1 );
@@ -15,7 +15,7 @@ use Automattic\WooCommerce\Pinterest\Logger;
 /**
  * Trait ProductFeedLogger
  *
- * @since x.x.x
+ * @since 1.0.10
  */
 trait ProductFeedLogger {
 

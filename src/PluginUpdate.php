@@ -98,7 +98,7 @@ class PluginUpdate {
 	/**
 	 * List of update procedures
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 * @return array List of update procedures names.
 	 */
 	private function update_procedures() {
@@ -148,7 +148,7 @@ class PluginUpdate {
 	 * Perform update procedure.
 	 *
 	 * @since 1.0.9
-	 * @since x.x.x Accepts procedure name as parameter.
+	 * @since 1.0.10 Accepts procedure name as parameter.
 	 * @param  string $update_procedure Name of the migration procedure.
 	 * @throws Throwable Update procedure failures.
 	 * @return void

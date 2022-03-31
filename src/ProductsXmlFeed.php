@@ -118,7 +118,7 @@ class ProductsXmlFeed {
 		/**
 		 * Filter XML output for product
 		 *
-		 * @since x.x.x
+		 * @since 1.0.10
 		 * @param string     XML content.
 		 * @param WC_Product Product for which the XML is being generated.
 		 */

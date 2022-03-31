@@ -3,7 +3,7 @@
  * Class responsible for managing local feed configurations.
  *
  * @package     Pinterest_For_WooCommerce/Classes/
- * @version     x.x.x
+ * @version     1.0.10
  */
 namespace Automattic\WooCommerce\Pinterest;
 
@@ -30,7 +30,7 @@ class LocalFeedConfigs {
 	/**
 	 * The Singleton's instance.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 * @var null|LocalFeedConfigs Instance object.
 	 */
 	private static $instance = null;
@@ -38,7 +38,7 @@ class LocalFeedConfigs {
 	/**
 	 * Singleton initialization and instance fetching method.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 * @return LocalFeedConfigs Singleton instance.
 	 */
 	public static function get_instance(): LocalFeedConfigs {
@@ -52,7 +52,7 @@ class LocalFeedConfigs {
 	/**
 	 * Class responsible for local feed configurations and handling.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	protected function __construct() {
 		$locations = array( Pinterest_For_Woocommerce()::get_base_country() ?? 'US' ); // Replace with multiple countries array for multiple feed config.
@@ -62,7 +62,7 @@ class LocalFeedConfigs {
 	/**
 	 * Prepare feed configurations.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 * @param array $locations Array of location to generate the feed files for.
 	 */
 	private function initialize_local_feeds_config( $locations ) {

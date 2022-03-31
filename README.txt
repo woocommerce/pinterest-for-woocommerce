@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.8
 Requires PHP: 7.3
-Stable tag: 1.0.9
+Stable tag: 1.0.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -87,7 +87,7 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
-= 1.0.10 - 2022-xx-xx =
+= 1.0.10 - 2022-03-31 =
 * Update - Feed Refactor with Action Scheduler Framework. ( [#368](https://github.com/woocommerce/pinterest-for-woocommerce/pull/368) )
 
 = 1.0.9 - 2022-03-29 =

@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Feed Files Generator
  *
  * @package     Pinterest_For_WooCommerce/Classes/
- * @since       x.x.x
+ * @since       1.0.10
  */
 
 namespace Automattic\WooCommerce\Pinterest;
@@ -54,7 +54,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * FeedGenerator initialization.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 * @param ActionSchedulerInterface $action_scheduler           Action Scheduler proxy.
 	 * @param LocalFeedConfigs         $local_feeds_configurations Locations configuration class.
 	 */
@@ -66,7 +66,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Initialize FeedGenerator actions and Action Scheduler hooks.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	public function init() {
 		// Initialize the action handlers.
@@ -87,7 +87,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Reschedule the next feed generator start.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 * @param integer $timestamp Next feed generator timestamp.
 	 */
 	public function schedule_next_generator_start( $timestamp ) {
@@ -107,7 +107,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Start the queue processing.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	private function start_generation() {
 		if ( $this->is_running() ) {
@@ -122,7 +122,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Runs as the first step of the generation process.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 *
 	 * @throws Throwable Related to issues possible when creating an empty feed temp file and populating the header.
 	 */
@@ -146,7 +146,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Runs as the last step of the job.
 	 * Add XML footer to the feed files and copy the move the files from tmp to the final destination.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 *
 	 * @throws Throwable Related to issues possible when adding the footer or renaming the files.
 	 */
@@ -210,7 +210,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Processes a batch of items. The middle part of the generation process.
 	 * Can run multiple times depending on the catalog size.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 *
 	 * @param array $items The items of the current batch.
 	 * @param array $args  The args for the job.
@@ -229,7 +229,7 @@ class FeedGenerator extends AbstractChainedJob {
 			/**
 			 * Filter excluded product types.
 			 *
-			 * @since x.x.x
+			 * @since 1.0.10
 			 * @param array Array of excluded product types.
 			 */
 			$excluded_product_types = apply_filters(
@@ -312,7 +312,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Marks feed as dirty.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	public function mark_feed_dirty(): void {
 		Pinterest_For_Woocommerce()::save_data( 'feed_dirty', true );
@@ -330,7 +330,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Marks feed as clean.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	public function mark_feed_clean(): void {
 		Pinterest_For_Woocommerce()::save_data( 'feed_dirty', false );
@@ -339,7 +339,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Check if feed is dirty.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 * @return bool Indicates if feed is dirty or not.
 	 */
 	public function feed_is_dirty(): bool {
@@ -350,7 +350,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Prepare a fresh temporary file for each local configuration.
 	 * Files is populated with the XML headers.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	private function prepare_temporary_files(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
@@ -366,7 +366,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Add XML footer to all of the temporary feed files.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	private function add_footer_to_temporary_feed_files(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
@@ -384,7 +384,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Checks the status of the file write operation and throws if issues are found.
 	 * Utility function for functions using file_put_contents.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 * @param integer $bytes_written How much data was written to the file.
 	 * @param string  $file          File location.
 	 *
@@ -416,7 +416,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * React to errors during feed files generation process.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 * @param Throwable $th Exception handled.
 	 */
 	private function handle_error( $th ) {
@@ -435,7 +435,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Rename temporary feed files to final name.
 	 * This is the last step of the feed file generation process.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 * @throws \Exception Renaming not possible.
 	 */
 	private function rename_temporary_feed_files_to_final(): void {
@@ -458,7 +458,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Remove feed files and cancel pending actions.
 	 * Part of the cleanup procedure.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	public static function deregister(): void {
 		foreach ( LocalFeedConfigs::get_instance()->get_configurations() as $config ) {
@@ -476,7 +476,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Write pre-populated buffers to feed files.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	private function write_buffers_to_temp_files(): void {
 		foreach ( $this->configurations->get_configurations() as $location => $config ) {
@@ -493,7 +493,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Check if we have a feed file on the disk.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	public function check_if_feed_file_exists() {
 		$configs = $this->configurations->get_configurations();
@@ -507,7 +507,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Create empty string buffers for
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	private function prepare_feed_buffers(): void {
 		foreach ( $this->get_locations() as $location ) {
@@ -518,7 +518,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Fetch supported locations.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	private function get_locations(): array {
 		return array_keys( $this->configurations->get_configurations() );
