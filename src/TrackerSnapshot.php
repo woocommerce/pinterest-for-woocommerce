@@ -73,18 +73,8 @@ class TrackerSnapshot {
 
 		$settings = Pinterest_For_Woocommerce::get_settings( true );
 
-		/**
-		 * Lambda function to parse booleans into strings
-		 *
-		 * @param $key
-		 * @return string
-		 */
-		$fn_boolean_setting_to_string = function ( $key ) use ( $settings ): string {
-			return $settings[ $key ] ? 'yes' : 'no';
-		};
-
-		// options to be formatted as "yes" or "no".
-		$boolean_options = array(
+		// List of settings that we want to track.
+		$tracked_settings = array(
 			'track_conversions',
 			'enhanced_match_support',
 			'save_to_pinterest',
@@ -95,9 +85,6 @@ class TrackerSnapshot {
 			'erase_plugin_data',
 		);
 
-		return array_merge(
-			array( 'version' => PINTEREST_FOR_WOOCOMMERCE_VERSION ),
-			array_combine( $boolean_options, array_map( $fn_boolean_setting_to_string, $boolean_options ) )
-		);
+		return array( 'version' => PINTEREST_FOR_WOOCOMMERCE_VERSION ) + array_map( 'wc_string_to_bool', array_intersect_key( $settings, $tracked_settings ) );
 	}
 }
