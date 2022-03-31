@@ -305,15 +305,21 @@ class Tracking {
 	 * @return void
 	 */
 	public static function ajax_tracking_snippet() {
-
-		$tracking = 'jQuery( function( $ ) { ;
-				$( document.body ).on( \'added_to_cart\', function ( e, fragments, cart_hash, thisbutton ) {
-					pintrk( \'track\', \'AddToCart\', {
-						\'product_id\': thisbutton.data( \'product_id\' ),
-						\'order_quantity\': thisbutton.data( \'quantity\' ),
-					});
-				} );
-			} )';
+		$wc_currency = get_woocommerce_currency();
+		$tracking    = <<< JS
+jQuery( function( $ ) {
+	$( document.body ).on( 'added_to_cart', function( e, fragments, cart_hash, thisbutton ) {
+		var quantity = thisbutton.data( 'quantity' );
+		pintrk( 'track', 'AddToCart', {
+			'product_id': thisbutton.data( 'product_id' ),
+			'product_name': thisbutton.data( 'product_name' ),
+			'value': thisbutton.data( 'price' ) * quantity,
+			'order_quantity': quantity,
+			'currency': '{$wc_currency}'
+		} );
+	} );
+} );
+JS;
 
 		wp_add_inline_script( 'wc-add-to-cart', $tracking );
 
