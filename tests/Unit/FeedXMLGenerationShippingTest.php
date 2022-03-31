@@ -181,6 +181,11 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:price>15.00 USD</g:price>
 			</g:shipping>
 			<g:shipping>
+				<g:country>MX</g:country>
+				<g:service>Flat rate</g:service>
+				<g:price>15.00 USD</g:price>
+			</g:shipping>
+			<g:shipping>
 				<g:country>US</g:country>
 				<g:service>Flat rate</g:service>
 				<g:price>15.00 USD</g:price>
@@ -401,6 +406,11 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
 		$expected = "<g:shipping>
 				<g:country>CA</g:country>
+				<g:service>Free shipping</g:service>
+				<g:price>0.00 USD</g:price>
+			</g:shipping>
+			<g:shipping>
+				<g:country>MX</g:country>
 				<g:service>Free shipping</g:service>
 				<g:price>0.00 USD</g:price>
 			</g:shipping>
