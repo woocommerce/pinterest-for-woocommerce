@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Feed Registration.
  *
  * @package     Pinterest_For_WooCommerce/Classes/
- * @version     x.x.x
+ * @version     1.0.10
  */
 
 namespace Automattic\WooCommerce\Pinterest;
@@ -42,7 +42,7 @@ class FeedRegistration {
 	/**
 	 * Feed Registration.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 * @param LocalFeedConfigs $local_feeds_configurations Locations configuration class.
 	 * @param FeedGenerator    $feed_generator Feed generator class.
 	 */
@@ -54,7 +54,7 @@ class FeedRegistration {
 	/**
 	 * Initialize FeedRegistration actions and Action Scheduler hooks.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	public function init() {
 		add_action( self::ACTION_HANDLE_FEED_REGISTRATION, array( $this, 'handle_feed_registration' ) );

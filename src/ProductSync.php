@@ -81,7 +81,7 @@ class ProductSync {
 	/**
 	 * Observe Pinterest option change and decide if we need to deregister.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 *
 	 * @param array $old_value Option old value.
 	 * @param array $value     Option new value.
@@ -101,7 +101,7 @@ class ProductSync {
 	/**
 	 * Initialize components of the synchronization process.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.10
 	 */
 	private static function initialize_feed_components() {
 		$action_scheduler        = new ActionSchedulerProxy();
