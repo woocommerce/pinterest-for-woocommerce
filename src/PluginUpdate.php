@@ -33,7 +33,7 @@ class PluginUpdate {
 	/**
 	 * Check if the plugin is up to date.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @return boolean
 	 */
 	public function plugin_is_up_to_date(): bool {
@@ -47,7 +47,7 @@ class PluginUpdate {
 	/**
 	 * Helper function to check if update to $version is needed.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @param string $version Version string for which we check if update is needed.
 	 * @return boolean
 	 */
@@ -64,7 +64,7 @@ class PluginUpdate {
 	 * happened. After the update procedure this will return the same version
 	 * as get_plugin_current_version().
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @return string
 	 */
 	private function get_plugin_update_version(): string {
@@ -74,7 +74,7 @@ class PluginUpdate {
 	/**
 	 * Returns the version of the plugin as defined in the main plugin file.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @return string
 	 */
 	private function get_plugin_current_version(): string {
@@ -85,7 +85,7 @@ class PluginUpdate {
 	 * After the update has been completed bump the previous version option to
 	 * the current version option.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @return void
 	 */
 	public function update_plugin_update_version_option(): void {
@@ -111,7 +111,7 @@ class PluginUpdate {
 	/**
 	 * Update procedures entry point.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @return void
 	 */
 	public function maybe_update(): void {
@@ -147,8 +147,10 @@ class PluginUpdate {
 	/**
 	 * Perform update procedure.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
+	 * @since x.x.x Accepts procedure name as parameter.
 	 * @param  string $update_procedure Name of the migration procedure.
+	 * @throws Throwable Update procedure failures.
 	 * @return void
 	 */
 	protected function perform_plugin_update_procedure( $update_procedure ): void {
@@ -172,7 +174,7 @@ class PluginUpdate {
 	/**
 	 * Update procedure for the 1.0.9 version of the plugin.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @throws Exception Verification error.
 	 * @return void
 	 */

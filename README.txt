@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.8
 Requires PHP: 7.3
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -86,6 +86,13 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.0.9 - 2022-03-29 =
+* Add    - Plugin update framework. ( [#390](https://github.com/woocommerce/pinterest-for-woocommerce/pull/390 ) )
+* Tweak  - Use website verification instead of domains. ( [#391](https://github.com/woocommerce/pinterest-for-woocommerce/pull/391) )
+* Tweak  - Move deactivation hook to plugin file ( [#397](https://github.com/woocommerce/pinterest-for-woocommerce/pull/397) )
+* Update - Add np:woocomerce param to partner data in the tag. ( [#404](https://github.com/woocommerce/pinterest-for-woocommerce/pull/404) )
+* Fix    - Remove invalid XML characters from feed. ( [#409](https://github.com/woocommerce/pinterest-for-woocommerce/pull/409) )
 
 = 1.0.8 - 2022-03-11 =
 * Update - Shipping column format. ( [#370](https://github.com/woocommerce/pinterest-for-woocommerce/pull/370) )

@@ -577,7 +577,7 @@ class ProductsXmlFeed {
 	 *    For information about allowed UTF-8 characters please go to
 	 *    https://www.w3.org/TR/xml/ documentation, section charsets.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @param string $xml_fragment XML fragment for sanitization.
 	 * @return string               Sanitized XML fragment.
 	 */
