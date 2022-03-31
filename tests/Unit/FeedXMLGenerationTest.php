@@ -59,7 +59,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		// We need header and footer so we can process XML directly.
 		$xml      = ProductsXmlFeed::get_xml_header();
-		$xml     .= ProductsXmlFeed::get_xml_item( $product );
+		$xml     .= ProductsXmlFeed::get_xml_item( $product, 'US' );
 		$xml     .= ProductsXmlFeed::get_xml_footer();
 
 		$simplex_object = simplexml_load_string( $xml, "SimpleXMLElement", LIBXML_NOCDATA );
@@ -129,7 +129,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 			)
 		);
 
-		$xml = ProductsXmlFeed::get_xml_item( $product );
+		$xml = ProductsXmlFeed::get_xml_item( $product, 'US' );
 		$this->assertEquals( '', $xml );
 	}
 

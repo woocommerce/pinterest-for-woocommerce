@@ -10,10 +10,17 @@
 	"license": "GPL-3.0-or-later",
 	"prefer-stable": true,
 	"minimum-stability": "dev",
+	"repositories": [
+		{
+		  "type": "vcs",
+		  "url": "https://github.com/woocommerce/action-scheduler-job-framework"
+		}
+	  ],
 	"require": {
 		"php": ">=7.3",
 		"automattic/jetpack-autoloader": "^2.10.1",
-		"defuse/php-encryption": "^2.2"
+		"defuse/php-encryption": "^2.2",
+		"woocommerce/action-scheduler-job-framework": "^2.0.0"
 	},
 	"require-dev": {
 		"composer/installers": "^1.7.0",

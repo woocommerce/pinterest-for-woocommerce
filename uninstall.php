@@ -22,4 +22,5 @@ if ( $plugin_settings['erase_plugin_data'] ) {
 if ( function_exists( 'as_unschedule_all_actions' ) ) {
 	as_unschedule_all_actions( 'pinterest-for-woocommerce-handle-sync', array(), 'pinterest-for-woocommerce' );
 	as_unschedule_all_actions( 'pinterest-for-woocommerce-feed-generation', array(), 'pinterest-for-woocommerce' );
+	as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
 }

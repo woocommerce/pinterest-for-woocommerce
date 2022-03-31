@@ -84,11 +84,11 @@ class ProductsXmlFeed {
 	/**
 	 * Returns the Item's XML for the given product.
 	 *
-	 * @param WC_Product $product  The product to print the XML for.
-	 *
-	 * @return string XML string
+	 * @param  WC_Product $product  The product to print the XML for.
+	 * @param  string     $location The location to print the XML for.
+	 * @return string     XML string.
 	 */
-	public static function get_xml_item( $product ) {
+	public static function get_xml_item( $product, $location ) {
 
 		if ( ! self::is_product_fit_for_feed( $product ) ) {
 			return '';
@@ -96,6 +96,13 @@ class ProductsXmlFeed {
 
 		$xml = "\t\t<item>" . PHP_EOL;
 
+		/**
+		 * Filter that controls the attributes that will be added to the product XML file.
+		 *
+		 * @since 0.5.0
+		 * @param array      XML fields to add.
+		 * @param WC_Product Product for which the XML is being generated.
+		 */
 		foreach ( apply_filters( 'pinterest_for_woocommerce_feed_item_structure', self::$feed_item_structure, $product ) as $attribute ) {
 			$method_name = 'get_property_' . str_replace( ':', '_', $attribute );
 			if ( method_exists( __CLASS__, $method_name ) ) {
@@ -108,6 +115,13 @@ class ProductsXmlFeed {
 
 		$xml .= "\t\t</item>" . PHP_EOL;
 
+		/**
+		 * Filter XML output for product
+		 *
+		 * @since x.x.x
+		 * @param string     XML content.
+		 * @param WC_Product Product for which the XML is being generated.
+		 */
 		return apply_filters( 'pinterest_for_woocommerce_feed_item_xml', $xml, $product );
 	}
 
