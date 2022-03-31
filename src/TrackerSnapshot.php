@@ -73,7 +73,6 @@ class TrackerSnapshot {
 
 		$settings = Pinterest_For_Woocommerce::get_settings( true );
 
-		// List of settings that we want to track.
 		$tracked_settings = array(
 			'track_conversions',
 			'enhanced_match_support',
@@ -85,6 +84,7 @@ class TrackerSnapshot {
 			'erase_plugin_data',
 		);
 
-		return array( 'version' => PINTEREST_FOR_WOOCOMMERCE_VERSION ) + array_map( 'wc_string_to_bool', array_intersect_key( $settings, $tracked_settings ) );
+		$settings = array_intersect_key( $settings, array_flip( $tracked_settings ) );
+		return array_map( 'wc_bool_to_string', $settings ) + array( 'version' => PINTEREST_FOR_WOOCOMMERCE_VERSION );
 	}
 }
