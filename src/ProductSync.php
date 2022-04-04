@@ -76,6 +76,22 @@ class ProductSync {
 				self::$feed_generator->mark_feed_dirty();
 			}
 		);
+
+		/**
+		 * Mark feed as needing re-generation on changes to the woocommerce_tax_display_shop or woocommerce_tax_display_cart settings
+		 */
+		add_action(
+			'update_option_woocommerce_tax_display_shop',
+			function () {
+				self::$feed_generator->mark_feed_dirty();
+			}
+		);
+		add_action(
+			'update_option_woocommerce_tax_display_cart',
+			function () {
+				self::$feed_generator->mark_feed_dirty();
+			}
+		);
 	}
 
 	/**
