@@ -17,7 +17,7 @@ Do not edit it manually!
 ### [`wcadmin_pfw_account_connect_button_click`](assets/source/setup-guide/app/components/Account/Connection.js#L37)
 Clicking on "Connect" Pinterest account button.
 #### Emitters
-- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L80)
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82)
 
 ### [`wcadmin_pfw_account_convert_button_click`](assets/source/setup-guide/app/steps/SetupAccount.js#L32)
 Clicking on "… convert your personal account" button.
@@ -36,7 +36,7 @@ Clicking on "Disconnect" Pinterest account button.
 |---|---|---|
 `context` | `string` | `'settings' \| 'wizard'` In which context it was used?
 #### Emitters
-- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L80) with the given `{ context }`
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with the given `{ context }`
 
 ### [`wcadmin_pfw_ads_manager_link_click`](assets/source/catalog-sync/sections/SyncState.js#L24)
 Clicking on the "Pinterest ads manager" link.
@@ -67,7 +67,7 @@ Clicking on an external documentation link.
 - [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L54)
 	- with `{ link_id: 'ad-guidelines', context: props.view }`
 	- with `{ link_id: 'merchant-guidelines', context: props.view }`
-- [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L53)
+- [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L54)
 	- with `{ link_id: 'ad-guidelines', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
@@ -119,7 +119,7 @@ Closing a modal.
 `context` | `string` | `'settings' \| 'wizard'` In which context it was used?
 `action` | `string` | `confirm` - When the final "Yes, I'm sure" button is clicked. <br> `dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
 #### Emitters
-- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L80) with `{ name: 'account-disconnection', … }`
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
 
 ### [`wcadmin_pfw_modal_open`](assets/source/setup-guide/app/components/Account/Connection.js#L48)
 Opening a modal.
@@ -129,9 +129,9 @@ Opening a modal.
 `name` | `string` | Which modal is it?
 `context` | `string` | `'settings' \| 'wizard'` In which context it was used?
 #### Emitters
-- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L80) with `{ name: 'account-disconnection', … }`
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
 
-### [`wcadmin_pfw_save_changes_button_click`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L18)
+### [`wcadmin_pfw_save_changes_button_click`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L19)
 Clicking on "… Save changes" button.
 #### Properties
 |   |   |   |
@@ -146,7 +146,7 @@ Clicking on "… Save changes" button.
 `track_conversions` | `boolean` | Indicates if Track Conversion option is checked
 `context` | `string` | The context in which the event is recorded
 #### Emitters
-- [`SaveSettingsButton`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L41) with `{ context: view, … }`
+- [`SaveSettingsButton`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L42) with `{ context: view, … }`
 
 ### [`wcadmin_pfw_setup`](assets/source/setup-guide/app/views/LandingPageApp.js#L28)
 Triggered on events during setup,
@@ -157,11 +157,11 @@ like starting, ending, or navigating between steps.
 `target` | `string` | Setup phase that the user navigates to.
 `trigger` | `string` | UI element that triggered the action, e.g. `wizard-stepper` or `get-started` button.
 #### Emitters
-- [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L53)
+- [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L54)
 	- with `{ target: 'complete', trigger: 'setup-tracking-complete' }` when "Complete setup" button is clicked.
 	- with `{ target: 'fetch-tags' | 'fetch-advertisers', trigger: 'setup-tracking-try-again' }` when "Try again" button is clicked.
 - [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L47) with `{ target: 'onboarding', trigger: 'get-started' }` when "Get started" button is clicked for incomplete setup.
-- [`WizardApp`](assets/source/setup-guide/app/views/WizardApp.js#L38)
+- [`WizardApp`](assets/source/setup-guide/app/views/WizardApp.js#L37)
 	- with `{ target: 'setup-account' | 'claim-website' | 'setup-tracking', trigger: 'wizard-stepper' }` when wizard's header step is clicked.
 	- with `{ target: 'claim-website' , trigger: 'setup-account-continue' }` when continue button is clicked.
 	- with `{ target: 'setup-tracking', trigger: 'claim-website-continue' }` when continue button is clicked.
