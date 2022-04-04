@@ -221,12 +221,14 @@ class Tracking {
 		$object_id = empty( $variation_id ) ? $product_id : $variation_id;
 		$product   = wc_get_product( $object_id );
 
+		$product_price = WC()->cart->display_prices_including_tax() ? wc_get_price_including_tax( $product ) : wc_get_price_excluding_tax( $product );
+
 		self::add_event(
 			'AddToCart',
 			array(
 				'product_id'     => $product->get_id(),
 				'product_name'   => $product->get_name(),
-				'value'          => ( $product->get_price() * $quantity ),
+				'value'          => ( $product_price * $quantity ),
 				'order_quantity' => $quantity,
 				'currency'       => get_woocommerce_currency(),
 			)
@@ -260,13 +262,15 @@ class Tracking {
 
 			$product = $order_item->get_product();
 
+			$product_price = WC()->cart->display_prices_including_tax() ? wc_get_price_including_tax( $product ) : wc_get_price_excluding_tax( $product );
+
 			$terms      = wc_get_object_terms( $product->get_id(), 'product_cat' );
 			$categories = ! empty( $terms ) ? wp_list_pluck( $terms, 'name' ) : array();
 
 			$order_items[] = array(
 				'product_id'       => $order_item->get_id(),
 				'product_name'     => $order_item->get_name(),
-				'product_price'    => $product->get_price(),
+				'product_price'    => $product_price,
 				'product_quantity' => $order_item->get_quantity(),
 				'product_category' => $categories,
 			);
@@ -367,7 +371,7 @@ class Tracking {
 			$data = array(
 				'product_id'    => $product->get_id(),
 				'product_name'  => $product->get_name(),
-				'product_price' => $product->get_price(),
+				'product_price' => wc_get_price_to_display( $product ),
 			);
 		}
 
