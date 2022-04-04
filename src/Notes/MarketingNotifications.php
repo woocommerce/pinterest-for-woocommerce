@@ -18,6 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * In the specification for the notes we have that the notification should
  * be sent some time after the plugin installation. There is no retroactive
  * way of figuring out when the plugin was first installed. So we count
+ *
  * @since x.x.x
  */
 class MarketingNotifications {
@@ -28,24 +29,17 @@ class MarketingNotifications {
 	// Timestamp option marking the moment we start to count time.
 	const INIT_TIMESTAMP = self::OPTIONS_PREFIX . '-init-timestamp';
 
-	// True if all marketing notices have been sent.
-	const COMPLETED = self::OPTIONS_PREFIX . 'completed';
-
 	// List of marketing notifications that we want to send.
 	const NOTES = array(
-	//	'EnableCatalogSync',
+		'EnableCatalogSync',
 		'CatalogSyncErrors',
-	//	'CompleteOnboardingAfterThreeDays',
-	//	'CompleteOnboardingReminderAfterSevenDays',
-	//	'CompleteOnboardingReminderAfterFourteenDays',
-	//	'CompleteOnboardingReminderAfterThirtyDays',
+		'CompleteOnboardingAfterThreeDays',
+		'CompleteOnboardingReminderAfterSevenDays',
+		'CompleteOnboardingReminderAfterFourteenDays',
+		'CompleteOnboardingReminderAfterThirtyDays',
 	);
 
 	public function init_notifications() {
-		// Check if we are not done.
-		if ( $this->is_completed() ) {
-			return;
-		}
 
 		foreach ( self::NOTES as $note ) {
 			$note = 'Automattic\WooCommerce\Pinterest\Notes\Collection\\' . $note ;
@@ -57,15 +51,6 @@ class MarketingNotifications {
 				->prepare_note()
 				->save();
 		}
-	}
-
-	/**
-	 * Check if notifications process is completed.
-	 *
-	 * @return boolean
-	 */
-	private function is_completed() {
-		return true === (bool) get_option( self::COMPLETED );
 	}
 
 	/**

@@ -8,9 +8,9 @@ use Automattic\WooCommerce\Pinterest\API\FeedIssues;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Throwable;
 
-class EnableCatalogSync extends AbstractNote {
+class CatalogSyncErrors extends AbstractNote {
 
-	const NOTE_NAME = 'enable-catalog-sync';
+	const NOTE_NAME = 'pinterest-catalog-sync-error';
 
 	public function should_be_added(): bool {
 		if ( ! Pinterest_For_Woocommerce()::is_setup_complete() ) {
@@ -21,7 +21,7 @@ class EnableCatalogSync extends AbstractNote {
 			return false;
 		}
 
-		if ( self::note_exists()) {
+		if ( self::note_exists() ) {
 			return false;
 		}
 
@@ -65,12 +65,12 @@ class EnableCatalogSync extends AbstractNote {
 
 
 	protected function get_note_title(): string {
-		return __( 'Notice: Your products aren’t synced on Pinterest', 'pinterest-for-woocommerce' );
+		return __( 'Review issues affecting your connection with Pinterest', 'pinterest-for-woocommerce' );
 	}
 
 	protected function get_note_content(): string
 	{
-		return __( 'Your Catalog sync with Pinterest has been disabled. Select “Enable Product Sync” to sync your products and reach shoppers on Pinterest.', 'pinterest-for-woocommerce' );
+		return __( 'Your product sync to Pinterest was unsuccessful. To complete your connection, Review and resolve issues in the extension.', 'pinterest-for-woocommerce' );
 	}
 
 	/**
@@ -78,9 +78,9 @@ class EnableCatalogSync extends AbstractNote {
 	 */
 	protected function add_action( $note ) {
 		$note->add_action(
-			'goto-pinterest-settings',
+			'goto-pinterest-catalog',
 			__( 'Complete setup', 'pinterest-for-woocommerce' ),
-			wc_admin_url( '&path=/pinterest/settings' )
+			wc_admin_url( '&path=/pinterest/catalog' )
 		);
 	}
 
