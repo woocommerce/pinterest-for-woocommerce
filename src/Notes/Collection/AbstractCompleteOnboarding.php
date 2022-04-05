@@ -1,11 +1,33 @@
 <?php
+/**
+ * Pinterest for WooCommerce Heartbeat class.
+ *
+ * @package Pinterest_For_WooCommerce/Classes/
+ * @version x.x.x
+ */
 
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
 
+use Automattic\WooCommerce\Admin\Notes\Note;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Class AbstractCompleteOnboarding.
+ *
+ * Base class for a set of onboarding reminders.
+ *
+ * @since x.x.x
+ */
 abstract class AbstractCompleteOnboarding extends AbstractNote {
 
+	/**
+	 * Should the note be added to the inbox.
+	 *
+	 * @since x.x.x
+	 * @return boolean
+	 */
 	public function should_be_added(): bool {
 		if ( Pinterest_For_Woocommerce()::is_setup_complete() ) {
 			return false;
@@ -29,7 +51,7 @@ abstract class AbstractCompleteOnboarding extends AbstractNote {
 
 		$orders_ids = wc_get_orders( $args );
 		if ( 5 > count( $orders_ids ) ) {
-		return false;
+			return false;
 		}
 
 		// All preconditions are met, we can send the note.
@@ -38,8 +60,11 @@ abstract class AbstractCompleteOnboarding extends AbstractNote {
 
 	/**
 	 * Add button to Pinterest For WooCommerce landing page
+	 *
+	 * @since x.x.x
+	 * @param Note $note Note to which we add an action.
 	 */
-	protected function add_action( $note ) {
+	protected function add_action( $note ): void {
 		$note->add_action(
 			'coupon-views',
 			__( 'Complete setup', 'pinterest-for-woocommerce' ),
