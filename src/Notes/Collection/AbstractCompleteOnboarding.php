@@ -11,7 +11,7 @@ abstract class AbstractCompleteOnboarding extends AbstractNote {
 			return false;
 		}
 
-		if ( self::note_exists()) {
+		if ( self::note_exists() ) {
 			return false;
 		}
 
@@ -28,9 +28,9 @@ abstract class AbstractCompleteOnboarding extends AbstractNote {
 		);
 
 		$orders_ids = wc_get_orders( $args );
-		// if ( 5 > count( $orders_ids ) ) {
-		// 	return false;
-		// }
+		if ( 5 > count( $orders_ids ) ) {
+		return false;
+		}
 
 		// All preconditions are met, we can send the note.
 		return true;

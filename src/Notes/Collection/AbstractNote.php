@@ -2,6 +2,7 @@
 declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
+
 use Automattic\WooCommerce\Admin\Notes\Note;
 use Automattic\WooCommerce\Admin\Notes\Notes;
 

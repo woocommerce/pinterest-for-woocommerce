@@ -25,10 +25,10 @@ class CatalogSyncErrors extends AbstractNote {
 			return false;
 		}
 
-		// // Are we there yet? We want to try three days after the account was connected.
-		// if ( time() < ( DAY_IN_SECONDS * 3 + Utilities\get_account_connection_timestamp() ) ) {
-		// 	return false;
-		// }
+		// Are we there yet? We want to try three days after the account was connected.
+		if ( time() < ( DAY_IN_SECONDS * 3 + Utilities\get_account_connection_timestamp() ) ) {
+		return false;
+		}
 
 		try {
 			$feed_id  = FeedRegistration::get_registered_feed_id();
@@ -51,7 +51,6 @@ class CatalogSyncErrors extends AbstractNote {
 					return true;
 					break;
 			}
-
 		} catch ( Throwable $th ) {
 			/*
 			 *	Whatever failed we don't care about it in this process.
@@ -68,8 +67,7 @@ class CatalogSyncErrors extends AbstractNote {
 		return __( 'Review issues affecting your connection with Pinterest', 'pinterest-for-woocommerce' );
 	}
 
-	protected function get_note_content(): string
-	{
+	protected function get_note_content(): string {
 		return __( 'Your product sync to Pinterest was unsuccessful. To complete your connection, Review and resolve issues in the extension.', 'pinterest-for-woocommerce' );
 	}
 

@@ -153,7 +153,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$this->define_constants();
 
-			// Load utilities manually. This is not a class so autoloader misses it
+			// Load utilities manually. This is not a class so autoloader misses it.
 			require_once 'src/Utilities/Utilities.php';
 
 			add_action( 'plugins_loaded', array( $this, 'init_plugin' ) );
@@ -260,7 +260,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
 
 			// Init marketing notifications.
-			add_action( Pinterest\Heartbeat::DAILY, array( $this, 'init_marketing_notifications') );
+			add_action( Pinterest\Heartbeat::DAILY, array( $this, 'init_marketing_notifications' ) );
 
 		}
 
@@ -298,8 +298,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since x.x.x
 		 */
-		public function init_marketing_notifications(){
-			$notifications =  new Pinterest\Notes\MarketingNotifications();
+		public function init_marketing_notifications() {
+			$notifications = new Pinterest\Notes\MarketingNotifications();
 			$notifications->init_notifications();
 		}
 

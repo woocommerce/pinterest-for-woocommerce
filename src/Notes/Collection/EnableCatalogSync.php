@@ -18,7 +18,7 @@ class EnableCatalogSync extends AbstractNote {
 			return false;
 		}
 
-		if ( self::note_exists()) {
+		if ( self::note_exists() ) {
 			return false;
 		}
 
@@ -36,8 +36,7 @@ class EnableCatalogSync extends AbstractNote {
 		return __( 'Notice: Your products aren’t synced on Pinterest', 'pinterest-for-woocommerce' );
 	}
 
-	protected function get_note_content(): string
-	{
+	protected function get_note_content(): string {
 		return __( 'Your Catalog sync with Pinterest has been disabled. Select “Enable Product Sync” to sync your products and reach shoppers on Pinterest.', 'pinterest-for-woocommerce' );
 	}
 

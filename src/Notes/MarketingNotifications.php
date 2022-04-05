@@ -42,7 +42,7 @@ class MarketingNotifications {
 	public function init_notifications() {
 
 		foreach ( self::NOTES as $note ) {
-			$note = 'Automattic\WooCommerce\Pinterest\Notes\Collection\\' . $note ;
+			$note         = 'Automattic\WooCommerce\Pinterest\Notes\Collection\\' . $note;
 			$notification = new $note();
 			if ( ! $notification->should_be_added() ) {
 				continue;
