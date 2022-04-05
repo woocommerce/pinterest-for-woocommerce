@@ -19,6 +19,7 @@ const PINTEREST_ACCOUNT_CONNECTION_TIMESTAMP = PINTEREST_FOR_WOOCOMMERCE_PREFIX 
  *
  * @since x.x.x
  * @throws Error Wrong value provided for the timestamp.
+ * @param int $timestamp Timestamp to set as the account connection moment.
  * @return int
  */
 function set_account_connection_timestamp( $timestamp = null ): int {
