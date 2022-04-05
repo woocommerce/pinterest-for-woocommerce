@@ -1,14 +1,34 @@
 <?php
+/**
+ * Pinterest for WooCommerce EnableCatalogSync class.
+ *
+ * @package Pinterest_For_WooCommerce/Classes/
+ * @version x.x.x
+ */
 
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
 
 use Automattic\WooCommerce\Pinterest\ProductSync;
 use Automattic\WooCommerce\Pinterest\Utilities;
 
+/**
+ * Class EnableCatalogSync.
+ *
+ * Class responsible for admin Inbox notification after successful connection but
+ * the sync feature disabled.
+ *
+ * @since x.x.x
+ */
 class EnableCatalogSync extends AbstractNote {
 
-	const NOTE_NAME = 'enable-catalog-sync';
+	const NOTE_NAME = 'pinterest-enable-catalog-sync';
 
+	/**
+	 * Should the note be added to the inbox.
+	 *
+	 * @since x.x.x
+	 * @return boolean
+	 */
 	public function should_be_added(): bool {
 		if ( ! Pinterest_For_Woocommerce()::is_setup_complete() ) {
 			return false;
@@ -31,19 +51,33 @@ class EnableCatalogSync extends AbstractNote {
 		return true;
 	}
 
-
+	/**
+	 * Get note title.
+	 *
+	 * @since x.x.x
+	 * @return string Note title.
+	 */
 	protected function get_note_title(): string {
 		return __( 'Notice: Your products aren’t synced on Pinterest', 'pinterest-for-woocommerce' );
 	}
 
+	/**
+	 * Get note content.
+	 *
+	 * @since x.x.x
+	 * @return string Note content.
+	 */
 	protected function get_note_content(): string {
 		return __( 'Your Catalog sync with Pinterest has been disabled. Select “Enable Product Sync” to sync your products and reach shoppers on Pinterest.', 'pinterest-for-woocommerce' );
 	}
 
 	/**
 	 * Add button to Pinterest For WooCommerce landing page
+	 *
+	 * @since x.x.x
+	 * @param Note $note Note to which we add an action.
 	 */
-	protected function add_action( $note ) {
+	protected function add_action( $note ): void {
 		$note->add_action(
 			'goto-pinterest-settings',
 			__( 'Review issues', 'pinterest-for-woocommerce' ),
