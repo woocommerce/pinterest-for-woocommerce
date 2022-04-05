@@ -148,9 +148,6 @@ class Merchants {
 			throw new Exception( __( 'Response error when trying create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
-		// Clean merchants error code.
-		Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', false );
-
 		$registered_feed = Feeds::is_local_feed_registered( $response['data'] );
 
 		// Update the registered feed id setting.

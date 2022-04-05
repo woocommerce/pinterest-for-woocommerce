@@ -262,6 +262,9 @@ class ProductSync {
 	 */
 	public static function handle_feed_registration() {
 
+		// Clean merchants error code.
+		Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', false );
+
 		if ( ! self::feed_file_exists() ) {
 			self::log( 'Feed didn\'t fully generate yet. Retrying later.', 'debug' );
 			// Feed is not generated yet, lets wait a bit longer.
