@@ -418,7 +418,8 @@ class Base {
 			"advertisers/{$advertiser_id}/conversion_tags",
 			'POST',
 			array(
-				'name' => $tag_name,
+				'name'        => $tag_name,
+				'aem_enabled' => (bool) Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ),
 			),
 			'ads'
 		);
