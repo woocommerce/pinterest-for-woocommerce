@@ -84,11 +84,11 @@ class ProductsXmlFeed {
 	/**
 	 * Returns the Item's XML for the given product.
 	 *
-	 * @param WC_Product $product  The product to print the XML for.
-	 *
-	 * @return string XML string
+	 * @param  WC_Product $product  The product to print the XML for.
+	 * @param  string     $location The location to print the XML for.
+	 * @return string     XML string.
 	 */
-	public static function get_xml_item( $product ) {
+	public static function get_xml_item( $product, $location ) {
 
 		if ( ! self::is_product_fit_for_feed( $product ) ) {
 			return '';
@@ -96,6 +96,13 @@ class ProductsXmlFeed {
 
 		$xml = "\t\t<item>" . PHP_EOL;
 
+		/**
+		 * Filter that controls the attributes that will be added to the product XML file.
+		 *
+		 * @since 0.5.0
+		 * @param array      XML fields to add.
+		 * @param WC_Product Product for which the XML is being generated.
+		 */
 		foreach ( apply_filters( 'pinterest_for_woocommerce_feed_item_structure', self::$feed_item_structure, $product ) as $attribute ) {
 			$method_name = 'get_property_' . str_replace( ':', '_', $attribute );
 			if ( method_exists( __CLASS__, $method_name ) ) {
@@ -108,6 +115,13 @@ class ProductsXmlFeed {
 
 		$xml .= "\t\t</item>" . PHP_EOL;
 
+		/**
+		 * Filter XML output for product
+		 *
+		 * @since 1.0.10
+		 * @param string     XML content.
+		 * @param WC_Product Product for which the XML is being generated.
+		 */
 		return apply_filters( 'pinterest_for_woocommerce_feed_item_xml', $xml, $product );
 	}
 
@@ -155,7 +169,7 @@ class ProductsXmlFeed {
 
 		foreach ( $attributes as $name => $value ) {
 			$property = "g:{$name}";
-			$value    = esc_html( $value );
+			$value    = esc_xml( $value );
 			$xml     .= "{$indent}<{$property}>{$value}</{$property}>" . PHP_EOL;
 		}
 
@@ -201,7 +215,8 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_title( $product, $property ) {
-		return '<' . $property . '><![CDATA[' . wp_strip_all_tags( $product->get_name() ) . ']]></' . $property . '>';
+		$title = wp_strip_all_tags( $product->get_name() );
+		return "<$property>" . self::sanitize( '<![CDATA[' . $title . ']]>' ) . "</$property>";
 	}
 
 	/**
@@ -252,7 +267,7 @@ class ProductsXmlFeed {
 		}
 		$description = substr( $description, 0, self::DESCRIPTION_SIZE_CHARS_LIMIT );
 
-		return '<' . $property . '><![CDATA[' . $description . ']]></' . $property . '>';
+		return "<$property>" . self::sanitize( '<![CDATA[' . $description . ']]>' ) . "</$property>";
 	}
 
 	/**
@@ -266,7 +281,10 @@ class ProductsXmlFeed {
 	private static function get_property_g_product_type( $product, $property ) {
 
 		$id         = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
-		$taxonomies = self::get_taxonomies( $id );
+		$taxonomies = array_map(
+			'self::sanitize',
+			self::get_taxonomies( $id )
+		);
 
 		if ( empty( $taxonomies ) ) {
 			return;
@@ -396,7 +414,7 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_g_mpn( $product, $property ) {
-		return '<' . $property . '>' . esc_xml( $product->get_sku() ) . '</' . $property . '>';
+		return '<' . $property . '>' . self::sanitize( $product->get_sku() ) . '</' . $property . '>';
 	}
 
 
@@ -459,11 +477,12 @@ class ProductsXmlFeed {
 		 *	</g:shipping>
 		 */
 		foreach ( $shipping_info as $info ) {
+			$shipping_name    = self::sanitize( $info['name'] );
 			$shipping_nodes[] =
 				'<g:shipping>' . PHP_EOL .
 					"\t\t\t\t<g:country>$info[country]</g:country>" . PHP_EOL .
 					( $info['state'] ? "\t\t\t\t<g:region>$info[state]</g:region>" . PHP_EOL : '' ) .
-					"\t\t\t\t<g:service>$info[name]</g:service>" . PHP_EOL .
+					"\t\t\t\t<g:service>$shipping_name</g:service>" . PHP_EOL .
 					"\t\t\t\t<g:price>$info[cost] $currency</g:price>" . PHP_EOL .
 				"\t\t\t</g:shipping>";
 		}
@@ -538,5 +557,33 @@ class ProductsXmlFeed {
 		}
 
 		return $price;
+	}
+
+	/**
+	 * Sanitize XML.
+	 * After this method the string should be a valid XML string to fit inside
+	 * a XML tag directly. If a CDATA markup is used it also needs to be passed
+	 * along the string.
+	 *
+	 * This operation consist of two steps:
+	 *
+	 * 1. First a standardized esc_xml WordPress method is used.
+	 *    This escapes XML control characters inside the text block.
+	 *
+	 * 2. Remove all UTF-8 characters that are not part of the XML specification.
+	 *    We search the whole string and remove the not-allowed chars. Since XML
+	 *    does not understand them removing is the only operation that we can do
+	 *    that will produce a valid XML.
+	 *    For information about allowed UTF-8 characters please go to
+	 *    https://www.w3.org/TR/xml/ documentation, section charsets.
+	 *
+	 * @since 1.0.9
+	 * @param string $xml_fragment XML fragment for sanitization.
+	 * @return string               Sanitized XML fragment.
+	 */
+	private static function sanitize( $xml_fragment ) {
+		return esc_xml(
+			preg_replace( '/[^\x{9}\x{A}\x{D}\x{20}-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]/u', ' ', $xml_fragment )
+		);
 	}
 }

@@ -112,7 +112,7 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 
 	/**
 	 * Test main update flow.
-	 * perform_plugin_updates does not throw.
+	 * perform_plugin_update_procedure does not throw.
 	 *
 	 * @group update
 	 * @return void
@@ -120,10 +120,10 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 	public function testUpdateFlowNoThrow() {
 
 		$mock_plugin_update = $this->getMockBuilder( PluginUpdate::class )
-			->setMethods( ['perform_plugin_updates'] )
+			->setMethods( ['perform_plugin_update_procedure'] )
 			->getMock();
 
-		$mock_plugin_update->method('perform_plugin_updates')
+		$mock_plugin_update->method('perform_plugin_update_procedure')
 			->willReturn( null );
 
 		$mock_plugin_update->maybe_update();
@@ -136,7 +136,7 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 
 	/**
 	 * Test main update flow.
-	 * perform_plugin_updates does not throw.
+	 * perform_plugin_update_procedure does not throw.
 	 *
 	 * @group update
 	 * @return void
@@ -144,11 +144,11 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 	public function testUpdateFlowWithThrow() {
 
 		$mock_plugin_update = $this->getMockBuilder( PluginUpdate::class )
-			->setMethods( ['perform_plugin_updates'] )
+			->setMethods( ['domain_verification_migration'] )
 			->getMock();
 
 		$ex = new Exception( 'Veni, vidi, error!' );
-		$mock_plugin_update->method( 'perform_plugin_updates' )
+		$mock_plugin_update->method( 'domain_verification_migration' )
 			->willThrowException( $ex );
 
 		$mock_plugin_update->maybe_update();
@@ -175,10 +175,10 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 	public function testAfterUpdateTheUpdateIsNotExecutedAgain() {
 
 		$mock_plugin_update = $this->getMockBuilder( PluginUpdate::class )
-			->setMethods( ['perform_plugin_updates'] )
+			->setMethods( ['perform_plugin_update_procedure'] )
 			->getMock();
 
-		$mock_plugin_update->method('perform_plugin_updates')
+		$mock_plugin_update->method('perform_plugin_update_procedure')
 			->willReturn( null );
 
 		$mock_plugin_update->maybe_update();

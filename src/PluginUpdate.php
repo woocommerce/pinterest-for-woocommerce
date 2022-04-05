@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+
 use Exception;
 use Throwable;
 /**
@@ -32,7 +33,7 @@ class PluginUpdate {
 	/**
 	 * Check if the plugin is up to date.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @return boolean
 	 */
 	public function plugin_is_up_to_date(): bool {
@@ -46,7 +47,7 @@ class PluginUpdate {
 	/**
 	 * Helper function to check if update to $version is needed.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @param string $version Version string for which we check if update is needed.
 	 * @return boolean
 	 */
@@ -63,7 +64,7 @@ class PluginUpdate {
 	 * happened. After the update procedure this will return the same version
 	 * as get_plugin_current_version().
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @return string
 	 */
 	private function get_plugin_update_version(): string {
@@ -73,7 +74,7 @@ class PluginUpdate {
 	/**
 	 * Returns the version of the plugin as defined in the main plugin file.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @return string
 	 */
 	private function get_plugin_current_version(): string {
@@ -84,7 +85,7 @@ class PluginUpdate {
 	 * After the update has been completed bump the previous version option to
 	 * the current version option.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @return void
 	 */
 	public function update_plugin_update_version_option(): void {
@@ -95,9 +96,22 @@ class PluginUpdate {
 	}
 
 	/**
+	 * List of update procedures
+	 *
+	 * @since 1.0.10
+	 * @return array List of update procedures names.
+	 */
+	private function update_procedures() {
+		return array(
+			'domain_verification_migration',
+			'feed_generation_migration',
+		);
+	}
+
+	/**
 	 * Update procedures entry point.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @return void
 	 */
 	public function maybe_update(): void {
@@ -107,20 +121,9 @@ class PluginUpdate {
 			return;
 		}
 
-		try {
-			$this->perform_plugin_updates();
-		} catch ( Throwable $th ) {
-			Logger::log(
-				sprintf(
-					// translators: 1: plugin version, 2: error message.
-					__( 'Plugin update to version %1$s error: %2$s', 'pinterest-for-woocommerce' ),
-					$this->get_plugin_current_version(),
-					$th->getMessage()
-				),
-				'error',
-				null,
-				true
-			);
+		// Run the update procedures.
+		foreach ( $this->update_procedures() as $update_procedure ) {
+			$this->perform_plugin_update_procedure( $update_procedure );
 		}
 
 		/**
@@ -142,24 +145,40 @@ class PluginUpdate {
 	}
 
 	/**
-	 * Perform update procedures.
+	 * Perform update procedure.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
+	 * @since 1.0.10 Accepts procedure name as parameter.
+	 * @param  string $update_procedure Name of the migration procedure.
 	 * @throws Throwable Update procedure failures.
 	 * @return void
 	 */
-	protected function perform_plugin_updates(): void {
-		$this->update_to_1_0_9();
+	protected function perform_plugin_update_procedure( $update_procedure ): void {
+		try {
+			$this->{$update_procedure}();
+		} catch ( Throwable $th ) {
+			Logger::log(
+				sprintf(
+					// translators: 1: plugin version, 2: error message.
+					__( 'Plugin update to version %1$s error: %2$s', 'pinterest-for-woocommerce' ),
+					$this->get_plugin_current_version(),
+					$th->getMessage()
+				),
+				'error',
+				null,
+				true
+			);
+		}
 	}
 
 	/**
 	 * Update procedure for the 1.0.9 version of the plugin.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.9
 	 * @throws Exception Verification error.
 	 * @return void
 	 */
-	private function update_to_1_0_9(): void {
+	protected function domain_verification_migration(): void {
 		if ( ! $this->version_needs_update( '1.0.9' ) ) {
 			// Already up to date.
 			return;
@@ -178,5 +197,73 @@ class PluginUpdate {
 		if ( is_wp_error( $response ) ) {
 			throw new Exception( $response->get_error_message() );
 		}
+	}
+
+	/**
+	 * New style feed generator migration procedure.
+	 *
+	 * @return void
+	 */
+	protected function feed_generation_migration(): void {
+		if ( ! $this->version_needs_update( '1.0.10' ) ) {
+			// Already up to date.
+			return;
+		}
+
+		/*
+		 * 1. Cancel old actions.
+		 */
+		as_unschedule_all_actions( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-handle-sync', array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_unschedule_all_actions( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-feed-generation', array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+
+		/*
+		 * 2. Move feed file id to a new location.
+		 */
+		$feed_id = Pinterest_For_Woocommerce()::get_data( 'local_feed_id' );
+		if ( null !== $feed_id ) {
+			/*
+			 * 2-a. Move location id to array of ids.
+			 */
+			$feed_ids = array(
+				Pinterest_For_Woocommerce()::get_base_country() ?? 'US' => $feed_id,
+			);
+			Pinterest_For_Woocommerce()::save_data( 'local_feed_ids', $feed_ids );
+
+			/*
+			 * 2-b. Move state.
+			 */
+			$data_prefix = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_' . $feed_id . '_';
+
+			$old_state = array(
+				'status'        => get_transient( $data_prefix . 'status' ),
+				'current_index' => get_transient( $data_prefix . 'current_index' ),
+				'last_activity' => get_transient( $data_prefix . 'last_activity' ),
+				'product_count' => get_transient( $data_prefix . 'product_count' ),
+				'error_message' => get_transient( $data_prefix . 'error_message' ),
+			);
+
+			foreach ( $old_state as $key => $value ) {
+				delete_transient( $data_prefix . $key );
+			}
+
+			unset( $old_state['product_count'] );
+
+			ProductFeedStatus::set( $old_state );
+
+			/*
+			 * 2-c. PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_dataset_' transient will be removed after WEEK_IN_SECONDS.
+			 */
+		}
+
+		/*
+		 * 3. Clear data.
+		 */
+		$settings = Pinterest_For_Woocommerce()::get_settings( true, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+
+		unset( $settings['local_feed_id'] );
+
+		Pinterest_For_Woocommerce()::save_settings( $settings, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+
+		// Update done.
 	}
 }

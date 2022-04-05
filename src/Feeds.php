@@ -118,14 +118,14 @@ class Feeds {
 	 * @return string Returns the ID of the feed if properly registered or an empty string otherwise.
 	 */
 	public static function is_local_feed_registered( $merchant_id ) {
-
-		$local_feed = ProductFeedStatus::get_local_feed();
+		$configs = LocalFeedConfigs::get_instance()->get_configurations();
+		$config  = reset( $configs );
 
 		// We need to fetch the feed object using the local feed location.
-		$feed = self::get_merchant_feed_by_location( $merchant_id, $local_feed['feed_url'] );
+		$feed = self::get_merchant_feed_by_location( $merchant_id, $config['feed_url'] );
 
 		$configured_path = dirname( $feed->location_config->full_feed_fetch_location );
-		$local_path      = dirname( $local_feed['feed_url'] );
+		$local_path      = dirname( $config['feed_url'] );
 		$local_country   = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
 		$local_locale    = str_replace( '_', '-', determine_locale() );
 

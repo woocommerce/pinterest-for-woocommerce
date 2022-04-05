@@ -9,6 +9,7 @@
 namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Pinterest\FeedRegistration;
 
 use \WP_REST_Server;
 use \WP_REST_Request;
@@ -56,7 +57,7 @@ class FeedIssues extends VendorAPI {
 	public function get_feed_issues( WP_REST_Request $request ) {
 
 		try {
-			$feed_id = Pinterest\ProductSync::get_registered_feed_id();
+			$feed_id = FeedRegistration::get_registered_feed_id();
 			if ( ! Pinterest\ProductSync::is_product_sync_enabled() || ! $feed_id ) {
 				return array( 'lines' => array() );
 			}
@@ -301,4 +302,12 @@ class FeedIssues extends VendorAPI {
 
 		return $workflow;
 	}
+
+	/**
+	 * Cleanup feed cached data.
+	 */
+	public static function deregister() {
+		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', false );
+	}
+
 }

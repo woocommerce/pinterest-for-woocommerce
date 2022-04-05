@@ -43,6 +43,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 				'IT', // Italy.
 				'LU', // Luxembourg.
 				'MT', // Malta.
+				'MX', // Mexico.
 				'NL', // Netherlands.
 				'NZ', // New Zealand.
 				'NO', // Norway.
