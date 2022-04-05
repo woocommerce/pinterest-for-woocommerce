@@ -28,11 +28,15 @@ class Heartbeat {
 	const DAILY = 'pinterest_for_woocommerce_daily_heartbeat';
 
 	/**
+	 * Cron name string.
+	 *
 	 * @var string
 	 */
 	protected $daily_cron_name = 'pinterest_for_woocommerce_daily_heartbeat_cron';
 
 	/**
+	 * WooCommerce Queue Interface.
+	 *
 	 * @var WC_Queue_Interface
 	 */
 	protected $queue;
