@@ -412,13 +412,15 @@ class Base {
 	 */
 	public static function create_tag( $advertiser_id ) {
 
-		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
+		$tag_name    = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
+		$aem_enabled = boolval( Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) );
 
 		return self::make_request(
 			"advertisers/{$advertiser_id}/conversion_tags",
 			'POST',
 			array(
-				'name' => $tag_name,
+				'name'        => $tag_name,
+				'aem_enabled' => $aem_enabled,
 			),
 			'ads'
 		);
