@@ -1,6 +1,6 @@
 <?php
 /**
- * Pinterest for WooCommerce CompleteOnboardingAfterThreeDaysclass.
+ * Pinterest for WooCommerce CompleteOnboardingAfterThreeDays class.
  *
  * @package Pinterest_For_WooCommerce/Classes/
  * @version x.x.x
@@ -31,7 +31,6 @@ class CompleteOnboardingAfterThreeDays extends AbstractCompleteOnboarding {
 	protected function get_note_title(): string {
 		return __( 'Reach more shoppers by connecting with Pinterest', 'pinterest-for-woocommerce' );
 	}
-
 
 	/**
 	 * Get note content.
