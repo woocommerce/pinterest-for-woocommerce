@@ -79,6 +79,4 @@ class MarketingNotifications {
 		return $timestamp;
 	}
 
-
-
 }
