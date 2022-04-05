@@ -1,6 +1,6 @@
 <?php
 /**
- * Pinterest for WooCommerce Heartbeat class.
+ * Pinterest for WooCommerce Abstract Marketing Note class.
  *
  * @package Pinterest_For_WooCommerce/Classes/
  * @version x.x.x

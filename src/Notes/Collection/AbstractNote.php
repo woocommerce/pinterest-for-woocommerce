@@ -139,8 +139,6 @@ abstract class AbstractNote {
 	 */
 	abstract protected function get_note_content(): string;
 
-
-
 	/**
 	 * Check whether the note should be added.
 	 *
