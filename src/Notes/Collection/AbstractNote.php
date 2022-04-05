@@ -1,4 +1,11 @@
 <?php
+/**
+ * Pinterest for WooCommerce Abstract Note.
+ *
+ * @package Pinterest_For_WooCommerce/Classes/
+ * @version x.x.x
+ */
+
 declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
@@ -6,14 +13,13 @@ namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
 use Automattic\WooCommerce\Admin\Notes\Note;
 use Automattic\WooCommerce\Admin\Notes\Notes;
 
-
-use WC_Data_Store;
 use stdClass;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * AbstractNote class.
+ * AbstractNote class. This is a proxy that helps us using the WC Admin Note
+ * class in the context of Pinterest For WooCommerce plugin.
  *
  * @since x.x.x
  *
@@ -33,11 +39,9 @@ abstract class AbstractNote {
 	}
 
 	/**
-	 * NOTE_NAME const needs to be defined in subclass.
-	 */
-
-	/**
 	 * Get the note entry.
+	 *
+	 * @since x.x.x
 	 */
 	public function prepare_note() {
 		$note = new Note();
@@ -46,11 +50,14 @@ abstract class AbstractNote {
 	}
 
 	/**
-	 * @param NoteEntry $note
+	 * Use helper functions to prepare the note.
+	 *
+	 * @since x.x.x
+	 * @param Note $note The note that we are setting up.
 	 *
 	 * @return void
 	 */
-	protected function fill_in_note_details( Note $note ): void {
+	protected function fill_in_note_details( $note ): void {
 		$note->set_title( $this->get_note_title() );
 		$note->set_content( $this->get_note_content() );
 		$note->set_content_data( new stdClass() );
@@ -64,14 +71,17 @@ abstract class AbstractNote {
 
 	/**
 	 * Get note type.
+	 *
+	 * @since x.x.x
 	 */
-	protected function get_type() {
+	protected function get_type(): string {
 		return Note::E_WC_ADMIN_NOTE_INFORMATIONAL;
 	}
 
 	/**
 	 * Get the note's unique name.
 	 *
+	 * @since x.x.x
 	 * @return string
 	 */
 	protected function get_name(): string {
@@ -79,7 +89,9 @@ abstract class AbstractNote {
 	}
 
 	/**
-	 * Get note layout.
+	 * Get note layout style.
+	 *
+	 * @since x.x.x
 	 */
 	protected function get_layout() {
 		return 'plain';
@@ -87,6 +99,8 @@ abstract class AbstractNote {
 
 	/**
 	 * Get note image.
+	 *
+	 * @since x.x.x
 	 */
 	protected function get_image() {
 		return '';
@@ -94,25 +108,34 @@ abstract class AbstractNote {
 
 	/**
 	 * Add action to note if necessary.
+	 *
+	 * @since x.x.x
+	 * @param Note $note Note to which we want to add an action.
 	 */
-	protected function add_action( $note ) {
+	protected function add_action( $note ): void {
 		return;
 	}
 
 	/**
 	 * Get note slug;
+	 *
+	 * @since x.x.x
 	 */
-	private function get_slug() {
+	private function get_slug(): string {
 		return PINTEREST_FOR_WOOCOMMERCE_PREFIX;
 	}
 
 	/**
 	 * Get note title.
+	 *
+	 * @since x.x.x
 	 */
 	abstract protected function get_note_title(): string;
 
 	/**
 	 * Get note content.
+	 *
+	 * @since x.x.x
 	 */
 	abstract protected function get_note_content(): string;
 
@@ -120,6 +143,8 @@ abstract class AbstractNote {
 
 	/**
 	 * Check whether the note should be added.
+	 *
+	 * @since x.x.x
 	 */
 	abstract public function should_be_added(): bool;
 
