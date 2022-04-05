@@ -39,7 +39,13 @@ class MarketingNotifications {
 		'CompleteOnboardingReminderAfterThirtyDays',
 	);
 
-	public function init_notifications() {
+	/**
+	 * Trigger inbox messages.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	public function init_notifications(): void {
 
 		foreach ( self::NOTES as $note ) {
 			$note         = 'Automattic\WooCommerce\Pinterest\Notes\Collection\\' . $note;
