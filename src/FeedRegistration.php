@@ -78,6 +78,9 @@ class FeedRegistration {
 	 */
 	public function handle_feed_registration() {
 
+		// Clean merchants error code.
+		Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', false );
+
 		if ( ! self::feed_file_exists() ) {
 			self::log( 'Feed didn\'t fully generate yet. Retrying later.', 'debug' );
 			// Feed is not generated yet, lets wait a bit longer.
@@ -92,6 +95,11 @@ class FeedRegistration {
 			throw new Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
 
 		} catch ( Throwable $th ) {
+			if ( 4163 === $th->get_pinterest_code() ) {
+				// Save the error to read it during the Health Check.
+				Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', true );
+			}
+
 			self::log( $th->getMessage(), 'error' );
 			return false;
 		}
