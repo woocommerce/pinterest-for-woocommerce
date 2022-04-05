@@ -426,6 +426,30 @@ class Base {
 		);
 	}
 
+	/**
+	 * Update an existing tag.
+	 *
+	 * @param string $tag_id The tag_id to update.
+	 * @param array  $params Tag parameters to update.
+	 *
+	 * @return mixed
+	 */
+	public static function update_tag( $tag_id, $params = array() ) {
+		$advertiser_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser', null );
+
+		if ( ! $advertiser_id || empty( $params ) ) {
+			return false;
+		}
+
+		$params['id'] = (string) $tag_id;
+
+		return self::make_request(
+			"advertisers/{$advertiser_id}/conversion_tags",
+			'PATCH',
+			$params,
+			'ads'
+		);
+	}
 
 	/**
 	 * Update the tags configuration.
