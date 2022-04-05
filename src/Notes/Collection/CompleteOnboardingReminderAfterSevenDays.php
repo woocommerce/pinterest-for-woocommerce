@@ -13,13 +13,14 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Class CompleteOnboardingAfterSevenDays.
  *
- * Class responsible for admin Inbox notification after three days from setup.
+ * Class responsible for admin Inbox notification after seven days from setup.
  *
  * @since x.x.x
  */
 class CompleteOnboardingReminderAfterSevenDays extends AbstractCompleteOnboarding {
 
 	const DELAY = 7;
+	const NOTE_NAME = 'pinterest-complete-onboarding-note-after-' . self::DELAY . '-days';
 
 	/**
 	 * Get note title.

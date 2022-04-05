@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 class CompleteOnboardingAfterThreeDays extends AbstractCompleteOnboarding {
 
 	const DELAY     = 0;
-	const NOTE_NAME = 'complete-onboarding-note-after-' . self::DELAY . '-days';
+	const NOTE_NAME = 'pinterest-complete-onboarding-note-after-' . self::DELAY . '-days';
 
 	/**
 	 * Get note title.
