@@ -383,6 +383,7 @@ JS;
 				'product_id'    => $product->get_id(),
 				'product_name'  => $product->get_name(),
 				'product_price' => $product->get_price(),
+				'currency'      => get_woocommerce_currency(),
 			);
 		}
 
