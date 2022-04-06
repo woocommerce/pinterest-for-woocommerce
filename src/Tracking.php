@@ -268,7 +268,7 @@ class Tracking {
 			$categories = ! empty( $terms ) ? wp_list_pluck( $terms, 'name' ) : array();
 
 			$order_items[] = array(
-				'product_id'       => $order_item->get_id(),
+				'product_id'       => $product->get_id(),
 				'product_name'     => $order_item->get_name(),
 				'product_price'    => $product_price,
 				'product_quantity' => $order_item->get_quantity(),
