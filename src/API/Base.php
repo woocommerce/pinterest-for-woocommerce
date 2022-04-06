@@ -100,7 +100,7 @@ class Base {
 				'args'   => $payload,
 			);
 
-			if ( 'ads/' === $api && in_array( $method, array( 'POST', 'PATCH', true ) ) ) {
+			if ( 'ads/' === $api && in_array( $method, array( 'POST', 'PATCH' ), true ) ) {
 				// Force json content-type header and json encode payload.
 				$request['headers']['Content-Type'] = 'application/json';
 
