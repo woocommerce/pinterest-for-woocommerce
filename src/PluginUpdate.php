@@ -105,6 +105,7 @@ class PluginUpdate {
 		return array(
 			'domain_verification_migration',
 			'feed_generation_migration',
+			'enable_enhanced_match',
 		);
 	}
 
@@ -265,5 +266,32 @@ class PluginUpdate {
 		Pinterest_For_Woocommerce()::save_settings( $settings, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 
 		// Update done.
+	}
+
+	/**
+	 * Enable enhanced match for tags which have already been created.
+	 *
+	 * @return void
+	 */
+	protected function enable_enhanced_match(): void {
+		if ( ! $this->version_needs_update( '1.0.11' ) ) {
+			// Already up to date.
+			return;
+		}
+
+		$aem_enabled  = (bool) Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support', null );
+		$tracking_tag = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag', null );
+
+		// Only update if the setting is enabled and we have a connected tag.
+		if ( ! $aem_enabled || ! $tracking_tag ) {
+			return;
+		}
+
+		API\Base::update_tag(
+			$tracking_tag,
+			array(
+				'aem_enabled' => true,
+			)
+		);
 	}
 }
