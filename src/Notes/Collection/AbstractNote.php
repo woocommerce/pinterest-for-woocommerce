@@ -22,8 +22,6 @@ defined( 'ABSPATH' ) || exit;
  * class in the context of Pinterest For WooCommerce plugin.
  *
  * @since x.x.x
- *
- * @package Automattic\WooCommerce\GoogleListingsAndAds\Notes
  */
 abstract class AbstractNote {
 

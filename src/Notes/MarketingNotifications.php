@@ -5,12 +5,11 @@
  * @package Pinterest_For_WooCommerce/Classes/
  * @since   x.x.x
  */
+declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Notes;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Class responsible for displaying inbox notifications for the merchant.
