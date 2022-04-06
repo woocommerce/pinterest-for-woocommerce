@@ -40,6 +40,7 @@ abstract class AbstractNote {
 	 * Get the note entry.
 	 *
 	 * @since x.x.x
+	 * @return Note Pre-filled note.
 	 */
 	public function prepare_note() {
 		$note = new Note();
