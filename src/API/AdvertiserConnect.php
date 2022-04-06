@@ -101,7 +101,7 @@ class AdvertiserConnect extends VendorAPI {
 		Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', true );
 
 		/*
-		 * This is the step of the connection process. We can use this moment to
+		 * This is the last step of the connection process. We can use this moment to
 		 * track when the connection to the account was made.
 		 */
 		Utilities\set_account_connection_timestamp();
