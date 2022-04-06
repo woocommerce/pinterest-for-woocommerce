@@ -282,8 +282,8 @@ class PluginUpdate {
 		$aem_enabled  = (bool) Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support', null );
 		$tracking_tag = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag', null );
 
-		// Only update if the setting is enabled and we have a connected tag.
-		if ( ! $aem_enabled || ! $tracking_tag ) {
+		// Update the setting if we have a connected tag.
+		if ( ! $tracking_tag ) {
 			return;
 		}
 
@@ -291,7 +291,7 @@ class PluginUpdate {
 			API\Base::update_tag(
 				$tracking_tag,
 				array(
-					'aem_enabled' => true,
+					'aem_enabled' => $aem_enabled,
 				)
 			);
 		} catch ( Exception $th ) {
