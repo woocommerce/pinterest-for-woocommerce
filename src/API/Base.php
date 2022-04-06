@@ -13,7 +13,6 @@ use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
 use \Exception;
-use Pinterest_For_Woocommerce;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -435,7 +434,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function update_tag( $tag_id, $params = array() ) {
-		$advertiser_id = Pinterest_For_Woocommerce::get_setting( 'tracking_advertiser' );
+		$advertiser_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
 
 		if ( ! $advertiser_id || empty( $params ) ) {
 			return false;
