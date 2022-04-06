@@ -170,6 +170,7 @@ class Settings {
 		}
 
 		self::maybe_disconnect_advertiser( $old_value, $new_value );
+		self::maybe_update_tag( $old_value, $new_value );
 	}
 
 	/**
@@ -199,6 +200,40 @@ class Settings {
 
 				Logger::log( esc_html__( 'There was an error disconnecting the Advertiser. Please try again.', 'pinterest-for-woocommerce' ) );
 			}
+		}
+	}
+
+	/**
+	 * Disconnect advertiser from the platform if advertiser or tag change.
+	 * Only update if tag is being enabled.
+	 *
+	 * @param array $old_value The old value of the option.
+	 * @param array $new_value The new value of the option.
+	 */
+	private static function maybe_update_tag( $old_value, $new_value ) {
+		$connected_tag = self::get_setting( 'tracking_tag' );
+
+		if (
+			! $connected_tag ||
+			! isset( $new_value['enhanced_match_support'] ) ||
+			! $new_value['enhanced_match_support'] ||
+			(
+				isset( $old_value['enhanced_match_support'] ) &&
+				$new_value['enhanced_match_support'] === $old_value['enhanced_match_support']
+			)
+		) {
+			return;
+		}
+
+		try {
+			API\Base::update_tag(
+				$connected_tag,
+				array(
+					'aem_enabled' => true,
+				)
+			);
+		} catch ( \Exception $th ) {
+			Logger::log( esc_html__( 'There was an error updating the tag.', 'pinterest-for-woocommerce' ) );
 		}
 	}
 
