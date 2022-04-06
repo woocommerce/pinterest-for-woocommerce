@@ -105,6 +105,7 @@ class PluginUpdate {
 		return array(
 			'domain_verification_migration',
 			'feed_generation_migration',
+			'enable_enhanced_match',
 		);
 	}
 
@@ -286,11 +287,15 @@ class PluginUpdate {
 			return;
 		}
 
-		Base::update_tag(
-			$connected_tag,
-			array(
-				'aem_enabled' => true,
-			)
-		);
+		try {
+			API\Base::update_tag(
+				$connected_tag,
+				array(
+					'aem_enabled' => true,
+				)
+			);
+		} catch ( Exception $th ) {
+			Logger::log( esc_html__( 'There was an error updating the tag.', 'pinterest-for-woocommerce' ) );
+		}
 	}
 }
