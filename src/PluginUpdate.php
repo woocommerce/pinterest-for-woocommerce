@@ -287,11 +287,15 @@ class PluginUpdate {
 			return;
 		}
 
-		API\Base::update_tag(
-			$tracking_tag,
-			array(
-				'aem_enabled' => true,
-			)
-		);
+		try {
+			API\Base::update_tag(
+				$tracking_tag,
+				array(
+					'aem_enabled' => true,
+				)
+			);
+		} catch ( Exception $th ) {
+			Logger::log( esc_html__( 'There was an error updating the tag.', 'pinterest-for-woocommerce' ) );
+		}
 	}
 }
