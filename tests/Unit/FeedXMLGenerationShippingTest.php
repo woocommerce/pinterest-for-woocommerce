@@ -10,6 +10,7 @@ use \WC_Unit_Test_Case;
 
 use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
+use Automattic\WooCommerce\Pinterest\Settings;
 use Exception;
 
 /**
@@ -620,7 +621,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		ShippingHelpers::addFlatRateShippingMethodToZone( $zone );
 
 		// Enable logging.
-		Pinterest_For_WooCommerce()::save_setting( 'enable_debug_logging', true );
+		Settings::save_setting( 'enable_debug_logging', true );
 
 		/**
 		 * Mock logger object that will catch any logged messages.

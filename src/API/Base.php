@@ -12,6 +12,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
+use Automattic\WooCommerce\Pinterest\Settings;
 use \Exception;
 
 
@@ -413,7 +414,7 @@ class Base {
 	public static function create_tag( $advertiser_id ) {
 
 		$tag_name    = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
-		$aem_enabled = boolval( Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) );
+		$aem_enabled = boolval( Settings::get_setting( 'enhanced_match_support' ) );
 
 		return self::make_request(
 			"advertisers/{$advertiser_id}/conversion_tags",
@@ -435,7 +436,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function update_tag( $tag_id, $params = array() ) {
-		$advertiser_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser', null );
+		$advertiser_id = Settings::get_setting( 'tracking_advertiser' );
 
 		if ( ! $advertiser_id || empty( $params ) ) {
 			return false;

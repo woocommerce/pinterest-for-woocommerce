@@ -318,7 +318,7 @@ class Tracking {
 	 */
 	private static function tracking_enabled() {
 
-		if ( ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' ) || ! self::get_active_tag() ) {
+		if ( ! Settings::get_setting( 'track_conversions' ) || ! self::get_active_tag() ) {
 			return false;
 		}
 
@@ -340,7 +340,7 @@ class Tracking {
 			return;
 		}
 
-		if ( Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) ) {
+		if ( Settings::get_setting( 'enhanced_match_support' ) ) {
 			$email = self::get_hashed_customer_email();
 		}
 
@@ -465,7 +465,7 @@ class Tracking {
 	 * @return object|boolean
 	 */
 	public static function get_active_tag() {
-		return Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
+		return Settings::get_setting( 'tracking_tag' );
 	}
 
 
@@ -514,9 +514,9 @@ class Tracking {
 	 */
 	private static function maybe_connect_advertiser_tag() {
 
-		$is_connected         = Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' );
-		$connected_advertiser = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
-		$connected_tag        = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
+		$is_connected         = Settings::get_data( 'is_advertiser_connected' );
+		$connected_advertiser = Settings::get_setting( 'tracking_advertiser' );
+		$connected_tag        = Settings::get_setting( 'tracking_tag' );
 
 		// Check if advertiser is already connected.
 		if ( ! $is_connected && $connected_advertiser && $connected_tag ) {

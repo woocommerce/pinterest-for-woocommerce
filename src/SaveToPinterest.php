@@ -95,7 +95,7 @@ class SaveToPinterest {
 	 * @return bool
 	 */
 	public static function show_pin_button() {
-		return (bool) Pinterest_For_Woocommerce()::get_setting( 'save_to_pinterest' );
+		return (bool) Settings::get_setting( 'save_to_pinterest' );
 	}
 
 

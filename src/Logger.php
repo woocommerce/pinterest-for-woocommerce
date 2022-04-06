@@ -46,7 +46,7 @@ class Logger {
 
 		$allow_logging = true;
 		if ( 'debug' === $level ) {
-			$allow_logging = Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' );
+			$allow_logging = Settings::get_setting( 'enable_debug_logging' );
 		}
 
 		if ( $force ) {

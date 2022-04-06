@@ -2,6 +2,8 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Settings;
+
 class TrackerSnapshotTest extends \WP_UnitTestCase {
 
 
@@ -25,7 +27,7 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 
 	function test_settings_are_tracked_by_woo_tracker_if_opt_in() {
 
-		\Pinterest_For_Woocommerce::save_settings( self::$default_settings );
+		Settings::save_settings( self::$default_settings );
 
 		TrackerSnapshot::maybe_init();
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
@@ -40,7 +42,7 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 
 		update_option( 'woocommerce_allow_tracking', 'no' );
 
-		\Pinterest_For_Woocommerce::save_settings( self::$default_settings );
+		Settings::save_settings( self::$default_settings );
 
 		TrackerSnapshot::maybe_init();
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );

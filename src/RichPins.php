@@ -49,8 +49,8 @@ class RichPins {
 
 		if ( ! $disable_rich_pins ) {
 
-			$rich_pins_on_products = Pinterest_For_Woocommerce()::get_setting( 'rich_pins_on_products' );
-			$rich_pins_on_posts    = Pinterest_For_Woocommerce()::get_setting( 'rich_pins_on_posts' );
+			$rich_pins_on_products = Settings::get_setting( 'rich_pins_on_products' );
+			$rich_pins_on_posts    = Settings::get_setting( 'rich_pins_on_posts' );
 
 			if ( $rich_pins_on_products || $rich_pins_on_posts ) {
 

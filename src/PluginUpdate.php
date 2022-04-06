@@ -183,7 +183,7 @@ class PluginUpdate {
 			// Already up to date.
 			return;
 		}
-		$account_data = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+		$account_data = Settings::get_setting( 'account_data' );
 
 		/**
 		 * Trigger update only if the user has performed verification
@@ -258,11 +258,11 @@ class PluginUpdate {
 		/*
 		 * 3. Clear data.
 		 */
-		$settings = Pinterest_For_Woocommerce()::get_settings( true, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+		$settings = Settings::get_settings( true, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 
 		unset( $settings['local_feed_id'] );
 
-		Pinterest_For_Woocommerce()::save_settings( $settings, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+		Settings::save_settings( $settings, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 
 		// Update done.
 	}
@@ -278,8 +278,8 @@ class PluginUpdate {
 			return;
 		}
 
-		$aem_enabled   = boolval( Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) );
-		$connected_tag = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag', null );
+		$aem_enabled   = boolval( Settings::get_setting( 'enhanced_match_support' ) );
+		$connected_tag = Settings::get_setting( 'tracking_tag' );
 
 		// Only update if the setting is enabled and we have a connected tag.
 		if ( ! $aem_enabled || ! $connected_tag ) {
