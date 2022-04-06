@@ -72,6 +72,7 @@ abstract class AbstractNote {
 	 * Get note type.
 	 *
 	 * @since x.x.x
+	 * @return string Note type.
 	 */
 	protected function get_type(): string {
 		return Note::E_WC_ADMIN_NOTE_INFORMATIONAL;
@@ -81,7 +82,7 @@ abstract class AbstractNote {
 	 * Get the note's unique name.
 	 *
 	 * @since x.x.x
-	 * @return string
+	 * @return string Note name.
 	 */
 	protected function get_name(): string {
 		return static::NOTE_NAME;
@@ -91,6 +92,7 @@ abstract class AbstractNote {
 	 * Get note layout style.
 	 *
 	 * @since x.x.x
+	 * @return string Note layout style.
 	 */
 	protected function get_layout() {
 		return 'plain';
@@ -100,6 +102,7 @@ abstract class AbstractNote {
 	 * Get note image.
 	 *
 	 * @since x.x.x
+	 * @return string URL to note image.
 	 */
 	protected function get_image() {
 		return '';
@@ -119,6 +122,7 @@ abstract class AbstractNote {
 	 * Get note slug;
 	 *
 	 * @since x.x.x
+	 * @return string Note Slug.
 	 */
 	private function get_slug(): string {
 		return PINTEREST_FOR_WOOCOMMERCE_PREFIX;
@@ -128,6 +132,7 @@ abstract class AbstractNote {
 	 * Get note title.
 	 *
 	 * @since x.x.x
+	 * @return strings Note title.
 	 */
 	abstract protected function get_note_title(): string;
 
@@ -135,6 +140,7 @@ abstract class AbstractNote {
 	 * Get note content.
 	 *
 	 * @since x.x.x
+	 * @return string Note content.
 	 */
 	abstract protected function get_note_content(): string;
 
@@ -142,6 +148,7 @@ abstract class AbstractNote {
 	 * Check whether the note should be added.
 	 *
 	 * @since x.x.x
+	 * @return bool Should the note be added.
 	 */
 	abstract public function should_be_added(): bool;
 
