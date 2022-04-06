@@ -748,19 +748,28 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Sync setting with Pinterest if old value is different than new ones.
 			if ( $old_value['enhanced_match_support'] !== $new_value['enhanced_match_support'] ) {
+				self::update_tag_config( $tracking_tag, $new_value['enhanced_match_support'] );
+			}
+		}
 
-				try {
-					Pinterest\API\Base::update_tag(
-						$tracking_tag,
-						array(
-							'aem_enabled' => $new_value['enhanced_match_support'],
-						)
-					);
+		/**
+		 * Update the tag on Pinterest.
+		 *
+		 * @param string  $tracking_tag The connected tag.
+		 * @param boolean $enhanced_match_support The value of the enhanced_math_support option.
+		 */
+		public static function update_tag_config( $tracking_tag, $enhanced_match_support ) {
+			try {
+				Pinterest\API\Base::update_tag(
+					$tracking_tag,
+					array(
+						'aem_enabled' => $enhanced_match_support,
+					)
+				);
 
-				} catch ( \Exception $th ) {
+			} catch ( \Exception $th ) {
 
-					Pinterest\Logger::log( esc_html__( 'There was an error updating the tag parameters.', 'pinterest-for-woocommerce' ) );
-				}
+				Pinterest\Logger::log( esc_html__( 'There was an error updating the tag parameters.', 'pinterest-for-woocommerce' ) );
 			}
 		}
 

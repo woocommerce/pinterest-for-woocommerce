@@ -64,6 +64,9 @@ class AdvertiserConnect extends VendorAPI {
 				);
 			}
 
+			// Sync the enhanced match support option (force syncing in users that already had an existing tag).
+			Pinterest_For_Woocommerce()::update_tag_config( $tag_id, Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) );
+
 			// Connect new advertiser and tag.
 			return self::connect_advertiser_and_tag( $advertiser_id, $tag_id );
 
