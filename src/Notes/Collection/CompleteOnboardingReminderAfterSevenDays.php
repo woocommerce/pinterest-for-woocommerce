@@ -39,7 +39,7 @@ class CompleteOnboardingReminderAfterSevenDays extends AbstractCompleteOnboardin
 	 * @return string Note content.
 	 */
 	protected function get_note_content(): string {
-		return __( 'Finish setting up Pinterest for WooCommerce to reach over 400 million shoppers and inspire their next purchase', 'pinterest-for-woocommerce' );
+		return __( 'Finish setting up Pinterest for WooCommerce to reach over 400 million shoppers and inspire their next purchase.', 'pinterest-for-woocommerce' );
 	}
 
 }
