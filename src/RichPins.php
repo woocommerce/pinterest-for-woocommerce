@@ -159,7 +159,7 @@ class RichPins {
 
 		// mandatory tags.
 		$tags['product:price:currency'] = get_woocommerce_currency();
-		$tags['product:price:amount']   = $product->get_price();
+		$tags['product:price:amount']   = wc_get_price_to_display( $product );
 
 		// tags enabled by setup.
 		if ( $product->is_on_sale() ) {
