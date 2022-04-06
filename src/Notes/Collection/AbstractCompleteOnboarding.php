@@ -59,16 +59,16 @@ abstract class AbstractCompleteOnboarding extends AbstractNote {
 	}
 
 	/**
-	 * Add button to Pinterest For WooCommerce landing page
+	 * Add button to Pinterest For WooCommerce landing page.
 	 *
 	 * @since x.x.x
 	 * @param Note $note Note to which we add an action.
 	 */
 	protected function add_action( $note ): void {
 		$note->add_action(
-			'coupon-views',
+			'goto-pinterest-landing',
 			__( 'Complete setup', 'pinterest-for-woocommerce' ),
-			wc_admin_url( '&path=/pinterest/catalog' )
+			wc_admin_url( '&path=/pinterest/landing' )
 		);
 	}
 

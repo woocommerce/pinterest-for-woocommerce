@@ -111,7 +111,7 @@ class CatalogSyncErrors extends AbstractNote {
 	protected function add_action( $note ): void {
 		$note->add_action(
 			'goto-pinterest-catalog',
-			__( 'Complete setup', 'pinterest-for-woocommerce' ),
+			__( 'Review issues', 'pinterest-for-woocommerce' ),
 			wc_admin_url( '&path=/pinterest/catalog' )
 		);
 	}

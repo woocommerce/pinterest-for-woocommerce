@@ -80,7 +80,7 @@ class EnableCatalogSync extends AbstractNote {
 	protected function add_action( $note ): void {
 		$note->add_action(
 			'goto-pinterest-settings',
-			__( 'Review issues', 'pinterest-for-woocommerce' ),
+			__( 'Enable Sync', 'pinterest-for-woocommerce' ),
 			wc_admin_url( '&path=/pinterest/settings' )
 		);
 	}
