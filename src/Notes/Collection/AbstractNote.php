@@ -132,7 +132,7 @@ abstract class AbstractNote {
 	 * Get note title.
 	 *
 	 * @since x.x.x
-	 * @return strings Note title.
+	 * @return string Note title.
 	 */
 	abstract protected function get_note_title(): string;
 
