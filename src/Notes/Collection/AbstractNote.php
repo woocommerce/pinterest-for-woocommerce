@@ -33,7 +33,12 @@ abstract class AbstractNote {
 	 * @throws NotesUnavailableException Throws exception when notes are unavailable.
 	 */
 	public static function note_exists() {
-		/** @var DataStore $data_store */
+
+		/**
+		 * Notes Data Store.
+		 *
+		 * @var DataStore $data_store
+		 */
 		$data_store = Notes::load_data_store();
 		$note_ids   = $data_store->get_notes_with_name( static::NOTE_NAME );
 		return ! empty( $note_ids );
