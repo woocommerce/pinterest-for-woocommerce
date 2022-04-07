@@ -7,6 +7,7 @@
  */
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Pinterest\Heartbeat;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -230,7 +231,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$this->includes();
 
 			// Start the heartbeat.
-			$this->heartbeat = new Pinterest\Heartbeat( WC()->queue() );
+			$this->heartbeat = new Heartbeat( WC()->queue() );
 			$this->heartbeat->init();
 
 			add_action( 'admin_init', array( $this, 'admin_init' ), 0 );
@@ -260,7 +261,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
 
 			// Init marketing notifications.
-			add_action( Pinterest\Heartbeat::DAILY, array( $this, 'init_marketing_notifications' ) );
+			add_action( Heartbeat::DAILY, array( $this, 'init_marketing_notifications' ) );
 
 		}
 
