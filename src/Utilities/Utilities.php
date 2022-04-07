@@ -48,6 +48,5 @@ function get_account_connection_timestamp(): int {
 		return (int) $timestamp;
 	}
 
-	$timestamp = set_account_connection_timestamp();
-	return $timestamp;
+	return set_account_connection_timestamp();
 }
