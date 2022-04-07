@@ -218,6 +218,18 @@ const HealthCheck = () => {
 				'pinterest-for-woocommerce'
 			),
 		},
+		merchant_connected_diff_platform: {
+			status: 'error',
+			dismissible: false,
+			message: __(
+				'Unable to upload catalog.',
+				'pinterest-for-woocommerce'
+			),
+			body: __(
+				'It looks like your Pinterest business account is connected to another e-commerce platform. Only one platform can be linked to a business account. To upload your catalog, disconnect your business account from the other platform and try again.',
+				'pinterest-for-woocommerce'
+			),
+		},
 		error: {
 			status: 'error',
 			dismissible: false,

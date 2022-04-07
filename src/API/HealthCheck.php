@@ -50,6 +50,13 @@ class HealthCheck extends VendorAPI {
 				);
 			}
 
+			$merchant_connected_diff_platform = Pinterest_For_Woocommerce()::get_data( 'merchant_connected_diff_platform' );
+			if ( $merchant_connected_diff_platform ) {
+				return array(
+					'status' => 'merchant_connected_diff_platform',
+				);
+			}
+
 			$merchant = Pinterest\Merchants::get_merchant();
 
 			if ( 'success' !== $merchant['status'] || empty( $merchant['data']->product_pin_approval_status ) ) {
