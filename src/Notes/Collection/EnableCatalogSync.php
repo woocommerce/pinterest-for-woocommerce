@@ -9,7 +9,7 @@
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
 
 use Automattic\WooCommerce\Pinterest\ProductSync;
-use Automattic\WooCommerce\Pinterest\Utilities;
+use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
 
 /**
  * Class EnableCatalogSync.
@@ -43,7 +43,7 @@ class EnableCatalogSync extends AbstractNote {
 		}
 
 		// Are we there yet? We want to try three days after the account was connected.
-		if ( time() < ( DAY_IN_SECONDS * 3 + Utilities\get_account_connection_timestamp() ) ) {
+		if ( time() < ( DAY_IN_SECONDS * 3 + Utilities::get_account_connection_timestamp() ) ) {
 			return false;
 		}
 

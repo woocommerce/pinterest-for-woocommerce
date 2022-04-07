@@ -155,9 +155,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$this->define_constants();
 
-			// Load utilities manually. This is not a class so autoloader misses it.
-			require_once __DIR__ . '/src/Utilities/Utilities.php';
-
 			add_action( 'plugins_loaded', array( $this, 'init_plugin' ) );
 
 			do_action( 'pinterest_for_woocommerce_loaded' );
