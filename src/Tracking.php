@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Automattic\WooCommerce\Pinterest\API\AdvertiserConnect;
+use WC_Product;
 
 /**
  * Class adding Save Pin support.
@@ -90,6 +91,14 @@ class Tracking {
 			// AddToCart - ajax.
 			if ( 'yes' === get_option( 'woocommerce_enable_ajax_add_to_cart' ) && 'yes' !== get_option( 'woocommerce_cart_redirect_after_add' ) ) {
 				add_action( 'wp_enqueue_scripts', array( __CLASS__, 'ajax_tracking_snippet' ), 20 );
+				add_filter(
+					'woocommerce_loop_add_to_cart_args',
+					function( $args, $product ) {
+						return self::filter_add_to_cart_attributes( $args, $product );
+					},
+					10,
+					2
+				);
 			}
 
 			// AddToCart - non-ajax.
@@ -300,15 +309,21 @@ class Tracking {
 	 * @return void
 	 */
 	public static function ajax_tracking_snippet() {
-
-		$tracking = 'jQuery( function( $ ) { ;
-				$( document.body ).on( \'added_to_cart\', function ( e, fragments, cart_hash, thisbutton ) {
-					pintrk( \'track\', \'AddToCart\', {
-						\'product_id\': thisbutton.data( \'product_id\' ),
-						\'order_quantity\': thisbutton.data( \'quantity\' ),
-					});
-				} );
-			} )';
+		$wc_currency = get_woocommerce_currency();
+		$tracking    = <<< JS
+jQuery( function( $ ) {
+	$( document.body ).on( 'added_to_cart', function( e, fragments, cart_hash, thisbutton ) {
+		var quantity = thisbutton.data( 'quantity' );
+		pintrk( 'track', 'AddToCart', {
+			'product_id': thisbutton.data( 'product_id' ),
+			'product_name': thisbutton.data( 'product_name' ),
+			'value': thisbutton.data( 'price' ) * quantity,
+			'order_quantity': quantity,
+			'currency': '{$wc_currency}'
+		} );
+	} );
+} );
+JS;
 
 		wp_add_inline_script( 'wc-add-to-cart', $tracking );
 
@@ -372,6 +387,7 @@ class Tracking {
 				'product_id'    => $product->get_id(),
 				'product_name'  => $product->get_name(),
 				'product_price' => wc_get_price_to_display( $product ),
+				'currency'      => get_woocommerce_currency(),
 			);
 		}
 
@@ -526,5 +542,28 @@ class Tracking {
 		if ( ! $is_connected && $connected_advertiser && $connected_tag ) {
 			AdvertiserConnect::connect_advertiser_and_tag( $connected_advertiser, $connected_tag );
 		}
+	}
+
+	/**
+	 * Filter the "Add to cart" button attributes to include more data.
+	 *
+	 * @see woocommerce_template_loop_add_to_cart()
+	 *
+	 * @since x.x.x
+	 *
+	 * @param array      $args The arguments used for the Add to cart button.
+	 * @param WC_Product $product The product object.
+	 *
+	 * @return array The filtered arguments for the Add to cart button.
+	 */
+	private static function filter_add_to_cart_attributes( array $args, WC_Product $product ) {
+		$attributes = array(
+			'data-product_name' => $product->get_name(),
+			'data-price'        => $product->get_price(),
+		);
+
+		$args['attributes'] = array_merge( $args['attributes'], $attributes );
+
+		return $args;
 	}
 }
