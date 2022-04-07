@@ -8,6 +8,7 @@
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
+use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -300,7 +301,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since x.x.x
 		 */
 		public function init_marketing_notifications() {
-			$notifications = new Pinterest\Notes\MarketingNotifications();
+			$notifications = new MarketingNotifications();
 			$notifications->init_notifications();
 		}
 
