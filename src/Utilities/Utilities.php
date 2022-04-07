@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Feed Logger
  *
  * @package     Pinterest_For_WooCommerce/Classes/
- * @since       1.0.10
+ * @since       x.x.x
  */
 
 declare( strict_types=1 );
