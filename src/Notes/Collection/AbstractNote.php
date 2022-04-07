@@ -114,9 +114,7 @@ abstract class AbstractNote {
 	 * @since x.x.x
 	 * @param Note $note Note to which we want to add an action.
 	 */
-	protected function add_action( $note ): void {
-		return;
-	}
+	protected function add_action( $note ): void {}
 
 	/**
 	 * Get note slug;
