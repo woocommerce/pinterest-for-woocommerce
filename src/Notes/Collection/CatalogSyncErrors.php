@@ -64,12 +64,10 @@ class CatalogSyncErrors extends AbstractNote {
 				case 'UNDER_REVIEW':
 				case 'QUEUED_FOR_PROCESSING':
 					return false;
-					break;
 
 				case 'FAILED':
 				default:
 					return true;
-					break;
 			}
 		} catch ( Throwable $th ) {
 			/*
@@ -78,8 +76,6 @@ class CatalogSyncErrors extends AbstractNote {
 			return false;
 		}
 
-		// We should never get here.
-		return true;
 	}
 
 	/**
