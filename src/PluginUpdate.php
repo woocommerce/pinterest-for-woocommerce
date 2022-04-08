@@ -279,8 +279,8 @@ class PluginUpdate {
 			return;
 		}
 
-		$aem_enabled  = (bool) Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support', null );
-		$tracking_tag = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag', null );
+		$aem_enabled  = (bool) Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' );
+		$tracking_tag = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
 
 		// Update the setting if we have a connected tag.
 		if ( ! $tracking_tag ) {

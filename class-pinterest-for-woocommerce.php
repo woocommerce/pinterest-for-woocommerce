@@ -735,13 +735,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		private static function maybe_sync_enhanced_match_support( $old_value, $new_value ) {
 
 			if (
-				! isset( $old_value['enhanced_match_support'] ) ||
-				! isset( $new_value['enhanced_match_support'] )
+				! isset( $old_value['enhanced_match_support'], $new_value['enhanced_match_support'] )
 			) {
 				return;
 			}
 
-			$tracking_tag = self::get_setting( 'tracking_tag', null );
+			$tracking_tag = self::get_setting( 'tracking_tag' );
 			if ( ! $tracking_tag ) {
 				return;
 			}
@@ -755,8 +754,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Update the tag on Pinterest.
 		 *
-		 * @param string  $tracking_tag The connected tag.
-		 * @param boolean $enhanced_match_support The value of the enhanced_math_support option.
+		 * @param string $tracking_tag The connected tag.
+		 * @param bool   $enhanced_match_support The value of the enhanced_math_support option.
 		 */
 		public static function update_tag_config( $tracking_tag, $enhanced_match_support ) {
 			try {
@@ -767,9 +766,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					)
 				);
 
-			} catch ( \Exception $th ) {
+			} catch ( \Exception $e ) {
 
-				Pinterest\Logger::log( esc_html__( 'There was an error updating the tag parameters.', 'pinterest-for-woocommerce' ) );
+				/* Translators: The error message */
+				Pinterest\Logger::log( sprintf( esc_html__( 'There was an error updating the tag parameters.: %s', 'pinterest-for-woocommerce' ), $e->getMessage() ), 'error' );
 			}
 		}
 
