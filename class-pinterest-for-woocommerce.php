@@ -734,9 +734,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		private static function maybe_sync_enhanced_match_support( $old_value, $new_value ) {
 
-			if (
-				! isset( $old_value['enhanced_match_support'], $new_value['enhanced_match_support'] )
-			) {
+			if ( ! isset( $old_value['enhanced_match_support'], $new_value['enhanced_match_support'] ) ) {
 				return;
 			}
 
