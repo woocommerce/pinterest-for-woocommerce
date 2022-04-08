@@ -71,9 +71,7 @@ class CatalogSyncErrors extends AbstractNote {
 					return true;
 			}
 		} catch ( Throwable $th ) {
-			/*
-			 *	Whatever failed we don't care about it in this process.
-			 */
+			// Whatever failed we don't care about it in this process.
 			return false;
 		}
 
