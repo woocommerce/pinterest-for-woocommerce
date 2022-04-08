@@ -14,7 +14,6 @@ use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
 use \Exception;
 
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -100,7 +99,7 @@ class Base {
 				'args'   => $payload,
 			);
 
-			if ( 'ads/' === $api && 'POST' === $method ) {
+			if ( 'ads/' === $api && in_array( $method, array( 'POST', 'PATCH' ), true ) ) {
 				// Force json content-type header and json encode payload.
 				$request['headers']['Content-Type'] = 'application/json';
 
@@ -418,8 +417,35 @@ class Base {
 			"advertisers/{$advertiser_id}/conversion_tags",
 			'POST',
 			array(
-				'name' => $tag_name,
+				'name'        => $tag_name,
+				'aem_enabled' => (bool) Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ),
 			),
+			'ads'
+		);
+	}
+
+
+	/**
+	 * Update the parameters of an existing tag.
+	 *
+	 * @param string $tag_id The tag_id for which we want to update the parameters.
+	 * @param array  $params The parameters to update.
+	 *
+	 * @return mixed
+	 */
+	public static function update_tag( $tag_id, $params = array() ) {
+		$advertiser_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
+
+		if ( ! $advertiser_id || empty( $params ) ) {
+			return false;
+		}
+
+		$params['id'] = (string) $tag_id;
+
+		return self::make_request(
+			"advertisers/{$advertiser_id}/conversion_tags",
+			'PATCH',
+			$params,
 			'ads'
 		);
 	}
