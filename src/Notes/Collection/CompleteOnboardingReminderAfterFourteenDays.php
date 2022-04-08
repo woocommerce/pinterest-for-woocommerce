@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
  */
 class CompleteOnboardingReminderAfterFourteenDays extends CompleteOnboardingReminderAfterSevenDays {
 
-	const DELAY = 14;
+	const DELAY     = 14;
 	const NOTE_NAME = 'pinterest-complete-onboarding-note-after-' . self::DELAY . '-days';
 
 }
