@@ -9,6 +9,13 @@
 declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Notes;
+use Automattic\WooCommerce\Pinterest\Notes\Collection\EnableCatalogSync;
+use Automattic\WooCommerce\Pinterest\Notes\Collection\CatalogSyncErrors;
+use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingAfterThreeDays;
+use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingReminderAfterSevenDays;
+use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingReminderAfterFourteenDays;
+use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingReminderAfterThirtyDays;
+
 
 defined( 'ABSPATH' ) || exit;
 
@@ -31,12 +38,12 @@ class MarketingNotifications {
 
 	// List of marketing notifications that we want to send.
 	const NOTES = array(
-		'EnableCatalogSync',
-		'CatalogSyncErrors',
-		'CompleteOnboardingAfterThreeDays',
-		'CompleteOnboardingReminderAfterSevenDays',
-		'CompleteOnboardingReminderAfterFourteenDays',
-		'CompleteOnboardingReminderAfterThirtyDays',
+		EnableCatalogSync::class,
+		CatalogSyncErrors::class,
+		CompleteOnboardingAfterThreeDays::class,
+		CompleteOnboardingReminderAfterSevenDays::class,
+		CompleteOnboardingReminderAfterFourteenDays::class,
+		CompleteOnboardingReminderAfterThirtyDays::class,
 	);
 
 	/**
@@ -48,7 +55,7 @@ class MarketingNotifications {
 	public function init_notifications(): void {
 
 		foreach ( self::NOTES as $note ) {
-			$note         = 'Automattic\WooCommerce\Pinterest\Notes\Collection\\' . $note;
+			/** @var AbstractNote $notification */
 			$notification = new $note();
 			if ( ! $notification->should_be_added() ) {
 				continue;
