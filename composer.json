@@ -38,6 +38,11 @@
 	"config": {
 		"platform": {
 			"php": "7.3.0"
+		},
+		"allow-plugins": {
+			"composer/installers": true,
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"automattic/jetpack-autoloader": true
 		}
 	},
 	"scripts": {
