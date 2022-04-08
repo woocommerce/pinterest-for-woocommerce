@@ -80,6 +80,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		protected static $initialized = false;
 
 		/**
+		 * Heartbeat instance.
+		 *
+		 * @var Heartbeat
+		 * @since x.x.x
+		 */
+		protected $heartbeat = null;
+
+		/**
 		 * When set to true, the settings have been
 		 * changed and the runtime cached must be flushed
 		 *
