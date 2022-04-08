@@ -1,5 +1,15 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.0.11 - xxxx-xx-xx =
+* Add - Clear error when the merchant is connected to another e-commerce platform.
+* Add - Mexico added to supported countries.
+* Fix - Ensure add to cart tag data is consistent.
+* Fix - Currency is now being sent on the product page visit event.
+* Fix - Price mismatch when price includes taxes.
+* Fix - Unit tests failing on WC 6.4.
+* Tweak - Simplify tracking code.
+* Tweak - Updated the Track event generation script to prevent future errors.
+
 = 1.0.10 - 2022-03-31 =
 * Update - Feed Refactor with Action Scheduler Framework. ( [#368](https://github.com/woocommerce/pinterest-for-woocommerce/pull/368) )
 
