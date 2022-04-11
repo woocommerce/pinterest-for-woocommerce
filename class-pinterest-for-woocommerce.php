@@ -246,9 +246,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Handle the Pinterest verification URL.
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
 
-			// Allow access to our option through the REST API.
-			add_filter( 'woocommerce_rest_api_option_permissions', array( $this, 'add_option_permissions' ), 10, 1 );
-
 			// Disconnect advertiser if advertiser or tag change.
 			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'hook_update_settings' ), 10, 2 );
 
@@ -398,21 +395,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public function ajax_url() {
 			return admin_url( 'admin-ajax.php', 'relative' );
-		}
-
-
-		/**
-		 * Allow access to our option through the REST API for a user that can manage the store.
-		 * The UI relies on this option being available through the API.
-		 *
-		 * @param array $permissions The permissions array.
-		 *
-		 * @return array
-		 */
-		public function add_option_permissions( $permissions ) {
-
-			$permissions[ PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ] = current_user_can( 'manage_woocommerce' );
-			return $permissions;
 		}
 
 
