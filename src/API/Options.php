@@ -55,23 +55,19 @@ class Options extends VendorAPI {
 	 *
 	 * @param WP_REST_Request $request The request.
 	 *
-	 * @return array
+	 * @return array|WP_Error
 	 */
 	public function set_settings( WP_REST_Request $request ) {
 		if ( ! $request->has_param( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ) || ! is_array( $request->get_param( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ) ) ) {
-			return array(
-				'success' => false,
-			);
+			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_options_error', esc_html__( 'Missing option parameters.', 'pinterest-for-woocommerce' ), array( 'status' => 400 ) );
 		}
 
 		if ( ! Pinterest_For_Woocommerce()::save_settings( $request->get_param( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ) ) ) {
-			return array(
-				'success' => false,
-			);
+			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_options_error', esc_html__( 'There was an error saving the settings.', 'pinterest-for-woocommerce' ), array( 'status' => 500 ) );
 		}
 
 		return array(
-			'success' => true,
+			PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => true,
 		);
 	}
 }
