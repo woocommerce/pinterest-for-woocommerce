@@ -102,6 +102,9 @@ class VendorAPI {
 	/**
 	 * Register endpoint route with single method
 	 *
+	 * @param string|array $methods The endpoint's methods.
+	 * @param string       $endpoint_callback The endpoint's callback.
+	 *
 	 * @since 1.0.11
 	 */
 	public function register_router_single_method( $methods = '', $endpoint_callback = '' ) {
