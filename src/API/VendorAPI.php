@@ -104,7 +104,7 @@ class VendorAPI {
 	 *
 	 * @since 1.0.11
 	 */
-	public function register_router_single_method() {
+	public function register_router_single_method( $methods = '', $endpoint_callback = '' ) {
 		$namespace = $this->api_namespace . $this->api_version;
 
 		register_rest_route(
@@ -112,8 +112,8 @@ class VendorAPI {
 			'/' . $this->base,
 			array(
 				array(
-					'methods'             => $this->methods,
-					'callback'            => array( $this, $this->endpoint_callback ),
+					'methods'             => $methods ?? $this->methods,
+					'callback'            => $endpoint_callback ?? array( $this, $this->endpoint_callback ),
 					'permission_callback' => array( $this, 'permissions_check' ),
 				),
 			)
@@ -126,23 +126,9 @@ class VendorAPI {
 	 * @since 1.0.11
 	 */
 	public function register_router_multiple_methods() {
-		$namespace = $this->api_namespace . $this->api_version;
-
-		$route_args = array();
-
 		foreach ( $this->endpoint_callbacks_map as $callback => $method ) {
-			$route_args[] = array(
-				'methods'             => $method,
-				'callback'            => array( $this, $callback ),
-				'permission_callback' => array( $this, 'permissions_check' ),
-			);
+			$this->register_router_single_method( $method, $callback );
 		}
-
-		register_rest_route(
-			$namespace,
-			'/' . $this->base,
-			$route_args
-		);
 	}
 
 	/**

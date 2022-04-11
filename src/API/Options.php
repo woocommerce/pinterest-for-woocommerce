@@ -41,9 +41,7 @@ class Options extends VendorAPI {
 	/**
 	 * Handle get settings.
 	 *
-	 * @return mixed
-	 *
-	 * @throws \Exception PHP Exception.
+	 * @return array
 	 */
 	public function get_settings() {
 		return array(
@@ -53,13 +51,11 @@ class Options extends VendorAPI {
 
 
 	/**
-	 * Handle get settings.
+	 * Handle set settings.
 	 *
 	 * @param WP_REST_Request $request The request.
 	 *
-	 * @return array|WP_Error
-	 *
-	 * @throws \Exception PHP Exception.
+	 * @return array
 	 */
 	public function set_settings( WP_REST_Request $request ) {
 		if ( ! $request->has_param( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ) || ! is_array( $request->get_param( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ) ) ) {
