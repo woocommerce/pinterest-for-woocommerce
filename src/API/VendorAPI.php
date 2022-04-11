@@ -66,7 +66,7 @@ class VendorAPI {
 	 *
 	 * @var array
 	 */
-	public $endpoint_callbacks_map;
+	public $endpoint_callbacks_map = array();
 
 	/**
 	 * Returns the namespace.
