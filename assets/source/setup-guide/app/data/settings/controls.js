@@ -7,7 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import { WC_ADMIN_NAMESPACE, OPTIONS_NAME } from './constants';
+import { API_ENDPOINT, OPTIONS_NAME } from './constants';
 
 export const fetch = () => {
 	return {
@@ -19,7 +19,7 @@ export const controls = {
 	...dataControls,
 	FETCH() {
 		return new Promise( ( resolve ) => {
-			const url = `${ WC_ADMIN_NAMESPACE }/options?options=${ OPTIONS_NAME }`;
+			const url = `${ API_ENDPOINT }`;
 			apiFetch( { path: url } ).then( ( result ) =>
 				resolve( result[ OPTIONS_NAME ] )
 			);
