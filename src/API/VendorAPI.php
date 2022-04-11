@@ -102,8 +102,8 @@ class VendorAPI {
 	/**
 	 * Register endpoint route with single method
 	 *
-	 * @param string|array $methods The endpoint's methods.
-	 * @param string       $endpoint_callback The endpoint's callback.
+	 * @param string $methods The endpoint's methods.
+	 * @param string $endpoint_callback The endpoint's callback.
 	 *
 	 * @since 1.0.11
 	 */
@@ -115,8 +115,8 @@ class VendorAPI {
 			'/' . $this->base,
 			array(
 				array(
-					'methods'             => $methods ?? $this->methods,
-					'callback'            => $endpoint_callback ?? array( $this, $this->endpoint_callback ),
+					'methods'             => empty( $methods ) ? $this->methods : $methods,
+					'callback'            => array( $this, empty( $endpoint_callback ) ? $this->endpoint_callback : $endpoint_callback ),
 					'permission_callback' => array( $this, 'permissions_check' ),
 				),
 			)
