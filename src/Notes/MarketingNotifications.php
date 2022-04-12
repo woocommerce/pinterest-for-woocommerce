@@ -9,6 +9,8 @@
 declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Notes;
+
+use Automattic\WooCommerce\Pinterest\Notes\Collection\AbstractNote;
 use Automattic\WooCommerce\Pinterest\Notes\Collection\EnableCatalogSync;
 use Automattic\WooCommerce\Pinterest\Notes\Collection\CatalogSyncErrors;
 use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingAfterThreeDays;
