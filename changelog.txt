@@ -1,6 +1,6 @@
 *** Pinterest for WooCommerce Changelog ***
 
-= 1.0.11 - xxxx-xx-xx =
+= 1.0.11 - 2022-04-12 =
 * Add - Clear error when the merchant is connected to another e-commerce platform.
 * Add - Mexico added to supported countries.
 * Fix - Ensure add to cart tag data is consistent.
