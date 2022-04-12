@@ -25,20 +25,13 @@ class Utilities {
 	 * Set the account connection timestamp.
 	 *
 	 * @since x.x.x
-	 * @throws Error Wrong value provided for the timestamp.
-	 * @param int $timestamp Timestamp to set as the account connection moment.
 	 * @return int
 	 */
-	public static function set_account_connection_timestamp( $timestamp = null ): int {
-		if ( is_null( $timestamp ) ) {
-			$timestamp = time();
-		}
-
-		if ( ! is_int( $timestamp ) ) {
-			throw new Error( 'Account connection timestamp needs to be an integer value.' );
-		}
+	public static function set_account_connection_timestamp(): int {
+		$timestamp = time();
 
 		add_option( self::PINTEREST_ACCOUNT_CONNECTION_TIMESTAMP, $timestamp );
+
 		return $timestamp;
 	}
 
