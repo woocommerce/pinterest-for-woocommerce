@@ -40,7 +40,7 @@ class Utilities {
 	 * Initialize if not.
 	 *
 	 * @since x.x.x
-	 * @return int Initialization timestamp.
+	 * @return int|bool Initialization timestamp. False if not set.
 	 */
 	public static function get_account_connection_timestamp(): int {
 		$timestamp = get_option( self::PINTEREST_ACCOUNT_CONNECTION_TIMESTAMP );
@@ -48,6 +48,6 @@ class Utilities {
 			return (int) $timestamp;
 		}
 
-		return self::set_account_connection_timestamp();
+		return false;
 	}
 }

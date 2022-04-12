@@ -17,6 +17,7 @@ use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingAfterThr
 use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingReminderAfterSevenDays;
 use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingReminderAfterFourteenDays;
 use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingReminderAfterThirtyDays;
+use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
 
 
 defined( 'ABSPATH' ) || exit;
@@ -55,6 +56,19 @@ class MarketingNotifications {
 	 * @return void
 	 */
 	public function init_notifications(): void {
+
+		/*
+		 * Check if we have connection timestamp set. If not and the connection
+		 * has been made we set the timestamp as now bc we can't know when the
+		 * actual connection has been made.
+		 */
+		if (
+			false === Utilities::get_account_connection_timestamp() &&
+			Pinterest_For_Woocommerce()::is_setup_complete()
+
+		) {
+			Utilities::set_account_connection_timestamp();
+		}
 
 		foreach ( self::NOTES as $note ) {
 			/** @var AbstractNote $notification */
