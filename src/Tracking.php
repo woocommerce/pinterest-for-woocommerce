@@ -549,7 +549,7 @@ JS;
 	 *
 	 * @see woocommerce_template_loop_add_to_cart()
 	 *
-	 * @since x.x.x
+	 * @since 1.0.11
 	 *
 	 * @param array      $args The arguments used for the Add to cart button.
 	 * @param WC_Product $product The product object.

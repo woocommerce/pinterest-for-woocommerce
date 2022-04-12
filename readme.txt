@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
-Tested up to: 5.8
+Tested up to: 5.9
 Requires PHP: 7.3
-Stable tag: 1.0.10
+Stable tag: 1.0.11
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -86,6 +86,18 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.0.11 - 2022-04-12 =
+* Add - Clear error when the merchant is connected to another e-commerce platform.
+* Add - Mexico added to supported countries.
+* Fix - Currency is now being sent on the product page visit event.
+* Fix - Ensure add to cart tag data is consistent.
+* Fix - Price mismatch when price includes taxes.
+* Fix - Unit tests failing on WC 6.4.
+* Tweak - Simplify tracking code.
+* Tweak - Updated the Track event generation script to prevent future errors.
+* Tweak - WC 6.3 compatibility.
+* Tweak - WP 5.9 compatibility.
 
 = 1.0.10 - 2022-03-31 =
 * Update - Feed Refactor with Action Scheduler Framework. ( [#368](https://github.com/woocommerce/pinterest-for-woocommerce/pull/368) )
