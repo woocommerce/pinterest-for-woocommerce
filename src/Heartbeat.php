@@ -28,13 +28,6 @@ class Heartbeat {
 	const DAILY = 'pinterest_for_woocommerce_daily_heartbeat';
 
 	/**
-	 * Cron name string.
-	 *
-	 * @var string
-	 */
-	protected $daily_cron_name = 'pinterest_for_woocommerce_daily_heartbeat_cron';
-
-	/**
 	 * WooCommerce Queue Interface.
 	 *
 	 * @var WC_Queue_Interface
@@ -55,34 +48,18 @@ class Heartbeat {
 	 * Add hooks.
 	 */
 	public function init() {
-		add_action( 'init', array( $this, 'schedule_cron_events' ) );
-		add_action( $this->daily_cron_name, array( $this, 'schedule_daily_action' ) );
+		add_action( 'admin_init', array( $this, 'schedule_events' ) );
 	}
 
 	/**
-	 * Schedule heartbeat cron events.
-	 *
-	 * WP Cron events are stored in an auto-loaded option so the performance impact
-	 * is much lower than checking and scheduling an Action Scheduler action.
+	 * Schedule heartbeat events.
 	 *
 	 * @since x.x.x
 	 */
-	public function schedule_cron_events() {
-		if ( ! wp_next_scheduled( $this->daily_cron_name ) ) {
-			wp_schedule_event( time(), 'daily', $this->daily_cron_name );
+	public function schedule_events() {
+		if ( null === $this->queue->get_next( self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+			$this->queue->schedule_recurring( time(), DAY_IN_SECONDS, self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
-	}
-
-	/**
-	 * Schedule the daily heartbeat action to run immediately.
-	 *
-	 * Scheduling an action frees up WP Cron to process more jobs in the current request.
-	 * Action Scheduler has greater throughput so running our checks there is better.
-	 *
-	 * @since x.x.x
-	 */
-	public function schedule_daily_action() {
-		$this->queue->add( self::DAILY );
 	}
 
 }
