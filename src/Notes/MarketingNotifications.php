@@ -56,7 +56,6 @@ class MarketingNotifications {
 	 * @return void
 	 */
 	public function init_notifications(): void {
-
 		/*
 		 * Check if we have connection timestamp set. If not and the connection
 		 * has been made we set the timestamp as now bc we can't know when the
