@@ -61,11 +61,7 @@ class MarketingNotifications {
 		 * has been made we set the timestamp as now bc we can't know when the
 		 * actual connection has been made.
 		 */
-		if (
-			false === Utilities::get_account_connection_timestamp() &&
-			Pinterest_For_Woocommerce()::is_setup_complete()
-
-		) {
+		if ( 0 === Utilities::get_account_connection_timestamp() && Pinterest_For_Woocommerce()::is_setup_complete() ) {
 			Utilities::set_account_connection_timestamp();
 		}
 

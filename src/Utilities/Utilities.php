@@ -10,8 +10,6 @@ declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Utilities;
 
-use \Error;
-
 /**
  * Utilities class.
  *
@@ -40,14 +38,9 @@ class Utilities {
 	 * Initialize if not.
 	 *
 	 * @since x.x.x
-	 * @return int|bool Initialization timestamp. False if not set.
+	 * @return int Initialization timestamp. Zero if not set.
 	 */
 	public static function get_account_connection_timestamp(): int {
-		$timestamp = get_option( self::PINTEREST_ACCOUNT_CONNECTION_TIMESTAMP );
-		if ( false !== $timestamp ) {
-			return (int) $timestamp;
-		}
-
-		return false;
+		return (int) get_option( self::PINTEREST_ACCOUNT_CONNECTION_TIMESTAMP, 0 );
 	}
 }
