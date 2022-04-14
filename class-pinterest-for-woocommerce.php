@@ -49,9 +49,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Set the minimum required versions for the plugin.
 		 */
 		const PLUGIN_REQUIREMENTS = array(
-			'php_version' => '7.3',
-			'wp_version'  => '5.6',
-			'wc_version'  => '5.3',
+			'php_version'      => '7.3',
+			'wp_version'       => '5.6',
+			'wc_version'       => '5.3',
+			'action_scheduler' => '3.3.0',
 		);
 
 		/**
@@ -310,6 +311,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			if ( apply_filters( 'woocommerce_admin_disabled', false ) ) {
 				$errors[] = esc_html__( 'Pinterest for WooCommerce requires WooCommerce Admin to be enabled.', 'pinterest-for-woocommerce' );
+			}
+
+			if ( ! function_exists( 'as_has_scheduled_action' ) ) {
+				$errors[] = sprintf( esc_html__( 'Pinterest for WooCommerce requires a minimum Action Scheduler package of %s. It can be caused by old version of the WooCommerce extensions.', 'pinterest-for-woocommerce' ), self::PLUGIN_REQUIREMENTS['action_scheduler'] );
 			}
 
 			if ( empty( $errors ) ) {
