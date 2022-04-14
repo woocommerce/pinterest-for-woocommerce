@@ -314,6 +314,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 
 			if ( ! function_exists( 'as_has_scheduled_action' ) ) {
+				/* Translators: The minimum Action Scheduler version */
 				$errors[] = sprintf( esc_html__( 'Pinterest for WooCommerce requires a minimum Action Scheduler package of %s. It can be caused by old version of the WooCommerce extensions.', 'pinterest-for-woocommerce' ), self::PLUGIN_REQUIREMENTS['action_scheduler'] );
 			}
 
