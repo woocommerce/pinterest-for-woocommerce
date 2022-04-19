@@ -648,11 +648,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$xml .= ProductsXmlFeed::get_xml_item( $product, 'US' );
 		$xml .= ProductsXmlFeed::get_xml_footer();
 
-		$configurations = LocalFeedConfigs::get_instance();
+		$feed_configurations = LocalFeedConfigs::get_instance();
 
-		$configurations = $configurations->get_configurations();
-
-		foreach ( $this->configurations->get_configurations() as $config ) {
+		foreach ( $feed_configurations->get_configurations() as $config ) {
 			$bytes_written = file_put_contents(
 				$config['tmp_file'],
 				$xml
