@@ -650,14 +650,18 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		$configurations = LocalFeedConfigs::get_instance();
 
-		$config = $configurations->get_configurations()[0];
+		$configurations = $configurations->get_configurations();
 
-		$bytes_written = file_put_contents(
-			$config['tmp_file'],
-			$xml
-		);
+		foreach ( $this->configurations->get_configurations() as $config ) {
+			$bytes_written = file_put_contents(
+				$config['tmp_file'],
+				$xml
+			);
 
-		$this->assertTrue( ( bool ) $bytes_written );
+			$this->assertTrue( ( bool ) $bytes_written );
+
+			break;
+		}
 	}
 
 	/**
