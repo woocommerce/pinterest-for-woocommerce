@@ -113,7 +113,7 @@ const SetupPins = ( {} ) => {
 										help={
 											<HelpTooltip
 												text={ __(
-													'Matches conversion data with the person responsible for the conversion and lets you track cross-device checkouts. Requires Track Conversion option to be enabled. Changes on this option are synched with the Pinterest conversion tag.',
+													'Matches conversion data with the person responsible for the conversion and lets you track cross-device checkouts. Requires Track Conversion option to be enabled.',
 													'pinterest-for-woocommerce'
 												) }
 											/>
