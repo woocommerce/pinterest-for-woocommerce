@@ -654,41 +654,10 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		$bytes_written = file_put_contents(
 			$config['tmp_file'],
-			ProductsXmlFeed::get_xml_header()
+			$xml
 		);
 
-		$this->assertNotEmpty( $bytes_written );
-	}
-
-	/**
-	 * @group feed
-	 *
-	 * Test that the feed is writable when there are no eligible products.
-	 */
-	public function testFeedWritableNiEligibleProducts() {
-		// Create product with zero price.
-		$product = WC_Helper_Product::create_simple_product(
-			true,
-			array(
-				'regular_price' => 0,
-			)
-		);
-
-		// We need header and footer so we can process XML directly.
-		$xml  = ProductsXmlFeed::get_xml_header();
-		$xml .= ProductsXmlFeed::get_xml_item( $product, 'US' );
-		$xml .= ProductsXmlFeed::get_xml_footer();
-
-		$configurations = LocalFeedConfigs::get_instance();
-
-		$config = $configurations->get_configurations()[0];
-
-		$bytes_written = file_put_contents(
-			$config['tmp_file'],
-			ProductsXmlFeed::get_xml_header()
-		);
-
-		$this->assertNotEmpty( $bytes_written );
+		$this->assertTrue( ( bool ) $bytes_written );
 	}
 
 	/**
