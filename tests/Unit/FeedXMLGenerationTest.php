@@ -9,6 +9,7 @@ use \WC_Unit_Test_Case;
 use \WC_Product_Variable;
 
 use Automattic\WooCommerce\Pinterest\Logger;
+use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
 use Automattic\WooCommerce\Pinterest\Product\GoogleCategorySearch;
 use Automattic\WooCommerce\Pinterest\Product\GoogleProductTaxonomy;
@@ -631,6 +632,34 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$xml = $method->invoke( null, $product, '' );
 		// Google product category attribute was set, we should see it in the output.
 		$this->assertEquals( '<g:google_product_category>Arts &amp; Entertainment &gt; Hobbies &amp; Creative Arts &gt; Arts &amp; Crafts &gt; Art &amp; Craft Kits &gt; Jewelry Making Kits</g:google_product_category>' . PHP_EOL, $xml );
+	}
+
+	/**
+	 * @group feed
+	 *
+	 * Test that the feed is writable.
+	 */
+	public function testFeedWritable() {
+		// Create simple product.
+		$product = WC_Helper_Product::create_simple_product();
+
+		// We need header and footer so we can process XML directly.
+		$xml  = ProductsXmlFeed::get_xml_header();
+		$xml .= ProductsXmlFeed::get_xml_item( $product, 'US' );
+		$xml .= ProductsXmlFeed::get_xml_footer();
+
+		$feed_configurations = LocalFeedConfigs::get_instance();
+
+		foreach ( $feed_configurations->get_configurations() as $config ) {
+			$bytes_written = file_put_contents(
+				$config['tmp_file'],
+				$xml
+			);
+
+			$this->assertTrue( ( bool ) $bytes_written );
+
+			break;
+		}
 	}
 
 	/**

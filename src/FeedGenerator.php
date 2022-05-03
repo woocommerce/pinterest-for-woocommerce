@@ -480,6 +480,10 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	private function write_buffers_to_temp_files(): void {
 		foreach ( $this->configurations->get_configurations() as $location => $config ) {
+			if ( '' === $this->buffers[ $location ] ) {
+				continue;
+			}
+
 			$bytes_written = file_put_contents(
 				$config['tmp_file'],
 				$this->buffers[ $location ],
