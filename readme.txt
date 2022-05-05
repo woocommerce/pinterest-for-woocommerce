@@ -87,6 +87,11 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.0.12 - 2022-05-05 =
+* Dev - update trusted plugins in composer.json.
+* Fix - Feed generation fails if there is no eligible product.
+* Fix - Fix fatal error if `get_pinterest_code()` doesn't exists on Throwable object.
+
 = 1.0.11 - 2022-04-12 =
 * Add - Clear error when the merchant is connected to another e-commerce platform.
 * Add - Mexico added to supported countries.
