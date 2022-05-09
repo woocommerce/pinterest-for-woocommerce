@@ -10,6 +10,7 @@ use Automattic\WooCommerce\Admin\Features\Features;
 use Automattic\WooCommerce\Admin\Features\Navigation\Menu;
 use Automattic\WooCommerce\Admin\Features\Navigation\Screen;
 use Automattic\WooCommerce\Admin\Loader;
+use Automattic\WooCommerce\Admin\PageController;
 use Automattic\WooCommerce\Blocks\Package;
 use Automattic\WooCommerce\Blocks\Assets\AssetDataRegistry;
 use Automattic\WooCommerce\Pinterest\Compat;
@@ -241,13 +242,24 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				Features::is_enabled( 'navigation' );
 		}
 
+		/**
+		 * Compatibility layer for is_admin_page function.
+		 * Needed since WC 6.5.
+		 */
+		private function is_admin_page(): bool {
+			if ( method_exists( PageController::class, 'is_admin_page' ) ) {
+				return PageController::is_admin_page();
+			} else {
+				return class_exists( Loader::class ) && Loader::is_admin_page();
+			}
+		}
 
 		/**
 		 * Load the scripts needed for the setup guide / settings page.
 		 */
 		public function load_setup_guide_scripts() {
 
-			if ( ! class_exists( Loader::class ) || ! Loader::is_admin_page() ) {
+			if ( ! $this->is_admin_page() ) {
 				return;
 			}
 
@@ -316,8 +328,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		public function register_task_list_item( $registered_tasks_list_items ) {
 
 			if (
-				! class_exists( Loader::class ) ||
-				! Loader::is_admin_page() ||
+				! $this->is_admin_page() ||
 				! Compat::should_show_tasks()
 			) {
 				return $registered_tasks_list_items;
@@ -340,7 +351,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		 * @return void
 		 */
 		public function load_settings() {
-			if ( ! class_exists( Loader::class ) || ! class_exists( AssetDataRegistry::class ) || ! Loader::is_admin_page() ) {
+			if ( ! $this->is_admin_page() || ! class_exists( AssetDataRegistry::class ) ) {
 				return;
 			}
 
