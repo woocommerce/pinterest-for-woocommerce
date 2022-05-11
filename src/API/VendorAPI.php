@@ -59,14 +59,14 @@ class VendorAPI {
 	 *
 	 * @var bool
 	 */
-	public $supports_multiple_endpoints = false;
+	protected $supports_multiple_endpoints = false;
 
 	/**
 	 * Map with callbacks for each supported method
 	 *
 	 * @var array
 	 */
-	public $endpoint_callbacks_map = array();
+	protected $endpoint_callbacks_map = array();
 
 	/**
 	 * Returns the namespace.
@@ -105,10 +105,11 @@ class VendorAPI {
 	 * @param string $methods The endpoint's methods.
 	 * @param string $endpoint_callback The endpoint's callback.
 	 *
-	 * @since 1.0.11
+	 * @since x.x.x
 	 */
 	public function register_router_single_method( $methods = '', $endpoint_callback = '' ) {
-		$namespace = $this->api_namespace . $this->api_version;
+		$namespace         = $this->api_namespace . $this->api_version;
+		$endpoint_callback = empty( $endpoint_callback ) ? $this->endpoint_callback : $endpoint_callback;
 
 		register_rest_route(
 			$namespace,
@@ -116,7 +117,7 @@ class VendorAPI {
 			array(
 				array(
 					'methods'             => empty( $methods ) ? $this->methods : $methods,
-					'callback'            => array( $this, empty( $endpoint_callback ) ? $this->endpoint_callback : $endpoint_callback ),
+					'callback'            => array( $this, $endpoint_callback ),
 					'permission_callback' => array( $this, 'permissions_check' ),
 				),
 			)
@@ -126,7 +127,7 @@ class VendorAPI {
 	/**
 	 * Register endpoint route with multiple methods
 	 *
-	 * @since 1.0.11
+	 * @since x.x.x
 	 */
 	public function register_router_multiple_methods() {
 		foreach ( $this->endpoint_callbacks_map as $callback => $method ) {

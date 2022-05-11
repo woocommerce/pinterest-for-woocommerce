@@ -8,8 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
-use Automattic\WooCommerce\Pinterest\Logger as Logger;
-
+use \WP_Error;
 use \WP_REST_Server;
 use \WP_REST_Request;
 
@@ -59,7 +58,7 @@ class Options extends VendorAPI {
 	 */
 	public function set_settings( WP_REST_Request $request ) {
 		if ( ! $request->has_param( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ) || ! is_array( $request->get_param( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ) ) ) {
-			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_options_error', esc_html__( 'Missing option parameters.', 'pinterest-for-woocommerce' ), array( 'status' => 400 ) );
+			return new WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_options_error', esc_html__( 'Missing option parameters.', 'pinterest-for-woocommerce' ), array( 'status' => 400 ) );
 		}
 
 		if ( ! Pinterest_For_Woocommerce()::save_settings( $request->get_param( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ) ) ) {
