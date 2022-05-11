@@ -451,7 +451,10 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '><![CDATA[' . implode( ',', array_slice( $images, 0, self::ADDITIONAL_IMAGES_LIMIT ) ) . ']]></' . $property . '>';
+		$images = array_slice( $images, 0, self::ADDITIONAL_IMAGES_LIMIT );
+		$images = implode( ',', $images );
+
+		return '<' . $property . '><![CDATA[' . $images . ']]></' . $property . '>';
 	}
 
 	/**
