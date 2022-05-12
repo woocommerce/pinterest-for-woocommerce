@@ -62,7 +62,7 @@ class Options extends VendorAPI {
 		}
 
 		if ( ! Pinterest_For_Woocommerce()::save_settings( $request->get_param( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ) ) ) {
-			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_options_error', esc_html__( 'There was an error saving the settings.', 'pinterest-for-woocommerce' ), array( 'status' => 500 ) );
+			return new WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_options_error', esc_html__( 'There was an error saving the settings.', 'pinterest-for-woocommerce' ), array( 'status' => 500 ) );
 		}
 
 		return array(
