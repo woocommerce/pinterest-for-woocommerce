@@ -60,6 +60,13 @@ class ProductsXmlFeed {
 	 */
 	const DESCRIPTION_SIZE_CHARS_LIMIT = 10000;
 
+	/**
+	 * Limit of additional images allowed by Pinterest.
+	 *
+	 * @var int
+	 */
+	const ADDITIONAL_IMAGES_LIMIT = 10;
+
 
 	/**
 	 * Returns the XML header to be printed.
@@ -444,7 +451,10 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '><![CDATA[' . implode( ',', $images ) . ']]></' . $property . '>';
+		$images = array_slice( $images, 0, self::ADDITIONAL_IMAGES_LIMIT );
+		$images = implode( ',', $images );
+
+		return '<' . $property . '><![CDATA[' . $images . ']]></' . $property . '>';
 	}
 
 	/**
