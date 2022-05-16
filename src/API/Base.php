@@ -122,8 +122,18 @@ class Base {
 			} else {
 				$pinterest_code = method_exists( $e, 'get_pinterest_code' ) ? '( pinterest code: ' . $e->get_pinterest_code() . ')' : '';
 
-				/* Translators: 1: Request method 2: Request endpoint 3: Response status code 4: Response message 5: Pinterest code */
-				Logger::log( sprintf( esc_html__( "%1\$s Request: %2\$s\nStatus Code: %3\$s\nAPI response: %4\$s%5\$s", 'pinterest-for-woocommerce' ), $method, $request['url'], $e->getCode(), $e->getMessage(), $pinterest_code ), 'error' );
+				Logger::log(
+					sprintf(
+						/* Translators: 1: Request method 2: Request endpoint 3: Response status code 4: Response message */
+						esc_html__( "%1\$s Request: %2\$s\nStatus Code: %3\$s\nAPI response: %4\$s", 'pinterest-for-woocommerce' ),
+						$method,
+						$request['url'],
+						$e->getCode(),
+						$e->getMessage(),
+						$pinterest_code
+					),
+					'error'
+				);
 			}
 
 			throw $e;
