@@ -41,6 +41,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 				'HU', // Hungary.
 				'IE', // Ireland.
 				'IT', // Italy.
+				'JP', // Japan.
 				'LU', // Luxembourg.
 				'MT', // Malta.
 				'MX', // Mexico.
