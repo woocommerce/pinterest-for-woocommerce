@@ -95,9 +95,12 @@ class Base {
 			$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
 
 			$request = array(
-				'url'    => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
-				'method' => $method,
-				'args'   => $payload,
+				'url'     => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
+				'method'  => $method,
+				'args'    => $payload,
+				'headers' => array(
+					'Pinterest-Woocommerce-Version' => PINTEREST_FOR_WOOCOMMERCE_VERSION,
+				),
 			);
 
 			if ( 'ads/' === $api && 'POST' === $method ) {
