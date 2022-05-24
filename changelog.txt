@@ -1,5 +1,8 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.0.13 - 2022-05-24 =
+* Tweak - WC 6.5 compatibility.
+
 = 1.0.12 - 2022-05-05 =
 * Dev - update trusted plugins in composer.json.
 * Fix - Feed generation fails if there is no eligible product.
