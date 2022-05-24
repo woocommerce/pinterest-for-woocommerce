@@ -105,7 +105,7 @@ class VendorAPI {
 	 * @param string $methods The endpoint's methods.
 	 * @param string $endpoint_callback The endpoint's callback.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.13
 	 */
 	public function register_router_single_method( $methods = '', $endpoint_callback = '' ) {
 		$namespace         = $this->api_namespace . $this->api_version;
@@ -127,7 +127,7 @@ class VendorAPI {
 	/**
 	 * Register endpoint route with multiple methods
 	 *
-	 * @since x.x.x
+	 * @since 1.0.13
 	 */
 	public function register_router_multiple_methods() {
 		foreach ( $this->endpoint_callbacks_map as $callback => $method ) {

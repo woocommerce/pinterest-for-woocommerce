@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.9
 Requires PHP: 7.3
-Stable tag: 1.0.12
+Stable tag: 1.0.13
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -86,6 +86,13 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.0.13 - 2022-05-24 =
+* Add - Add action scheduler as a minimum plugin requirement.
+* Add - Japan to ads supported countries.
+* Add - Route to handle the plugin's settings.
+* Fix - Limit the number of additional images to 10.
+* Tweak - WC 6.5 compatibility.
 
 = 1.0.12 - 2022-05-05 =
 * Dev - update trusted plugins in composer.json.
