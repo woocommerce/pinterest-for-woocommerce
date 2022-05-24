@@ -22,11 +22,11 @@
  * Domain Path:       /i18n/languages
  *
  * Requires at least: 5.6
- * Tested up to: 5.9
+ * Tested up to: 6.2
  * Requires PHP: 7.3
  *
  * WC requires at least: 5.3
- * WC tested up to: 6.3
+ * WC tested up to: 6.5
  */
 
 /**
