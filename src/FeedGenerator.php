@@ -237,6 +237,8 @@ class FeedGenerator extends AbstractChainedJob {
 				array(
 					'grouped',
 					'variable',
+					'subscription',
+					'variable-subscription',
 				)
 			);
 
