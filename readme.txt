@@ -88,6 +88,10 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 == Changelog ==
 
 = 1.0.13 - 2022-05-24 =
+* Add - Add action scheduler as a minimum plugin requirement.
+* Add - Japan to ads supported countries.
+* Add - Route to handle the plugin's settings.
+* Fix - Limit the number of additional images to 10.
 * Tweak - WC 6.5 compatibility.
 
 = 1.0.12 - 2022-05-05 =
