@@ -54,4 +54,31 @@ trait PluginHelper {
 		return defined( 'WP_DEBUG' ) && WP_DEBUG;
 	}
 
+	/**
+	 * Helper method to return the onboarding page parameters.
+	 *
+	 * @return array The onboarding page parameters.
+	 */
+	protected function onboarding_page_parameters(): array {
+
+		return array(
+			'page' => 'wc-admin',
+			'path' => '/pinterest/onboarding',
+		);
+	}
+
+	/**
+	 * Check wether if the current page is the Get Started page.
+	 *
+	 * @return bool Wether the current page is the Get Started page.
+	 */
+	protected function is_onboarding_page(): bool {
+
+		if ( count( $this->onboarding_page_parameters() ) === count( array_intersect_assoc( $_GET, $this->onboarding_page_parameters() ) ) ) { // phpcs:disable WordPress.Security.NonceVerification.Recommended
+			return true;
+		}
+
+		return false;
+	}
+
 }
