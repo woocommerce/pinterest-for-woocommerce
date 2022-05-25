@@ -274,10 +274,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$view_factory         = new Pinterest\View\PHPViewFactory();
 			$admin                = new Pinterest\Admin\Admin( $view_factory );
 			$attributes_tab       = new Pinterest\Admin\Product\Attributes\AttributesTab( $admin );
+			$activation_redirect  = new Pinterest\Admin\ActivationRedirect();
 			$variation_attributes = new Pinterest\Admin\Product\Attributes\VariationsAttributes( $admin );
 
 			$admin->register();
 			$attributes_tab->register();
+			$activation_redirect->register();
 			$variation_attributes->register();
 		}
 
