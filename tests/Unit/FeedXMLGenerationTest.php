@@ -683,7 +683,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	/**
 	 * Remove filters and shortcodes.
 	 */
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 
 		// Remove any added filter.
