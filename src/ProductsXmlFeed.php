@@ -168,10 +168,13 @@ class ProductsXmlFeed {
 		$xml               = '';
 
 		// Merge with parent's attributes if it's a variation product.
-		if ( $product instanceof WC_Product_Variation && ! empty( $product->get_parent_id() ) ) {
-			$parent_product    = wc_get_product( $product->get_parent_id() );
-			$parent_attributes = $attribute_manager->get_all_values( $parent_product );
-			$attributes        = array_merge( $parent_attributes, $attributes );
+		if ( $product instanceof WC_Product_Variation ) {
+			$parent_product = wc_get_product( $product->get_parent_id() );
+
+			if ( $parent_product instanceof WC_Product ) {
+				$parent_attributes = $attribute_manager->get_all_values( $parent_product );
+				$attributes        = array_merge( $parent_attributes, $attributes );
+			}
 		}
 
 		foreach ( $attributes as $name => $value ) {
