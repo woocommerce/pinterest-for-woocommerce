@@ -77,7 +77,8 @@ class Base {
 	 *
 	 * @return array
 	 *
-	 * @throws Exception PHP exception.
+	 * @throws ApiException PHP exception.
+	 * @throws Exception    PHP exception.
 	 */
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 
