@@ -3,7 +3,7 @@
  * Helper class for handling the redirection to the onboarding page.
  *
  * @package Automattic\WooCommerce\Pinterest\Admin
- * @since   X.X.X
+ * @since   x.x.x
  */
 
 namespace Automattic\WooCommerce\Pinterest\Admin;
@@ -24,14 +24,14 @@ class ActivationRedirect {
 	/**
 	 * The setting for redirect to onboarding.
 	 *
-	 * @since  X.X.X
+	 * @since  x.x.x
 	 */
 	protected const REDIRECT_SETTING = 'redirect_to_onboarding';
 
 	/**
 	 * Initiate class.
 	 *
-	 * @since  X.X.X
+	 * @since  x.x.x
 	 */
 	public function register() {
 		add_action(
@@ -45,7 +45,7 @@ class ActivationRedirect {
 	/**
 	 * Checks if merchant should be redirected to the onboarding page.
 	 *
-	 * @since  X.X.X
+	 * @since  x.x.x
 	 * @return bool True if the redirection should have happened
 	 */
 	public function maybe_redirect_to_onboarding(): bool {
@@ -80,7 +80,7 @@ class ActivationRedirect {
 	 * Utility function to immediately redirect to the main "Get Started" onboarding page.
 	 * Note that this function immediately ends the execution.
 	 *
-	 * @since  X.X.X
+	 * @since  x.x.x
 	 * @return void
 	 */
 	protected function redirect_to_onboarding_page(): void {
@@ -98,7 +98,7 @@ class ActivationRedirect {
 	/**
 	 * Maybe update the redirect option.
 	 *
-	 * @since  X.X.X
+	 * @since  x.x.x
 	 */
 	public function maybe_update_redirect_option(): void {
 
@@ -116,7 +116,7 @@ class ActivationRedirect {
 	 * Update the redirect setting.
 	 *
 	 * @param bool $redirect_setting The new value.
-	 * @since X.X.X
+	 * @since x.x.x
 	 */
 	protected function update_redirect_setting( $redirect_setting ): void {
 		Pinterest_For_Woocommerce()->save_setting( self::REDIRECT_SETTING, $redirect_setting );
@@ -125,7 +125,7 @@ class ActivationRedirect {
 	/**
 	 * Get the redirect setting.
 	 *
-	 * @since  X.X.X
+	 * @since  x.x.x
 	 * @return bool
 	 */
 	protected function redirect_setting(): bool {

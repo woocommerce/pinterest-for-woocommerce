@@ -3,7 +3,7 @@
  * Helper class for handling the activation hook.
  *
  * @package Automattic\WooCommerce\Pinterest
- * @since   X.X.X
+ * @since   x.x.x
  */
 
 namespace Automattic\WooCommerce\Pinterest;
@@ -22,7 +22,7 @@ class PluginActivate {
 	/**
 	 * Activation hook
 	 *
-	 * @since X.X.X
+	 * @since x.x.x
 	 */
 	public function activate(): void {
 
@@ -36,7 +36,7 @@ class PluginActivate {
 	/**
 	 * Initialize the update helper class.
 	 *
-	 * @since  X.X.X
+	 * @since  x.x.x
 	 */
 	protected function init_plugin_update(): void {
 		( new PluginUpdate() )->update_plugin_update_version_option();
