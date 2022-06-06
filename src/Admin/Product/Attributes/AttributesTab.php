@@ -188,6 +188,8 @@ class AttributesTab {
 	/**
 	 * Return an array of WooCommerce product types that the Pinterest tab cannot be displayed for.
 	 *
+	 * @since x.x.x
+	 *
 	 * @return array of WooCommerce product types (e.g. 'subscription', 'variable-subscription', etc.)
 	 */
 	protected function get_hidden_product_types(): array {
