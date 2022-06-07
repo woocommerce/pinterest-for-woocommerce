@@ -27,6 +27,8 @@ defined( 'ABSPATH' ) || exit;
  */
 abstract class AbstractNote {
 
+	const NOTE_NAME = '';
+
 	/**
 	 * Check if the note has been previously added.
 	 *
