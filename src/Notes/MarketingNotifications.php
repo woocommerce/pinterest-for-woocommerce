@@ -65,6 +65,14 @@ class MarketingNotifications {
 			Utilities::set_account_connection_timestamp();
 		}
 
+		/*
+		 * Check to see whether we have initialized marketing notifications. If
+		 * not we set the timestamp now.
+		 */
+		if ( 0 === $this->get_init_timestamp() ) {
+			$this->set_init_timestamp();
+		}
+
 		foreach ( self::NOTES as $note ) {
 			/** @var AbstractNote $notification */
 			$notification = new $note();
@@ -78,23 +86,22 @@ class MarketingNotifications {
 	}
 
 	/**
-	 * Check if the init timestamp exist.
-	 * Initialize if not.
+	 * Get the notification init timestamp.
 	 *
 	 * @since x.x.x
 	 * @return int Initialization timestamp.
 	 */
-	public static function get_init_timestamp(): int {
-		$timestamp = get_option( self::INIT_TIMESTAMP );
-		if ( false !== $timestamp ) {
-			// Timestamp already init, return.
-			return (int) $timestamp;
-		}
-
-		// Timestamp not initialized, create a new one.
-		$timestamp = time();
-		add_option( self::INIT_TIMESTAMP, $timestamp );
-		return $timestamp;
+	protected function get_init_timestamp(): int {
+		return get_option( self::INIT_TIMESTAMP, 0 );
 	}
 
+	/**
+	 * Set the notification init timestamp to the current time.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	public function set_init_timestamp(): void {
+		add_option( self::INIT_TIMESTAMP, time() );
+	}
 }
