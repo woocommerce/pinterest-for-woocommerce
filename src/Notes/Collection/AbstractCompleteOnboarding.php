@@ -9,7 +9,6 @@
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
 
 use Automattic\WooCommerce\Admin\Notes\Note;
-use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -26,9 +25,12 @@ abstract class AbstractCompleteOnboarding extends AbstractNote {
 	 * Should the note be added to the inbox.
 	 *
 	 * @since x.x.x
+	 *
+	 * @param int $init_timestamp The marketing notifications init timestamp.
+	 *
 	 * @return boolean
 	 */
-	public function should_be_added(): bool {
+	public static function should_be_added( int $init_timestamp = 0 ): bool {
 		if ( Pinterest_For_Woocommerce()::is_setup_complete() ) {
 			return false;
 		}
@@ -38,7 +40,7 @@ abstract class AbstractCompleteOnboarding extends AbstractNote {
 		}
 
 		// Are we there yet?
-		if ( time() < ( DAY_IN_SECONDS * static::DELAY + MarketingNotifications::get_init_timestamp() ) ) {
+		if ( time() < ( DAY_IN_SECONDS * self::get_days_delay() + $init_timestamp ) ) {
 			return false;
 		}
 
@@ -72,4 +74,14 @@ abstract class AbstractCompleteOnboarding extends AbstractNote {
 		);
 	}
 
+	/**
+	 * Get the number of days that a notification should be delayed.
+	 *
+	 * This method should be overridden by child classes if needed.
+	 *
+	 * @return int
+	 */
+	protected static function get_days_delay(): int {
+		return 0;
+	}
 }

@@ -19,8 +19,7 @@ defined( 'ABSPATH' ) || exit;
  */
 class CompleteOnboardingAfterThreeDays extends AbstractCompleteOnboarding {
 
-	const DELAY     = 3;
-	const NOTE_NAME = 'pinterest-complete-onboarding-note-after-' . self::DELAY . '-days';
+	const NOTE_NAME = 'pinterest-complete-onboarding-note-after-3-days';
 
 	/**
 	 * Get note title.
@@ -42,4 +41,14 @@ class CompleteOnboardingAfterThreeDays extends AbstractCompleteOnboarding {
 		return __( 'Complete setting up Pinterest for WooCommerce to get your catalog in front of a large, engaged audience who are ready to buy! Create or connect your Pinterest business account to sync your product catalog and turn your products into shoppable Pins.', 'pinterest-for-woocommerce' );
 	}
 
+	/**
+	 * Get the number of days that a notification should be delayed.
+	 *
+	 * This method should be overridden by child classes if needed.
+	 *
+	 * @return int
+	 */
+	protected static function get_days_delay(): int {
+		return 3;
+	}
 }

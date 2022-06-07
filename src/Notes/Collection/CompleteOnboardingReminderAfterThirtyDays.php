@@ -19,7 +19,16 @@ defined( 'ABSPATH' ) || exit;
  */
 class CompleteOnboardingReminderAfterThirtyDays extends CompleteOnboardingReminderAfterSevenDays {
 
-	const DELAY     = 30;
-	const NOTE_NAME = 'pinterest-complete-onboarding-note-after-' . self::DELAY . '-days';
+	const NOTE_NAME = 'pinterest-complete-onboarding-note-after-30-days';
 
+	/**
+	 * Get the number of days that a notification should be delayed.
+	 *
+	 * This method should be overridden by child classes if needed.
+	 *
+	 * @return int
+	 */
+	protected static function get_days_delay(): int {
+		return 30;
+	}
 }
