@@ -74,11 +74,9 @@ trait PluginHelper {
 	 */
 	protected function is_onboarding_page(): bool {
 
-		if ( count( $this->onboarding_page_parameters() ) === count( array_intersect_assoc( $_GET, $this->onboarding_page_parameters() ) ) ) { // phpcs:disable WordPress.Security.NonceVerification.Recommended
-			return true;
-		}
+		$page_parameters = $this->onboarding_page_parameters();
 
-		return false;
+		return count( $page_parameters ) === count( array_intersect_assoc( $_GET, $page_parameters ) ); // phpcs:disable WordPress.Security.NonceVerification.Recommended
 	}
 
 }
