@@ -30,7 +30,7 @@ class EnableCatalogSync extends AbstractNote {
 	 * @since x.x.x
 	 * @return bool
 	 */
-	public function should_be_added(): bool {
+	public static function should_be_added(): bool {
 		if ( ! Pinterest_For_Woocommerce()::is_setup_complete() ) {
 			return false;
 		}

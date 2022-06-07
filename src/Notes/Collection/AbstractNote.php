@@ -158,6 +158,6 @@ abstract class AbstractNote {
 	 * @since x.x.x
 	 * @return bool Should the note be added.
 	 */
-	abstract public function should_be_added(): bool;
+	abstract public static function should_be_added(): bool;
 
 }

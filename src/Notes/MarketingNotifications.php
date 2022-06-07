@@ -73,15 +73,15 @@ class MarketingNotifications {
 			$this->set_init_timestamp();
 		}
 
+		/** @var AbstractNote $note */
 		foreach ( self::NOTES as $note ) {
-			/** @var AbstractNote $notification */
-			$notification = new $note();
-			if ( ! $notification->should_be_added() ) {
+			if ( ! $note::should_be_added( $this->get_init_timestamp() ) ) {
 				continue;
 			}
-			$notification
-				->prepare_note()
-				->save();
+
+			/** @var AbstractNote $notification */
+			$notification = new $note();
+			$notification->prepare_note()->save();
 		}
 	}
 
