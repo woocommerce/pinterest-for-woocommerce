@@ -13,10 +13,10 @@ namespace Automattic\WooCommerce\Pinterest\Notes;
 use Automattic\WooCommerce\Pinterest\Notes\Collection\AbstractNote;
 use Automattic\WooCommerce\Pinterest\Notes\Collection\EnableCatalogSync;
 use Automattic\WooCommerce\Pinterest\Notes\Collection\CatalogSyncErrors;
-use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingAfterThreeDays;
-use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingReminderAfterSevenDays;
-use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingReminderAfterFourteenDays;
-use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingReminderAfterThirtyDays;
+use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingAfterThreeDays as OnboardingThreeDays;
+use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingReminderAfterSevenDays as OnboardingSevenDays;
+use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingReminderAfterFourteenDays as OnboardingFourteenDays;
+use Automattic\WooCommerce\Pinterest\Notes\Collection\CompleteOnboardingReminderAfterThirtyDays as OnboardingThirtyDays;
 use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
 
 
@@ -43,10 +43,10 @@ class MarketingNotifications {
 	const NOTES = array(
 		EnableCatalogSync::class,
 		CatalogSyncErrors::class,
-		CompleteOnboardingAfterThreeDays::class,
-		CompleteOnboardingReminderAfterSevenDays::class,
-		CompleteOnboardingReminderAfterFourteenDays::class,
-		CompleteOnboardingReminderAfterThirtyDays::class,
+		OnboardingThreeDays::class,
+		OnboardingSevenDays::class,
+		OnboardingFourteenDays::class,
+		OnboardingThirtyDays::class,
 	);
 
 	/**
