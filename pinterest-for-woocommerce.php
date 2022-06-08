@@ -116,8 +116,7 @@ Pinterest_For_Woocommerce();
 register_activation_hook(
 	__FILE__,
 	function () {
-		// Initialize update engine on activation. This prevents update procedures from running on first activation.
-		( new Automattic\WooCommerce\Pinterest\PluginUpdate() )->update_plugin_update_version_option();
+		( new Automattic\WooCommerce\Pinterest\PluginActivate() )->activate();
 	}
 );
 
