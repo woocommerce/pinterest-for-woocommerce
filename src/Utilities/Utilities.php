@@ -17,7 +17,7 @@ namespace Automattic\WooCommerce\Pinterest\Utilities;
  */
 class Utilities {
 
-	const PINTEREST_ACCOUNT_CONNECTION_TIMESTAMP = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-account-connection-timestamp';
+	const ACCOUNT_CONNECTION_TIMESTAMP = PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_account_connection_timestamp';
 
 	/**
 	 * Set the account connection timestamp.
@@ -35,6 +35,6 @@ class Utilities {
 	 * @return int Account connection timestamp. Zero if not set.
 	 */
 	public static function get_account_connection_timestamp(): int {
-		return (int) get_option( self::PINTEREST_ACCOUNT_CONNECTION_TIMESTAMP, 0 );
+		return (int) get_option( self::ACCOUNT_CONNECTION_TIMESTAMP, 0 );
 	}
 }

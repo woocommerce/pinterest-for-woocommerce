@@ -34,10 +34,10 @@ defined( 'ABSPATH' ) || exit;
 class MarketingNotifications {
 
 	// All options common prefix.
-	const OPTIONS_PREFIX = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-marketing-notifications';
+	const OPTIONS_PREFIX = PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_marketing_notifications';
 
 	// Timestamp option marking the moment we start to count time.
-	const INIT_TIMESTAMP = self::OPTIONS_PREFIX . '-init-timestamp';
+	const INIT_TIMESTAMP = self::OPTIONS_PREFIX . '_init_timestamp';
 
 	// List of marketing notifications that we want to send.
 	const NOTES = array(
