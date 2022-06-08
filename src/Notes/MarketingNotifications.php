@@ -102,6 +102,6 @@ class MarketingNotifications {
 	 * @return void
 	 */
 	public function set_init_timestamp(): void {
-		add_option( self::INIT_TIMESTAMP, time() );
+		update_option( self::INIT_TIMESTAMP, time() );
 	}
 }

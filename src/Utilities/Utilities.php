@@ -25,7 +25,7 @@ class Utilities {
 	 * @since x.x.x
 	 */
 	public static function set_account_connection_timestamp() {
-		add_option( self::PINTEREST_ACCOUNT_CONNECTION_TIMESTAMP, time() );
+		update_option( self::ACCOUNT_CONNECTION_TIMESTAMP, time() );
 	}
 
 	/**
