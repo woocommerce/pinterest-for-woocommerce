@@ -92,7 +92,7 @@ class MarketingNotifications {
 	 * @return int Initialization timestamp.
 	 */
 	protected function get_init_timestamp(): int {
-		return get_option( self::INIT_TIMESTAMP, 0 );
+		return (int) get_option( self::INIT_TIMESTAMP, 0 );
 	}
 
 	/**
