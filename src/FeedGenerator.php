@@ -237,6 +237,8 @@ class FeedGenerator extends AbstractChainedJob {
 				array(
 					'grouped',
 					'variable',
+					'subscription',
+					'variable-subscription',
 				)
 			);
 
@@ -248,6 +250,15 @@ class FeedGenerator extends AbstractChainedJob {
 				'visibility' => 'catalog',
 				'orderby'    => 'none',
 				'limit'      => $this->get_batch_size(),
+			);
+
+			// Exclude variation subscriptions.
+			$products_query_args['parent_exclude'] = wc_get_products(
+				array(
+					'type'   => 'variable-subscription',
+					'limit'  => -1,
+					'return' => 'ids',
+				)
 			);
 
 			// Do not sync out of stock products if woocommerce_hide_out_of_stock_items is set.
