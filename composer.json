@@ -20,7 +20,8 @@
 		"php": ">=7.3",
 		"automattic/jetpack-autoloader": "^2.10.1",
 		"defuse/php-encryption": "^2.2",
-		"woocommerce/action-scheduler-job-framework": "^2.0.0"
+		"woocommerce/action-scheduler-job-framework": "^2.0.0",
+		"wp-cli/i18n-command": "^2.3"
 	},
 	"require-dev": {
 		"composer/installers": "^1.7.0",
