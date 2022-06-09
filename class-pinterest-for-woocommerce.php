@@ -7,6 +7,8 @@
  */
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Pinterest\Heartbeat;
+use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -77,6 +79,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.0.0
 		 */
 		protected static $initialized = false;
+
+		/**
+		 * Heartbeat instance.
+		 *
+		 * @var Heartbeat
+		 * @since x.x.x
+		 */
+		protected $heartbeat = null;
 
 		/**
 		 * When set to true, the settings have been
@@ -227,6 +237,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$this->includes();
 
+			// Start the heartbeat.
+			$this->heartbeat = new Heartbeat( WC()->queue() );
+			$this->heartbeat->init();
+
 			add_action( 'admin_init', array( $this, 'admin_init' ), 0 );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
@@ -249,6 +263,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Disconnect advertiser if advertiser or tag change.
 			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
+
+			// Init marketing notifications.
+			add_action( Heartbeat::DAILY, array( $this, 'init_marketing_notifications' ) );
 
 		}
 
@@ -281,6 +298,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$attributes_tab->register();
 			$activation_redirect->register();
 			$variation_attributes->register();
+		}
+
+		/**
+		 * Init marketing notifications.
+		 *
+		 * @since x.x.x
+		 */
+		public function init_marketing_notifications() {
+			$notifications = new MarketingNotifications();
+			$notifications->init_notifications();
 		}
 
 		/**
@@ -972,7 +999,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$account_data = self::get_setting( 'account_data' );
 			return isset( $account_data['is_any_website_verified'] ) ? (bool) $account_data['is_any_website_verified'] : false;
 		}
-
 
 		/**
 		 * Checks if tracking is configured properly and enabled.

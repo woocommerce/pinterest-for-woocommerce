@@ -278,7 +278,7 @@ class FeedIssues extends VendorAPI {
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
-	private static function get_feed_workflow( $feed_id ) {
+	public static function get_feed_workflow( $feed_id ) {
 		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
 		$feed_report = $merchant_id ? Base::get_merchant_feed_report( $merchant_id, $feed_id ) : false;
 
