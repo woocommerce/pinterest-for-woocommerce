@@ -75,7 +75,7 @@
     "semver": "^6.0.0",
     "stylelint": "^13.13.1",
     "underscore": "^1.9.1",
-    "woocommerce-grow-jsdoc": "https://gitpkg.now.sh/woocommerce/grow/packages/js/jsdoc?c99cb5af2f6d73c3d0c0173e5f8b0b681770a52e"
+    "woocommerce-grow-jsdoc": "https://gitpkg.now.sh/woocommerce/grow/packages/js/jsdoc?9eb10353728dc915bf5f7bdd4b8e218c625355a9"
   },
   "eslintConfig": {
     "extends": [
