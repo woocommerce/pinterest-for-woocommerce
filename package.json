@@ -109,7 +109,7 @@
     "dev": "wp-scripts build && gulp build",
     "doc:tracking": "jsdoc ./assets/source/ -c .jsdocrc.json -t ./woo-tracking-jsdoc",
     "format:js": "wp-scripts format ./assets/source",
-    "i18n": "WP_CLI_PHP_ARGS='-d memory_limit=2048M' ./vendor/bin/wp i18n make-pot ./ i18n/languages/$npm_package_name.pot --slug=$npm_package_name --domain=$npm_package_name --include=assets/build,includes,src,views,*.php",
+    "i18n": "WP_CLI_PHP_ARGS='-d memory_limit=2048M' ./vendor/bin/wp i18n make-pot ./ i18n/languages/$npm_package_name.pot --slug=$npm_package_name --domain=$npm_package_name --exclude='bin,*.asset.php,assets/source/_maps,assets/setup-*,assets/catalog-sync,assets/build,tests,woo-tracking-jsdoc,index.php,gulpfile.js,jest.config.js'",
     "lint:css": "wp-scripts lint-style ./assets/source",
     "lint:css:fix": "wp-scripts lint-style ./assets/source --fix",
     "lint:js": "wp-scripts lint-js ./assets/source",
