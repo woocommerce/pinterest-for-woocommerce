@@ -7,12 +7,14 @@
 
 declare( strict_types=1 );
 
+use Automattic\WooCommerce\Pinterest\View\PHPView;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
  * PHP View.
  *
- * @var \Automattic\WooCommerce\GoogleListingsAndAds\View\PHPView $this
+ * @var PHPView $this
  */
 
 /**
