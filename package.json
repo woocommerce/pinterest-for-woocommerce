@@ -103,13 +103,14 @@
     }
   },
   "scripts": {
-    "prebuild": "composer install --no-dev --no-interaction",
-    "build": "wp-scripts build && gulp package",
-    "postbuild": "composer install",
-    "build:zip": "npm run build",
+    "prebuild": "composer install",
+    "build": "wp-scripts build && gulp build && npm run i18n",
+    "build:zip": "npm run build && composer install --no-dev -n && gulp zip",
+    "postbuild:zip": "composer install",
     "dev": "wp-scripts build && gulp build",
     "doc:tracking": "woocommerce-grow-jsdoc ./assets/source/",
     "format:js": "wp-scripts format ./assets/source",
+    "i18n": "WP_CLI_PHP_ARGS='-d memory_limit=2048M' ./vendor/bin/wp i18n make-pot ./ i18n/languages/$npm_package_name.pot --slug=$npm_package_name --domain=$npm_package_name --exclude='bin,*.asset.php,assets/source/_maps,assets/setup-*,assets/catalog-sync,assets/build,tests,woo-tracking-jsdoc,index.php,gulpfile.js,jest.config.js'",
     "lint:css": "wp-scripts lint-style ./assets/source",
     "lint:css:fix": "wp-scripts lint-style ./assets/source --fix",
     "lint:js": "wp-scripts lint-js ./assets/source",
@@ -147,6 +148,7 @@
     "npm": ">=6.14.10 <7"
   },
   "config": {
+    "build_step": "npm run build:zip",
     "wp_org_slug": "pinterest-for-woocommerce",
     "version_replace_paths": [
       "includes",
