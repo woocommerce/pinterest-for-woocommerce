@@ -87,6 +87,17 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.1.0 - 2022-06-17 =
+* Add - .pot file for translators.
+* Add - Inbox notifications for the onboarding process and catalog sync.
+* Add - Key flows documentation.
+* Add - The user will be redirected to the Get started page on first activation.
+* Fix - Add plugin version to request headers.
+* Fix - Error on feed generation due to orphaned variations.
+* Fix - Unit tests for WooCommerce 6.5.
+* Tweak - Improvements on the error logs.
+* Tweak - WC 6.6 compatibility.
+
 = 1.0.13 - 2022-05-24 =
 * Add - Add action scheduler as a minimum plugin requirement.
 * Add - Japan to ads supported countries.
