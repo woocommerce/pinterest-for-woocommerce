@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Abstract Note.
  *
  * @package Pinterest_For_WooCommerce/Classes/
- * @version x.x.x
+ * @version 1.1.0
  */
 
 declare( strict_types=1 );
@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
  * AbstractNote class. This is a proxy that helps us using the WC Admin Note
  * class in the context of Pinterest For WooCommerce plugin.
  *
- * @since x.x.x
+ * @since 1.1.0
  */
 abstract class AbstractNote {
 
@@ -49,7 +49,7 @@ abstract class AbstractNote {
 	/**
 	 * Get the note entry.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return Note Pre-filled note.
 	 */
 	public function prepare_note() {
@@ -61,7 +61,7 @@ abstract class AbstractNote {
 	/**
 	 * Use helper functions to prepare the note.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @param Note $note The note that we are setting up.
 	 *
 	 * @return void
@@ -81,7 +81,7 @@ abstract class AbstractNote {
 	/**
 	 * Get note type.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return string Note type.
 	 */
 	protected function get_type(): string {
@@ -91,7 +91,7 @@ abstract class AbstractNote {
 	/**
 	 * Get the note's unique name.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return string Note name.
 	 */
 	protected function get_name(): string {
@@ -101,7 +101,7 @@ abstract class AbstractNote {
 	/**
 	 * Get note layout style.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return string Note layout style.
 	 */
 	protected function get_layout() {
@@ -111,7 +111,7 @@ abstract class AbstractNote {
 	/**
 	 * Get note image.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return string URL to note image.
 	 */
 	protected function get_image() {
@@ -121,7 +121,7 @@ abstract class AbstractNote {
 	/**
 	 * Add action to note if necessary.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @param Note $note Note to which we want to add an action.
 	 */
 	protected function add_action( $note ): void {}
@@ -129,7 +129,7 @@ abstract class AbstractNote {
 	/**
 	 * Get note slug;
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return string Note Slug.
 	 */
 	private function get_slug(): string {
@@ -139,7 +139,7 @@ abstract class AbstractNote {
 	/**
 	 * Get note title.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return string Note title.
 	 */
 	abstract protected function get_note_title(): string;
@@ -147,7 +147,7 @@ abstract class AbstractNote {
 	/**
 	 * Get note content.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return string Note content.
 	 */
 	abstract protected function get_note_content(): string;
@@ -155,7 +155,7 @@ abstract class AbstractNote {
 	/**
 	 * Check whether the note should be added.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return bool Should the note be added.
 	 */
 	abstract public static function should_be_added(): bool;

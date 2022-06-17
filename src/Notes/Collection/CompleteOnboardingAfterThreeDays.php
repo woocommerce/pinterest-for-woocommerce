@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce CompleteOnboardingAfterThreeDays class.
  *
  * @package Pinterest_For_WooCommerce/Classes/
- * @version x.x.x
+ * @version 1.1.0
  */
 
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * Class responsible for admin Inbox notification after three days from setup.
  *
- * @since x.x.x
+ * @since 1.1.0
  */
 class CompleteOnboardingAfterThreeDays extends AbstractCompleteOnboarding {
 
@@ -24,7 +24,7 @@ class CompleteOnboardingAfterThreeDays extends AbstractCompleteOnboarding {
 	/**
 	 * Get note title.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return string Note title.
 	 */
 	protected function get_note_title(): string {
@@ -34,7 +34,7 @@ class CompleteOnboardingAfterThreeDays extends AbstractCompleteOnboarding {
 	/**
 	 * Get note content.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return string Note content.
 	 */
 	protected function get_note_content(): string {

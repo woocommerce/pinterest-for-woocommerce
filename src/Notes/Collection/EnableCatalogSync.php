@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce EnableCatalogSync class.
  *
  * @package Pinterest_For_WooCommerce/Classes/
- * @version x.x.x
+ * @version 1.1.0
  */
 
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
@@ -18,7 +18,7 @@ use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
  * Class responsible for admin Inbox notification after successful connection but
  * the sync feature disabled.
  *
- * @since x.x.x
+ * @since 1.1.0
  */
 class EnableCatalogSync extends AbstractNote {
 
@@ -27,7 +27,7 @@ class EnableCatalogSync extends AbstractNote {
 	/**
 	 * Should the note be added to the inbox.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return bool
 	 */
 	public static function should_be_added(): bool {
@@ -55,7 +55,7 @@ class EnableCatalogSync extends AbstractNote {
 	/**
 	 * Get note title.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return string Note title.
 	 */
 	protected function get_note_title(): string {
@@ -65,7 +65,7 @@ class EnableCatalogSync extends AbstractNote {
 	/**
 	 * Get note content.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return string Note content.
 	 */
 	protected function get_note_content(): string {
@@ -75,7 +75,7 @@ class EnableCatalogSync extends AbstractNote {
 	/**
 	 * Add button to Pinterest For WooCommerce landing page
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @param Note $note Note to which we add an action.
 	 */
 	protected function add_action( $note ): void {

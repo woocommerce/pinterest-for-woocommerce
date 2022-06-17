@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Abstract Marketing Note class.
  *
  * @package Pinterest_For_WooCommerce/Classes/
- * @version x.x.x
+ * @version 1.1.0
  */
 
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
@@ -17,14 +17,14 @@ defined( 'ABSPATH' ) || exit;
  *
  * Base class for a set of onboarding reminders.
  *
- * @since x.x.x
+ * @since 1.1.0
  */
 abstract class AbstractCompleteOnboarding extends AbstractNote {
 
 	/**
 	 * Should the note be added to the inbox.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 *
 	 * @param int $init_timestamp The marketing notifications init timestamp.
 	 *
@@ -63,7 +63,7 @@ abstract class AbstractCompleteOnboarding extends AbstractNote {
 	/**
 	 * Add button to Pinterest For WooCommerce landing page.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @param Note $note Note to which we add an action.
 	 */
 	protected function add_action( $note ): void {

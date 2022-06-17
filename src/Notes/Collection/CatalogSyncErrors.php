@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce CatalogSyncErrors class.
  *
  * @package Pinterest_For_WooCommerce/Classes/
- * @version x.x.x
+ * @version 1.1.0
  */
 
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
@@ -21,7 +21,7 @@ use Throwable;
  * Class responsible for admin Inbox notification after successful connection but
  * when the catalog ingestion fails.
  *
- * @since x.x.x
+ * @since 1.1.0
  */
 class CatalogSyncErrors extends AbstractNote {
 
@@ -30,7 +30,7 @@ class CatalogSyncErrors extends AbstractNote {
 	/**
 	 * Should the note be added to the inbox.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return bool
 	 */
 	public static function should_be_added(): bool {
@@ -80,7 +80,7 @@ class CatalogSyncErrors extends AbstractNote {
 	/**
 	 * Get note title.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return string Note title.
 	 */
 	protected function get_note_title(): string {
@@ -90,7 +90,7 @@ class CatalogSyncErrors extends AbstractNote {
 	/**
 	 * Get note content.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return string Note content.
 	 */
 	protected function get_note_content(): string {
@@ -100,7 +100,7 @@ class CatalogSyncErrors extends AbstractNote {
 	/**
 	 * Add button to Pinterest For WooCommerce landing page
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @param Note $note Note to which we add an action.
 	 */
 	protected function add_action( $note ): void {

@@ -188,7 +188,7 @@ class AttributesTab {
 	/**
 	 * Return an array of WooCommerce product types that the Pinterest tab cannot be displayed for.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 *
 	 * @return array of WooCommerce product types (e.g. 'subscription', 'variable-subscription', etc.)
 	 */

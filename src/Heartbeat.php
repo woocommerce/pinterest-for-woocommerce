@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Heartbeat class.
  *
  * @package Pinterest_For_WooCommerce/Classes/
- * @version x.x.x
+ * @version 1.1.0
  */
 
 namespace Automattic\WooCommerce\Pinterest;
@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
  * Responsible for scheduling cron heartbeat hooks.
  * Useful for performing various async actions of low intensity.
  *
- * @since x.x.x
+ * @since 1.1.0
  */
 class Heartbeat {
 
@@ -37,7 +37,7 @@ class Heartbeat {
 	/**
 	 * Heartbeat constructor.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @param WC_Queue_Interface $queue WC Action Scheduler proxy.
 	 */
 	public function __construct( WC_Queue_Interface $queue ) {
@@ -54,7 +54,7 @@ class Heartbeat {
 	/**
 	 * Schedule heartbeat events.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 */
 	public function schedule_events() {
 		if ( null === $this->queue->get_next( self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {

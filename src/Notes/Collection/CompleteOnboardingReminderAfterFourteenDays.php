@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce CompleteOnboardingAfterFourteenDays class.
  *
  * @package Pinterest_For_WooCommerce/Classes/
- * @version x.x.x
+ * @version 1.1.0
  */
 
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * Class responsible for admin Inbox notification after fourteen days from setup.
  *
- * @since x.x.x
+ * @since 1.1.0
  */
 class CompleteOnboardingReminderAfterFourteenDays extends CompleteOnboardingReminderAfterSevenDays {
 

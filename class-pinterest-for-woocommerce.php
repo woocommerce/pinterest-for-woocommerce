@@ -84,7 +84,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Heartbeat instance.
 		 *
 		 * @var Heartbeat
-		 * @since x.x.x
+		 * @since 1.1.0
 		 */
 		protected $heartbeat = null;
 
@@ -303,7 +303,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Init marketing notifications.
 		 *
-		 * @since x.x.x
+		 * @since 1.1.0
 		 */
 		public function init_marketing_notifications() {
 			$notifications = new MarketingNotifications();

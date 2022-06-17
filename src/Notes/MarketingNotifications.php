@@ -3,7 +3,7 @@
  * Marketing notifications for merchants (admin).
  *
  * @package Pinterest_For_WooCommerce/Classes/
- * @since   x.x.x
+ * @since   1.1.0
  */
 
 declare( strict_types=1 );
@@ -29,7 +29,7 @@ defined( 'ABSPATH' ) || exit;
  * be sent some time after the plugin installation. There is no retroactive
  * way of figuring out when the plugin was first installed. So we count
  *
- * @since x.x.x
+ * @since 1.1.0
  */
 class MarketingNotifications {
 
@@ -52,7 +52,7 @@ class MarketingNotifications {
 	/**
 	 * Trigger inbox messages.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return void
 	 */
 	public function init_notifications(): void {
@@ -88,7 +88,7 @@ class MarketingNotifications {
 	/**
 	 * Get the notification init timestamp.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return int Initialization timestamp.
 	 */
 	protected function get_init_timestamp(): int {
@@ -98,7 +98,7 @@ class MarketingNotifications {
 	/**
 	 * Set the notification init timestamp to the current time.
 	 *
-	 * @since x.x.x
+	 * @since 1.1.0
 	 * @return void
 	 */
 	public function set_init_timestamp(): void {
