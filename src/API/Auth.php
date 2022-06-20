@@ -71,7 +71,7 @@ class Auth extends VendorAPI {
 	public function redirect_to_settings_page( $served, $result, $request ) {
 
 		if ( 401 === $result->get_status() ) {
-			$error_message = esc_html__( 'Something went wrong with your attempt to authorize this App. Please try agagin.', 'pinterest-for-woocommerce' );
+			$error_message = esc_html__( 'Something went wrong with your attempt to authorize this App. Please try again.', 'pinterest-for-woocommerce' );
 			wp_safe_redirect( add_query_arg( 'error', rawurlencode( $error_message ), $this->get_redirect_url( $request->get_param( 'view' ), true ) ) );
 			exit;
 		}

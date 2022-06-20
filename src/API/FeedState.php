@@ -116,7 +116,7 @@ class FeedState extends VendorAPI {
 							'extra_info'   => wp_kses_post(
 								sprintf(
 									/* Translators: %1$s The URL of the settings page */
-									__( 'Visit the <a href="%1$s">settings</a> page to enabled it.', 'pinterest-for-woocommerce' ),
+									__( 'Visit the <a href="%1$s">settings</a> page to enable it.', 'pinterest-for-woocommerce' ),
 									esc_url(
 										add_query_arg(
 											array(
@@ -173,8 +173,15 @@ class FeedState extends VendorAPI {
 				$status       = 'pending';
 				$status_label = esc_html__( 'Feed generation in progress.', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
-					/* Translators: %1$s Time string, %2$s number of products */
-					esc_html__( 'Last activity: %1$s ago - Wrote %2$s products to %3$sfeed file%4$s.', 'pinterest-for-woocommerce' ),
+					esc_html(
+						/* Translators: %1$s Time string, %2$s number of products */
+						_n(
+							'Last activity: %1$s ago - Wrote %2$s product to %3$sfeed file%4$s.',
+							'Last activity: %1$s ago - Wrote %2$s products to %3$sfeed file%4$s.',
+							$state['product_count'],
+							'pinterest-for-woocommerce'
+						)
+					),
 					human_time_diff( $state['last_activity'] ),
 					$state['product_count'],
 					sprintf( '<a href="%s" target="_blank">', esc_url( $this->get_feed_url() ) ),
@@ -186,8 +193,15 @@ class FeedState extends VendorAPI {
 				$status       = 'success';
 				$status_label = esc_html__( 'Up to date', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
-					/* Translators: %1$s Time string, %2$s total number of products */
-					esc_html__( 'Successfully generated %1$s ago - Wrote %2$s products to %3$sfeed file%4$s', 'pinterest-for-woocommerce' ),
+					esc_html(
+						/* Translators: %1$s Time string, %2$s total number of products */
+						_n(
+							'Successfully generated %1$s ago - Wrote %2$s product to %3$sfeed file%4$s',
+							'Successfully generated %1$s ago - Wrote %2$s products to %3$sfeed file%4$s',
+							$state['product_count'],
+							'pinterest-for-woocommerce'
+						)
+					),
 					human_time_diff( $state['last_activity'] ),
 					$state['product_count'],
 					sprintf( '<a href="%s" target="_blank">', esc_url( $this->get_feed_url() ) ),
