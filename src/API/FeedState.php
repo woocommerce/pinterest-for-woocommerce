@@ -174,7 +174,7 @@ class FeedState extends VendorAPI {
 				$status_label = esc_html__( 'Feed generation in progress.', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
 					esc_html(
-						/* Translators: %1$s Time string, %2$s number of products */
+						/* translators: 1: Time string, 2: number of products, 3: opening anchor tag, 4: closing anchor tag */
 						_n(
 							'Last activity: %1$s ago - Wrote %2$s product to %3$sfeed file%4$s.',
 							'Last activity: %1$s ago - Wrote %2$s products to %3$sfeed file%4$s.',
@@ -194,7 +194,7 @@ class FeedState extends VendorAPI {
 				$status_label = esc_html__( 'Up to date', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
 					esc_html(
-						/* Translators: %1$s Time string, %2$s total number of products */
+						/* translators: 1: Time string, 2: total number of products, 3: opening anchor tag, 4: closing anchor tag */
 						_n(
 							'Successfully generated %1$s ago - Wrote %2$s product to %3$sfeed file%4$s',
 							'Successfully generated %1$s ago - Wrote %2$s products to %3$sfeed file%4$s',
