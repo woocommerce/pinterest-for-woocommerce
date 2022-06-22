@@ -566,4 +566,22 @@ JS;
 
 		return $args;
 	}
+
+	/**
+	 * Detect if there are other tags installed on the site.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array The list of installed tags.
+	 */
+	public static function get_third_party_installed_tags() {
+
+		if ( ! self::get_active_tag() || ! self::tracking_enabled() ) {
+			return array();
+		}
+
+		$third_party_tags = array();
+
+		return $third_party_tags;
+	}
 }

@@ -129,6 +129,51 @@ const FormattedReasons = ( { reasons } ) => {
 	);
 };
 
+const ThirdPartyTagsNotice = ( { tags } ) => {
+	if ( undefined === tags || tags.length < 1 ) {
+		return null;
+	}
+
+	const action = [
+		{
+			label: __(
+				'Disable potential conflicting tags',
+				'pinterest-for-woocommerce'
+			),
+			url: '/wp-admin/plugins.php',
+		},
+		{
+			label: __(
+				'Disable tracking in the plugin',
+				'pinterest-for-woocommerce'
+			),
+			url: 'admin.php?page=wc-admin&path=%2Fpinterest%2Fsettings',
+		},
+	];
+
+	const formattedTags = [];
+	for ( const tag in tags ) {
+		formattedTags.push( <li key={ tag }>{ tags[ tag ] }</li> );
+	}
+
+	return (
+		<Notice
+			status="warning"
+			isDismissible={ true }
+			actions={ action }
+			className="pinterest-for-woocommerce-healthcheck-notice"
+		>
+			<Text variant="titleSmall">
+				{ __(
+					'There are other installed tags extensions that can potentially cause problems with tracking.',
+					'pinterest-for-woocommerce'
+				) }
+			</Text>
+			<ul>{ formattedTags }</ul>
+		</Notice>
+	);
+};
+
 const HealthCheck = () => {
 	const createNotice = useCreateNotice();
 	const appSettings = useSettingsSelect();
@@ -248,16 +293,19 @@ const HealthCheck = () => {
 	}
 
 	return (
-		<Notice
-			status={ notice.status }
-			isDismissible={ notice.dismissible }
-			actions={ notice.actions || [] }
-			className="pinterest-for-woocommerce-healthcheck-notice"
-		>
-			<Text variant="titleSmall">{ notice.message }</Text>
-			<FormattedReasons reasons={ notice.reasons } />
-			{ notice.body }
-		</Notice>
+		<>
+			<Notice
+				status={ notice.status }
+				isDismissible={ notice.dismissible }
+				actions={ notice.actions || [] }
+				className="pinterest-for-woocommerce-healthcheck-notice"
+			>
+				<Text variant="titleSmall">{ notice.message }</Text>
+				<FormattedReasons reasons={ notice.reasons } />
+				{ notice.body }
+			</Notice>
+			<ThirdPartyTagsNotice tags={ healthStatus.third_party_tags } />
+		</>
 	);
 };
 
