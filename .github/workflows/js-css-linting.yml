@@ -15,6 +15,10 @@ on:
       - "**.scss"
       - .github/workflows/js-css-linting.yml
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   JSLintingCheck:
     name: Lint JavaScript

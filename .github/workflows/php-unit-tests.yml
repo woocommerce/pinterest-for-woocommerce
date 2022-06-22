@@ -17,6 +17,10 @@ on:
       - composer.lock
       - .github/workflows/php-unit-tests.yml
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   UnitTests:
     name: PHP unit tests - PHP ${{ matrix.php }}, WP ${{ matrix.wp-version }}

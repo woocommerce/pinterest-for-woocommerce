@@ -17,6 +17,10 @@ on:
       - package-lock.json
       - .github/workflows/js-unit-tests.yml
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   UnitTests:
     name: JavaScript unit tests
