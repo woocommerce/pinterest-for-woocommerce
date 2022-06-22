@@ -1,5 +1,10 @@
 # Pinterest for WooCommerce
 
+[![PHP Unit Tests](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-unit-tests.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-unit-tests.yml)
+[![JavaScript Unit Tests](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-unit-tests.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-unit-tests.yml)
+[![PHP Coding Standards](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-coding-standards.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-coding-standards.yml)
+[![JavaScript and CSS Linting](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-css-linting.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-css-linting.yml)
+
 A native integration which allows you to market your store on Pinterest, including:
 
 -   [Sync your WooCommerce products to Pinterest.](https://help.pinterest.com/en/business/article/before-you-get-started-with-catalogs)
