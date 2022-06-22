@@ -5,7 +5,17 @@ on:
     branches:
       - trunk
       - develop
+    paths:
+      - "**.js"
+      - package.json
+      - package-lock.json
+      - .github/workflows/js-unit-tests.yml
   pull_request:
+    paths:
+      - "**.js"
+      - package.json
+      - package-lock.json
+      - .github/workflows/js-unit-tests.yml
 
 jobs:
   UnitTests:

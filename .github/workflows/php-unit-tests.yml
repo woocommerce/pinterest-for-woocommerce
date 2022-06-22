@@ -5,7 +5,17 @@ on:
     branches:
       - trunk
       - develop
+    paths:
+      - "**.php"
+      - composer.json
+      - composer.lock
+      - .github/workflows/php-unit-tests.yml
   pull_request:
+    paths:
+      - "**.php"
+      - composer.json
+      - composer.lock
+      - .github/workflows/php-unit-tests.yml
 
 jobs:
   UnitTests:

@@ -5,7 +5,15 @@ on:
     branches:
       - trunk
       - develop
+    paths:
+      - "**.js"
+      - "**.scss"
+      - .github/workflows/js-css-linting.yml
   pull_request:
+    paths:
+      - "**.js"
+      - "**.scss"
+      - .github/workflows/js-css-linting.yml
 
 jobs:
   JSLintingCheck:
