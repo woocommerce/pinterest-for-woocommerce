@@ -42,17 +42,26 @@ class Tracking {
 	 * The base tracking snippet.
 	 * Documentation: https://help.pinterest.com/en/business/article/install-the-pinterest-tag
 	 *
-	 * @var array
+	 * @var string
 	 */
-	private static $base_tag = "<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "', { np: \"woocommerce\" } );\n  pintrk('page');\n</script>\n\n<noscript>\n  <img height=\"1\" width=\"1\" style=\"display:none;\" alt=\"\" src=\"https://ct.pinterest.com/v3/?tid=" . self::TAG_ID_SLUG . "&noscript=1\" />\n</noscript>\n";
+	private static $base_tag = "<!-- Pinterest Pixel Base Code -->\n<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "', { np: \"woocommerce\" } );\n  pintrk('page');\n</script>\n<!-- End Pinterest Pixel Base Code -->\n";
 
 	/**
 	 * The base tracking snippet with Enchanced match support.
 	 * Documentation: https://help.pinterest.com/en/business/article/enhanced-match
 	 *
-	 * @var array
+	 * @var string
 	 */
-	private static $base_tag_em = "<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n pintrk('load', '" . self::TAG_ID_SLUG . "', { em: '" . self::HASHED_EMAIL_SLUG . "', np: \"woocommerce\" });\n  pintrk('page');\n</script>\n\n<noscript>\n  <img height=\"1\" width=\"1\" style=\"display:none;\" alt=\"\" src=\"https://ct.pinterest.com/v3/?tid=" . self::TAG_ID_SLUG . '&pd[em]=' . self::HASHED_EMAIL_SLUG . "&noscript=1\" />\n</noscript>\n";
+	private static $base_tag_em = "<!-- Pinterest Pixel Base Code -->\n<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n pintrk('load', '" . self::TAG_ID_SLUG . "', { em: '" . self::HASHED_EMAIL_SLUG . "', np: \"woocommerce\" });\n  pintrk('page');\n</script>\n<!-- End Pinterest Pixel Base Code -->\n";
+
+
+	/**
+	 * The noscript base tracking snippet.
+	 * Documentation: https://help.pinterest.com/en/business/article/install-the-pinterest-tag
+	 *
+	 * @var string
+	 */
+	private static $noscript_base_tag = '<!-- Pinterest Pixel Base Code -->\n<noscript>\n  <img height=\"1\" width=\"1\" style=\"display:none;\" alt=\"\" src=\"https://ct.pinterest.com/v3/?tid=' . self::TAG_ID_SLUG . '&noscript=1\" />\n</noscript>\n<!-- End Pinterest Pixel Base Code -->\n';
 
 	/**
 	 * The user/customer specific key used to store async events that are to be printed the next
@@ -115,6 +124,9 @@ class Tracking {
 
 		// Print to head.
 		add_action( 'wp_head', array( __CLASS__, 'print_script' ) );
+
+		// Print noscript to body.
+		add_action( 'wp_body_open', array( __CLASS__, 'print_noscript' ), 0 );
 
 		add_action( 'admin_init', array( __CLASS__, 'verify_advertiser_connection' ) );
 	}
@@ -506,6 +518,25 @@ JS;
 				self::$events = array();
 			}
 		}
+	}
+
+
+	/**
+	 * Prints the noscript code.
+	 *
+	 * @return void
+	 */
+	public static function print_noscript() {
+
+		$active_tag = self::get_active_tag();
+
+		if ( ! $active_tag ) {
+			return;
+		}
+
+		$noscript = str_replace( self::TAG_ID_SLUG, sanitize_key( $active_tag ), self::$noscript_base_tag );
+
+		echo $noscript; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
 	}
 
 
