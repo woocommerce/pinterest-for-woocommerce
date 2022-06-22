@@ -61,7 +61,7 @@ class Tracking {
 	 *
 	 * @var string
 	 */
-	private static $noscript_base_tag = "<!-- Pinterest Pixel Base Code -->\n<noscript>\n  <img height=\"1\" width=\"1\" style=\"display:none;\" alt=\"\" src=\"https://ct.pinterest.com/v3/?tid=" . self::TAG_ID_SLUG . "&noscript=1\" />\n</noscript>\n<!-- End Pinterest Pixel Base Code -->\n";
+	private static $noscript_base_tag = '<!-- Pinterest Pixel Base Code -->\n<noscript>\n  <img height=\"1\" width=\"1\" style=\"display:none;\" alt=\"\" src=\"https://ct.pinterest.com/v3/?tid=' . self::TAG_ID_SLUG . '&noscript=1\" />\n</noscript>\n<!-- End Pinterest Pixel Base Code -->\n';
 
 	/**
 	 * The user/customer specific key used to store async events that are to be printed the next
@@ -528,11 +528,15 @@ JS;
 	 */
 	public static function print_noscript() {
 
-		if ( ! self::get_active_tag() ) {
+		$active_tag = self::get_active_tag();
+
+		if ( ! $active_tag ) {
 			return;
 		}
 
-		echo self::$noscript_base_tag; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
+		$noscript = str_replace( self::TAG_ID_SLUG, sanitize_key( $active_tag ), self::$noscript_base_tag );
+
+		echo $noscript; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
 	}
 
 
