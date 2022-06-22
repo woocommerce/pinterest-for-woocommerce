@@ -8,28 +8,17 @@ on:
   pull_request:
 
 jobs:
-  Setup:
-    name: Setup for jobs
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Prepare node
-        uses: ./.github/actions/prepare-node
-        with:
-          install-deps: "maybe"
-
   JSLintingCheck:
     name: Lint JavaScript
-    needs: Setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Prepare node
-        uses: ./.github/actions/prepare-node
+        uses: woocommerce/grow/prepare-node@actions-v1
+        with:
+          node-version-file: ".nvmrc"
 
       - name: Save code linting report JSON
         run: npm run lint:js -- --quiet --output-file eslint_report.json --format json
@@ -50,14 +39,15 @@ jobs:
 
   CSSLintingCheck:
     name: Lint CSS
-    needs: Setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Prepare node
-        uses: ./.github/actions/prepare-node
+        uses: woocommerce/grow/prepare-node@actions-v1
+        with:
+          node-version-file: ".nvmrc"
 
       - name: Lint CSS
         run: npm run lint:css

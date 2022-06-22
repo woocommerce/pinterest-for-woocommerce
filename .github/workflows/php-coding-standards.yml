@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Prepare PHP
-        uses: ./.github/actions/prepare-php
+        uses: woocommerce/grow/prepare-php@actions-v1
         with:
           php-version: '7.3'
           tools: cs2pr
