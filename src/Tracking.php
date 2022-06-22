@@ -582,6 +582,10 @@ JS;
 
 		$third_party_tags = array();
 
+		if ( defined( 'GTM4WP_VERSION' ) ) {
+			$third_party_tags['gtm'] = 'Google Tag Manager';
+		}
+
 		return $third_party_tags;
 	}
 }
