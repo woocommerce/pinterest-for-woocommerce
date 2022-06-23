@@ -26,11 +26,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 		 */
 		public static function get_countries() {
 			return array(
+				'AR', // Argentina.
 				'AU', // Australia.
 				'AT', // Austria.
 				'BE', // Belgium.
 				'BR', // Brazil.
 				'CA', // Canada.
+				'CL', // Chile.
+				'CO', // Colombia.
 				'CY', // Cyprus.
 				'CZ', // Czech Republic.
 				'DK', // Denmark.
