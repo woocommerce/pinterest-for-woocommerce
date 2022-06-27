@@ -87,6 +87,11 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.0 - 2022-06-27 =
+* Add - Argentina, Colombia and Chile to ads supported countries.
+* Fix - Move the <noscript> base code to <body>.
+* Fix - Typo errors on translatable strings.
+
 = 1.1.0 - 2022-06-17 =
 * Add - .pot file for translators.
 * Add - Inbox notifications for the onboarding process and catalog sync.
