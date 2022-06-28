@@ -61,7 +61,7 @@ class Tracking {
 	 *
 	 * @var string
 	 */
-	private static $noscript_base_tag = '<!-- Pinterest Pixel Base Code -->\n<noscript>\n  <img height=\"1\" width=\"1\" style=\"display:none;\" alt=\"\" src=\"https://ct.pinterest.com/v3/?tid=' . self::TAG_ID_SLUG . '&noscript=1\" />\n</noscript>\n<!-- End Pinterest Pixel Base Code -->\n';
+	private static $noscript_base_tag = '<!-- Pinterest Pixel Base Code -->' . PHP_EOL . '<noscript>' . PHP_EOL . '  <img height=\"1\" width=\"1\" style=\"display:none;\" alt=\"\" src=\"https://ct.pinterest.com/v3/?tid=' . self::TAG_ID_SLUG . '&noscript=1\" />' . PHP_EOL . '</noscript>' . PHP_EOL . '<!-- End Pinterest Pixel Base Code -->' . PHP_EOL;
 
 	/**
 	 * The user/customer specific key used to store async events that are to be printed the next
