@@ -504,6 +504,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function save_settings( $settings, $option = PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ) {
+
+			if ( self::get_settings( true, $option ) === $settings ) {
+				return true;
+			}
+
 			self::$dirty_settings[ $option ] = true;
 			return update_option( $option, $settings );
 		}
