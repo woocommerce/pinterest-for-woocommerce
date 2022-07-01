@@ -87,6 +87,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.1 - 2022-07-01 =
+* Fix - Error printing end of line character.
+
 = 1.2.0 - 2022-06-27 =
 * Add - Argentina, Colombia and Chile to ads supported countries.
 * Fix - Move the <noscript> base code to <body>.
