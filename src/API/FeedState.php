@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
+use Automattic\WooCommerce\Pinterest\Tracking;
 use \WP_REST_Server;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -141,6 +142,7 @@ class FeedState extends VendorAPI {
 
 			$result = $this->add_local_feed_state( $result );
 			$result = $this->add_feed_registration_state( $result );
+			$result = $this->add_third_party_tags_warning( $result );
 
 			return $result;
 
@@ -320,6 +322,36 @@ class FeedState extends VendorAPI {
 				'errors'     => 0,
 			);
 		}
+
+		return $result;
+	}
+
+	/**
+	 * Adds to the result variable an array with info about the
+	 * registration and configuration process of the XML feed to the Pinterest API.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param array $result The result array to add values to.
+	 *
+	 * @return array
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
+	private function add_third_party_tags_warning( $result ) {
+
+		$tags = Tracking::get_third_party_installed_tags();
+
+		if ( empty( $tags ) ) {
+			return $result;
+		}
+
+		$result['workflow'][] = array(
+			'label'        => esc_html__( 'Pinterest tag', 'pinterest-for-woocommerce' ),
+			'status'       => 'warning',
+			'status_label' => esc_html__( 'Potential conflicting plugins', 'pinterest-for-woocommerce' ),
+			'extra_info'   => Tracking::get_third_party_tags_warning_message(),
+		);
 
 		return $result;
 	}

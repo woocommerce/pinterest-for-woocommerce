@@ -567,6 +567,37 @@ JS;
 		return $args;
 	}
 
+
+	/**
+	 * Get the formatted warning message for the potential conflicting tags.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return string The warning message.
+	 */
+	public static function get_third_party_tags_warning_message() {
+
+		$third_party_tags = self::get_third_party_installed_tags();
+
+		if ( empty( $third_party_tags ) ) {
+			return '';
+		}
+
+		return wp_kses_post(
+			sprintf(
+				/* Translators: %1$s Conflicting plugins */
+				__( 'The following installed plugin(s) can potentially cause problems with tracking: %1$s. %2$sRemove conflicting plugins%3$s or %4$smanage tracking settings%5$s.', 'pinterest-for-woocommerce' ),
+				implode( ', ', $third_party_tags ),
+				sprintf( '<a href="%s" target="_blank">', esc_url( admin_url( 'plugins.php' ) ) ),
+				'</a>',
+				sprintf( '<a href="%s" target="_blank">', esc_url( wc_admin_url( '&path=/pinterest/settings' ) ) ),
+				'</a>',
+			)
+		);
+
+	}
+
+
 	/**
 	 * Detect if there are other tags installed on the site.
 	 *
@@ -586,7 +617,7 @@ JS;
 			$third_party_tags['gtm'] = 'Google Tag Manager';
 		}
 
-		if ( defined( 'PYS_VERSION' ) && function_exists( 'PixelYourSite\isPinterestActive' ) && PixelYourSite\isPinterestActive() ) {
+		if ( defined( 'PYS_VERSION' ) && function_exists( '\PixelYourSite\isPinterestActive' ) && \PixelYourSite\isPinterestActive() ) {
 			$third_party_tags['pys'] = 'Pixel Your Site - Pinterest Addon';
 		}
 
