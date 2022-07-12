@@ -9,7 +9,6 @@
 namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
-use Automattic\WooCommerce\Pinterest\Tracking;
 use \WP_REST_Server;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -46,8 +45,6 @@ class HealthCheck extends VendorAPI {
 
 			$response = array();
 
-			$response['third_party_tags'] = Tracking::get_third_party_installed_tags();
-
 			if ( ! Pinterest_For_Woocommerce()::get_data( 'merchant_id' ) ) {
 				$response['status'] = 'pending_initial_configuration';
 				return $response;
@@ -79,10 +76,9 @@ class HealthCheck extends VendorAPI {
 			$error_message = sprintf( __( 'Could not fetch account status. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
 
 			return array(
-				'status'           => 'error',
-				'message'          => $error_message,
-				'code'             => $th->getCode(),
-				'third_party_tags' => Tracking::get_third_party_installed_tags(),
+				'status'  => 'error',
+				'message' => $error_message,
+				'code'    => $th->getCode(),
 			);
 		}
 	}
