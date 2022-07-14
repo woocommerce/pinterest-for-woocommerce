@@ -222,13 +222,8 @@ class FeedGenerator extends AbstractChainedJob {
 			// Get included product types.
 			$included_product_types = self::get_supported_product_types();
 
-			// Get excluded product types.
-			$excluded_product_types = self::get_unsupported_product_types();
-
-			$types = array_diff( $included_product_types, $excluded_product_types );
-
 			$products_query_args = array(
-				'type'       => $types,
+				'type'       => $included_product_types,
 				'include'    => $items,
 				'visibility' => 'catalog',
 				'orderby'    => 'none',
@@ -553,25 +548,6 @@ class FeedGenerator extends AbstractChainedJob {
 				'simple',
 				'external',
 				'variation',
-			)
-		);
-	}
-
-	/**
-	 * Return the list of hidden product types.
-	 *
-	 * @since x.x.x
-	 *
-	 * @return array
-	 */
-	private function get_unsupported_product_types(): array {
-		return (array) apply_filters(
-			'pinterest_for_woocommerce_excluded_product_types',
-			array(
-				'grouped',
-				'variable',
-				'subscription',
-				'variable-subscription',
 			)
 		);
 	}
