@@ -219,28 +219,11 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	protected function process_items( array $items, array $args ) {
 		try {
-			/**
-			 * Prepare allowed product types.
-			 * For variations:
-			 * We just want variations ( variable children ) but not parents ( variable ).
-			 */
-			$included_product_types = array_merge( array_keys( wc_get_product_types() ), array( 'variation' ) );
+			// Get included product types.
+			$included_product_types = self::get_supported_product_types();
 
-			/**
-			 * Filter excluded product types.
-			 *
-			 * @since 1.0.10
-			 * @param array Array of excluded product types.
-			 */
-			$excluded_product_types = apply_filters(
-				'pinterest_for_woocommerce_excluded_product_types',
-				array(
-					'grouped',
-					'variable',
-					'subscription',
-					'variable-subscription',
-				)
-			);
+			// Get excluded product types.
+			$excluded_product_types = self::get_unsupported_product_types();
 
 			$types = array_diff( $included_product_types, $excluded_product_types );
 
@@ -253,13 +236,7 @@ class FeedGenerator extends AbstractChainedJob {
 			);
 
 			// Exclude variation subscriptions.
-			$products_query_args['parent_exclude'] = wc_get_products(
-				array(
-					'type'   => 'variable-subscription',
-					'limit'  => -1,
-					'return' => 'ids',
-				)
-			);
+			$products_query_args['parent_exclude'] = $this->get_excluded_products_by_parent();
 
 			// Do not sync out of stock products if woocommerce_hide_out_of_stock_items is set.
 			if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) ) {
@@ -560,5 +537,62 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	protected function process_item( $item, array $args ) {
 		// Process each item here.
+	}
+
+	/**
+	 * Return the list of supported product types.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array
+	 */
+	private function get_supported_product_types(): array {
+		return (array) apply_filters(
+			'pinterest_for_woocommerce_included_product_types',
+			array(
+				'simple',
+				'external',
+				'variation',
+			)
+		);
+	}
+
+	/**
+	 * Return the list of hidden product types.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array
+	 */
+	private function get_unsupported_product_types(): array {
+		return (array) apply_filters(
+			'pinterest_for_woocommerce_excluded_product_types',
+			array(
+				'grouped',
+				'variable',
+				'subscription',
+				'variable-subscription',
+			)
+		);
+	}
+
+	/**
+	 * Exclude products by parent (e.g. 'variation-subscriptions').
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array
+	 */
+	private function get_excluded_products_by_parent(): array {
+		return (array) apply_filters(
+			'pinterest_for_woocommerce_excluded_products_by_parent',
+			wc_get_products(
+				array(
+					'type'   => 'variable-subscription',
+					'limit'  => -1,
+					'return' => 'ids',
+				)
+			)
+		);
 	}
 }
