@@ -607,10 +607,6 @@ JS;
 	 */
 	public static function get_third_party_installed_tags() {
 
-		if ( ! self::get_active_tag() || ! self::tracking_enabled() ) {
-			return array();
-		}
-
 		$third_party_tags = array();
 
 		if ( defined( 'GTM4WP_VERSION' ) ) {
