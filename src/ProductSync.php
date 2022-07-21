@@ -144,6 +144,64 @@ class ProductSync {
 	}
 
 	/**
+	 * Get the proper extra_info for the feed status.
+	 *
+	 * @return string
+	 */
+	public static function get_feed_status_extra_info() {
+
+		if ( self::is_product_sync_enabled() ) {
+			return '';
+		}
+
+		if ( ! Pinterest_For_Woocommerce()::is_domain_verified() ) {
+			return sprintf(
+				/* Translators: %1$s The URL of the connection page */
+				__( 'The domain is not verified, visit the <a href="%1$s">connection</a> page to verify it.', 'pinterest-for-woocommerce' ),
+				esc_url(
+					add_query_arg(
+						array(
+							'page' => 'wc-admin',
+							'path' => '/pinterest/connection',
+						),
+						admin_url( 'admin.php' )
+					)
+				)
+			);
+		}
+
+		if ( ! Pinterest_For_Woocommerce()::is_tracking_configured() ) {
+			return sprintf(
+				/* Translators: %1$s The URL of the connection page */
+				__( 'The tracking conversions is disabled, visit the <a href="%1$s">connection</a> page to enable it.', 'pinterest-for-woocommerce' ),
+				esc_url(
+					add_query_arg(
+						array(
+							'page' => 'wc-admin',
+							'path' => '/pinterest/connection',
+						),
+						admin_url( 'admin.php' )
+					)
+				)
+			);
+		}
+
+		return sprintf(
+			/* Translators: %1$s The URL of the settings page */
+			__( 'Visit the <a href="%1$s">settings</a> page to enable it.', 'pinterest-for-woocommerce' ),
+			esc_url(
+				add_query_arg(
+					array(
+						'page' => 'wc-admin',
+						'path' => '/pinterest/settings',
+					),
+					admin_url( 'admin.php' )
+				)
+			)
+		);
+	}
+
+	/**
 	 * Handles de-registration of the feed.
 	 *
 	 * @return void
