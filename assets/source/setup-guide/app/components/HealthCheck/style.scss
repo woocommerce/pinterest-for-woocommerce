@@ -3,12 +3,14 @@
 	margin-right: 0;
 	margin-bottom: 1em;
 
+	.test-warning-annotation {}
+
 	p {
 		font-weight: 600;
 		margin-bottom: 1em;
 
 		&:last-child {
-			margin-bottom: 0;
+			margin-bottom: 0px;
 		}
 	}
 }

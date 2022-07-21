@@ -87,6 +87,10 @@
       "@wordpress/stylelint-config/scss"
     ],
     "rules": {
+      "block-no-empty": [
+        true,
+        {"severity": "warning"}
+      ],
       "no-descending-specificity": null,
       "selector-class-pattern": null,
       "unit-allowed-list": [
