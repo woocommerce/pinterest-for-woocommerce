@@ -157,9 +157,9 @@ const HealthCheck = () => {
 
 	useEffect( () => {
 		checkHealth();
-	}, [] );
+	}, [ checkHealth ] );
 
-	if ( healthStatus == undefined || healthStatus.status === 'approved' ) {
+	if ( healthStatus === undefined || healthStatus.status === 'approved' ) {
 		return null;
 	}
 
