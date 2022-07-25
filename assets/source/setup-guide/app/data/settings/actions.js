@@ -40,6 +40,13 @@ export function setIsUpdating( isUpdating ) {
 	};
 }
 
+export function setIsSyncing( isSyncing ) {
+	return {
+		type: TYPES.SET_IS_SYNCING,
+		isSyncing,
+	};
+}
+
 /**
  * Update the settings in the store or in DB
  *
@@ -75,4 +82,10 @@ export function* updateSettings( data, saveToDb = false ) {
 		yield setUpdatingError( error );
 		throw error;
 	}
+}
+
+export function* syncSettings() {
+	yield setIsSyncing( true );
+
+	yield setIsSyncing( false );
 }

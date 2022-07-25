@@ -7,7 +7,7 @@ $root: ".woocommerce-setup-guide";
 // Adds animation to placeholder section
 // Copied from WC-admin
 // https://github.com/woocommerce/woocommerce-admin/blob/9f68059c7df466ee7a559c555bcb5a7b9e421e6d/packages/style-build/abstracts/_mixins.scss#L22-L35
-@mixin placeholder( $lighten-percentage: 30% ) {
+@mixin placeholder($lighten-percentage: 30%) {
 	animation: loading-fade 1.6s ease-in-out infinite;
 	background-color: $gray-100;
 	color: transparent;
@@ -16,7 +16,7 @@ $root: ".woocommerce-setup-guide";
 		content: "\00a0";
 	}
 
-	@media screen and ( prefers-reduced-motion: reduce ) {
+	@media screen and (prefers-reduced-motion: reduce) {
 		animation: none;
 	}
 }
@@ -132,7 +132,7 @@ $root: ".woocommerce-setup-guide";
 
 				}
 
-				> div {
+				>div {
 
 					&:not(:first-child) {
 						margin-top: calc(var(--large-gap) + (var(--main-gap) / 2));
@@ -155,6 +155,14 @@ $root: ".woocommerce-setup-guide";
 						color: #710d0d;
 					}
 				}
+
+				.pinterest-for-woocommerce-sync-settings .woocommerce-spinner {
+					display: block;
+					margin: auto;
+					width: 15px;
+					min-width: 15px;
+					height: 15px;
+				}
 			}
 
 			&__step {
@@ -169,7 +177,7 @@ $root: ".woocommerce-setup-guide";
 						min-height: 120px;
 					}
 
-					> div {
+					>div {
 						margin: 12px 0;
 					}
 
@@ -189,7 +197,7 @@ $root: ".woocommerce-setup-guide";
 						position: absolute;
 					}
 
-					> div {
+					>div {
 						margin: 8px 0;
 					}
 
@@ -235,7 +243,7 @@ $root: ".woocommerce-setup-guide";
 
 					&__buttons {
 
-						button + button {
+						button+button {
 							margin-left: 12px;
 						}
 					}
@@ -302,7 +310,7 @@ $root: ".woocommerce-setup-guide";
 
 				.components-flex {
 
-					> * {
+					>* {
 						margin: 0 6px;
 
 						&:first-child {
@@ -529,7 +537,7 @@ $root: ".woocommerce-setup-guide";
 
 	&__state {
 
-		@media ( max-width: #{ ($break-medium - 1) } ) {
+		@media (max-width: #{ ($break-medium - 1) }) {
 
 			tr {
 				display: flex;
@@ -598,7 +606,7 @@ $root: ".woocommerce-setup-guide";
 
 					&:last-child {
 
-						> div {
+						>div {
 							border-right: 0;
 						}
 					}
