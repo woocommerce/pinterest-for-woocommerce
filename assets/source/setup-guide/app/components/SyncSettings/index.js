@@ -69,7 +69,17 @@ const SyncSettings = () => {
 			<Spinner />
 		</>
 	) : (
-		<Button isLink target="_blank" onClick={ syncSettings }>
+		<Button
+			isLink
+			target="_blank"
+			onClick={ syncSettings }
+			label={ __(
+				'Sync to get latest settings from Pinterest Ads Manager',
+				'pinterest-for-woocommerce'
+			) }
+			showTooltip={ true }
+			tooltipPosition="top center"
+		>
 			{ __( 'Sync', 'pinterest-for-woocommerce' ) }
 		</Button>
 	);
