@@ -14,6 +14,7 @@ use Automattic\WooCommerce\Admin\PageController;
 use Automattic\WooCommerce\Blocks\Package;
 use Automattic\WooCommerce\Blocks\Assets\AssetDataRegistry;
 use Automattic\WooCommerce\Pinterest\Compat;
+use Automattic\WooCommerce\Pinterest\PinterestSyncSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -382,6 +383,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				'businessAccounts'         => Pinterest_For_Woocommerce()::get_linked_businesses(),
 				'apiRoute'                 => PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION,
 				'optionsName'              => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,
+				'syncedSettings'           => PinterestSyncSettings::get_synced_settings(),
 				'error'                    => isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				'pinterestLinks'           => array(
 					'newAccount'             => 'https://business.pinterest.com/',
