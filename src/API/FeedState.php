@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
+use Automattic\WooCommerce\Pinterest\ProductSync;
 use \WP_REST_Server;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -106,28 +107,14 @@ class FeedState extends VendorAPI {
 
 			$result = array();
 
-			if ( ! Pinterest\ProductSync::is_product_sync_enabled() ) {
+			if ( ! ProductSync::is_product_sync_enabled() ) {
 				return array(
 					'workflow' => array(
 						array(
 							'label'        => esc_html__( 'XML feed', 'pinterest-for-woocommerce' ),
 							'status'       => 'error',
 							'status_label' => esc_html__( 'Product sync is disabled.', 'pinterest-for-woocommerce' ),
-							'extra_info'   => wp_kses_post(
-								sprintf(
-									/* Translators: %1$s The URL of the settings page */
-									__( 'Visit the <a href="%1$s">settings</a> page to enable it.', 'pinterest-for-woocommerce' ),
-									esc_url(
-										add_query_arg(
-											array(
-												'page' => 'wc-admin',
-												'path' => '/pinterest/settings',
-											),
-											admin_url( 'admin.php' )
-										)
-									)
-								)
-							),
+							'extra_info'   => wp_kses_post( ProductSync::get_feed_status_extra_info() ),
 						),
 					),
 					'overview' => array(
