@@ -14,6 +14,7 @@ use Automattic\WooCommerce\Admin\PageController;
 use Automattic\WooCommerce\Blocks\Package;
 use Automattic\WooCommerce\Blocks\Assets\AssetDataRegistry;
 use Automattic\WooCommerce\Pinterest\Compat;
+use Automattic\WooCommerce\Pinterest\Tracking;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -406,6 +407,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					406 => 'domain verification',
 					409 => 'meta-tag',
 					),
+				'conflictingTagsWarning'   => Tracking::get_third_party_tags_warning_message(),
 			);
 		}
 

@@ -9,7 +9,6 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { Spinner } from '@woocommerce/components';
 import { getNewPath } from '@woocommerce/navigation';
 import { recordEvent } from '@woocommerce/tracks';
 import {
@@ -18,6 +17,7 @@ import {
 	CardBody,
 	SelectControl,
 	CheckboxControl,
+	Spinner,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
@@ -26,6 +26,7 @@ import {
  */
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
+import ThirdPartyTagsNotice from '../components/ThirdPartyTagsNotice';
 import {
 	useSettingsSelect,
 	useSettingsDispatch,
@@ -407,6 +408,7 @@ const SetupTracking = ( { view = 'settings' } ) => {
 						Object.keys( appSettings ).length > 0 &&
 						undefined !== advertisersList ? (
 							<CardBody size="large">
+								<ThirdPartyTagsNotice />
 								{ advertisersList.length > 0 ? (
 									<>
 										<SelectControl
