@@ -23,6 +23,7 @@ import './style.scss';
  * Sync settings button.
  */
 const SyncSettings = () => {
+	const appSettings = useSettingsSelect();
 	const isSyncing = useSettingsSelect( 'isSettingsSyncing' );
 	const syncAppSettings = useSyncSettingsDispatch();
 	const createNotice = useCreateNotice();
@@ -57,10 +58,14 @@ const SyncSettings = () => {
 		}
 	};
 
+	const lastSyncedTime = appSettings.last_synced_settings
+		? appSettings.last_synced_settings
+		: '-';
+
 	const syncInfo = sprintf(
 		'%1$s: %2$s •',
 		__( 'Settings last updated' ),
-		'last updated'
+		lastSyncedTime
 	);
 
 	const syncButton = isSyncing ? (
