@@ -25,10 +25,9 @@ class SyncSettings extends VendorAPI {
 	 */
 	public function __construct() {
 
-		$this->base                   = 'sync_settings';
-		$this->endpoint_callbacks_map = array(
-			'sync_settings' => WP_REST_Server::READABLE,
-		);
+		$this->base              = 'sync_settings';
+		$this->endpoint_callback = 'sync_settings';
+		$this->methods           = WP_REST_Server::READABLE;
 
 		$this->register_routes();
 	}

@@ -8,6 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Exception;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -17,7 +19,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class PinterestSyncSettings {
 
-	const SYNCED_SETTINGS = array();
+	const SYNCED_SETTINGS = array(
+		'enhanced_match_support',
+	);
 
 	/**
 	 * Get the list of synced settings.
@@ -35,14 +39,23 @@ class PinterestSyncSettings {
 	 */
 	public static function sync_settings() {
 
-		foreach ( self::SYNCED_SETTINGS as $setting ) {
+		$synced_settings = array();
 
-			if ( ! self::sync_setting( $setting ) ) {
-				return false;
+		try {
+			foreach ( self::SYNCED_SETTINGS as $setting ) {
+				$synced_settings[ $setting ] = self::sync_setting( $setting );
 			}
+		} catch ( Exception $e ) {
+			return array(
+				'success' => false,
+				'message' => $e->getMessage(),
+			);
 		}
 
-		return true;
+		return array(
+			'success'         => true,
+			'synced_settings' => $synced_settings,
+		);
 	}
 
 
@@ -51,16 +64,14 @@ class PinterestSyncSettings {
 	 *
 	 * @param  string $setting Setting name.
 	 *
-	 * @return bool
+	 * @return mixed
+	 *
+	 * @throws Exception PHP Exception.
 	 */
-	public static function sync_setting( $setting ) {
-
-		if ( ! in_array( $setting, self::SYNCED_SETTINGS, true ) ) {
-			return false;
-		}
+	private static function sync_setting( $setting ) {
 
 		if ( ! is_callable( array( __CLASS__, $setting ) ) ) {
-			return false;
+			throw new Exception( esc_html__( 'Missing method to sync the setting.', 'pinterest-for-woocommerce' ) );
 		}
 
 		return call_user_func( array( __CLASS__, $setting ) );

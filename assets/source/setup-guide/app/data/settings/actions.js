@@ -87,5 +87,22 @@ export function* updateSettings( data, saveToDb = false ) {
 export function* syncSettings() {
 	yield setIsSyncing( true );
 
-	yield setIsSyncing( false );
+	try {
+		const results = yield apiFetch( {
+			path:
+				wcSettings.pinterest_for_woocommerce.apiRoute +
+				'/sync_settings/',
+			method: 'GET',
+		} );
+
+		if ( results.success ) {
+			yield receiveSettings( results.synced_settings );
+		}
+
+		yield setIsSyncing( false );
+		return { success: results.success };
+	} catch ( error ) {
+		yield setIsSyncing( false );
+		throw error;
+	}
 }
