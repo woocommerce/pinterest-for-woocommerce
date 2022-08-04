@@ -8,7 +8,10 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
-use Exception;
+use \Exception;
+use Automattic\WooCommerce\Pinterest\API\Base;
+use Automattic\WooCommerce\Pinterest\Logger;
+use DateTime;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -52,6 +55,14 @@ class PinterestSyncSettings {
 			);
 		}
 
+		$formatted_synced_time = new DateTime();
+
+		$formatted_synced_time = $formatted_synced_time->format( 'j M Y, h:i:s a' );
+
+		Pinterest_For_Woocommerce()::save_setting( 'last_synced_settings', $formatted_synced_time );
+
+		$synced_settings['last_synced_settings'] = $formatted_synced_time;
+
 		return array(
 			'success'         => true,
 			'synced_settings' => $synced_settings,
@@ -75,6 +86,43 @@ class PinterestSyncSettings {
 		}
 
 		return call_user_func( array( __CLASS__, $setting ) );
+	}
+
+
+	/**
+	 * Sync enhanced match support.
+	 *
+	 * @return bool
+	 *
+	 * @throws Exception PHP Exception.
+	 */
+	private static function enhanced_match_support() {
+
+		try {
+
+			$advertiser_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+			$tag_id        = Pinterest_For_WooCommerce()::get_setting( 'tracking_tag' );
+
+			if ( ! $advertiser_id || ! $tag_id ) {
+				throw new Exception( esc_html__( 'Tracking advertiser or tag missing', 'pinterest-for-woocommerce' ), 400 );
+			}
+
+			$response = Base::get_advertiser_tag( $advertiser_id, $tag_id );
+
+			if ( 'success' !== $response['status'] ) {
+				throw new Exception( esc_html__( 'Response error', 'pinterest-for-woocommerce' ), 400 );
+			}
+
+			$enhanced_match_support = $response['data']->configs->aem_enabled;
+
+			Pinterest_For_Woocommerce()::save_setting( 'enhanced_match_support', $enhanced_match_support );
+
+		} catch ( Exception $th ) {
+
+			Logger::log( $th->getMessage(), 'error' );
+		}
+
+		return Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' );
 	}
 
 }
