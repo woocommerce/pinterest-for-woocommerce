@@ -3,6 +3,7 @@
  */
 import { sprintf, __ } from '@wordpress/i18n';
 import { Spinner } from '@woocommerce/components';
+import { useState } from '@wordpress/element';
 import {
 	Button,
 	Flex,
@@ -27,6 +28,9 @@ const SyncSettings = () => {
 	const isSyncing = useSettingsSelect( 'isSettingsSyncing' );
 	const syncAppSettings = useSyncSettingsDispatch();
 	const createNotice = useCreateNotice();
+	const [ triggeredSyncSettings, setTriggeredSyncSettings ] = useState(
+		false
+	);
 
 	const syncSettings = async () => {
 		try {
@@ -57,6 +61,11 @@ const SyncSettings = () => {
 			);
 		}
 	};
+
+	if ( ! triggeredSyncSettings ) {
+		syncSettings();
+		setTriggeredSyncSettings( true );
+	}
 
 	const lastSyncedTime = appSettings.last_synced_settings
 		? appSettings.last_synced_settings
