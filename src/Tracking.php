@@ -613,7 +613,7 @@ JS;
 			$third_party_tags['gtm'] = 'Google Tag Manager';
 		}
 
-		if ( defined( 'PYS_VERSION' ) && function_exists( '\PixelYourSite\isPinterestActive' ) && \PixelYourSite\isPinterestActive() ) {
+		if ( defined( 'PYS_PINTEREST_VERSION' ) ) {
 			$third_party_tags['pys'] = 'Pixel Your Site - Pinterest Addon';
 		}
 
