@@ -617,6 +617,10 @@ JS;
 			$third_party_tags['pys'] = 'Pixel Your Site - Pinterest Addon';
 		}
 
+		if ( class_exists( '\Premmerce\WooCommercePinterest\PinterestPlugin' ) ) {
+			$third_party_tags['softblues'] = 'Pinterest for WooCommerce by Softblues';
+		}
+
 		return $third_party_tags;
 	}
 }
