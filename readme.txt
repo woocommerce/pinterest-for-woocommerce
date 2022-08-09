@@ -87,6 +87,11 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.2 - 2022-08-09 =
+* Dev - GH release config and the new PR template.
+* Fix - Error after domain verification.
+* Tweak - WC 6.8 compatibility.
+
 = 1.2.1 - 2022-07-01 =
 * Fix - Error printing end of line character.
 
