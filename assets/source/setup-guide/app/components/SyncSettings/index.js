@@ -3,6 +3,7 @@
  */
 import { sprintf, __ } from '@wordpress/i18n';
 import { Spinner } from '@woocommerce/components';
+import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import {
 	Button,
@@ -28,6 +29,7 @@ const SyncSettings = () => {
 	const isSyncing = useSettingsSelect( 'isSettingsSyncing' );
 	const syncAppSettings = useSyncSettingsDispatch();
 	const createNotice = useCreateNotice();
+	const { removeNotice } = useDispatch( 'core/notices' );
 	const [ triggeredSyncSettings, setTriggeredSyncSettings ] = useState(
 		false
 	);
@@ -41,7 +43,10 @@ const SyncSettings = () => {
 				__(
 					'Settings successfully synced with Pinterest Ads Manager.',
 					'pinterest-for-woocommerce'
-				)
+				),
+				{
+					id: 'pinterest-for-woocommerce-settings-synced',
+				}
 			);
 		} catch ( error ) {
 			createNotice(
@@ -57,6 +62,9 @@ const SyncSettings = () => {
 							onClick: syncSettings,
 						},
 					],
+				},
+				{
+					id: 'pinterest-for-woocommerce-settings-synced',
 				}
 			);
 		}
@@ -66,6 +74,8 @@ const SyncSettings = () => {
 		syncSettings();
 		setTriggeredSyncSettings( true );
 	}
+
+	removeNotice( 'pinterest-for-woocommerce-settings-synced' );
 
 	const lastSyncedTime = appSettings.last_synced_settings
 		? appSettings.last_synced_settings
