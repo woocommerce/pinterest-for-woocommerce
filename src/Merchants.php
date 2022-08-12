@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Automattic\WooCommerce\Pinterest\API\Base;
 use \Exception;
+use Pinterest_For_Woocommerce;
 use \Throwable;
 
 /**
@@ -44,12 +45,9 @@ class Merchants {
 			try {
 				$merchant_id = self::get_merchant_id_from_advertiser();
 			} catch ( Throwable $th ) {
-
 				if ( 404 !== $th->getCode() ) {
 					throw $th;
 				}
-
-				$merchant = false;
 			}
 		}
 
@@ -101,7 +99,7 @@ class Merchants {
 	 * @throws Exception PHP exception.
 	 */
 	private static function get_merchant_id_from_advertiser() {
-		$advertisers = API\Base::get_advertisers();
+		$advertisers = Base::get_advertisers();
 
 		if ( 'success' !== $advertisers['status'] ) {
 			throw new Exception( __( 'Response error when trying to get advertisers.', 'pinterest-for-woocommerce' ), 400 );
@@ -110,7 +108,7 @@ class Merchants {
 		$advertiser = reset( $advertisers['data'] ); // All advertisers assigned to a user share the same merchant_id.
 
 		if ( empty( $advertiser->merchant_id ) ) {
-			throw new Exception( __( 'No merchant returned in the advertiser\'s response.', 'pinterest-for-woocommerce' ), 404 );
+			throw new Exception( __( "No merchant returned in the advertiser's response.", 'pinterest-for-woocommerce' ), 404 );
 		}
 
 		return $advertiser->merchant_id;
@@ -143,7 +141,7 @@ class Merchants {
 		);
 
 		// The response only contains the merchant id.
-		$response = API\Base::update_or_create_merchant( $args );
+		$response = self::get_merchant_response( $args );
 
 		if ( 'success' !== $response['status'] ) {
 			throw new Exception( __( 'Response error when trying to create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
@@ -160,4 +158,30 @@ class Merchants {
 		);
 	}
 
+	/**
+	 * Get the (possibly cached) response from attempting to create the merchant.
+	 *
+	 * This will also use a progressively lengthening delay of the transient value.
+	 *
+	 * @param array $args
+	 *
+	 * @return array|mixed
+	 */
+	private static function get_merchant_response( array $args ) {
+		// Get the current delay value, defaulting to 10 minutes.
+		$delay = Pinterest_For_Woocommerce::get_data( 'create_merchant_delay' ) ?? 10 * MINUTE_IN_SECONDS;
+
+		$response = get_transient( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_get_merchant_response' );
+		if ( false === $response ) {
+			$response = Base::update_or_create_merchant( $args );
+
+			// Store the response as a transient using the current delay.
+			set_transient( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_get_merchant_response', $response, $delay );
+
+			// Double the delay, to ensure the API is called progressively less often.
+			Pinterest_For_Woocommerce::save_data( 'create_merchant_delay', $delay * 2 );
+		}
+
+		return $response;
+	}
 }
