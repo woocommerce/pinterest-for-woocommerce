@@ -8,6 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use \Pinterest_For_Woocommerce;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -21,6 +23,10 @@ class SaveToPinterest {
 	 * Initiate class.
 	 */
 	public static function maybe_init() {
+
+		if ( ! Pinterest_For_Woocommerce::is_setup_complete() ) {
+			return;
+		}
 
 		if ( self::show_pin_button() ) {
 			add_action( 'woocommerce_before_single_product_summary', array( __CLASS__, 'render_product_pin' ) );
