@@ -68,6 +68,19 @@ class FeedState extends VendorAPI {
 		$this->methods           = WP_REST_Server::READABLE;
 
 		$this->register_routes();
+
+		$this->hooks();
+
+	}
+
+
+	/**
+	 * Add feed state hooks.
+	 */
+	private function hooks() {
+		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_local_feed_state' ) );
+		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_feed_registration_state' ) );
+		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_third_party_tags_warning' ) );
 	}
 
 
@@ -105,8 +118,6 @@ class FeedState extends VendorAPI {
 
 		try {
 
-			$result = array();
-
 			if ( ! Pinterest\ProductSync::is_product_sync_enabled() ) {
 				return array(
 					'workflow' => array(
@@ -140,11 +151,7 @@ class FeedState extends VendorAPI {
 				);
 			}
 
-			$result = $this->add_local_feed_state( $result );
-			$result = $this->add_feed_registration_state( $result );
-			$result = $this->add_third_party_tags_warning( $result );
-
-			return $result;
+			return apply_filters( 'pinterest_for_woocommerce_feed_state', array() );
 
 		} catch ( \Throwable $th ) {
 
@@ -164,7 +171,7 @@ class FeedState extends VendorAPI {
 	 *
 	 * @return array
 	 */
-	private function add_local_feed_state( $result ) {
+	public function add_local_feed_state( $result ) {
 
 		$state      = Pinterest\ProductFeedStatus::get();
 		$extra_info = '';
@@ -240,7 +247,7 @@ class FeedState extends VendorAPI {
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
-	private function add_feed_registration_state( $result ) {
+	public function add_feed_registration_state( $result ) {
 
 		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
 		$feed_id     = Pinterest_For_Woocommerce()::get_data( 'feed_registered' );
@@ -338,11 +345,11 @@ class FeedState extends VendorAPI {
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
-	private function add_third_party_tags_warning( $result ) {
+	public function add_third_party_tags_warning( $result ) {
 
-		$tags = Tracking::get_third_party_installed_tags();
+		$warning_message = Tracking::get_third_party_tags_warning_message();
 
-		if ( empty( $tags ) ) {
+		if ( empty( $warning_message ) ) {
 			return $result;
 		}
 
@@ -350,7 +357,7 @@ class FeedState extends VendorAPI {
 			'label'        => esc_html__( 'Pinterest tag', 'pinterest-for-woocommerce' ),
 			'status'       => 'warning',
 			'status_label' => esc_html__( 'Potential conflicting plugins', 'pinterest-for-woocommerce' ),
-			'extra_info'   => Tracking::get_third_party_tags_warning_message(),
+			'extra_info'   => $warning_message,
 		);
 
 		return $result;

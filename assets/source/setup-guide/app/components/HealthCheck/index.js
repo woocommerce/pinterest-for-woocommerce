@@ -248,18 +248,16 @@ const HealthCheck = () => {
 	}
 
 	return (
-		<>
-			<Notice
-				status={ notice.status }
-				isDismissible={ notice.dismissible }
-				actions={ notice.actions || [] }
-				className="pinterest-for-woocommerce-healthcheck-notice"
-			>
-				<Text variant="titleSmall">{ notice.message }</Text>
-				<FormattedReasons reasons={ notice.reasons } />
-				{ notice.body }
-			</Notice>
-		</>
+		<Notice
+			status={ notice.status }
+			isDismissible={ notice.dismissible }
+			actions={ notice.actions || [] }
+			className="pinterest-for-woocommerce-healthcheck-notice"
+		>
+			<Text variant="titleSmall">{ notice.message }</Text>
+			<FormattedReasons reasons={ notice.reasons } />
+			{ notice.body }
+		</Notice>
 	);
 };
 

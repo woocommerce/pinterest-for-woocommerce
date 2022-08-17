@@ -46,14 +46,12 @@ class HealthCheck extends VendorAPI {
 			$response = array();
 
 			if ( ! Pinterest_For_Woocommerce()::get_data( 'merchant_id' ) ) {
-				$response['status'] = 'pending_initial_configuration';
-				return $response;
+				return array( 'status' => 'pending_initial_configuration' );
 			}
 
 			$merchant_connected_diff_platform = Pinterest_For_Woocommerce()::get_data( 'merchant_connected_diff_platform' );
 			if ( $merchant_connected_diff_platform ) {
-				$response['status'] = 'merchant_connected_diff_platform';
-				return $response;
+				return array( 'status' => 'merchant_connected_diff_platform' );
 			}
 
 			$merchant = Pinterest\Merchants::get_merchant();
