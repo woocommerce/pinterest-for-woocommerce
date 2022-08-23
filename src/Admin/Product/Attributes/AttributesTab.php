@@ -105,7 +105,7 @@ class AttributesTab {
 
 		$tabs['pinterest_attributes'] = array(
 			'label'  => 'Pinterest',
-			'class'  => join( ' ', $classes ),
+			'class'  => $classes,
 			'target' => 'pinterest_attributes',
 		);
 
@@ -193,7 +193,7 @@ class AttributesTab {
 	 * @return array of WooCommerce product types (e.g. 'subscription', 'variable-subscription', etc.)
 	 */
 	protected function get_hidden_product_types(): array {
-		return apply_filters( 'wc_pinterest_attributes_tab_hidden_product_types', array( 'subscription', 'variable-subscription' ) );
+		return apply_filters( 'wc_pinterest_attributes_tab_hidden_product_types', array_diff( array_keys( wc_get_product_types() ), $this->get_applicable_product_types() ) );
 	}
 
 	/**
