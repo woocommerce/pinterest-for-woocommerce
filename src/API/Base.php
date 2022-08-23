@@ -13,6 +13,7 @@ use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
 use \Exception;
+use Pinterest_For_Woocommerce;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -505,11 +506,21 @@ class Base {
 	 * @return mixed
 	 */
 	public static function update_or_create_merchant( $args ) {
-		return self::make_request(
+		// Get the current delay value, defaulting to 10 minutes.
+		$delay = Pinterest_For_Woocommerce::get_data( 'create_merchant_delay' ) ?? 10 * MINUTE_IN_SECONDS;
+
+		$result = self::make_request(
 			'catalogs/partner/connect/',
 			'POST',
 			$args,
+			'',
+			$delay
 		);
+
+		// Double the delay for next time, to ensure the API is called progressively less often.
+		Pinterest_For_Woocommerce::save_data( 'create_merchant_delay', $delay * 2 );
+
+		return $result;
 	}
 
 
