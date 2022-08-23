@@ -35,7 +35,6 @@ const SetupPins = ( {} ) => {
 	const appSettings = useSettingsSelect();
 	const setAppSettings = useSettingsDispatch( false );
 	const createNotice = useCreateNotice();
-	const isSyncing = useSettingsSelect( 'isSettingsSyncing' );
 
 	const handleOptionChange = async ( name, value ) => {
 		try {
@@ -125,13 +124,10 @@ const SetupPins = ( {} ) => {
 										className={ classnames(
 											'woocommerce-setup-guide__checkbox-group',
 											{
-												'pinterest-for-woocommerce-settings-checkbox-disabled':
-													isSyncing ||
-													! appSettings.track_conversions,
+												'pinterest-for-woocommerce-settings-checkbox-disabled': ! appSettings.track_conversions,
 											}
 										) }
 										disabled={
-											isSyncing ||
 											! appSettings.track_conversions
 										}
 										onChange={ () =>

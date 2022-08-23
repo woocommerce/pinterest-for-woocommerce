@@ -22,9 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class PinterestSyncSettings {
 
-	const SYNCED_SETTINGS = array(
-		'enhanced_match_support',
-	);
+	const SYNCED_SETTINGS = array();
 
 	/**
 	 * Get the list of synced settings.
@@ -96,7 +94,7 @@ class PinterestSyncSettings {
 	 *
 	 * @throws Exception PHP Exception.
 	 */
-	private static function enhanced_match_support() {
+	private static function automatic_enhanced_match_support() {
 
 		try {
 
@@ -113,16 +111,16 @@ class PinterestSyncSettings {
 				throw new Exception( esc_html__( 'Response error', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$enhanced_match_support = $response['data']->configs->aem_enabled;
+			$automatic_enhanced_match_support = $response['data']->configs->aem_enabled;
 
-			Pinterest_For_Woocommerce()::save_setting( 'enhanced_match_support', $enhanced_match_support );
+			Pinterest_For_Woocommerce()::save_setting( 'automatic_enhanced_match_support', $automatic_enhanced_match_support );
 
 		} catch ( Exception $th ) {
 
 			Logger::log( $th->getMessage(), 'error' );
 		}
 
-		return Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' );
+		return Pinterest_For_Woocommerce()::get_setting( 'automatic_enhanced_match_support' );
 	}
 
 }
