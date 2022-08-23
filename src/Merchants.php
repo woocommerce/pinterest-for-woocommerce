@@ -163,7 +163,7 @@ class Merchants {
 	 *
 	 * This will also use a progressively lengthening delay of the transient value.
 	 *
-	 * @param array $args
+	 * @param array $args Payload array to be sent to the request.
 	 *
 	 * @return array|mixed
 	 */
