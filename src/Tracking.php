@@ -586,7 +586,7 @@ JS;
 
 		return sprintf(
 				/* Translators: 1: Conflicting plugins, 2: Plugins Admin page opening tag, 3: Pinterest settings opening tag, 4: Closing anchor tag */
-			esc_html__( 'The following installed plugin(s) can potentially cause problems with tracking: %1$s. %2$sRemove conflicting plugins%4$s or %4$smanage tracking settings%4$s.', 'pinterest-for-woocommerce' ),
+			esc_html__( 'The following installed plugin(s) can potentially cause problems with tracking: %1$s. %2$sRemove conflicting plugins%4$s or %3$smanage tracking settings%4$s.', 'pinterest-for-woocommerce' ),
 			implode( ', ', $third_party_tags ),
 			sprintf( '<a href="%s" target="_blank">', esc_url( admin_url( 'plugins.php' ) ) ),
 			sprintf( '<a href="%s" target="_blank">', esc_url( wc_admin_url( '&path=/pinterest/settings' ) ) ),
