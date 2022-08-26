@@ -181,7 +181,7 @@ class AttributesTab {
 	 *
 	 * @return array of WooCommerce product types (e.g. 'simple', 'variable', etc.)
 	 */
-	protected function get_applicable_product_types(): array {
+	public static function get_applicable_product_types(): array {
 		return apply_filters( 'wc_pinterest_attributes_tab_applicable_product_types', array( 'simple', 'variable' ) );
 	}
 
