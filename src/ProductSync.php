@@ -156,7 +156,7 @@ class ProductSync {
 
 		if ( ! Pinterest_For_Woocommerce()::is_domain_verified() ) {
 			return sprintf(
-				/* Translators: %1$s The URL of the connection page */
+				/* translators: 1: The URL of the connection page */
 				__( 'The domain is not verified, visit the <a href="%1$s">connection</a> page to verify it.', 'pinterest-for-woocommerce' ),
 				esc_url(
 					add_query_arg(
