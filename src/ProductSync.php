@@ -172,7 +172,7 @@ class ProductSync {
 
 		if ( ! Pinterest_For_Woocommerce()::is_tracking_configured() ) {
 			return sprintf(
-				/* Translators: %1$s The URL of the connection page */
+				/* translators: 1: The URL of the connection page */
 				__( 'The tracking tag is not configured, visit the <a href="%1$s">connection</a> page to configure it.', 'pinterest-for-woocommerce' ),
 				esc_url(
 					add_query_arg(
@@ -187,7 +187,7 @@ class ProductSync {
 		}
 
 		return sprintf(
-			/* Translators: %1$s The URL of the settings page */
+			/* translators: 1: The URL of the settings page */
 			__( 'Visit the <a href="%1$s">settings</a> page to enable it.', 'pinterest-for-woocommerce' ),
 			esc_url(
 				add_query_arg(
