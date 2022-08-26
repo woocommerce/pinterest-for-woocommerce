@@ -167,7 +167,7 @@ const HealthCheck = () => {
 		pending_initial_configuration: {
 			status: 'warning',
 			message: __(
-				'The feed is being configured. Depending on the number of products this may take a while as the feed needs to be fully generated before its been sent to Pinterest for registration. You can check the the status of the generation process in the Catalog tab.',
+				'The feed is being configured. Depending on the number of products this may take a while as the feed needs to be fully generated before it is been sent to Pinterest for registration. You can check the status of the generation process in the Catalog tab.',
 				'pinterest-for-woocommerce'
 			),
 			dismissible: false,
@@ -187,7 +187,7 @@ const HealthCheck = () => {
 				'pinterest-for-woocommerce'
 			),
 			body: __(
-				'If you have a valid reason (such as having corrected the violations that resulted in the dissaproval) for appealing a merchant review decision, you can submit an appeal.',
+				'If you have a valid reason for appealing a merchant review decision (such as having corrected the violations that resulted in the disapproval), you can submit an appeal.',
 				'pinterest-for-woocommerce'
 			),
 			reasons: healthStatus.reasons,

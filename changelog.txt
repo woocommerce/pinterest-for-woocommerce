@@ -1,5 +1,18 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.2.2 - 2022-08-09 =
+* Dev - GH release config and the new PR template.
+* Fix - Error after domain verification.
+* Tweak - WC 6.8 compatibility.
+
+= 1.2.1 - 2022-07-01 =
+* Fix - Error printing end of line character.
+
+= 1.2.0 - 2022-06-27 =
+* Add - Argentina, Colombia and Chile to ads supported countries.
+* Fix - Move the <noscript> base code to <body>.
+* Fix - Typo errors on translatable strings.
+
 = 1.1.0 - 2022-06-17 =
 * Add - .pot file for translators.
 * Add - Inbox notifications for the onboarding process and catalog sync.

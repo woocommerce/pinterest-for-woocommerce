@@ -81,7 +81,7 @@ class Merchants {
 		}
 
 		if ( ! $merchant || 'success' !== $merchant['status'] || ! $merchant['data'] ) {
-			throw new Exception( __( 'Response error when trying create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
+			throw new Exception( __( 'Response error when trying to create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
 		// Update merchant id if it is different from the stored in DB.
@@ -146,7 +146,7 @@ class Merchants {
 		$response = API\Base::update_or_create_merchant( $args );
 
 		if ( 'success' !== $response['status'] ) {
-			throw new Exception( __( 'Response error when trying create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
+			throw new Exception( __( 'Response error when trying to create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
 		$registered_feed = Feeds::is_local_feed_registered( $response['data'] );

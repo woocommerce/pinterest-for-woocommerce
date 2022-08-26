@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
+use Automattic\WooCommerce\Pinterest\ProductSync;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use \WP_REST_Server;
 
@@ -125,21 +126,7 @@ class FeedState extends VendorAPI {
 							'label'        => esc_html__( 'XML feed', 'pinterest-for-woocommerce' ),
 							'status'       => 'error',
 							'status_label' => esc_html__( 'Product sync is disabled.', 'pinterest-for-woocommerce' ),
-							'extra_info'   => wp_kses_post(
-								sprintf(
-									/* Translators: %1$s The URL of the settings page */
-									__( 'Visit the <a href="%1$s">settings</a> page to enabled it.', 'pinterest-for-woocommerce' ),
-									esc_url(
-										add_query_arg(
-											array(
-												'page' => 'wc-admin',
-												'path' => '/pinterest/settings',
-											),
-											admin_url( 'admin.php' )
-										)
-									)
-								)
-							),
+							'extra_info'   => wp_kses_post( ProductSync::get_feed_status_extra_info() ),
 						),
 					),
 					'overview' => array(
@@ -182,8 +169,15 @@ class FeedState extends VendorAPI {
 				$status       = 'pending';
 				$status_label = esc_html__( 'Feed generation in progress.', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
-					/* Translators: %1$s Time string, %2$s number of products */
-					esc_html__( 'Last activity: %1$s ago - Wrote %2$s products to %3$sfeed file%4$s.', 'pinterest-for-woocommerce' ),
+					esc_html(
+						/* translators: 1: Time string, 2: number of products, 3: opening anchor tag, 4: closing anchor tag */
+						_n(
+							'Last activity: %1$s ago - Wrote %2$s product to %3$sfeed file%4$s.',
+							'Last activity: %1$s ago - Wrote %2$s products to %3$sfeed file%4$s.',
+							$state['product_count'],
+							'pinterest-for-woocommerce'
+						)
+					),
 					human_time_diff( $state['last_activity'] ),
 					$state['product_count'],
 					sprintf( '<a href="%s" target="_blank">', esc_url( $this->get_feed_url() ) ),
@@ -195,8 +189,15 @@ class FeedState extends VendorAPI {
 				$status       = 'success';
 				$status_label = esc_html__( 'Up to date', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
-					/* Translators: %1$s Time string, %2$s total number of products */
-					esc_html__( 'Successfully generated %1$s ago - Wrote %2$s products to %3$sfeed file%4$s', 'pinterest-for-woocommerce' ),
+					esc_html(
+						/* translators: 1: Time string, 2: total number of products, 3: opening anchor tag, 4: closing anchor tag */
+						_n(
+							'Successfully generated %1$s ago - Wrote %2$s product to %3$sfeed file%4$s',
+							'Successfully generated %1$s ago - Wrote %2$s products to %3$sfeed file%4$s',
+							$state['product_count'],
+							'pinterest-for-woocommerce'
+						)
+					),
 					human_time_diff( $state['last_activity'] ),
 					$state['product_count'],
 					sprintf( '<a href="%s" target="_blank">', esc_url( $this->get_feed_url() ) ),
