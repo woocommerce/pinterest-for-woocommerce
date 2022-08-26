@@ -119,7 +119,7 @@ class FeedState extends VendorAPI {
 
 		try {
 
-			if ( ! Pinterest\ProductSync::is_product_sync_enabled() ) {
+			if ( ! ProductSync::is_product_sync_enabled() ) {
 				return array(
 					'workflow' => array(
 						array(
