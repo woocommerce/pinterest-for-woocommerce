@@ -9,7 +9,6 @@
 namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
-
 use \WP_REST_Server;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,17 +43,15 @@ class HealthCheck extends VendorAPI {
 
 		try {
 
+			$response = array();
+
 			if ( ! Pinterest_For_Woocommerce()::get_data( 'merchant_id' ) ) {
-				return array(
-					'status' => 'pending_initial_configuration',
-				);
+				return array( 'status' => 'pending_initial_configuration' );
 			}
 
 			$merchant_connected_diff_platform = Pinterest_For_Woocommerce()::get_data( 'merchant_connected_diff_platform' );
 			if ( $merchant_connected_diff_platform ) {
-				return array(
-					'status' => 'merchant_connected_diff_platform',
-				);
+				return array( 'status' => 'merchant_connected_diff_platform' );
 			}
 
 			$merchant = Pinterest\Merchants::get_merchant();
@@ -63,9 +60,7 @@ class HealthCheck extends VendorAPI {
 				throw new \Exception( __( 'Could not get approval status from Pinterest.', 'pinterest-for-woocommerce' ), 200 );
 			}
 
-			$response = array(
-				'status' => $merchant['data']->product_pin_approval_status,
-			);
+			$response['status'] = $merchant['data']->product_pin_approval_status;
 
 			if ( isset( $merchant['data']->product_pin_approval_status_reasons ) ) {
 				$response['reasons'] = $merchant['data']->product_pin_approval_status_reasons;

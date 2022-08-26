@@ -12,6 +12,7 @@ use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductSync;
+use Automattic\WooCommerce\Pinterest\Tracking;
 use \WP_REST_Server;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -68,6 +69,19 @@ class FeedState extends VendorAPI {
 		$this->methods           = WP_REST_Server::READABLE;
 
 		$this->register_routes();
+
+		$this->hooks();
+
+	}
+
+
+	/**
+	 * Add feed state hooks.
+	 */
+	private function hooks() {
+		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_local_feed_state' ) );
+		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_feed_registration_state' ) );
+		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_third_party_tags_warning' ) );
 	}
 
 
@@ -105,8 +119,6 @@ class FeedState extends VendorAPI {
 
 		try {
 
-			$result = array();
-
 			if ( ! ProductSync::is_product_sync_enabled() ) {
 				return array(
 					'workflow' => array(
@@ -126,10 +138,7 @@ class FeedState extends VendorAPI {
 				);
 			}
 
-			$result = $this->add_local_feed_state( $result );
-			$result = $this->add_feed_registration_state( $result );
-
-			return $result;
+			return apply_filters( 'pinterest_for_woocommerce_feed_state', array() );
 
 		} catch ( \Throwable $th ) {
 
@@ -149,7 +158,7 @@ class FeedState extends VendorAPI {
 	 *
 	 * @return array
 	 */
-	private function add_local_feed_state( $result ) {
+	public function add_local_feed_state( $result ) {
 
 		$state      = Pinterest\ProductFeedStatus::get();
 		$extra_info = '';
@@ -239,7 +248,7 @@ class FeedState extends VendorAPI {
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
-	private function add_feed_registration_state( $result ) {
+	public function add_feed_registration_state( $result ) {
 
 		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
 		$feed_id     = Pinterest_For_Woocommerce()::get_data( 'feed_registered' );
@@ -321,6 +330,36 @@ class FeedState extends VendorAPI {
 				'errors'     => 0,
 			);
 		}
+
+		return $result;
+	}
+
+	/**
+	 * Adds to the result variable an array with info about the
+	 * registration and configuration process of the XML feed to the Pinterest API.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param array $result The result array to add values to.
+	 *
+	 * @return array
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
+	public function add_third_party_tags_warning( $result ) {
+
+		$warning_message = Tracking::get_third_party_tags_warning_message();
+
+		if ( empty( $warning_message ) ) {
+			return $result;
+		}
+
+		$result['workflow'][] = array(
+			'label'        => esc_html__( 'Pinterest tag', 'pinterest-for-woocommerce' ),
+			'status'       => 'warning',
+			'status_label' => esc_html__( 'Potential conflicting plugins', 'pinterest-for-woocommerce' ),
+			'extra_info'   => $warning_message,
+		);
 
 		return $result;
 	}
