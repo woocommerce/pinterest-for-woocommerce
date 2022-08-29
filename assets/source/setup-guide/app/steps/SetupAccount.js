@@ -10,9 +10,18 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, Card, CardFooter, CardDivider } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { recordEvent } from '@woocommerce/tracks';
+import {
+	Button,
+	Card,
+	CardFooter,
+	CardDivider,
+	Flex,
+	FlexBlock,
+	Icon,
+	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -23,6 +32,10 @@ import AccountConnection from '../components/Account/Connection';
 import BusinessAccountSelection from '../components/Account/BusinessAccountSelection';
 import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
 import documentationLinkProps from '../helpers/documentation-link-props';
+import GiftIcon from '../components/GiftIcon';
+
+// Placeholder link (to be updated)
+const atHref = 'https://business.pinterest.com/business-terms-of-service/';
 
 /**
  * Clicking on "… create a new Pinterest account" button.
@@ -166,6 +179,40 @@ const SetupAccount = ( {
 							}
 						) }
 					/>
+					<CardDivider
+						className={
+							'woocommerce-setup-guide__ad-credits__divider'
+						}
+					/>
+					<Flex className={ 'woocommerce-setup-guide__ad-credits' }>
+						<FlexBlock className="image-block">
+							<Icon icon={ GiftIcon } />
+						</FlexBlock>
+						<FlexBlock className="content-block">
+							<Text variant="body">
+								{ createInterpolateElement(
+									__(
+										'Get 100$ in Pinterest ad credits when you complete this setup. <a>View terms</a>.',
+										'pinterest-for-woocommerce'
+									),
+									{
+										a: (
+											// Disabling no-content rule - content is interpolated from above string.
+											// eslint-disable-next-line jsx-a11y/anchor-has-content
+											<a
+												{ ...documentationLinkProps( {
+													href: atHref,
+													linkId: 'ad-credits-terms',
+													context,
+													rel: 'noreferrer',
+												} ) }
+											/>
+										),
+									}
+								) }
+							</Text>
+						</FlexBlock>
+					</Flex>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
