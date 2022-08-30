@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.9
 Requires PHP: 7.3
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -86,6 +86,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.2 - 2022-08-09 =
+* Dev - GH release config and the new PR template.
+* Fix - Error after domain verification.
+* Tweak - WC 6.8 compatibility.
 
 = 1.2.1 - 2022-07-01 =
 * Fix - Error printing end of line character.
