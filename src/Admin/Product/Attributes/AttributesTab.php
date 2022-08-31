@@ -91,14 +91,14 @@ class AttributesTab {
 			function ( string $product_type ) {
 				return "show_if_${product_type}";
 			},
-			$this->get_applicable_product_types()
+			array_keys( $this->get_applicable_product_types() )
 		);
 
 		$hidden_types = array_map(
 			function ( string $product_type ) {
 				return "hide_if_${product_type}";
 			},
-			$this->get_hidden_product_types()
+			array_keys( $this->get_hidden_product_types() )
 		);
 
 		$classes = array_merge( array( 'pinterest' ), $shown_types, $hidden_types );
@@ -182,7 +182,13 @@ class AttributesTab {
 	 * @return array of WooCommerce product types (e.g. 'simple', 'variable', etc.)
 	 */
 	public static function get_applicable_product_types(): array {
-		return apply_filters( 'wc_pinterest_attributes_tab_applicable_product_types', array( 'simple', 'variable' ) );
+		return apply_filters(
+			'wc_pinterest_attributes_tab_applicable_product_types',
+			array(
+				'simple'   => __( 'Simple product', 'pinterest-for-woocommerce' ),
+				'variable' => __( 'Variable product', 'pinterest-for-woocommerce' ),
+			)
+		);
 	}
 
 	/**
@@ -193,7 +199,13 @@ class AttributesTab {
 	 * @return array of WooCommerce product types (e.g. 'subscription', 'variable-subscription', etc.)
 	 */
 	protected function get_hidden_product_types(): array {
-		return apply_filters( 'wc_pinterest_attributes_tab_hidden_product_types', array_diff( array_keys( wc_get_product_types() ), $this->get_applicable_product_types() ) );
+		return apply_filters(
+			'wc_pinterest_attributes_tab_hidden_product_types',
+			array_diff_key(
+				wc_get_product_types(),
+				$this->get_applicable_product_types()
+			)
+		);
 	}
 
 	/**

@@ -50,7 +50,7 @@ class VariationsAttributes {
 	 */
 	public function register(): void {
 
-		if ( ! in_array( 'variable', AttributesTab::get_applicable_product_types(), true ) ) {
+		if ( ! array_key_exists( 'variable', AttributesTab::get_applicable_product_types() ) ) {
 			return;
 		}
 
