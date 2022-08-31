@@ -578,4 +578,16 @@ class Base {
 	public static function get_message_map() {
 		return self::make_request( 'catalogs/message_map', 'GET', array(), '', DAY_IN_SECONDS );
 	}
+
+
+	/**
+	 * Get billing data information from the advertiser.
+	 *
+	 * @param string $advertiser_id the advertiser_id to create a tag for.
+	 *
+	 * @return mixed
+	 */
+	public static function get_advertiser_billing_data( $advertiser_id ) {
+		return self::make_request( "/ads/v4/advertisers/{$advertiser_id}/partners/billing_profiles", 'GET', array(), 'ads' );
+	}
 }
