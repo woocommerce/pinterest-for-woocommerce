@@ -198,7 +198,7 @@ const SetupAccount = ( {
 									<Text variant="body">
 										{ createInterpolateElement(
 											__(
-												'Get 100$ in Pinterest ad credits when you complete this setup. <a>View terms</a>.',
+												'Get 100$ in Pinterest ad credits when you complete the setup. <a>View terms</a>.',
 												'pinterest-for-woocommerce'
 											),
 											{
