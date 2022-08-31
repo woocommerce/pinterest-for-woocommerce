@@ -30,7 +30,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		 * Initialize class
 		 */
 		public function __construct() {
-			add_action( 'admin_enqueue_scripts', array( $this, 'load_setup_guide_scripts' ) );
+			add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_assets' ) );
 			add_action( 'admin_init', array( $this, 'maybe_redirect_to_middleware' ) );
 			add_filter( 'woocommerce_get_registered_extended_tasks', array( $this, 'register_task_list_item' ), 10, 1 );
 			add_filter( 'admin_footer', array( $this, 'load_settings' ) );
@@ -318,6 +318,21 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			);
 
 			wp_enqueue_style( $handle );
+		}
+
+		/**
+		 * Enqueues admin related scripts & styles
+		 *
+		 * @return void
+		 */
+		public function load_admin_assets() {
+
+			$assets_path_url = str_replace( array( 'http:', 'https:' ), '', Pinterest_For_Woocommerce()->plugin_url() ) . '/assets/';
+			$ext             = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+
+			wp_enqueue_script( 'pinterest-for-woocommerce-admin', $assets_path_url . 'js/admin/pinterest-for-woocommerce-admin' . $ext . '.js', array( 'jquery' ), PINTEREST_FOR_WOOCOMMERCE_VERSION, true );
+
+			$this->load_setup_guide_scripts();
 		}
 
 		/**
