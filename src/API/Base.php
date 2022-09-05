@@ -588,6 +588,6 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_advertiser_billing_data( $advertiser_id ) {
-		return self::make_request( "/advertisers/{$advertiser_id}/partners/billing_profiles", 'GET', array(), 'ads' );
+		return self::make_request( "/advertisers/{$advertiser_id}/billing_data", 'GET', array(), 'ads' );
 	}
 }
