@@ -3,9 +3,10 @@
 ( function ( $ ) {
 	'use strict';
 
-	$( document.body ).on(
+	$( document ).on(
 		'woocommerce-product-type-change',
-		function ( productType ) {
+		'body',
+		function ( event, productType ) {
 			$( '.hide_if_' + productType ).hide();
 		}
 	);
