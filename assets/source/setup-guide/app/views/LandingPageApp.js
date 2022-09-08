@@ -25,6 +25,8 @@ import UnsupportedCountryNotice from '../components/UnsupportedCountryNotice';
 
 const tosHref = 'https://business.pinterest.com/business-terms-of-service/';
 
+const adsHref = 'https://business.pinterest.com/business-terms-of-service/';
+
 /**
  * Triggered on events during setup,
  * like starting, ending, or navigating between steps.
@@ -116,6 +118,62 @@ const WelcomeSection = () => {
 						}
 						alt=""
 					/>
+				</FlexBlock>
+			</Flex>
+		</Card>
+	);
+};
+
+/**
+ * Welcome Section Card.
+ * To be used in getting started page.
+ *
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
+ *
+ * @return {JSX.Element} Rendered element.
+ */
+const AdsCreditSection = () => {
+	return (
+		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__credits-section">
+			<Flex>
+				<FlexBlock className="image-block">
+					<img
+						src={
+							wcSettings.pinterest_for_woocommerce.pluginUrl +
+							'/assets/images/landing_credit.svg'
+						}
+						alt=""
+					/>
+				</FlexBlock>
+				<FlexBlock className="content-block">
+					<Text variant="subtitle">
+						{ __(
+							'Get $100 in ad credits when you set up Pinterest for WooCommerce!',
+							'pinterest-for-woocommerce'
+						) }
+					</Text>
+					<Text variant="body">
+						{ createInterpolateElement(
+							__(
+								'To help you get started with Pinterest Ads, you can get $100 in ad credits when you have successfully set up Pinterest for WooCommerce. <a>Terms and conditions</a> apply',
+								'pinterest-for-woocommerce'
+							),
+							{
+								a: (
+									// Disabling no-content rule - content is interpolated from above string.
+									// eslint-disable-next-line jsx-a11y/anchor-has-content
+									<a
+										{ ...documentationLinkProps( {
+											href: adsHref,
+											linkId: 'ad-credits-terms',
+											context: 'welcome-section',
+											rel: 'noreferrer',
+										} ) }
+									/>
+								),
+							}
+						) }
+					</Text>
 				</FlexBlock>
 			</Flex>
 		</Card>
@@ -280,6 +338,7 @@ const LandingPageApp = () => {
 					<UnsupportedCountryNotice countryCode={ storeCountry } />
 				) }
 				<WelcomeSection />
+				<AdsCreditSection />
 				<FeaturesSection />
 				<FaqSection />
 			</div>
