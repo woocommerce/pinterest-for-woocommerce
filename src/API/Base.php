@@ -583,11 +583,23 @@ class Base {
 	/**
 	 * Get billing data information from the advertiser.
 	 *
-	 * @param string $advertiser_id the advertiser_id to create a tag for.
+	 * @param string $advertiser_id The advertiser id for which to get the billing data.
 	 *
 	 * @return mixed
 	 */
 	public static function get_advertiser_billing_data( $advertiser_id ) {
 		return self::make_request( "/advertisers/{$advertiser_id}/billing_data", 'GET', array(), 'ads' );
+	}
+
+	/**
+	 * Redeem advertisement offer code ( ads credit ).
+	 *
+	 * @param string $advertiser_id The advertiser id for which we redeeme the offer code.
+	 * @param string $offer_code Promotional ads credit offer code.
+	 *
+	 * @return mixed
+	 */
+	public static function redeem_ads_offer_code( $advertiser_id, $offer_code ) {
+		return self::make_request( "/advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem", 'GET', array(), 'ads' );
 	}
 }
