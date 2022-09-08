@@ -583,7 +583,7 @@ class Base {
 	/**
 	 * Get billing data information from the advertiser.
 	 *
-	 * @param string $advertiser_id the advertiser_id to create a tag for.
+	 * @param string $advertiser_id The advertiser id for which to get the billing data.
 	 *
 	 * @return mixed
 	 */
