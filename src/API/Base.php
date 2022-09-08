@@ -594,12 +594,31 @@ class Base {
 	/**
 	 * Redeem advertisement offer code ( ads credit ).
 	 *
-	 * @param string $advertiser_id The advertiser id for which we redeeme the offer code.
+	 * @param string $advertiser_id The advertiser id for which we redeem the offer code.
 	 * @param string $offer_code Promotional ads credit offer code.
 	 *
 	 * @return mixed
 	 */
 	public static function redeem_ads_offer_code( $advertiser_id, $offer_code ) {
 		return self::make_request( "/advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem", 'GET', array(), 'ads' );
+	}
+
+	/**
+	 * Validate advertisement offer code ( ads credit ).
+	 *
+	 * @param string $advertiser_id The advertiser id for which we validate the offer code.
+	 * @param string $offer_code Promotional ads credit offer code.
+	 *
+	 * @return mixed
+	 */
+	public static function validate_ads_offer_code( $advertiser_id, $offer_code ) {
+		return self::make_request(
+			"/advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem",
+			'GET',
+			array(
+				'validate_only' => true,
+			),
+			'ads'
+		);
 	}
 }
