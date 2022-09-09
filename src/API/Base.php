@@ -621,4 +621,15 @@ class Base {
 			'ads'
 		);
 	}
+
+	/**
+	 * Pull information about available ads credits for advertiser.
+	 *
+	 * @param string $advertiser_id The advertiser id for which we check the available ads credits.
+	 *
+	 * @return mixed
+	 */
+	public static function get_available_discounts( $advertiser_id ) {
+		return self::make_request( "/advertisers/{$advertiser_id}/discounts", 'GET', array(), 'ads' );
+	}
 }
