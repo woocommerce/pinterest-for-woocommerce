@@ -51,4 +51,12 @@ class PinterestApiException extends \Exception {
 		return $this->pinterest_code;
 	}
 
+	/**
+	 * Merchant not found during the API call. API response message:
+	 * "Sorry! We couldn't find that merchant. Please ensure you have access and a valid merchant id."
+	 *
+	 * @var int MERCHANT_NOT_FOUND Error code for merchant not found API error.
+	 */
+	public const MERCHANT_NOT_FOUND = 650;
+
 }
