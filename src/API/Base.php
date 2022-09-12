@@ -592,6 +592,17 @@ class Base {
 	}
 
 	/**
+	 * Get billing data information from the advertiser.
+	 *
+	 * @param string $advertiser_id The advertiser id for which to get the billing data.
+	 *
+	 * @return mixed
+	 */
+	public static function get_advertiser_billing_profile( $advertiser_id ) {
+		return self::make_request( "advertisers/{$advertiser_id}/partners/billing_profiles", 'GET', array(), 'ads' );
+	}
+
+	/**
 	 * Redeem advertisement offer code ( ads credit ).
 	 *
 	 * @param string $advertiser_id The advertiser id for which we redeem the offer code.
@@ -600,7 +611,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function redeem_ads_offer_code( $advertiser_id, $offer_code ) {
-		return self::make_request( "/advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem", 'GET', array(), 'ads' );
+		return self::make_request( "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem", 'GET', array(), 'ads' );
 	}
 
 	/**
@@ -613,7 +624,7 @@ class Base {
 	 */
 	public static function validate_ads_offer_code( $advertiser_id, $offer_code ) {
 		return self::make_request(
-			"/advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem",
+			"advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem",
 			'GET',
 			array(
 				'validate_only' => true,
@@ -630,6 +641,6 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_available_discounts( $advertiser_id ) {
-		return self::make_request( "/advertisers/{$advertiser_id}/discounts", 'GET', array(), 'ads' );
+		return self::make_request( "advertisers/{$advertiser_id}/discounts", 'GET', array(), 'ads' );
 	}
 }
