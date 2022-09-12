@@ -99,7 +99,6 @@ class AdvertiserConnect extends VendorAPI {
 		}
 
 		Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', true );
-		Pinterest_For_Woocommerce()::save_data( 'connected_advertiser_id', $advertiser_id );
 
 		/*
 		 * This is the last step of the connection process. We can use this moment to
