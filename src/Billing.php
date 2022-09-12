@@ -37,7 +37,7 @@ class Billing {
 
 		if ( false === $advertiser_id ) {
 			// No advertiser id stored. But we are connected. This is an abnormal state that should not happen.
-			Logger::log( __( 'Advertiser connected but the connection id is missing.', 'pinterest-for-woocommerce' ) ); 
+			Logger::log( __( 'Advertiser connected but the connection id is missing.', 'pinterest-for-woocommerce' ) );
 			return false;
 		}
 

@@ -44,7 +44,6 @@ class Options extends VendorAPI {
 	 * @return array
 	 */
 	public function get_settings() {
-		$billing = Billing::has_billing_set_up();
 		return array(
 			PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => Pinterest_For_Woocommerce()::get_settings( true ),
 		);
