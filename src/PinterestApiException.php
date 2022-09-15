@@ -18,6 +18,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class PinterestApiException
  */
 class PinterestApiException extends \Exception {
+
+	/**
+	 * Merchant not found during the API call. API response message:
+	 * "Sorry! We couldn't find that merchant. Please ensure you have access and a valid merchant id."
+	 *
+	 * @var int MERCHANT_NOT_FOUND Error code for merchant not found API error.
+	 */
+	public const MERCHANT_NOT_FOUND = 650;
+
 	/**
 	 * Holds the specific Pinterest error code, which is useful in addition to the response code.
 	 *
@@ -50,13 +59,4 @@ class PinterestApiException extends \Exception {
 	public function get_pinterest_code() {
 		return $this->pinterest_code;
 	}
-
-	/**
-	 * Merchant not found during the API call. API response message:
-	 * "Sorry! We couldn't find that merchant. Please ensure you have access and a valid merchant id."
-	 *
-	 * @var int MERCHANT_NOT_FOUND Error code for merchant not found API error.
-	 */
-	public const MERCHANT_NOT_FOUND = 650;
-
 }
