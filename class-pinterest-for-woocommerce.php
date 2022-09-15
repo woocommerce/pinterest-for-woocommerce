@@ -671,7 +671,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			} catch ( PinterestApiException $e ) {
 				$code = $e->get_pinterest_code();
 
-				if ( PinterestApiException::MERCHANT_NOT_FOUND == $code ) {
+				if ( PinterestApiException::MERCHANT_NOT_FOUND === $code ) {
 					Pinterest\Logger::log( esc_html__( 'Trying to disconnect while the merchant ( id ) was not found.', 'pinterest-for-woocommerce' ) );
 					/**
 					 * This is an abnormal state of the application. Caused probably by issues during the connection process.
