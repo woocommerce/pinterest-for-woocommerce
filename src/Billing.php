@@ -8,7 +8,6 @@
 namespace Automattic\WooCommerce\Pinterest;
 
 use Automattic\WooCommerce\Pinterest\API\Base;
-use Automattic\WooCommerce\Pinterest\Logger;
 use Throwable;
 
 if ( ! defined( 'ABSPATH' ) ) {
