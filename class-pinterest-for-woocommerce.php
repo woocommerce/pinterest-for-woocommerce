@@ -835,6 +835,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					)
 				);
 
+				/*
+				 * For now we assume that the billing is not setup.
+				 * We will be able to check that only when the advertiser will be connected.
+				 * The billing is tied to advertiser.
+				 */
+				$data['is_billing_setup'] = false;
+
 				Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
 				return $data;
 			}
