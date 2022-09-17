@@ -100,6 +100,9 @@ class AdvertiserConnect extends VendorAPI {
 
 		Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', true );
 
+		// At this stage we can check if the connected advertiser has billing setup.
+		Pinterest_For_Woocommerce()::add_billing_setup_info_to_account_data();
+
 		/*
 		 * This is the last step of the connection process. We can use this moment to
 		 * track when the connection to the account was made.
