@@ -7,6 +7,7 @@
  */
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 
@@ -835,6 +836,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					)
 				);
 
+				/*
+				 * For now we assume that the billing is not setup.
+				 * We will be able to check that only when the advertiser will be connected.
+				 * The billing is tied to advertiser.
+				 */
+				$data['is_billing_setup'] = false;
+
 				Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
 				return $data;
 			}
@@ -843,6 +851,20 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			return array();
 
+		}
+
+		/**
+		 * Add billing setup information to the account data option.
+		 * Using this function makes sense only when we have a connected advertiser.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public static function add_billing_setup_info_to_account_data() {
+			$account_data                     = self::get_setting( 'account_data' );
+			$account_data['is_billing_setup'] = Billing::has_billing_set_up();
+			self::save_setting( 'account_data', $account_data );
 		}
 
 
