@@ -8,11 +8,6 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
-use Exception;
-use Throwable;
-use Automattic\WooCommerce\Pinterest\API\Base;
-use Automattic\WooCommerce\Pinterest\Logger;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -37,8 +32,6 @@ class BillingSetupCheck {
 	 * @since x.x.x
 	 *
 	 * @return mixed
-	 *
-	 * @throws Exception PHP Exception.
 	 */
 	public function handle_billing_setup_check() {
 
