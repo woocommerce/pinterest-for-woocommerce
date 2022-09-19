@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Automattic\WooCommerce\Pinterest\API\AdvertiserConnect;
 use WC_Product;
+use \Premmerce\WooCommercePinterest\PinterestPlugin;
 
 /**
  * Class adding Save Pin support.
@@ -596,5 +597,59 @@ JS;
 		$args['attributes'] = array_merge( $args['attributes'], $attributes );
 
 		return $args;
+	}
+
+
+	/**
+	 * Get the formatted warning message for the potential conflicting tags.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return string The warning message.
+	 */
+	public static function get_third_party_tags_warning_message() {
+
+		$third_party_tags = self::get_third_party_installed_tags();
+
+		if ( empty( $third_party_tags ) ) {
+			return '';
+		}
+
+		return sprintf(
+			/* Translators: 1: Conflicting plugins, 2: Plugins Admin page opening tag, 3: Pinterest settings opening tag, 4: Closing anchor tag */
+			esc_html__( 'The following installed plugin(s) can potentially cause problems with tracking: %1$s. %2$sRemove conflicting plugins%4$s or %3$smanage tracking settings%4$s.', 'pinterest-for-woocommerce' ),
+			implode( ', ', $third_party_tags ),
+			sprintf( '<a href="%s" target="_blank">', esc_url( admin_url( 'plugins.php' ) ) ),
+			sprintf( '<a href="%s" target="_blank">', esc_url( wc_admin_url( '&path=/pinterest/settings' ) ) ),
+			'</a>',
+		);
+
+	}
+
+
+	/**
+	 * Detect if there are other tags installed on the site.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array The list of installed tags.
+	 */
+	public static function get_third_party_installed_tags() {
+
+		$third_party_tags = array();
+
+		if ( defined( 'GTM4WP_VERSION' ) ) {
+			$third_party_tags['gtm'] = 'Google Tag Manager';
+		}
+
+		if ( defined( 'PYS_PINTEREST_VERSION' ) ) {
+			$third_party_tags['pys'] = 'Pixel Your Site - Pinterest Addon';
+		}
+
+		if ( class_exists( PinterestPlugin::class ) ) {
+			$third_party_tags['softblues'] = 'Pinterest for WooCommerce by Softblues';
+		}
+
+		return $third_party_tags;
 	}
 }
