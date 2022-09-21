@@ -3,11 +3,12 @@
  */
 import { __ } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
+import { Link } from '@woocommerce/components';
 import {
 	Modal,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
-import { Link } from '@woocommerce/components';
+
 
 /**
  * Internal dependencies
@@ -52,17 +53,17 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 				) }
 			</Text>
 			<Text variant="body" isBlock>
-						{ __(
-							'The following terms and conditions apply:',
-							'pinterest-for-woocommerce'
-						) }
+				{ __(
+					'The following terms and conditions apply:',
+					'pinterest-for-woocommerce'
+				) }
 			</Text>
 			{ createInterpolateElement(
 				__(
 					'<link>Business Terms of Service</link>',
 					'pinterest-for-woocommerce'
 				),
-				{ 
+				{
 					link: (
 						<Link
 							{ ...documentationLinkProps( {
@@ -71,7 +72,7 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 								context: 'ads-credits-terms-and-conditions',
 							} ) }
 						/>
-					)
+					),
 				}
 			) }
 			{ createInterpolateElement(
@@ -79,7 +80,7 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 					'<link>Privacy Policy</link>',
 					'pinterest-for-woocommerce'
 				),
-				{ 
+				{
 					link: (
 						<Link
 							{ ...documentationLinkProps( {
@@ -88,7 +89,7 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 								context: 'ads-credits-terms-and-conditions',
 							} ) }
 						/>
-					)
+					),
 				}
 			) }
 			{ createInterpolateElement(
@@ -96,7 +97,7 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 					'<link>Pinterest Advertising Services Agreement</link>',
 					'pinterest-for-woocommerce'
 				),
-				{ 
+				{
 					link: (
 						<Link
 							{ ...documentationLinkProps( {
@@ -105,7 +106,7 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 								context: 'ads-credits-terms-and-conditions',
 							} ) }
 						/>
-					)
+					),
 				}
 			) }
 		</Modal>
