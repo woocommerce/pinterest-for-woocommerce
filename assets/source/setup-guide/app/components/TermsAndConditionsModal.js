@@ -1,16 +1,16 @@
 /**
  * External dependencies
  */
- import { __ } from '@wordpress/i18n';
- import {
-     Modal,
-     __experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
- } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import {
+    Modal,
+    __experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
+} from '@wordpress/components';
 
  /**
   * Internal dependencies
   */
- import documentationLinkProps from '../helpers/documentation-link-props';
+import documentationLinkProps from '../helpers/documentation-link-props';
 
 const tosHref = 'https://business.pinterest.com/business-terms-of-service/';
 const privacyPolicyHref = 'https://policy.pinterest.com/privacy-policy';
