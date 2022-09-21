@@ -15,8 +15,9 @@ import {
  */
 import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
 
-const OnboardingModal = ( { isBillingSetup, onCloseModal } ) => {
+const OnboardingModal = ( { onCloseModal } ) => {
 	const appSettings = useSettingsSelect();
+	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
 
 	return (
 		<Modal
