@@ -3,10 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { getNewPath, getHistory } from '@woocommerce/navigation';
-import { 
+import {
 	createInterpolateElement,
 	useCallback,
-	useState
+	useState,
 } from '@wordpress/element';
 import { recordEvent } from '@woocommerce/tracks';
 import {
@@ -14,7 +14,6 @@ import {
 	Card,
 	Flex,
 	FlexBlock,
-	Modal,
 	Panel,
 	PanelBody,
 	PanelRow,
@@ -138,34 +137,27 @@ const WelcomeSection = () => {
  * @return {JSX.Element} Rendered element.
  */
 const AdsCreditSection = () => {
-
-	const [ isTermsAndConditionsModalOpen, setIsTermsAndConditionsModalOpen ] = useState(
-		false
-	);
+	const [
+		isTermsAndConditionsModalOpen,
+		setIsTermsAndConditionsModalOpen,
+	] = useState( false );
 
 	const openTermsAndConditionsModal = () => {
 		setIsTermsAndConditionsModalOpen( true );
-		recordEvent(
-			'pfw_modal_open',
-			{ 
-				context: 'landing-page',
-				name: 'ads-credits-terms-and-conditions' 
-			}
-		);
+		recordEvent( 'pfw_modal_open', {
+			context: 'landing-page',
+			name: 'ads-credits-terms-and-conditions',
+		} );
 	};
 
 	const closeTermsAndConditionsModal = () => {
 		setIsTermsAndConditionsModalOpen( false );
-		recordEvent( 
-			'pfw_modal_closed',
-			{ 
-				context: 'landing-page',
-				name: 'ads-credits-terms-and-conditions' 
-			}
-		);
+		recordEvent( 'pfw_modal_closed', {
+			context: 'landing-page',
+			name: 'ads-credits-terms-and-conditions',
+		} );
 	};
 
-	
 	return (
 		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__credits-section">
 			<Flex>
@@ -188,15 +180,15 @@ const AdsCreditSection = () => {
 					<Text variant="body">
 						{ createInterpolateElement(
 							__(
-							'To help you get started with Pinterest Ads, new Pinterest customers can get $125 in ad credits when they have successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Terms and conditions</a> apply.',
+								'To help you get started with Pinterest Ads, new Pinterest customers can get $125 in ad credits when they have successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Terms and conditions</a> apply.',
 								'pinterest-for-woocommerce'
 							),
 							{
 								a: (
-									// Disabling no-content rule - content is interpolated from above string.
-									// eslint-disable-next-line jsx-a11y/anchor-has-content
+									// Disabling no-content rule - content is interpolated from above string
+									// eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/anchor-has-content
 									<a
-										href={'#'}
+										href={ '#' }
 										onClick={ openTermsAndConditionsModal }
 									/>
 								),
@@ -205,9 +197,11 @@ const AdsCreditSection = () => {
 					</Text>
 				</FlexBlock>
 			</Flex>
-			{ isTermsAndConditionsModalOpen && 
-				<AdsCreditsTermsAndConditionsModal onModalClose={ closeTermsAndConditionsModal }/>
-			}
+			{ isTermsAndConditionsModalOpen && (
+				<AdsCreditsTermsAndConditionsModal
+					onModalClose={ closeTermsAndConditionsModal }
+				/>
+			) }
 		</Card>
 	);
 };
