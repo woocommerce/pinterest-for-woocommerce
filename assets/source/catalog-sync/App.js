@@ -3,6 +3,7 @@
  */
 import '@wordpress/notices';
 import { useCallback, useEffect, useState } from '@wordpress/element';
+import { recordEvent } from '@woocommerce/tracks';
 
 /**
  * Internal dependencies
@@ -16,9 +17,25 @@ import NavigationClassic from '../components/navigation-classic';
 import AdsOnboardingModal from './components/AdsOnboardingModal';
 
 /**
+ * Opening a modal.
+ *
+ * @event wcadmin_pfw_modal_open
+ * @property {string} name Ads Onboarding Modal.
+ * @property {string} context catalog-sync
+ */
+/**
+ * Closing a modal.
+ *
+ * @event wcadmin_pfw_modal_closed
+ * @property {string} name Ads Onboarding Modal.
+ * @property {string} context catalog-sync
+ */
+
+/**
  * Catalog Sync Tab.
  *
- * @fires wcadmin_pfw_ with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
+ * @fires wcadmin_pfw_modal_open with `{ name: 'ads-credits-onboarding' }`
+ * @fires wcadmin_pfw_modal_close with `{ name: 'ads-credits-onboarding' }`
  *
  * @return {JSX.Element} rendered component
  */
@@ -30,10 +47,18 @@ const CatalogSyncApp = () => {
 
 	const openAdsOnboardingModal = useCallback( () => {
 		setIsAdsOnboardingModalOpen( true );
+		recordEvent( 'pfw_modal_open', {
+			context: 'catalog-sync',
+			name: 'ads-credits-onboarding',
+		} );
 	}, [ setIsAdsOnboardingModalOpen ] );
 
 	const closeAdsOnboardingModal = () => {
 		setIsAdsOnboardingModalOpen( false );
+		recordEvent( 'pfw_modal_closed', {
+			context: 'catalog-sync',
+			name: 'ads-credits-onboarding',
+		} );
 	};
 
 	useEffect( () => {

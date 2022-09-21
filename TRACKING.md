@@ -116,20 +116,22 @@ Closing a modal.
 | name | type | description |
 | ---- | ---- | ----------- |
 `name` | `string` | Which modal is it?
-`context` | `string` | `'settings' \| 'wizard'` In which context it was used?
+`context` | `string` | `'settings' \| 'wizard' \| 'catalog-sync'` In which context it was used?
 `action` | `string` | `confirm` - When the final "Yes, I'm sure" button is clicked. <br> `dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
+- [`CatalogSync`](assets/source/catalog-sync/App.js#L37) with `{ name: 'ads-credits-onboarding', … } `
 
-### [`wcadmin_pfw_modal_open`](assets/source/setup-guide/app/components/Account/Connection.js#L48)
+### [`wcadmin_pfw_modal_open`](assets/source/setup-guide/app/components/Account/Connection.js#L39)
 Opening a modal.
 #### Properties
 | name | type | description |
 | ---- | ---- | ----------- |
 `name` | `string` | Which modal is it?
-`context` | `string` | `'settings' \| 'wizard'` In which context it was used?
+`context` | `string` | `'settings' \| 'wizard' \| 'catalog-sync'` In which context it was used?
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
+- [`CatalogSync`](assets/source/catalog-sync/App.js#L38) with `{ name: 'ads-credits-onboarding', … } `
 
 ### [`wcadmin_pfw_save_changes_button_click`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L19)
 Clicking on "… Save changes" button.
