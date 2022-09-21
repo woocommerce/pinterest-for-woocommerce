@@ -15,7 +15,14 @@ import {
  */
 import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
 
-const OnboardingModal = ( { onCloseModal } ) => {
+/**
+ * Ads Onboarding Modal.
+ *
+ * @param {Function} onModalClose Action to call when the modal gets closed.
+ *
+ * @returns {JSX.Element} rendered component
+ */
+const AdsOnboardingModal = ( { onCloseModal } ) => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
 
@@ -95,4 +102,4 @@ const OnboardingModal = ( { onCloseModal } ) => {
 	);
 };
 
-export default OnboardingModal;
+export default AdsOnboardingModal;

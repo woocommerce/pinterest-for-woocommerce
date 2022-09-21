@@ -13,26 +13,32 @@ import TransientNotices from './components/TransientNotices';
 import HealthCheck from '../setup-guide/app/components/HealthCheck';
 import { useCreateNotice } from './helpers/effects';
 import NavigationClassic from '../components/navigation-classic';
-import OnboardingModal from './components/OnboardingModal';
+import AdsOnboardingModal from './components/AdsOnboardingModal';
 
+/**
+ * Catalog Sync Tab.
+ *
+ * @fires wcadmin_pfw_ with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
+ *
+ * @return {JSX.Element} rendered component
+ */
 const CatalogSyncApp = () => {
 	useCreateNotice( wcSettings.pinterest_for_woocommerce.error );
-	const [
-		isOnboardingAdCreditsModalOpen,
-		setIsOnboardingAdCreditsModalOpen,
-	] = useState( false );
+	const [ isAdsOnboardingModalOpen, setIsAdsOnboardingModalOpen ] = useState(
+		false
+	);
 
-	const openOnboardingAdCreditsModal = useCallback( () => {
-		setIsOnboardingAdCreditsModalOpen( true );
-	}, [ setIsOnboardingAdCreditsModalOpen ] );
+	const openAdsOnboardingModal = useCallback( () => {
+		setIsAdsOnboardingModalOpen( true );
+	}, [ setIsAdsOnboardingModalOpen ] );
 
-	const closeOnboardingAdCreditsModal = () => {
-		setIsOnboardingAdCreditsModalOpen( false );
+	const closeAdsOnboardingModal = () => {
+		setIsAdsOnboardingModalOpen( false );
 	};
 
 	useEffect( () => {
-		openOnboardingAdCreditsModal();
-	}, [ openOnboardingAdCreditsModal ] );
+		openAdsOnboardingModal();
+	}, [ openAdsOnboardingModal ] );
 
 	return (
 		<div className="pinterest-for-woocommerce-catalog-sync">
@@ -44,10 +50,8 @@ const CatalogSyncApp = () => {
 				<SyncState />
 				<SyncIssues />
 			</div>
-			{ isOnboardingAdCreditsModalOpen && (
-				<OnboardingModal
-					onCloseModal={ closeOnboardingAdCreditsModal }
-				/>
+			{ isAdsOnboardingModalOpen && (
+				<AdsOnboardingModal onCloseModal={ closeAdsOnboardingModal } />
 			) }
 		</div>
 	);
