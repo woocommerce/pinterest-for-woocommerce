@@ -59,7 +59,7 @@ Clicking on an external documentation link.
 | name | type | description |
 | ---- | ---- | ----------- |
 `link_id` | `string` | Identifier of the link.
-`context` | `string` | `'settings' \| 'welcome-section' \| 'wizard'` In which context the link was placed?
+`context` | `string` | `'settings' \| 'welcome-section' \| 'wizard' \| 'ads-credits-terms-and-conditions'` In which context the link was placed?
 `href` | `string` | Href to which the user was navigated to.
 #### Emitters
 - [`documentationLinkProps`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L49) on click, with given `linkId` and `context`.
@@ -73,7 +73,10 @@ Clicking on an external documentation link.
 	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
 - [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L47) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
-
+- [TermsAndConditionsModal]( assets/source/setup-guide/app/components/TermsAndConditionsModal.js#L24)
+    - with `{ link_id: 'terms-of-service', context: 'ads-credits-terms-and-conditions' }`
+	- with `{ link_id: 'privacy-policy', context: 'ads-credits-terms-and-conditions' }`
+	- with `{ link_id: 'advertising-services-agreement', context: 'ads-credits-terms-and-conditions' }`
 ### [`wcadmin_pfw_domain_verify_failure`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L69)
 Triggered when domain verification fails.
 #### Properties
@@ -116,10 +119,11 @@ Closing a modal.
 | name | type | description |
 | ---- | ---- | ----------- |
 `name` | `string` | Which modal is it?
-`context` | `string` | `'settings' \| 'wizard' \| 'catalog-sync'` In which context it was used?
+`context` | `string` | `'settings' \| 'wizard' \| 'landing-page' \| 'catalog-sync'` In which context it was used?
 `action` | `string` | `confirm` - When the final "Yes, I'm sure" button is clicked. <br> `dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
+- [`LandingPageApp.AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L136) with `{ name: 'ads-credits-terms-and-conditions', … } `
 - [`CatalogSync`](assets/source/catalog-sync/App.js#L37) with `{ name: 'ads-credits-onboarding', … } `
 
 ### [`wcadmin_pfw_modal_open`](assets/source/setup-guide/app/components/Account/Connection.js#L39)
@@ -128,9 +132,10 @@ Opening a modal.
 | name | type | description |
 | ---- | ---- | ----------- |
 `name` | `string` | Which modal is it?
-`context` | `string` | `'settings' \| 'wizard' \| 'catalog-sync'` In which context it was used?
+`context` | `string` | `'settings' \| 'wizard' \| 'landing-page' \| 'catalog-sync'` In which context it was used?
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
+- [`LandingPageApp.AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L135) with `{ name: 'ads-credits-terms-and-conditions', … } `
 - [`CatalogSync`](assets/source/catalog-sync/App.js#L38) with `{ name: 'ads-credits-onboarding', … } `
 
 ### [`wcadmin_pfw_save_changes_button_click`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L19)

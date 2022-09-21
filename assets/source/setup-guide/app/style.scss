@@ -508,11 +508,27 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					img {
+						padding: 12px;
 						height: 100%;
 						object-fit: cover;
 						width: 100%;
 					}
 				}
+			}
+		}
+
+		&__tac-modal {
+			width: 600px;
+
+			.components-modal__header {
+				border-bottom: 1px solid #ddd;
+			}
+
+			a,
+			p {
+
+				display: block;
+				margin-bottom: 16px;
 			}
 		}
 	}
