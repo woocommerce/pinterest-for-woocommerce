@@ -148,14 +148,14 @@ const AdsCreditSection = () => {
 				<FlexBlock className="content-block">
 					<Text variant="subtitle">
 						{ __(
-							'Get $100 in ad credits when you set up Pinterest for WooCommerce!',
+							'Try Pinterest for WooCommerce and get $125 in ad credits!',
 							'pinterest-for-woocommerce'
 						) }
 					</Text>
 					<Text variant="body">
 						{ createInterpolateElement(
 							__(
-								'To help you get started with Pinterest Ads, you can get $100 in ad credits when you have successfully set up Pinterest for WooCommerce. <a>Terms and conditions</a> apply',
+							'To help you get started with Pinterest Ads, new Pinterest customers can get $125 in ad credits when they have successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Terms and conditions</a> apply.',
 								'pinterest-for-woocommerce'
 							),
 							{
