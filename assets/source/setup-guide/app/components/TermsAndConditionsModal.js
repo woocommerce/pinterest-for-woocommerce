@@ -9,7 +9,6 @@ import {
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
-
 /**
  * Internal dependencies
  */
