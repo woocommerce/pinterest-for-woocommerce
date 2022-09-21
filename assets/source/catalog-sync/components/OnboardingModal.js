@@ -2,14 +2,6 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { addQueryArgs } from '@wordpress/url';
-import {
-	useEffect,
-	useState,
-	useCallback,
-	createInterpolateElement,
-} from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
 import { Icon, external as externalIcon } from '@wordpress/icons';
 import {
 	Button,
@@ -37,7 +29,7 @@ const OnboardingModal = ( { isBillingSetup, onCloseModal } ) => {
 					alt="Gift banner"
 				/>
 			}
-			onRequestClose={ closeConfirmationModal }
+			onRequestClose={ onCloseModal }
 			className="pinterest-for-woocommerce-catalog-sync__onboarding-modal"
 		>
 			<Text variant="title.small">
