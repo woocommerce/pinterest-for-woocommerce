@@ -3,13 +3,18 @@
  */
 import { __ } from '@wordpress/i18n';
 import { getNewPath, getHistory } from '@woocommerce/navigation';
-import { createInterpolateElement, useCallback } from '@wordpress/element';
+import { 
+	createInterpolateElement,
+	useCallback,
+	useState
+} from '@wordpress/element';
 import { recordEvent } from '@woocommerce/tracks';
 import {
 	Button,
 	Card,
 	Flex,
 	FlexBlock,
+	Modal,
 	Panel,
 	PanelBody,
 	PanelRow,
@@ -19,13 +24,12 @@ import {
 /**
  * Internal dependencies
  */
+import AdsCreditsTermsAndConditionsModal from '../components/TermsAndConditionsModal';
 import PrelaunchNotice from '../../../components/prelaunch-notice';
 import documentationLinkProps from '../helpers/documentation-link-props';
 import UnsupportedCountryNotice from '../components/UnsupportedCountryNotice';
 
 const tosHref = 'https://business.pinterest.com/business-terms-of-service/';
-
-const adsHref = 'https://business.pinterest.com/business-terms-of-service/';
 
 /**
  * Triggered on events during setup,
@@ -125,14 +129,43 @@ const WelcomeSection = () => {
 };
 
 /**
- * Welcome Section Card.
+ * Ads Credits Section Card.
  * To be used in getting started page.
  *
- * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
+ * @fires wcadmin_pfw_modal_open with `{ name: 'terms-and-conditions', … }`
+ * @fires wcadmin_pfw_modal_closed with `{ name: 'terms-and-conditions', … }`
  *
  * @return {JSX.Element} Rendered element.
  */
 const AdsCreditSection = () => {
+
+	const [ isTermsAndConditionsModalOpen, setIsTermsAndConditionsModalOpen ] = useState(
+		false
+	);
+
+	const openTermsAndConditionsModal = () => {
+		setIsTermsAndConditionsModalOpen( true );
+		recordEvent(
+			'pfw_modal_open',
+			{ 
+				context: 'landing-page',
+				name: 'ads-credits-terms-and-conditions' 
+			}
+		);
+	};
+
+	const closeTermsAndConditionsModal = () => {
+		setIsTermsAndConditionsModalOpen( false );
+		recordEvent( 
+			'pfw_modal_closed',
+			{ 
+				context: 'landing-page',
+				name: 'ads-credits-terms-and-conditions' 
+			}
+		);
+	};
+
+	
 	return (
 		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__credits-section">
 			<Flex>
@@ -163,12 +196,8 @@ const AdsCreditSection = () => {
 									// Disabling no-content rule - content is interpolated from above string.
 									// eslint-disable-next-line jsx-a11y/anchor-has-content
 									<a
-										{ ...documentationLinkProps( {
-											href: adsHref,
-											linkId: 'ad-credits-terms',
-											context: 'welcome-section',
-											rel: 'noreferrer',
-										} ) }
+										href={'#'}
+										onClick={ openTermsAndConditionsModal }
 									/>
 								),
 							}
@@ -176,6 +205,9 @@ const AdsCreditSection = () => {
 					</Text>
 				</FlexBlock>
 			</Flex>
+			{ isTermsAndConditionsModalOpen && 
+				<AdsCreditsTermsAndConditionsModal onModalClose={ closeTermsAndConditionsModal }/>
+			}
 		</Card>
 	);
 };

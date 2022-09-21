@@ -516,6 +516,14 @@ $root: ".woocommerce-setup-guide";
 				}
 			}
 		}
+
+		&__tac-modal {
+			width: 600px;
+
+			.components-modal__header {
+				border-bottom: 1px solid #CCCCCC;
+			}
+		}
 	}
 
 	&__features-section {
