@@ -20,7 +20,7 @@ import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
  *
  * @param {Function} onModalClose Action to call when the modal gets closed.
  *
- * @returns {JSX.Element} rendered component
+ * @return {JSX.Element} rendered component
  */
 const AdsOnboardingModal = ( { onCloseModal } ) => {
 	const appSettings = useSettingsSelect();
