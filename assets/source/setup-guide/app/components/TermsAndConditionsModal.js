@@ -2,10 +2,12 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { createInterpolateElement } from '@wordpress/element';
 import {
 	Modal,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
+import { Link } from '@woocommerce/components';
 
 /**
  * Internal dependencies
@@ -37,73 +39,75 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 			onRequestClose={ onModalClose }
 			className="pinterest-for-woocommerce-landing-page__credits-section__tac-modal"
 		>
-			<Text variant="body">
-				<div className="woocommerce-setup-guide__step-modal__wrapper">
-					<p>
-						{ __(
-							'To redeem the $125 ad credit from Pinterest, you would need to be a new customer to Pinterest ads, complete the setup of Pinterest for WooCommerce, and spend $15 with Pinterest ads. Credits may take up to 24 hours to be credited to the user.',
-							'pinterest-for-woocommerce'
-						) }
-					</p>
-					<p>
-						{ __(
-							'Each user is only eligible to receive the credits once. Ad credits may vary by country and is subject to availability.',
-							'pinterest-for-woocommerce'
-						) }
-					</p>
-					<p>
+			<Text>
+				{ __(
+					'To redeem the $125 ad credit from Pinterest, you would need to be a new customer to Pinterest ads, complete the setup of Pinterest for WooCommerce, and spend $15 with Pinterest ads. Credits may take up to 24 hours to be credited to the user.',
+					'pinterest-for-woocommerce'
+				) }
+			</Text>
+			<Text>
+				{ __(
+					'Each user is only eligible to receive the credits once. Ad credits may vary by country and is subject to availability.',
+					'pinterest-for-woocommerce'
+				) }
+			</Text>
+			<Text variant="body" isBlock>
 						{ __(
 							'The following terms and conditions apply:',
 							'pinterest-for-woocommerce'
 						) }
-					</p>
-					<p>
-						<a
+			</Text>
+			{ createInterpolateElement(
+				__(
+					'<link>Business Terms of Service</link>',
+					'pinterest-for-woocommerce'
+				),
+				{ 
+					link: (
+						<Link
 							{ ...documentationLinkProps( {
 								href: tosHref,
 								linkId: 'terms-of-service',
 								context: 'ads-credits-terms-and-conditions',
-								rel: 'noreferrer',
 							} ) }
-						>
-							{ __(
-								'Business Terms of Service',
-								'pinterest-for-woocommerce'
-							) }
-						</a>
-					</p>
-					<p>
-						<a
+						/>
+					)
+				}
+			) }
+			{ createInterpolateElement(
+				__(
+					'<link>Privacy Policy</link>',
+					'pinterest-for-woocommerce'
+				),
+				{ 
+					link: (
+						<Link
 							{ ...documentationLinkProps( {
 								href: privacyPolicyHref,
 								linkId: 'privacy-policy',
 								context: 'ads-credits-terms-and-conditions',
-								rel: 'noreferrer',
 							} ) }
-						>
-							{ __(
-								'Privacy Policy',
-								'pinterest-for-woocommerce'
-							) }
-						</a>
-					</p>
-					<p>
-						<a
+						/>
+					)
+				}
+			) }
+			{ createInterpolateElement(
+				__(
+					'<link>Pinterest Advertising Services Agreement</link>',
+					'pinterest-for-woocommerce'
+				),
+				{ 
+					link: (
+						<Link
 							{ ...documentationLinkProps( {
 								href: advertisingServicesAgreementHref,
 								linkId: 'advertising-services-agreement',
 								context: 'ads-credits-terms-and-conditions',
-								rel: 'noreferrer',
 							} ) }
-						>
-							{ __(
-								'Pinterest Advertising Services Agreement',
-								'pinterest-for-woocommerce'
-							) }
-						</a>
-					</p>
-				</div>
-			</Text>
+						/>
+					)
+				}
+			) }
 		</Modal>
 	);
 };
