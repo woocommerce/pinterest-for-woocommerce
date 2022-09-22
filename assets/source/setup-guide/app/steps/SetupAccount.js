@@ -137,7 +137,7 @@ const SetupAccount = ( {
 	}, [ createNotice ] );
 
 	return (
-		<div className="woocommerce-setup-guide__setup-account">
+		<div className="woocommerce-setup-guide__setup-account pinterest-for-woocommerce-account-setup">
 			{ view === 'wizard' && (
 				<StepHeader
 					title={ __(
