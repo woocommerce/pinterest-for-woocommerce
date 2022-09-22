@@ -52,17 +52,39 @@ const AdsOnboardingModal = ( { onCloseModal } ) => {
 					'pinterest-for-woocommerce'
 				) }
 			</Text>
-			<Text variant="body">
-				{ __(
-					'You are eligible for $125 of Pinterest ad credits. To claim the credits, ',
-					'pinterest-for-woocommerce'
-				) }
-				<strong>
+			{ isBillingSetup ? (
+				<Text variant="body">
 					{ __(
-						'you would need to add your billing details and spend $15 on Pinterest ads.',
+						'You are eligible for $125 of Pinterest ad credits. To claim the credits, head over to the Pinterest ads manager and ',
 						'pinterest-for-woocommerce'
 					) }
-				</strong>
+					<strong>
+						{ __(
+							'spend $15 on Pinterest ads.',
+							'pinterest-for-woocommerce'
+						) }
+					</strong>
+				</Text>
+			 ) : (
+				<Text variant="body">
+					{ __(
+						'You are eligible for $125 of Pinterest ad credits. To claim the credits, ',
+						'pinterest-for-woocommerce'
+					) }
+					<strong>
+						{ __(
+							'you would need to add your billing details and spend $15 on Pinterest ads.',
+							'pinterest-for-woocommerce'
+						) }
+					</strong>
+				</Text>
+			    )
+			}
+			<Text variant="caption">
+				{ __(
+					'*Ad credits may take up to 24 hours to be credited to account.',
+					'pinterest-for-woocommerce'
+				) }
 			</Text>
 			<Flex direction="row" justify="flex-end">
 				{ isBillingSetup ? (
