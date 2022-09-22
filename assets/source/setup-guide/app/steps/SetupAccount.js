@@ -229,7 +229,7 @@ const SetupAccount = ( {
 													<a
 														href={ '#' }
 														onClick={
-															openTermsAndConditionsModal 
+															openTermsAndConditionsModal
 														}
 													/>
 												),
