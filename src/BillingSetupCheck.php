@@ -35,7 +35,7 @@ class BillingSetupCheck {
 	 */
 	public function handle_billing_setup_check() {
 
-		Pinterest_For_Woocommerce()::save_setting( 'is_billing_setup', Billing::has_billing_set_up() );
+		Pinterest_For_Woocommerce()::add_billing_setup_info_to_account_data();
 
 		return true;
 	}
