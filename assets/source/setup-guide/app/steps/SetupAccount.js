@@ -26,6 +26,7 @@ import {
 /**
  * Internal dependencies
  */
+import AdsCreditsTermsAndConditionsModal from '../components/TermsAndConditionsModal';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import AccountConnection from '../components/Account/Connection';
@@ -55,6 +56,8 @@ const atHref = 'https://business.pinterest.com/business-terms-of-service/';
  * @fires wcadmin_pfw_account_convert_button_click
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-guidelines', context: props.view }`
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'merchant-guidelines', context: props.view }`
+ * @fires wcadmin_pfw_modal_open with `{ name: 'ads-credits-terms-and-conditions', … }`
+ * @fires wcadmin_pfw_modal_closed with `{ name: 'ads-credits-terms-and-conditions'', … }`
  *
  * @param {Object} props React props
  * @param {Function} props.goToNextStep
@@ -77,6 +80,27 @@ const SetupAccount = ( {
 	const [ businessAccounts, setBusinessAccounts ] = useState(
 		wcSettings.pinterest_for_woocommerce.businessAccounts
 	);
+
+	const [
+		isTermsAndConditionsModalOpen,
+		setIsTermsAndConditionsModalOpen,
+	] = useState( false );
+
+	const openTermsAndConditionsModal = () => {
+		setIsTermsAndConditionsModalOpen( true );
+		recordEvent( 'pfw_modal_open', {
+			context: 'wizard',
+			name: 'ads-credits-terms-and-conditions',
+		} );
+	};
+
+	const closeTermsAndConditionsModal = () => {
+		setIsTermsAndConditionsModalOpen( false );
+		recordEvent( 'pfw_modal_closed', {
+			context: 'wizard',
+			name: 'ads-credits-terms-and-conditions',
+		} );
+	};
 
 	useEffect( () => {
 		if ( undefined !== businessAccounts && businessAccounts.length > 0 ) {
@@ -198,24 +222,16 @@ const SetupAccount = ( {
 									<Text variant="body">
 										{ createInterpolateElement(
 											__(
-												'Get 100$ in Pinterest ad credits when you complete the setup. <a>View terms</a>.',
+												'As a new Pinterest customer, you can get $125 in free ad credits when you successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Terms and conditions</a> apply.',
 												'pinterest-for-woocommerce'
 											),
 											{
 												a: (
-													// Disabling no-content rule - content is interpolated from above string.
-													// eslint-disable-next-line jsx-a11y/anchor-has-content
+													// Disabling no-content rule - content is interpolated from above string
+													// eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/anchor-has-content
 													<a
-														{ ...documentationLinkProps(
-															{
-																href: atHref,
-																linkId:
-																	'ad-credits-terms',
-																context,
-																rel:
-																	'noreferrer',
-															}
-														) }
+														href={ '#' }
+														onClick={ openTermsAndConditionsModal }
 													/>
 												),
 											}
@@ -308,6 +324,11 @@ const SetupAccount = ( {
 					) }
 				</div>
 			</div>
+			{ isTermsAndConditionsModalOpen && (
+				<AdsCreditsTermsAndConditionsModal
+					onModalClose={ closeTermsAndConditionsModal }
+				/>
+			) }
 		</div>
 	);
 };

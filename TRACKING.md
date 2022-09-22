@@ -124,6 +124,7 @@ Closing a modal.
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
 - [`LandingPageApp.AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L136) with `{ name: 'ads-credits-terms-and-conditions', … } `
+- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L60 ) with `{ name: 'ads-credits-terms-and-conditions', … } `
 
 ### [`wcadmin_pfw_modal_open`](assets/source/setup-guide/app/components/Account/Connection.js#L48)
 Opening a modal.
@@ -135,6 +136,7 @@ Opening a modal.
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
 - [`LandingPageApp.AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L135) with `{ name: 'ads-credits-terms-and-conditions', … } `
+- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L59 ) with `{ name: 'ads-credits-terms-and-conditions', … } `
 
 ### [`wcadmin_pfw_save_changes_button_click`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L19)
 Clicking on "… Save changes" button.

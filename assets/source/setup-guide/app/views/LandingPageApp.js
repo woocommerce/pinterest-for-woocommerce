@@ -131,8 +131,8 @@ const WelcomeSection = () => {
  * Ads Credits Section Card.
  * To be used in getting started page.
  *
- * @fires wcadmin_pfw_modal_open with `{ name: 'terms-and-conditions', … }`
- * @fires wcadmin_pfw_modal_closed with `{ name: 'terms-and-conditions', … }`
+ * @fires wcadmin_pfw_modal_open with `{ name: 'ads-credits-terms-and-conditions', … }`
+ * @fires wcadmin_pfw_modal_closed with `{ name: 'ads-credits-terms-and-conditions'', … }`
  *
  * @return {JSX.Element} Rendered element.
  */
