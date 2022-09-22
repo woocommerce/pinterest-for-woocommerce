@@ -698,6 +698,44 @@ $root: ".woocommerce-setup-guide";
 		}
 	}
 
+	&__onboarding-modal {
+
+		width: 500px;
+
+		.components-modal {
+
+			&__content {
+
+				margin-top: 160px;
+
+				.components-modal__header {
+					align-items: flex-start;
+					height: 160px;
+
+					img {
+						height: 160px;
+						position: absolute;
+						left: 0;
+						right: 0;
+						top: 0;
+					}
+
+					button {
+						margin-top: 15px;
+					}
+				}
+			}
+		}
+
+		p {
+			margin-bottom: 16px;
+
+			&:not(:nth-of-type(1)) {
+				color: #757575;
+			}
+		}
+	}
+
 	.error-text {
 
 		color: #d63b44;
