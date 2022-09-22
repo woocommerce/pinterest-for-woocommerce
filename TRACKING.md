@@ -119,23 +119,25 @@ Closing a modal.
 | name | type | description |
 | ---- | ---- | ----------- |
 `name` | `string` | Which modal is it?
-`context` | `string` | `'settings' \| 'wizard' \| 'landing-page'` In which context it was used?
+`context` | `string` | `'settings' \| 'wizard' \| 'landing-page' \| 'catalog-sync'` In which context it was used?
 `action` | `string` | `confirm` - When the final "Yes, I'm sure" button is clicked. <br> `dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
 - [`LandingPageApp.AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L136) with `{ name: 'ads-credits-terms-and-conditions', … } `
+- [`CatalogSync`](assets/source/catalog-sync/App.js#L37) with `{ name: 'ads-credits-onboarding', … } `
 - [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L60 ) with `{ name: 'ads-credits-terms-and-conditions', … } `
 
-### [`wcadmin_pfw_modal_open`](assets/source/setup-guide/app/components/Account/Connection.js#L48)
+### [`wcadmin_pfw_modal_open`](assets/source/setup-guide/app/components/Account/Connection.js#L39)
 Opening a modal.
 #### Properties
 | name | type | description |
 | ---- | ---- | ----------- |
 `name` | `string` | Which modal is it?
-`context` | `string` | `'settings' \| 'wizard' \| 'landing-page'` In which context it was used?
+`context` | `string` | `'settings' \| 'wizard' \| 'landing-page' \| 'catalog-sync'` In which context it was used?
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
 - [`LandingPageApp.AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L135) with `{ name: 'ads-credits-terms-and-conditions', … } `
+- [`CatalogSync`](assets/source/catalog-sync/App.js#L38) with `{ name: 'ads-credits-onboarding', … } `
 - [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L59 ) with `{ name: 'ads-credits-terms-and-conditions', … } `
 
 ### [`wcadmin_pfw_save_changes_button_click`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L19)
