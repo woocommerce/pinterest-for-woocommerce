@@ -35,9 +35,6 @@ import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
 import documentationLinkProps from '../helpers/documentation-link-props';
 import GiftIcon from '../components/GiftIcon';
 
-// Placeholder link (to be updated)
-const atHref = 'https://business.pinterest.com/business-terms-of-service/';
-
 /**
  * Clicking on "… create a new Pinterest account" button.
  *
@@ -231,7 +228,9 @@ const SetupAccount = ( {
 													// eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/anchor-has-content
 													<a
 														href={ '#' }
-														onClick={ openTermsAndConditionsModal }
+														onClick={
+															openTermsAndConditionsModal 
+														}
 													/>
 												),
 											}
