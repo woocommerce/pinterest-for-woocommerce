@@ -7,8 +7,10 @@
  */
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
+use Automattic\WooCommerce\Pinterest\PinterestApiException;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -668,6 +670,22 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 				// At this point we're disconnected.
 				return true;
+			} catch ( PinterestApiException $e ) {
+				$code = $e->get_pinterest_code();
+
+				if ( PinterestApiException::MERCHANT_NOT_FOUND === $code ) {
+					Pinterest\Logger::log( esc_html__( 'Trying to disconnect while the merchant (id) was not found.', 'pinterest-for-woocommerce' ) );
+
+					/*
+					 * This is an abnormal state of the application. Caused probably by issues during the connection process.
+					 * It looks like the best course of actions is to flush the options and assume that we are disconnected.
+					 * This way we restore UI connect functionality and allow merchant to retry.
+					 */
+					self::flush_options();
+					return true;
+				}
+
+				return false;
 
 			} catch ( \Exception $th ) {
 				// There was an error disconnecting merchant.
@@ -836,6 +854,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					)
 				);
 
+				/*
+				 * For now we assume that the billing is not setup.
+				 * We will be able to check that only when the advertiser will be connected.
+				 * The billing is tied to advertiser.
+				 */
+				$data['is_billing_setup'] = false;
+
 				Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
 				return $data;
 			}
@@ -844,6 +869,20 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			return array();
 
+		}
+
+		/**
+		 * Add billing setup information to the account data option.
+		 * Using this function makes sense only when we have a connected advertiser.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public static function add_billing_setup_info_to_account_data() {
+			$account_data                     = self::get_setting( 'account_data' );
+			$account_data['is_billing_setup'] = Billing::has_billing_set_up();
+			self::save_setting( 'account_data', $account_data );
 		}
 
 
