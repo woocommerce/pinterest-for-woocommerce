@@ -18,7 +18,7 @@ import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
 /**
  * Ads Onboarding Modal.
  *
- * @param {Function} onModalClose Action to call when the modal gets closed.
+ * @param {Function} onCloseModal Action to call when the modal gets closed.
  *
  * @return {JSX.Element} rendered component
  */
