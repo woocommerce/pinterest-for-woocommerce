@@ -185,10 +185,6 @@ $root: ".woocommerce-setup-guide";
 				&-overview {
 					margin-top: var(--large-gap);
 
-					@include break-medium() {
-						position: absolute;
-					}
-
 					> div {
 						margin: 8px 0;
 					}
@@ -239,6 +235,28 @@ $root: ".woocommerce-setup-guide";
 							margin-left: 12px;
 						}
 					}
+				}
+			}
+
+			&__ad-credits {
+
+				&__divider {
+					margin: 20px 0;
+				}
+
+				.image-block {
+					align-items: center;
+					display: flex;
+					flex: 0 0 32px;
+
+					svg {
+						height: 100%;
+						width: 100%;
+					}
+				}
+
+				.content-block {
+					color: #757575;
 				}
 			}
 
@@ -767,4 +785,8 @@ $root: ".woocommerce-setup-guide";
 .pinterest-for-woocommerce-settings-checkbox-disabled {
 	color: $gray-700;
 	pointer-events: none;
+}
+
+.pinterest-for-woocommerce-account-setup .woocommerce-setup-guide__ad-credits {
+	align-items: flex-start;
 }
