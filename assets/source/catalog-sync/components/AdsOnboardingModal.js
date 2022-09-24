@@ -19,10 +19,11 @@ import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
  * Ads Onboarding Modal.
  *
  * @param {Function} onCloseModal Action to call when the modal gets closed.
+ * @param {Function} onDoItLater Action to call when the user clicks Do It Later button.
  *
  * @return {JSX.Element} rendered component
  */
-const AdsOnboardingModal = ( { onCloseModal } ) => {
+const AdsOnboardingModal = ( { onCloseModal, onDoItLater } ) => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
 
@@ -92,7 +93,7 @@ const AdsOnboardingModal = ( { onCloseModal } ) => {
 					</Button>
 				) : (
 					<>
-						<Button onClick={ onCloseModal }>
+						<Button onClick={ onDoItLater }>
 							{ __(
 								'Do this later',
 								'pinterest-for-woocommerce'
