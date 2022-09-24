@@ -57,7 +57,7 @@ const CatalogSyncApp = () => {
 
 	const openAdsOnboardingModal = useCallback( () => {
 		if (
-			( false === userInteractionsLoaded ) ||
+			userInteractionsLoaded === false ||
 			userInteractions?.ads_modal_dismissed
 		) {
 			return;
@@ -68,10 +68,7 @@ const CatalogSyncApp = () => {
 			context: 'catalog-sync',
 			name: 'ads-credits-onboarding',
 		} );
-	}, [
-		userInteractions?.ads_modal_dismissed,
-		userInteractionsLoaded,
-	] );
+	}, [ userInteractions?.ads_modal_dismissed, userInteractionsLoaded ] );
 
 	const closeAdsOnboardingModal = () => {
 		setIsAdsOnboardingModalOpen( false );
@@ -82,12 +79,11 @@ const CatalogSyncApp = () => {
 	};
 
 	const setDismissAdsModal = useDismissAdsModalDispatch();
-	const handleSetDismissAdsModal = async () => {
+	const handleSetDismissAdsModal = useCallback( async () => {
 		try {
 			await setDismissAdsModal();
-		} catch ( error ) {
-		}
-	};
+		} catch ( error ) {}
+	}, [ setDismissAdsModal ] );
 
 	const doItLaterAdsOnboardingModal = useCallback( () => {
 		setIsAdsOnboardingModalOpen( false );
@@ -96,8 +92,7 @@ const CatalogSyncApp = () => {
 			context: 'catalog-sync',
 			name: 'ads-credits-onboarding-do-it-later',
 		} );
-
-	}, [ setIsAdsOnboardingModalOpen ] );
+	}, [ setIsAdsOnboardingModalOpen, handleSetDismissAdsModal ] );
 
 	useEffect( () => {
 		openAdsOnboardingModal();

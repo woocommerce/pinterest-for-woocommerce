@@ -3,6 +3,10 @@
  */
 import { useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import { USER_INTERACTION_STORE_NAME } from '../data';
 
 export const useCreateNotice = ( error ) => {

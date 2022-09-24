@@ -24,7 +24,9 @@ export const controls = {
 		return new Promise( ( resolve ) => {
 			const url = addQueryArgs( `${ API_ROUTE }`, data );
 
-			apiFetch( { path: url, method } ).then( ( result ) => resolve( result ) );
+			apiFetch( { path: url, method } ).then( ( result ) =>
+				resolve( result )
+			);
 		} );
 	},
 };

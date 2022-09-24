@@ -62,7 +62,21 @@ class UserInteraction extends VendorAPI {
 
 		if ( $request->has_param( self::ADS_MODAL_DISMISSED ) ) {
 			$ads_modal_dismissed = $request->has_param( self::ADS_MODAL_DISMISSED );
-			set_transient( PINTEREST_FOR_WOOCOMMERCE_TRANSIENT_NAME . '_' . self::ADS_MODAL_DISMISSED, true, DAY_IN_SECONDS );
+
+			/*
+			 * ADS_MODAL_DISMISSED dismissed transient counts how many times the modal has been dismissed.
+			 * Each new dismiss time equals 24h times dismiss count.
+			 * 4th dismiss dismisses the modal indefinitely.
+			 */
+			$old_count = get_transient( PINTEREST_FOR_WOOCOMMERCE_TRANSIENT_NAME . '_' . self::ADS_MODAL_DISMISSED );
+			$new_count = $old_count ? $old_count++ : 1;
+			if ( 4 === $new_count ) {
+				set_transient( PINTEREST_FOR_WOOCOMMERCE_TRANSIENT_NAME . '_' . self::ADS_MODAL_DISMISSED, $new_count );
+			} else {
+				set_transient( PINTEREST_FOR_WOOCOMMERCE_TRANSIENT_NAME . '_' . self::ADS_MODAL_DISMISSED, $new_count, $new_count * DAY_IN_SECONDS );
+			}
+
+			// Confirm dismissal.
 			return array(
 				self::ADS_MODAL_DISMISSED => true,
 			);

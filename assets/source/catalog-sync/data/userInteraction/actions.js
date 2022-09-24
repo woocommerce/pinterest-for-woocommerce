@@ -42,7 +42,6 @@ export function* adsModalDismissed() {
 	yield setAdsModalDismissed( true );
 
 	try {
-		debugger;
 		const results = yield apiFetch( {
 			path: API_ROUTE,
 			method: 'POST',
@@ -52,8 +51,5 @@ export function* adsModalDismissed() {
 		} );
 
 		return { success: results.ads_modal_dismissed };
-	} catch (error) {
-		
-	}
-
+	} catch ( error ) {}
 }
