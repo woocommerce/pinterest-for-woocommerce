@@ -65,7 +65,7 @@ const AdsOnboardingModal = ( { onCloseModal } ) => {
 						) }
 					</strong>
 				</Text>
-			 ) : (
+			) : (
 				<Text variant="body">
 					{ __(
 						'You are eligible for $125 of Pinterest ad credits. To claim the credits, ',
@@ -78,8 +78,7 @@ const AdsOnboardingModal = ( { onCloseModal } ) => {
 						) }
 					</strong>
 				</Text>
-			    )
-			}
+			) }
 			<Text variant="caption">
 				{ __(
 					'*Ad credits may take up to 24 hours to be credited to account.',
