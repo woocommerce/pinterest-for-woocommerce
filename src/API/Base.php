@@ -611,7 +611,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function redeem_ads_offer_code( $advertiser_id, $offer_code ) {
-		return self::make_request( "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem", 'GET', array(), 'ads' );
+		return self::make_request( "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem", 'POST', array(), 'ads' );
 	}
 
 	/**
@@ -625,7 +625,7 @@ class Base {
 	public static function validate_ads_offer_code( $advertiser_id, $offer_code ) {
 		return self::make_request(
 			"advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem",
-			'GET',
+			'POST',
 			array(
 				'validate_only' => true,
 			),
