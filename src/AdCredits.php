@@ -49,16 +49,26 @@ class AdCredits {
 			return false;
 		}
 
+		$offer_code = self::OFFER_CODE;
+
 		try {
-			$result = Base::validate_ads_offer_code( $advertiser_id, self::OFFER_CODE );
+			$result = Base::validate_ads_offer_code( $advertiser_id, $offer_code );
 			if ( 'success' !== $result['status'] ) {
 				return false;
 			}
 
 			$redeem_credits_data = (array) $result['data'];
 
-			if ( ! $redeem_credits_data['success'] ) {
-				Logger::log( $redeem_credits_data['failure_reason'], 'error' );
+			if ( ! isset( $redeem_credits_data[ $offer_code ] ) ) {
+				// No data for the requested offer code.
+				Logger::log( __( 'There is no available data for the requested offer code.', 'pinterest-for-woocommerce' ) );
+				return false;
+			}
+
+			$offer_code_credits_data = $redeem_credits_data[ $offer_code ];
+
+			if ( ! $offer_code_credits_data->success && 2322 !== $offer_code_credits_data->error_code ) {
+				Logger::log( $offer_code_credits_data->failure_reason, 'error' );
 				return false;
 			}
 
