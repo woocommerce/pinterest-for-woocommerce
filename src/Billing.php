@@ -20,6 +20,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Billing {
 
 	/**
+	 * Initialize Billing actions and Action Scheduler hooks.
+	 *
+	 * @since x.x.x
+	 */
+	public static function schedule_event() {
+		add_action( Heartbeat::DAILY, array( __CLASS__, 'handle_billing_setup_check' ) );
+	}
+
+	/**
+	 * Check if the advertiser has set the billing data.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return mixed
+	 */
+	public function handle_billing_setup_check() {
+
+		Pinterest_For_Woocommerce()::add_billing_setup_info_to_account_data();
+
+		return true;
+	}
+
+	/**
 	 * Helper function to check if billing has been set up.
 	 *
 	 * @since x.x.x
