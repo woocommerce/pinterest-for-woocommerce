@@ -39,13 +39,6 @@ class Billing {
 
 		Pinterest_For_Woocommerce()::add_billing_setup_info_to_account_data();
 
-		/**
-		 * Redeem credits if billing is setup and credits are not already redeemed.
-		 */
-		if ( Pinterest_For_Woocommerce()::get_billing_setup_info_from_account_data() && ! Pinterest_For_Woocommerce()::get_redeem_credits_info_from_account_data() ) {
-			Pinterest_For_Woocommerce()::add_redeem_credits_info_to_account_data();
-		}
-
 		return true;
 	}
 

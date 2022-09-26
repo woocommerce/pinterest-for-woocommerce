@@ -28,6 +28,40 @@ class AdCredits {
 
 
 	/**
+	 * Initialize Ad Credits actions and Action Scheduler hooks.
+	 *
+	 * @since x.x.x
+	 */
+	public static function schedule_event() {
+		add_action( Heartbeat::DAILY, array( __CLASS__, 'handle_redeem_credit' ), 20 );
+	}
+
+	/**
+	 * Check if the advertiser has set the billing data.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return mixed
+	 */
+	public function handle_redeem_credit() {
+
+		if ( ! Pinterest_For_Woocommerce()::get_billing_setup_info_from_account_data() ) {
+			// Do not redeem credits if the billing is not setup.
+			return true;
+		}
+
+		if ( Pinterest_For_Woocommerce()::get_redeem_credits_info_from_account_data() ) {
+			// Redeem credits only once.
+			return true;
+		}
+
+		Pinterest_For_Woocommerce()::add_redeem_credits_info_to_account_data();
+
+		return true;
+	}
+
+
+	/**
 	 * Redeem Ad Credits.
 	 *
 	 * @since x.x.x
