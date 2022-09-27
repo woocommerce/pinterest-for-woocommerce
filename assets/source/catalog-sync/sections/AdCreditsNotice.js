@@ -60,15 +60,15 @@ const AdCreditsNotice = () => {
 					icon={ GiftIcon }
 					className="pinterest-for-woocommerce-catalog-sync__state__ad-credits__icon"
 				/>
-				<Text>
-					{ isBillingSetup && didRedeemCredits ? (
-						<Text>
-							{ __(
-								'You have successfully set up your account and claimed your free Pinterest ads credits.'
-							) }
-						</Text>
-					) : (
-						createInterpolateElement(
+				{ isBillingSetup && didRedeemCredits ? (
+					<Text>
+						{ __(
+							'You have successfully set up your account and claimed your free Pinterest ads credits.'
+						) }
+					</Text>
+				) : (
+					<Text>
+						{ createInterpolateElement(
 							__(
 								'Get started with Pinterest ads with a free $125 ads credits. To claim the credits, <adsBillingDetails>add your billing details.</adsBillingDetails>',
 								'pinterest-for-woocommerce'
@@ -84,12 +84,12 @@ const AdCreditsNotice = () => {
 										} }
 									/>
 								) : (
-									<Text />
+									<strong />
 								),
 							}
-						)
-					) }
-				</Text>
+						) }
+					</Text>
+				) }
 			</Notice>
 		)
 	);
