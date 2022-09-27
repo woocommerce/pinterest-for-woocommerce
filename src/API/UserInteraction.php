@@ -46,7 +46,7 @@ class UserInteraction extends VendorAPI {
 	 */
 	public function get_user_interaction() {
 		return array(
-			self::ADS_MODAL_DISMISSED => (bool) get_transient( PINTEREST_FOR_WOOCOMMERCE_TRANSIENT_NAME . '_' . self::ADS_MODAL_DISMISSED ),
+			self::ADS_MODAL_DISMISSED => (bool) get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::ADS_MODAL_DISMISSED ),
 		);
 	}
 
@@ -61,21 +61,7 @@ class UserInteraction extends VendorAPI {
 	public function set_user_interaction( WP_REST_Request $request ) {
 
 		if ( $request->has_param( self::ADS_MODAL_DISMISSED ) ) {
-			$ads_modal_dismissed = $request->has_param( self::ADS_MODAL_DISMISSED );
-
-			/*
-			 * ADS_MODAL_DISMISSED dismissed transient counts how many times the modal has been dismissed.
-			 * Each new dismiss time equals 24h times dismiss count.
-			 * 4th dismiss dismisses the modal indefinitely.
-			 */
-			$old_count = get_transient( PINTEREST_FOR_WOOCOMMERCE_TRANSIENT_NAME . '_' . self::ADS_MODAL_DISMISSED );
-			$new_count = $old_count ? $old_count++ : 1;
-			if ( 4 === $new_count ) {
-				set_transient( PINTEREST_FOR_WOOCOMMERCE_TRANSIENT_NAME . '_' . self::ADS_MODAL_DISMISSED, $new_count );
-			} else {
-				set_transient( PINTEREST_FOR_WOOCOMMERCE_TRANSIENT_NAME . '_' . self::ADS_MODAL_DISMISSED, $new_count, $new_count * DAY_IN_SECONDS );
-			}
-
+			update_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::ADS_MODAL_DISMISSED, true, false );
 			// Confirm dismissal.
 			return array(
 				self::ADS_MODAL_DISMISSED => true,
