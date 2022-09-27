@@ -20,6 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class AdCredits {
 
+	const ADS_CREDIT_CAMPAIGN_TRANSIENT = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-ads-credit-campaign-transient';
+	const ADS_CREDIT_CAMPAIGN_OPTION    = 'ads_campaign_is_active';
 	/**
 	 * Hardcoded offer code as an initial approach.
 	 * TODO: Add the rest of offer codes or perhaps moving the logic to a separate class, where we can get codes by country, etc.
@@ -114,6 +116,35 @@ class AdCredits {
 			return false;
 
 		}
+	}
+
+	public static function check_if_ads_campaign_is_active() {
+
+		$is_campaign_active = get_transient( self::ADS_CREDIT_CAMPAIGN_TRANSIENT );
+
+		if ( true || false === $is_campaign_active ) {
+			$request         = wp_remote_get( 'https://woocommerce.com/wp-json/wccom/marketing-tab/1.1/recommendations.json' );
+			$recommendations = array();
+
+			if ( ! is_wp_error( $request ) && 200 === $request['response']['code'] ) {
+				$recommendations = json_decode( $request['body'], true );
+			}
+
+			foreach ( $recommendations as $recommendation ) {
+				if ( 'pinterest-for-woocommerce' === $recommendation['product'] ) {
+					$is_campaign_active = $recommendation['show_extension_promotions'] ?? false;
+					break;
+				}
+			}
+			$is_campaign_active = wc_bool_to_string( $is_campaign_active );
+			set_transient(
+				self::ADS_CREDIT_CAMPAIGN_TRANSIENT,
+				wc_bool_to_string( $is_campaign_active ),
+				empty( $recommendations ) ? 15 * MINUTE_IN_SECONDS : 12 * HOUR_IN_SECONDS
+			);
+		}
+
+		Pinterest_For_Woocommerce()->save_setting( self::ADS_CREDIT_CAMPAIGN_OPTION, wc_string_to_bool( $is_campaign_active ) );
 	}
 
 }
