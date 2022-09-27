@@ -549,7 +549,6 @@ class FeedGenerator extends AbstractChainedJob {
 			'pinterest_for_woocommerce_included_product_types',
 			array(
 				'simple',
-				'external',
 				'variation',
 			)
 		);
