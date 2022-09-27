@@ -7,7 +7,7 @@ $root: ".woocommerce-setup-guide";
 // Adds animation to placeholder section
 // Copied from WC-admin
 // https://github.com/woocommerce/woocommerce-admin/blob/9f68059c7df466ee7a559c555bcb5a7b9e421e6d/packages/style-build/abstracts/_mixins.scss#L22-L35
-@mixin placeholder($lighten-percentage: 30%) {
+@mixin placeholder( $lighten-percentage: 30% ) {
 	animation: loading-fade 1.6s ease-in-out infinite;
 	background-color: $gray-100;
 	color: transparent;
@@ -16,13 +16,15 @@ $root: ".woocommerce-setup-guide";
 		content: "\00a0";
 	}
 
-	@media screen and (prefers-reduced-motion: reduce) {
+	@media screen and ( prefers-reduced-motion: reduce ) {
 		animation: none;
 	}
 }
 
 #{$root} {
+
 	&__body {
+
 		&.woocommerce-admin-full-screen {
 			margin-top: 0;
 
@@ -36,6 +38,7 @@ $root: ".woocommerce-setup-guide";
 			}
 
 			.woocommerce-layout__main {
+
 				.woocommerce-layout__header {
 					top: 0;
 					left: 0;
@@ -47,6 +50,7 @@ $root: ".woocommerce-setup-guide";
 		}
 
 		@media screen and (max-width: #{ ($break-small - 1) }) {
+
 			#wpbody {
 				padding-top: 0;
 			}
@@ -61,6 +65,7 @@ $root: ".woocommerce-setup-guide";
 		}
 
 		.woocommerce-layout {
+
 			&__main {
 				display: block;
 			}
@@ -75,8 +80,11 @@ $root: ".woocommerce-setup-guide";
 		}
 
 		#{$root} {
+
 			&__main {
+
 				.woocommerce-stepper {
+
 					&__steps {
 						align-items: center;
 						display: flex;
@@ -121,13 +129,13 @@ $root: ".woocommerce-setup-guide";
 					margin: var(--large-gap) auto;
 					padding-left: 16px;
 					padding-right: 16px;
+
 				}
 
 				> div {
+
 					&:not(:first-child) {
-						margin-top: calc(
-							var(--large-gap) + (var(--main-gap) / 2)
-						);
+						margin-top: calc(var(--large-gap) + (var(--main-gap) / 2));
 					}
 				}
 
@@ -150,6 +158,7 @@ $root: ".woocommerce-setup-guide";
 			}
 
 			&__step {
+
 				&-header {
 					margin: 16px auto 40px;
 					max-width: 490px;
@@ -185,6 +194,7 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					&__link {
+
 						a {
 							text-decoration: none;
 
@@ -196,6 +206,7 @@ $root: ".woocommerce-setup-guide";
 				}
 
 				&-columns {
+
 					@include break-medium() {
 						column-gap: 24px;
 						display: grid;
@@ -217,7 +228,9 @@ $root: ".woocommerce-setup-guide";
 				}
 
 				&-modal {
+
 					&__buttons {
+
 						button + button {
 							margin-left: 12px;
 						}
@@ -226,6 +239,7 @@ $root: ".woocommerce-setup-guide";
 			}
 
 			&__ad-credits {
+
 				&__divider {
 					margin: 20px 0;
 				}
@@ -247,6 +261,7 @@ $root: ".woocommerce-setup-guide";
 			}
 
 			&__setup-pins {
+
 				.components-popover__content {
 					width: 180px;
 					white-space: normal;
@@ -254,9 +269,11 @@ $root: ".woocommerce-setup-guide";
 					// `font-family` is overwritten when using dashicon as the hovering anchor.
 					font-family: $default-font;
 				}
+
 			}
 
 			&__setup-account {
+
 				.connection-info {
 					// Set minimum height to the height of the spinner preloader.
 					min-height: 40px;
@@ -267,6 +284,7 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					.connection-info__placeholder {
+
 						@include placeholder();
 						width: 50%;
 						min-width: 10em;
@@ -278,6 +296,7 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					.account-label {
+
 						p {
 							font-weight: 600;
 
@@ -289,6 +308,7 @@ $root: ".woocommerce-setup-guide";
 				}
 
 				.business-connection {
+
 					p {
 						margin-bottom: 0.5em;
 
@@ -299,6 +319,7 @@ $root: ".woocommerce-setup-guide";
 				}
 
 				.components-flex {
+
 					> * {
 						margin: 0 6px;
 
@@ -326,7 +347,9 @@ $root: ".woocommerce-setup-guide";
 			}
 
 			&__claim-website {
+
 				.components-card__body {
+
 					> :not(:last-child) {
 						margin-bottom: var(--main-gap);
 					}
@@ -342,16 +365,19 @@ $root: ".woocommerce-setup-guide";
 			}
 
 			&__setup-tracking {
+
 				.text-margin {
 					margin: 1em 0;
 				}
 
 				.components-base-control {
+
 					&__help {
 						margin: 0.2em 0 1.5em 0;
 					}
 
 					&:last-child .components-base-control {
+
 						&__help {
 							margin-bottom: 0;
 						}
@@ -360,6 +386,7 @@ $root: ".woocommerce-setup-guide";
 			}
 
 			&__checkbox {
+
 				&-heading {
 					margin: 24px 0;
 
@@ -378,6 +405,7 @@ $root: ".woocommerce-setup-guide";
 					}
 
 					.components-base-control {
+
 						&__field,
 						&__help {
 							margin: 0;
@@ -444,6 +472,7 @@ $root: ".woocommerce-setup-guide";
 					flex: 0 0 50%;
 
 					@include break-medium() {
+
 						padding: 20px 64px 64px 64px;
 					}
 
@@ -472,6 +501,7 @@ $root: ".woocommerce-setup-guide";
 	}
 
 	&__credits-section {
+
 		.components-flex {
 			padding: 20px 64px;
 
@@ -514,6 +544,7 @@ $root: ".woocommerce-setup-guide";
 
 			a,
 			p {
+
 				display: block;
 				margin-bottom: 16px;
 			}
@@ -521,6 +552,7 @@ $root: ".woocommerce-setup-guide";
 	}
 
 	&__features-section {
+
 		.components-flex {
 			gap: 64px;
 			padding: 32px;
@@ -549,6 +581,7 @@ $root: ".woocommerce-setup-guide";
 	}
 
 	&__faq-section {
+
 		h2 {
 			font-weight: 700;
 		}
@@ -556,14 +589,18 @@ $root: ".woocommerce-setup-guide";
 }
 
 .pinterest-for-woocommerce-catalog-sync {
+
 	&__container {
+
 		@include break-medium() {
 			margin: var(--large-gap) auto;
 		}
 	}
 
 	&__state {
+
 		@media ( max-width: #{ ($break-medium - 1) } ) {
+
 			tr {
 				display: flex;
 				flex-direction: column;
@@ -629,7 +666,9 @@ $root: ".woocommerce-setup-guide";
 				background: none;
 
 				&-container {
+
 					&:last-child {
+
 						> div {
 							border-right: 0;
 						}
@@ -670,12 +709,14 @@ $root: ".woocommerce-setup-guide";
 	}
 
 	&__issues {
+
 		&.woocommerce-card {
 			border: 1px solid rgb(226, 228, 231);
 			box-shadow: none;
 		}
 
 		.woocommerce-card {
+
 			&__header {
 				padding: 16px 24px;
 				border-bottom: 1px solid rgb(226, 228, 231);
@@ -699,10 +740,13 @@ $root: ".woocommerce-setup-guide";
 	}
 
 	&__onboarding-modal {
+
 		width: 500px;
 
 		.components-modal {
+
 			&__content {
+
 				margin-top: 160px;
 
 				.components-modal__header {
@@ -734,6 +778,7 @@ $root: ".woocommerce-setup-guide";
 	}
 
 	.error-text {
+
 		color: #d63b44;
 
 		svg {
@@ -742,6 +787,7 @@ $root: ".woocommerce-setup-guide";
 	}
 
 	.warning-text {
+
 		color: #f0b849;
 
 		svg {
@@ -750,6 +796,7 @@ $root: ".woocommerce-setup-guide";
 	}
 
 	.success-text {
+
 		color: #23a713;
 
 		svg {
