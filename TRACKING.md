@@ -38,10 +38,20 @@ Clicking on "Disconnect" Pinterest account button.
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with the given `{ context }`
 
-### [`wcadmin_pfw_ads_manager_link_click`](assets/source/catalog-sync/sections/SyncState.js#L24)
+### [`wcadmin_pfw_ads_manager_link_click`](assets/source/catalog-sync/sections/SyncState.js#L25)
 Clicking on the "Pinterest ads manager" link.
 #### Emitters
-- [`SyncState`](assets/source/catalog-sync/sections/SyncState.js#L36)
+- [`SyncState`](assets/source/catalog-sync/sections/SyncState.js#L41)
+
+### [`wcadmin_pfw_ads_credits_success_notice`](assets/source/catalog-sync/sections/AdCreditsNotice.js#L20)
+Closing the Ads Credits notice on Catalog Page.
+#### Emitters
+- [`AdCreditsNotice`](assets/source/catalog-sync/sections/AdCreditsNotice.js#L38)
+
+### [`wcadmin_pfw_ads_billing_details_link_click`](assets/source/catalog-sync/sections/AdCreditsNotice.js#L25)
+Clicking on the "add your billing details" link.
+#### Emitters
+- [`AdCreditsNotice`](assets/source/catalog-sync/sections/AdCreditsNotice.js#L38)
 
 ### [`wcadmin_pfw_business_account_connect_button_click`](assets/source/setup-guide/app/components/Account/BusinessAccountSelection.js#L24)
 Clicking on "Connect" business account button.
