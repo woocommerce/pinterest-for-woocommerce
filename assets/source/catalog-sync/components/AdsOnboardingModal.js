@@ -18,7 +18,8 @@ import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
 /**
  * Ads Onboarding Modal.
  *
- * @param {Function} onCloseModal Action to call when the modal gets closed.
+ * @param {Object} options
+ * @param {Function} options.onCloseModal Action to call when the modal gets closed.
  *
  * @return {JSX.Element} rendered component
  */
@@ -105,6 +106,7 @@ const AdsOnboardingModal = ( { onCloseModal } ) => {
 									isPrimary
 									href={ `https://ads.pinterest.com/advertiser/${ appSettings.tracking_advertiser }/billing/` }
 									target="_blank"
+									onClick={ onCloseModal }
 								>
 									{ __(
 										'Add billing details',

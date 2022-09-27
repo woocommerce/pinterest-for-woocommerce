@@ -2,6 +2,7 @@
  * External dependencies
  */
 import '@wordpress/notices';
+import { useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { recordEvent } from '@woocommerce/tracks';
 
@@ -12,9 +13,10 @@ import SyncState from './sections/SyncState';
 import SyncIssues from './sections/SyncIssues';
 import TransientNotices from './components/TransientNotices';
 import HealthCheck from '../setup-guide/app/components/HealthCheck';
-import { useCreateNotice } from './helpers/effects';
+import { useCreateNotice, useDismissAdsModalDispatch } from './helpers/effects';
 import NavigationClassic from '../components/navigation-classic';
 import AdsOnboardingModal from './components/AdsOnboardingModal';
+import { USER_INTERACTION_STORE_NAME } from './data';
 
 /**
  * Opening a modal.
@@ -45,21 +47,44 @@ const CatalogSyncApp = () => {
 		false
 	);
 
+	const userInteractions = useSelect( ( select ) =>
+		select( USER_INTERACTION_STORE_NAME ).getUserInteractions()
+	);
+
+	const userInteractionsLoaded = useSelect( ( select ) =>
+		select( USER_INTERACTION_STORE_NAME ).areInteractionsLoaded()
+	);
+
 	const openAdsOnboardingModal = useCallback( () => {
+		if (
+			userInteractionsLoaded === false ||
+			userInteractions?.ads_modal_dismissed
+		) {
+			return;
+		}
+
 		setIsAdsOnboardingModalOpen( true );
 		recordEvent( 'pfw_modal_open', {
 			context: 'catalog-sync',
 			name: 'ads-credits-onboarding',
 		} );
-	}, [ setIsAdsOnboardingModalOpen ] );
+	}, [ userInteractions?.ads_modal_dismissed, userInteractionsLoaded ] );
 
 	const closeAdsOnboardingModal = () => {
 		setIsAdsOnboardingModalOpen( false );
+		handleSetDismissAdsModal();
 		recordEvent( 'pfw_modal_closed', {
 			context: 'catalog-sync',
 			name: 'ads-credits-onboarding',
 		} );
 	};
+
+	const setDismissAdsModal = useDismissAdsModalDispatch();
+	const handleSetDismissAdsModal = useCallback( async () => {
+		try {
+			await setDismissAdsModal();
+		} catch ( error ) {}
+	}, [ setDismissAdsModal ] );
 
 	useEffect( () => {
 		openAdsOnboardingModal();
