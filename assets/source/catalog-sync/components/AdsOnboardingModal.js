@@ -15,7 +15,7 @@ import {
  */
 import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
 
-const GetModalText = ( { isBillingSetup, isRedeemCredit } ) => {
+const OnboardingModalText = ( { isBillingSetup, didRedeemCredits } ) => {
 	if ( ! isBillingSetup ) {
 		return (
 			<Text variant="body">
@@ -33,7 +33,7 @@ const GetModalText = ( { isBillingSetup, isRedeemCredit } ) => {
 		);
 	}
 
-	if ( isBillingSetup && ! isRedeemCredit ) {
+	if ( isBillingSetup && ! didRedeemCredits ) {
 		return (
 			<Text variant="body">
 				{ __(
@@ -72,6 +72,7 @@ const GetModalText = ( { isBillingSetup, isRedeemCredit } ) => {
 const AdsOnboardingModal = ( { onCloseModal } ) => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
+	const didRedeemCredits = appSettings?.account_data?.did_redeem_credits;
 
 	return (
 		<Modal
@@ -99,7 +100,12 @@ const AdsOnboardingModal = ( { onCloseModal } ) => {
 					'pinterest-for-woocommerce'
 				) }
 			</Text>
-			{ GetModalText() }
+			{
+				<OnboardingModalText
+					isBillingSetup={ isBillingSetup }
+					isRedeemCredit={ didRedeemCredits }
+				/>
+			}
 			<Text variant="caption">
 				{ __(
 					'*Ad credits may take up to 24 hours to be credited to account.',
