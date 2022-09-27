@@ -72,6 +72,7 @@ const CatalogSyncApp = () => {
 
 	const closeAdsOnboardingModal = () => {
 		setIsAdsOnboardingModalOpen( false );
+		handleSetDismissAdsModal();
 		recordEvent( 'pfw_modal_closed', {
 			context: 'catalog-sync',
 			name: 'ads-credits-onboarding',
@@ -84,15 +85,6 @@ const CatalogSyncApp = () => {
 			await setDismissAdsModal();
 		} catch ( error ) {}
 	}, [ setDismissAdsModal ] );
-
-	const doItLaterAdsOnboardingModal = useCallback( () => {
-		setIsAdsOnboardingModalOpen( false );
-		handleSetDismissAdsModal();
-		recordEvent( 'pfw_modal_close', {
-			context: 'catalog-sync',
-			name: 'ads-credits-onboarding-do-it-later',
-		} );
-	}, [ setIsAdsOnboardingModalOpen, handleSetDismissAdsModal ] );
 
 	useEffect( () => {
 		openAdsOnboardingModal();
@@ -109,10 +101,7 @@ const CatalogSyncApp = () => {
 				<SyncIssues />
 			</div>
 			{ isAdsOnboardingModalOpen && (
-				<AdsOnboardingModal
-					onCloseModal={ closeAdsOnboardingModal }
-					onDoItLater={ doItLaterAdsOnboardingModal }
-				/>
+				<AdsOnboardingModal onCloseModal={ closeAdsOnboardingModal } />
 			) }
 		</div>
 	);

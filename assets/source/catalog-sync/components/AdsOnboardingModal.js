@@ -20,11 +20,10 @@ import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
  *
  * @param {Object} options
  * @param {Function} options.onCloseModal Action to call when the modal gets closed.
- * @param {Function} options.onDoItLater Action to call when the user clicks Do It Later button.
  *
  * @return {JSX.Element} rendered component
  */
-const AdsOnboardingModal = ( { onCloseModal, onDoItLater } ) => {
+const AdsOnboardingModal = ( { onCloseModal } ) => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
 
@@ -94,7 +93,7 @@ const AdsOnboardingModal = ( { onCloseModal, onDoItLater } ) => {
 					</Button>
 				) : (
 					<>
-						<Button onClick={ onDoItLater }>
+						<Button onClick={ onCloseModal }>
 							{ __(
 								'Do this later',
 								'pinterest-for-woocommerce'
@@ -107,6 +106,7 @@ const AdsOnboardingModal = ( { onCloseModal, onDoItLater } ) => {
 									isPrimary
 									href={ `https://ads.pinterest.com/advertiser/${ appSettings.tracking_advertiser }/billing/` }
 									target="_blank"
+									onClick={ onCloseModal }
 								>
 									{ __(
 										'Add billing details',
