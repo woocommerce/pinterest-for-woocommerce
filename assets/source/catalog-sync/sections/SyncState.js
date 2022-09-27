@@ -28,7 +28,7 @@ import SyncStateTable from './SyncStateTable';
  */
 
 /**
- * Catalog cync state overview component.
+ * Catalog sync state overview component.
  *
  * @fires wcadmin_pfw_ads_manager_link_click
  * @return {JSX.Element} Rendered component.
