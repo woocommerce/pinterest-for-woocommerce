@@ -7,6 +7,7 @@
  */
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Pinterest\AdCredits;
 use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
@@ -256,7 +257,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'init', array( Pinterest\Tracking::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\TrackerSnapshot::class, 'maybe_init' ) );
-			add_action( 'init', array( Pinterest\BillingSetupCheck::class, 'schedule_event' ) );
+			add_action( 'init', array( Pinterest\Billing::class, 'schedule_event' ) );
+			add_action( 'init', array( Pinterest\AdCredits::class, 'schedule_event' ) );
 
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
@@ -856,11 +858,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				);
 
 				/*
-				 * For now we assume that the billing is not setup.
+				 * For now we assume that the billing is not setup and credits are not redeemed.
 				 * We will be able to check that only when the advertiser will be connected.
 				 * The billing is tied to advertiser.
 				 */
-				$data['is_billing_setup'] = false;
+				$data['is_billing_setup']   = false;
+				$data['did_redeem_credits'] = false;
 
 				Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
 				return $data;
@@ -886,6 +889,45 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			self::save_setting( 'account_data', $account_data );
 		}
 
+		/**
+		 * Get billing setup information from the account data option.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return bool
+		 */
+		public static function get_billing_setup_info_from_account_data() {
+			$account_data = self::get_setting( 'account_data' );
+
+			return (bool) $account_data['is_billing_setup'];
+		}
+
+		/**
+		 * Add redeem credits information to the account data option.
+		 * Using this function makes sense only when we have a connected advertiser and the billing data is set up.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public static function add_redeem_credits_info_to_account_data() {
+			$account_data                       = self::get_setting( 'account_data' );
+			$account_data['did_redeem_credits'] = AdCredits::redeem_credits();
+			self::save_setting( 'account_data', $account_data );
+		}
+
+		/**
+		 * Get redeem credits information from the account data option.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return bool
+		 */
+		public static function get_redeem_credits_info_from_account_data() {
+			$account_data = self::get_setting( 'account_data' );
+
+			return (bool) $account_data['did_redeem_credits'];
+		}
 
 		/**
 		 * Fetches a fresh copy (if needed or explicitly requested), of the authenticated user's linked business accounts.
