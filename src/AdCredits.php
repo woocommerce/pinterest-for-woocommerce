@@ -20,6 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class AdCredits {
 
+	const ADS_CREDIT_CAMPAIGN_TRANSIENT = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-ads-credit-campaign-transient';
+	const ADS_CREDIT_CAMPAIGN_OPTION    = 'ads_campaign_is_active';
 	/**
 	 * Hardcoded offer code as an initial approach.
 	 * TODO: Add the rest of offer codes or perhaps moving the logic to a separate class, where we can get codes by country, etc.
@@ -114,6 +116,46 @@ class AdCredits {
 			return false;
 
 		}
+	}
+
+	/**
+	 * Check if the ads campaign option is enabled in marketing recommendations.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	public static function check_if_ads_campaign_is_active() {
+
+		$is_campaign_active = get_transient( self::ADS_CREDIT_CAMPAIGN_TRANSIENT );
+
+		// If transient is available then it means that we have already checked.
+		if ( false !== $is_campaign_active ) {
+			return;
+		}
+
+		$request         = wp_remote_get( 'https://woocommerce.com/wp-json/wccom/marketing-tab/1.2/recommendations.json' );
+		$recommendations = array();
+
+		if ( ! is_wp_error( $request ) && 200 === $request['response']['code'] ) {
+			$recommendations = json_decode( $request['body'], true );
+		}
+
+		// Find Pinterest plugin entry and check for promotions key.
+		foreach ( $recommendations as $recommendation ) {
+			if ( 'pinterest-for-woocommerce' === $recommendation['product'] ) {
+				$is_campaign_active = array_key_exists( 'show_extension_promotions', $recommendation ) ? $recommendation['show_extension_promotions'] : false;
+				break;
+			}
+		}
+
+		Pinterest_For_Woocommerce()->save_setting( self::ADS_CREDIT_CAMPAIGN_OPTION, $is_campaign_active );
+
+		set_transient(
+			self::ADS_CREDIT_CAMPAIGN_TRANSIENT,
+			wc_bool_to_string( $is_campaign_active ),
+			empty( $recommendations ) ? 15 * MINUTE_IN_SECONDS : 12 * HOUR_IN_SECONDS
+		);
 	}
 
 }
