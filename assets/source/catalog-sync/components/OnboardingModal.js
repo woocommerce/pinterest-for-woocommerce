@@ -23,7 +23,7 @@ import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
  *
  * @return {JSX.Element} rendered component
  */
-const AdsOnboardingModal = ( { onCloseModal } ) => {
+const OnboardingModal = ( { onCloseModal } ) => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
 
@@ -125,4 +125,4 @@ const AdsOnboardingModal = ( { onCloseModal } ) => {
 	);
 };
 
-export default AdsOnboardingModal;
+export default OnboardingModal;

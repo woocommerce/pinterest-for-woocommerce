@@ -15,7 +15,7 @@ import TransientNotices from './components/TransientNotices';
 import HealthCheck from '../setup-guide/app/components/HealthCheck';
 import { useCreateNotice, useDismissAdsModalDispatch } from './helpers/effects';
 import NavigationClassic from '../components/navigation-classic';
-import AdsOnboardingModal from './components/AdsOnboardingModal';
+import OnboardingModal from './components/OnboardingModal';
 import OnboardingSuccessModal from './components/OnboardingSuccessModal';
 import { USER_INTERACTION_STORE_NAME } from './data';
 import { useSettingsSelect } from '../setup-guide/app/helpers/effects';
@@ -106,7 +106,7 @@ const CatalogSyncApp = () => {
 			</div>
 			{ isOnboardingModalOpen &&
 				( adsCampaignIsActive ? (
-					<AdsOnboardingModal onCloseModal={ closeOnboardingModal } />
+					<OnboardingModal onCloseModal={ closeOnboardingModal } />
 				) : (
 					<OnboardingSuccessModal
 						onCloseModal={ closeOnboardingModal }
