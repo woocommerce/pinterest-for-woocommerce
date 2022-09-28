@@ -716,7 +716,8 @@ $root: ".woocommerce-setup-guide";
 		}
 	}
 
-	&__onboarding-modal {
+	&__onboarding-modal,
+	&__onboarding-success-modal {
 
 		width: 500px;
 
