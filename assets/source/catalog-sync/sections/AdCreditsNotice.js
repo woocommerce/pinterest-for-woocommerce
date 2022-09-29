@@ -40,7 +40,6 @@ const AdCreditsNotice = () => {
 
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
-	const didRedeemCredits = appSettings?.account_data?.did_redeem_credits;
 	const trackingAdvertiser = appSettings?.tracking_advertiser;
 
 	const handleOnRemove = () => {
@@ -60,17 +59,17 @@ const AdCreditsNotice = () => {
 					icon={ GiftIcon }
 					className="pinterest-for-woocommerce-catalog-sync__state__ad-credits__icon"
 				/>
-				{ isBillingSetup && didRedeemCredits ? (
+				{ isBillingSetup ? (
 					<Text>
 						{ __(
-							'You have successfully set up your account and claimed your free Pinterest ads credits.'
+							'Spend $15 to claim $125 Pinterest ad credits. (Ad credits may take up to 24 hours to be credited to account).'
 						) }
 					</Text>
 				) : (
 					<Text>
 						{ createInterpolateElement(
 							__(
-								'Get started with Pinterest ads with a free $125 ads credits. To claim the credits, <adsBillingDetails>add your billing details.</adsBillingDetails>',
+								'Spend $15 to get $125 in Pinterest ad credits. To claim the credits, <adsBillingDetails>add your billing details.</adsBillingDetails>',
 								'pinterest-for-woocommerce'
 							),
 							{
