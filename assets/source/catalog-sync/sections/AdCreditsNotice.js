@@ -66,11 +66,11 @@ const AdCreditsNotice = () => {
 				status="success"
 				isDismissible={ true }
 				onRemove={ closeAdCreditsNotice }
-				className="pinterest-for-woocommerce-catalog-sync__state__ad-credits"
+				className="pinterest-for-woocommerce-catalog-sync__ad-credits"
 			>
 				<Icon
 					icon={ GiftIcon }
-					className="pinterest-for-woocommerce-catalog-sync__state__ad-credits__icon"
+					className="pinterest-for-woocommerce-catalog-sync__ad-credits__icon"
 				/>
 				{ isBillingSetup ? (
 					<Text>
