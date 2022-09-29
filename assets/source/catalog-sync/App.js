@@ -118,7 +118,9 @@ const CatalogSyncApp = () => {
 			<TransientNotices />
 			<div className="pinterest-for-woocommerce-catalog-sync__container">
 				<SyncState />
-				{ isAdCreditsNoticeOpen && <AdCreditsNotice /> }
+				{ isAdCreditsNoticeOpen && adsCampaignIsActive && (
+					<AdCreditsNotice />
+				) }
 				<SyncIssues />
 			</div>
 			{ isOnboardingModalOpen &&
