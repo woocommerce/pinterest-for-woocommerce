@@ -7,6 +7,7 @@ const userInteractionsReducer = (
 	state = {
 		userInteractions: {
 			adsModalDismissed: false,
+			adsNoticeDismissed: false,
 		},
 		isRequesting: false,
 		interactionsLoaded: false,
@@ -34,6 +35,15 @@ const userInteractionsReducer = (
 				userInteractions: {
 					...state.userInteractions,
 					adsModalDismissed: action.modalDismissed,
+				},
+			};
+			break;
+		case TYPES.SET_ADS_NOTICE_DISMISSED:
+			state = {
+				...state,
+				userInteractions: {
+					...state.userInteractions,
+					adsNoticeDismissed: action.noticeDismissed,
 				},
 			};
 			break;

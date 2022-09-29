@@ -53,3 +53,26 @@ export function* adsModalDismissed() {
 		return { success: results.ads_modal_dismissed };
 	} catch ( error ) {}
 }
+
+export function setAdsNoticeDismissed( noticeDismissed ) {
+	return {
+		type: TYPES.SET_ADS_NOTICE_DISMISSED,
+		noticeDismissed,
+	};
+}
+
+export function* adsNoticeDismissed() {
+	yield setAdsNoticeDismissed( true );
+
+	try {
+		const results = yield apiFetch( {
+			path: API_ROUTE,
+			method: 'POST',
+			data: {
+				ads_notice_dismissed: true,
+			},
+		} );
+
+		return { success: results.ads_notice_dismissed };
+	} catch ( error ) {}
+}

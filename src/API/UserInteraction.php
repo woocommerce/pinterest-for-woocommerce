@@ -21,8 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class UserInteraction extends VendorAPI {
 
-	const USER_INTERACTION    = 'user_interaction';
-	const ADS_MODAL_DISMISSED = 'ads_modal_dismissed';
+	const USER_INTERACTION     = 'user_interaction';
+	const ADS_MODAL_DISMISSED  = 'ads_modal_dismissed';
+	const ADS_NOTICE_DISMISSED = 'ads_notice_dismissed';
 
 	/**
 	 * Initialize class
@@ -46,7 +47,8 @@ class UserInteraction extends VendorAPI {
 	 */
 	public function get_user_interaction() {
 		return array(
-			self::ADS_MODAL_DISMISSED => (bool) get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::ADS_MODAL_DISMISSED ),
+			self::ADS_MODAL_DISMISSED  => (bool) get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::ADS_MODAL_DISMISSED ),
+			self::ADS_NOTICE_DISMISSED => (bool) get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::ADS_NOTICE_DISMISSED ),
 		);
 	}
 
@@ -65,6 +67,14 @@ class UserInteraction extends VendorAPI {
 			// Confirm dismissal.
 			return array(
 				self::ADS_MODAL_DISMISSED => true,
+			);
+		}
+
+		if ( $request->has_param( self::ADS_NOTICE_DISMISSED ) ) {
+			update_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::ADS_NOTICE_DISMISSED, true, false );
+			// Confirm notice dismissal.
+			return array(
+				self::ADS_NOTICE_DISMISSED => true,
 			);
 		}
 
