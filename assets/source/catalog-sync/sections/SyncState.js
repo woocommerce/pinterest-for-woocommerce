@@ -20,7 +20,6 @@ import {
 import { REPORTS_STORE_NAME } from '../data';
 import SyncStateSummary from './SyncStateSummary';
 import SyncStateTable from './SyncStateTable';
-import AdCreditsNotice from './AdCreditsNotice';
 
 /**
  * Clicking on the "Pinterest ads manager" link.
@@ -74,7 +73,6 @@ const SyncState = () => {
 					) }
 				</Text>
 			</CardFooter>
-			<AdCreditsNotice />
 		</Card>
 	);
 };

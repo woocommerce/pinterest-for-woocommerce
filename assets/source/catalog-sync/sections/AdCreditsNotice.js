@@ -3,7 +3,11 @@
  */
 import { recordEvent } from '@woocommerce/tracks';
 import { __ } from '@wordpress/i18n';
-import { createInterpolateElement, useState } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useCallback,
+	useState,
+} from '@wordpress/element';
 import {
 	ExternalLink,
 	Icon,
@@ -16,6 +20,7 @@ import {
  */
 import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
 import GiftIcon from '../../setup-guide/app/components/GiftIcon';
+import { useDismissAdsNoticeDispatch } from '../helpers/effects';
 
 /**
  * Closing the Ad Credits notice.
@@ -42,17 +47,25 @@ const AdCreditsNotice = () => {
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
 	const trackingAdvertiser = appSettings?.tracking_advertiser;
 
-	const handleOnRemove = () => {
+	const closeAdCreditsNotice = () => {
 		setIsNoticeDisplayed( false );
-		recordEvent( 'wcadmin_pfw_ads_credits_success_notice' );
+		handleSetDismissAdsNotice();
+		recordEvent( 'pfw_ads_credits_success_notice' );
 	};
+
+	const setDismissAdsNotice = useDismissAdsNoticeDispatch();
+	const handleSetDismissAdsNotice = useCallback( async () => {
+		try {
+			await setDismissAdsNotice();
+		} catch ( error ) {}
+	}, [ setDismissAdsNotice ] );
 
 	return (
 		isNoticeDisplayed && (
 			<Notice
 				status="success"
 				isDismissible={ true }
-				onRemove={ handleOnRemove }
+				onRemove={ closeAdCreditsNotice }
 				className="pinterest-for-woocommerce-catalog-sync__state__ad-credits"
 			>
 				<Icon
