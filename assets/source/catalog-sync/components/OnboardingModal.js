@@ -69,7 +69,7 @@ const OnboardingModalText = ( { isBillingSetup, didRedeemCredits } ) => {
  *
  * @return {JSX.Element} rendered component
  */
-const AdsOnboardingModal = ( { onCloseModal } ) => {
+const OnboardingModal = ( { onCloseModal } ) => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
 	const didRedeemCredits = appSettings?.account_data?.did_redeem_credits;
@@ -151,4 +151,4 @@ const AdsOnboardingModal = ( { onCloseModal } ) => {
 	);
 };
 
-export default AdsOnboardingModal;
+export default OnboardingModal;

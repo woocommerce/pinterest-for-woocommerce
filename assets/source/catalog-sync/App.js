@@ -15,8 +15,10 @@ import TransientNotices from './components/TransientNotices';
 import HealthCheck from '../setup-guide/app/components/HealthCheck';
 import { useCreateNotice, useDismissAdsModalDispatch } from './helpers/effects';
 import NavigationClassic from '../components/navigation-classic';
-import AdsOnboardingModal from './components/AdsOnboardingModal';
+import OnboardingModal from './components/OnboardingModal';
+import OnboardingSuccessModal from './components/OnboardingSuccessModal';
 import { USER_INTERACTION_STORE_NAME } from './data';
+import { useSettingsSelect } from '../setup-guide/app/helpers/effects';
 
 /**
  * Opening a modal.
@@ -42,8 +44,10 @@ import { USER_INTERACTION_STORE_NAME } from './data';
  * @return {JSX.Element} rendered component
  */
 const CatalogSyncApp = () => {
+	const adsCampaignIsActive = useSettingsSelect()?.ads_campaign_is_active;
+
 	useCreateNotice( wcSettings.pinterest_for_woocommerce.error );
-	const [ isAdsOnboardingModalOpen, setIsAdsOnboardingModalOpen ] = useState(
+	const [ isOnboardingModalOpen, setIsOnboardingModalOpen ] = useState(
 		false
 	);
 
@@ -55,7 +59,7 @@ const CatalogSyncApp = () => {
 		select( USER_INTERACTION_STORE_NAME ).areInteractionsLoaded()
 	);
 
-	const openAdsOnboardingModal = useCallback( () => {
+	const openOnboardingModal = useCallback( () => {
 		if (
 			userInteractionsLoaded === false ||
 			userInteractions?.ads_modal_dismissed
@@ -63,15 +67,15 @@ const CatalogSyncApp = () => {
 			return;
 		}
 
-		setIsAdsOnboardingModalOpen( true );
+		setIsOnboardingModalOpen( true );
 		recordEvent( 'pfw_modal_open', {
 			context: 'catalog-sync',
 			name: 'ads-credits-onboarding',
 		} );
 	}, [ userInteractions?.ads_modal_dismissed, userInteractionsLoaded ] );
 
-	const closeAdsOnboardingModal = () => {
-		setIsAdsOnboardingModalOpen( false );
+	const closeOnboardingModal = () => {
+		setIsOnboardingModalOpen( false );
 		handleSetDismissAdsModal();
 		recordEvent( 'pfw_modal_closed', {
 			context: 'catalog-sync',
@@ -87,8 +91,8 @@ const CatalogSyncApp = () => {
 	}, [ setDismissAdsModal ] );
 
 	useEffect( () => {
-		openAdsOnboardingModal();
-	}, [ openAdsOnboardingModal ] );
+		openOnboardingModal();
+	}, [ openOnboardingModal ] );
 
 	return (
 		<div className="pinterest-for-woocommerce-catalog-sync">
@@ -100,9 +104,14 @@ const CatalogSyncApp = () => {
 				<SyncState />
 				<SyncIssues />
 			</div>
-			{ isAdsOnboardingModalOpen && (
-				<AdsOnboardingModal onCloseModal={ closeAdsOnboardingModal } />
-			) }
+			{ isOnboardingModalOpen &&
+				( adsCampaignIsActive ? (
+					<OnboardingModal onCloseModal={ closeOnboardingModal } />
+				) : (
+					<OnboardingSuccessModal
+						onCloseModal={ closeOnboardingModal }
+					/>
+				) ) }
 		</div>
 	);
 };

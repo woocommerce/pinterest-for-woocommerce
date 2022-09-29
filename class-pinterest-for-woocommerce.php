@@ -260,6 +260,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'init', array( Pinterest\Billing::class, 'schedule_event' ) );
 			add_action( 'init', array( Pinterest\AdCredits::class, 'schedule_event' ) );
 
+			// Verify that the ads_campaign is active or not.
+			add_action( 'admin_init', array( Pinterest\AdCredits::class, 'check_if_ads_campaign_is_active' ) );
+
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 
