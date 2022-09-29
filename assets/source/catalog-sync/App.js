@@ -10,6 +10,7 @@ import { recordEvent } from '@woocommerce/tracks';
  * Internal dependencies
  */
 import SyncState from './sections/SyncState';
+import AdCreditsNotice from './sections/AdCreditsNotice';
 import SyncIssues from './sections/SyncIssues';
 import TransientNotices from './components/TransientNotices';
 import HealthCheck from '../setup-guide/app/components/HealthCheck';
@@ -50,6 +51,9 @@ const CatalogSyncApp = () => {
 	const [ isOnboardingModalOpen, setIsOnboardingModalOpen ] = useState(
 		false
 	);
+	const [ isAdCreditsNoticeOpen, setIsAdCreditsNoticeOpen ] = useState(
+		false
+	);
 
 	const userInteractions = useSelect( ( select ) =>
 		select( USER_INTERACTION_STORE_NAME ).getUserInteractions()
@@ -74,9 +78,21 @@ const CatalogSyncApp = () => {
 		} );
 	}, [ userInteractions?.ads_modal_dismissed, userInteractionsLoaded ] );
 
+	const openAdsCreditsNotice = useCallback( () => {
+		if (
+			userInteractionsLoaded === false ||
+			userInteractions?.ads_notice_dismissed
+		) {
+			return;
+		}
+
+		setIsAdCreditsNoticeOpen( true );
+	}, [ userInteractions?.ads_notice_dismissed, userInteractionsLoaded ] );
+
 	const closeOnboardingModal = () => {
 		setIsOnboardingModalOpen( false );
 		handleSetDismissAdsModal();
+		openAdsCreditsNotice();
 		recordEvent( 'pfw_modal_closed', {
 			context: 'catalog-sync',
 			name: 'ads-credits-onboarding',
@@ -102,6 +118,9 @@ const CatalogSyncApp = () => {
 			<TransientNotices />
 			<div className="pinterest-for-woocommerce-catalog-sync__container">
 				<SyncState />
+				{ isAdCreditsNoticeOpen && adsCampaignIsActive && (
+					<AdCreditsNotice />
+				) }
 				<SyncIssues />
 			</div>
 			{ isOnboardingModalOpen &&

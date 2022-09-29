@@ -23,3 +23,8 @@ export const useDismissAdsModalDispatch = () => {
 	const { adsModalDismissed } = useDispatch( USER_INTERACTION_STORE_NAME );
 	return () => adsModalDismissed();
 };
+
+export const useDismissAdsNoticeDispatch = () => {
+	const { adsNoticeDismissed } = useDispatch( USER_INTERACTION_STORE_NAME );
+	return () => adsNoticeDismissed();
+};

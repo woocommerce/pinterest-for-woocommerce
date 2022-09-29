@@ -599,6 +599,8 @@ $root: ".woocommerce-setup-guide";
 
 	&__state {
 
+		margin-bottom: 0;
+
 		@media ( max-width: #{ ($break-medium - 1) } ) {
 
 			tr {
@@ -683,9 +685,43 @@ $root: ".woocommerce-setup-guide";
 		svg.dashicon {
 			margin-bottom: -5px;
 		}
+
+	}
+
+	&__ad-credits {
+		flex-direction: row;
+		margin: 0;
+		padding: 16px 20px;
+
+		.components-external-link {
+			text-decoration: none;
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+
+		&__icon {
+			margin-right: 8px;
+
+			> * {
+				stroke: #000;
+			}
+		}
+
+		.components-notice__content {
+			display: flex;
+			justify-items: flex-start;
+
+			.components-visually-hidden {
+				display: none;
+			}
+		}
 	}
 
 	&__issues {
+
+		margin-top: 40px;
 
 		&.woocommerce-card {
 			border: 1px solid rgb(226, 228, 231);
