@@ -9,6 +9,8 @@
 namespace Automattic\WooCommerce\Pinterest;
 
 use Automattic\WooCommerce\Pinterest\API\Base;
+use Exception;
+use Pinterest_For_Woocommerce_Ads_Supported_Countries;
 use Throwable;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -119,7 +121,11 @@ class AdCredits {
 	}
 
 	/**
-	 * Check if the ads campaign option is enabled in marketing recommendations.
+	 * Check if the ads campaign is active. In order for that to happen the
+	 * following conditions need to be met:
+	 * 1. Merchant needs to be in ads supported country.
+	 * 2. Merchant needs to have coupon available for his chosen currency.
+	 * 3. Ads Campaign needs to be globally active.
 	 *
 	 * @since x.x.x
 	 *
@@ -134,8 +140,67 @@ class AdCredits {
 			return;
 		}
 
+		$request_error = false;
+		try {
+			// Check if all conditions are met.
+			if (
+				Pinterest_For_Woocommerce_Ads_Supported_Countries::is_ads_supported_country() &&
+				self::verify_if_coupon_exists_for_merchant() &&
+				self::get_is_campaign_active_from_recommendations()
+			) {
+				$is_campaign_active = true;
+			}
+		} catch ( Exception $ex ) {
+			$request_error = true;
+		}
+
+		Pinterest_For_Woocommerce()->save_setting( self::ADS_CREDIT_CAMPAIGN_OPTION, $is_campaign_active );
+
+		/*
+		 * Try again in fifteen minutes in case we had problems fetching
+		 * the campaign status from the server, wait full day otherwise.
+		 */
+		set_transient(
+			self::ADS_CREDIT_CAMPAIGN_TRANSIENT,
+			wc_bool_to_string( $is_campaign_active ),
+			$request_error ? 15 * MINUTE_IN_SECONDS : DAY_IN_SECONDS
+		);
+	}
+
+	/**
+	 * Verify if there is a valid coupon for user currency.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return bool Wether there is a coupon for merchant available.
+	 */
+	private static function verify_if_coupon_exists_for_merchant() {
+		return ! ( false === AdCreditsCoupons::has_valid_coupon_for_merchant() );
+	}
+
+	/**
+	 * Check if campaign is enabled in the recommendations API from woocommerce.com.
+	 *
+	 * @since x.x.x
+	 *
+	 * @throws Exception API fetch error.
+	 *
+	 * @return bool Wether the campaign is active or not.
+	 */
+	private static function get_is_campaign_active_from_recommendations() {
+
 		$request         = wp_remote_get( 'https://woocommerce.com/wp-json/wccom/marketing-tab/1.2/recommendations.json' );
 		$recommendations = array();
+
+		if ( is_wp_error( $request ) ) {
+			throw new Exception(
+				sprintf(
+					/* translators: API error message */
+					__( 'Could not fetch ads campaign status due to: %s', 'pinterest-for-woocommerce' ),
+					$request->get_error_message()
+				)
+			);
+		}
 
 		if ( ! is_wp_error( $request ) && 200 === $request['response']['code'] ) {
 			$recommendations = json_decode( $request['body'], true );
@@ -144,18 +209,11 @@ class AdCredits {
 		// Find Pinterest plugin entry and check for promotions key.
 		foreach ( $recommendations as $recommendation ) {
 			if ( 'pinterest-for-woocommerce' === $recommendation['product'] ) {
-				$is_campaign_active = array_key_exists( 'show_extension_promotions', $recommendation ) ? $recommendation['show_extension_promotions'] : false;
-				break;
+				return array_key_exists( 'show_extension_promotions', $recommendation ) ? $recommendation['show_extension_promotions'] : false;
 			}
 		}
 
-		Pinterest_For_Woocommerce()->save_setting( self::ADS_CREDIT_CAMPAIGN_OPTION, $is_campaign_active );
-
-		set_transient(
-			self::ADS_CREDIT_CAMPAIGN_TRANSIENT,
-			wc_bool_to_string( $is_campaign_active ),
-			empty( $recommendations ) ? 15 * MINUTE_IN_SECONDS : 12 * HOUR_IN_SECONDS
-		);
+		return false;
 	}
 
 }
