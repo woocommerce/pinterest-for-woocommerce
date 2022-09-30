@@ -141,7 +141,7 @@ class AdCredits {
 		}
 
 		$request_error = false;
-		try {		
+		try {
 			// Check if all conditions are met.
 			if (
 				Pinterest_For_Woocommerce_Ads_Supported_Countries::is_ads_supported_country() &&
@@ -150,7 +150,7 @@ class AdCredits {
 			) {
 				$is_campaign_active = true;
 			}
-		} catch ( Exception $ex) {
+		} catch ( Exception $ex ) {
 			$request_error = true;
 		}
 
