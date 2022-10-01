@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest\AdCredits;
 use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
 use \WP_REST_Server;
 use \WP_REST_Request;
@@ -102,6 +103,9 @@ class AdvertiserConnect extends VendorAPI {
 
 		// At this stage we can check if the connected advertiser has billing setup.
 		Pinterest_For_Woocommerce()::add_billing_setup_info_to_account_data();
+
+		// Try to claim coupons if they are available for the merchant.
+		AdCredits::handle_redeem_credit();
 
 		/*
 		 * This is the last step of the connection process. We can use this moment to

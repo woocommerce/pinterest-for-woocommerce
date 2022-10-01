@@ -37,7 +37,7 @@ class AdCredits {
 	 * @since x.x.x
 	 */
 	public static function schedule_event() {
-		add_action( Heartbeat::DAILY, array( __CLASS__, 'handle_redeem_credit' ), 20 );
+		add_action( Heartbeat::DAILY, array( static::class, 'handle_redeem_credit' ), 20 );
 	}
 
 	/**
@@ -47,7 +47,7 @@ class AdCredits {
 	 *
 	 * @return mixed
 	 */
-	public function handle_redeem_credit() {
+	public static function handle_redeem_credit() {
 
 		if ( ! Pinterest_For_Woocommerce()::get_billing_setup_info_from_account_data() ) {
 			// Do not redeem credits if the billing is not setup.
