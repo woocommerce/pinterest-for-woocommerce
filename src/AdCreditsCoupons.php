@@ -64,11 +64,13 @@ class AdCreditsCoupons {
 	);
 
 	/**
-	 * Check if there is a valid coupon for the user currency.
+	 * Get a valid coupon for merchant.
 	 *
-	 * @return string|false Coupon string or false if no coupon was found.
+	 * @since x.x.x
+	 *
+	 * @return string|false Coupon string of false if no coupon was found.
 	 */
-	public static function has_valid_coupon_for_merchant() {
+	public static function get_coupon_for_merchant() {
 		$currency = get_woocommerce_currency();
 		$coupons  = self::$currency_coupons_map[ $currency ] ?? array();
 		if ( empty( $coupons ) ) {
@@ -77,4 +79,14 @@ class AdCreditsCoupons {
 
 		return reset( $coupons );
 	}
+
+	/**
+	 * Check if there is a valid coupon for the user currency.
+	 *
+	 * @return bool Wether there is a valid coupon for the merchant.
+	 */
+	public static function has_valid_coupon_for_merchant() {
+		return self::get_coupon_for_merchant() !== false;
+	}
+
 }

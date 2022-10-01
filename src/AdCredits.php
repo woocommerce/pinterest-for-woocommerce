@@ -54,8 +54,12 @@ class AdCredits {
 			return true;
 		}
 
-		if ( Pinterest_For_Woocommerce()::get_redeem_credits_info_from_account_data() ) {
+		if ( Pinterest_For_Woocommerce()::check_if_coupon_was_redeemed() ) {
 			// Redeem credits only once.
+			return true;
+		}
+
+		if ( ! self::check_if_ads_campaign_is_active() ) {
 			return true;
 		}
 
@@ -70,9 +74,11 @@ class AdCredits {
 	 *
 	 * @since x.x.x
 	 *
-	 * @return bool
+	 * @param string $offer_code Coupon string.
+	 *
+	 * @return bool Weather the coupon was successfully redeemed or not.
 	 */
-	public static function redeem_credits() {
+	public static function redeem_credits( $offer_code ) {
 
 		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
 			// Advertiser not connected, we can't check if credits were redeemed.
@@ -86,8 +92,6 @@ class AdCredits {
 			Logger::log( __( 'Advertiser connected but the connection id is missing.', 'pinterest-for-woocommerce' ) );
 			return false;
 		}
-
-		$offer_code = self::OFFER_CODE;
 
 		try {
 			$result = Base::validate_ads_offer_code( $advertiser_id, $offer_code );
@@ -129,7 +133,7 @@ class AdCredits {
 	 *
 	 * @since x.x.x
 	 *
-	 * @return void
+	 * @return bool Wether campaign is active or not.
 	 */
 	public static function check_if_ads_campaign_is_active() {
 
@@ -145,7 +149,7 @@ class AdCredits {
 			// Check if all conditions are met.
 			if (
 				Pinterest_For_Woocommerce_Ads_Supported_Countries::is_ads_supported_country() &&
-				self::verify_if_coupon_exists_for_merchant() &&
+				AdCreditsCoupons::has_valid_coupon_for_merchant() &&
 				self::get_is_campaign_active_from_recommendations()
 			) {
 				$is_campaign_active = true;
@@ -165,17 +169,8 @@ class AdCredits {
 			wc_bool_to_string( $is_campaign_active ),
 			$request_error ? 15 * MINUTE_IN_SECONDS : DAY_IN_SECONDS
 		);
-	}
 
-	/**
-	 * Verify if there is a valid coupon for user currency.
-	 *
-	 * @since x.x.x
-	 *
-	 * @return bool Wether there is a coupon for merchant available.
-	 */
-	private static function verify_if_coupon_exists_for_merchant() {
-		return ! ( false === AdCreditsCoupons::has_valid_coupon_for_merchant() );
+		return $is_campaign_active;
 	}
 
 	/**

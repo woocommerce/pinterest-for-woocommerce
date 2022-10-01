@@ -8,6 +8,7 @@
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\AdCredits;
+use Automattic\WooCommerce\Pinterest\AdCreditsCoupons;
 use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
@@ -914,22 +915,36 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return void
 		 */
 		public static function add_redeem_credits_info_to_account_data() {
-			$account_data                       = self::get_setting( 'account_data' );
-			$account_data['did_redeem_credits'] = AdCredits::redeem_credits();
+			$account_data = self::get_setting( 'account_data' );
+			$offer_code   = AdCreditsCoupons::get_coupon_for_merchant();
+
+			// Redeem the coupon.
+			$redeem_status = AdCredits::redeem_credits( $offer_code );
+
+			$redeem_information = array(
+				'redeem_status' => $redeem_status,
+				'offer_code'    => $offer_code,
+				'advertiser_id' => Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' ),
+				'username'      => $account_data['username'],
+				'id'            => $account_data['id'],
+				'error'         => false,
+			);
+
+			$account_data['did_redeem_credits'] = $redeem_information;
 			self::save_setting( 'account_data', $account_data );
 		}
 
 		/**
-		 * Get redeem credits information from the account data option.
+		 * Check if coupon was redeemed. We can redeem only once.
 		 *
 		 * @since x.x.x
 		 *
 		 * @return bool
 		 */
-		public static function get_redeem_credits_info_from_account_data() {
+		public static function check_if_coupon_was_redeemed() {
 			$account_data = self::get_setting( 'account_data' );
 
-			return (bool) $account_data['did_redeem_credits'] ?? false;
+			return is_array( $account_data['did_redeem_credits'] ) ? $account_data['did_redeem_credits']['redeem_status'] : false;
 		}
 
 		/**
