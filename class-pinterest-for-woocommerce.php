@@ -929,7 +929,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function get_redeem_credits_info_from_account_data() {
 			$account_data = self::get_setting( 'account_data' );
 
-			return (bool) $account_data['did_redeem_credits'];
+			return (bool) $account_data['did_redeem_credits'] ?? false;
 		}
 
 		/**
