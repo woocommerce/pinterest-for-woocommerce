@@ -16,7 +16,8 @@ import OnboardingErrorModal from './OnboardingErrorModal';
  */
 const OnboardingModals = ( { onCloseModal } ) => {
 	const adsCampaignIsActive = useSettingsSelect()?.ads_campaign_is_active;
-	const couponRedeemInfo = useSettingsSelect()?.account_data?.coupon_redeem_info;
+	const couponRedeemInfo = useSettingsSelect()?.account_data
+		?.coupon_redeem_info;
 
 	// Generic modal when there is no campaign.
 	if ( ! adsCampaignIsActive ) {
