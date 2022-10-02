@@ -43,19 +43,19 @@ class AdCredits {
 	 */
 	public static function handle_redeem_credit() {
 
-		if ( ! Pinterest_For_Woocommerce()::get_billing_setup_info_from_account_data() ) {
-			// Do not redeem credits if the billing is not setup.
-			return true;
-		}
+		// if ( ! Pinterest_For_Woocommerce()::get_billing_setup_info_from_account_data() ) {
+		// 	// Do not redeem credits if the billing is not setup.
+		// 	return true;
+		// }
 
-		if ( Pinterest_For_Woocommerce()::check_if_coupon_was_redeemed() ) {
-			// Redeem credits only once.
-			return true;
-		}
+		// if ( Pinterest_For_Woocommerce()::check_if_coupon_was_redeemed() ) {
+		// 	// Redeem credits only once.
+		// 	return true;
+		// }
 
-		if ( ! self::check_if_ads_campaign_is_active() ) {
-			return true;
-		}
+		// if ( ! self::check_if_ads_campaign_is_active() ) {
+		// 	return true;
+		// }
 
 		Pinterest_For_Woocommerce()::add_redeem_credits_info_to_account_data();
 

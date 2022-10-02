@@ -13,7 +13,7 @@ import {
 /**
  * Internal dependencies
  */
-import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
+import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
 
 const OnboardingModalText = ( { isBillingSetup } ) => {
 	if ( ! isBillingSetup ) {
