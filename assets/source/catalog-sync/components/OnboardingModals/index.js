@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
-import OnboardingModal from './OnboardingModal';
+import OnboardingAdsModal from './OnboardingAdsModal';
 import OnboardingSuccessModal from './OnboardingSuccessModal';
 
 /**
@@ -19,7 +19,7 @@ const OnboardingModals = ( { onCloseModal } ) => {
 	return (
 		<>
 			{ adsCampaignIsActive ? (
-				<OnboardingModal onCloseModal={ onCloseModal } />
+				<OnboardingAdsModal onCloseModal={ onCloseModal } />
 			) : (
 				<OnboardingSuccessModal onCloseModal={ onCloseModal } />
 			) }
