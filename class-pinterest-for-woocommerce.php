@@ -867,7 +867,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				 * The billing is tied to advertiser.
 				 */
 				$data['is_billing_setup']   = false;
-				$data['did_redeem_credits'] = false;
+				$data['coupon_redeem_info'] = array( 'redeem_status' => false );
 
 				Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
 				return $data;
@@ -931,7 +931,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				'error'         => $error,
 			);
 
-			$account_data['did_redeem_credits'] = $redeem_information;
+			$account_data['coupon_redeem_info'] = $redeem_information;
 			self::save_setting( 'account_data', $account_data );
 		}
 
@@ -945,7 +945,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function check_if_coupon_was_redeemed() {
 			$account_data = self::get_setting( 'account_data' );
 
-			return is_array( $account_data['did_redeem_credits'] ) ? $account_data['did_redeem_credits']['redeem_status'] : false;
+			return is_array( $account_data['coupon_redeem_info'] ) ? $account_data['coupon_redeem_info']['redeem_status'] : false;
 		}
 
 		/**
