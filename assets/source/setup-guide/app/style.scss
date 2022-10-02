@@ -753,7 +753,7 @@ $root: ".woocommerce-setup-guide";
 	}
 
 	&__onboarding-modal,
-	&__onboarding-success-modal {
+	&__onboarding-generic-modal {
 
 		width: 500px;
 
@@ -787,6 +787,15 @@ $root: ".woocommerce-setup-guide";
 
 			&:not(:nth-of-type(1)) {
 				color: #757575;
+			}
+		}
+
+		& &__error {
+			align-items: flex-start;
+			color: #757575;
+			.dashicon {
+				color: #f0b849;
+				font-size: 24px;
 			}
 		}
 	}

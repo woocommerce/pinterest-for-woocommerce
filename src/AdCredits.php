@@ -43,19 +43,19 @@ class AdCredits {
 	 */
 	public static function handle_redeem_credit() {
 
-		// if ( ! Pinterest_For_Woocommerce()::get_billing_setup_info_from_account_data() ) {
-		// 	// Do not redeem credits if the billing is not setup.
-		// 	return true;
-		// }
+		if ( ! Pinterest_For_Woocommerce()::get_billing_setup_info_from_account_data() ) {
+			// Do not redeem credits if the billing is not setup.
+			return true;
+		}
 
-		// if ( Pinterest_For_Woocommerce()::check_if_coupon_was_redeemed() ) {
-		// 	// Redeem credits only once.
-		// 	return true;
-		// }
+		if ( Pinterest_For_Woocommerce()::check_if_coupon_was_redeemed() ) {
+			// Redeem credits only once.
+			return true;
+		}
 
-		// if ( ! self::check_if_ads_campaign_is_active() ) {
-		// 	return true;
-		// }
+		if ( ! self::check_if_ads_campaign_is_active() ) {
+			return true;
+		}
 
 		Pinterest_For_Woocommerce()::add_redeem_credits_info_to_account_data();
 
@@ -69,11 +69,12 @@ class AdCredits {
 	 * @since x.x.x
 	 *
 	 * @param string  $offer_code Coupon string.
-	 * @param integer $error reference parameter for error number.
+	 * @param integer $error_code Reference parameter for error number.
+	 * @param string  $error_message Reference parameter for error message.
 	 *
 	 * @return bool Weather the coupon was successfully redeemed or not.
 	 */
-	public static function redeem_credits( $offer_code, &$error = null ) {
+	public static function redeem_credits( $offer_code, &$error_code = null, &$error_message = null ) {
 
 		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
 			// Advertiser not connected, we can't check if credits were redeemed.
@@ -106,7 +107,9 @@ class AdCredits {
 
 			if ( ! $offer_code_credits_data->success ) {
 				Logger::log( $offer_code_credits_data->failure_reason, 'error' );
-				$error = $offer_code_credits_data->error_code;
+				$error_code    = $offer_code_credits_data->error_code;
+				$error_message = $offer_code_credits_data->failure_reason;
+
 				return false;
 			}
 
