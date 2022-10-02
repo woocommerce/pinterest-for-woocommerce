@@ -8,6 +8,7 @@
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\AdCredits;
+use Automattic\WooCommerce\Pinterest\AdCreditsCoupons;
 use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
@@ -866,7 +867,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				 * The billing is tied to advertiser.
 				 */
 				$data['is_billing_setup']   = false;
-				$data['did_redeem_credits'] = false;
+				$data['coupon_redeem_info'] = array( 'redeem_status' => false );
 
 				Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
 				return $data;
@@ -914,22 +915,37 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return void
 		 */
 		public static function add_redeem_credits_info_to_account_data() {
-			$account_data                       = self::get_setting( 'account_data' );
-			$account_data['did_redeem_credits'] = AdCredits::redeem_credits();
+			$account_data = self::get_setting( 'account_data' );
+			$offer_code   = AdCreditsCoupons::get_coupon_for_merchant();
+
+			// Redeem the coupon.
+			$error         = false;
+			$redeem_status = AdCredits::redeem_credits( $offer_code, $error );
+
+			$redeem_information = array(
+				'redeem_status' => $redeem_status,
+				'offer_code'    => $offer_code,
+				'advertiser_id' => Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' ),
+				'username'      => $account_data['username'],
+				'id'            => $account_data['id'],
+				'error'         => $error,
+			);
+
+			$account_data['coupon_redeem_info'] = $redeem_information;
 			self::save_setting( 'account_data', $account_data );
 		}
 
 		/**
-		 * Get redeem credits information from the account data option.
+		 * Check if coupon was redeemed. We can redeem only once.
 		 *
 		 * @since x.x.x
 		 *
 		 * @return bool
 		 */
-		public static function get_redeem_credits_info_from_account_data() {
+		public static function check_if_coupon_was_redeemed() {
 			$account_data = self::get_setting( 'account_data' );
 
-			return (bool) $account_data['did_redeem_credits'];
+			return is_array( $account_data['coupon_redeem_info'] ) ? $account_data['coupon_redeem_info']['redeem_status'] : false;
 		}
 
 		/**

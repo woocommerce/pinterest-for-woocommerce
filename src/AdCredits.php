@@ -24,12 +24,6 @@ class AdCredits {
 
 	const ADS_CREDIT_CAMPAIGN_TRANSIENT = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-ads-credit-campaign-transient';
 	const ADS_CREDIT_CAMPAIGN_OPTION    = 'ads_campaign_is_active';
-	/**
-	 * Hardcoded offer code as an initial approach.
-	 * TODO: Add the rest of offer codes or perhaps moving the logic to a separate class, where we can get codes by country, etc.
-	 */
-	const OFFER_CODE = 'TESTING_WOO_FUTURE';
-
 
 	/**
 	 * Initialize Ad Credits actions and Action Scheduler hooks.
@@ -37,7 +31,7 @@ class AdCredits {
 	 * @since x.x.x
 	 */
 	public static function schedule_event() {
-		add_action( Heartbeat::DAILY, array( __CLASS__, 'handle_redeem_credit' ), 20 );
+		add_action( Heartbeat::DAILY, array( static::class, 'handle_redeem_credit' ), 20 );
 	}
 
 	/**
@@ -47,15 +41,19 @@ class AdCredits {
 	 *
 	 * @return mixed
 	 */
-	public function handle_redeem_credit() {
+	public static function handle_redeem_credit() {
 
 		if ( ! Pinterest_For_Woocommerce()::get_billing_setup_info_from_account_data() ) {
 			// Do not redeem credits if the billing is not setup.
 			return true;
 		}
 
-		if ( Pinterest_For_Woocommerce()::get_redeem_credits_info_from_account_data() ) {
+		if ( Pinterest_For_Woocommerce()::check_if_coupon_was_redeemed() ) {
 			// Redeem credits only once.
+			return true;
+		}
+
+		if ( ! self::check_if_ads_campaign_is_active() ) {
 			return true;
 		}
 
@@ -70,9 +68,12 @@ class AdCredits {
 	 *
 	 * @since x.x.x
 	 *
-	 * @return bool
+	 * @param string  $offer_code Coupon string.
+	 * @param integer $error reference parameter for error number.
+	 *
+	 * @return bool Weather the coupon was successfully redeemed or not.
 	 */
-	public static function redeem_credits() {
+	public static function redeem_credits( $offer_code, &$error = null ) {
 
 		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
 			// Advertiser not connected, we can't check if credits were redeemed.
@@ -86,8 +87,6 @@ class AdCredits {
 			Logger::log( __( 'Advertiser connected but the connection id is missing.', 'pinterest-for-woocommerce' ) );
 			return false;
 		}
-
-		$offer_code = self::OFFER_CODE;
 
 		try {
 			$result = Base::validate_ads_offer_code( $advertiser_id, $offer_code );
@@ -105,8 +104,9 @@ class AdCredits {
 
 			$offer_code_credits_data = $redeem_credits_data[ $offer_code ];
 
-			if ( ! $offer_code_credits_data->success && 2322 !== $offer_code_credits_data->error_code ) {
+			if ( ! $offer_code_credits_data->success ) {
 				Logger::log( $offer_code_credits_data->failure_reason, 'error' );
+				$error = $offer_code_credits_data->error_code;
 				return false;
 			}
 
@@ -129,7 +129,7 @@ class AdCredits {
 	 *
 	 * @since x.x.x
 	 *
-	 * @return void
+	 * @return bool Wether campaign is active or not.
 	 */
 	public static function check_if_ads_campaign_is_active() {
 
@@ -145,7 +145,7 @@ class AdCredits {
 			// Check if all conditions are met.
 			if (
 				Pinterest_For_Woocommerce_Ads_Supported_Countries::is_ads_supported_country() &&
-				self::verify_if_coupon_exists_for_merchant() &&
+				AdCreditsCoupons::has_valid_coupon_for_merchant() &&
 				self::get_is_campaign_active_from_recommendations()
 			) {
 				$is_campaign_active = true;
@@ -165,17 +165,8 @@ class AdCredits {
 			wc_bool_to_string( $is_campaign_active ),
 			$request_error ? 15 * MINUTE_IN_SECONDS : DAY_IN_SECONDS
 		);
-	}
 
-	/**
-	 * Verify if there is a valid coupon for user currency.
-	 *
-	 * @since x.x.x
-	 *
-	 * @return bool Wether there is a coupon for merchant available.
-	 */
-	private static function verify_if_coupon_exists_for_merchant() {
-		return ! ( false === AdCreditsCoupons::has_valid_coupon_for_merchant() );
+		return $is_campaign_active;
 	}
 
 	/**

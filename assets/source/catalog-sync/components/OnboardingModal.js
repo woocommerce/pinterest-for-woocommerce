@@ -15,7 +15,7 @@ import {
  */
 import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
 
-const OnboardingModalText = ( { isBillingSetup, didRedeemCredits } ) => {
+const OnboardingModalText = ( { isBillingSetup } ) => {
 	if ( ! isBillingSetup ) {
 		return (
 			<Text variant="body">
@@ -33,30 +33,18 @@ const OnboardingModalText = ( { isBillingSetup, didRedeemCredits } ) => {
 		);
 	}
 
-	if ( isBillingSetup && ! didRedeemCredits ) {
-		return (
-			<Text variant="body">
-				{ __(
-					'You are eligible for $125 of Pinterest ad credits. To claim the credits, head over to the Pinterest ads manager and ',
-					'pinterest-for-woocommerce'
-				) }
-				<strong>
-					{ __(
-						'spend $15 on Pinterest ads.',
-						'pinterest-for-woocommerce'
-					) }
-				</strong>
-			</Text>
-		);
-	}
-
-	// This means that billing is setup and credits redeemed.
 	return (
 		<Text variant="body">
 			{ __(
-				'$125 of ad credits has been added to your Pinterest adds account. To use credits, head over to Pinterest Ads Manager to create a new ad campaign.',
+				'You are eligible for $125 of Pinterest ad credits. To claim the credits, head over to the Pinterest ads manager and ',
 				'pinterest-for-woocommerce'
 			) }
+			<strong>
+				{ __(
+					'spend $15 on Pinterest ads.',
+					'pinterest-for-woocommerce'
+				) }
+			</strong>
 		</Text>
 	);
 };
@@ -72,7 +60,6 @@ const OnboardingModalText = ( { isBillingSetup, didRedeemCredits } ) => {
 const OnboardingModal = ( { onCloseModal } ) => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
-	const didRedeemCredits = appSettings?.account_data?.did_redeem_credits;
 
 	return (
 		<Modal
@@ -100,12 +87,7 @@ const OnboardingModal = ( { onCloseModal } ) => {
 					'pinterest-for-woocommerce'
 				) }
 			</Text>
-			{
-				<OnboardingModalText
-					isBillingSetup={ isBillingSetup }
-					isRedeemCredit={ didRedeemCredits }
-				/>
-			}
+			<OnboardingModalText isBillingSetup={ isBillingSetup } />
 			<Text variant="caption">
 				{ __(
 					'*Ad credits may take up to 24 hours to be credited to account.',
