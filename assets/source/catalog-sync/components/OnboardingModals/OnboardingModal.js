@@ -14,10 +14,11 @@ import {
  *
  * @param {Object} options
  * @param {Function} options.onCloseModal Action to call when the modal gets closed.
+ * @param {Object} options.children Children of the component.
  *
  * @return {JSX.Element} rendered component
  */
-const OnboardingSuccessModal = ( { onCloseModal } ) => {
+const OnboardingModal = ( { onCloseModal, children } ) => {
 	return (
 		<Modal
 			icon={
@@ -30,7 +31,7 @@ const OnboardingSuccessModal = ( { onCloseModal } ) => {
 				/>
 			}
 			onRequestClose={ onCloseModal }
-			className="pinterest-for-woocommerce-catalog-sync__onboarding-success-modal"
+			className="pinterest-for-woocommerce-catalog-sync__onboarding-generic-modal"
 		>
 			<Text variant="title.small">
 				{ __(
@@ -44,6 +45,7 @@ const OnboardingSuccessModal = ( { onCloseModal } ) => {
 					'pinterest-for-woocommerce'
 				) }
 			</Text>
+			{ children }
 			<Flex direction="row" justify="flex-end">
 				<Button isPrimary onClick={ onCloseModal }>
 					{ __( 'View catalog', 'pinterest-for-woocommerce' ) }
@@ -53,4 +55,4 @@ const OnboardingSuccessModal = ( { onCloseModal } ) => {
 	);
 };
 
-export default OnboardingSuccessModal;
+export default OnboardingModal;

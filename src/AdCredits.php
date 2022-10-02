@@ -69,11 +69,12 @@ class AdCredits {
 	 * @since x.x.x
 	 *
 	 * @param string  $offer_code Coupon string.
-	 * @param integer $error reference parameter for error number.
+	 * @param integer $error_code Reference parameter for error number.
+	 * @param string  $error_message Reference parameter for error message.
 	 *
 	 * @return bool Weather the coupon was successfully redeemed or not.
 	 */
-	public static function redeem_credits( $offer_code, &$error = null ) {
+	public static function redeem_credits( $offer_code, &$error_code = null, &$error_message = null ) {
 
 		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
 			// Advertiser not connected, we can't check if credits were redeemed.
@@ -106,7 +107,9 @@ class AdCredits {
 
 			if ( ! $offer_code_credits_data->success ) {
 				Logger::log( $offer_code_credits_data->failure_reason, 'error' );
-				$error = $offer_code_credits_data->error_code;
+				$error_code    = $offer_code_credits_data->error_code;
+				$error_message = $offer_code_credits_data->failure_reason;
+
 				return false;
 			}
 

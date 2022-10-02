@@ -13,7 +13,7 @@ import {
 /**
  * Internal dependencies
  */
-import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
+import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
 
 const OnboardingModalText = ( { isBillingSetup } ) => {
 	if ( ! isBillingSetup ) {
@@ -57,7 +57,7 @@ const OnboardingModalText = ( { isBillingSetup } ) => {
  *
  * @return {JSX.Element} rendered component
  */
-const OnboardingModal = ( { onCloseModal } ) => {
+const OnboardingAdsModal = ( { onCloseModal } ) => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
 
@@ -133,4 +133,4 @@ const OnboardingModal = ( { onCloseModal } ) => {
 	);
 };
 
-export default OnboardingModal;
+export default OnboardingAdsModal;
