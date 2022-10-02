@@ -24,12 +24,6 @@ class AdCredits {
 
 	const ADS_CREDIT_CAMPAIGN_TRANSIENT = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-ads-credit-campaign-transient';
 	const ADS_CREDIT_CAMPAIGN_OPTION    = 'ads_campaign_is_active';
-	/**
-	 * Hardcoded offer code as an initial approach.
-	 * TODO: Add the rest of offer codes or perhaps moving the logic to a separate class, where we can get codes by country, etc.
-	 */
-	const OFFER_CODE = 'TESTING_WOO_FUTURE';
-
 
 	/**
 	 * Initialize Ad Credits actions and Action Scheduler hooks.
@@ -74,11 +68,12 @@ class AdCredits {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $offer_code Coupon string.
+	 * @param string  $offer_code Coupon string.
+	 * @param integer $error reference parameter for error number.
 	 *
 	 * @return bool Weather the coupon was successfully redeemed or not.
 	 */
-	public static function redeem_credits( $offer_code ) {
+	public static function redeem_credits( $offer_code, &$error = null ) {
 
 		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
 			// Advertiser not connected, we can't check if credits were redeemed.
@@ -109,8 +104,9 @@ class AdCredits {
 
 			$offer_code_credits_data = $redeem_credits_data[ $offer_code ];
 
-			if ( ! $offer_code_credits_data->success && 2322 !== $offer_code_credits_data->error_code ) {
+			if ( ! $offer_code_credits_data->success ) {
 				Logger::log( $offer_code_credits_data->failure_reason, 'error' );
+				$error = $offer_code_credits_data->error_code;
 				return false;
 			}
 

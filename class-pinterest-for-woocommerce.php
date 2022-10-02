@@ -919,7 +919,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$offer_code   = AdCreditsCoupons::get_coupon_for_merchant();
 
 			// Redeem the coupon.
-			$redeem_status = AdCredits::redeem_credits( $offer_code );
+			$error         = false;
+			$redeem_status = AdCredits::redeem_credits( $offer_code, $error );
 
 			$redeem_information = array(
 				'redeem_status' => $redeem_status,
@@ -927,7 +928,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				'advertiser_id' => Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' ),
 				'username'      => $account_data['username'],
 				'id'            => $account_data['id'],
-				'error'         => false,
+				'error'         => $error,
 			);
 
 			$account_data['did_redeem_credits'] = $redeem_information;
