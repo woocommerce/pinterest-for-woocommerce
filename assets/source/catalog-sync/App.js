@@ -123,9 +123,7 @@ const CatalogSyncApp = () => {
 				<SyncIssues />
 			</div>
 			{ isOnboardingModalOpen && (
-				<OnboardingModals 
-					onCloseModal={ closeOnboardingModal }
-				/>
+				<OnboardingModals onCloseModal={ closeOnboardingModal } />
 			) }
 		</div>
 	);

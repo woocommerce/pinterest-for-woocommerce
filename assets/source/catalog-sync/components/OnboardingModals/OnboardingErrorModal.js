@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	Flex,
 	Dashicon,
@@ -23,15 +22,13 @@ import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
  * @return {JSX.Element} rendered component
  */
 const OnboardingErrorModal = ( { onCloseModal } ) => {
-	const couponRedeemInfo =
-		useSettingsSelect()?.account_data?.coupon_redeem_info;
+	const couponRedeemInfo = useSettingsSelect()?.account_data
+		?.coupon_redeem_info;
 
 	let errorMessageText = '';
 	switch ( couponRedeemInfo?.error_code ) {
 		// case 2327:
-			
 		// 	break;
-	
 		default:
 			errorMessageText = couponRedeemInfo?.error_message;
 			break;
