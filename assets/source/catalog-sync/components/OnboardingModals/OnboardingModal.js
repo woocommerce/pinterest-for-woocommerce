@@ -17,7 +17,7 @@ import {
  *
  * @return {JSX.Element} rendered component
  */
-const OnboardingSuccessModal = ( { onCloseModal } ) => {
+const OnboardingModal = ( { onCloseModal } ) => {
 	return (
 		<Modal
 			icon={
@@ -53,4 +53,4 @@ const OnboardingSuccessModal = ( { onCloseModal } ) => {
 	);
 };
 
-export default OnboardingSuccessModal;
+export default OnboardingModal;

@@ -3,7 +3,7 @@
  */
 import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
 import OnboardingAdsModal from './OnboardingAdsModal';
-import OnboardingSuccessModal from './OnboardingSuccessModal';
+import OnboardingModal from './OnboardingModal';
 
 /**
  * Ads Onboarding Modal.
@@ -21,7 +21,7 @@ const OnboardingModals = ( { onCloseModal } ) => {
 			{ adsCampaignIsActive ? (
 				<OnboardingAdsModal onCloseModal={ onCloseModal } />
 			) : (
-				<OnboardingSuccessModal onCloseModal={ onCloseModal } />
+				<OnboardingModal onCloseModal={ onCloseModal } />
 			) }
 		</>
 	);
