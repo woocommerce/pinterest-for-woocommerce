@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { recordEvent } from '@woocommerce/tracks';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { Icon, trendingUp as trendingUpIcon } from '@wordpress/icons';
@@ -11,6 +11,8 @@ import {
 	CardHeader,
 	CardFooter,
 	ExternalLink,
+	Flex,
+	FlexItem,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
@@ -20,6 +22,7 @@ import {
 import { REPORTS_STORE_NAME } from '../data';
 import SyncStateSummary from './SyncStateSummary';
 import SyncStateTable from './SyncStateTable';
+import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
 
 /**
  * Clicking on the "Pinterest ads manager" link.
@@ -38,6 +41,18 @@ const SyncState = () => {
 		select( REPORTS_STORE_NAME ).getFeedState()
 	);
 
+	const hasAvailableCredits = useSettingsSelect()?.account_data
+		?.available_discounts?.marketing_offer?.remaining_discount;
+
+	const availableCredits = sprintf(
+		/* translators: %s credits value with currency formatted using wc_price */
+		__(
+			'You have %s of free ad credits left to use',
+			'pinterest-for-woocommerce'
+		),
+		hasAvailableCredits
+	);
+
 	return (
 		<Card className="woocommerce-table pinterest-for-woocommerce-catalog-sync__state">
 			<CardHeader>
@@ -49,29 +64,47 @@ const SyncState = () => {
 			<SyncStateTable workflow={ feedState?.workflow } />
 			<CardFooter justify="flex-start">
 				<Icon icon={ trendingUpIcon } />
-				<Text>
-					{ createInterpolateElement(
-						__(
-							'Set up and manage ads to increase your reach with <adsManagerLink>Pinterest ads manager</adsManagerLink>',
-							'pinterest-for-woocommerce'
-						),
-						{
-							adsManagerLink: (
-								<ExternalLink
-									href={
-										wcSettings.pinterest_for_woocommerce
-											.pinterestLinks.adsManager
-									}
-									onClick={ () => {
-										recordEvent(
-											'pfw_ads_manager_link_click'
-										);
-									} }
-								/>
-							),
-						}
+				<Flex
+					direction={ 'column' }
+					className="pinterest-for-woocommerce-catalog-sync__state-footer"
+				>
+					<FlexItem>
+						<Text>
+							{ createInterpolateElement(
+								__(
+									'Create ads to increase your reach with the <adsManagerLink>Pinterest ads manager</adsManagerLink>',
+									'pinterest-for-woocommerce'
+								),
+								{
+									adsManagerLink: (
+										<ExternalLink
+											href={
+												wcSettings
+													.pinterest_for_woocommerce
+													.pinterestLinks.adsManager
+											}
+											onClick={ () => {
+												recordEvent(
+													'pfw_ads_manager_link_click'
+												);
+											} }
+										/>
+									),
+								}
+							) }
+						</Text>
+					</FlexItem>
+					{ hasAvailableCredits && (
+						<FlexItem>
+							<Text
+								className="pinterest-for-woocommerce-catalog-sync__state-footer-credits"
+								dangerouslySetInnerHTML={ {
+									__html: availableCredits,
+								} }
+							/>
+						</FlexItem>
 					) }
-				</Text>
+				</Flex>
 			</CardFooter>
 		</Card>
 	);

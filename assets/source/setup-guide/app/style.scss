@@ -686,6 +686,15 @@ $root: ".woocommerce-setup-guide";
 			margin-bottom: -5px;
 		}
 
+		& &-footer {
+			flex-direction: column;
+			align-items: flex-start;
+
+			&-credits {
+				color: #757575;
+			}
+		}
+
 	}
 
 	&__ad-credits {

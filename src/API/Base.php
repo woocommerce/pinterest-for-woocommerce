@@ -623,14 +623,10 @@ class Base {
 	 * @return mixed
 	 */
 	public static function validate_ads_offer_code( $advertiser_id, $offer_code ) {
-		return self::make_request(
-			"advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem",
-			'POST',
-			array(
-				'validate_only' => true,
-			),
-			'ads'
-		);
+		$url = "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem";
+		$url = add_query_arg( 'validate_only', 'true', $url );
+
+		return self::make_request( $url, 'POST', array(), 'ads' );
 	}
 
 	/**

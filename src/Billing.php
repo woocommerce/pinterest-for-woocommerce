@@ -35,7 +35,7 @@ class Billing {
 	 *
 	 * @return mixed
 	 */
-	public function handle_billing_setup_check() {
+	public static function handle_billing_setup_check() {
 
 		Pinterest_For_Woocommerce()::add_billing_setup_info_to_account_data();
 
