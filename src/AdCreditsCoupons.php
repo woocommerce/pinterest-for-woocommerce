@@ -24,42 +24,22 @@ class AdCreditsCoupons {
 		'USD' =>
 			array(
 				'TESTING_WOO_FUTURE_01',
-				'TESTING_WOO_FUTURE_02',
-				'TESTING_WOO_FUTURE_03',
-				'TESTING_WOO_FUTURE_04',
-				'TESTING_WOO_FUTURE_05',
 			),
 		'GBP' =>
 			array(
 				'TESTING_WOO_FUTURE_01',
-				'TESTING_WOO_FUTURE_02',
-				'TESTING_WOO_FUTURE_03',
-				'TESTING_WOO_FUTURE_04',
-				'TESTING_WOO_FUTURE_05',
 			),
 		'CAD' =>
 			array(
 				'TESTING_WOO_FUTURE_01',
-				'TESTING_WOO_FUTURE_02',
-				'TESTING_WOO_FUTURE_03',
-				'TESTING_WOO_FUTURE_04',
-				'TESTING_WOO_FUTURE_05',
 			),
 		'EUR' =>
 			array(
 				'TESTING_WOO_FUTURE_01',
-				'TESTING_WOO_FUTURE_02',
-				'TESTING_WOO_FUTURE_03',
-				'TESTING_WOO_FUTURE_04',
-				'TESTING_WOO_FUTURE_05',
 			),
 		'AUD' =>
 			array(
 				'TESTING_WOO_FUTURE_01',
-				'TESTING_WOO_FUTURE_02',
-				'TESTING_WOO_FUTURE_03',
-				'TESTING_WOO_FUTURE_04',
-				'TESTING_WOO_FUTURE_05',
 			),
 	);
 
