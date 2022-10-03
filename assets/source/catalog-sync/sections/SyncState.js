@@ -42,8 +42,7 @@ const SyncState = () => {
 	);
 
 	const hasAvailableCredits = useSettingsSelect()?.account_data
-		?.available_discounts?.marketing_offer
-			?.remaining_discount;
+		?.available_discounts?.marketing_offer?.remaining_discount;
 
 	const availableCredits = sprintf(
 		/* translators: %s credits value with currency formatted using wc_price */
