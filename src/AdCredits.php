@@ -25,8 +25,8 @@ class AdCredits {
 	const ADS_CREDIT_CAMPAIGN_TRANSIENT = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-ads-credit-campaign-transient';
 	const ADS_CREDIT_CAMPAIGN_OPTION    = 'ads_campaign_is_active';
 
-	const ADS_CREDIT_FUTURE_DISCOUNT = 5;// 16; temporary change for testing
-	const ADS_CREDIT_MARKETING_OFFER = 16; //5; temporary change for testing
+	const ADS_CREDIT_FUTURE_DISCOUNT = 16;
+	const ADS_CREDIT_MARKETING_OFFER = 5;
 
 	/**
 	 * Initialize Ad Credits actions and Action Scheduler hooks.
