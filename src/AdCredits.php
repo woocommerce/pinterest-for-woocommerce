@@ -25,6 +25,9 @@ class AdCredits {
 	const ADS_CREDIT_CAMPAIGN_TRANSIENT = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-ads-credit-campaign-transient';
 	const ADS_CREDIT_CAMPAIGN_OPTION    = 'ads_campaign_is_active';
 
+	const ADS_CREDIT_FUTURE_DISCOUNT = 5;// 16; temporary change for testing
+	const ADS_CREDIT_MARKETING_OFFER = 16; //5; temporary change for testing
+
 	/**
 	 * Initialize Ad Credits actions and Action Scheduler hooks.
 	 *
@@ -208,6 +211,51 @@ class AdCredits {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Fetch data from the discount endpoint and get the necessary fields.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return mixed False when no info is available, discounts object when discounts are available.
+	 */
+	public static function process_available_discounts() {
+		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
+			// Advertiser not connected, we can't check if credits were redeemed.
+			return false;
+		}
+
+		$advertiser_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
+
+		if ( false === $advertiser_id ) {
+			// No advertiser id stored. But we are connected. This is an abnormal state that should not happen.
+			Logger::log( __( 'Advertiser connected but the connection id is missing.', 'pinterest-for-woocommerce' ) );
+			return false;
+		}
+
+		$result = Base::get_available_discounts( $advertiser_id );
+		if ( 'success' !== $result['status'] ) {
+			return false;
+		}
+
+		$discounts = (array) $result['data'];
+
+		$found_discounts = array();
+		if ( array_key_exists( self::ADS_CREDIT_FUTURE_DISCOUNT, $discounts ) ) {
+			$found_discounts['future_discount'] = true;
+		}
+
+		if ( array_key_exists( self::ADS_CREDIT_MARKETING_OFFER, $discounts ) ) {
+			// We only look at the first available field. For now we have no plans to handle more fields.
+			$discount_information     = (array) reset( $discounts[ self::ADS_CREDIT_MARKETING_OFFER ] );
+			$remaining_discount_value = ( (float) $discount_information['remaining_discount_in_micro_currency'] ) / 1000000;
+			$found_discounts['marketing_offer'] = array(
+				'remaining_discount' => wc_price( $remaining_discount_value ),
+			);
+		}
+
+		return $found_discounts;
 	}
 
 }

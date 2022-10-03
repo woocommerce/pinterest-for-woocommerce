@@ -91,7 +91,6 @@ const CatalogSyncApp = () => {
 	const closeOnboardingModal = () => {
 		setIsOnboardingModalOpen( false );
 		handleSetDismissAdsModal();
-		openAdsCreditsNotice();
 		recordEvent( 'pfw_modal_closed', {
 			context: 'catalog-sync',
 			name: 'ads-credits-onboarding',
@@ -107,7 +106,8 @@ const CatalogSyncApp = () => {
 
 	useEffect( () => {
 		openOnboardingModal();
-	}, [ openOnboardingModal ] );
+		openAdsCreditsNotice();
+	}, [ openOnboardingModal, openAdsCreditsNotice ] );
 
 	return (
 		<div className="pinterest-for-woocommerce-catalog-sync">

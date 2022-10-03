@@ -46,6 +46,9 @@ const AdCreditsNotice = () => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
 	const trackingAdvertiser = appSettings?.tracking_advertiser;
+	const hasAvailableCredits =
+		appSettings?.account_data?.available_discounts?.marketing_offer
+			?.remaining_discount;
 
 	const closeAdCreditsNotice = () => {
 		setIsNoticeDisplayed( false );
@@ -61,9 +64,9 @@ const AdCreditsNotice = () => {
 	}, [ setDismissAdsNotice ] );
 
 	return (
-		isNoticeDisplayed && (
+		isNoticeDisplayed &&
+		! hasAvailableCredits && (
 			<Notice
-				status="success"
 				isDismissible={ true }
 				onRemove={ closeAdCreditsNotice }
 				className="pinterest-for-woocommerce-catalog-sync__ad-credits"
