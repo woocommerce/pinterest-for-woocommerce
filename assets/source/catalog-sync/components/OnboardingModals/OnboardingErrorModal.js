@@ -12,6 +12,7 @@ import {
  */
 import OnboardingModal from './OnboardingModal';
 import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
+import { __ } from '@wordpress/i18n/build-types';
 
 /**
  * Ads Onboarding Modal.
@@ -22,13 +23,48 @@ import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
  * @return {JSX.Element} rendered component
  */
 const OnboardingErrorModal = ( { onCloseModal } ) => {
+	const ALREADY_REDEEMED_ERROR = 2322;
+	const OFFER_EXPIRED_ERROR = 2319;
+	const NOT_AVAILABLE_IN_COUNTRY_OR_CURRENCY_ERROR = 2327;
+	const WRONG_BILLING_PROFILE_ERROR = 2006;
+
 	const couponRedeemInfo = useSettingsSelect()?.account_data
 		?.coupon_redeem_info;
 
 	let errorMessageText = '';
 	switch ( couponRedeemInfo?.error_code ) {
-		// case 2327:
-		// 	break;
+		case ALREADY_REDEEMED_ERROR:
+			errorMessageText = __(
+				'Advertiser already has a redeemed offer',
+				'pinterest-for-woocommerce'
+			);
+
+			break;
+
+		case OFFER_EXPIRED_ERROR:
+			errorMessageText = __(
+				'Unable to claim Pinterest ads credits as the offer has expired.',
+				'pinterest-for-woocommerce'
+			);
+
+			break;
+
+		case NOT_AVAILABLE_IN_COUNTRY_OR_CURRENCY_ERROR:
+			errorMessageText = __(
+				'Unable to claim Pinterest ads credits as the offer code is not available for your country.',
+				'pinterest-for-woocommerce'
+			);
+
+			break;
+
+		case WRONG_BILLING_PROFILE_ERROR:
+			errorMessageText = __(
+				'Offer code can only be redeemed by an advertiser with a credit card billing profile.',
+				'pinterest-for-woocommerce'
+			);
+
+			break;
+
 		default:
 			errorMessageText = couponRedeemInfo?.error_message;
 			break;
