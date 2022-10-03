@@ -41,8 +41,8 @@ const SyncState = () => {
 		select( REPORTS_STORE_NAME ).getFeedState()
 	);
 
-	const hasAvailableCredits =
-		useSettingsSelect()?.account_data?.available_discounts?.marketing_offer
+	const hasAvailableCredits = useSettingsSelect()?.account_data
+		?.available_discounts?.marketing_offer
 			?.remaining_discount;
 
 	const availableCredits = sprintf(
@@ -80,7 +80,8 @@ const SyncState = () => {
 									adsManagerLink: (
 										<ExternalLink
 											href={
-												wcSettings.pinterest_for_woocommerce
+												wcSettings
+													.pinterest_for_woocommerce
 													.pinterestLinks.adsManager
 											}
 											onClick={ () => {
