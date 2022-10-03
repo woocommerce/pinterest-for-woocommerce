@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { __ } from '@wordpress/i18n';
 import {
 	Flex,
 	Dashicon,
@@ -12,7 +13,6 @@ import {
  */
 import OnboardingModal from './OnboardingModal';
 import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
-import { __ } from '@wordpress/i18n/build-types';
 
 /**
  * Ads Onboarding Modal.
