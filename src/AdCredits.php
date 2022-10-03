@@ -93,7 +93,7 @@ class AdCredits {
 		}
 
 		try {
-			$result = Base::validate_ads_offer_code( $advertiser_id, $offer_code );
+			$result = Base::redeem_ads_offer_code( $advertiser_id, $offer_code );
 			if ( 'success' !== $result['status'] ) {
 				return false;
 			}
