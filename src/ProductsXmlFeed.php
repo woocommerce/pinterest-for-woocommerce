@@ -401,11 +401,18 @@ class ProductsXmlFeed {
 	private static function get_property_sale_price( $product, $property ) {
 
 		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_sale_price' ) ) {
-			$regular_price = $product->get_variation_regular_price();
-			$sale_price    = $product->get_variation_sale_price();
+			$regular_price = $product->get_variation_regular_price( 'min', true );
+			$sale_price    = $product->get_variation_sale_price( 'min', true );
 			$price         = $regular_price > $sale_price ? $sale_price : false;
 		} else {
-			$price = $product->get_sale_price();
+			$sale_price = $product->get_sale_price();
+
+			$price = $sale_price ? wc_get_price_to_display(
+				$product,
+				array(
+					'price' => $sale_price,
+				)
+			) : '';
 		}
 
 		if ( empty( $price ) ) {
@@ -566,7 +573,12 @@ class ProductsXmlFeed {
 		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
 			$price = $product->get_variation_regular_price( 'min', true );
 		} else {
-			$price = wc_get_price_to_display( $product );
+			$price = wc_get_price_to_display(
+				$product,
+				array(
+					'price' => $product->get_regular_price(),
+				)
+			);
 		}
 
 		return $price;
