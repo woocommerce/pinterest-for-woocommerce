@@ -85,7 +85,7 @@ class UserInteraction extends VendorAPI {
 	 * Flush options.
 	 */
 	public static function flush_options() {
-		delete_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . UserInteraction::ADS_MODAL_DISMISSED );
-		delete_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . UserInteraction::ADS_NOTICE_DISMISSED );
+		delete_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::ADS_MODAL_DISMISSED );
+		delete_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::ADS_NOTICE_DISMISSED );
 	}
 }
