@@ -611,7 +611,9 @@ class Base {
 	 * @return mixed
 	 */
 	public static function redeem_ads_offer_code( $advertiser_id, $offer_code ) {
-		return self::make_request( "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem", 'POST', array(), 'ads' );
+		$request_url = "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem";
+		$request_url = add_query_arg( 'is_encoded', 'true', $request_url );
+		return self::make_request( $request_url, 'POST', array(), 'ads' );
 	}
 
 	/**
