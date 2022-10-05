@@ -80,4 +80,12 @@ class UserInteraction extends VendorAPI {
 
 		return new WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_' . self::USER_INTERACTION, esc_html__( 'Unrecognized interaction parameter', 'pinterest-for-woocommerce' ), array( 'status' => 400 ) );
 	}
+
+	/**
+	 * Flush options.
+	 */
+	public static function flush_options() {
+		delete_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . UserInteraction::ADS_MODAL_DISMISSED );
+		delete_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . UserInteraction::ADS_NOTICE_DISMISSED );
+	}
 }
