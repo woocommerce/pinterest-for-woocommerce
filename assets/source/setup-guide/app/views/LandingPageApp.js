@@ -357,8 +357,6 @@ const LandingPageApp = () => {
 		<PrelaunchNotice />
 	) : null;
 
-	const adsCampaignIsActive = useSettingsSelect()?.ads_campaign_is_active;
-
 	return (
 		<>
 			{ prelaunchNotice }
@@ -367,7 +365,7 @@ const LandingPageApp = () => {
 					<UnsupportedCountryNotice countryCode={ storeCountry } />
 				) }
 				<WelcomeSection />
-				{ adsCampaignIsActive && <AdsCreditSection /> }
+				{ isAdsSupportedCountry && <AdsCreditSection /> }
 				<FeaturesSection />
 				<FaqSection />
 			</div>
