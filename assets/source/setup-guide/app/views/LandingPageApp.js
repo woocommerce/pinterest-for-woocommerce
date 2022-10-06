@@ -27,6 +27,7 @@ import AdsCreditsTermsAndConditionsModal from '../components/TermsAndConditionsM
 import PrelaunchNotice from '../../../components/prelaunch-notice';
 import documentationLinkProps from '../helpers/documentation-link-props';
 import UnsupportedCountryNotice from '../components/UnsupportedCountryNotice';
+import { useSettingsSelect } from '../helpers/effects';
 
 const tosHref = 'https://business.pinterest.com/business-terms-of-service/';
 
@@ -356,6 +357,8 @@ const LandingPageApp = () => {
 		<PrelaunchNotice />
 	) : null;
 
+	const adsCampaignIsActive = useSettingsSelect()?.ads_campaign_is_active;
+
 	return (
 		<>
 			{ prelaunchNotice }
@@ -364,7 +367,7 @@ const LandingPageApp = () => {
 					<UnsupportedCountryNotice countryCode={ storeCountry } />
 				) }
 				<WelcomeSection />
-				<AdsCreditSection />
+				{ adsCampaignIsActive && <AdsCreditSection /> }
 				<FeaturesSection />
 				<FaqSection />
 			</div>
