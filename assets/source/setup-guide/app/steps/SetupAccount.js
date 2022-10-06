@@ -78,6 +78,8 @@ const SetupAccount = ( {
 		wcSettings.pinterest_for_woocommerce.businessAccounts
 	);
 
+	const { isAdsSupportedCountry } = wcSettings.pinterest_for_woocommerce;
+
 	const [
 		isTermsAndConditionsModalOpen,
 		setIsTermsAndConditionsModalOpen,
@@ -200,47 +202,46 @@ const SetupAccount = ( {
 							}
 						) }
 					/>
-					{ view === 'wizard' &&
-						appSettings?.ads_campaign_is_active && (
-							<>
-								<CardDivider
-									className={
-										'woocommerce-setup-guide__ad-credits__divider'
-									}
-								/>
-								<Flex
-									className={
-										'woocommerce-setup-guide__ad-credits'
-									}
-								>
-									<FlexBlock className="image-block">
-										<Icon icon={ GiftIcon } />
-									</FlexBlock>
-									<FlexBlock className="content-block">
-										<Text variant="body">
-											{ createInterpolateElement(
-												__(
-													'As a new Pinterest customer, you can get $125 in free ad credits when you successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Terms and conditions</a> apply.',
-													'pinterest-for-woocommerce'
+					{ view === 'wizard' && isAdsSupportedCountry && (
+						<>
+							<CardDivider
+								className={
+									'woocommerce-setup-guide__ad-credits__divider'
+								}
+							/>
+							<Flex
+								className={
+									'woocommerce-setup-guide__ad-credits'
+								}
+							>
+								<FlexBlock className="image-block">
+									<Icon icon={ GiftIcon } />
+								</FlexBlock>
+								<FlexBlock className="content-block">
+									<Text variant="body">
+										{ createInterpolateElement(
+											__(
+												'As a new Pinterest customer, you can get $125 in free ad credits when you successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Terms and conditions</a> apply.',
+												'pinterest-for-woocommerce'
+											),
+											{
+												a: (
+													// Disabling no-content rule - content is interpolated from above string
+													// eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/anchor-has-content
+													<a
+														href={ '#' }
+														onClick={
+															openTermsAndConditionsModal
+														}
+													/>
 												),
-												{
-													a: (
-														// Disabling no-content rule - content is interpolated from above string
-														// eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/anchor-has-content
-														<a
-															href={ '#' }
-															onClick={
-																openTermsAndConditionsModal
-															}
-														/>
-													),
-												}
-											) }
-										</Text>
-									</FlexBlock>
-								</Flex>
-							</>
-						) }
+											}
+										) }
+									</Text>
+								</FlexBlock>
+							</Flex>
+						</>
+					) }
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
