@@ -27,7 +27,6 @@ import AdsCreditsTermsAndConditionsModal from '../components/TermsAndConditionsM
 import PrelaunchNotice from '../../../components/prelaunch-notice';
 import documentationLinkProps from '../helpers/documentation-link-props';
 import UnsupportedCountryNotice from '../components/UnsupportedCountryNotice';
-import { useSettingsSelect } from '../helpers/effects';
 
 const tosHref = 'https://business.pinterest.com/business-terms-of-service/';
 
