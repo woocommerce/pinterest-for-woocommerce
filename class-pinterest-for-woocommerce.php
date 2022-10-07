@@ -923,7 +923,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$error_message = '';
 			$redeem_status = AdCredits::redeem_credits( $offer_code, $error_code, $error_message );
 
-			$redeem_information = array(
+			$redeem_information                 = array(
 				'redeem_status' => $redeem_status,
 				'offer_code'    => $offer_code,
 				'advertiser_id' => Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' ),
@@ -934,9 +934,21 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			);
 			$account_data['coupon_redeem_info'] = $redeem_information;
 
+			self::save_setting( 'account_data', $account_data );
+		}
+
+		/**
+		 * Add available credits information to the account data option.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public static function add_available_credits_info_to_account_data() {
+			$account_data = self::get_setting( 'account_data' );
+
 			// Check for available discounts.
-			$available_discounts                 = AdCredits::process_available_discounts();
-			$account_data['available_discounts'] = $available_discounts;
+			$account_data['available_discounts'] = AdCredits::process_available_discounts();
 
 			self::save_setting( 'account_data', $account_data );
 		}
