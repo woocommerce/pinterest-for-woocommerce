@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Internal\Utilities\Users;
 use Automattic\WooCommerce\Pinterest\AdCredits;
 use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
 use \WP_REST_Server;
@@ -112,6 +113,9 @@ class AdvertiserConnect extends VendorAPI {
 		 * track when the connection to the account was made.
 		 */
 		Utilities::set_account_connection_timestamp();
+
+		// Reset UI state when the new advertiser is connected.
+		UserInteraction::flush_options();
 
 		return array(
 			'connected'   => $response['data']->advertiser_id,
