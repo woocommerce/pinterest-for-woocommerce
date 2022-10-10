@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-
+use Automattic\WooCommerce\Pinterest\AdCredits;
 use Exception;
 use Throwable;
 /**
@@ -265,5 +265,21 @@ class PluginUpdate {
 		Pinterest_For_Woocommerce()::save_settings( $settings, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 
 		// Update done.
+	}
+
+	/**
+	 * Integrate Ads credit flow.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	protected function ads_credits_integration(): void {
+		// TODO: What is the version where this will be integrated?
+		if ( ! $this->plugin_is_up_to_date() ) {
+			return;
+		}
+
+		AdCredits::handle_redeem_credit();
 	}
 }
