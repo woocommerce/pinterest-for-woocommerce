@@ -78,8 +78,6 @@ const SetupAccount = ( {
 		wcSettings.pinterest_for_woocommerce.businessAccounts
 	);
 
-	const { isAdsSupportedCountry } = wcSettings.pinterest_for_woocommerce;
-
 	const [
 		isTermsAndConditionsModalOpen,
 		setIsTermsAndConditionsModalOpen,
