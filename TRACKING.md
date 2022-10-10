@@ -82,7 +82,7 @@ Clicking on an external documentation link.
 	- with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
-- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L47) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
+- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L48) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
 - [TermsAndConditionsModal]( assets/source/setup-guide/app/components/TermsAndConditionsModal.js#L24)
     - with `{ link_id: 'terms-of-service', context: 'ads-credits-terms-and-conditions' }`
 	- with `{ link_id: 'privacy-policy', context: 'ads-credits-terms-and-conditions' }`
@@ -101,7 +101,7 @@ Triggered when a site is successfully verified.
 #### Emitters
 - [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L99)
 
-### [`wcadmin_pfw_get_started_faq`](assets/source/setup-guide/app/views/LandingPageApp.js#L222)
+### [`wcadmin_pfw_get_started_faq`](assets/source/setup-guide/app/views/LandingPageApp.js#L310)
 Clicking on getting started page faq item to collapse or expand it.
 #### Properties
 | name | type | description |
@@ -109,7 +109,7 @@ Clicking on getting started page faq item to collapse or expand it.
 `action` | `string` | `'expand' \| 'collapse'` What action was initiated.
 `question_id` | `string` | Identifier of the clicked question.
 #### Emitters
-- [`FaqQuestion`](assets/source/setup-guide/app/views/LandingPageApp.js#L241) whenever the FAQ is toggled.
+- [`FaqQuestion`](assets/source/setup-guide/app/views/LandingPageApp.js#326) whenever the FAQ is toggled.
 
 ### [`wcadmin_pfw_get_started_notice_link_click`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L16)
 Clicking on the link inside the notice.
@@ -133,7 +133,7 @@ Closing a modal.
 `action` | `string` | `confirm` - When the final "Yes, I'm sure" button is clicked. <br> `dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
-- [`LandingPageApp.AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L136) with `{ name: 'ads-credits-terms-and-conditions', … } `
+- [`LandingPageApp.AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L140) with `{ name: 'ads-credits-terms-and-conditions', … } `
 - [`CatalogSync`](assets/source/catalog-sync/App.js#L37) with `{ name: 'ads-credits-onboarding', … } `
 - [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L60 ) with `{ name: 'ads-credits-terms-and-conditions', … } `
 
@@ -146,7 +146,7 @@ Opening a modal.
 `context` | `string` | `'settings' \| 'wizard' \| 'landing-page' \| 'catalog-sync'` In which context it was used?
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
-- [`LandingPageApp.AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L135) with `{ name: 'ads-credits-terms-and-conditions', … } `
+- [`LandingPageApp.AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L140) with `{ name: 'ads-credits-terms-and-conditions', … } `
 - [`CatalogSync`](assets/source/catalog-sync/App.js#L38) with `{ name: 'ads-credits-onboarding', … } `
 - [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L59 ) with `{ name: 'ads-credits-terms-and-conditions', … } `
 
@@ -167,7 +167,7 @@ Clicking on "… Save changes" button.
 #### Emitters
 - [`SaveSettingsButton`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L42) with `{ context: view, … }`
 
-### [`wcadmin_pfw_setup`](assets/source/setup-guide/app/views/LandingPageApp.js#L28)
+### [`wcadmin_pfw_setup`](assets/source/setup-guide/app/views/LandingPageApp.js#L38)
 Triggered on events during setup,
 like starting, ending, or navigating between steps.
 #### Properties
@@ -179,7 +179,7 @@ like starting, ending, or navigating between steps.
 - [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L54)
 	- with `{ target: 'complete', trigger: 'setup-tracking-complete' }` when "Complete setup" button is clicked.
 	- with `{ target: 'fetch-tags' | 'fetch-advertisers', trigger: 'setup-tracking-try-again' }` when "Try again" button is clicked.
-- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L47) with `{ target: 'onboarding', trigger: 'get-started' }` when "Get started" button is clicked for incomplete setup.
+- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L53) with `{ target: 'onboarding', trigger: 'get-started' }` when "Get started" button is clicked for incomplete setup.
 - [`WizardApp`](assets/source/setup-guide/app/views/WizardApp.js#L37)
 	- with `{ target: 'setup-account' | 'claim-website' | 'setup-tracking', trigger: 'wizard-stepper' }` when wizard's header step is clicked.
 	- with `{ target: 'claim-website' , trigger: 'setup-account-continue' }` when continue button is clicked.
