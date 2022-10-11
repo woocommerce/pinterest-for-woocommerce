@@ -77,7 +77,8 @@ class Base {
 	 *
 	 * @return array
 	 *
-	 * @throws Exception PHP exception.
+	 * @throws ApiException PHP exception.
+	 * @throws Exception    PHP exception.
 	 */
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 
@@ -95,9 +96,12 @@ class Base {
 			$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
 
 			$request = array(
-				'url'    => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
-				'method' => $method,
-				'args'   => $payload,
+				'url'     => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
+				'method'  => $method,
+				'args'    => $payload,
+				'headers' => array(
+					'Pinterest-Woocommerce-Version' => PINTEREST_FOR_WOOCOMMERCE_VERSION,
+				),
 			);
 
 			if ( 'ads/' === $api && 'POST' === $method ) {
@@ -114,9 +118,47 @@ class Base {
 			}
 
 			return $response;
+		} catch ( ApiException $e ) {
+
+			if ( ! empty( Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' ) ) ) {
+				/* Translators: 1: Error message 2: Stack trace */
+				Logger::log( sprintf( "%1\$s\n%2\$s", $e->getMessage(), $e->getTraceAsString() ), 'error' );
+			} else {
+
+				Logger::log(
+					sprintf(
+						/* Translators: 1: Request method 2: Request endpoint 3: Response status code 4: Response message 5: Pinterest code */
+						esc_html__( "%1\$s Request: %2\$s\nStatus Code: %3\$s\nAPI response: %4\$s\nPinterest Code: %5\$s", 'pinterest-for-woocommerce' ),
+						$method,
+						$request['url'],
+						$e->getCode(),
+						$e->getMessage(),
+						$e->get_pinterest_code(),
+					),
+					'error'
+				);
+			}
+
+			throw $e;
 		} catch ( Exception $e ) {
 
-			Logger::log( $e->getMessage(), 'error' );
+			if ( ! empty( Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' ) ) ) {
+				/* Translators: 1: Error message 2: Stack trace */
+				Logger::log( sprintf( "%1\$s\n%2\$s", $e->getMessage(), $e->getTraceAsString() ), 'error' );
+			} else {
+
+				Logger::log(
+					sprintf(
+						/* Translators: 1: Request method 2: Request endpoint 3: Response status code 4: Response message */
+						esc_html__( "%1\$s Request: %2\$s\nStatus Code: %3\$s\nAPI response: %4\$s", 'pinterest-for-woocommerce' ),
+						$method,
+						$request['url'],
+						$e->getCode(),
+						$e->getMessage(),
+					),
+					'error'
+				);
+			}
 
 			throw $e;
 		}

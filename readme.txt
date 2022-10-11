@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.9
 Requires PHP: 7.3
-Stable tag: 1.0.12
+Stable tag: 1.2.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -86,6 +86,47 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.3 - 2022-10-11 =
+* Add - Warning message on potential conflicting tags.
+* Dev - Add branch-labels GH workflow.
+* Dev - Remove from PHP test matrix WP 5.6 and 5.7, add 5.9.
+* Fix - Clear connection options during disconnection error to allow new connection.
+* Fix - Display correct error if product sync is broken.
+* Fix - Issue with sale price on the feed.
+* Fix - Save Pin button available before finishing onboarding.
+* Fix - Strip HTML from the Rich Pins description field.
+
+= 1.2.2 - 2022-08-09 =
+* Dev - GH release config and the new PR template.
+* Fix - Error after domain verification.
+* Tweak - WC 6.8 compatibility.
+
+= 1.2.1 - 2022-07-01 =
+* Fix - Error printing end of line character.
+
+= 1.2.0 - 2022-06-27 =
+* Add - Argentina, Colombia and Chile to ads supported countries.
+* Fix - Move the <noscript> base code to <body>.
+* Fix - Typo errors on translatable strings.
+
+= 1.1.0 - 2022-06-17 =
+* Add - .pot file for translators.
+* Add - Inbox notifications for the onboarding process and catalog sync.
+* Add - Key flows documentation.
+* Add - The user will be redirected to the Get started page on first activation.
+* Fix - Add plugin version to request headers.
+* Fix - Error on feed generation due to orphaned variations.
+* Fix - Unit tests for WooCommerce 6.5.
+* Tweak - Improvements on the error logs.
+* Tweak - WC 6.6 compatibility.
+
+= 1.0.13 - 2022-05-24 =
+* Add - Add action scheduler as a minimum plugin requirement.
+* Add - Japan to ads supported countries.
+* Add - Route to handle the plugin's settings.
+* Fix - Limit the number of additional images to 10.
+* Tweak - WC 6.5 compatibility.
 
 = 1.0.12 - 2022-05-05 =
 * Dev - update trusted plugins in composer.json.

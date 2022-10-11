@@ -8,6 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use \Pinterest_For_Woocommerce;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -22,11 +24,13 @@ class SaveToPinterest {
 	 */
 	public static function maybe_init() {
 
-		if ( self::show_pin_button() ) {
-			add_action( 'woocommerce_before_single_product_summary', array( __CLASS__, 'render_product_pin' ) );
-			add_action( 'woocommerce_before_shop_loop_item', array( __CLASS__, 'render_product_pin' ), 1 );
-			add_filter( 'woocommerce_blocks_product_grid_item_html', array( __CLASS__, 'add_to_wc_blocks' ), 10, 3 );
+		if ( ! Pinterest_For_Woocommerce::is_setup_complete() || ! self::show_pin_button() ) {
+			return;
 		}
+
+		add_action( 'woocommerce_before_single_product_summary', array( __CLASS__, 'render_product_pin' ) );
+		add_action( 'woocommerce_before_shop_loop_item', array( __CLASS__, 'render_product_pin' ), 1 );
+		add_filter( 'woocommerce_blocks_product_grid_item_html', array( __CLASS__, 'add_to_wc_blocks' ), 10, 3 );
 	}
 
 

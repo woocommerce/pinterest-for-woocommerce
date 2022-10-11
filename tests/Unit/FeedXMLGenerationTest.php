@@ -469,6 +469,26 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
 		$xml          = $price_method( $product );
 		$this->assertEquals( '<g:price>15.00USD</g:price>', $xml );
+		
+		
+		// Test if the price excludes taxes.
+		$old_tax_display_option = get_option( 'woocommerce_tax_display_shop' );
+		update_option( 'woocommerce_tax_display_shop', 'excl' );
+
+		$price_decimals_method = ( new ReflectionClass( ProductsXmlFeed::class ) )->getMethod( 'get_currency_decimals' );
+		$price_decimals_method->setAccessible( true );
+		$price_decimals = $price_decimals_method->invoke( null );
+
+		$product_price = wc_get_price_excluding_tax( 
+			$product,
+			array(
+				'price' => $product->get_regular_price(),
+			)
+		);
+		$formatted_price = wc_format_decimal( $product_price, $price_decimals );
+		$this->assertEquals( '<g:price>' . $formatted_price . get_woocommerce_currency() . '</g:price>', $xml );
+
+		update_option( 'woocommerce_tax_display_shop', $old_tax_display_option );
 
 		// Test with another currency.
 		$old_currency = get_woocommerce_currency();
@@ -503,6 +523,26 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		);
 		$xml     = $sale_price_method( $product );
 		$this->assertEquals( '<sale_price>5.00USD</sale_price>', $xml );
+
+
+		// Test if the price excludes taxes.
+		$old_tax_display_option = get_option( 'woocommerce_tax_display_shop' );
+		update_option( 'woocommerce_tax_display_shop', 'excl' );
+
+		$price_decimals_method = ( new ReflectionClass( ProductsXmlFeed::class ) )->getMethod( 'get_currency_decimals' );
+		$price_decimals_method->setAccessible( true );
+		$price_decimals = $price_decimals_method->invoke( null );
+
+		$product_price = wc_get_price_excluding_tax( 
+			$product,
+			array(
+				'price' => $product->get_sale_price(),
+			)
+		);
+		$formatted_price = wc_format_decimal( $product_price, $price_decimals );
+		$this->assertEquals( '<sale_price>' . $formatted_price . get_woocommerce_currency() . '</sale_price>', $xml );
+	
+		update_option( 'woocommerce_tax_display_shop', $old_tax_display_option );
 	}
 
 	/**
@@ -683,7 +723,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	/**
 	 * Remove filters and shortcodes.
 	 */
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 
 		// Remove any added filter.

@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
 use \WP_REST_Server;
 use \WP_REST_Request;
 use \WP_Error;
@@ -98,6 +99,12 @@ class AdvertiserConnect extends VendorAPI {
 		}
 
 		Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', true );
+
+		/*
+		 * This is the last step of the connection process. We can use this moment to
+		 * track when the connection to the account was made.
+		 */
+		Utilities::set_account_connection_timestamp();
 
 		return array(
 			'connected'   => $response['data']->advertiser_id,

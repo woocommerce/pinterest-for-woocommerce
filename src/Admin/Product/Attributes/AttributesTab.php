@@ -94,7 +94,14 @@ class AttributesTab {
 			$this->get_applicable_product_types()
 		);
 
-		$classes = array_merge( array( 'pinterest' ), $shown_types );
+		$hidden_types = array_map(
+			function ( string $product_type ) {
+				return "hide_if_${product_type}";
+			},
+			$this->get_hidden_product_types()
+		);
+
+		$classes = array_merge( array( 'pinterest' ), $shown_types, $hidden_types );
 
 		$tabs['pinterest_attributes'] = array(
 			'label'  => 'Pinterest',
@@ -176,6 +183,17 @@ class AttributesTab {
 	 */
 	protected function get_applicable_product_types(): array {
 		return apply_filters( 'wc_pinterest_attributes_tab_applicable_product_types', array( 'simple', 'variable' ) );
+	}
+
+	/**
+	 * Return an array of WooCommerce product types that the Pinterest tab cannot be displayed for.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array of WooCommerce product types (e.g. 'subscription', 'variable-subscription', etc.)
+	 */
+	protected function get_hidden_product_types(): array {
+		return apply_filters( 'wc_pinterest_attributes_tab_hidden_product_types', array( 'subscription', 'variable-subscription' ) );
 	}
 
 	/**

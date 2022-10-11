@@ -11,6 +11,8 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
+use Automattic\WooCommerce\Pinterest\ProductSync;
+use Automattic\WooCommerce\Pinterest\Tracking;
 use \WP_REST_Server;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -67,6 +69,19 @@ class FeedState extends VendorAPI {
 		$this->methods           = WP_REST_Server::READABLE;
 
 		$this->register_routes();
+
+		$this->hooks();
+
+	}
+
+
+	/**
+	 * Add feed state hooks.
+	 */
+	private function hooks() {
+		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_local_feed_state' ) );
+		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_feed_registration_state' ) );
+		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_third_party_tags_warning' ) );
 	}
 
 
@@ -104,30 +119,14 @@ class FeedState extends VendorAPI {
 
 		try {
 
-			$result = array();
-
-			if ( ! Pinterest\ProductSync::is_product_sync_enabled() ) {
+			if ( ! ProductSync::is_product_sync_enabled() ) {
 				return array(
 					'workflow' => array(
 						array(
 							'label'        => esc_html__( 'XML feed', 'pinterest-for-woocommerce' ),
 							'status'       => 'error',
 							'status_label' => esc_html__( 'Product sync is disabled.', 'pinterest-for-woocommerce' ),
-							'extra_info'   => wp_kses_post(
-								sprintf(
-									/* Translators: %1$s The URL of the settings page */
-									__( 'Visit the <a href="%1$s">settings</a> page to enabled it.', 'pinterest-for-woocommerce' ),
-									esc_url(
-										add_query_arg(
-											array(
-												'page' => 'wc-admin',
-												'path' => '/pinterest/settings',
-											),
-											admin_url( 'admin.php' )
-										)
-									)
-								)
-							),
+							'extra_info'   => wp_kses_post( ProductSync::get_feed_status_extra_info() ),
 						),
 					),
 					'overview' => array(
@@ -139,10 +138,7 @@ class FeedState extends VendorAPI {
 				);
 			}
 
-			$result = $this->add_local_feed_state( $result );
-			$result = $this->add_feed_registration_state( $result );
-
-			return $result;
+			return apply_filters( 'pinterest_for_woocommerce_feed_state', array() );
 
 		} catch ( \Throwable $th ) {
 
@@ -162,7 +158,7 @@ class FeedState extends VendorAPI {
 	 *
 	 * @return array
 	 */
-	private function add_local_feed_state( $result ) {
+	public function add_local_feed_state( $result ) {
 
 		$state      = Pinterest\ProductFeedStatus::get();
 		$extra_info = '';
@@ -173,8 +169,15 @@ class FeedState extends VendorAPI {
 				$status       = 'pending';
 				$status_label = esc_html__( 'Feed generation in progress.', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
-					/* Translators: %1$s Time string, %2$s number of products */
-					esc_html__( 'Last activity: %1$s ago - Wrote %2$s products to %3$sfeed file%4$s.', 'pinterest-for-woocommerce' ),
+					esc_html(
+						/* translators: 1: Time string, 2: number of products, 3: opening anchor tag, 4: closing anchor tag */
+						_n(
+							'Last activity: %1$s ago - Wrote %2$s product to %3$sfeed file%4$s.',
+							'Last activity: %1$s ago - Wrote %2$s products to %3$sfeed file%4$s.',
+							$state['product_count'],
+							'pinterest-for-woocommerce'
+						)
+					),
 					human_time_diff( $state['last_activity'] ),
 					$state['product_count'],
 					sprintf( '<a href="%s" target="_blank">', esc_url( $this->get_feed_url() ) ),
@@ -186,8 +189,15 @@ class FeedState extends VendorAPI {
 				$status       = 'success';
 				$status_label = esc_html__( 'Up to date', 'pinterest-for-woocommerce' );
 				$extra_info   = sprintf(
-					/* Translators: %1$s Time string, %2$s total number of products */
-					esc_html__( 'Successfully generated %1$s ago - Wrote %2$s products to %3$sfeed file%4$s', 'pinterest-for-woocommerce' ),
+					esc_html(
+						/* translators: 1: Time string, 2: total number of products, 3: opening anchor tag, 4: closing anchor tag */
+						_n(
+							'Successfully generated %1$s ago - Wrote %2$s product to %3$sfeed file%4$s',
+							'Successfully generated %1$s ago - Wrote %2$s products to %3$sfeed file%4$s',
+							$state['product_count'],
+							'pinterest-for-woocommerce'
+						)
+					),
 					human_time_diff( $state['last_activity'] ),
 					$state['product_count'],
 					sprintf( '<a href="%s" target="_blank">', esc_url( $this->get_feed_url() ) ),
@@ -238,7 +248,7 @@ class FeedState extends VendorAPI {
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
-	private function add_feed_registration_state( $result ) {
+	public function add_feed_registration_state( $result ) {
 
 		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
 		$feed_id     = Pinterest_For_Woocommerce()::get_data( 'feed_registered' );
@@ -320,6 +330,36 @@ class FeedState extends VendorAPI {
 				'errors'     => 0,
 			);
 		}
+
+		return $result;
+	}
+
+	/**
+	 * Adds to the result variable an array with info about the
+	 * registration and configuration process of the XML feed to the Pinterest API.
+	 *
+	 * @since 1.2.3
+	 *
+	 * @param array $result The result array to add values to.
+	 *
+	 * @return array
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
+	public function add_third_party_tags_warning( $result ) {
+
+		$warning_message = Tracking::get_third_party_tags_warning_message();
+
+		if ( empty( $warning_message ) ) {
+			return $result;
+		}
+
+		$result['workflow'][] = array(
+			'label'        => esc_html__( 'Pinterest tag', 'pinterest-for-woocommerce' ),
+			'status'       => 'warning',
+			'status_label' => esc_html__( 'Potential conflicting plugins', 'pinterest-for-woocommerce' ),
+			'extra_info'   => $warning_message,
+		);
 
 		return $result;
 	}

@@ -7,6 +7,9 @@
  */
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Pinterest\Heartbeat;
+use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
+use Automattic\WooCommerce\Pinterest\PinterestApiException;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -49,9 +52,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Set the minimum required versions for the plugin.
 		 */
 		const PLUGIN_REQUIREMENTS = array(
-			'php_version' => '7.3',
-			'wp_version'  => '5.6',
-			'wc_version'  => '5.3',
+			'php_version'      => '7.3',
+			'wp_version'       => '5.6',
+			'wc_version'       => '5.3',
+			'action_scheduler' => '3.3.0',
 		);
 
 		/**
@@ -76,6 +80,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.0.0
 		 */
 		protected static $initialized = false;
+
+		/**
+		 * Heartbeat instance.
+		 *
+		 * @var Heartbeat
+		 * @since 1.1.0
+		 */
+		protected $heartbeat = null;
 
 		/**
 		 * When set to true, the settings have been
@@ -128,7 +140,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.0.0
 		 */
 		public function __clone() {
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'pinterest-for-woocommerce' ), '1.0.0' );
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cloning this class is forbidden.', 'pinterest-for-woocommerce' ), '1.0.0' );
 		}
 
 		/**
@@ -137,7 +149,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.0.0
 		 */
 		public function __wakeup() {
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'pinterest-for-woocommerce' ), '1.0.0' );
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'Unserializing instances of this class is forbidden.', 'pinterest-for-woocommerce' ), '1.0.0' );
 		}
 
 		/**
@@ -226,6 +238,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$this->includes();
 
+			// Start the heartbeat.
+			$this->heartbeat = new Heartbeat( WC()->queue() );
+			$this->heartbeat->init();
+
 			add_action( 'admin_init', array( $this, 'admin_init' ), 0 );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
@@ -246,11 +262,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Handle the Pinterest verification URL.
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
 
-			// Allow access to our option through the REST API.
-			add_filter( 'woocommerce_rest_api_option_permissions', array( $this, 'add_option_permissions' ), 10, 1 );
-
 			// Disconnect advertiser if advertiser or tag change.
 			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
+
+			// Init marketing notifications.
+			add_action( Heartbeat::DAILY, array( $this, 'init_marketing_notifications' ) );
 
 		}
 
@@ -276,11 +292,23 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$view_factory         = new Pinterest\View\PHPViewFactory();
 			$admin                = new Pinterest\Admin\Admin( $view_factory );
 			$attributes_tab       = new Pinterest\Admin\Product\Attributes\AttributesTab( $admin );
+			$activation_redirect  = new Pinterest\Admin\ActivationRedirect();
 			$variation_attributes = new Pinterest\Admin\Product\Attributes\VariationsAttributes( $admin );
 
 			$admin->register();
 			$attributes_tab->register();
+			$activation_redirect->register();
 			$variation_attributes->register();
+		}
+
+		/**
+		 * Init marketing notifications.
+		 *
+		 * @since 1.1.0
+		 */
+		public function init_marketing_notifications() {
+			$notifications = new MarketingNotifications();
+			$notifications->init_notifications();
 		}
 
 		/**
@@ -310,6 +338,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			if ( apply_filters( 'woocommerce_admin_disabled', false ) ) {
 				$errors[] = esc_html__( 'Pinterest for WooCommerce requires WooCommerce Admin to be enabled.', 'pinterest-for-woocommerce' );
+			}
+
+			if ( ! function_exists( 'as_has_scheduled_action' ) ) {
+				/* Translators: The minimum Action Scheduler version */
+				$errors[] = sprintf( esc_html__( 'Pinterest for WooCommerce requires a minimum Action Scheduler package of %s. It can be caused by old version of the WooCommerce extensions.', 'pinterest-for-woocommerce' ), self::PLUGIN_REQUIREMENTS['action_scheduler'] );
 			}
 
 			if ( empty( $errors ) ) {
@@ -398,21 +431,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public function ajax_url() {
 			return admin_url( 'admin-ajax.php', 'relative' );
-		}
-
-
-		/**
-		 * Allow access to our option through the REST API for a user that can manage the store.
-		 * The UI relies on this option being available through the API.
-		 *
-		 * @param array $permissions The permissions array.
-		 *
-		 * @return array
-		 */
-		public function add_option_permissions( $permissions ) {
-
-			$permissions[ PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ] = current_user_can( 'manage_woocommerce' );
-			return $permissions;
 		}
 
 
@@ -546,6 +564,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			new Pinterest\API\FeedIssues();
 			new Pinterest\API\Tags();
 			new Pinterest\API\HealthCheck();
+			new Pinterest\API\Options();
 		}
 
 		/**
@@ -649,6 +668,22 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 				// At this point we're disconnected.
 				return true;
+			} catch ( PinterestApiException $e ) {
+				$code = $e->get_pinterest_code();
+
+				if ( PinterestApiException::MERCHANT_NOT_FOUND === $code ) {
+					Pinterest\Logger::log( esc_html__( 'Trying to disconnect while the merchant (id) was not found.', 'pinterest-for-woocommerce' ) );
+
+					/*
+					 * This is an abnormal state of the application. Caused probably by issues during the connection process.
+					 * It looks like the best course of actions is to flush the options and assume that we are disconnected.
+					 * This way we restore UI connect functionality and allow merchant to retry.
+					 */
+					self::flush_options();
+					return true;
+				}
+
+				return false;
 
 			} catch ( \Exception $th ) {
 				// There was an error disconnecting merchant.
@@ -981,7 +1016,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$account_data = self::get_setting( 'account_data' );
 			return isset( $account_data['is_any_website_verified'] ) ? (bool) $account_data['is_any_website_verified'] : false;
 		}
-
 
 		/**
 		 * Checks if tracking is configured properly and enabled.

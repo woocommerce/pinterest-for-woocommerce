@@ -24,6 +24,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ProductsXmlFeed {
 
+	use PluginHelper;
+
 	/**
 	 * The default data structure of the Item to be printed in the XML feed.
 	 *
@@ -59,6 +61,13 @@ class ProductsXmlFeed {
 	 * @var int
 	 */
 	const DESCRIPTION_SIZE_CHARS_LIMIT = 10000;
+
+	/**
+	 * Limit of additional images allowed by Pinterest.
+	 *
+	 * @var int
+	 */
+	const ADDITIONAL_IMAGES_LIMIT = 10;
 
 
 	/**
@@ -162,9 +171,12 @@ class ProductsXmlFeed {
 
 		// Merge with parent's attributes if it's a variation product.
 		if ( $product instanceof WC_Product_Variation ) {
-			$parent_product    = wc_get_product( $product->get_parent_id() );
-			$parent_attributes = $attribute_manager->get_all_values( $parent_product );
-			$attributes        = array_merge( $parent_attributes, $attributes );
+			$parent_product = wc_get_product( $product->get_parent_id() );
+
+			if ( $parent_product instanceof WC_Product ) {
+				$parent_attributes = $attribute_manager->get_all_values( $parent_product );
+				$attributes        = array_merge( $parent_attributes, $attributes );
+			}
 		}
 
 		foreach ( $attributes as $name => $value ) {
@@ -246,19 +258,8 @@ class ProductsXmlFeed {
 		 * @param WC_Product $product          WooCommerce product object.
 		 */
 		$apply_shortcodes = apply_filters( 'pinterest_for_woocommerce_product_description_apply_shortcodes', false, $product );
-		if ( $apply_shortcodes ) {
-			// Apply active shortcodes.
-			$description = do_shortcode( $description );
-		} else {
-			// Strip out active shortcodes.
-			$description = strip_shortcodes( $description );
-		}
 
-		// Strip HTML tags from description.
-		$description = wp_strip_all_tags( $description );
-
-		// Strip [&hellip] character from description.
-		$description = str_replace( '[&hellip;]', '...', $description );
+		$description = self::strip_tags_from_string( $description, $apply_shortcodes );
 
 		// Limit the number of characters in the description to 10000.
 		if ( strlen( $description ) > self::DESCRIPTION_SIZE_CHARS_LIMIT ) {
@@ -391,11 +392,18 @@ class ProductsXmlFeed {
 	private static function get_property_sale_price( $product, $property ) {
 
 		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_sale_price' ) ) {
-			$regular_price = $product->get_variation_regular_price();
-			$sale_price    = $product->get_variation_sale_price();
+			$regular_price = $product->get_variation_regular_price( 'min', true );
+			$sale_price    = $product->get_variation_sale_price( 'min', true );
 			$price         = $regular_price > $sale_price ? $sale_price : false;
 		} else {
-			$price = $product->get_sale_price();
+			$sale_price = $product->get_sale_price();
+
+			$price = $sale_price ? wc_get_price_to_display(
+				$product,
+				array(
+					'price' => $sale_price,
+				)
+			) : '';
 		}
 
 		if ( empty( $price ) ) {
@@ -444,7 +452,10 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '><![CDATA[' . implode( ',', $images ) . ']]></' . $property . '>';
+		$images = array_slice( $images, 0, self::ADDITIONAL_IMAGES_LIMIT );
+		$images = implode( ',', $images );
+
+		return '<' . $property . '><![CDATA[' . $images . ']]></' . $property . '>';
 	}
 
 	/**
@@ -553,7 +564,12 @@ class ProductsXmlFeed {
 		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
 			$price = $product->get_variation_regular_price( 'min', true );
 		} else {
-			$price = wc_get_price_to_display( $product );
+			$price = wc_get_price_to_display(
+				$product,
+				array(
+					'price' => $product->get_regular_price(),
+				)
+			);
 		}
 
 		return $price;

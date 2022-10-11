@@ -17,6 +17,8 @@ $plugin_settings = get_option( 'pinterest_for_woocommerce' );
 if ( $plugin_settings['erase_plugin_data'] ) {
 	delete_option( 'pinterest_for_woocommerce' );
 	delete_option( 'pinterest_for_woocommerce_data' );
+	delete_option( 'pinterest_for_woocommerce_marketing_notifications_init_timestamp' );
+	delete_option( 'pinterest_for_woocommerce_account_connection_timestamp' );
 }
 
 if ( function_exists( 'as_unschedule_all_actions' ) ) {

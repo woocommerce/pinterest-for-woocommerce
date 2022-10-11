@@ -25,7 +25,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 *
 	 * @return void
 	 */
-	public function setUp() {
+	public function setUp(): void {
 		$this->products[] = WC_Helper_Product::create_simple_product(  true, array( "regular_price" => 15 ) );
 	}
 
@@ -34,7 +34,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 *
 	 * @return void
 	 */
-	public function tearDown() {
+	public function tearDown(): void {
 		foreach( $this->products as $product ) {
 			$product->delete( true );
 		}

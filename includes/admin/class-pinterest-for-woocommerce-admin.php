@@ -10,9 +10,11 @@ use Automattic\WooCommerce\Admin\Features\Features;
 use Automattic\WooCommerce\Admin\Features\Navigation\Menu;
 use Automattic\WooCommerce\Admin\Features\Navigation\Screen;
 use Automattic\WooCommerce\Admin\Loader;
+use Automattic\WooCommerce\Admin\PageController;
 use Automattic\WooCommerce\Blocks\Package;
 use Automattic\WooCommerce\Blocks\Assets\AssetDataRegistry;
 use Automattic\WooCommerce\Pinterest\Compat;
+use Automattic\WooCommerce\Pinterest\Tracking;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -241,13 +243,24 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				Features::is_enabled( 'navigation' );
 		}
 
+		/**
+		 * Compatibility layer for is_admin_page function.
+		 * Needed since WC 6.5.
+		 */
+		private function is_admin_page(): bool {
+			if ( method_exists( PageController::class, 'is_admin_page' ) ) {
+				return PageController::is_admin_page();
+			} else {
+				return class_exists( Loader::class ) && Loader::is_admin_page();
+			}
+		}
 
 		/**
 		 * Load the scripts needed for the setup guide / settings page.
 		 */
 		public function load_setup_guide_scripts() {
 
-			if ( ! class_exists( Loader::class ) || ! Loader::is_admin_page() ) {
+			if ( ! $this->is_admin_page() ) {
 				return;
 			}
 
@@ -316,8 +329,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		public function register_task_list_item( $registered_tasks_list_items ) {
 
 			if (
-				! class_exists( Loader::class ) ||
-				! Loader::is_admin_page() ||
+				! $this->is_admin_page() ||
 				! Compat::should_show_tasks()
 			) {
 				return $registered_tasks_list_items;
@@ -340,7 +352,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		 * @return void
 		 */
 		public function load_settings() {
-			if ( ! class_exists( Loader::class ) || ! class_exists( AssetDataRegistry::class ) || ! Loader::is_admin_page() ) {
+			if ( ! $this->is_admin_page() || ! class_exists( AssetDataRegistry::class ) ) {
 				return;
 			}
 
@@ -395,6 +407,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					406 => 'domain verification',
 					409 => 'meta-tag',
 					),
+				'conflictingTagsWarning'   => Tracking::get_third_party_tags_warning_message(),
 			);
 		}
 
@@ -476,8 +489,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			}
 
 			if ( ! isset( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' ] ) || ! wp_verify_nonce( sanitize_key( $_GET[ PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_nonce' ] ), 'go_to_middleware_url' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-				wp_die( esc_html__( 'Cheatin&#8217; huh?', 'pinterest-for-woocommerce' ) );
-				return;
+				wp_die( esc_html__( "Cheatin' huh?", 'pinterest-for-woocommerce' ) );
 			}
 
 			$context = 'login';

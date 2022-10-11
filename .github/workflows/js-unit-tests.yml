@@ -5,18 +5,36 @@ on:
     branches:
       - trunk
       - develop
+    paths:
+      - "**.js"
+      - package.json
+      - package-lock.json
+      - .github/workflows/js-unit-tests.yml
   pull_request:
+    paths:
+      - "**.js"
+      - package.json
+      - package-lock.json
+      - .github/workflows/js-unit-tests.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   UnitTests:
     name: JavaScript unit tests
     runs-on: ubuntu-latest
+    env:
+      FORCE_COLOR: 2
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Prepare node
-        uses: ./.github/actions/prepare-node
+        uses: woocommerce/grow/prepare-node@actions-v1
+        with:
+          node-version-file: ".nvmrc"
 
       - name: Run JavaScript unit tests
         run: npm run test:js

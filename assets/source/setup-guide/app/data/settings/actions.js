@@ -8,7 +8,7 @@ import { apiFetch } from '@wordpress/data-controls';
  * Internal dependencies
  */
 import TYPES from './action-types';
-import { STORE_NAME, WC_ADMIN_NAMESPACE, OPTIONS_NAME } from './constants';
+import { STORE_NAME, API_ENDPOINT, OPTIONS_NAME } from './constants';
 import { REPORTS_STORE_NAME } from '../../../../catalog-sync/data';
 
 export function receiveSettings( settings ) {
@@ -59,7 +59,7 @@ export function* updateSettings( data, saveToDb = false ) {
 
 	try {
 		const results = yield apiFetch( {
-			path: WC_ADMIN_NAMESPACE + '/options',
+			path: API_ENDPOINT,
 			method: 'POST',
 			data: {
 				[ OPTIONS_NAME ]: settings,
