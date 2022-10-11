@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Automattic\WooCommerce\Pinterest\AdCredits;
+use Automattic\WooCommerce\Pinterest\API\UserInteraction;
 use Exception;
 use Throwable;
 /**
@@ -105,6 +105,7 @@ class PluginUpdate {
 		return array(
 			'domain_verification_migration',
 			'feed_generation_migration',
+			'ads_credits_integration',
 		);
 	}
 
@@ -276,10 +277,11 @@ class PluginUpdate {
 	 */
 	protected function ads_credits_integration(): void {
 		// TODO: What is the version where this will be integrated?
-		if ( ! $this->plugin_is_up_to_date() ) {
+		if ( ! $this->version_needs_update( 'x.x.x' ) ) {
 			return;
 		}
 
-		AdCredits::handle_redeem_credit();
+		// Set modals as dismissed and notice as not dismissed.
+		update_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . UserInteraction::ADS_MODAL_DISMISSED, true, false );
 	}
 }
