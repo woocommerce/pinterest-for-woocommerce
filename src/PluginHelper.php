@@ -83,7 +83,7 @@ trait PluginHelper {
 	 * Strip HTML tags from the given string.
 	 * This is intended to be used with the description field on the feed and the Rich Pins.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.3
 	 *
 	 * @param string $string           String with HTML tags.
 	 * @param bool   $apply_shortcodes Whether to apply shortcodes or not.
