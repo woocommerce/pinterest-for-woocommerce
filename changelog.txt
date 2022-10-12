@@ -1,15 +1,5 @@
 *** Pinterest for WooCommerce Changelog ***
 
-= 1.2.3 - 2022-10-11 =
-* Add - Warning message on potential conflicting tags.
-* Dev - Add branch-labels GH workflow.
-* Dev - Remove from PHP test matrix WP 5.6 and 5.7, add 5.9.
-* Fix - Clear connection options during disconnection error to allow new connection.
-* Fix - Display correct error if product sync is broken.
-* Fix - Issue with sale price on the feed.
-* Fix - Save Pin button available before finishing onboarding.
-* Fix - Strip HTML from the Rich Pins description field.
-
 = 1.2.2 - 2022-08-09 =
 * Dev - GH release config and the new PR template.
 * Fix - Error after domain verification.

@@ -24,8 +24,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class ProductsXmlFeed {
 
-	use PluginHelper;
-
 	/**
 	 * The default data structure of the Item to be printed in the XML feed.
 	 *
@@ -258,8 +256,19 @@ class ProductsXmlFeed {
 		 * @param WC_Product $product          WooCommerce product object.
 		 */
 		$apply_shortcodes = apply_filters( 'pinterest_for_woocommerce_product_description_apply_shortcodes', false, $product );
+		if ( $apply_shortcodes ) {
+			// Apply active shortcodes.
+			$description = do_shortcode( $description );
+		} else {
+			// Strip out active shortcodes.
+			$description = strip_shortcodes( $description );
+		}
 
-		$description = self::strip_tags_from_string( $description, $apply_shortcodes );
+		// Strip HTML tags from description.
+		$description = wp_strip_all_tags( $description );
+
+		// Strip [&hellip] character from description.
+		$description = str_replace( '[&hellip;]', '...', $description );
 
 		// Limit the number of characters in the description to 10000.
 		if ( strlen( $description ) > self::DESCRIPTION_SIZE_CHARS_LIMIT ) {
@@ -392,18 +401,11 @@ class ProductsXmlFeed {
 	private static function get_property_sale_price( $product, $property ) {
 
 		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_sale_price' ) ) {
-			$regular_price = $product->get_variation_regular_price( 'min', true );
-			$sale_price    = $product->get_variation_sale_price( 'min', true );
+			$regular_price = $product->get_variation_regular_price();
+			$sale_price    = $product->get_variation_sale_price();
 			$price         = $regular_price > $sale_price ? $sale_price : false;
 		} else {
-			$sale_price = $product->get_sale_price();
-
-			$price = $sale_price ? wc_get_price_to_display(
-				$product,
-				array(
-					'price' => $sale_price,
-				)
-			) : '';
+			$price = $product->get_sale_price();
 		}
 
 		if ( empty( $price ) ) {
@@ -564,12 +566,7 @@ class ProductsXmlFeed {
 		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
 			$price = $product->get_variation_regular_price( 'min', true );
 		} else {
-			$price = wc_get_price_to_display(
-				$product,
-				array(
-					'price' => $product->get_regular_price(),
-				)
-			);
+			$price = wc_get_price_to_display( $product );
 		}
 
 		return $price;

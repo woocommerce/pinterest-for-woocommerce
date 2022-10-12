@@ -79,33 +79,4 @@ trait PluginHelper {
 		return count( $page_parameters ) === count( array_intersect_assoc( $_GET, $page_parameters ) ); // phpcs:disable WordPress.Security.NonceVerification.Recommended
 	}
 
-	/**
-	 * Strip HTML tags from the given string.
-	 * This is intended to be used with the description field on the feed and the Rich Pins.
-	 *
-	 * @since 1.2.3
-	 *
-	 * @param string $string           String with HTML tags.
-	 * @param bool   $apply_shortcodes Whether to apply shortcodes or not.
-	 *
-	 * @return string
-	 */
-	protected static function strip_tags_from_string( $string, $apply_shortcodes = false ) {
-
-		if ( $apply_shortcodes ) {
-			// Apply active shortcodes.
-			$string = do_shortcode( $string );
-		} else {
-			// Strip out active shortcodes.
-			$string = strip_shortcodes( $string );
-		}
-
-		// Strip HTML tags from description.
-		$string = wp_strip_all_tags( $string );
-
-		// Strip [&hellip] character from description.
-		$string = str_replace( '[&hellip;]', '...', $string );
-
-		return $string;
-	}
 }
