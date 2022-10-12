@@ -14,6 +14,7 @@ use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\Utilities\Tracks;
+use Automattic\WooCommerce\Pinterest\API\UserInteraction;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -713,6 +714,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Flush the whole data option.
 			delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+			UserInteraction::flush_options();
 
 			// Remove settings that may cause issues if stale on disconnect.
 			self::save_setting( 'account_data', null );
