@@ -13,6 +13,7 @@ use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
+use Automattic\WooCommerce\Pinterest\API\UserInteraction;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -710,6 +711,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Flush the whole data option.
 			delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+			UserInteraction::flush_options();
 
 			// Remove settings that may cause issues if stale on disconnect.
 			self::save_setting( 'account_data', null );
@@ -932,11 +934,24 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				'error_id'      => $error_code,
 				'error_message' => $error_message,
 			);
+
 			$account_data['coupon_redeem_info'] = $redeem_information;
 
+			self::save_setting( 'account_data', $account_data );
+		}
+
+		/**
+		 * Add available credits information to the account data option.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public static function add_available_credits_info_to_account_data() {
+			$account_data = self::get_setting( 'account_data' );
+
 			// Check for available discounts.
-			$available_discounts                 = AdCredits::process_available_discounts();
-			$account_data['available_discounts'] = $available_discounts;
+			$account_data['available_discounts'] = AdCredits::process_available_discounts();
 
 			self::save_setting( 'account_data', $account_data );
 		}

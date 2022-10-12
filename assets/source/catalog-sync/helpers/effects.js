@@ -28,3 +28,10 @@ export const useDismissAdsNoticeDispatch = () => {
 	const { adsNoticeDismissed } = useDispatch( USER_INTERACTION_STORE_NAME );
 	return () => adsNoticeDismissed();
 };
+
+export const useResetUserInteractions = () => {
+	const { invalidateResolutionForStore } = useDispatch(
+		USER_INTERACTION_STORE_NAME
+	);
+	return () => invalidateResolutionForStore();
+};

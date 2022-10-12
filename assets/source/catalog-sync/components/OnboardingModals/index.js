@@ -25,7 +25,7 @@ const OnboardingModals = ( { onCloseModal } ) => {
 	}
 
 	// Ads campaign modal no error.
-	if ( couponRedeemInfo?.error_code === false ) {
+	if ( ! couponRedeemInfo?.error_code ) {
 		return <OnboardingAdsModal onCloseModal={ onCloseModal } />;
 	}
 
