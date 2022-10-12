@@ -9,7 +9,6 @@
 namespace Automattic\WooCommerce\Pinterest;
 
 use Automattic\WooCommerce\Pinterest\API\Base;
-use Automattic\WooCommerce\Pinterest\Utilities\Tracks;
 use Exception;
 use Pinterest_For_Woocommerce_Ads_Supported_Countries;
 use Throwable;
@@ -22,8 +21,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Handling ad credits.
  */
 class AdCredits {
-
-	use Tracks;
 
 	const ADS_CREDIT_CAMPAIGN_TRANSIENT = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-ads-credit-campaign-transient';
 	const ADS_CREDIT_CAMPAIGN_OPTION    = 'ads_campaign_is_active';
@@ -120,16 +117,6 @@ class AdCredits {
 
 				return false;
 			}
-
-			/*
-			 * Track the redeemed offer code.
-			 */
-			self::record_event(
-				'pfw_ads_redeem_offer_code',
-				array(
-					'offer_code' => $offer_code,
-				),
-			);
 
 			return true;
 
