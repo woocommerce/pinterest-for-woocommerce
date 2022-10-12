@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 5.9
 Requires PHP: 7.3
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -86,6 +86,16 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.3 - 2022-10-11 =
+* Add - Warning message on potential conflicting tags.
+* Dev - Add branch-labels GH workflow.
+* Dev - Remove from PHP test matrix WP 5.6 and 5.7, add 5.9.
+* Fix - Clear connection options during disconnection error to allow new connection.
+* Fix - Display correct error if product sync is broken.
+* Fix - Issue with sale price on the feed.
+* Fix - Save Pin button available before finishing onboarding.
+* Fix - Strip HTML from the Rich Pins description field.
 
 = 1.2.2 - 2022-08-09 =
 * Dev - GH release config and the new PR template.
