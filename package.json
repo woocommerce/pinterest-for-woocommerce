@@ -2,7 +2,7 @@
   "name": "pinterest-for-woocommerce",
   "title": "Pinterest for WooCommerce",
   "description": "Pinterest for WooCommerce",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "main": "gulpfile.js",
   "repository": {
     "type": "git",

@@ -603,7 +603,7 @@ JS;
 	/**
 	 * Get the formatted warning message for the potential conflicting tags.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.3
 	 *
 	 * @return string The warning message.
 	 */
@@ -630,7 +630,7 @@ JS;
 	/**
 	 * Detect if there are other tags installed on the site.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.3
 	 *
 	 * @return array The list of installed tags.
 	 */
