@@ -87,6 +87,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.4 - 2022-10-13 =
+* Tweak - WC 7.0 compatibility.
+
 = 1.2.3 - 2022-10-11 =
 * Add - Warning message on potential conflicting tags.
 * Dev - Add branch-labels GH workflow.
