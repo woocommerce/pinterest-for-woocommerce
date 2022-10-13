@@ -250,8 +250,8 @@ class AdCredits {
 
 		if ( array_key_exists( self::ADS_CREDIT_MARKETING_OFFER, $discounts ) ) {
 			// We only look at the first available field. For now we have no plans to handle more fields.
-			$discount_information     = (array) reset( $discounts[ self::ADS_CREDIT_MARKETING_OFFER ] );
-			$remaining_discount_value = ( (float) $discount_information['remaining_discount_in_micro_currency'] ) / 1000000;
+			$discount_information               = (array) reset( $discounts[ self::ADS_CREDIT_MARKETING_OFFER ] );
+			$remaining_discount_value           = ( (float) $discount_information['remaining_discount_in_micro_currency'] ) / 1000000;
 			$found_discounts['marketing_offer'] = array(
 				'remaining_discount' => wc_price( $remaining_discount_value ),
 			);

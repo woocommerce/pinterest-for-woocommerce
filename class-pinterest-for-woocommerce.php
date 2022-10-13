@@ -13,6 +13,7 @@ use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
+use Automattic\WooCommerce\Pinterest\Utilities\Tracks;
 use Automattic\WooCommerce\Pinterest\API\UserInteraction;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
@@ -21,6 +22,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 	 * Base Plugin class holding generic functionality
 	 */
 	final class Pinterest_For_Woocommerce {
+
+		use Tracks;
 
 		/**
 		 * Tos IDs and URLs per country.
@@ -933,6 +936,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				'id'            => $account_data['id'],
 				'error_id'      => $error_code,
 				'error_message' => $error_message,
+			);
+
+			/*
+			 * Track the redeemed offer code.
+			 */
+			self::record_event(
+				'pfw_ads_redeem_credits',
+				array(
+					'redeem_status' => $redeem_information['redeem_status'],
+					'offer_code'    => $redeem_information['offer_code'],
+					'error_id'      => $redeem_information['error_id'],
+				)
 			);
 
 			$account_data['coupon_redeem_info'] = $redeem_information;
