@@ -943,7 +943,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			 */
 			self::record_event(
 				'pfw_ads_redeem_credits',
-				$redeem_information,
+				array(
+					'redeem_status' => $redeem_information['redeem_status'],
+					'offer_code'    => $redeem_information['offer_code'],
+					'error_id'      => $redeem_information['error_id'],
+				)
 			);
 
 			$account_data['coupon_redeem_info'] = $redeem_information;
