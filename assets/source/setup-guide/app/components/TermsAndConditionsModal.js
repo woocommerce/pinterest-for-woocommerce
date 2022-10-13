@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Link } from '@woocommerce/components';
 import { createInterpolateElement } from '@wordpress/element';
 import {
 	Modal,
@@ -64,7 +63,8 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 				),
 				{
 					link: (
-						<Link
+						// eslint-disable-next-line jsx-a11y/anchor-has-content -- context passed via documentationLinkProps
+						<a
 							{ ...documentationLinkProps( {
 								href: tosHref,
 								linkId: 'terms-of-service',
@@ -81,7 +81,8 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 				),
 				{
 					link: (
-						<Link
+						// eslint-disable-next-line jsx-a11y/anchor-has-content -- context passed via documentationLinkProps
+						<a
 							{ ...documentationLinkProps( {
 								href: privacyPolicyHref,
 								linkId: 'privacy-policy',
@@ -98,7 +99,8 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 				),
 				{
 					link: (
-						<Link
+						// eslint-disable-next-line jsx-a11y/anchor-has-content -- context passed via documentationLinkProps
+						<a
 							{ ...documentationLinkProps( {
 								href: advertisingServicesAgreementHref,
 								linkId: 'advertising-services-agreement',
