@@ -672,7 +672,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					} catch ( \Exception $th ) {
 
 						Pinterest\Logger::log( esc_html__( 'There was an error disconnecting the Advertiser.', 'pinterest-for-woocommerce' ) );
-
+						self::flush_options();
 						throw new \Exception( esc_html__( 'There was an error disconnecting the Advertiser. Please try again.', 'pinterest-for-woocommerce' ), 400 );
 					}
 				}
@@ -1031,12 +1031,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return array
 		 */
 		public static function update_linked_businesses() {
-			if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
-				return array();
-			}
 
-			$account_data       = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
-			$fetched_businesses = ( ! empty( $account_data ) && ! $account_data['is_partner'] ) ? Pinterest\API\Base::get_linked_businesses() : array();
+			$account_data            = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+			$fetch_linked_businesses =
+				! empty( $account_data ) &&
+				array_key_exists( 'is_partner', $account_data ) &&
+				! $account_data['is_partner'];
+
+			$fetched_businesses = $fetch_linked_businesses ? Pinterest\API\Base::get_linked_businesses() : array();
 
 			if ( ! empty( $fetched_businesses ) && 'success' === $fetched_businesses['status'] ) {
 				$linked_businesses = $fetched_businesses['data'];
