@@ -46,6 +46,11 @@ class AdCredits {
 	 */
 	public static function handle_redeem_credit() {
 
+		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
+			// Advertiser not connected redeem operation makes no sense.
+			return true;
+		}
+
 		Pinterest_For_Woocommerce()::add_available_credits_info_to_account_data();
 
 		if ( ! Pinterest_For_Woocommerce()::get_billing_setup_info_from_account_data() ) {
