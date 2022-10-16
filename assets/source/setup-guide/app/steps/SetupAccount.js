@@ -12,28 +12,18 @@ import {
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { recordEvent } from '@woocommerce/tracks';
-import {
-	Button,
-	Card,
-	CardFooter,
-	CardDivider,
-	Flex,
-	FlexBlock,
-	Icon,
-	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
-} from '@wordpress/components';
+import { Button, Card, CardFooter, CardDivider } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import AdsCreditsTermsAndConditionsModal from '../components/TermsAndConditionsModal';
+import AdsCreditsPromo from './components/AdsCreditsPromo';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import AccountConnection from '../components/Account/Connection';
 import BusinessAccountSelection from '../components/Account/BusinessAccountSelection';
 import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
 import documentationLinkProps from '../helpers/documentation-link-props';
-import GiftIcon from '../components/GiftIcon';
 
 /**
  * Clicking on "… create a new Pinterest account" button.
@@ -77,27 +67,6 @@ const SetupAccount = ( {
 	const [ businessAccounts, setBusinessAccounts ] = useState(
 		wcSettings.pinterest_for_woocommerce.businessAccounts
 	);
-
-	const [
-		isTermsAndConditionsModalOpen,
-		setIsTermsAndConditionsModalOpen,
-	] = useState( false );
-
-	const openTermsAndConditionsModal = () => {
-		setIsTermsAndConditionsModalOpen( true );
-		recordEvent( 'pfw_modal_open', {
-			context: 'wizard',
-			name: 'ads-credits-terms-and-conditions',
-		} );
-	};
-
-	const closeTermsAndConditionsModal = () => {
-		setIsTermsAndConditionsModalOpen( false );
-		recordEvent( 'pfw_modal_closed', {
-			context: 'wizard',
-			name: 'ads-credits-terms-and-conditions',
-		} );
-	};
 
 	useEffect( () => {
 		if ( undefined !== businessAccounts && businessAccounts.length > 0 ) {
@@ -200,47 +169,7 @@ const SetupAccount = ( {
 							}
 						) }
 					/>
-					{ view === 'wizard' &&
-						appSettings?.ads_campaign_is_active && (
-							<>
-								<CardDivider
-									className={
-										'woocommerce-setup-guide__ad-credits__divider'
-									}
-								/>
-								<Flex
-									className={
-										'woocommerce-setup-guide__ad-credits'
-									}
-								>
-									<FlexBlock className="image-block">
-										<Icon icon={ GiftIcon } />
-									</FlexBlock>
-									<FlexBlock className="content-block">
-										<Text variant="body">
-											{ createInterpolateElement(
-												__(
-													'As a new Pinterest customer, you can get $125 in free ad credits when you successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Terms and conditions</a> apply.',
-													'pinterest-for-woocommerce'
-												),
-												{
-													a: (
-														// Disabling no-content rule - content is interpolated from above string
-														// eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/anchor-has-content
-														<a
-															href={ '#' }
-															onClick={
-																openTermsAndConditionsModal
-															}
-														/>
-													),
-												}
-											) }
-										</Text>
-									</FlexBlock>
-								</Flex>
-							</>
-						) }
+					{ view === 'wizard' && <AdsCreditsPromo /> }
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
@@ -324,11 +253,6 @@ const SetupAccount = ( {
 					) }
 				</div>
 			</div>
-			{ isTermsAndConditionsModalOpen && (
-				<AdsCreditsTermsAndConditionsModal
-					onModalClose={ closeTermsAndConditionsModal }
-				/>
-			) }
 		</div>
 	);
 };

@@ -22,6 +22,7 @@ import {
 /**
  * Internal dependencies
  */
+import AdsCreditsPromo from './components/AdsCreditsPromo';
 import { PROCESS_STATUS as STATUS, LABEL_STATUS } from '../constants';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
@@ -203,6 +204,7 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 							context: view,
 						} ) }
 					/>
+					{ view === 'wizard' && <AdsCreditsPromo /> }
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
