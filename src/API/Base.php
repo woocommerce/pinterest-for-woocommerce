@@ -639,6 +639,13 @@ class Base {
 	 * @return mixed
 	 */
 	public static function get_available_discounts( $advertiser_id ) {
-		return self::make_request( "advertisers/{$advertiser_id}/discounts", 'GET', array(), 'ads' );
+		return self::make_request(
+			"advertisers/{$advertiser_id}/discounts",
+			'GET',
+			array(
+				'active' => true,
+			),
+			'ads'
+		);
 	}
 }
