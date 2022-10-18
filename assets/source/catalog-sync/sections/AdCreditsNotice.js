@@ -70,6 +70,7 @@ const AdCreditsNotice = () => {
 				isDismissible={ true }
 				onRemove={ closeAdCreditsNotice }
 				className="pinterest-for-woocommerce-catalog-sync__ad-credits"
+				status="success"
 			>
 				<Icon
 					icon={ GiftIcon }
