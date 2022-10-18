@@ -76,3 +76,25 @@ export function* adsNoticeDismissed() {
 		return { success: results.ads_notice_dismissed };
 	} catch ( error ) {}
 }
+
+export function setBillingSetupFlowEntered() {
+	return {
+		type: TYPES.SET_BILLING_SETUP_FLOW_ENTERED,
+	};
+}
+
+export function* billingSetupFlowEntered() {
+	yield setBillingSetupFlowEntered();
+
+	try {
+		const results = yield apiFetch( {
+			path: API_ROUTE,
+			method: 'POST',
+			data: {
+				billing_setup_flow_entered: true,
+			},
+		} );
+
+		return { success: results.billing_setup_flow_entered };
+	} catch ( error ) {}
+}

@@ -29,6 +29,11 @@ export const useDismissAdsNoticeDispatch = () => {
 	return () => adsNoticeDismissed();
 };
 
+export const useBillingSetupFlowEntered = () => {
+	const { billingSetupFlowEntered } = useDispatch( USER_INTERACTION_STORE_NAME );
+	return () => billingSetupFlowEntered();
+};
+
 export const useResetUserInteractions = () => {
 	const { invalidateResolutionForStore } = useDispatch(
 		USER_INTERACTION_STORE_NAME

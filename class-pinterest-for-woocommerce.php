@@ -268,6 +268,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Verify that the ads_campaign is active or not.
 			add_action( 'admin_init', array( Pinterest\AdCredits::class, 'check_if_ads_campaign_is_active' ) );
 
+			// Maybe check billing setup.
+			add_action( 'admin_init', array( $this, 'maybe_check_billing_setup' ) );
+
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 
@@ -890,12 +893,26 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since x.x.x
 		 *
-		 * @return void
+		 * @return bool Wether billing is set up or not.
 		 */
 		public static function add_billing_setup_info_to_account_data() {
 			$account_data                     = self::get_setting( 'account_data' );
 			$account_data['is_billing_setup'] = Billing::has_billing_set_up();
 			self::save_setting( 'account_data', $account_data );
+
+			return $account_data['is_billing_setup'];
+		}
+
+		/**
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public static function maybe_check_billing_setup() {
+			if ( Billing::should_check_billing_setup_often() ) {
+				self::add_billing_setup_info_to_account_data();
+			}
 		}
 
 		/**
