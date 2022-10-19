@@ -19,7 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Billing {
 
-	const CHECK_BILLING_SETUP_OFTEN = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-check-billing-transient'; 
+	const CHECK_BILLING_SETUP_OFTEN         = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-check-billing-transient';
+	const CHECK_BILLING_SETUP_ONCE_PER_HOUR = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-check-billing-once-per-hour-transient';
 	/**
 	 * Initialize Billing actions and Action Scheduler hooks.
 	 *
@@ -55,11 +56,27 @@ class Billing {
 		/*
 		 * Check if we have verified a correct billing setup.
 		 */
-		$account_data = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
-		if ( is_array( $account_data ) && $account_data['is_billing_setup'] ?? false ) {
+		$account_data       = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+		$has_billing_setup  = is_array( $account_data ) && $account_data['is_billing_setup'] ?? false;
+		$should_check_often = false !== get_transient( self::CHECK_BILLING_SETUP_OFTEN );
+		if ( $has_billing_setup && $should_check_often ) {
+			/*
+			 * We are just after initial setup or billing button click and billing setup is correct.
+			 * Assume that the user has just crated the setup and we have caught it. We don't need to check for now.
+			 */
 			return false;
 		}
-		return (bool) get_transient( self::CHECK_BILLING_SETUP_OFTEN );
+
+		if ( $should_check_often ) {
+			return true;
+		}
+
+		if ( false !== get_transient( self::CHECK_BILLING_SETUP_ONCE_PER_HOUR ) ) {
+			// Last check was less then hour ago. Skip this one.
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -84,6 +101,17 @@ class Billing {
 	 */
 	public static function do_not_check_billing_setup_often() {
 		delete_transient( self::CHECK_BILLING_SETUP_OFTEN );
+	}
+
+	/**
+	 * Mark setup as checked. This will delay next setup for an hour.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	public static function mark_billing_setup_checked() {
+		set_transient( self::CHECK_BILLING_SETUP_ONCE_PER_HOUR, true, HOUR_IN_SECONDS );
 	}
 
 	/**

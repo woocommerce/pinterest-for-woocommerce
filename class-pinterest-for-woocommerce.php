@@ -899,7 +899,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$account_data                     = self::get_setting( 'account_data' );
 			$account_data['is_billing_setup'] = Billing::has_billing_set_up();
 			self::save_setting( 'account_data', $account_data );
-
+			Billing::mark_billing_setup_checked();
 			return $account_data['is_billing_setup'];
 		}
 
