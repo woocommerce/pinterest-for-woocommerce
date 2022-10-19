@@ -30,7 +30,9 @@ export const useDismissAdsNoticeDispatch = () => {
 };
 
 export const useBillingSetupFlowEntered = () => {
-	const { billingSetupFlowEntered } = useDispatch( USER_INTERACTION_STORE_NAME );
+	const { billingSetupFlowEntered } = useDispatch(
+		USER_INTERACTION_STORE_NAME
+	);
 	return () => billingSetupFlowEntered();
 };
 
