@@ -8,6 +8,7 @@ const userInteractionsReducer = (
 		userInteractions: {
 			adsModalDismissed: false,
 			adsNoticeDismissed: false,
+			billingSetupFlowEntered: false,
 		},
 		isRequesting: false,
 		interactionsLoaded: false,
@@ -44,6 +45,15 @@ const userInteractionsReducer = (
 				userInteractions: {
 					...state.userInteractions,
 					adsNoticeDismissed: action.noticeDismissed,
+				},
+			};
+			break;
+		case TYPES.SET_BILLING_SETUP_FLOW_ENTERED:
+			state = {
+				...state,
+				userInteractions: {
+					...state.userInteractions,
+					billingSetupFlowEntered: true,
 				},
 			};
 			break;

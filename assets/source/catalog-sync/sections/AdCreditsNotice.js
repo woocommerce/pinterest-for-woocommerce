@@ -20,7 +20,10 @@ import {
  */
 import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
 import GiftIcon from '../../setup-guide/app/components/GiftIcon';
-import { useDismissAdsNoticeDispatch } from '../helpers/effects';
+import {
+	useBillingSetupFlowEntered,
+	useDismissAdsNoticeDispatch,
+} from '../helpers/effects';
 
 /**
  * Closing the Ad Credits notice.
@@ -63,6 +66,8 @@ const AdCreditsNotice = () => {
 		} catch ( error ) {}
 	}, [ setDismissAdsNotice ] );
 
+	const billingSetupFlowEntered = useBillingSetupFlowEntered();
+
 	return (
 		isNoticeDisplayed &&
 		! hasAvailableCredits && (
@@ -70,6 +75,7 @@ const AdCreditsNotice = () => {
 				isDismissible={ true }
 				onRemove={ closeAdCreditsNotice }
 				className="pinterest-for-woocommerce-catalog-sync__ad-credits"
+				status="success"
 			>
 				<Icon
 					icon={ GiftIcon }
@@ -96,6 +102,7 @@ const AdCreditsNotice = () => {
 											recordEvent(
 												'wcadmin_pfw_ads_credits_success_notice'
 											);
+											billingSetupFlowEntered();
 										} }
 									/>
 								) : (

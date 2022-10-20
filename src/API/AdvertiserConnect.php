@@ -8,8 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
-use Automattic\WooCommerce\Internal\Utilities\Users;
 use Automattic\WooCommerce\Pinterest\AdCredits;
+use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
 use \WP_REST_Server;
 use \WP_REST_Request;
@@ -103,7 +103,14 @@ class AdvertiserConnect extends VendorAPI {
 		Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', true );
 
 		// At this stage we can check if the connected advertiser has billing setup.
-		Pinterest_For_Woocommerce()::add_billing_setup_info_to_account_data();
+		$has_billing = Pinterest_For_Woocommerce()::add_billing_setup_info_to_account_data();
+
+		/*
+		 * If the advertiser does not have a correct billing lets check for the setup frequently for the next hour.
+		 */
+		if ( ! $has_billing ) {
+			Billing::check_billing_setup_often();
+		}
 
 		// Try to claim coupons if they are available for the merchant.
 		AdCredits::handle_redeem_credit();
@@ -145,7 +152,12 @@ class AdvertiserConnect extends VendorAPI {
 			Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', false );
 
 			// Advertiser disconnected, clear the billing status information in the account data.
-			Pinterest_For_Woocommerce()::add_billing_setup_info_to_account_data();
+			$account_data                        = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+			$account_data['is_billing_setup']    = null;
+			$account_data['coupon_redeem_info']  = null;
+			$account_data['available_discounts'] = null;
+			Pinterest_For_Woocommerce()::save_setting( 'account_data', $account_data );
+
 		} catch ( \Exception $e ) {
 
 			throw new \Exception( esc_html__( 'The advertiser could not be disconnected from Pinterest.', 'pinterest-for-woocommerce' ), 400 );

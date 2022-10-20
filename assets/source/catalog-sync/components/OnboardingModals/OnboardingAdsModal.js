@@ -14,6 +14,7 @@ import {
  * Internal dependencies
  */
 import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
+import { useBillingSetupFlowEntered } from '../../helpers/effects';
 
 const OnboardingModalText = ( { isBillingSetup } ) => {
 	if ( ! isBillingSetup ) {
@@ -60,6 +61,12 @@ const OnboardingModalText = ( { isBillingSetup } ) => {
 const OnboardingAdsModal = ( { onCloseModal } ) => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
+	const billingSetupFlowEntered = useBillingSetupFlowEntered();
+
+	const onClickBilling = () => {
+		onCloseModal();
+		billingSetupFlowEntered();
+	};
 
 	return (
 		<Modal
@@ -114,7 +121,7 @@ const OnboardingAdsModal = ( { onCloseModal } ) => {
 									isPrimary
 									href={ `https://ads.pinterest.com/advertiser/${ appSettings.tracking_advertiser }/billing/` }
 									target="_blank"
-									onClick={ onCloseModal }
+									onClick={ onClickBilling }
 								>
 									{ __(
 										'Add billing details',
