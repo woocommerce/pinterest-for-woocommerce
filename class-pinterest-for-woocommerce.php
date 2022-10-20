@@ -280,6 +280,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Init marketing notifications.
 			add_action( Heartbeat::DAILY, array( $this, 'init_marketing_notifications' ) );
 
+			// Check available coupons and credits.
+			add_action( Heartbeat::HOURLY, array( $this, 'check_available_coupons_and_credits' ) );
+
 		}
 
 
@@ -979,10 +982,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function add_available_credits_info_to_account_data() {
 			$account_data = self::get_setting( 'account_data' );
 
-			// Check for available discounts.
-			$account_data['available_discounts'] = AdCredits::process_available_discounts();
-
-			self::save_setting( 'account_data', $account_data );
+			try {
+				// Check for available discounts.
+				$account_data['available_discounts'] = AdCredits::process_available_discounts();
+				self::save_setting( 'account_data', $account_data );
+			} catch ( Exception $e ) {
+				return;
+			}
 		}
 
 		/**
@@ -1120,6 +1126,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 		}
 
+		/**
+		 * Trigger coupons check.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public function check_available_coupons_and_credits() {
+			Pinterest_For_Woocommerce()::add_available_credits_info_to_account_data();
+		}
 
 		/**
 		 * Checks if setup is completed and all requirements are set.

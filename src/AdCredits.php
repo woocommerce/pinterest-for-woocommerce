@@ -248,15 +248,26 @@ class AdCredits {
 
 		$discounts = (array) $result['data'];
 
+		$coupon = AdCreditsCoupons::get_coupon_for_merchant();
+
 		$found_discounts = array();
 		if ( array_key_exists( self::ADS_CREDIT_FUTURE_DISCOUNT, $discounts ) ) {
-			$found_discounts['future_discount'] = true;
+			foreach ( $discounts[ self::ADS_CREDIT_FUTURE_DISCOUNT ] as $future_discount ) {
+				$discount_information = (array) $future_discount;
+				if ( $discount_information['offer_code'] === $coupon ) {
+					$found_discounts['future_discount'] = true;
+				}
+			}
 		}
 
+		$remaining_discount_value = 0;
 		if ( array_key_exists( self::ADS_CREDIT_MARKETING_OFFER, $discounts ) ) {
-			// We only look at the first available field. For now we have no plans to handle more fields.
-			$discount_information               = (array) reset( $discounts[ self::ADS_CREDIT_MARKETING_OFFER ] );
-			$remaining_discount_value           = ( (float) $discount_information['remaining_discount_in_micro_currency'] ) / 1000000;
+			// Sum all of the available coupons values.
+			foreach ( $discounts[ self::ADS_CREDIT_MARKETING_OFFER ] as $discount ) {
+				$discount_information      = (array) $discount;
+				$remaining_discount_value += ( (float) $discount_information['remaining_discount_in_micro_currency'] ) / 1000000;
+			}
+
 			$found_discounts['marketing_offer'] = array(
 				'remaining_discount' => wc_price( $remaining_discount_value ),
 			);
