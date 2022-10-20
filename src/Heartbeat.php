@@ -25,7 +25,8 @@ class Heartbeat {
 	/**
 	 * Hook name for daily heartbeat.
 	 */
-	const DAILY = 'pinterest_for_woocommerce_daily_heartbeat';
+	const DAILY  = 'pinterest_for_woocommerce_daily_heartbeat';
+	const HOURLY = 'pinterest_for_woocommerce_hourly_heartbeat';
 
 	/**
 	 * WooCommerce Queue Interface.
@@ -59,6 +60,10 @@ class Heartbeat {
 	public function schedule_events() {
 		if ( null === $this->queue->get_next( self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			$this->queue->schedule_recurring( time(), DAY_IN_SECONDS, self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		}
+
+		if ( null === $this->queue->get_next( self::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+			$this->queue->schedule_recurring( time(), HOUR_IN_SECONDS, self::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 	}
 
