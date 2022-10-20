@@ -58,12 +58,12 @@ class Heartbeat {
 	 * @since 1.1.0
 	 */
 	public function schedule_events() {
-		if ( null === $this->queue->get_next( self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			$this->queue->schedule_recurring( time(), DAY_IN_SECONDS, self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		if ( ! as_has_scheduled_action( self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+			as_schedule_recurring_action( time(), DAY_IN_SECONDS, self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 
-		if ( null === $this->queue->get_next( self::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			$this->queue->schedule_recurring( time(), HOUR_IN_SECONDS, self::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		if ( ! as_has_scheduled_action( self::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+			as_schedule_recurring_action( time(), HOUR_IN_SECONDS, self::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 	}
 
