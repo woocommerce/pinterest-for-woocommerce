@@ -110,7 +110,7 @@ class Merchants {
 		$advertiser = reset( $advertisers['data'] ); // All advertisers assigned to a user share the same merchant_id.
 
 		if ( empty( $advertiser->merchant_id ) ) {
-			throw new Exception( __( 'No merchant returned in the advertiser\'s response.', 'pinterest-for-woocommerce' ), 404 );
+			throw new Exception( __( "No merchant returned in the advertiser's response.", 'pinterest-for-woocommerce' ), 404 );
 		}
 
 		return $advertiser->merchant_id;
