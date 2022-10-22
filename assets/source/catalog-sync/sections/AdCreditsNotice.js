@@ -49,9 +49,6 @@ const AdCreditsNotice = () => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
 	const trackingAdvertiser = appSettings?.tracking_advertiser;
-	const hasAvailableCredits =
-		appSettings?.account_data?.available_discounts?.marketing_offer
-			?.remaining_discount;
 
 	const closeAdCreditsNotice = () => {
 		setIsNoticeDisplayed( false );
@@ -69,8 +66,7 @@ const AdCreditsNotice = () => {
 	const billingSetupFlowEntered = useBillingSetupFlowEntered();
 
 	return (
-		isNoticeDisplayed &&
-		! hasAvailableCredits && (
+		isNoticeDisplayed && (
 			<Notice
 				isDismissible={ true }
 				onRemove={ closeAdCreditsNotice }

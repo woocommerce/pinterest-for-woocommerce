@@ -150,7 +150,7 @@ class AdCredits {
 
 		// If transient is available then it means that we have already checked.
 		if ( false !== $is_campaign_active ) {
-			return;
+			return wc_string_to_bool( $is_campaign_active );
 		}
 
 		$request_error = false;
