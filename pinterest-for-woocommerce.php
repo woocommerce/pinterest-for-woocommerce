@@ -46,6 +46,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE', __FILE__ );
 define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', '1.2.4' ); // WRCS: DEFINED_VERSION.
 
+// HPOS compatibility declaration.
+add_action(
+	'before_woocommerce_init',
+	function() {
+		if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', 'pinterest-for-woocommerce/pinterest-for-woocommerce.php', true );
+		}
+	}
+);
+
 /**
  * Autoload packages.
  *
