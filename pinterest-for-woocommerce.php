@@ -38,9 +38,11 @@
  * - `phpcs.xml`
  */
 
+use Automattic\WooCommerce\Utilities\FeaturesUtil;
+
 // If this file is called directly, abort.
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+	exit;
 }
 
 define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE', __FILE__ );
@@ -50,8 +52,8 @@ define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', '1.2.4' ); // WRCS: DEFINED_VERSION
 add_action(
 	'before_woocommerce_init',
 	function() {
-		if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
-			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', 'pinterest-for-woocommerce/pinterest-for-woocommerce.php', true );
+		if ( class_exists( FeaturesUtil::class ) ) {
+			FeaturesUtil::declare_compatibility( 'custom_order_tables', plugin_basename( __FILE__ ) );
 		}
 	}
 );
