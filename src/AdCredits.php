@@ -196,7 +196,6 @@ class AdCredits {
 	 * @return bool Wether the campaign is active or not.
 	 */
 	private static function get_is_campaign_active_from_recommendations() {
-		return true;
 		$request         = wp_remote_get( 'https://woocommerce.com/wp-json/wccom/marketing-tab/1.2/recommendations.json' );
 		$recommendations = array();
 
