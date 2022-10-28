@@ -24,6 +24,7 @@ import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
  */
 const OnboardingErrorModal = ( { onCloseModal } ) => {
 	const ALREADY_REDEEMED_ERROR = 2322;
+	const DIFFERENT_ADVERTISER_ALREADY_REDEEMED_ERROR = 2318;
 	const OFFER_EXPIRED_ERROR = 2319;
 	const NOT_AVAILABLE_IN_COUNTRY_OR_CURRENCY_ERROR = 2327;
 	const WRONG_BILLING_PROFILE_ERROR = 2006;
@@ -32,10 +33,18 @@ const OnboardingErrorModal = ( { onCloseModal } ) => {
 		?.coupon_redeem_info;
 
 	let errorMessageText = '';
-	switch ( couponRedeemInfo?.error_code ) {
+	switch ( couponRedeemInfo?.error_id ) {
 		case ALREADY_REDEEMED_ERROR:
 			errorMessageText = __(
-				'Advertiser already has a redeemed offer',
+				'Advertiser already has a redeemed offer.',
+				'pinterest-for-woocommerce'
+			);
+
+			break;
+
+		case DIFFERENT_ADVERTISER_ALREADY_REDEEMED_ERROR:
+			errorMessageText = __(
+				'The merchant already redeemed the offer on another advertiser.',
 				'pinterest-for-woocommerce'
 			);
 
