@@ -34,7 +34,7 @@ class AdCredits {
 	 * @since x.x.x
 	 */
 	public static function schedule_event() {
-		add_action( Heartbeat::DAILY, array( static::class, 'handle_redeem_credit' ), 20 );
+		add_action( Heartbeat::HOURLY, array( static::class, 'handle_redeem_credit' ), 20 );
 	}
 
 	/**
@@ -113,7 +113,11 @@ class AdCredits {
 				return false;
 			}
 
-			$offer_code_credits_data = $redeem_credits_data[ $offer_code ];
+			$offer_code_credits_data = reset( $redeem_credits_data );
+
+			if ( false === $offer_code_credits_data ) {
+				return false;
+			}
 
 			if ( ! $offer_code_credits_data->success ) {
 				Logger::log( $offer_code_credits_data->failure_reason, 'error' );
@@ -192,7 +196,7 @@ class AdCredits {
 	 * @return bool Wether the campaign is active or not.
 	 */
 	private static function get_is_campaign_active_from_recommendations() {
-
+		return true;
 		$request         = wp_remote_get( 'https://woocommerce.com/wp-json/wccom/marketing-tab/1.2/recommendations.json' );
 		$recommendations = array();
 
