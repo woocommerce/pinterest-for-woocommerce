@@ -105,15 +105,13 @@ class AdCredits {
 				return false;
 			}
 
-			$redeem_credits_data = (array) $result['data'];
-
-			if ( ! isset( $redeem_credits_data[ $offer_code ] ) ) {
+			$redeem_credits_data     = (array) $result['data'];
+			$offer_code_credits_data = reset( $redeem_credits_data );
+			if ( false === $offer_code_credits_data ) {
 				// No data for the requested offer code.
 				Logger::log( __( 'There is no available data for the requested offer code.', 'pinterest-for-woocommerce' ) );
 				return false;
 			}
-
-			$offer_code_credits_data = $redeem_credits_data[ $offer_code ];
 
 			if ( ! $offer_code_credits_data->success ) {
 				Logger::log( $offer_code_credits_data->failure_reason, 'error' );

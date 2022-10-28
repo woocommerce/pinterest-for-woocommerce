@@ -33,7 +33,7 @@ const OnboardingErrorModal = ( { onCloseModal } ) => {
 		?.coupon_redeem_info;
 
 	let errorMessageText = '';
-	switch ( couponRedeemInfo?.error_code ) {
+	switch ( couponRedeemInfo?.error_id ) {
 		case ALREADY_REDEEMED_ERROR:
 			errorMessageText = __(
 				'Advertiser already has a redeemed offer.',
