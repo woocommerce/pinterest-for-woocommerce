@@ -910,8 +910,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return void
 		 */
 		public static function maybe_check_billing_setup() {
+			$account_data          = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+			$has_billing_setup_old = is_array( $account_data ) && $account_data['is_billing_setup'] ?? false;
 			if ( Billing::should_check_billing_setup_often() ) {
-				self::add_billing_setup_info_to_account_data();
+				$has_billing_setup_new = self::add_billing_setup_info_to_account_data();
+				// Detect change in billing setup to true and try to redeem.
+				if ( $has_billing_setup_new && ! $has_billing_setup_old ) {
+					AdCredits::handle_redeem_credit();
+				}
 			}
 		}
 
