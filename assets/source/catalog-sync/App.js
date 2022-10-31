@@ -46,6 +46,9 @@ import { useSettingsSelect } from '../setup-guide/app/helpers/effects';
 const CatalogSyncApp = () => {
 	const adsCampaignIsActive = useSettingsSelect()?.ads_campaign_is_active;
 
+	const couponRedeemErrorID = useSettingsSelect()?.account_data
+		?.coupon_redeem_info?.error_id;
+
 	useCreateNotice( wcSettings.pinterest_for_woocommerce.error );
 	const [ isOnboardingModalOpen, setIsOnboardingModalOpen ] = useState(
 		false
@@ -85,8 +88,19 @@ const CatalogSyncApp = () => {
 			return;
 		}
 
+		if (
+			couponRedeemErrorID !== undefined &&
+			couponRedeemErrorID !== 2322
+		) {
+			return;
+		}
+
 		setIsAdCreditsNoticeOpen( true );
-	}, [ userInteractions?.ads_notice_dismissed, userInteractionsLoaded ] );
+	}, [
+		userInteractions?.ads_notice_dismissed,
+		userInteractionsLoaded,
+		couponRedeemErrorID,
+	] );
 
 	const closeOnboardingModal = () => {
 		setIsOnboardingModalOpen( false );
