@@ -6,8 +6,8 @@ import TYPES from './action-types';
 const userInteractionsReducer = (
 	state = {
 		userInteractions: {
-			adsModalDismissed: false,
-			adsNoticeDismissed: false,
+			ads_modal_dismissed: false,
+			ads_notice_dismissed: false,
 			billingSetupFlowEntered: false,
 		},
 		isRequesting: false,
@@ -35,7 +35,7 @@ const userInteractionsReducer = (
 				...state,
 				userInteractions: {
 					...state.userInteractions,
-					adsModalDismissed: action.modalDismissed,
+					ads_modal_dismissed: action.modalDismissed,
 				},
 			};
 			break;
@@ -44,7 +44,7 @@ const userInteractionsReducer = (
 				...state,
 				userInteractions: {
 					...state.userInteractions,
-					adsNoticeDismissed: action.noticeDismissed,
+					ads_notice_dismissed: action.noticeDismissed,
 				},
 			};
 			break;
