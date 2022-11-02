@@ -409,6 +409,15 @@ $root: ".woocommerce-setup-guide";
 				}
 			}
 
+			&__with-help-description {
+				margin-bottom: 6px;
+			}
+
+			&__help-description {
+				color: $gray-700;
+				margin-bottom: 16px;
+			}
+
 			&__footer-button {
 				display: block;
 				margin-top: var(--large-gap);
