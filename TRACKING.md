@@ -72,6 +72,7 @@ Clicking on an external documentation link.
 	- with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
+- [`SetupPins`](assets/source/setup-guide/app/steps/SetupPins.js#L46) with `{ link_id: 'ads-manager', context: 'settings' }`
 - [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L47) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
 
 ### [`wcadmin_pfw_domain_verify_failure`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L69)
