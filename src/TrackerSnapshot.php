@@ -76,6 +76,7 @@ class TrackerSnapshot {
 		$tracked_settings = array(
 			'track_conversions',
 			'enhanced_match_support',
+			'automatic_enhanced_match_support',
 			'save_to_pinterest',
 			'rich_pins_on_posts',
 			'rich_pins_on_products',
