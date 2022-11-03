@@ -45,7 +45,7 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 		>
 			<Text>
 				{ __(
-					'To redeem the $125 ad credit from Pinterest, you would need to be a new customer to Pinterest ads, complete the setup of Pinterest for WooCommerce, and spend $15 with Pinterest ads. Credits may take up to 24 hours to be credited to the user.',
+					'To be eligible and redeem the $125 ad credit from Pinterest, you must complete the setup of Pinterest for WooCommerce, set up your billing with Pinterest Ads manager, and spend $15 with Pinterest ads. Credits may take up to 24 hours to be credited to the user.',
 					'pinterest-for-woocommerce'
 				) }
 			</Text>
