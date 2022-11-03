@@ -181,7 +181,7 @@ const AdsCreditSection = () => {
 					<Text variant="body">
 						{ createInterpolateElement(
 							__(
-								'To help you get started with Pinterest Ads, new Pinterest customers can get $125 in ad credits when they have successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Terms and conditions</a> apply.',
+								'To help you get started with Pinterest Ads, new Pinterest customers can get $125 in ad credits when they have successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Pinterest Terms and conditions</a> apply.',
 								'pinterest-for-woocommerce'
 							),
 							{
