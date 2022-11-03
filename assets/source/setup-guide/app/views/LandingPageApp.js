@@ -299,6 +299,17 @@ const FaqSection = () => {
 						'pinterest-for-woocommerce'
 					) }
 				/>
+				<FaqQuestion
+					questionId={ 'can-i-connect-to-multiple-accounts' }
+					question={ __(
+						'How do I redeem the $125 ad credit from Pinterest?',
+						'pinterest-for-woocommerce'
+					) }
+					answer={ __(
+						'To be eligible and redeem the $125 ad credit from Pinterest, you must complete the setup of Pinterest for WooCommerce, set up your billing with Pinterest Ads manager, and spend $15 with Pinterest ads.',
+						'pinterest-for-woocommerce'
+					) }
+				/>
 			</Panel>
 		</Card>
 	);
