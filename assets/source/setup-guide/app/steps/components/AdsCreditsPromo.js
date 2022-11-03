@@ -55,7 +55,7 @@ const AdsCreditsPromo = () => {
 					<Text variant="body">
 						{ createInterpolateElement(
 							__(
-								'As a new Pinterest customer, you can get $125 in free ad credits when you successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Terms and conditions</a> apply.',
+								'As a new Pinterest customer, you can get $125 in free ad credits when you successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Pinterest Terms and conditions</a> apply.',
 								'pinterest-for-woocommerce'
 							),
 							{

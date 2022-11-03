@@ -33,7 +33,12 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 	return (
 		<Modal
 			title={
-				<>{ __( 'Terms & Conditions', 'pinterest-for-woocommerce' ) }</>
+				<>
+					{ __(
+						'Pinterest Terms & Conditions',
+						'pinterest-for-woocommerce'
+					) }
+				</>
 			}
 			onRequestClose={ onModalClose }
 			className="pinterest-for-woocommerce-landing-page__credits-section__tac-modal"
