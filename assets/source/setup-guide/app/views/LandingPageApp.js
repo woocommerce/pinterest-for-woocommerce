@@ -306,7 +306,7 @@ const FaqSection = () => {
 						'pinterest-for-woocommerce'
 					) }
 					answer={ __(
-						'To be eligible and redeem the $125 ad credit from Pinterest, you must complete the setup of Pinterest for WooCommerce, set up your billing with Pinterest Ads manager, and spend $15 with Pinterest ads.',
+						'To be eligible and redeem the $125 ad credit from Pinterest, you must complete the setup of Pinterest for WooCommerce, set up your billing with Pinterest Ads manager, and spend $15 with Pinterest ads. Ad credits may vary by country and is subject to availability. Credits may take up to 24 hours to be credited to the user. Each user is only eligible to receive the ad credits once.',
 						'pinterest-for-woocommerce'
 					) }
 				/>
