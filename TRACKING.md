@@ -73,6 +73,7 @@ Clicking on an external documentation link.
 	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'automatic-enhanced-match', context: 'wizard'|'settings' }`
+- [`SetupPins`](assets/source/setup-guide/app/steps/SetupPins.js#L46) with `{ link_id: 'ads-manager', context: 'settings' }`
 - [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L47) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
 
 ### [`wcadmin_pfw_domain_verify_failure`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L69)
@@ -139,6 +140,7 @@ Clicking on "… Save changes" button.
 | ---- | ---- | ----------- |
 `enable_debug_logging` | `boolean` | Indicates if Enable debug logging option is checked
 `enhanced_match_support` | `boolean` | Indicates if Enhanced Match Support option is checked
+`automatic_enhanced_match_support` | `boolean` | Indicates if Automatic Enhanced Match Support option is checked
 `erase_plugin_data` | `boolean` | Indicates if Erase Plugin Data option is checked
 `product_sync_enabled` | `boolean` | Indicates if Enable Product Sync option is checked
 `rich_pins_on_posts` | `boolean` | Indicates if Add Rich Pins for Posts option is checked

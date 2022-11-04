@@ -23,6 +23,7 @@ import prepareForTracking from '../helpers/prepare-for-tracking';
  *
  * @property {boolean} enable_debug_logging Indicates if Enable debug logging option is checked
  * @property {boolean} enhanced_match_support Indicates if Enhanced Match Support option is checked
+ * @property {boolean} automatic_enhanced_match_support Indicates if Automatic Enhanced Match Support option is checked
  * @property {boolean} erase_plugin_data Indicates if Erase Plugin Data option is checked
  * @property {boolean} product_sync_enabled Indicates if Enable Product Sync option is checked
  * @property {boolean} rich_pins_on_posts Indicates if Add Rich Pins for Posts option is checked
