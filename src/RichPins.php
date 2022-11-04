@@ -17,6 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class RichPins {
 
+	use PluginHelper;
+
 	/**
 	 * Output Pinterest Rich Pins metatags based on post_type and site setup.
 	 *
@@ -171,6 +173,17 @@ class RichPins {
 			if ( empty( $description ) ) {
 				$description = $product->get_description();
 			}
+
+			/**
+			 * Filters whether the shortcodes should be applied for product descriptions on the rich pins or be stripped out.
+			 *
+			 * @param bool       $apply_shortcodes Shortcodes are applied if set to `true` and stripped out if set to `false`.
+			 * @param WC_Product $product          WooCommerce product object.
+			 */
+			$apply_shortcodes = apply_filters( 'pinterest_for_woocommerce_rich_pins_product_description_apply_shortcodes', false, $product );
+
+			$description = self::strip_tags_from_string( $description, $apply_shortcodes );
+
 			$tags['og:description'] = $description;
 		}
 
@@ -211,8 +224,20 @@ class RichPins {
 			return $tags;
 		}
 
+		$description = get_the_excerpt();
+
+		/**
+		 * Filters whether the shortcodes should be applied for product descriptions on the rich pins or be stripped out.
+		 *
+		 * @param bool $apply_shortcodes Shortcodes are applied if set to `true` and stripped out if set to `false`.
+		 * @param int  The post id.
+		 */
+		$apply_shortcodes = apply_filters( 'pinterest_for_woocommerce_rich_pins_post_description_apply_shortcodes', false, get_the_ID() );
+
+		$description = self::strip_tags_from_string( $description, $apply_shortcodes );
+
 		// mandatory tags.
-		$tags['og:description'] = get_the_excerpt();
+		$tags['og:description'] = $description;
 
 		// tags enabled by setup.
 		if ( ! empty( $args['posts']['enable_publish_time'] ) ) {

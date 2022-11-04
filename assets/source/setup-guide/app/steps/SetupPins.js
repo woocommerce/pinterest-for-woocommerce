@@ -3,13 +3,15 @@
  */
 import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
-import { Spinner } from '@woocommerce/components';
+import { createInterpolateElement } from '@wordpress/element';
 import {
 	Tooltip,
+	ExternalLink,
 	Card,
 	CardBody,
 	CheckboxControl,
 	Icon,
+	Spinner,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
@@ -22,6 +24,7 @@ import {
 	useSettingsDispatch,
 	useCreateNotice,
 } from '../helpers/effects';
+import documentationLinkProps from '../helpers/documentation-link-props';
 
 function HelpTooltip( { text } ) {
 	return (
@@ -31,6 +34,15 @@ function HelpTooltip( { text } ) {
 	);
 }
 
+/**
+ * Tracking setup component.
+ *
+ * To be used in onboarding stepper.
+ *
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ads-manager', context: 'settings' }`
+ *
+ * @return {JSX.Element} rendered component
+ */
 const SetupPins = ( {} ) => {
 	const appSettings = useSettingsSelect();
 	const setAppSettings = useSettingsDispatch( false );
@@ -136,6 +148,67 @@ const SetupPins = ( {} ) => {
 											)
 										}
 									/>
+									<CheckboxControl
+										label={ __(
+											'Automatic Enhanced Match support',
+											'pinterest-for-woocommerce'
+										) }
+										help={
+											<HelpTooltip
+												text={ __(
+													'Uses hashed information that your customers have already provided to your business to help match more of your website visitors and conversions to people on Pinterest. Enabling it may improve the performance of your campaigns and can help increase the size of your Pinterest tag audiences.',
+													'pinterest-for-woocommerce'
+												) }
+											/>
+										}
+										checked={
+											appSettings.automatic_enhanced_match_support
+										}
+										className={ classnames(
+											'woocommerce-setup-guide__checkbox-group woocommerce-setup-guide__with-help-description',
+											{
+												'pinterest-for-woocommerce-settings-checkbox-disabled': ! appSettings.track_conversions,
+											}
+										) }
+										disabled={
+											! appSettings.track_conversions
+										}
+										onChange={ () =>
+											handleOptionChange(
+												'automatic_enhanced_match_support'
+											)
+										}
+									/>
+									<Text
+										className="woocommerce-setup-guide__help-description"
+										variant="caption"
+									>
+										{ createInterpolateElement(
+											__(
+												'Manage information shared on <linkAdsManager>Pinterest Ads Manager</linkAdsManager>',
+												'pinterest-for-woocommerce'
+											),
+											{
+												linkAdsManager: (
+													<ExternalLink
+														{ ...documentationLinkProps(
+															{
+																href:
+																	wcSettings
+																		.pinterest_for_woocommerce
+																		.pinterestLinks
+																		.adsManager,
+																linkId:
+																	'ads-manager',
+																context:
+																	'settings',
+															}
+														) }
+													/>
+												),
+											}
+										) }
+									</Text>
 									<Text
 										className="woocommerce-setup-guide__checkbox-heading"
 										variant="subtitle"

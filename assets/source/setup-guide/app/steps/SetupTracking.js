@@ -44,6 +44,7 @@ import documentationLinkProps from '../helpers/documentation-link-props';
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'automatic-enhanced-match', context: 'wizard'|'settings' }`
  *
  * @fires wcadmin_pfw_setup with `{ target: 'complete', trigger: 'setup-tracking-complete' }` when "Complete setup" button is clicked.
  * @fires wcadmin_pfw_setup with `{ target: 'fetch-tags' | 'fetch-advertisers', trigger: 'setup-tracking-try-again' }` when "Try again" button is clicked.
@@ -350,56 +351,55 @@ const SetupTracking = ( { view = 'settings' } ) => {
 						}
 						description={
 							<>
-								{ __(
-									'The Pinterest tag is a piece of JavaScript code you put on your website to gather conversion insights and build audiences to target based on actions people have taken on your site.',
-									'pinterest-for-woocommerce'
+								{ createInterpolateElement(
+									__(
+										'The <linkTag>Pinterest tag</linkTag> is a piece of JavaScript code you put on your website to gather conversion insights and build audiences to target based on actions people have taken on your site.',
+										'pinterest-for-woocommerce'
+									),
+									{
+										linkTag: (
+											<Button
+												isLink
+												{ ...documentationLinkProps( {
+													href:
+														wcSettings
+															.pinterest_for_woocommerce
+															.pinterestLinks
+															.installTag,
+													linkId: 'install-tag',
+													context: view,
+												} ) }
+											></Button>
+										),
+									}
 								) }
 								<br />
 								<br />
-								{ __(
-									'Using conversion tags means you agree to our',
-									'pinterest-for-woocommerce'
-								) }{ ' ' }
-								<Button
-									isLink
-									{ ...documentationLinkProps( {
-										href:
-											wcSettings.pinterest_for_woocommerce
-												.pinterestLinks.adGuidelines,
-										linkId: 'ad-guidelines',
-										context: view,
-									} ) }
-								>
-									{ __(
-										'Ad Guidelines',
+								{ createInterpolateElement(
+									__(
+										'<linkAem>Automatic Enhanced Match</linkAem> is enabled by default to match more of your website visitors and conversions to people on Pinterest. You can manage this in Settings.',
 										'pinterest-for-woocommerce'
-									) }
-								</Button>{ ' ' }
-								{ __( 'and', 'pinterest-for-woocommerce' ) }{ ' ' }
-								<Button
-									isLink
-									{ ...documentationLinkProps( {
-										href:
-											wcSettings.pinterest_for_woocommerce
-												.pinterestLinks.adDataTerms,
-										linkId: 'ad-data-terms',
-										context: view,
-									} ) }
-								>
-									{ __(
-										'Ad Data Terms',
-										'pinterest-for-woocommerce'
-									) }
-								</Button>
+									),
+									{
+										linkAem: (
+											<Button
+												isLink
+												{ ...documentationLinkProps( {
+													href:
+														wcSettings
+															.pinterest_for_woocommerce
+															.pinterestLinks
+															.automaticEnhancedMatch,
+													linkId:
+														'automatic-enhanced-match',
+													context: view,
+												} ) }
+											></Button>
+										),
+									}
+								) }
 							</>
 						}
-						readMore={ documentationLinkProps( {
-							href:
-								wcSettings.pinterest_for_woocommerce
-									.pinterestLinks.installTag,
-							linkId: 'install-tag',
-							context: view,
-						} ) }
 					/>
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
@@ -488,6 +488,48 @@ const SetupTracking = ( { view = 'settings' } ) => {
 											) : (
 												<Spinner />
 											) ) }
+										{ createInterpolateElement(
+											__(
+												'Using conversion tags means you agree to our <linkGuidelines>Ad Guidelines</linkGuidelines> and <linkTerms>Ad Data Terms</linkTerms>.',
+												'pinterest-for-woocommerce'
+											),
+											{
+												linkGuidelines: (
+													<Button
+														isLink
+														{ ...documentationLinkProps(
+															{
+																href:
+																	wcSettings
+																		.pinterest_for_woocommerce
+																		.pinterestLinks
+																		.adGuidelines,
+																linkId:
+																	'ad-guidelines',
+																context: view,
+															}
+														) }
+													></Button>
+												),
+												linkTerms: (
+													<Button
+														isLink
+														{ ...documentationLinkProps(
+															{
+																href:
+																	wcSettings
+																		.pinterest_for_woocommerce
+																		.pinterestLinks
+																		.adDataTerms,
+																linkId:
+																	'ad-data-terms',
+																context: view,
+															}
+														) }
+													></Button>
+												),
+											}
+										) }
 									</>
 								) : (
 									<>

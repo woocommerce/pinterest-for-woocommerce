@@ -400,6 +400,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'adsManager'             => 'https://ads.pinterest.com/',
 					'preLaunchNotice'        => 'https://help.pinterest.com/en-gb/business/article/get-a-business-profile/',
 					'adsAvailability'        => 'https://help.pinterest.com/en/business/availability/ads-availability',
+					'automaticEnhancedMatch' => 'https://www.pinterest.com/_/_/help/business/article/automatic-enhanced-match',
 				),
 				'isSetupComplete'          => Pinterest_For_Woocommerce()::is_setup_complete(),
 				'countryTos'               => Pinterest_For_Woocommerce()::get_applicable_tos(),

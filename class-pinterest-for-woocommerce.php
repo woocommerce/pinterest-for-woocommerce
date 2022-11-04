@@ -9,6 +9,7 @@
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
+use Automattic\WooCommerce\Pinterest\PinterestApiException;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -105,14 +106,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.0.0
 		 */
 		protected static $default_settings = array(
-			'track_conversions'      => true,
-			'enhanced_match_support' => true,
-			'save_to_pinterest'      => true,
-			'rich_pins_on_posts'     => true,
-			'rich_pins_on_products'  => true,
-			'product_sync_enabled'   => true,
-			'enable_debug_logging'   => false,
-			'erase_plugin_data'      => false,
+			'track_conversions'                => true,
+			'enhanced_match_support'           => true,
+			'automatic_enhanced_match_support' => true,
+			'save_to_pinterest'                => true,
+			'rich_pins_on_posts'               => true,
+			'rich_pins_on_products'            => true,
+			'product_sync_enabled'             => true,
+			'enable_debug_logging'             => false,
+			'erase_plugin_data'                => false,
 		);
 
 		/**
@@ -668,6 +670,22 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 				// At this point we're disconnected.
 				return true;
+			} catch ( PinterestApiException $e ) {
+				$code = $e->get_pinterest_code();
+
+				if ( PinterestApiException::MERCHANT_NOT_FOUND === $code ) {
+					Pinterest\Logger::log( esc_html__( 'Trying to disconnect while the merchant (id) was not found.', 'pinterest-for-woocommerce' ) );
+
+					/*
+					 * This is an abnormal state of the application. Caused probably by issues during the connection process.
+					 * It looks like the best course of actions is to flush the options and assume that we are disconnected.
+					 * This way we restore UI connect functionality and allow merchant to retry.
+					 */
+					self::flush_options();
+					return true;
+				}
+
+				return false;
 
 			} catch ( \Exception $th ) {
 				// There was an error disconnecting merchant.

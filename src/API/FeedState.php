@@ -338,7 +338,7 @@ class FeedState extends VendorAPI {
 	 * Adds to the result variable an array with info about the
 	 * registration and configuration process of the XML feed to the Pinterest API.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.3
 	 *
 	 * @param array $result The result array to add values to.
 	 *
