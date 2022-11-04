@@ -22,7 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class PinterestSyncSettings {
 
-	const SYNCED_SETTINGS = array();
+	const SYNCED_SETTINGS = array(
+		'automatic_enhanced_match_support',
+	);
 
 	/**
 	 * Get the list of synced settings.
