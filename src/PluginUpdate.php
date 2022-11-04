@@ -277,7 +277,7 @@ class PluginUpdate {
 	 */
 	protected function ads_credits_integration(): void {
 		// TODO: What is the version where this will be integrated?
-		if ( ! $this->version_needs_update( 'x.x.x' ) ) {
+		if ( ! $this->version_needs_update( '1.2.5' ) ) {
 			return;
 		}
 
