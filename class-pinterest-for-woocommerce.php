@@ -1008,14 +1008,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$account_data = self::get_setting( 'account_data' );
 
 			$redeem_status = is_array( $account_data['coupon_redeem_info'] ) ? $account_data['coupon_redeem_info']['redeem_status'] : false;
-			if ( false === $redeem_status ) {
-				return false;
+			$error         = $account_data['coupon_redeem_info']['error_id'];
+			if ( 2322 === $error || 2318 === $error ) {
+				/*
+				 * Advertiser has already redeemed the coupon or
+				 * the coupon was redeemed by a different advertiser of the same user.
+				 * In both cases another redeem is not possible.
+				 */
+				return true;
 			}
 
-			$redeemed_coupon_advertiser_id = $account_data['coupon_redeem_info']['advertiser_id'];
-			$current_advertiser_id         = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
-
-			if ( $redeemed_coupon_advertiser_id !== $current_advertiser_id ) {
+			if ( false === $redeem_status ) {
 				return false;
 			}
 
