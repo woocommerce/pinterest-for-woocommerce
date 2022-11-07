@@ -87,6 +87,12 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.5 - 2022-11-07 =
+* Add - Ads Credit Campaign.
+* Tweak - Declare HPOS compatibility.
+* Tweak - WC 7.1 compatibility.
+* Tweak - WP 6.1 compatibility.
+
 = 1.2.4 - 2022-10-13 =
 * Tweak - WC 7.0 compatibility.
 
