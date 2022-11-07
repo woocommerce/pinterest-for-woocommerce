@@ -271,7 +271,7 @@ class PluginUpdate {
 	/**
 	 * Integrate Ads credit flow.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 *
 	 * @return void
 	 */

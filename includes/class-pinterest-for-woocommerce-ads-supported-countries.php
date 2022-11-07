@@ -66,7 +66,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 		/**
 		 * Check if user selected location is in the list of ads supported countries.
 		 *
-		 * @since x.x.x
+		 * @since 1.2.5
 		 *
 		 * @return bool Wether this is ads supported location.
 		 */

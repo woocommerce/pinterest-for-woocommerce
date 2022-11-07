@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Ads Credits Coupons
  *
  * @package     Pinterest_For_WooCommerce/Classes/
- * @version     x.x.x
+ * @version     1.2.5
  */
 
 namespace Automattic\WooCommerce\Pinterest;
@@ -44,7 +44,7 @@ class AdCreditsCoupons {
 	/**
 	 * Get a valid coupon for merchant.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 *
 	 * @return string|false Coupon string of false if no coupon was found.
 	 */
