@@ -3,7 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 import { getNewPath, getHistory } from '@woocommerce/navigation';
-import { createInterpolateElement, useCallback } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useCallback,
+	useState,
+} from '@wordpress/element';
 import { recordEvent } from '@woocommerce/tracks';
 import {
 	Button,
@@ -19,9 +23,11 @@ import {
 /**
  * Internal dependencies
  */
+import AdsCreditsTermsAndConditionsModal from '../components/TermsAndConditionsModal';
 import PrelaunchNotice from '../../../components/prelaunch-notice';
 import documentationLinkProps from '../helpers/documentation-link-props';
 import UnsupportedCountryNotice from '../components/UnsupportedCountryNotice';
+import { useSettingsSelect } from '../helpers/effects';
 
 const tosHref = 'https://business.pinterest.com/business-terms-of-service/';
 
@@ -122,6 +128,85 @@ const WelcomeSection = () => {
 	);
 };
 
+/**
+ * Ads Credits Section Card.
+ * To be used in getting started page.
+ *
+ * @fires wcadmin_pfw_modal_open with `{ name: 'ads-credits-terms-and-conditions', … }`
+ * @fires wcadmin_pfw_modal_closed with `{ name: 'ads-credits-terms-and-conditions'', … }`
+ *
+ * @return {JSX.Element} Rendered element.
+ */
+const AdsCreditSection = () => {
+	const [
+		isTermsAndConditionsModalOpen,
+		setIsTermsAndConditionsModalOpen,
+	] = useState( false );
+
+	const openTermsAndConditionsModal = () => {
+		setIsTermsAndConditionsModalOpen( true );
+		recordEvent( 'pfw_modal_open', {
+			context: 'landing-page',
+			name: 'ads-credits-terms-and-conditions',
+		} );
+	};
+
+	const closeTermsAndConditionsModal = () => {
+		setIsTermsAndConditionsModalOpen( false );
+		recordEvent( 'pfw_modal_closed', {
+			context: 'landing-page',
+			name: 'ads-credits-terms-and-conditions',
+		} );
+	};
+
+	return (
+		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__credits-section">
+			<Flex>
+				<FlexBlock className="image-block">
+					<img
+						src={
+							wcSettings.pinterest_for_woocommerce.pluginUrl +
+							'/assets/images/landing_credit.svg'
+						}
+						alt=""
+					/>
+				</FlexBlock>
+				<FlexBlock className="content-block">
+					<Text variant="subtitle">
+						{ __(
+							'Try Pinterest for WooCommerce and get $125 in ad credits!',
+							'pinterest-for-woocommerce'
+						) }
+					</Text>
+					<Text variant="body">
+						{ createInterpolateElement(
+							__(
+								'To help you get started with Pinterest Ads, new Pinterest customers can get $125 in ad credits when they have successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Pinterest Terms and conditions</a> apply.',
+								'pinterest-for-woocommerce'
+							),
+							{
+								a: (
+									// Disabling no-content rule - content is interpolated from above string
+									// eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/anchor-has-content
+									<a
+										href={ '#' }
+										onClick={ openTermsAndConditionsModal }
+									/>
+								),
+							}
+						) }
+					</Text>
+				</FlexBlock>
+			</Flex>
+			{ isTermsAndConditionsModalOpen && (
+				<AdsCreditsTermsAndConditionsModal
+					onModalClose={ closeTermsAndConditionsModal }
+				/>
+			) }
+		</Card>
+	);
+};
+
 const FeaturesSection = () => {
 	return (
 		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__features-section">
@@ -214,6 +299,17 @@ const FaqSection = () => {
 						'pinterest-for-woocommerce'
 					) }
 				/>
+				<FaqQuestion
+					questionId={ 'can-i-connect-to-multiple-accounts' }
+					question={ __(
+						'How do I redeem the $125 ad credit from Pinterest?',
+						'pinterest-for-woocommerce'
+					) }
+					answer={ __(
+						'To be eligible and redeem the $125 ad credit from Pinterest, you must complete the setup of Pinterest for WooCommerce, set up your billing with Pinterest Ads manager, and spend $15 with Pinterest ads. Ad credits may vary by country and is subject to availability. Credits may take up to 24 hours to be credited to the user. Each user is only eligible to receive the ad credits once.',
+						'pinterest-for-woocommerce'
+					) }
+				/>
 			</Panel>
 		</Card>
 	);
@@ -267,6 +363,8 @@ const LandingPageApp = () => {
 		storeCountry,
 	} = wcSettings.pinterest_for_woocommerce;
 
+	const adsCampaignIsActive = useSettingsSelect()?.ads_campaign_is_active;
+
 	// Only show the pre-launch beta notice if the plugin version is a beta.
 	const prelaunchNotice = pluginVersion.includes( 'beta' ) ? (
 		<PrelaunchNotice />
@@ -280,6 +378,7 @@ const LandingPageApp = () => {
 					<UnsupportedCountryNotice countryCode={ storeCountry } />
 				) }
 				<WelcomeSection />
+				{ adsCampaignIsActive && <AdsCreditSection /> }
 				<FeaturesSection />
 				<FaqSection />
 			</div>

@@ -7,9 +7,14 @@
  */
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Pinterest\AdCredits;
+use Automattic\WooCommerce\Pinterest\AdCreditsCoupons;
+use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
+use Automattic\WooCommerce\Pinterest\Utilities\Tracks;
+use Automattic\WooCommerce\Pinterest\API\UserInteraction;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -17,6 +22,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 	 * Base Plugin class holding generic functionality
 	 */
 	final class Pinterest_For_Woocommerce {
+
+		use Tracks;
 
 		/**
 		 * Tos IDs and URLs per country.
@@ -255,6 +262,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'init', array( Pinterest\Tracking::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\TrackerSnapshot::class, 'maybe_init' ) );
+			add_action( 'init', array( Pinterest\Billing::class, 'schedule_event' ) );
+			add_action( 'init', array( Pinterest\AdCredits::class, 'schedule_event' ) );
+
+			// Verify that the ads_campaign is active or not.
+			add_action( 'admin_init', array( Pinterest\AdCredits::class, 'check_if_ads_campaign_is_active' ) );
 
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
@@ -267,6 +279,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Init marketing notifications.
 			add_action( Heartbeat::DAILY, array( $this, 'init_marketing_notifications' ) );
+
+			// Check available coupons and credits.
+			add_action( Heartbeat::HOURLY, array( $this, 'check_available_coupons_and_credits' ) );
 
 		}
 
@@ -565,6 +580,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			new Pinterest\API\Tags();
 			new Pinterest\API\HealthCheck();
 			new Pinterest\API\Options();
+			new Pinterest\API\UserInteraction();
 		}
 
 		/**
@@ -659,7 +675,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					} catch ( \Exception $th ) {
 
 						Pinterest\Logger::log( esc_html__( 'There was an error disconnecting the Advertiser.', 'pinterest-for-woocommerce' ) );
-
+						self::flush_options();
 						throw new \Exception( esc_html__( 'There was an error disconnecting the Advertiser. Please try again.', 'pinterest-for-woocommerce' ), 400 );
 					}
 				}
@@ -701,6 +717,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Flush the whole data option.
 			delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+			UserInteraction::flush_options();
 
 			// Remove settings that may cause issues if stale on disconnect.
 			self::save_setting( 'account_data', null );
@@ -852,6 +869,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					)
 				);
 
+				/*
+				 * For now we assume that the billing is not setup and credits are not redeemed.
+				 * We will be able to check that only when the advertiser will be connected.
+				 * The billing is tied to advertiser.
+				 */
+				$data['is_billing_setup']   = false;
+				$data['coupon_redeem_info'] = array( 'redeem_status' => false );
+
 				Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
 				return $data;
 			}
@@ -862,6 +887,143 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		}
 
+		/**
+		 * Add billing setup information to the account data option.
+		 * Using this function makes sense only when we have a connected advertiser.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return bool Wether billing is set up or not.
+		 */
+		public static function add_billing_setup_info_to_account_data() {
+			$account_data                     = self::get_setting( 'account_data' );
+			$account_data['is_billing_setup'] = Billing::has_billing_set_up();
+			self::save_setting( 'account_data', $account_data );
+			Billing::mark_billing_setup_checked();
+			return $account_data['is_billing_setup'];
+		}
+
+		/**
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public static function maybe_check_billing_setup() {
+			$account_data          = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+			$has_billing_setup_old = is_array( $account_data ) && $account_data['is_billing_setup'] ?? false;
+			if ( Billing::should_check_billing_setup_often() ) {
+				$has_billing_setup_new = self::add_billing_setup_info_to_account_data();
+				// Detect change in billing setup to true and try to redeem.
+				if ( $has_billing_setup_new && ! $has_billing_setup_old ) {
+					AdCredits::handle_redeem_credit();
+				}
+			}
+		}
+
+		/**
+		 * Get billing setup information from the account data option.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return bool
+		 */
+		public static function get_billing_setup_info_from_account_data() {
+			$account_data = self::get_setting( 'account_data' );
+
+			return (bool) $account_data['is_billing_setup'];
+		}
+
+		/**
+		 * Add redeem credits information to the account data option.
+		 * Using this function makes sense only when we have a connected advertiser and the billing data is set up.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public static function add_redeem_credits_info_to_account_data() {
+			$account_data = self::get_setting( 'account_data' );
+			$offer_code   = AdCreditsCoupons::get_coupon_for_merchant();
+
+			// Redeem the coupon.
+			$error_code    = false;
+			$error_message = '';
+			$redeem_status = AdCredits::redeem_credits( $offer_code, $error_code, $error_message );
+
+			$redeem_information = array(
+				'redeem_status' => $redeem_status,
+				'offer_code'    => $offer_code,
+				'advertiser_id' => Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' ),
+				'username'      => $account_data['username'],
+				'id'            => $account_data['id'],
+				'error_id'      => $error_code,
+				'error_message' => $error_message,
+			);
+
+			/*
+			 * Track the redeemed offer code.
+			 */
+			self::record_event(
+				'pfw_ads_redeem_credits',
+				array(
+					'redeem_status' => $redeem_information['redeem_status'],
+					'offer_code'    => $redeem_information['offer_code'],
+					'error_id'      => $redeem_information['error_id'],
+				)
+			);
+
+			$account_data['coupon_redeem_info'] = $redeem_information;
+
+			self::save_setting( 'account_data', $account_data );
+		}
+
+		/**
+		 * Add available credits information to the account data option.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public static function add_available_credits_info_to_account_data() {
+			$account_data = self::get_setting( 'account_data' );
+
+			try {
+				// Check for available discounts.
+				$account_data['available_discounts'] = AdCredits::process_available_discounts();
+				self::save_setting( 'account_data', $account_data );
+			} catch ( Exception $e ) {
+				return;
+			}
+		}
+
+		/**
+		 * Check if coupon was redeemed. We can redeem only once.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return bool
+		 */
+		public static function check_if_coupon_was_redeemed() {
+			$account_data = self::get_setting( 'account_data' );
+
+			$redeem_status = is_array( $account_data['coupon_redeem_info'] ) ? $account_data['coupon_redeem_info']['redeem_status'] : false;
+			$error         = $account_data['coupon_redeem_info']['error_id'];
+			if ( 2322 === $error || 2318 === $error ) {
+				/*
+				 * Advertiser has already redeemed the coupon or
+				 * the coupon was redeemed by a different advertiser of the same user.
+				 * In both cases another redeem is not possible.
+				 */
+				return true;
+			}
+
+			if ( false === $redeem_status ) {
+				return false;
+			}
+
+			return true;
+		}
 
 		/**
 		 * Fetches a fresh copy (if needed or explicitly requested), of the authenticated user's linked business accounts.
@@ -898,8 +1060,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return array
 		 */
 		public static function update_linked_businesses() {
-			$account_data       = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
-			$fetched_businesses = ( ! empty( $account_data ) && ! $account_data['is_partner'] ) ? Pinterest\API\Base::get_linked_businesses() : array();
+
+			$account_data            = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+			$fetch_linked_businesses =
+				! empty( $account_data ) &&
+				array_key_exists( 'is_partner', $account_data ) &&
+				! $account_data['is_partner'];
+
+			$fetched_businesses = $fetch_linked_businesses ? Pinterest\API\Base::get_linked_businesses() : array();
 
 			if ( ! empty( $fetched_businesses ) && 'success' === $fetched_businesses['status'] ) {
 				$linked_businesses = $fetched_businesses['data'];
@@ -967,6 +1135,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 		}
 
+		/**
+		 * Trigger coupons check.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public function check_available_coupons_and_credits() {
+			Pinterest_For_Woocommerce()::add_available_credits_info_to_account_data();
+		}
 
 		/**
 		 * Checks if setup is completed and all requirements are set.

@@ -10,13 +10,14 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, Card, CardFooter, CardDivider } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { recordEvent } from '@woocommerce/tracks';
+import { Button, Card, CardFooter, CardDivider } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import AdsCreditsPromo from './components/AdsCreditsPromo';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import AccountConnection from '../components/Account/Connection';
@@ -42,6 +43,8 @@ import documentationLinkProps from '../helpers/documentation-link-props';
  * @fires wcadmin_pfw_account_convert_button_click
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-guidelines', context: props.view }`
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'merchant-guidelines', context: props.view }`
+ * @fires wcadmin_pfw_modal_open with `{ name: 'ads-credits-terms-and-conditions', … }`
+ * @fires wcadmin_pfw_modal_closed with `{ name: 'ads-credits-terms-and-conditions'', … }`
  *
  * @param {Object} props React props
  * @param {Function} props.goToNextStep
@@ -100,7 +103,7 @@ const SetupAccount = ( {
 	}, [ createNotice ] );
 
 	return (
-		<div className="woocommerce-setup-guide__setup-account">
+		<div className="woocommerce-setup-guide__setup-account pinterest-for-woocommerce-account-setup">
 			{ view === 'wizard' && (
 				<StepHeader
 					title={ __(
@@ -166,6 +169,7 @@ const SetupAccount = ( {
 							}
 						) }
 					/>
+					{ view === 'wizard' && <AdsCreditsPromo /> }
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>

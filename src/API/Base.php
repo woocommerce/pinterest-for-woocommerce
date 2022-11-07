@@ -578,4 +578,70 @@ class Base {
 	public static function get_message_map() {
 		return self::make_request( 'catalogs/message_map', 'GET', array(), '', DAY_IN_SECONDS );
 	}
+
+
+	/**
+	 * Get billing data information from the advertiser.
+	 *
+	 * @param string $advertiser_id The advertiser id for which to get the billing data.
+	 *
+	 * @return mixed
+	 */
+	public static function get_advertiser_billing_data( $advertiser_id ) {
+		return self::make_request( "/advertisers/{$advertiser_id}/billing_data", 'GET', array(), 'ads' );
+	}
+
+	/**
+	 * Get billing data information from the advertiser.
+	 *
+	 * @param string $advertiser_id The advertiser id for which to get the billing data.
+	 *
+	 * @return mixed
+	 */
+	public static function get_advertiser_billing_profile( $advertiser_id ) {
+		return self::make_request( "advertisers/{$advertiser_id}/partners/billing_profiles", 'GET', array(), 'ads' );
+	}
+
+	/**
+	 * Redeem advertisement offer code ( ads credit ).
+	 *
+	 * @param string $advertiser_id The advertiser id for which we redeem the offer code.
+	 * @param string $offer_code Promotional ads credit offer code.
+	 *
+	 * @return mixed
+	 */
+	public static function redeem_ads_offer_code( $advertiser_id, $offer_code ) {
+		$request_url = "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem";
+		$request_url = add_query_arg( 'is_encoded', 'true', $request_url );
+		return self::make_request( $request_url, 'POST', array(), 'ads' );
+	}
+
+	/**
+	 * Validate advertisement offer code ( ads credit ).
+	 *
+	 * @param string $advertiser_id The advertiser id for which we validate the offer code.
+	 * @param string $offer_code Promotional ads credit offer code.
+	 *
+	 * @return mixed
+	 */
+	public static function validate_ads_offer_code( $advertiser_id, $offer_code ) {
+		$url = "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem";
+		$url = add_query_arg( 'validate_only', 'true', $url );
+
+		return self::make_request( $url, 'POST', array(), 'ads' );
+	}
+
+	/**
+	 * Pull information about available ads credits for advertiser.
+	 *
+	 * @param string $advertiser_id The advertiser id for which we check the available ads credits.
+	 *
+	 * @return mixed
+	 */
+	public static function get_available_discounts( $advertiser_id ) {
+		$request_url = "advertisers/{$advertiser_id}/discounts";
+		$request_url = add_query_arg( 'active', 'true', $request_url );
+
+		return self::make_request( $request_url, 'GET', array(), 'ads' );
+	}
 }
