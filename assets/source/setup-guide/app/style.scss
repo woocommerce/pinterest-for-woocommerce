@@ -415,6 +415,13 @@ $root: ".woocommerce-setup-guide";
 						}
 					}
 				}
+
+				&-readonly {
+					.components-base-control__field {
+						color: $gray-700;
+						pointer-events: none;
+					}
+				}
 			}
 
 			&__with-help-description {
