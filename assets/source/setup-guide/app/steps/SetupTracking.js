@@ -24,6 +24,7 @@ import {
 /**
  * Internal dependencies
  */
+import AdsCreditsPromo from './components/AdsCreditsPromo';
 import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import ThirdPartyTagsNotice from '../components/ThirdPartyTagsNotice';
@@ -401,6 +402,7 @@ const SetupTracking = ( { view = 'settings' } ) => {
 							</>
 						}
 					/>
+					{ view === 'wizard' && <AdsCreditsPromo /> }
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>

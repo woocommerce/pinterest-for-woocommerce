@@ -61,3 +61,8 @@ export const useBodyClasses = ( style ) => {
 		};
 	}, [ style ] );
 };
+
+export const useResetSettings = () => {
+	const { invalidateResolution } = useDispatch( SETTINGS_STORE_NAME );
+	return () => invalidateResolution( 'getSettings', [] );
+};
