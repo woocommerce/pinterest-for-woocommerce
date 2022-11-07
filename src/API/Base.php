@@ -446,6 +446,19 @@ class Base {
 
 
 	/**
+	 * Get the parameters of an existing tag.
+	 *
+	 * @param string $advertiser_id The advertiser_id to request the tag for.
+	 * @param string $tag_id        The tag_id for which we want to get.
+	 *
+	 * @return mixed
+	 */
+	public static function get_advertiser_tag( $advertiser_id, $tag_id ) {
+		return self::make_request( "advertisers/{$advertiser_id}/conversion_tags/{$tag_id}", 'GET', array(), 'ads' );
+	}
+
+
+	/**
 	 * Create a tag for the given advertiser.
 	 *
 	 * @param string $advertiser_id the advertiser_id to create a tag for.

@@ -165,14 +165,9 @@ const SetupPins = ( {} ) => {
 											appSettings.automatic_enhanced_match_support
 										}
 										className={ classnames(
-											'woocommerce-setup-guide__checkbox-group woocommerce-setup-guide__with-help-description',
-											{
-												'pinterest-for-woocommerce-settings-checkbox-disabled': ! appSettings.track_conversions,
-											}
+											'woocommerce-setup-guide__checkbox-group woocommerce-setup-guide__checkbox-readonly woocommerce-setup-guide__with-help-description'
 										) }
-										disabled={
-											! appSettings.track_conversions
-										}
+										disabled={ true }
 										onChange={ () =>
 											handleOptionChange(
 												'automatic_enhanced_match_support'
