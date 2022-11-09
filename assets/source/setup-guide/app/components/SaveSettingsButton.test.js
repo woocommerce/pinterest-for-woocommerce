@@ -3,6 +3,8 @@ jest.mock( '../helpers/effects', () => {
 		useCreateNotice: () => () => {},
 		useSettingsSelect: () => {},
 		useSettingsDispatch: () => () => {},
+		useResetSettings: () => () => {},
+		useResetUserInteractions: () => () => {},
 	};
 } );
 jest.mock( '@woocommerce/tracks', () => {

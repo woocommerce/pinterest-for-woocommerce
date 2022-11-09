@@ -62,6 +62,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 				'US', // United States (US).
 			);
 		}
+
+		/**
+		 * Check if user selected location is in the list of ads supported countries.
+		 *
+		 * @since 1.2.5
+		 *
+		 * @return bool Wether this is ads supported location.
+		 */
+		public static function is_ads_supported_country() {
+			$store_country = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
+			return in_array( $store_country, self::get_countries(), true );
+		}
 	}
 
 endif;

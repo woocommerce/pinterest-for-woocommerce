@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
-Tested up to: 5.9
+Tested up to: 6.1
 Requires PHP: 7.3
-Stable tag: 1.2.3
+Stable tag: 1.2.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -86,6 +86,15 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.5 - 2022-11-07 =
+* Add - Ads Credit Campaign.
+* Tweak - Declare HPOS compatibility.
+* Tweak - WC 7.1 compatibility.
+* Tweak - WP 6.1 compatibility.
+
+= 1.2.4 - 2022-10-13 =
+* Tweak - WC 7.0 compatibility.
 
 = 1.2.3 - 2022-10-11 =
 * Add - Warning message on potential conflicting tags.

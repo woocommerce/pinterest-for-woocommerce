@@ -12,9 +12,11 @@ import {
 	useSettingsSelect,
 	useSettingsDispatch,
 	useCreateNotice,
+	useResetSettings,
 } from '../helpers/effects';
 import connectAdvertiser from '../helpers/connect-advertiser';
 import prepareForTracking from '../helpers/prepare-for-tracking';
+import { useResetUserInteractions } from '../../../catalog-sync/helpers/effects';
 
 /**
  * Clicking on "… Save changes" button.
@@ -42,6 +44,8 @@ import prepareForTracking from '../helpers/prepare-for-tracking';
 const SaveSettingsButton = ( { view } ) => {
 	const isSaving = useSettingsSelect( 'isSettingsUpdating' );
 	const settings = useSettingsSelect( 'getSettings' );
+	const resetUserInteractions = useResetUserInteractions();
+	const resetSettings = useResetSettings();
 	const setAppSettings = useSettingsDispatch( true );
 	const createNotice = useCreateNotice();
 	const appSettings = useSettingsSelect();
@@ -74,6 +78,14 @@ const SaveSettingsButton = ( { view } ) => {
 					);
 				}
 			}
+
+			/*
+			 * Make sure that the state is fresh after a reset.
+			 * We want fresh options because account data could have been updated.
+			 * We want fresh interactions because different advertiser has different coupons.
+			 */
+			await resetSettings();
+			await resetUserInteractions();
 
 			createNotice(
 				'success',
