@@ -146,7 +146,7 @@ class Merchants {
 		$cache     = get_transient( $cache_key );
 
 		if ( false !== $cache ) {
-			return $cache;
+			throw new Exception( __( 'There was a previous error trying to create or update merchant.', 'pinterest-for-woocommerce' ), (int) $cache );
 		}
 
 		try {
@@ -155,10 +155,10 @@ class Merchants {
 		} catch ( Throwable $th ) {
 			$delay = Pinterest_For_Woocommerce()::get_data( 'create_merchant_delay' ) ?? 10 * MINUTE_IN_SECONDS;
 
-			set_transient( $cache_key, $response, $delay );
+			set_transient( $cache_key, $th->getCode(), $delay );
 
 			// Double the delay.
-			Pinterest_For_Woocommerce()::save_data( 'create_merchant_delay', $delay * 2 );
+			Pinterest_For_Woocommerce()::save_data( 'create_merchant_delay', max( $delay * 2, 6 * HOUR_IN_SECONDS ) );
 
 			throw new Exception( $th->getMessage(), $th->getCode() );
 		}
