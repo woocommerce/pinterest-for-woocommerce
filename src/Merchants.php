@@ -145,7 +145,7 @@ class Merchants {
 		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( wp_json_encode( $args ) );
 		$cache     = get_transient( $cache_key );
 
-		if ( ! $cache ) {
+		if ( false !== $cache ) {
 			return $cache;
 		}
 
