@@ -349,6 +349,10 @@ JS;
 	 * @return boolean
 	 */
 	private static function tracking_enabled() {
+		
+		if ( apply_filters( 'woocommerce_pinterest_disable_tracking', false ) ) {
+		  return false; 
+		}
 
 		if ( ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' ) || ! self::get_active_tag() ) {
 			return false;
