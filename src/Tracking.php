@@ -349,15 +349,15 @@ JS;
 	 * @return boolean
 	 */
 	private static function tracking_enabled() {
-		
+
 		/**
-		 * Allow third party plugins to disable the tracking pixel. 
+		 * Allow third party plugins to disable the tracking pixel.
 		 *
 		 * @since 1.2.6
 		 *
 		 * @param bool $is_disable Tracking is enabled if false, and disabled if true.
 		 */
-		if ( apply_filters('woocommerce_pinterest_disable_tracking', false) ) {
+		if ( apply_filters( 'woocommerce_pinterest_disable_tracking', false ) ) {
 			return false;
 		}
 
