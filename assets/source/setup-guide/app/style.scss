@@ -193,10 +193,6 @@ $root: ".woocommerce-setup-guide";
 				&-overview {
 					margin-top: var(--large-gap);
 
-					@include break-medium() {
-						position: absolute;
-					}
-
 					> div {
 						margin: 8px 0;
 					}
