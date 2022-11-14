@@ -350,8 +350,15 @@ JS;
 	 */
 	private static function tracking_enabled() {
 		
-		if ( apply_filters( 'woocommerce_pinterest_disable_tracking', false ) ) {
-		  return false; 
+		/**
+		 * Allow third party plugins to disable the tracking pixel. 
+		 *
+		 * @since 1.2.6
+		 *
+		 * @param bool $is_disable Tracking is enabled if false, and disabled if true.
+		 */
+		if ( apply_filters('woocommerce_pinterest_disable_tracking', false) ) {
+			return false;
 		}
 
 		if ( ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' ) || ! self::get_active_tag() ) {
