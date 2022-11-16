@@ -91,6 +91,10 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.6 - 2022-11-16 =
+* Tweak - Add Ads Credits promotion information to the readme.txt.
+* Tweak - Backoff merchant creation in case of failure.
+
 = 1.2.5 - 2022-11-07 =
 * Add - Ads Credit Campaign.
 * Tweak - Declare HPOS compatibility.
