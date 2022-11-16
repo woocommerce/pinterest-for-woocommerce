@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.1
 Requires PHP: 7.3
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -15,6 +15,10 @@ Get your products in front of Pinterest users searching for ideas and things to 
 Pinterest gives people their next great idea. Part collection, part marketplace, it’s a one-stop shop for millions of pinners to source inspiration, new products and new possibilities. It’s like a visual search engine, guiding people to ideas, inspiration and products that are just right for them.
 
 With the Pinterest for WooCommerce extension, you can put your products in front of Pinterest users who are already looking for ideas and things to buy. Connect your WooCommerce store to your *[Pinterest business account](https://business.pinterest.com/)* directly in the WooCommerce app. Your entire catalog will become browsable on Pinterest in just a few clicks.
+
+= Pinterest Ads =
+
+Get started with Pinterest Ads with **$125 free ad credit\*** from Pinterest when you set up Pinterest for WooCommerce and spend $15 on ads! Pinterest *[terms and conditions](https://business.pinterest.com/en-us/business-terms-of-service/)* apply.
 
 = Open-minded and undecided =
 
@@ -86,6 +90,10 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.6 - 2022-11-16 =
+* Tweak - Add Ads Credits promotion information to the readme.txt.
+* Tweak - Backoff merchant creation in case of failure.
 
 = 1.2.5 - 2022-11-07 =
 * Add - Ads Credit Campaign.
