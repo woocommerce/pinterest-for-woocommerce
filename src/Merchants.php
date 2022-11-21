@@ -158,7 +158,7 @@ class Merchants {
 			set_transient( $cache_key, $th->getCode(), $delay );
 
 			// Double the delay.
-			Pinterest_For_Woocommerce()::save_data( 'create_merchant_delay', max( $delay * 2, 6 * HOUR_IN_SECONDS ) );
+			Pinterest_For_Woocommerce()::save_data( 'create_merchant_delay', min( $delay * 2, 6 * HOUR_IN_SECONDS ) );
 
 			throw new Exception( $th->getMessage(), $th->getCode() );
 		}
