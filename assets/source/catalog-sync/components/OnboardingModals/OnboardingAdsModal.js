@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { createInterpolateElement } from '@wordpress/element';
 import { Icon, external as externalIcon } from '@wordpress/icons';
 import {
 	Button,
@@ -20,16 +21,15 @@ const OnboardingModalText = ( { isBillingSetup } ) => {
 	if ( ! isBillingSetup ) {
 		return (
 			<Text variant="body">
-				{ __(
-					'You are eligible for $125 of Pinterest ad credits. To claim the credits, ',
-					'pinterest-for-woocommerce'
-				) }
-				<strong>
-					{ __(
-						'you would need to add your billing details and spend $15 on Pinterest ads.',
+				{ createInterpolateElement(
+					__(
+						'You are eligible for $125 of Pinterest ad credits. To claim the credits, <strong>you would need to add your billing details and spend $15 on Pinterest ads.</strong>',
 						'pinterest-for-woocommerce'
-					) }
-				</strong>
+					),
+					{
+						strong: <strong />,
+					}
+				) }
 			</Text>
 		);
 	}

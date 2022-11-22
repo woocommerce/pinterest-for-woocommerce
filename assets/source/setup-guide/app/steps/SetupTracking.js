@@ -357,41 +357,42 @@ const SetupTracking = ( { view = 'settings' } ) => {
 								) }
 								<br />
 								<br />
-								{ __(
-									'Using conversion tags means you agree to our',
-									'pinterest-for-woocommerce'
-								) }{ ' ' }
-								<Button
-									isLink
-									{ ...documentationLinkProps( {
-										href:
-											wcSettings.pinterest_for_woocommerce
-												.pinterestLinks.adGuidelines,
-										linkId: 'ad-guidelines',
-										context: view,
-									} ) }
-								>
-									{ __(
-										'Ad Guidelines',
+								{ createInterpolateElement(
+									__(
+										'Using conversion tags means you agree to our <buttonGuidelines>Ad Guidelines</buttonGuidelines> and <buttonTerms>Ad Data Terms</buttonTerms>',
 										'pinterest-for-woocommerce'
-									) }
-								</Button>{ ' ' }
-								{ __( 'and', 'pinterest-for-woocommerce' ) }{ ' ' }
-								<Button
-									isLink
-									{ ...documentationLinkProps( {
-										href:
-											wcSettings.pinterest_for_woocommerce
-												.pinterestLinks.adDataTerms,
-										linkId: 'ad-data-terms',
-										context: view,
-									} ) }
-								>
-									{ __(
-										'Ad Data Terms',
-										'pinterest-for-woocommerce'
-									) }
-								</Button>
+									),
+									{
+										buttonGuidelines: (
+											<Button
+												isLink
+												{ ...documentationLinkProps( {
+													href:
+														wcSettings
+															.pinterest_for_woocommerce
+															.pinterestLinks
+															.adGuidelines,
+													linkId: 'ad-guidelines',
+													context: view,
+												} ) }
+											/>
+										),
+										buttonTerms: (
+											<Button
+												isLink
+												{ ...documentationLinkProps( {
+													href:
+														wcSettings
+															.pinterest_for_woocommerce
+															.pinterestLinks
+															.adDataTerms,
+													linkId: 'ad-data-terms',
+													context: view,
+												} ) }
+											/>
+										),
+									}
+								) }
 							</>
 						}
 						readMore={ documentationLinkProps( {
