@@ -353,7 +353,9 @@ JS;
 		/**
 		 * Allow third party plugins to disable the tracking pixel.
 		 *
-		 * @since 1.2.6
+		 * This filter is not guaranteed to be here in the future. It may be removed at any time. Use at your own risk.
+		 *
+		 * @since x.x.x
 		 *
 		 * @param bool $is_disable Tracking is enabled if false, and disabled if true.
 		 */
