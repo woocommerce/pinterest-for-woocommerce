@@ -112,7 +112,7 @@ class FeedRegistration {
 	 * Also if a different feed is registered, it will update using the URL in the
 	 * $feed_args.
 	 *
-	 * @return boolean|string
+	 * @return boolean
 	 *
 	 * @throws Exception PHP Exception.
 	 */
@@ -138,8 +138,10 @@ class FeedRegistration {
 				// The response only contains the merchant id.
 				$response = Merchants::update_or_create_merchant();
 
-				// The response contains an array with the ID of merchant and feed.
-				$registered = $response['feed_id'];
+				// If he response contains an array with the feed id this means that it is registered.
+				if ( $response['feed_id'] ) {
+					$registered = true;
+				}
 			}
 		}
 
