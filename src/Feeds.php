@@ -66,20 +66,18 @@ class Feeds {
 
 
 	/**
-	 * Get merchant's feed based on feed location
+	 * Get merchant's feeds
 	 *
-	 * @param string $merchant_id   The merchant ID.
-	 * @param string $feed_location The feed full location.
+	 * @param string $merchant_id The merchant ID.
 	 *
-	 * @return object The feed profile object.
+	 * @return array The feed profile objects.
 	 *
 	 * @throws Exception PHP Exception.
 	 */
-	public static function get_merchant_feed_by_location( $merchant_id, $feed_location ) {
+	public static function get_merchant_feeds( $merchant_id ) {
 
 		try {
 
-			// Get the feeds of the merchant.
 			$feeds = API\Base::get_merchant_feeds( $merchant_id );
 
 			if ( 'success' !== $feeds['status'] ) {
@@ -90,16 +88,7 @@ class Feeds {
 				throw new Exception( esc_html__( 'Wrong feed info.', 'pinterest-for-woocommerce' ) );
 			}
 
-			foreach ( $feeds['data'] as $feed_profile ) {
-
-				// Get the feed with the requested location if exists.
-				if ( $feed_location === $feed_profile->location_config->full_feed_fetch_location ) {
-					return $feed_profile;
-				}
-			}
-
-			// No feed found.
-			throw new Exception( esc_html__( 'No feed found with the requested location.', 'pinterest-for-woocommerce' ) );
+			return $feeds['data'];
 
 		} catch ( Exception $e ) {
 
@@ -118,26 +107,26 @@ class Feeds {
 	 * @return string Returns the ID of the feed if properly registered or an empty string otherwise.
 	 */
 	public static function is_local_feed_registered( $merchant_id ) {
-		$configs = LocalFeedConfigs::get_instance()->get_configurations();
-		$config  = reset( $configs );
+		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
+		$config        = reset( $configs );
+		$local_path    = dirname( $config['feed_url'] );
+		$local_country = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
+		$local_locale  = str_replace( '_', '-', determine_locale() );
+		$feeds         = self::get_merchant_feeds( $merchant_id );
 
-		// We need to fetch the feed object using the local feed location.
-		$feed = self::get_merchant_feed_by_location( $merchant_id, $config['feed_url'] );
-
-		$configured_path = dirname( $feed->location_config->full_feed_fetch_location );
-		$local_path      = dirname( $config['feed_url'] );
-		$local_country   = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
-		$local_locale    = str_replace( '_', '-', determine_locale() );
-
-		$registered_feed = '';
-
-		if ( $configured_path === $local_path && $local_country === $feed->country && $local_locale === $feed->locale ) {
-
-			// We can assume we're on the same site.
-			$registered_feed = $feed->id;
+		foreach ( $feeds as $feed ) {
+			$configured_path = dirname( $feed->location_config->full_feed_fetch_location );
+			if (
+				$configured_path === $local_path &&
+				$local_country === $feed->country &&
+				$local_locale === $feed->locale
+			) {
+				// We can assume we're on the same site.
+				return $feed->id;
+			}
 		}
 
-		return $registered_feed;
+		return '';
 	}
 
 }
