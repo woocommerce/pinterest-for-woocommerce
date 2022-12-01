@@ -57,7 +57,7 @@ class FeedIssues extends VendorAPI {
 	public function get_feed_issues( WP_REST_Request $request ) {
 
 		try {
-			$feed_id = FeedRegistration::get_registered_feed_id();
+			$feed_id = FeedRegistration::get_locally_stored_registered_feed_id();
 			if ( ! Pinterest\ProductSync::is_product_sync_enabled() || ! $feed_id ) {
 				return array( 'lines' => array() );
 			}

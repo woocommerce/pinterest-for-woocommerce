@@ -131,7 +131,7 @@ class FeedRegistration {
 			 * Update feed if we don't have a feed_id saved or if local feed is not properly registered.
 			 * for cases where the already existed in the API.
 			 */
-			$registered = self::get_registered_feed_id();
+			$registered = self::get_locally_stored_registered_feed_id();
 
 			if ( ! $registered || ! Feeds::is_local_feed_registered( $merchant['data']->id ) ) {
 
@@ -158,11 +158,14 @@ class FeedRegistration {
 	}
 
 	/**
-	 * Returns the feed profile ID if it's registered. Returns `false` otherwise.
+	 * Returns the feed profile ID stored locally if it's registered.
+	 * Returns `false` otherwise.
+	 * If everything is configured correctly, this feed profile id will match
+	 * the setup that the merchant has in Pinterest.
 	 *
 	 * @return string|boolean
 	 */
-	public static function get_registered_feed_id() {
+	public static function get_locally_stored_registered_feed_id() {
 		return Pinterest_For_Woocommerce()::get_data( 'feed_registered' ) ?? false;
 	}
 
