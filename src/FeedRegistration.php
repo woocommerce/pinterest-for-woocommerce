@@ -127,9 +127,10 @@ class FeedRegistration {
 			self::log( 'Pinterest returned a Declined status for product_pin_approval_status' );
 
 		} else {
-
-			// Update feed if we don't have a feed_id saved or if local feed is not properly registered.
-			// for cases where the already existed in the API.
+			/*
+			 * Update feed if we don't have a feed_id saved or if local feed is not properly registered.
+			 * for cases where the already existed in the API.
+			 */
 			$registered = self::get_registered_feed_id();
 
 			if ( ! $registered || ! Feeds::is_local_feed_registered( $merchant['data']->id ) ) {
