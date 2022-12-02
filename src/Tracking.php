@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Automattic\WooCommerce\Pinterest\API\AdvertiserConnect;
 use WC_Product;
+use Automattic\WooCommerce\Utilities\NumberUtil;
 use \Premmerce\WooCommercePinterest\PinterestPlugin;
 
 /**
@@ -243,7 +244,7 @@ class Tracking {
 		$object_id = empty( $variation_id ) ? $product_id : $variation_id;
 		$product   = wc_get_product( $object_id );
 
-		$product_price = WC()->cart->display_prices_including_tax() ? wc_get_price_including_tax( $product ) : wc_get_price_excluding_tax( $product );
+		$product_price = self::get_product_price_with_taxes( $product );
 
 		self::add_event(
 			'AddToCart',
@@ -284,7 +285,7 @@ class Tracking {
 
 			$product = $order_item->get_product();
 
-			$product_price = WC()->cart->display_prices_including_tax() ? wc_get_price_including_tax( $product ) : wc_get_price_excluding_tax( $product );
+			$product_price = self::get_product_price_with_taxes( $product );
 
 			$terms      = wc_get_object_terms( $product->get_id(), 'product_cat' );
 			$categories = ! empty( $terms ) ? wp_list_pluck( $terms, 'name' ) : array();
@@ -322,6 +323,24 @@ class Tracking {
 	 * @return void
 	 */
 	public static function ajax_tracking_snippet() {
+
+		if ( is_product() ) {
+			$tracking = self::get_add_to_cart_snippet_product();
+		} else {
+			$tracking = self::get_add_to_cart_snippet_archive();
+		}
+
+		wp_add_inline_script( 'wc-add-to-cart', $tracking );
+
+	}
+
+
+	/**
+	 * Get the add to cart tracking snippet for archives.
+	 *
+	 * @return string
+	 */
+	protected static function get_add_to_cart_snippet_archive() {
 		$wc_currency = get_woocommerce_currency();
 		$tracking    = <<< JS
 jQuery( function( $ ) {
@@ -338,8 +357,43 @@ jQuery( function( $ ) {
 } );
 JS;
 
-		wp_add_inline_script( 'wc-add-to-cart', $tracking );
+		return $tracking;
+	}
 
+
+	/**
+	 * Get the add to cart tracking snippet for single product page.
+	 *
+	 * @return string
+	 */
+	protected static function get_add_to_cart_snippet_product() {
+		$product = wc_get_product( get_the_ID() );
+
+		if ( ! $product ) {
+			return '';
+		}
+
+		$product_id    = $product->get_id();
+		$product_name  = $product->get_name();
+		$product_price = self::get_product_price_with_taxes( $product );
+
+		$wc_currency = get_woocommerce_currency();
+		$tracking    = <<< JS
+jQuery( function( $ ) {
+	$( document.body ).on( 'added_to_cart', function( e, fragments, cart_hash, thisbutton ) {
+		var quantity = document.querySelector( 'input.qty[name="quantity"]' ).value;
+		pintrk( 'track', 'AddToCart', {
+			'product_id': '{$product_id}',
+			'product_name': '{$product_name}',
+			'value': {$product_price} * quantity,
+			'order_quantity': quantity,
+			'currency': '{$wc_currency}'
+		} );
+	} );
+} );
+JS;
+
+		return $tracking;
 	}
 
 
@@ -604,7 +658,7 @@ JS;
 	private static function filter_add_to_cart_attributes( array $args, WC_Product $product ) {
 		$attributes = array(
 			'data-product_name' => $product->get_name(),
-			'data-price'        => $product->get_price(),
+			'data-price'        => self::get_product_price_with_taxes( $product ),
 		);
 
 		$args['attributes'] = array_merge( $args['attributes'], $attributes );
@@ -665,4 +719,16 @@ JS;
 
 		return $third_party_tags;
 	}
+
+	/**
+	 * Get product's price including/excluding tax.
+	 *
+	 * @param WC_Product $product The product object.
+	 *
+	 * @return string
+	 */
+	protected static function get_product_price_with_taxes( $product ) {
+		return WC()->cart->display_prices_including_tax() ? wc_get_price_including_tax( $product ) : NumberUtil::round( wc_get_price_excluding_tax( $product ), wc_get_price_decimals() );
+	}
+
 }
