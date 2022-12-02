@@ -31,6 +31,9 @@ class SaveToPinterest {
 		add_action( 'woocommerce_before_single_product_summary', array( __CLASS__, 'render_product_pin' ) );
 		add_action( 'woocommerce_before_shop_loop_item', array( __CLASS__, 'render_product_pin' ), 1 );
 		add_filter( 'woocommerce_blocks_product_grid_item_html', array( __CLASS__, 'add_to_wc_blocks' ), 10, 3 );
+
+		// Enqueue our JS files.
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 	}
 
 
@@ -121,6 +124,25 @@ class SaveToPinterest {
 		}
 
 		return str_replace( '</li>', self::render_pin( $product->get_id() ) . '</li>', $html );
+	}
+
+
+	/**
+	 * Enqueue JS files necessary to properly track actions such as search.
+	 *
+	 * @return void
+	 */
+	public static function enqueue_scripts() {
+
+		$ext = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+
+		wp_enqueue_script(
+			PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-save-button',
+			Pinterest_For_Woocommerce()->plugin_url() . '/assets/js/pinterest-for-woocommerce-save-button' . $ext . '.js',
+			array(),
+			PINTEREST_FOR_WOOCOMMERCE_VERSION,
+			true
+		);
 	}
 
 }
