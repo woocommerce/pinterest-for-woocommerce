@@ -1,3 +1,5 @@
+/*global fetch*/
+
 /**
  * Disable the Save to Pinterest button if the Chrome extension is detected.
  */
