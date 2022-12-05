@@ -650,7 +650,7 @@ class Base {
 	 *
 	 * @since x.x.x
 	 *
-	 * @return mixed
+	 * @return array
 	 */
 	public static function get_list_of_ads_supported_countries() {
 		$request_url = 'advertisers/countries';
