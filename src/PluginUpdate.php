@@ -165,6 +165,7 @@ class PluginUpdate {
 	 *
 	 * @since 1.0.9
 	 * @since 1.0.10 Accepts procedure name as parameter.
+	 * @since x.x.x  Log the failed procedure.
 	 * @param  string $update_procedure Name of the migration procedure.
 	 * @throws Throwable Update procedure failures.
 	 * @return void
@@ -175,9 +176,10 @@ class PluginUpdate {
 		} catch ( Throwable $th ) {
 			Logger::log(
 				sprintf(
-					// translators: 1: plugin version, 2: error message.
-					__( 'Plugin update to version %1$s error: %2$s', 'pinterest-for-woocommerce' ),
+					// translators: 1: plugin version, 2: failed procedure, 3: error message.
+					__( 'Plugin update to version %1$s. Procedure: %2$s. Error: %3$s', 'pinterest-for-woocommerce' ),
 					$this->get_plugin_current_version(),
+					$update_procedure,
 					$th->getMessage()
 				),
 				'error',
