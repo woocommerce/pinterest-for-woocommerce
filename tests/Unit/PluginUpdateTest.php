@@ -154,7 +154,7 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 		$mock_plugin_update->maybe_update();
 
 		// Exception was caught and logged.
-		$this->assertEquals( "Plugin update to version {$this->current_version} error: Veni, vidi, error!", $this->mock_logger->message[0] );
+		$this->assertEquals( "Plugin update to version {$this->current_version}. Procedure: domain_verification_migration. Error: Veni, vidi, error!", $this->mock_logger->message[0] );
 
 		// Plugin update message logged.
 		$this->assertEquals( "Plugin updated to version: {$this->current_version}.", $this->mock_logger->message[1] );
