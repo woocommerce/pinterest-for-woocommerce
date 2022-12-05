@@ -130,6 +130,7 @@ class Merchants {
 		$configs = LocalFeedConfigs::get_instance()->get_configurations();
 		$config  = reset( $configs );
 
+		// TODO: Add comment. 
 		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		$args = array(
@@ -152,6 +153,7 @@ class Merchants {
 		try {
 			// The response only contains the merchant id.
 			$response = Base::update_or_create_merchant( $args );
+			// TODO: invalidate cache for feed fetch.
 		} catch ( Throwable $th ) {
 			$delay = Pinterest_For_Woocommerce()::get_data( 'create_merchant_delay' ) ?? MINUTE_IN_SECONDS;
 

@@ -118,34 +118,74 @@ class FeedRegistration {
 	 */
 	private static function register_feed() {
 
-		// Get merchant object.
-		$merchant   = Merchants::get_merchant();
-		$registered = false;
+		$merchant = Merchants::get_merchant();
 
 		if ( ! empty( $merchant['data']->id ) && 'declined' === $merchant['data']->product_pin_approval_status ) {
 
 			self::log( 'Pinterest returned a Declined status for product_pin_approval_status' );
+			return false;
+		}
 
-		} else {
-			/*
-			 * Update feed if we don't have a feed_id saved or if local feed is not properly registered.
-			 * for cases where the already existed in the API.
-			 */
-			$registered = self::get_locally_stored_registered_feed_id();
+		$merchant_id   = $merchant['data']->id;
+		$local_feed_id = self::get_locally_stored_registered_feed_id();
 
-			if ( ! $registered || ! Feeds::is_local_feed_registered( $merchant['data']->id ) ) {
+		if ( ! $local_feed_id || ! Feeds::is_local_feed_registered( $merchant_id ) ) {
 
-				// The response only contains the merchant id.
-				$response = Merchants::update_or_create_merchant();
+			$response = Merchants::update_or_create_merchant();
 
-				// If he response contains an array with the feed id this means that it is registered.
-				if ( $response['feed_id'] ) {
-					$registered = true;
-				}
+			// If he response contains an array with the feed id this means that it is registered.
+			if ( $response['feed_id'] ) {
+				$local_feed_id = $response['feed_id'];
 			}
 		}
 
-		return $registered;
+		if ( $local_feed_id && ( ! Feeds::is_local_feed_enabled( $merchant_id, $local_feed_id ) ) ) {
+			Feeds::enabled_feed( $merchant_id, $local_feed_id );
+		}
+
+		// Cleanup feeds that are registered but not in the local feed configurations.
+		self::maybe_disable_stale_feeds_for_merchant( $merchant_id );
+
+		return true;
+	}
+
+	/**
+	 * Check if there are stale feeds that are registered but not in the local feed configurations.
+	 * Deregister them if they are registered as WooCommerce integration.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $merchant_id Merchant ID.
+	 *
+	 * @return void
+	 */
+	public static function maybe_disable_stale_feeds_for_merchant( $merchant_id ) {
+
+		$feed_profiles = Feeds::get_merchant_feeds( $merchant_id );
+
+		if ( empty( $feed_profiles ) ) {
+			return;
+		}
+
+		$local_feed_id = self::get_locally_stored_registered_feed_id();
+
+		foreach ( $feed_profiles as $feed ) {
+			// Local feed should not be disabled.
+			if ( $local_feed_id === $feed->id ) {
+				continue;
+			}
+
+			// Only disable feeds that are registered as WooCommerce integration.
+			if ( 'WOOCOMMERCE' !== $feed->integration_platform_type ) {
+				continue;
+			}
+
+			if ( 'ACTIVE' === $feed->feed_status ) {
+				Feeds::disable_feed( $merchant_id, $feed->id );
+			}
+		}
+
+		// TODO: Invalidate cache.
 	}
 
 	/**

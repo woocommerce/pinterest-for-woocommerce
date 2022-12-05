@@ -530,6 +530,33 @@ class Base {
 		);
 	}
 
+	/**
+	 * Disable a feed.
+	 *
+	 * @param string $merchant_id     The merchant ID the feed belongs to.
+	 * @param string $feed_profile_id The ID of the feed to be disabled.
+	 *
+	 * @return mixed
+	 */
+	public static function disable_merchant_feed( $merchant_id, $feed_profile_id ) {
+		return self::make_request(
+			"catalogs/disable_feed_profile/{$merchant_id}/{$feed_profile_id}/"
+		);
+	}
+
+	/**
+	 * Enable a feed.
+	 *
+	 * @param string $merchant_id     The merchant ID the feed belongs to.
+	 * @param string $feed_profile_id The ID of the feed to be enabled.
+	 *
+	 * @return mixed
+	 */
+	public static function enable_merchant_feed( $merchant_id, $feed_profile_id ) {
+		return self::make_request(
+			"catalogs/enable_feed_profile/{$merchant_id}/{$feed_profile_id}/"
+		);
+	}
 
 	/**
 	 * Get a merchant's feeds.

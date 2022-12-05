@@ -129,4 +129,61 @@ class Feeds {
 		return '';
 	}
 
+	/**
+	 * Check if the registered feed is enabled.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $merchant_id     The merchant ID.
+	 * @param string $feed_profile_id The ID of the feed.
+	 *
+	 * @return bool True if the feed is active, false otherwise.
+	 */
+	public static function is_local_feed_enabled( $merchant_id, $feed_profile_id ) {
+		$feed = self::get_merchant_feed( $merchant_id, $feed_profile_id );
+		return 'ACTIVE' === $feed->feed_status;
+	}
+
+	/**
+	 * Enabled the feed.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $merchant_id     The merchant ID.
+	 * @param string $feed_profile_id The ID of the feed.
+	 *
+	 * @return bool True if the feed is has been enabled, false otherwise.
+	 */
+	public static function enabled_feed( $merchant_id, $feed_profile_id ) {
+		try {
+			$result = Base::enable_merchant_feed( $merchant_id, $feed_profile_id );
+
+			return true;
+		} catch ( \Throwable $th ) {
+			Logger::log( $th->getMessage(), 'error' );
+			return false;
+		}
+	}
+
+	/**
+	 * Enabled the feed.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $merchant_id     The merchant ID.
+	 * @param string $feed_profile_id The ID of the feed.
+	 *
+	 * @return bool True if the feed is has been disabled, false otherwise.
+	 */
+	public static function disable_feed( $merchant_id, $feed_profile_id ) {
+		try {
+			$result = Base::disable_merchant_feed( $merchant_id, $feed_profile_id );
+
+			return true;
+		} catch ( \Throwable $th ) {
+			Logger::log( $th->getMessage(), 'error' );
+			return false;
+		}
+	}
+
 }
