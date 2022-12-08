@@ -533,6 +533,8 @@ class Base {
 	/**
 	 * Disable a feed.
 	 *
+	 * @since x.x.x
+	 *
 	 * @param string $merchant_id     The merchant ID the feed belongs to.
 	 * @param string $feed_profile_id The ID of the feed to be disabled.
 	 *
@@ -546,6 +548,8 @@ class Base {
 
 	/**
 	 * Enable a feed.
+	 *
+	 * @since x.x.x
 	 *
 	 * @param string $merchant_id     The merchant ID the feed belongs to.
 	 * @param string $feed_profile_id The ID of the feed to be enabled.
