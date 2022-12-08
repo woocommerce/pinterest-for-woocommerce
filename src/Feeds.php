@@ -100,13 +100,14 @@ class Feeds {
 
 
 	/**
-	 * Verify if the local feed is already registered to the merchant
+	 * Verify if the local feed is already registered to the merchant.
+	 * Return its ID if it is.
 	 *
 	 * @param string $merchant_id The merchant ID.
 	 *
 	 * @return string Returns the ID of the feed if properly registered or an empty string otherwise.
 	 */
-	public static function is_local_feed_registered( $merchant_id ) {
+	public static function match_local_feed_configuration_to_registered_feeds( $merchant_id ) {
 		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
 		$config        = reset( $configs );
 		$local_path    = dirname( $config['feed_url'] );

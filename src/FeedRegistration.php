@@ -129,7 +129,7 @@ class FeedRegistration {
 		$merchant_id   = $merchant['data']->id;
 		$local_feed_id = self::get_locally_stored_registered_feed_id();
 
-		if ( ! $local_feed_id || ! Feeds::is_local_feed_registered( $merchant_id ) ) {
+		if ( ! $local_feed_id || ! Feeds::match_local_feed_configuration_to_registered_feeds( $merchant_id ) ) {
 
 			$response = Merchants::update_or_create_merchant();
 

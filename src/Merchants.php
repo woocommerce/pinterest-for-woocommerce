@@ -168,7 +168,7 @@ class Merchants {
 			throw new Exception( __( 'Response error when trying to create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
-		$registered_feed = Feeds::is_local_feed_registered( $response['data'] );
+		$registered_feed = Feeds::match_local_feed_configuration_to_registered_feeds( $response['data'] );
 
 		// Clean the cached delay.
 		Pinterest_For_Woocommerce()::save_data( 'create_merchant_delay', false );
