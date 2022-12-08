@@ -66,7 +66,7 @@ class Feeds {
 
 
 	/**
-	 * Get merchant's feeds
+	 * Get merchant's feeds.
 	 *
 	 * @param string $merchant_id The merchant ID.
 	 *
