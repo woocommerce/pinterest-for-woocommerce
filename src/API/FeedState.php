@@ -371,7 +371,7 @@ class FeedState extends VendorAPI {
 	 * Adds to the result variable an array with info about the
 	 * third party plugins that may conflict with the Rich Pins feature.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.7
 	 *
 	 * @param array $result The result array to add values to.
 	 *

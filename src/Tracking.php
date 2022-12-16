@@ -355,7 +355,7 @@ JS;
 		 *
 		 * This filter is not guaranteed to be here in the future. It may be removed at any time. Use at your own risk.
 		 *
-		 * @since x.x.x
+		 * @since 1.2.7
 		 *
 		 * @param bool $is_disable Tracking is enabled if false, and disabled if true.
 		 */
