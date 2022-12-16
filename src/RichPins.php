@@ -276,7 +276,7 @@ class RichPins {
 	/**
 	 * Get the formatted warning message for the potential conflicting rich pin tags.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.7
 	 *
 	 * @return string The warning message.
 	 */
@@ -303,7 +303,7 @@ class RichPins {
 	/**
 	 * Detect if there are other plugins installed on the site that conflicts with Rich Pins feature.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.7
 	 *
 	 * @return array The list of installed plugins.
 	 */
