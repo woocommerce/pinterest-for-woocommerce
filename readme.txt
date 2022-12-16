@@ -91,6 +91,15 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.7 - 2022-12-16 =
+* Add - Warning message duplicated meta tags.
+* Fix - Update Tracking.php.
+* Fix - Update wording in filter descriotion, tracking disable fiter.
+* Fix - Use min instead of max.
+* Tweak - Improve translators strings.
+* Tweak - Refactor update procedures.
+* Tweak - WC 7.2 compatibility.
+
 = 1.2.6 - 2022-11-16 =
 * Tweak - Add Ads Credits promotion information to the readme.txt.
 * Tweak - Backoff merchant creation in case of failure.
