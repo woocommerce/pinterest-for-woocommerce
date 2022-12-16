@@ -71,7 +71,7 @@ class TrackerSnapshot {
 	 */
 	protected static function parse_settings(): array {
 
-		$settings = Pinterest_For_Woocommerce::get_settings( true );
+		$settings = (array) Pinterest_For_Woocommerce()::get_settings( true );
 
 		$tracked_settings = array(
 			'track_conversions',
