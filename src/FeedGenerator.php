@@ -36,6 +36,11 @@ class FeedGenerator extends AbstractChainedJob {
 	const WAIT_ON_ERROR_BEFORE_RETRY = HOUR_IN_SECONDS;
 
 	/**
+	 * The max number of retries per batch before aborting the generation process.
+	 */
+	const MAX_RETRIES_PER_BATCH = 2;
+
+	/**
 	 * Local Feed Configurations class.
 	 *
 	 * @var LocalFeedConfigs of local feed configurations;
@@ -138,6 +143,47 @@ class FeedGenerator extends AbstractChainedJob {
 			);
 		} catch ( Throwable $th ) {
 			$this->handle_error( $th );
+			throw $th;
+		}
+	}
+
+	/**
+	 * Handle processing a chain batch.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param int   $batch_number The batch number for the new batch.
+	 * @param array $args         The args for the job.
+	 *
+	 * @throws Throwable Related to issues possible when creating an empty feed temp file and populating the header.
+	 */
+	public function handle_batch_action( int $batch_number, array $args ) {
+		try {
+			$error_retries = (int) Pinterest_For_Woocommerce()::get_data( 'feed_generation_retries' ) ?? 0;
+
+			parent::handle_batch_action( $batch_number, $args );
+
+			Pinterest_For_Woocommerce()::save_data( 'feed_generation_retries', 0 );
+		} catch ( Throwable $th ) {
+			$error_retries = (int) Pinterest_For_Woocommerce()::get_data( 'feed_generation_retries' ) ?? 0;
+
+			// We abort after many retries.
+			if ( $error_retries >= self::MAX_RETRIES_PER_BATCH ) {
+				Pinterest_For_Woocommerce()::save_data( 'feed_generation_retries', 0 );
+
+				self::log( __( 'Aborting the feed generation after too many retries.', 'pinterest-for-woocommerce' ), 'error' );
+
+				throw $th;
+			}
+
+			Pinterest_For_Woocommerce()::save_data( 'feed_generation_retries', $error_retries + 1 );
+
+			/* Translators: The batch number. */
+			self::log( sprintf( __( 'There was an error running the batch #%s, it will be rescheduled to run again.', 'pinterest-for-woocommerce' ), $batch_number ), 'error' );
+
+			// Re-schedule the current batch item.
+			$this->queue_batch( $batch_number, $args );
+
 			throw $th;
 		}
 	}
