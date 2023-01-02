@@ -271,4 +271,50 @@ class RichPins {
 
 		return '';
 	}
+
+
+	/**
+	 * Get the formatted warning message for the potential conflicting rich pin tags.
+	 *
+	 * @since 1.2.7
+	 *
+	 * @return string The warning message.
+	 */
+	public static function get_third_party_conflict_warning_message() {
+
+		$third_party_plugins = self::get_third_party_conflicting_plugins();
+
+		if ( empty( $third_party_plugins ) ) {
+			return '';
+		}
+
+		return sprintf(
+			/* Translators: 1: Conflicting plugins, 2: Plugins Admin page opening tag, 3: Pinterest settings opening tag, 4: Closing anchor tag */
+			esc_html__( 'The following installed plugin(s) can potentially cause problems with Rich Pins: %1$s. %2$sRemove conflicting plugins%4$s or %3$smanage Rich Pins settings%4$s.', 'pinterest-for-woocommerce' ),
+			implode( ', ', $third_party_plugins ),
+			sprintf( '<a href="%s" target="_blank">', esc_url( admin_url( 'plugins.php' ) ) ),
+			sprintf( '<a href="%s" target="_blank">', esc_url( wc_admin_url( '&path=/pinterest/settings' ) ) ),
+			'</a>',
+		);
+
+	}
+
+
+	/**
+	 * Detect if there are other plugins installed on the site that conflicts with Rich Pins feature.
+	 *
+	 * @since 1.2.7
+	 *
+	 * @return array The list of installed plugins.
+	 */
+	public static function get_third_party_conflicting_plugins() {
+
+		$third_party_plugins = array();
+
+		if ( class_exists( 'RankMath' ) ) {
+			$third_party_plugins['rmseo'] = 'RankMath SEO';
+		}
+
+		return $third_party_plugins;
+	}
 }

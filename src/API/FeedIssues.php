@@ -14,6 +14,7 @@ use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use \WP_REST_Server;
 use \WP_REST_Request;
 use \WP_REST_Response;
+use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -52,7 +53,7 @@ class FeedIssues extends VendorAPI {
 	 *
 	 * @param WP_REST_Request $request The request.
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	public function get_feed_issues( WP_REST_Request $request ) {
 
@@ -83,7 +84,7 @@ class FeedIssues extends VendorAPI {
 			$issues_file = $this->get_remote_file( $issues_file_url, (array) $workflow );
 
 			if ( empty( $issues_file ) ) {
-				throw new \Exception( esc_html__( 'Error downloading feed issues file from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
+				throw new Exception( esc_html__( 'Error downloading feed issues file from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
 			$start_line  = ( ( $paged - 1 ) * $per_page );
@@ -276,14 +277,18 @@ class FeedIssues extends VendorAPI {
 	 *
 	 * @return object
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	public static function get_feed_workflow( $feed_id ) {
+		if ( ! $feed_id ) {
+			throw new Exception( esc_html__( 'No feed ID provided.', 'pinterest-for-woocommerce' ) );
+		}
+
 		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
 		$feed_report = $merchant_id ? Base::get_merchant_feed_report( $merchant_id, $feed_id ) : false;
 
 		if ( ! $feed_report || 'success' !== $feed_report['status'] ) {
-			throw new \Exception( esc_html__( 'Could not get feed report from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
+			throw new Exception( esc_html__( 'Could not get feed report from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
 		if ( ! property_exists( $feed_report['data'], 'workflows' ) || ! is_array( $feed_report['data']->workflows ) || empty( $feed_report['data']->workflows ) ) {

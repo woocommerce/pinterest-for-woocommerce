@@ -12,6 +12,7 @@ use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductSync;
+use Automattic\WooCommerce\Pinterest\RichPins;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use \WP_REST_Server;
 
@@ -82,6 +83,7 @@ class FeedState extends VendorAPI {
 		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_local_feed_state' ) );
 		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_feed_registration_state' ) );
 		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_third_party_tags_warning' ) );
+		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_rich_pins_conflict_warning' ) );
 	}
 
 
@@ -336,7 +338,7 @@ class FeedState extends VendorAPI {
 
 	/**
 	 * Adds to the result variable an array with info about the
-	 * registration and configuration process of the XML feed to the Pinterest API.
+	 * third party plugins that may conflict with the tracking feature.
 	 *
 	 * @since 1.2.3
 	 *
@@ -356,6 +358,37 @@ class FeedState extends VendorAPI {
 
 		$result['workflow'][] = array(
 			'label'        => esc_html__( 'Pinterest tag', 'pinterest-for-woocommerce' ),
+			'status'       => 'warning',
+			'status_label' => esc_html__( 'Potential conflicting plugins', 'pinterest-for-woocommerce' ),
+			'extra_info'   => $warning_message,
+		);
+
+		return $result;
+	}
+
+
+	/**
+	 * Adds to the result variable an array with info about the
+	 * third party plugins that may conflict with the Rich Pins feature.
+	 *
+	 * @since 1.2.7
+	 *
+	 * @param array $result The result array to add values to.
+	 *
+	 * @return array
+	 *
+	 * @throws \Exception PHP Exception.
+	 */
+	public function add_rich_pins_conflict_warning( $result ) {
+
+		$warning_message = RichPins::get_third_party_conflict_warning_message();
+
+		if ( empty( $warning_message ) ) {
+			return $result;
+		}
+
+		$result['workflow'][] = array(
+			'label'        => esc_html__( 'Pinterest Rich Pins', 'pinterest-for-woocommerce' ),
 			'status'       => 'warning',
 			'status_label' => esc_html__( 'Potential conflicting plugins', 'pinterest-for-woocommerce' ),
 			'extra_info'   => $warning_message,
