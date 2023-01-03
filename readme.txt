@@ -91,6 +91,11 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.8 - 2023-01-03 =
+* Dev - Add node and npm version restrictions.
+* Fix - Prevent failed to `feed_report` if there is no feed registered.
+* Tweak - WC 7.3 compatibility.
+
 = 1.2.7 - 2022-12-16 =
 * Add - Warning message duplicated meta tags.
 * Fix - Update Tracking.php.
