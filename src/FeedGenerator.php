@@ -221,7 +221,7 @@ class FeedGenerator extends AbstractChainedJob {
 		try {
 			// Get included product types.
 			$included_product_types = array_diff(
-				self::get_supported_product_types(),
+				self::get_included_product_types(),
 				self::get_excluded_product_types(),
 			);
 
@@ -544,7 +544,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @return array
 	 */
-	private function get_supported_product_types(): array {
+	private function get_included_product_types(): array {
 		return (array) apply_filters(
 			'pinterest_for_woocommerce_included_product_types',
 			array(
