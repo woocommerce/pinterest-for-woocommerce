@@ -49,6 +49,11 @@ class VariationsAttributes {
 	 * Register a service.
 	 */
 	public function register(): void {
+
+		if ( ! array_key_exists( 'variable', AttributesTab::get_applicable_product_types() ) ) {
+			return;
+		}
+
 		// Priority 90 to render after regular variation attributes.
 		add_action(
 			'woocommerce_product_after_variable_attributes',
