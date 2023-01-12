@@ -34,6 +34,11 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['settings']['track_conversions'], 'yes', "Boolean track value 'true' is tracked as 'yes'" );
 		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['settings']['erase_plugin_data'], 'no', "Boolean track value 'false' is tracked as 'no'" );
 		$this->assertEquals( count( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['settings'] ), count(  self::$default_settings ), "All the values should be tracked" );
+
+		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['store']['connected'], 'no' );
+		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['store']['actively_syncing'], 'no' );
+		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed']['generation_time'], '0' );
+		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed']['products_count'], '0' );
 	}
 
 	function test_settings_are_not_tracked_by_woo_tracker_if_opt_out() {
@@ -49,4 +54,29 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 
 	}
 
+	function test_reset_feed_file_generation_time_resets_transients() {
+		set_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_TIME, 1234567 );
+		set_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_START_TIME, 9876543 );
+
+		TrackerSnapshot::reset_feed_file_generation_time();
+
+		$this->assertEquals( get_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_TIME ), 0 );
+		$this->assertNotEquals( get_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_START_TIME ), 9876543 );
+	}
+
+	function test_set_feed_file_generation_time_calculates_generation_time() {
+		set_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_START_TIME, 12 );
+
+		TrackerSnapshot::set_feed_file_generation_time( 10 );
+
+		$this->assertEquals( get_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_TIME ), 2 );
+	}
+
+	function test_set_feed_file_generation_time_does_not_set_generation_time() {
+		delete_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_START_TIME );
+
+		TrackerSnapshot::set_feed_file_generation_time( 10 );
+
+		$this->assertFalse( get_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_TIME ) );
+	}
 }
