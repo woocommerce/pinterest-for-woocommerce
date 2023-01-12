@@ -77,8 +77,8 @@ class TrackerSnapshot {
 		$data['extensions'][ PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX ] = array(
 			'settings' => self::parse_settings(),
 			'store'    => array(
-				'connected'        => Pinterest_For_Woocommerce::is_connected(),
-				'actively_syncing' => ProductSync::is_product_sync_enabled(),
+				'connected'        => wc_bool_to_string( Pinterest_For_Woocommerce::is_connected() ),
+				'actively_syncing' => wc_bool_to_string( ProductSync::is_product_sync_enabled() ),
 			),
 			'feed'     => array(
 				'generation_time' => $feed_generation_time,
