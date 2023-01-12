@@ -60,8 +60,8 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 
 		TrackerSnapshot::reset_feed_file_generation_time();
 
-		$this->assertEquals( get_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_TIME ), 0 );
-		$this->assertNotEquals( get_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_START_TIME ), 9876543 );
+		$this->assertEquals( 0, get_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_TIME ) );
+		$this->assertNotEquals( 9876543, get_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_START_TIME ) );
 	}
 
 	function test_set_feed_file_generation_time_calculates_generation_time() {
@@ -69,7 +69,7 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 
 		TrackerSnapshot::set_feed_file_generation_time( 14 );
 
-		$this->assertEquals( get_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_TIME ), 2 );
+		$this->assertEquals( 2, get_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_TIME ) );
 	}
 
 	function test_set_feed_file_generation_time_does_not_set_generation_time() {
