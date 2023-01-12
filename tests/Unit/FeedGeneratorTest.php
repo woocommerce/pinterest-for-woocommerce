@@ -6,9 +6,11 @@ use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerIn
 
 class FeedGeneratorTest extends \WP_UnitTestCase {
 
-	private ActionSchedulerInterface $action_scheduler;
+	/** @var ActionSchedulerInterface */
+	private $action_scheduler;
 
-	private LocalFeedConfigs $local_feed_configs;
+	/** @var LocalFeedConfigs */
+	private $local_feed_configs;
 
 	public function setUp() {
 		parent::setUp();

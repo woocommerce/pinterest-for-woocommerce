@@ -67,7 +67,7 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 	function test_set_feed_file_generation_time_calculates_generation_time() {
 		set_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_START_TIME, 12 );
 
-		TrackerSnapshot::set_feed_file_generation_time( 10 );
+		TrackerSnapshot::set_feed_file_generation_time( 14 );
 
 		$this->assertEquals( get_transient( TrackerSnapshot::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_TIME ), 2 );
 	}
