@@ -19,22 +19,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class TrackerSnapshot {
 
 	/**
-	 * Transient key name; the time when was the feed generation started.
-	 *
-	 * @var string
-	 */
-	public const TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_START_TIME = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_wctracker_feed_generation_wall_start_time';
-
-	/**
-	 * Transient key name; the time it took to generate feed.
-	 *
-	 * @var string
-	 */
-	public const TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_TIME = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_wctracker_feed_generation_wall_time';
-
-	public const TRANSIENT_WCTRACKER_LIFE_TIME = 2 * WEEK_IN_SECONDS;
-
-	/**
 	 * Not needed if allow_tracking is disabled.
 	 *
 	 * @return bool Whether the object is needed.
