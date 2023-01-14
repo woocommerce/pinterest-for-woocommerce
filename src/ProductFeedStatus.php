@@ -18,10 +18,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ProductFeedStatus {
 
 	const STATE_PROPS = array(
-		'status'        => 'pending_config',
-		'last_activity' => 0,
-		'product_count' => 0,
-		'error_message' => '',
+		'status'                                   => 'pending_config',
+		'last_activity'                            => 0,
+		'product_count'                            => 0,
+		'error_message'                            => '',
+		self::PROP_FEED_GENERATION_WALL_START_TIME => false,
+		self::PROP_FEED_GENERATION_WALL_TIME       => false,
 	);
 
 	const PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feeds_';
@@ -96,6 +98,7 @@ class ProductFeedStatus {
 	public static function deregister() {
 
 		foreach ( self::STATE_PROPS as $key => $default_value ) {
+			self::$state[ $key ] = $default_value;
 			delete_transient( self::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key );
 		}
 	}
@@ -106,8 +109,8 @@ class ProductFeedStatus {
 	public static function reset_feed_file_generation_time() {
 		self::set(
 			array(
-				ProductFeedStatus::PROP_FEED_GENERATION_WALL_START_TIME => time(),
-				ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME       => 0,
+				self::PROP_FEED_GENERATION_WALL_START_TIME => time(),
+				self::PROP_FEED_GENERATION_WALL_TIME       => 0,
 			)
 		);
 	}
@@ -118,11 +121,11 @@ class ProductFeedStatus {
 	 * @param int $time_now - current time, e.g. time().
 	 */
 	public static function set_feed_file_generation_time( int $time_now ) {
-		$recent_feed_start_time = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_START_TIME ];
+		$recent_feed_start_time = self::get()[ self::PROP_FEED_GENERATION_WALL_START_TIME ];
 		if ( false !== $recent_feed_start_time ) {
 			self::set(
 				array(
-					ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME => $time_now - (int) $recent_feed_start_time,
+					self::PROP_FEED_GENERATION_WALL_TIME => $time_now - (int) $recent_feed_start_time,
 				)
 			);
 		}
@@ -132,9 +135,9 @@ class ProductFeedStatus {
 	 * Sets feed generation time into negative value to communicate feed generation failure.
 	 */
 	public static function mark_feed_file_generation_as_failed() {
-		ProductFeedStatus::set(
+		self::set(
 			array(
-				ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME => -1,
+				self::PROP_FEED_GENERATION_WALL_TIME => -1,
 			)
 		);
 	}

@@ -72,7 +72,7 @@ class TrackerSnapshot {
 			$data['extensions'] = array();
 		}
 
-		$feed_generation_time = (int) get_transient( self::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_TIME );
+		$feed_generation_time = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
 
 		$data['extensions'][ PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX ] = array(
 			'settings' => self::parse_settings(),

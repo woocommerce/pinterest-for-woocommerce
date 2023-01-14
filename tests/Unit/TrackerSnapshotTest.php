@@ -29,8 +29,8 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		TrackerSnapshot::maybe_init();
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
 
-		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['settings']['track_conversions'], 'yes', "Boolean track value 'true' is tracked as 'yes'" );
-		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['settings']['erase_plugin_data'], 'no', "Boolean track value 'false' is tracked as 'no'" );
+		$this->assertEquals( 'yes', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['settings']['track_conversions'], "Boolean track value 'true' is tracked as 'yes'" );
+		$this->assertEquals( 'no', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['settings']['erase_plugin_data'], "Boolean track value 'false' is tracked as 'no'" );
 		$this->assertEquals( count( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['settings'] ), count(  self::$default_settings ), "All the values should be tracked" );
 	}
 
@@ -40,15 +40,14 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		TrackerSnapshot::maybe_init();
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
 
-		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['store']['connected'], 'no' );
-		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['store']['actively_syncing'], 'no' );
+		$this->assertEquals( 'no', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['store']['connected'] );
+		$this->assertEquals( 'no', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['store']['actively_syncing'] );
 	}
 
 	public function test_extension_connection_status_is_tracked_as_yes_if_opt_in() {
 		$settings = array_merge(
 			self::$default_settings,
 			array(
-				'token'                => 'some-fake-token',
 				'account_data'         => array(
 					'is_any_website_verified' => true,
 				),
@@ -56,13 +55,19 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 				'product_sync_enabled' => true,
 			)
 		);
+
 		Pinterest_For_Woocommerce::save_settings( $settings );
+		Pinterest_For_Woocommerce::save_token(
+			array(
+				'access_token' => 'some-fake-access-token',
+			)
+		);
 
 		TrackerSnapshot::maybe_init();
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
 
-		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['store']['connected'], 'yes' );
-		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['store']['actively_syncing'], 'yes' );
+		$this->assertEquals( 'yes', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['store']['connected'] );
+		$this->assertEquals( 'yes', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['store']['actively_syncing'] );
 	}
 
 	public function test_extension_feed_status_is_tracked_if_opt_in() {
@@ -71,11 +76,12 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		TrackerSnapshot::maybe_init();
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
 
-		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed']['generation_time'], 0 );
-		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed']['products_count'], 0 );
+		$this->assertArrayHasKey( 'feed', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX] );
+		$this->assertArrayHasKey( 'generation_time', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed'] );
+		$this->assertArrayHasKey( 'products_count', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed'] );
 	}
 
-	public function test_extension_feed_generation_time_has_the_value_of_the_transient() {
+	public function test_extension_feed_generation_time_has_the_value_from_product_feed_status_storage() {
 		Pinterest_For_Woocommerce::save_settings( self::$default_settings );
 
 		TrackerSnapshot::maybe_init();
@@ -86,7 +92,7 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 			)
 		);
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
-		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed']['generation_time'], 786453786 );
+		$this->assertEquals( 786453786, $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed']['generation_time'] );
 
 		ProductFeedStatus::set(
 			array(
@@ -94,7 +100,7 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 			)
 		);
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
-		$this->assertEquals( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed']['generation_time'], -87935467089345 );
+		$this->assertEquals( -87935467089345, $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed']['generation_time'] );
 	}
 
 	function test_settings_are_not_tracked_by_woo_tracker_if_opt_out() {

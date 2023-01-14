@@ -6,7 +6,30 @@ use Pinterest_For_Woocommerce;
 
 class ProductFeedStatusTest extends \WP_UnitTestCase {
 
-	function test_product_feed_state_has_feed_related_data_entries() {
+	public function setUp() {
+		parent::setUp();
+		/* Cleanup status before each test. */
+		ProductFeedStatus::deregister();
+	}
+
+	public function test_deregister_resets_feed_generation_product_feed_status_properties_to_defaults() {
+		ProductFeedStatus::set(
+			array(
+				ProductFeedStatus::PROP_FEED_GENERATION_WALL_START_TIME => 11214,
+				ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME       => 61515,
+			)
+		);
+
+		ProductFeedStatus::deregister();
+
+		$feed_generation_wall_start_time = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_START_TIME ];
+		$feed_generation_wall_time       = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
+
+		$this->assertFalse( $feed_generation_wall_start_time );
+		$this->assertFalse( $feed_generation_wall_time );
+	}
+
+	public function test_product_feed_state_has_feed_related_data_entries() {
 		$this->assertArrayHasKey( ProductFeedStatus::PROP_FEED_GENERATION_WALL_START_TIME, ProductFeedStatus::STATE_PROPS );
 		$this->assertArrayHasKey( ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME, ProductFeedStatus::STATE_PROPS );
 	}
@@ -71,6 +94,6 @@ class ProductFeedStatusTest extends \WP_UnitTestCase {
 
 		$feed_generation_wall_time = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
 
-		$this->asertEquals( -1, $feed_generation_wall_time );
+		$this->assertEquals( -1, $feed_generation_wall_time );
 	}
 }
