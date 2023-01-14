@@ -82,7 +82,7 @@ class TrackerSnapshot {
 			),
 			'feed'     => array(
 				'generation_time' => $feed_generation_time,
-				'products_count'  => ProductFeedStatus::get()['product_count'] ?? 0,
+				'products_count'  => (int) ProductFeedStatus::get()['product_count'] ?? 0,
 			),
 		);
 
@@ -113,29 +113,5 @@ class TrackerSnapshot {
 		return array_map( 'wc_bool_to_string', $settings ) + array( 'version' => PINTEREST_FOR_WOOCOMMERCE_VERSION );
 	}
 
-	/**
-	 * Resets a feed generation start time.
-	 *
-	 * @return bool
-	 */
-	public static function reset_feed_file_generation_time(): bool {
-		$start_time = set_transient( self::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_START_TIME, time(), self::TRANSIENT_WCTRACKER_LIFE_TIME );
-		$wall_time  = set_transient( self::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_TIME, 0, self::TRANSIENT_WCTRACKER_LIFE_TIME );
-		return $start_time && $wall_time;
-	}
 
-	/**
-	 * Calculates and sets feed generation time.
-	 *
-	 * @param int $time_now - current time, e.g. time().
-	 *
-	 * @return bool
-	 */
-	public static function set_feed_file_generation_time( int $time_now ): bool {
-		$recent_feed_start_time = get_transient( self::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_START_TIME );
-		if ( false !== $recent_feed_start_time ) {
-			return set_transient( self::TRANSIENT_WCTRACKER_FEED_GENERATION_WALL_TIME, $time_now - (int) $recent_feed_start_time, self::TRANSIENT_WCTRACKER_LIFE_TIME );
-		}
-		return false;
-	}
 }
