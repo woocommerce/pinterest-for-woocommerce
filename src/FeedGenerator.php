@@ -128,7 +128,6 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	protected function handle_start() {
 		self::log( __( 'Feed generation start. Preparing temporary files.', 'pinterest-for-woocommerce' ) );
-		/* Remember the time a feed generation has started. */
 		ProductFeedStatus::reset_feed_file_generation_time();
 		try {
 			$this->prepare_temporary_files();
@@ -157,7 +156,6 @@ class FeedGenerator extends AbstractChainedJob {
 		try {
 			$this->add_footer_to_temporary_feed_files();
 			$this->rename_temporary_feed_files_to_final();
-			/* Calculate the time it took a feed to generate. */
 			ProductFeedStatus::set_feed_file_generation_time( time() );
 		} catch ( Throwable $th ) {
 			$this->handle_error( $th );
@@ -415,7 +413,6 @@ class FeedGenerator extends AbstractChainedJob {
 				'error_message' => $th->getMessage(),
 			)
 		);
-		/* Marks feed as failed to generate. */
 		ProductFeedStatus::mark_feed_file_generation_as_failed();
 
 		self::log( $th->getMessage(), 'error' );
