@@ -78,7 +78,7 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 
 		$this->assertArrayHasKey( 'feed', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX] );
 		$this->assertArrayHasKey( 'generation_time', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed'] );
-		$this->assertArrayHasKey( 'products_count', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed'] );
+		$this->assertArrayHasKey( 'product_count', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed'] );
 	}
 
 	public function test_extension_feed_generation_time_has_the_value_from_product_feed_status_storage() {

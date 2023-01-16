@@ -66,7 +66,7 @@ class TrackerSnapshot {
 			),
 			'feed'     => array(
 				'generation_time' => $feed_generation_time,
-				'products_count'  => (int) ProductFeedStatus::get()['product_count'] ?? 0,
+				'product_count'   => (int) ProductFeedStatus::get()['product_count'] ?? 0,
 			),
 		);
 
