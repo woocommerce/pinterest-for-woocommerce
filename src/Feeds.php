@@ -180,7 +180,7 @@ class Feeds {
 		try {
 			$result = Base::disable_merchant_feed( $merchant_id, $feed_profile_id );
 
-			return true;
+			return $result['status'] === 'success';
 		} catch ( \Throwable $th ) {
 			Logger::log( $th->getMessage(), 'error' );
 			return false;
