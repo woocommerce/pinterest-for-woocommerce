@@ -1,7 +1,9 @@
 <?php
 
-namespace Automattic\WooCommerce\Pinterest;
+namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
+use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
+use Automattic\WooCommerce\Pinterest\TrackerSnapshot;
 use Pinterest_For_Woocommerce;
 
 class TrackerSnapshotTest extends \WP_UnitTestCase {
@@ -81,26 +83,32 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		$this->assertArrayHasKey( 'product_count', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed'] );
 	}
 
-	public function test_extension_feed_generation_time_has_the_value_from_product_feed_status_storage() {
+	public function test_extension_feed_generation_time_and_recent_product_count_have_values_from_product_feed_status_storage() {
 		Pinterest_For_Woocommerce::save_settings( self::$default_settings );
 
 		TrackerSnapshot::maybe_init();
 
 		ProductFeedStatus::set(
 			array(
-				ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME => 786453786,
+				'product_count'                                              => 19,
+				ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME            => 786453786,
+				ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT => 99,
 			)
 		);
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
 		$this->assertEquals( 786453786, $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed']['generation_time'] );
+		$this->assertEquals( 99, $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed']['product_count'] );
 
 		ProductFeedStatus::set(
 			array(
-				ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME => -87935467089345,
+				'product_count'                                              => 39,
+				ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME            => -87935467089345,
+				ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT => 69,
 			)
 		);
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
 		$this->assertEquals( -87935467089345, $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed']['generation_time'] );
+		$this->assertEquals( 69, $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['feed']['product_count'] );
 	}
 
 	function test_settings_are_not_tracked_by_woo_tracker_if_opt_out() {

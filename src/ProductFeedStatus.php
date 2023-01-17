@@ -18,12 +18,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ProductFeedStatus {
 
 	const STATE_PROPS = array(
-		'status'                                   => 'pending_config',
-		'last_activity'                            => 0,
-		'product_count'                            => 0,
-		'error_message'                            => '',
-		self::PROP_FEED_GENERATION_WALL_START_TIME => false,
-		self::PROP_FEED_GENERATION_WALL_TIME       => false,
+		'status'                                        => 'pending_config',
+		'last_activity'                                 => 0,
+		'product_count'                                 => 0,
+		'error_message'                                 => '',
+		self::PROP_FEED_GENERATION_WALL_START_TIME      => false,
+		self::PROP_FEED_GENERATION_WALL_TIME            => 0,
+		self::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT => 0,
 	);
 
 	const PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feeds_';
@@ -31,6 +32,8 @@ class ProductFeedStatus {
 	const PROP_FEED_GENERATION_WALL_START_TIME = 'feed_generation_wall_start_time';
 
 	const PROP_FEED_GENERATION_WALL_TIME = 'feed_generation_wall_time';
+
+	const PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT = 'feed_generation_recent_product_count';
 
 	/**
 	 * The array that holds the state of the feed, used as cache.
@@ -96,10 +99,15 @@ class ProductFeedStatus {
 	 * @return void
 	 */
 	public static function deregister() {
-
+		$properties_to_persist = array(
+			self::PROP_FEED_GENERATION_WALL_TIME,
+			self::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT,
+		);
 		foreach ( self::STATE_PROPS as $key => $default_value ) {
-			self::$state[ $key ] = $default_value;
-			delete_transient( self::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key );
+			if ( ! in_array( $key, $properties_to_persist, true ) ) {
+				self::$state[ $key ] = $default_value;
+				delete_transient( self::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key );
+			}
 		}
 	}
 
@@ -113,7 +121,6 @@ class ProductFeedStatus {
 		self::set(
 			array(
 				self::PROP_FEED_GENERATION_WALL_START_TIME => time(),
-				self::PROP_FEED_GENERATION_WALL_TIME       => 0,
 			)
 		);
 	}

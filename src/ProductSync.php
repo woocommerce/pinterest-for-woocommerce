@@ -120,14 +120,14 @@ class ProductSync {
 	 * @since 1.0.10
 	 */
 	private static function initialize_feed_components() {
-		$action_scheduler        = new ActionSchedulerProxy();
 		self::$configurations    = LocalFeedConfigs::get_instance();
-		self::$feed_generator    = new FeedGenerator( $action_scheduler, self::$configurations );
-		self::$feed_registration = new FeedRegistration( self::$configurations, self::$feed_generator );
+		$action_scheduler        = new ActionSchedulerProxy();
+		$feed_file_operations    = new FeedFileOperations( self::$configurations );
+		self::$feed_generator    = new FeedGenerator( $action_scheduler, $feed_file_operations, self::$configurations );
+		self::$feed_registration = new FeedRegistration( self::$configurations, $feed_file_operations );
 
 		self::$feed_registration->init();
 		self::$feed_generator->init();
-
 	}
 
 	/**
