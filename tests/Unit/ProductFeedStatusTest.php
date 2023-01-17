@@ -34,7 +34,8 @@ class ProductFeedStatusTest extends \WP_UnitTestCase {
 	/**
 	 * Tests if ProductFeedStatus::deregister() does not clean up Feed Generation Wall Time
 	 * and Feed Generation Product Count from the previous successful run to be reused in case
-	 * of feed generation failure.
+	 * of feed generation in progress when tracker snapshot is running (not to get intermediate product count into
+	 * tracker parameters while generation is running we use numbers from the previous run).
 	 *
 	 * @return void
 	 */
