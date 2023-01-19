@@ -12,5 +12,5 @@ jobs:
     steps:
       - uses: actions/add-to-project@v0.4.0
         with:
-          project-url: hhttps://github.com/orgs/woocommerce/projects/117
+          project-url: https://github.com/orgs/woocommerce/projects/117
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
