@@ -99,15 +99,9 @@ class ProductFeedStatus {
 	 * @return void
 	 */
 	public static function deregister() {
-		$properties_to_persist = array(
-			self::PROP_FEED_GENERATION_WALL_TIME,
-			self::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT,
-		);
 		foreach ( self::STATE_PROPS as $key => $default_value ) {
-			if ( ! in_array( $key, $properties_to_persist, true ) ) {
-				self::$state[ $key ] = $default_value;
-				delete_transient( self::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key );
-			}
+			self::$state[ $key ] = $default_value;
+			delete_transient( self::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key );
 		}
 	}
 

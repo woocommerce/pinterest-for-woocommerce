@@ -8,52 +8,27 @@ class ProductFeedStatusTest extends \WP_UnitTestCase {
 
 	public function setUp() {
 		parent::setUp();
-		/**
-		 * Cleanup status before each test.
-		 * ProductFeedStatus::deregister() won't work here because deregister()
-		 * is made to skip some keys which values must be persisted e.g. recent feed generation time and
-		 * recent feed generation product count.
-		 */
-		ProductFeedStatus::set( ProductFeedStatus::STATE_PROPS );
+		ProductFeedStatus::deregister();
 	}
 
 	public function test_deregister_resets_feed_generation_product_feed_status_properties_to_defaults() {
 		ProductFeedStatus::set(
 			array(
-				ProductFeedStatus::PROP_FEED_GENERATION_WALL_START_TIME => 11214,
+				ProductFeedStatus::PROP_FEED_GENERATION_WALL_START_TIME      => 11214,
+				ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME            => 53452,
+				ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT => 43623,
 			)
 		);
 
 		ProductFeedStatus::deregister();
 
-		$feed_generation_wall_start_time = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_START_TIME ];
+		$start_time    = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_START_TIME ];
+		$wall_time     = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
+		$product_count = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT ];
 
-		$this->assertFalse( $feed_generation_wall_start_time );
-	}
-
-	/**
-	 * Tests if ProductFeedStatus::deregister() does not clean up Feed Generation Wall Time
-	 * and Feed Generation Product Count from the previous successful run to be reused in case
-	 * of feed generation in progress when tracker snapshot is running (not to get intermediate product count into
-	 * tracker parameters while generation is running we use numbers from the previous run).
-	 *
-	 * @return void
-	 */
-	public function test_deregister_does_not_clean_up_feed_generation_time_and_feed_product_count() {
-		ProductFeedStatus::set(
-			array(
-				ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME            => 61515,
-				ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT => 54,
-			)
-		);
-
-		ProductFeedStatus::deregister();
-
-		$feed_generation_wall_time     = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
-		$feed_generation_product_count = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT ];
-
-		$this->assertEquals( 61515, $feed_generation_wall_time );
-		$this->assertEquals( 54, $feed_generation_product_count );
+		$this->assertFalse( $start_time );
+		$this->assertEquals( 0, $wall_time );
+		$this->assertEquals( 0, $product_count );
 	}
 
 	public function test_product_feed_state_has_feed_related_data_entries() {

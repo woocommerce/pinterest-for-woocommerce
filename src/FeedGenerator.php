@@ -166,7 +166,7 @@ class FeedGenerator extends AbstractChainedJob {
 			$this->feed_file_operations->rename_temporary_feed_files_to_final();
 			ProductFeedStatus::set(
 				array(
-					'status'                                                     => 'generated',
+					'status' => 'generated',
 					ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT => ProductFeedStatus::get()['product_count'],
 				)
 			);

@@ -36,7 +36,7 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		$this->assertEquals( count( $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['settings'] ), count(  self::$default_settings ), "All the values should be tracked" );
 	}
 
-	public function test_extension_connection_status_is_tracked_as_no_if_opt_in() {
+	public function test_extension_connection_status_is_tracked_as_no_if_no_feed_registered() {
 		Pinterest_For_Woocommerce::save_settings( self::$default_settings );
 
 		TrackerSnapshot::maybe_init();
@@ -46,24 +46,25 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		$this->assertEquals( 'no', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['store']['actively_syncing'] );
 	}
 
-	public function test_extension_connection_status_is_tracked_as_yes_if_opt_in() {
-		$settings = array_merge(
-			self::$default_settings,
-			array(
-				'account_data'         => array(
-					'is_any_website_verified' => true,
-				),
-				'tracking_tag'         => true,
-				'product_sync_enabled' => true,
-			)
-		);
+	public function test_extension_connection_status_is_tracked_as_no_if_feed_registered_has_empty_value() {
+		Pinterest_For_Woocommerce::save_settings( self::$default_settings );
+		Pinterest_For_Woocommerce::save_data( 'feed_registered', '' );
 
-		Pinterest_For_Woocommerce::save_settings( $settings );
+		TrackerSnapshot::maybe_init();
+		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
+
+		$this->assertEquals( 'no', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['store']['connected'] );
+		$this->assertEquals( 'no', $tracks['extensions'][PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX]['store']['actively_syncing'] );
+	}
+
+	public function test_extension_connection_status_is_tracked_as_yes_if_opt_in() {
+		Pinterest_For_Woocommerce::save_settings( self::$default_settings );
 		Pinterest_For_Woocommerce::save_token(
 			array(
 				'access_token' => 'some-fake-access-token',
 			)
 		);
+		Pinterest_For_Woocommerce::save_data( 'feed_registered', uniqid() );
 
 		TrackerSnapshot::maybe_init();
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );

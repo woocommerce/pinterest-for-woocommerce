@@ -62,7 +62,7 @@ class TrackerSnapshot {
 			'settings' => self::parse_settings(),
 			'store'    => array(
 				'connected'        => wc_bool_to_string( Pinterest_For_Woocommerce::is_connected() ),
-				'actively_syncing' => wc_bool_to_string( ProductSync::is_product_sync_enabled() ),
+				'actively_syncing' => wc_bool_to_string( ! ! Pinterest_For_Woocommerce::get_data( 'feed_registered' ) ),
 			),
 			'feed'     => array(
 				'generation_time' => $feed_generation_time,
