@@ -33,22 +33,22 @@ class FeedRegistration {
 	private $configurations;
 
 	/**
-	 * Feed File Generator Instance
+	 * Feed File Operations Instance
 	 *
-	 * @var $feed_generator FeedGenerator
+	 * @var $feed_file_operations FeedFileOperations
 	 */
-	private $feed_generator = null;
+	private $feed_file_operations;
 
 	/**
 	 * Feed Registration.
 	 *
 	 * @since 1.0.10
-	 * @param LocalFeedConfigs $local_feeds_configurations Locations configuration class.
-	 * @param FeedGenerator    $feed_generator Feed generator class.
+	 * @param LocalFeedConfigs   $local_feeds_configurations Locations configuration class.
+	 * @param FeedFileOperations $feed_file_operations Feed file operations class.
 	 */
-	public function __construct( $local_feeds_configurations, $feed_generator ) {
-		$this->configurations = $local_feeds_configurations;
-		$this->feed_generator = $feed_generator;
+	public function __construct( $local_feeds_configurations, $feed_file_operations ) {
+		$this->configurations       = $local_feeds_configurations;
+		$this->feed_file_operations = $feed_file_operations;
 	}
 
 	/**
@@ -153,7 +153,7 @@ class FeedRegistration {
 	 * @return bool
 	 */
 	public function feed_file_exists() {
-		return $this->feed_generator->check_if_feed_file_exists();
+		return $this->feed_file_operations->check_if_feed_file_exists();
 	}
 
 	/**

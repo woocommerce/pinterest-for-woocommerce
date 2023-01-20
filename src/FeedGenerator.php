@@ -1,4 +1,4 @@
-<?php //phpcs:disable WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliable append to an existing file.
+<?php //phpcs:disable WordPress.WP.AlternativeFunctions --- Uses FS read/write in order to reliably append to an existing file.
 /**
  * Pinterest for WooCommerce Feed Files Generator
  *
@@ -36,12 +36,18 @@ class FeedGenerator extends AbstractChainedJob {
 	const WAIT_ON_ERROR_BEFORE_RETRY = HOUR_IN_SECONDS;
 
 	/**
+	 * Feed file operations class.
+	 *
+	 * @var FeedFileOperations
+	 */
+	private $feed_file_operations;
+
+	/**
 	 * Local Feed Configurations class.
 	 *
 	 * @var LocalFeedConfigs of local feed configurations;
 	 */
 	private $configurations;
-
 
 	/**
 	 * Location buffers. On buffer for each local feed configuration.
@@ -56,11 +62,13 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @since 1.0.10
 	 * @param ActionSchedulerInterface $action_scheduler           Action Scheduler proxy.
+	 * @param FeedFileOperations       $feed_file_operations       Feed file operations.
 	 * @param LocalFeedConfigs         $local_feeds_configurations Locations configuration class.
 	 */
-	public function __construct( ActionSchedulerInterface $action_scheduler, $local_feeds_configurations ) {
+	public function __construct( ActionSchedulerInterface $action_scheduler, FeedFileOperations $feed_file_operations, $local_feeds_configurations ) {
 		parent::__construct( $action_scheduler );
-		$this->configurations = $local_feeds_configurations;
+		$this->feed_file_operations = $feed_file_operations;
+		$this->configurations       = $local_feeds_configurations;
 	}
 
 	/**
@@ -124,18 +132,19 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @since 1.0.10
 	 *
-	 * @throws Throwable Related to issues possible when creating an empty feed temp file and populating the header.
+	 * @throws Throwable Related to creating an empty feed temp file and populating the header possible issues.
 	 */
 	protected function handle_start() {
 		self::log( __( 'Feed generation start. Preparing temporary files.', 'pinterest-for-woocommerce' ) );
 		try {
-			$this->prepare_temporary_files();
+			ProductFeedStatus::reset_feed_file_generation_time();
 			ProductFeedStatus::set(
 				array(
 					'status'        => 'in_progress',
 					'product_count' => 0,
 				)
 			);
+			$this->feed_file_operations->prepare_temporary_files();
 		} catch ( Throwable $th ) {
 			$this->handle_error( $th );
 			throw $th;
@@ -148,20 +157,24 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @since 1.0.10
 	 *
-	 * @throws Throwable Related to issues possible when adding the footer or renaming the files.
+	 * @throws Throwable Related to adding the footer or renaming the files possible issues.
 	 */
 	protected function handle_end() {
 		self::log( __( 'Feed generation end. Moving files to the final destination.', 'pinterest-for-woocommerce' ) );
-
 		try {
-			$this->add_footer_to_temporary_feed_files();
-			$this->rename_temporary_feed_files_to_final();
+			$this->feed_file_operations->add_footer_to_temporary_feed_files();
+			$this->feed_file_operations->rename_temporary_feed_files_to_final();
+			ProductFeedStatus::set(
+				array(
+					'status' => 'generated',
+					ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT => ProductFeedStatus::get()['product_count'],
+				)
+			);
+			ProductFeedStatus::set_feed_file_generation_time( time() );
 		} catch ( Throwable $th ) {
 			$this->handle_error( $th );
 			throw $th;
 		}
-
-		ProductFeedStatus::set( array( 'status' => 'generated' ) );
 		self::log( __( 'Feed generated successfully.', 'pinterest-for-woocommerce' ) );
 
 		// Check if feed is dirty and reschedule in necessary.
@@ -260,8 +273,7 @@ class FeedGenerator extends AbstractChainedJob {
 				}
 			);
 
-			$this->write_buffers_to_temp_files();
-
+			$this->feed_file_operations->write_buffers_to_temp_files( $this->buffers );
 		} catch ( Throwable $th ) {
 			$this->handle_error( $th );
 			throw $th;
@@ -333,73 +345,6 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
-	 * Prepare a fresh temporary file for each local configuration.
-	 * Files is populated with the XML headers.
-	 *
-	 * @since 1.0.10
-	 */
-	private function prepare_temporary_files(): void {
-		foreach ( $this->configurations->get_configurations() as $config ) {
-			$bytes_written = file_put_contents(
-				$config['tmp_file'],
-				ProductsXmlFeed::get_xml_header()
-			);
-
-			$this->check_write_for_io_errors( $bytes_written, $config['tmp_file'] );
-		}
-	}
-
-	/**
-	 * Add XML footer to all of the temporary feed files.
-	 *
-	 * @since 1.0.10
-	 */
-	private function add_footer_to_temporary_feed_files(): void {
-		foreach ( $this->configurations->get_configurations() as $config ) {
-			$bytes_written = file_put_contents(
-				$config['tmp_file'],
-				ProductsXmlFeed::get_xml_footer(),
-				FILE_APPEND
-			);
-
-			$this->check_write_for_io_errors( $bytes_written, $config['tmp_file'] );
-		}
-	}
-
-	/**
-	 * Checks the status of the file write operation and throws if issues are found.
-	 * Utility function for functions using file_put_contents.
-	 *
-	 * @since 1.0.10
-	 * @param integer $bytes_written How much data was written to the file.
-	 * @param string  $file          File location.
-	 *
-	 * @throws Exception Can't open or write to the file.
-	 */
-	private function check_write_for_io_errors( $bytes_written, $file ): void {
-
-		if ( false === $bytes_written ) {
-			throw new Exception(
-				sprintf(
-					/* translators: error message with file path */
-					__( 'Could not open temporary file %s for writing', 'pinterest-for-woocommerce' ),
-					$file
-				)
-			);
-		}
-
-		if ( 0 === $bytes_written ) {
-			throw new Exception(
-				sprintf(
-					/* translators: error message with file path */
-					__( 'Temporary file: %s is not writeable.', 'pinterest-for-woocommerce' ),
-					$file
-				)
-			);
-		}
-	}
-
-	/**
 	 * React to errors during feed files generation process.
 	 *
 	 * @since 1.0.10
@@ -412,32 +357,10 @@ class FeedGenerator extends AbstractChainedJob {
 				'error_message' => $th->getMessage(),
 			)
 		);
+		ProductFeedStatus::mark_feed_file_generation_as_failed();
 
 		self::log( $th->getMessage(), 'error' );
 		$this->schedule_next_generator_start( time() + self::WAIT_ON_ERROR_BEFORE_RETRY );
-	}
-
-	/**
-	 * Rename temporary feed files to final name.
-	 * This is the last step of the feed file generation process.
-	 *
-	 * @since 1.0.10
-	 * @throws \Exception Renaming not possible.
-	 */
-	private function rename_temporary_feed_files_to_final(): void {
-		foreach ( $this->configurations->get_configurations() as $config ) {
-			$status = rename( $config['tmp_file'], $config['feed_file'] );
-			if ( false === $status ) {
-				throw new Exception(
-					sprintf(
-						/* translators: 1: temporary file name 2: final file name */
-						__( 'Could not rename %1$s to %2$s', 'pinterest-for-woocommerce' ),
-						$config['tmp_file'],
-						$config['feed_file']
-					)
-				);
-			}
-		}
 	}
 
 	/**
@@ -457,41 +380,6 @@ class FeedGenerator extends AbstractChainedJob {
 			}
 		}
 		as_unschedule_all_actions( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-	}
-
-	/**
-	 * Write pre-populated buffers to feed files.
-	 *
-	 * @since 1.0.10
-	 */
-	private function write_buffers_to_temp_files(): void {
-		foreach ( $this->configurations->get_configurations() as $location => $config ) {
-			if ( '' === $this->buffers[ $location ] ) {
-				continue;
-			}
-
-			$bytes_written = file_put_contents(
-				$config['tmp_file'],
-				$this->buffers[ $location ],
-				FILE_APPEND
-			);
-
-			$this->check_write_for_io_errors( $bytes_written, $config['tmp_file'] );
-		}
-	}
-
-	/**
-	 * Check if we have a feed file on the disk.
-	 *
-	 * @since 1.0.10
-	 */
-	public function check_if_feed_file_exists() {
-		$configs = $this->configurations->get_configurations();
-		$config  = reset( $configs );
-		if ( false === $config ) {
-			return false;
-		}
-		return isset( $config['feed_file'] ) && file_exists( $config['feed_file'] );
 	}
 
 	/**
