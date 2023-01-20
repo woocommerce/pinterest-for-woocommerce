@@ -89,14 +89,14 @@ class AttributesTab {
 	private function add_tab( array $tabs ): array {
 		$shown_types = array_map(
 			function ( string $product_type ) {
-				return "show_if_${product_type}";
+				return "show_if_{$product_type}";
 			},
 			array_keys( $this->get_applicable_product_types() )
 		);
 
 		$hidden_types = array_map(
 			function ( string $product_type ) {
-				return "hide_if_${product_type}";
+				return "hide_if_{$product_type}";
 			},
 			array_keys( $this->get_hidden_product_types() )
 		);
