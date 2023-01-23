@@ -15,6 +15,8 @@ use Automattic\WooCommerce\Blocks\Package;
 use Automattic\WooCommerce\Blocks\Assets\AssetDataRegistry;
 use Automattic\WooCommerce\Pinterest\Compat;
 use Automattic\WooCommerce\Pinterest\Tracking;
+use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
+use Automattic\WooCommerce\Pinterest\Admin\Tasks\Onboarding;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -38,6 +40,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			add_filter( 'woocommerce_marketing_menu_items', array( $this, 'add_menu_items' ) );
 			add_action( 'admin_menu', array( $this, 'fix_menu_paths' ) );
 			add_action( 'admin_menu', array( $this, 'register_wc_admin_pages' ) );
+
+			// Hook the setup task. The hook admin_init is not triggered when the WC fetches the tasks using the endpoint: wp-json/wc-admin/onboarding/tasks and hence hooking into init.
+			add_action( 'init', array( $this, 'add_onboarding_task' ), 20 );
 		}
 
 
@@ -265,11 +270,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			}
 
 			$build_path = '/assets/build';
-
-			if ( Compat::should_show_tasks() ) {
-
-				
-			}
 
 			$handle            = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide';
 			$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/setup-guide.asset.php';
@@ -519,6 +519,22 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			$allowed_hosts[] = wp_parse_url( $service_domain, PHP_URL_HOST );
 
 			return $allowed_hosts;
+		}
+
+		/**
+		 * Adds the onboarding task to the Tasklists.
+		 *
+		 * @since x.x.x
+		 */
+		public function add_onboarding_task() {
+			if ( class_exists( TaskLists::class ) ) { // This is added for backward compatibility.
+				TaskLists::add_task(
+					'extended',
+					new Onboarding(
+						TaskLists::get_list( 'extended' )
+					)
+				);
+			}
 		}
 	}
 
