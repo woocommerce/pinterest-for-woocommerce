@@ -18,13 +18,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ProductFeedStatus {
 
 	const STATE_PROPS = array(
-		'status'        => 'pending_config',
-		'last_activity' => 0,
-		'product_count' => 0,
-		'error_message' => '',
+		'status'                                        => 'pending_config',
+		'last_activity'                                 => 0,
+		'product_count'                                 => 0,
+		'error_message'                                 => '',
+		self::PROP_FEED_GENERATION_WALL_START_TIME      => false,
+		self::PROP_FEED_GENERATION_WALL_TIME            => 0,
+		self::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT => 0,
 	);
 
 	const PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feeds_';
+
+	const PROP_FEED_GENERATION_WALL_START_TIME = 'feed_generation_wall_start_time';
+
+	const PROP_FEED_GENERATION_WALL_TIME = 'feed_generation_wall_time';
+
+	const PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT = 'feed_generation_recent_product_count';
 
 	/**
 	 * The array that holds the state of the feed, used as cache.
@@ -90,9 +99,55 @@ class ProductFeedStatus {
 	 * @return void
 	 */
 	public static function deregister() {
-
 		foreach ( self::STATE_PROPS as $key => $default_value ) {
+			self::$state[ $key ] = $default_value;
 			delete_transient( self::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key );
 		}
+	}
+
+	/**
+	 * Resets a feed generation start time.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	public static function reset_feed_file_generation_time() {
+		self::set(
+			array(
+				self::PROP_FEED_GENERATION_WALL_START_TIME => time(),
+			)
+		);
+	}
+
+	/**
+	 * Calculates and sets feed generation time.
+	 *
+	 * @param int $time_now - current time, e.g. time().
+	 * @since x.x.x
+	 * @return void
+	 */
+	public static function set_feed_file_generation_time( int $time_now ) {
+		$recent_feed_start_time = self::get()[ self::PROP_FEED_GENERATION_WALL_START_TIME ];
+		if ( false !== $recent_feed_start_time ) {
+			self::set(
+				array(
+					self::PROP_FEED_GENERATION_WALL_TIME => $time_now - (int) $recent_feed_start_time,
+				)
+			);
+		}
+	}
+
+	/**
+	 * Sets feed generation time into negative value to communicate feed generation failure.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	public static function mark_feed_file_generation_as_failed() {
+		self::set(
+			array(
+				self::PROP_FEED_GENERATION_WALL_TIME => -1,
+			)
+		);
 	}
 }
