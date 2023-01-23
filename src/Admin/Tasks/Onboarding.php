@@ -60,7 +60,7 @@ class Onboarding extends Task {
 	 */
 	public function get_action_url() {
 		if ( $this->is_complete() ) {
-            $action_url = admin_url( 'admin.php?page=wc-admin&path=/pinterest/connection' );
+            $action_url = admin_url( 'admin.php?page=wc-admin&path=/pinterest/catalog' );
         } else {
             $action_url = admin_url( 'admin.php?page=wc-admin&path=/pinterest/landing' );
         }
