@@ -78,6 +78,7 @@ class Onboarding extends Task {
 
 	/**
 	 * Parent ID. This method is abstract in WooCommerce 6.1.x, 6.2.x and 6.3.x. This implementation is for backward compatibility for these versions.
+     * compatibility-code "WC 6.1.x, WC 6.2.x, WC 6.3.x"
 	 *
 	 * @return string
 	 */
