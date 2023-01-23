@@ -561,6 +561,9 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_product_regular_price( $product ) {
+		// Set the store address as taxable location.
+		add_filter( 'woocommerce_customer_taxable_address', array( static::class, 'set_store_address_as_taxable_location' ) );
+
 		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
 			$price = $product->get_variation_regular_price( 'min', true );
 		} else {
@@ -572,7 +575,25 @@ class ProductsXmlFeed {
 			);
 		}
 
+		remove_filter( 'woocommerce_customer_taxable_address', array( static::class, 'set_store_address_as_taxable_location' ) );
+
 		return $price;
+	}
+
+	/**
+	 * Set the store address as taxable location.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param array $taxable_location The taxable location.
+	 */
+	public static function set_store_address_as_taxable_location( array $taxable_location ) {
+
+		if ( isset( $taxable_location[0] ) ) {
+			$taxable_location[0] = Pinterest_For_Woocommerce()::get_base_country();
+		}
+
+		return $taxable_location;
 	}
 
 	/**
