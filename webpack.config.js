@@ -28,7 +28,6 @@ const webpackConfig = {
 	plugins: ourPlugins,
 	entry: {
 		'setup-guide': __dirname + '/assets/source/setup-guide/index.js',
-		'setup-task': __dirname + '/assets/source/setup-task/index.js',
 		'product-attributes':
 			__dirname + '/assets/source/product-attributes/index.js',
 	},
