@@ -108,7 +108,7 @@ class ProductFeedStatus {
 	/**
 	 * Resets a feed generation start time.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.9
 	 * @return void
 	 */
 	public static function reset_feed_file_generation_time() {
@@ -123,7 +123,7 @@ class ProductFeedStatus {
 	 * Calculates and sets feed generation time.
 	 *
 	 * @param int $time_now - current time, e.g. time().
-	 * @since x.x.x
+	 * @since 1.2.9
 	 * @return void
 	 */
 	public static function set_feed_file_generation_time( int $time_now ) {
@@ -140,7 +140,7 @@ class ProductFeedStatus {
 	/**
 	 * Sets feed generation time into negative value to communicate feed generation failure.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.9
 	 * @return void
 	 */
 	public static function mark_feed_file_generation_as_failed() {
