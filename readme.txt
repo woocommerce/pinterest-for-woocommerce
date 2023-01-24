@@ -91,6 +91,11 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.9 - 2023-01-24 =
+* Add - Plugin connection and feed registration status tracking.
+* Add - Recent feed generation time and feed product count tracking.
+* Fix - Add backlog automation.
+
 = 1.2.8 - 2023-01-03 =
 * Dev - Add node and npm version restrictions.
 * Fix - Prevent failed to `feed_report` if there is no feed registered.
