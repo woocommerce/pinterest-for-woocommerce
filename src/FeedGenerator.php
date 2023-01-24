@@ -428,7 +428,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Return the list of supported product types.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.9
 	 *
 	 * @return array
 	 */
@@ -445,7 +445,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Return the list of excluded product types.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.9
 	 *
 	 * @return array
 	 */
@@ -464,7 +464,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Exclude products by parent (e.g. 'variation-subscriptions').
 	 *
-	 * @since x.x.x
+	 * @since 1.2.9
 	 *
 	 * @return array
 	 */

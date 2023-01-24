@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Feed File Operations.
  *
  * @package     Pinterest_For_WooCommerce/Classes/
- * @version     x.x.x
+ * @version     1.2.9
  */
 
 namespace Automattic\WooCommerce\Pinterest;
@@ -28,7 +28,7 @@ class FeedFileOperations {
 
 	/**
 	 * @param LocalFeedConfigs $local_feeds_configurations local feed configuration.
-	 * @since x.x.x
+	 * @since 1.2.9
 	 */
 	public function __construct( LocalFeedConfigs $local_feeds_configurations ) {
 		$this->configurations = $local_feeds_configurations;
@@ -38,7 +38,7 @@ class FeedFileOperations {
 	 * Prepare a fresh temporary file for each local configuration.
 	 * Files is populated with the XML headers.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.9
 	 * @throws Exception Can't open or write to the file.
 	 */
 	public function prepare_temporary_files(): void {
@@ -55,7 +55,7 @@ class FeedFileOperations {
 	/**
 	 * Add XML footer to all temporary feed files.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.9
 	 * @throws Exception Can't open or write to the file.
 	 */
 	public function add_footer_to_temporary_feed_files(): void {
@@ -73,7 +73,7 @@ class FeedFileOperations {
 	/**
 	 * Check if we have a feed file on the disk.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.9
 	 * @return bool
 	 */
 	public function check_if_feed_file_exists(): bool {
@@ -89,7 +89,7 @@ class FeedFileOperations {
 	 * Checks the status of the file write operation and throws if issues are found.
 	 * Utility function for functions using file_put_contents.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.9
 	 * @param integer $bytes_written How much data was written to the file.
 	 * @param string  $file          File location.
 	 *
@@ -122,7 +122,7 @@ class FeedFileOperations {
 	 * Rename temporary feed files to final name.
 	 * This is the last step of the feed file generation process.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.9
 	 * @throws \Exception Renaming not possible.
 	 */
 	public function rename_temporary_feed_files_to_final(): void {
@@ -145,7 +145,7 @@ class FeedFileOperations {
 	 * Write pre-populated buffers to feed files.
 	 *
 	 * @param array $buffers an array of (locale => content) elements.
-	 * @since x.x.x
+	 * @since 1.2.9
 	 * @throws Exception Can't open or write to the file.
 	 */
 	public function write_buffers_to_temp_files( array $buffers ): void {
