@@ -62,7 +62,10 @@ These flows can be used when testing PRs or releases, and as a basis for documen
 - The plugin supports by default the following product types (since `v1.2.9`):
   - Simple products.
   - Variation products (the parent Variable product is not included since `v1.0.9`).
-- The product types included in the feed can be modified by the `pinterest_for_woocommerce_included_product_types` and `pinterest_for_woocommerce_excluded_product_types` filters. The filter to exclude product types takes precedence over the include filter (since `1.2.9`).
+- The plugin exclude by default from the feed the following product types (since `v1.2.9`):
+  - Grouped products
+  - Subscription products
+- The product types included/excluded in the feed can be modified by the `pinterest_for_woocommerce_included_product_types` and `pinterest_for_woocommerce_excluded_product_types` filters. The filter to exclude product types takes precedence over the include filter (since `1.2.9`).
 
 ## Connection page
 
