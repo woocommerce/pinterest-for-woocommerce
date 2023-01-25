@@ -17,7 +17,7 @@ use Automattic\WooCommerce\Admin\Features\OnboardingTasks\Task;
  */
 class Onboarding extends Task {
 
-    /**
+	/**
 	 * Get the ID of the task.
 	 *
 	 * @return string
@@ -26,7 +26,7 @@ class Onboarding extends Task {
 		return 'setup-pinterest';
 	}
 
-    /**
+	/**
 	 * Get the title for the task.
 	 *
 	 * @return string
@@ -35,7 +35,7 @@ class Onboarding extends Task {
 		return esc_html__( 'Get your products in front of engaged shoppers with Pinterest for WooCommerce', 'pinterest-for-woocommerce' );
 	}
 
-    /**
+	/**
 	 * Get the content for the task.
 	 *
 	 * @return string
@@ -44,7 +44,7 @@ class Onboarding extends Task {
 		return '';
 	}
 
-    /**
+	/**
 	 * Get the time required to perform the task.
 	 *
 	 * @return string
@@ -53,18 +53,18 @@ class Onboarding extends Task {
 		return esc_html__( '20 minutes', 'pinterest-for-woocommerce' );
 	}
 
-    /**
+	/**
 	 * Get the action URL for the task.
 	 *
 	 * @return string
 	 */
 	public function get_action_url() {
 		if ( $this->is_complete() ) {
-            $action_url = admin_url( 'admin.php?page=wc-admin&path=/pinterest/catalog' );
-        } else {
-            $action_url = admin_url( 'admin.php?page=wc-admin&path=/pinterest/landing' );
-        }
-        return $action_url;
+			$action_url = admin_url( 'admin.php?page=wc-admin&path=/pinterest/catalog' );
+		} else {
+			$action_url = admin_url( 'admin.php?page=wc-admin&path=/pinterest/landing' );
+		}
+		return $action_url;
 	}
 
 	/**
@@ -78,7 +78,7 @@ class Onboarding extends Task {
 
 	/**
 	 * Parent ID. This method is abstract in WooCommerce 6.1.x, 6.2.x and 6.3.x. This implementation is for backward compatibility for these versions.
-     * compatibility-code "WC 6.1.x, WC 6.2.x, WC 6.3.x"
+	 * compatibility-code "WC 6.1.x, WC 6.2.x, WC 6.3.x"
 	 *
 	 * @return string
 	 */
