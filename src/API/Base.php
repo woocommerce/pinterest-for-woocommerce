@@ -644,4 +644,16 @@ class Base {
 
 		return self::make_request( $request_url, 'GET', array(), 'ads' );
 	}
+
+	/**
+	 * Pull ads supported countries information from the API.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array
+	 */
+	public static function get_list_of_ads_supported_countries() {
+		$request_url = 'advertisers/countries';
+		return self::make_request( $request_url, 'GET', array(), 'ads', DAY_IN_SECONDS );
+	}
 }
