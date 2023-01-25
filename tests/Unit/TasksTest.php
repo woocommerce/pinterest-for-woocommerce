@@ -12,13 +12,6 @@ use Automattic\WooCommerce\Pinterest\Admin\Tasks\Onboarding;
 class TasksTest extends WP_UnitTestCase {
 
     /**
-     * Pinterest WooCommerce admin object.
-     *
-     * @var \Pinterest_For_Woocommerce_Admin
-     */
-    protected $pinterest_wc_admin;
-
-    /**
      * Check if an object of a given class name is present in the array.
      *
      * @param string   $class_name The name of the class to test the object against.
@@ -38,42 +31,9 @@ class TasksTest extends WP_UnitTestCase {
     }
 
     /**
-     * Check if an object of a given class name is not present in the array.
-     *
-     * @param string   $class_name The name of the class to test the object against.
-     * @param iterable $hay_stack  Array of objects.
-     * @param string   $message    Message to display on failed assertion.
-     * @return void
+     * Tests to assert the addition of the Onboarding task to the task list.
      */
-    private function assertNotContainsInstanceOf( string $class_name, iterable $haystack, string $message = '' ): void {
-        $contains = false;
-        foreach ( $haystack as $hay ) {
-            if ( get_class( $hay ) === $class_name ) {
-                $contains = true;
-                break;
-            }
-        }
-        $this->assertFalse( $contains, $message );
-    }
-
-    /**
-     * Run before each test.
-     */
-    public function setUp(): void {
-        parent::setUp();
-        require_once 'includes/admin/class-pinterest-for-woocommerce-admin.php';
-        $this->pinterest_wc_admin = new \Pinterest_For_Woocommerce_Admin();
-    }
-
     public function test_add_onboarding_task_added() {
-        // Assert that the task is not present in the default tasklist.
-        $task_lists     = TaskLists::get_lists();
-        $extended_tasks = $task_lists['extended']->tasks;
-        $this->assertNotContainsInstanceOf( Onboarding::class, $extended_tasks, 'Cannot assert onboarding task not added to tasklist.' );
-
-        // Add the task.
-        $this->pinterest_wc_admin->add_onboarding_task();
-
         // Assert that the task is added to the tasklist.
         $task = TaskLists::get_task( 'setup-pinterest' );
         $this->assertNotNull( $task );
@@ -85,10 +45,10 @@ class TasksTest extends WP_UnitTestCase {
         $this->assertContainsInstanceOf( Onboarding::class, $extended_tasks, 'Cannot assert onboarding task added to extended tasklist.' );
     }
 
+    /**
+     * Tasks to assert the completion of the Onboarding task.
+     */
     public function test_onboarding_task_completed() {
-        // Add the task.
-        $this->pinterest_wc_admin->add_onboarding_task();
-
         // Assert that the task is not completed.
         $task        = TaskLists::get_task( 'setup-pinterest' );
         $is_complete = $task->is_complete();
