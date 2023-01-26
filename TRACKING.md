@@ -77,7 +77,7 @@ Clicking on an external documentation link.
 - [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L56)
 	- with `{ link_id: 'ad-guidelines', context: props.view }`
 	- with `{ link_id: 'merchant-guidelines', context: props.view }`
-- [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L56)
+- [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L57)
 	- with `{ link_id: 'ad-guidelines', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
