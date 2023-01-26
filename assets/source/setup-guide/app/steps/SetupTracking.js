@@ -291,7 +291,8 @@ const SetupTracking = ( { view = 'settings' } ) => {
 		try {
 			const result = await connectAdvertiser(
 				appSettings.tracking_advertiser,
-				appSettings.tracking_tag
+				appSettings.tracking_tag,
+				true
 			);
 
 			if ( result ) {
