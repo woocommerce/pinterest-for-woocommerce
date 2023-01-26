@@ -101,7 +101,7 @@ class Merchants {
 	 * @throws Exception PHP exception.
 	 */
 	private static function get_merchant_id_from_advertiser() {
-		$advertisers = API\Base::get_advertisers();
+		$advertisers = Base::get_advertisers();
 
 		if ( 'success' !== $advertisers['status'] ) {
 			throw new Exception( __( 'Response error when trying to get advertisers.', 'pinterest-for-woocommerce' ), 400 );
@@ -110,7 +110,7 @@ class Merchants {
 		$advertiser = reset( $advertisers['data'] ); // All advertisers assigned to a user share the same merchant_id.
 
 		if ( empty( $advertiser->merchant_id ) ) {
-			throw new Exception( __( 'No merchant returned in the advertiser\'s response.', 'pinterest-for-woocommerce' ), 404 );
+			throw new Exception( __( "No merchant returned in the advertiser's response.", 'pinterest-for-woocommerce' ), 404 );
 		}
 
 		return $advertiser->merchant_id;
@@ -142,14 +142,35 @@ class Merchants {
 			'merchant_name'    => $merchant_name,
 		);
 
-		// The response only contains the merchant id.
-		$response = API\Base::update_or_create_merchant( $args );
+		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( wp_json_encode( $args ) );
+		$cache     = get_transient( $cache_key );
+
+		if ( false !== $cache ) {
+			throw new Exception( __( 'There was a previous error trying to create or update merchant.', 'pinterest-for-woocommerce' ), (int) $cache );
+		}
+
+		try {
+			// The response only contains the merchant id.
+			$response = Base::update_or_create_merchant( $args );
+		} catch ( Throwable $th ) {
+			$delay = Pinterest_For_Woocommerce()::get_data( 'create_merchant_delay' ) ?? MINUTE_IN_SECONDS;
+
+			set_transient( $cache_key, $th->getCode(), $delay );
+
+			// Double the delay.
+			Pinterest_For_Woocommerce()::save_data( 'create_merchant_delay', min( $delay * 2, 6 * HOUR_IN_SECONDS ) );
+
+			throw new Exception( $th->getMessage(), $th->getCode() );
+		}
 
 		if ( 'success' !== $response['status'] ) {
 			throw new Exception( __( 'Response error when trying to create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
 		$registered_feed = Feeds::is_local_feed_registered( $response['data'] );
+
+		// Clean the cached delay.
+		Pinterest_For_Woocommerce()::save_data( 'create_merchant_delay', false );
 
 		// Update the registered feed id setting.
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $registered_feed );

@@ -1,5 +1,40 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.2.10 - 2023-01-26 =
+* Add - Pull supported countries from the API.
+* Fix - Disable pin button if Chrome extension is detected.
+* Fix - Doc/add include exluce filters to docs.
+* Fix - Missing Attributes form on Simple products.
+
+= 1.2.9 - 2023-01-24 =
+* Add - Plugin connection and feed registration status tracking.
+* Add - Recent feed generation time and feed product count tracking.
+* Fix - Add backlog automation.
+
+= 1.2.8 - 2023-01-03 =
+* Dev - Add node and npm version restrictions.
+* Fix - Prevent failed to `feed_report` if there is no feed registered.
+* Tweak - WC 7.3 compatibility.
+
+= 1.2.7 - 2022-12-16 =
+* Add - Warning message duplicated meta tags.
+* Fix - Update Tracking.php.
+* Fix - Update wording in filter descriotion, tracking disable fiter.
+* Fix - Use min instead of max.
+* Tweak - Improve translators strings.
+* Tweak - Refactor update procedures.
+* Tweak - WC 7.2 compatibility.
+
+= 1.2.6 - 2022-11-16 =
+* Tweak - Add Ads Credits promotion information to the readme.txt.
+* Tweak - Backoff merchant creation in case of failure.
+
+= 1.2.5 - 2022-11-07 =
+* Add - Ads Credit Campaign.
+* Tweak - Declare HPOS compatibility.
+* Tweak - WC 7.1 compatibility.
+* Tweak - WP 6.1 compatibility.
+
 = 1.2.4 - 2022-10-13 =
 * Tweak - WC 7.0 compatibility.
 

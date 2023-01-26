@@ -18,7 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class TrackerSnapshot {
 
-
 	/**
 	 * Not needed if allow_tracking is disabled.
 	 *
@@ -57,8 +56,18 @@ class TrackerSnapshot {
 			$data['extensions'] = array();
 		}
 
+		$feed_generation_time = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
+
 		$data['extensions'][ PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX ] = array(
 			'settings' => self::parse_settings(),
+			'store'    => array(
+				'connected'        => wc_bool_to_string( Pinterest_For_Woocommerce::is_connected() ),
+				'actively_syncing' => wc_bool_to_string( ! ! Pinterest_For_Woocommerce::get_data( 'feed_registered' ) ),
+			),
+			'feed'     => array(
+				'generation_time' => $feed_generation_time,
+				'product_count'   => (int) ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT ] ?? 0,
+			),
 		);
 
 		return $data;
@@ -71,7 +80,7 @@ class TrackerSnapshot {
 	 */
 	protected static function parse_settings(): array {
 
-		$settings = Pinterest_For_Woocommerce::get_settings( true );
+		$settings = (array) Pinterest_For_Woocommerce()::get_settings( true );
 
 		$tracked_settings = array(
 			'track_conversions',
@@ -88,4 +97,6 @@ class TrackerSnapshot {
 		$settings = array_intersect_key( $settings, array_flip( $tracked_settings ) );
 		return array_map( 'wc_bool_to_string', $settings ) + array( 'version' => PINTEREST_FOR_WOOCOMMERCE_VERSION );
 	}
+
+
 }

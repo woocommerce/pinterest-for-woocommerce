@@ -99,13 +99,20 @@ class PluginUpdate {
 	 * List of update procedures
 	 *
 	 * @since 1.0.10
+	 * @since 1.2.7 Updates procedures organized in an array by plugin version.
 	 * @return array List of update procedures names.
 	 */
 	private function update_procedures() {
 		return array(
-			'domain_verification_migration',
-			'feed_generation_migration',
-			'ads_credits_integration',
+			'1.0.9'  => array(
+				'domain_verification_migration',
+			),
+			'1.0.10' => array(
+				'feed_generation_migration',
+			),
+			'1.2.5'  => array(
+				'ads_credits_integration',
+			),
 		);
 	}
 
@@ -123,8 +130,16 @@ class PluginUpdate {
 		}
 
 		// Run the update procedures.
-		foreach ( $this->update_procedures() as $update_procedure ) {
-			$this->perform_plugin_update_procedure( $update_procedure );
+		foreach ( $this->update_procedures() as $version => $update_procedures ) {
+
+			if ( ! $this->version_needs_update( $version ) ) {
+				// Already up to date.
+				continue;
+			}
+
+			foreach ( $update_procedures as $update_procedure ) {
+				$this->perform_plugin_update_procedure( $update_procedure );
+			}
 		}
 
 		/**
@@ -150,6 +165,7 @@ class PluginUpdate {
 	 *
 	 * @since 1.0.9
 	 * @since 1.0.10 Accepts procedure name as parameter.
+	 * @since 1.2.7  Log the failed procedure.
 	 * @param  string $update_procedure Name of the migration procedure.
 	 * @throws Throwable Update procedure failures.
 	 * @return void
@@ -160,9 +176,10 @@ class PluginUpdate {
 		} catch ( Throwable $th ) {
 			Logger::log(
 				sprintf(
-					// translators: 1: plugin version, 2: error message.
-					__( 'Plugin update to version %1$s error: %2$s', 'pinterest-for-woocommerce' ),
+					// translators: 1: plugin version, 2: failed procedure, 3: error message.
+					__( 'Plugin update to version %1$s. Procedure: %2$s. Error: %3$s', 'pinterest-for-woocommerce' ),
 					$this->get_plugin_current_version(),
+					$update_procedure,
 					$th->getMessage()
 				),
 				'error',
@@ -180,10 +197,7 @@ class PluginUpdate {
 	 * @return void
 	 */
 	protected function domain_verification_migration(): void {
-		if ( ! $this->version_needs_update( '1.0.9' ) ) {
-			// Already up to date.
-			return;
-		}
+
 		$account_data = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
 
 		/**
@@ -206,11 +220,6 @@ class PluginUpdate {
 	 * @return void
 	 */
 	protected function feed_generation_migration(): void {
-		if ( ! $this->version_needs_update( '1.0.10' ) ) {
-			// Already up to date.
-			return;
-		}
-
 		/*
 		 * 1. Cancel old actions.
 		 */
@@ -271,15 +280,11 @@ class PluginUpdate {
 	/**
 	 * Integrate Ads credit flow.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 *
 	 * @return void
 	 */
 	protected function ads_credits_integration(): void {
-		if ( ! $this->version_needs_update( '1.2.5' ) ) {
-			return;
-		}
-
 		// Set modals as dismissed and notice as not dismissed.
 		update_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . UserInteraction::ADS_MODAL_DISMISSED, true, false );
 	}

@@ -893,7 +893,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Add billing setup information to the account data option.
 		 * Using this function makes sense only when we have a connected advertiser.
 		 *
-		 * @since x.x.x
+		 * @since 1.2.5
 		 *
 		 * @return bool Wether billing is set up or not.
 		 */
@@ -907,7 +907,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 *
-		 * @since x.x.x
+		 * @since 1.2.5
 		 *
 		 * @return void
 		 */
@@ -926,7 +926,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Get billing setup information from the account data option.
 		 *
-		 * @since x.x.x
+		 * @since 1.2.5
 		 *
 		 * @return bool
 		 */
@@ -940,7 +940,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Add redeem credits information to the account data option.
 		 * Using this function makes sense only when we have a connected advertiser and the billing data is set up.
 		 *
-		 * @since x.x.x
+		 * @since 1.2.5
 		 *
 		 * @return void
 		 */
@@ -983,7 +983,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Add available credits information to the account data option.
 		 *
-		 * @since x.x.x
+		 * @since 1.2.5
 		 *
 		 * @return void
 		 */
@@ -1002,7 +1002,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Check if coupon was redeemed. We can redeem only once.
 		 *
-		 * @since x.x.x
+		 * @since 1.2.5
 		 *
 		 * @return bool
 		 */
@@ -1140,7 +1140,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Trigger coupons check.
 		 *
-		 * @since x.x.x
+		 * @since 1.2.5
 		 *
 		 * @return void
 		 */

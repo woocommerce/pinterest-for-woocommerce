@@ -24,7 +24,7 @@ class Billing {
 	/**
 	 * Initialize Billing actions and Action Scheduler hooks.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 */
 	public static function schedule_event() {
 		add_action( Heartbeat::DAILY, array( __CLASS__, 'handle_billing_setup_check' ) );
@@ -33,7 +33,7 @@ class Billing {
 	/**
 	 * Check if the advertiser has set the billing data.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 *
 	 * @return mixed
 	 */
@@ -48,7 +48,7 @@ class Billing {
 	 * Check if we are during the period of frequent billing checks.
 	 * If the billing has been verified as correct we don't want the frequent check.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 *
 	 * @return bool
 	 */
@@ -82,7 +82,7 @@ class Billing {
 	/**
 	 * Mark billing setup check as required often.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 *
 	 * @param int $duration For how lon frequent billing check should happen.
 	 *
@@ -95,7 +95,7 @@ class Billing {
 	/**
 	 * Clear billing check transient.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 *
 	 * @return void
 	 */
@@ -106,7 +106,7 @@ class Billing {
 	/**
 	 * Mark setup as checked. This will delay next setup for an hour.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 *
 	 * @return void
 	 */
@@ -117,7 +117,7 @@ class Billing {
 	/**
 	 * Helper function to check if billing has been set up.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 * @return bool
 	 */
 	public static function has_billing_set_up(): bool {

@@ -400,6 +400,42 @@ const SetupTracking = ( { view = 'settings' } ) => {
 										),
 									}
 								) }
+								{ createInterpolateElement(
+									__(
+										'Using conversion tags means you agree to our <buttonGuidelines>Ad Guidelines</buttonGuidelines> and <buttonTerms>Ad Data Terms</buttonTerms>',
+										'pinterest-for-woocommerce'
+									),
+									{
+										buttonGuidelines: (
+											<Button
+												isLink
+												{ ...documentationLinkProps( {
+													href:
+														wcSettings
+															.pinterest_for_woocommerce
+															.pinterestLinks
+															.adGuidelines,
+													linkId: 'ad-guidelines',
+													context: view,
+												} ) }
+											/>
+										),
+										buttonTerms: (
+											<Button
+												isLink
+												{ ...documentationLinkProps( {
+													href:
+														wcSettings
+															.pinterest_for_woocommerce
+															.pinterestLinks
+															.adDataTerms,
+													linkId: 'ad-data-terms',
+													context: view,
+												} ) }
+											/>
+										),
+									}
+								) }
 							</>
 						}
 					/>

@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
-Tested up to: 5.9
+Tested up to: 6.1
 Requires PHP: 7.3
-Stable tag: 1.2.4
+Stable tag: 1.2.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -15,6 +15,10 @@ Get your products in front of Pinterest users searching for ideas and things to 
 Pinterest gives people their next great idea. Part collection, part marketplace, it’s a one-stop shop for millions of pinners to source inspiration, new products and new possibilities. It’s like a visual search engine, guiding people to ideas, inspiration and products that are just right for them.
 
 With the Pinterest for WooCommerce extension, you can put your products in front of Pinterest users who are already looking for ideas and things to buy. Connect your WooCommerce store to your *[Pinterest business account](https://business.pinterest.com/)* directly in the WooCommerce app. Your entire catalog will become browsable on Pinterest in just a few clicks.
+
+= Pinterest Ads =
+
+Get started with Pinterest Ads with **$125 free ad credit\*** from Pinterest when you set up Pinterest for WooCommerce and spend $15 on ads! Pinterest *[terms and conditions](https://business.pinterest.com/en-us/business-terms-of-service/)* apply.
 
 = Open-minded and undecided =
 
@@ -86,6 +90,41 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.10 - 2023-01-26 =
+* Add - Pull supported countries from the API.
+* Fix - Disable pin button if Chrome extension is detected.
+* Fix - Doc/add include exluce filters to docs.
+* Fix - Missing Attributes form on Simple products.
+
+= 1.2.9 - 2023-01-24 =
+* Add - Plugin connection and feed registration status tracking.
+* Add - Recent feed generation time and feed product count tracking.
+* Fix - Add backlog automation.
+
+= 1.2.8 - 2023-01-03 =
+* Dev - Add node and npm version restrictions.
+* Fix - Prevent failed to `feed_report` if there is no feed registered.
+* Tweak - WC 7.3 compatibility.
+
+= 1.2.7 - 2022-12-16 =
+* Add - Warning message duplicated meta tags.
+* Fix - Update Tracking.php.
+* Fix - Update wording in filter descriotion, tracking disable fiter.
+* Fix - Use min instead of max.
+* Tweak - Improve translators strings.
+* Tweak - Refactor update procedures.
+* Tweak - WC 7.2 compatibility.
+
+= 1.2.6 - 2022-11-16 =
+* Tweak - Add Ads Credits promotion information to the readme.txt.
+* Tweak - Backoff merchant creation in case of failure.
+
+= 1.2.5 - 2022-11-07 =
+* Add - Ads Credit Campaign.
+* Tweak - Declare HPOS compatibility.
+* Tweak - WC 7.1 compatibility.
+* Tweak - WP 6.1 compatibility.
 
 = 1.2.4 - 2022-10-13 =
 * Tweak - WC 7.0 compatibility.

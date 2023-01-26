@@ -91,21 +91,21 @@ class AttributesTab {
 			function ( string $product_type ) {
 				return "show_if_${product_type}";
 			},
-			$this->get_applicable_product_types()
+			array_keys( $this->get_applicable_product_types() )
 		);
 
 		$hidden_types = array_map(
 			function ( string $product_type ) {
 				return "hide_if_${product_type}";
 			},
-			$this->get_hidden_product_types()
+			array_keys( $this->get_hidden_product_types() )
 		);
 
 		$classes = array_merge( array( 'pinterest' ), $shown_types, $hidden_types );
 
 		$tabs['pinterest_attributes'] = array(
 			'label'  => 'Pinterest',
-			'class'  => join( ' ', $classes ),
+			'class'  => $classes,
 			'target' => 'pinterest_attributes',
 		);
 
@@ -168,7 +168,7 @@ class AttributesTab {
 	 * @return AttributesForm
 	 */
 	protected function get_form( WC_Product $product ): AttributesForm {
-		$attribute_types = $this->attribute_manager->get_attribute_types_for_product_types( $this->get_applicable_product_types() );
+		$attribute_types = $this->attribute_manager->get_attribute_types_for_product_types( array_keys( $this->get_applicable_product_types() ) );
 
 		$form = new AttributesForm( $attribute_types, $this->attribute_manager->get_all_values( $product ) );
 		$form->set_name( 'attributes' );
@@ -181,8 +181,14 @@ class AttributesTab {
 	 *
 	 * @return array of WooCommerce product types (e.g. 'simple', 'variable', etc.)
 	 */
-	protected function get_applicable_product_types(): array {
-		return apply_filters( 'wc_pinterest_attributes_tab_applicable_product_types', array( 'simple', 'variable' ) );
+	public static function get_applicable_product_types(): array {
+		return apply_filters(
+			'wc_pinterest_attributes_tab_applicable_product_types',
+			array(
+				'simple'   => __( 'Simple product', 'pinterest-for-woocommerce' ),
+				'variable' => __( 'Variable product', 'pinterest-for-woocommerce' ),
+			)
+		);
 	}
 
 	/**
@@ -193,7 +199,13 @@ class AttributesTab {
 	 * @return array of WooCommerce product types (e.g. 'subscription', 'variable-subscription', etc.)
 	 */
 	protected function get_hidden_product_types(): array {
-		return apply_filters( 'wc_pinterest_attributes_tab_hidden_product_types', array( 'subscription', 'variable-subscription' ) );
+		return apply_filters(
+			'wc_pinterest_attributes_tab_hidden_product_types',
+			array_diff_key(
+				wc_get_product_types(),
+				$this->get_applicable_product_types()
+			)
+		);
 	}
 
 	/**

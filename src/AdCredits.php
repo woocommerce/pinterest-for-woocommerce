@@ -31,7 +31,7 @@ class AdCredits {
 	/**
 	 * Initialize Ad Credits actions and Action Scheduler hooks.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 */
 	public static function schedule_event() {
 		add_action( Heartbeat::HOURLY, array( static::class, 'handle_redeem_credit' ), 20 );
@@ -40,7 +40,7 @@ class AdCredits {
 	/**
 	 * Check if the advertiser has set the billing data.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 *
 	 * @return mixed
 	 */
@@ -76,7 +76,7 @@ class AdCredits {
 	/**
 	 * Redeem Ad Credits.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 *
 	 * @param string  $offer_code Coupon string.
 	 * @param integer $error_code Reference parameter for error number.
@@ -138,7 +138,7 @@ class AdCredits {
 	 * 2. Merchant needs to have coupon available for his chosen currency.
 	 * 3. Ads Campaign needs to be globally active.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 *
 	 * @return bool Wether campaign is active or not.
 	 */
@@ -183,7 +183,7 @@ class AdCredits {
 	/**
 	 * Check if campaign is enabled in the recommendations API from woocommerce.com.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 *
 	 * @throws Exception API fetch error.
 	 *
@@ -220,7 +220,7 @@ class AdCredits {
 	/**
 	 * Fetch data from the discount endpoint and get the necessary fields.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.5
 	 *
 	 * @return mixed False when no info is available, discounts object when discounts are available.
 	 */
