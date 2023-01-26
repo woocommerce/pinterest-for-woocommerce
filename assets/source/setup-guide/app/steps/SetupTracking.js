@@ -379,6 +379,44 @@ const SetupTracking = ( { view = 'settings' } ) => {
 								<br />
 								{ createInterpolateElement(
 									__(
+										'Using conversion tags means you agree to our <linkGuidelines>Ad Guidelines</linkGuidelines> and <linkTerms>Ad Data Terms</linkTerms>.',
+										'pinterest-for-woocommerce'
+									),
+									{
+										linkGuidelines: (
+											<Button
+												isLink
+												{ ...documentationLinkProps( {
+													href:
+														wcSettings
+															.pinterest_for_woocommerce
+															.pinterestLinks
+															.adGuidelines,
+													linkId: 'ad-guidelines',
+													context: view,
+												} ) }
+											></Button>
+										),
+										linkTerms: (
+											<Button
+												isLink
+												{ ...documentationLinkProps( {
+													href:
+														wcSettings
+															.pinterest_for_woocommerce
+															.pinterestLinks
+															.adDataTerms,
+													linkId: 'ad-data-terms',
+													context: view,
+												} ) }
+											></Button>
+										),
+									}
+								) }
+								<br />
+								<br />
+								{ createInterpolateElement(
+									__(
 										'<linkAem>Automatic Enhanced Match</linkAem> is enabled by default to match more of your website visitors and conversions to people on Pinterest. You can manage this in Settings.',
 										'pinterest-for-woocommerce'
 									),
@@ -491,48 +529,6 @@ const SetupTracking = ( { view = 'settings' } ) => {
 											) : (
 												<Spinner />
 											) ) }
-										{ createInterpolateElement(
-											__(
-												'Using conversion tags means you agree to our <linkGuidelines>Ad Guidelines</linkGuidelines> and <linkTerms>Ad Data Terms</linkTerms>.',
-												'pinterest-for-woocommerce'
-											),
-											{
-												linkGuidelines: (
-													<Button
-														isLink
-														{ ...documentationLinkProps(
-															{
-																href:
-																	wcSettings
-																		.pinterest_for_woocommerce
-																		.pinterestLinks
-																		.adGuidelines,
-																linkId:
-																	'ad-guidelines',
-																context: view,
-															}
-														) }
-													></Button>
-												),
-												linkTerms: (
-													<Button
-														isLink
-														{ ...documentationLinkProps(
-															{
-																href:
-																	wcSettings
-																		.pinterest_for_woocommerce
-																		.pinterestLinks
-																		.adDataTerms,
-																linkId:
-																	'ad-data-terms',
-																context: view,
-															}
-														) }
-													></Button>
-												),
-											}
-										) }
 									</>
 								) : (
 									<>
