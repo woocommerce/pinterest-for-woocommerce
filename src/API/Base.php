@@ -648,7 +648,7 @@ class Base {
 	/**
 	 * Pull ads supported countries information from the API.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.10
 	 *
 	 * @return array
 	 */
