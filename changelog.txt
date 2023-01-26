@@ -1,5 +1,11 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.2.10 - 2023-01-26 =
+* Add - Pull supported countries from the API.
+* Fix - Disable pin button if Chrome extension is detected.
+* Fix - Doc/add include exluce filters to docs.
+* Fix - Missing Attributes form on Simple products.
+
 = 1.2.9 - 2023-01-24 =
 * Add - Plugin connection and feed registration status tracking.
 * Add - Recent feed generation time and feed product count tracking.
