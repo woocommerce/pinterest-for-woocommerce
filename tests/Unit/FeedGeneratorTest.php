@@ -8,6 +8,9 @@ use Automattic\WooCommerce\Pinterest\FeedGenerator;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Exception;
+use Pinterest_For_Woocommerce;
+use Throwable;
+use wpdb;
 
 class FeedGeneratorTest extends \WP_UnitTestCase {
 
@@ -177,5 +180,74 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->assertEquals( 'in_progress', $status );
 		$this->assertEquals( 19, $wall_time );
 		$this->assertEquals( 99, $product_count );
+	}
+
+	public function test_handle_batch_action_ends_queue_when_no_more_items() {
+		$this->action_scheduler
+			->expects( $this->once() )
+			->method( 'schedule_immediate' )
+			->with(
+				'pinterest/jobs/generate_feed/chain_end',
+				array( array() ),
+				''
+			);
+
+		$this->feed_generator->handle_batch_action( 1, array() );
+
+		$this->assertEquals( 0, (int) \Pinterest_For_Woocommerce::get_data( 'feed_generation_retries' ));
+	}
+
+	public function test_handle_batch_action_queues_next_batch_when_there_are_items_to_process() {
+		\WC_Helper_Product::create_simple_product();
+
+		$this->action_scheduler
+			->expects( $this->once() )
+			->method( 'schedule_immediate' )
+			->with(
+				'pinterest/jobs/generate_feed/chain_batch',
+				array( 2, array() ),
+				''
+			);
+
+		$this->feed_generator->handle_batch_action( 1, array() );
+
+		$this->assertEquals( 0, (int) \Pinterest_For_Woocommerce::get_data( 'feed_generation_retries' ));
+	}
+
+	public function test_handle_batch_action_retries_up_to_two_times_on_exception() {
+		try {
+			\WC_Helper_Product::create_simple_product();
+			add_filter(
+				'pinterest_for_woocommerce_included_product_types',
+				function () {
+					throw new \Exception('Dummy exception to emulate processing items failure somewhere.');
+				}
+			);
+			$this->action_scheduler
+				->expects( $this->exactly( FeedGenerator::MAX_RETRIES_PER_BATCH ) )
+				->method( 'schedule_immediate' )
+				->with(
+					'pinterest/jobs/generate_feed/chain_batch',
+					array( 1, array() ),
+					''
+				);
+
+			$retries = 0;
+			while( $retries < FeedGenerator::MAX_RETRIES_PER_BATCH ) {
+				$this->feed_generator->handle_batch_action( 1, array() );
+				$this->assertEquals( ++$retries, (int) Pinterest_For_Woocommerce::get_data( 'feed_generation_retries' ) );
+			}
+			$this->feed_generator->handle_batch_action(1, array());
+		} catch ( Throwable $e ) {
+			$this->assertEquals(
+				'Dummy exception to emulate processing items failure somewhere.',
+				$e->getMessage()
+			);
+			$this->assertEquals( 0, (int) Pinterest_For_Woocommerce::get_data( 'feed_generation_retries' ) );
+		}
+	}
+
+	public function test_handle_batch_action_retries_up_to_two_times_on_timeout() {
+		$this->markTestIncomplete( 'This test awaits something.' );
 	}
 }

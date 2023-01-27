@@ -168,8 +168,6 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	public function handle_batch_action( int $batch_number, array $args ) {
 		try {
-			$error_retries = (int) Pinterest_For_Woocommerce()::get_data( 'feed_generation_retries' ) ?? 0;
-
 			parent::handle_batch_action( $batch_number, $args );
 
 			Pinterest_For_Woocommerce()::save_data( 'feed_generation_retries', 0 );
@@ -192,8 +190,6 @@ class FeedGenerator extends AbstractChainedJob {
 
 			// Re-schedule the current batch item.
 			$this->queue_batch( $batch_number, $args );
-
-			throw $th;
 		}
 	}
 
