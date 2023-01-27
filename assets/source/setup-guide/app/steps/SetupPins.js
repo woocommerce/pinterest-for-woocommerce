@@ -180,7 +180,7 @@ const SetupPins = ( {} ) => {
 									>
 										{ createInterpolateElement(
 											__(
-												'Manage information shared on <linkAdsManager>Pinterest Ads Manager</linkAdsManager>',
+												'Manage information shared on <linkAdsManager>Pinterest Ads Manager </linkAdsManager>',
 												'pinterest-for-woocommerce'
 											),
 											{
