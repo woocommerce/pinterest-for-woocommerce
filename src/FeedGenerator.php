@@ -16,6 +16,7 @@ use Automattic\WooCommerce\ActionSchedulerJobFramework\Utilities\BatchQueryOffse
 use Automattic\WooCommerce\ActionSchedulerJobFramework\AbstractChainedJob;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
+use ActionScheduler;
 use Exception;
 use Throwable;
 
@@ -95,6 +96,9 @@ class FeedGenerator extends AbstractChainedJob {
 		if ( false === as_has_scheduled_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			$this->schedule_next_generator_start( time() );
 		}
+
+		// Timeout actions.
+		add_action( 'action_scheduler_failed_action', array( $this, 'maybe_handle_error_on_timeout' ) );
 	}
 
 	/**
@@ -521,5 +525,25 @@ class FeedGenerator extends AbstractChainedJob {
 				)
 			)
 		);
+	}
+
+	/**
+	 * Handle error on generate feed timeout.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param int $action_id The ID of the action marked as failed.
+	 */
+	public function maybe_handle_error_on_timeout( $action_id ) {
+
+		$action = ActionScheduler::store()->fetch_action( $action_id );
+
+		if ( $this->get_action_full_name( self::CHAIN_BATCH ) !== $action->get_hook() ) {
+			return;
+		}
+
+		$exception = new Exception( __( 'The feed generation job was marked as failed after the timeout.', 'pinterest-for-woocommerce' ) );
+
+		$this->handle_error( $exception );
 	}
 }
