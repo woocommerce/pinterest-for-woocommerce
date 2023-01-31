@@ -391,6 +391,9 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_sale_price( $product, $property ) {
 
+		// Set the store address as taxable location.
+		add_filter( 'woocommerce_customer_taxable_address', array( static::class, 'set_store_address_as_taxable_location' ) );
+
 		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_sale_price' ) ) {
 			$regular_price = $product->get_variation_regular_price( 'min', true );
 			$sale_price    = $product->get_variation_sale_price( 'min', true );
@@ -405,6 +408,8 @@ class ProductsXmlFeed {
 				)
 			) : '';
 		}
+
+		remove_filter( 'woocommerce_customer_taxable_address', array( static::class, 'set_store_address_as_taxable_location' ) );
 
 		if ( empty( $price ) ) {
 			return;
