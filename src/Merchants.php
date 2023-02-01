@@ -137,7 +137,7 @@ class Merchants {
 			'feed_location'    => $config['feed_url'],
 			'feed_format'      => 'XML',
 			'country'          => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
-			'locale'           => str_replace( '_', '-', determine_locale() ),
+			'locale'           => LocaleMapper::get_locale_for_api(),
 			'currency'         => get_woocommerce_currency(),
 			'merchant_name'    => $merchant_name,
 		);
