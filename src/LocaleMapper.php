@@ -94,7 +94,7 @@ class LocaleMapper {
 		}
 
 		// If the locale is not in the list of Pinterest locales, try to find a match for just the language code.
-		$locale_parts = explode( '_', $locale );
+		$locale_parts = explode( '-', $locale );
 
 		if ( in_array( $locale_parts[0], self::PINTEREST_LOCALE_CODES, true ) ) {
 			return $locale_parts[0];
