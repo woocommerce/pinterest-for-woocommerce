@@ -86,21 +86,32 @@ class LocaleMapper {
 	 * @throws Exception If no matching locale code is found.
 	 */
 	public static function get_locale_for_api() {
-		$wordpress_locale = determine_locale();
+		$locale = self::get_wordpress_locale();
 
 		// If the locale is in the list of Pinterest locales, return it.
-		if ( in_array( $wordpress_locale, self::PINTEREST_LOCALE_CODES, true ) ) {
-			return str_replace( '_', '-', $wordpress_locale );
+		if ( in_array( $locale, self::PINTEREST_LOCALE_CODES, true ) ) {
+			return $locale;
 		}
 
 		// If the locale is not in the list of Pinterest locales, try to find a match for just the language code.
-		$wordpress_locale_parts = explode( '_', $wordpress_locale );
+		$locale_parts = explode( '_', $locale );
 
-		if ( in_array( $wordpress_locale_parts[0], self::PINTEREST_LOCALE_CODES, true ) ) {
-			return $wordpress_locale_parts[0];
+		if ( in_array( $locale_parts[0], self::PINTEREST_LOCALE_CODES, true ) ) {
+			return $locale_parts[0];
 		}
 
 		// If no match was found, throw an exception.
-		throw new Exception( 'No matching API locale found for ' . $wordpress_locale );
+		throw new Exception( 'No matching Pinterest API locale found for ' . $locale );
+	}
+
+	/**
+	 * Get WordPress locale code.
+	 *
+	 * @since x.x.x
+	 * @return string
+	 */
+	private static function get_wordpress_locale() {
+		$wordpress_locale = determine_locale();
+		return str_replace( '_', '-', $wordpress_locale );
 	}
 }
