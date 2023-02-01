@@ -569,11 +569,18 @@ class Base {
 	 *
 	 * @return mixed
 	 */
-	public static function get_merchant_feeds( $merchant_id ) {
+	public static function get_merchant_feeds( $merchant_id, $include_disabled = false ) {
+
+		$args = array();
+
+		if ( $include_disabled ) {
+			$args['include_disabled'] = 'true';
+		}
+
 		return self::make_request(
 			"catalogs/{$merchant_id}/feed_profiles/",
 			'GET',
-			array(),
+			$args,
 			'',
 			MINUTE_IN_SECONDS
 		);
