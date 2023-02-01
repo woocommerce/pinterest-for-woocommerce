@@ -77,8 +77,7 @@ class Feeds {
 	public static function get_merchant_feeds( $merchant_id ) {
 
 		try {
-
-			$feeds = API\Base::get_merchant_feeds( $merchant_id );
+			$feeds = API\Base::get_merchant_feeds( $merchant_id, true );
 
 			if ( 'success' !== $feeds['status'] ) {
 				throw new Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
