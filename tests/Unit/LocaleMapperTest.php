@@ -8,60 +8,63 @@ use Automattic\WooCommerce\Pinterest\LocaleMapper;
 use Exception;
 
 /**
- * Plugin Update Procedures test class.
+ * Class for testing locale mapper.
  */
 class Pinterest_Test_LocaleMapper extends TestCase {
 
+	private $locale;
+
 	/**
-	 * Test that the locale is mapped correctly.
+	 * Method used for 'pre_determine_locale' filter.
+	 * Using this allows us to modify the value that is used by
+	 * the determine_locale() function in WordPress.
+	 */
+	public function locale_filter() {
+		return $this->locale;
+	}
+
+	/**
+	 * Set up the filter for the locale.
+	 */
+    protected function setUp(): void
+    {
+		add_filter( 'pre_determine_locale', array( $this, 'locale_filter' ) );
+    }
+
+	/**
+	 * Remove the filter for the locale.
+	 */
+	protected function tearDown(): void
+	{
+		remove_filter( 'pre_determine_locale', array( $this, 'locale_filter' ) );
+	}
+
+	/**
+	 * Test that the locale that matches is mapped correctly.
 	 * @group locale_mapper
 	 */
-	public function testLocaleMatch() {
-		$locale_filter = function() {
-			return 'en_US';
-		};
-
-		add_filter( 'pre_determine_locale', $locale_filter );
-
+	public function testLocaleWithFullMatch() {
+		$this->locale = 'en_US';
 		$this->assertEquals( 'en-US', LocaleMapper::get_locale_for_api() );
-
-		remove_filter( 'pre_determine_locale', $locale_filter );
 	}
 
 	/**
 	 * Test that the locale that should match partially is mapped correctly.
 	 * @group locale_mapper
 	 */
-	public function testLocalePartialMatch() {
-		$locale_filter = function() {
-			return 'de_DE';
-		};
-
-		add_filter( 'pre_determine_locale', $locale_filter );
-
+	public function testLocaleWithPartialMatch() {
+		$this->locale = 'de_DE';
 		$this->assertEquals( 'de', LocaleMapper::get_locale_for_api() );
-
-		remove_filter( 'pre_determine_locale', $locale_filter );
 	}
 
 	/**
 	 * Test that the locale that does not matches throws an exception.
 	 * @group locale_mapper
 	 */
-	public function testLocaleNolMatch() {
-		$locale_filter = function() {
-			return 'dx_DE';
-		};
-
-		add_filter( 'pre_determine_locale', $locale_filter );
-
+	public function testLocaleWithNolMatch() {
+		$this->locale = 'me_ME';
 		$this->expectException( Exception::class );
-
 		LocaleMapper::get_locale_for_api();
-
-		remove_filter( 'pre_determine_locale', $locale_filter );
 	}
-
-
 }
 
