@@ -37,5 +37,5 @@ jobs:
       - name: Run PHPCS on all files
         run: vendor/bin/phpcs . -q -n --report=checkstyle | cs2pr
 
-      - name: PHP 8.1 Syntax checker
-        uses: StephaneBour/actions-php-lint@8.1
+      - name: PHP 8.2 Syntax Check
+        uses: overtrue/phplint@8.2
