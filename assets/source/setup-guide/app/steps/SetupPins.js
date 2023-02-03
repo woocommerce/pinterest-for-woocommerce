@@ -192,7 +192,7 @@ const SetupPins = ( {} ) => {
 																	wcSettings
 																		.pinterest_for_woocommerce
 																		.pinterestLinks
-																		.adsManager,
+																		.tagManager,
 																linkId:
 																	'ads-manager',
 																context:

@@ -416,6 +416,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'preLaunchNotice'        => 'https://help.pinterest.com/en-gb/business/article/get-a-business-profile/',
 					'adsAvailability'        => 'https://help.pinterest.com/en/business/availability/ads-availability',
 					'automaticEnhancedMatch' => 'https://www.pinterest.com/_/_/help/business/article/automatic-enhanced-match',
+					'tagManager'             => $this->get_tag_manager_link(),
 				),
 				'isSetupComplete'          => Pinterest_For_Woocommerce()::is_setup_complete(),
 				'countryTos'               => Pinterest_For_Woocommerce()::get_applicable_tos(),
@@ -541,6 +542,25 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			$allowed_hosts[] = wp_parse_url( $service_domain, PHP_URL_HOST );
 
 			return $allowed_hosts;
+		}
+
+		/**
+		 * Get tags manager link if there is a connected advertiser or the ads manager link if not.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return string
+		 */
+		protected function get_tag_manager_link() {
+			$tag_manager_link = 'https://ads.pinterest.com/advertiser/';
+
+			$advertiser_id = Pinterest_For_Woocommerce()->get_setting( 'tracking_advertiser' );
+
+			if ( ! $advertiser_id ) {
+				return $tag_manager_link;
+			}
+
+			return "{$tag_manager_link}{$advertiser_id}/conversions/tag";
 		}
 	}
 
