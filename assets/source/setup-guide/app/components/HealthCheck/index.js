@@ -57,6 +57,14 @@ const DISAPPROVAL_COPY_STATES = {
 		"Merchant's information is incomplete or plagiarized",
 		'pinterest-for-woocommerce'
 	),
+	AUTHENTICITY_NO_SOCIALS_OR_ABOUT: __(
+		"There is no 'About Us' page or no social information in your website",
+		'pinterest-for-woocommerce'
+	),
+	AUTHENTICITY_NO_CONTACT_INFORMATION: __(
+		'There is no contact information in your website',
+		'pinterest-for-woocommerce'
+	),
 	IN_STOCK: __(
 		"Merchant's products are out of stock",
 		'pinterest-for-woocommerce'
@@ -111,6 +119,10 @@ const DISAPPROVAL_COPY_STATES = {
 	),
 	BRAND_REPUTATION: __(
 		'Account does not meet the brand reputation criteria for verification',
+		'pinterest-for-woocommerce'
+	),
+	INCOMPLETE_WEBSITE_TEMPLATE: __(
+		'The template of the website is incomplete',
 		'pinterest-for-woocommerce'
 	),
 };
