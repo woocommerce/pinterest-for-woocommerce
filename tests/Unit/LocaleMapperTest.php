@@ -43,7 +43,7 @@ class Pinterest_Test_LocaleMapper extends TestCase {
 	 * Test that the locale that matches is mapped correctly.
 	 * @group locale_mapper
 	 */
-	public function testLocaleWithFullMatch() {
+	public function test_locale_with_full_match() {
 		$this->locale = 'en_US';
 		$this->assertEquals( 'en-US', LocaleMapper::get_locale_for_api() );
 	}
@@ -52,7 +52,7 @@ class Pinterest_Test_LocaleMapper extends TestCase {
 	 * Test that the locale that should match partially is mapped correctly.
 	 * @group locale_mapper
 	 */
-	public function testLocaleWithPartialMatch() {
+	public function test_locale_with_partial_match() {
 		$this->locale = 'de_DE';
 		$this->assertEquals( 'de', LocaleMapper::get_locale_for_api() );
 	}
@@ -61,7 +61,7 @@ class Pinterest_Test_LocaleMapper extends TestCase {
 	 * Test that the locale that does not matches throws an exception.
 	 * @group locale_mapper
 	 */
-	public function testLocaleWithNolMatch() {
+	public function test_locale_with_no_match() {
 		$this->locale = 'me_ME';
 		$this->expectException( Exception::class );
 		LocaleMapper::get_locale_for_api();
