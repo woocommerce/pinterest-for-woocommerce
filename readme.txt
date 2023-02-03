@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.1
 Requires PHP: 7.3
-Stable tag: 1.2.8
+Stable tag: 1.2.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,17 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.10 - 2023-01-26 =
+* Add - Pull supported countries from the API.
+* Fix - Disable pin button if Chrome extension is detected.
+* Fix - Doc/add include exluce filters to docs.
+* Fix - Missing Attributes form on Simple products.
+
+= 1.2.9 - 2023-01-24 =
+* Add - Plugin connection and feed registration status tracking.
+* Add - Recent feed generation time and feed product count tracking.
+* Fix - Add backlog automation.
 
 = 1.2.8 - 2023-01-03 =
 * Dev - Add node and npm version restrictions.

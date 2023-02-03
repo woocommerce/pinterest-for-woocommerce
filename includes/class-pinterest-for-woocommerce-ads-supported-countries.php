@@ -6,6 +6,8 @@
  * @since 1.0.5
  */
 
+use  Automattic\WooCommerce\Pinterest\API\Base;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -25,42 +27,59 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 		 * @return string[]
 		 */
 		public static function get_countries() {
-			return array(
-				'AR', // Argentina.
-				'AU', // Australia.
-				'AT', // Austria.
-				'BE', // Belgium.
-				'BR', // Brazil.
-				'CA', // Canada.
-				'CL', // Chile.
-				'CO', // Colombia.
-				'CY', // Cyprus.
-				'CZ', // Czech Republic.
-				'DK', // Denmark.
-				'FI', // Finland.
-				'FR', // France.
-				'DE', // Germany.
-				'GR', // Greece.
-				'HU', // Hungary.
-				'IE', // Ireland.
-				'IT', // Italy.
-				'JP', // Japan.
-				'LU', // Luxembourg.
-				'MT', // Malta.
-				'MX', // Mexico.
-				'NL', // Netherlands.
-				'NZ', // New Zealand.
-				'NO', // Norway.
-				'PL', // Poland.
-				'PT', // Portugal.
-				'RO', // Romania.
-				'SK', // Slovakia.
-				'ES', // Spain.
-				'SE', // Sweden.
-				'CH', // Switzerland.
-				'GB', // United Kingdom (UK).
-				'US', // United States (US).
-			);
+			try {
+
+				$allowed_countries = Base::get_list_of_ads_supported_countries();
+				$get_country_code  = function( $country_object ) {
+					return $country_object->code;
+				};
+
+				// Extract codes.
+				$allowed_countries_codes = array_map(
+					$get_country_code,
+					$allowed_countries['data'],
+				);
+
+				return $allowed_countries_codes;
+			} catch ( \Exception $th ) {
+				// A fallback in case of error.
+				return array(
+					'AR', // Argentina.
+					'AU', // Australia.
+					'AT', // Austria.
+					'BE', // Belgium.
+					'BR', // Brazil.
+					'CA', // Canada.
+					'CL', // Chile.
+					'CO', // Colombia.
+					'CY', // Cyprus.
+					'CZ', // Czech Republic.
+					'DK', // Denmark.
+					'FI', // Finland.
+					'FR', // France.
+					'DE', // Germany.
+					'GR', // Greece.
+					'HU', // Hungary.
+					'IE', // Ireland.
+					'IT', // Italy.
+					'JP', // Japan.
+					'LU', // Luxembourg.
+					'MT', // Malta.
+					'MX', // Mexico.
+					'NL', // Netherlands.
+					'NZ', // New Zealand.
+					'NO', // Norway.
+					'PL', // Poland.
+					'PT', // Portugal.
+					'RO', // Romania.
+					'SK', // Slovakia.
+					'ES', // Spain.
+					'SE', // Sweden.
+					'CH', // Switzerland.
+					'GB', // United Kingdom (UK).
+					'US', // United States (US).
+				);
+			}
 		}
 
 		/**
