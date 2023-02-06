@@ -495,7 +495,7 @@ class FeedGenerator extends AbstractChainedJob {
 	public function set_store_address_as_taxable_location( array $taxable_location ) {
 
 		if ( ! doing_action( $this->get_action_full_name( self::CHAIN_BATCH ) ) ) {
-			return;
+			return $taxable_location;
 		}
 
 		if ( isset( $taxable_location[0] ) ) {
