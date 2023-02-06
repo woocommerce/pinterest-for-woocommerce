@@ -104,9 +104,7 @@ class Tracking {
 				add_action( 'wp_enqueue_scripts', array( __CLASS__, 'ajax_tracking_snippet' ), 20 );
 				add_filter(
 					'woocommerce_loop_add_to_cart_args',
-					function( $args, $product ) {
-						return self::filter_add_to_cart_attributes( $args, $product );
-					},
+					array( __CLASS__, 'filter_add_to_cart_attributes' ),
 					10,
 					2
 				);
@@ -233,7 +231,11 @@ class Tracking {
 	 *
 	 * @return void
 	 */
-	public static function hook_add_to_cart_event( $cart_item_key, $product_id, $quantity, $variation_id ) {
+	public static function 	hook_add_to_cart_event( $cart_item_key, $product_id, $quantity, $variation_id ) {
+
+		if ( ! empty( $cart_item_key ) ) {
+			_deprecated_argument( __FUNCTION__, '1.2.6' );
+		}
 
 		$redirect_to_cart = 'yes' === get_option( 'woocommerce_cart_redirect_after_add' );
 
@@ -655,7 +657,7 @@ JS;
 	 *
 	 * @return array The filtered arguments for the Add to cart button.
 	 */
-	private static function filter_add_to_cart_attributes( array $args, WC_Product $product ) {
+	public static function filter_add_to_cart_attributes( array $args, WC_Product $product ) {
 		$attributes = array(
 			'data-product_name' => $product->get_name(),
 			'data-price'        => self::get_product_display_price( $product ),
