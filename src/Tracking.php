@@ -231,7 +231,7 @@ class Tracking {
 	 *
 	 * @return void
 	 */
-	public static function 	hook_add_to_cart_event( $cart_item_key, $product_id, $quantity, $variation_id ) {
+	public static function hook_add_to_cart_event( $cart_item_key, $product_id, $quantity, $variation_id ) {
 
 		if ( ! empty( $cart_item_key ) ) {
 			_deprecated_argument( __FUNCTION__, '1.2.6' );
