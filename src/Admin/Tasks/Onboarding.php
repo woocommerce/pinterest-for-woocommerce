@@ -3,7 +3,7 @@
  * The Setup for Pinterest Onboarding task.
  *
  * @package Automattic\WooCommerce\Pinterest\Admin
- * @since x.x.x
+ * @since 1.2.11
  */
 
 namespace Automattic\WooCommerce\Pinterest\Admin\Tasks;
