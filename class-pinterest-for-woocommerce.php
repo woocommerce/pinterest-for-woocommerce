@@ -15,6 +15,8 @@ use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\Utilities\Tracks;
 use Automattic\WooCommerce\Pinterest\API\UserInteraction;
+use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
+use Automattic\WooCommerce\Pinterest\Admin\Tasks\Onboarding;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -282,6 +284,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Check available coupons and credits.
 			add_action( Heartbeat::HOURLY, array( $this, 'check_available_coupons_and_credits' ) );
+
+			// Hook the setup task. The hook admin_init is not triggered when the WC fetches the tasks using the endpoint: wp-json/wc-admin/onboarding/tasks and hence hooking into init.
+			add_action( 'init', array( $this, 'add_onboarding_task' ), 20 );
 
 		}
 
@@ -1230,6 +1235,22 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$base_location = wc_get_base_location();
 
 			return ! empty( $base_location['country'] ) ? $base_location['country'] : null;
+		}
+
+		/**
+		 * Adds the onboarding task to the Tasklists.
+		 *
+		 * @since 1.2.11
+		 */
+		public function add_onboarding_task() {
+			if ( class_exists( TaskLists::class ) ) { // compatibility-code "< WC 5.9". This is added for backward compatibility.
+				TaskLists::add_task(
+					'extended',
+					new Onboarding(
+						TaskLists::get_list( 'extended' )
+					)
+				);
+			}
 		}
 	}
 
