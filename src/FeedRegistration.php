@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest;
 use Exception;
 use Throwable;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
+use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -93,6 +94,12 @@ class FeedRegistration {
 			}
 
 			throw new Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
+
+		} catch ( PinterestApiLocaleException $e ) {
+
+			// translators: %s: Error message.
+			$error_message = "Could not register feed. Error: {$e->getMessage()}";
+			self::log( $error_message, 'error' );
 
 		} catch ( Throwable $th ) {
 			if ( method_exists( $th, 'get_pinterest_code' ) && 4163 === $th->get_pinterest_code() ) {

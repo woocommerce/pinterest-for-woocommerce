@@ -12,8 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Automattic\WooCommerce\Pinterest\API\Base;
 use \Exception;
+use Automattic\WooCommerce\Pinterest\API\Base;
+use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 
 /**
  * Class handling fetch methods for feed profiles.
@@ -127,7 +128,13 @@ class Feeds {
 		$configured_path = dirname( $feed->location_config->full_feed_fetch_location );
 		$local_path      = dirname( $config['feed_url'] );
 		$local_country   = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
-		$local_locale    = LocaleMapper::get_locale_for_api();
+
+		try {
+			$local_locale = LocaleMapper::get_locale_for_api();
+		} catch ( PinterestApiLocaleException $e ) {
+			// Local feed locale is not supported by Pinterest.
+			return '';
+		}
 
 		$registered_feed = '';
 

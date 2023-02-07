@@ -10,7 +10,7 @@ namespace Automattic\WooCommerce\Pinterest;
 
 defined( 'ABSPATH' ) || exit;
 
-use Exception;
+use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 
 /**
  * Class LocaleMapper.
@@ -83,7 +83,7 @@ class LocaleMapper {
 	 *
 	 * @since x.x.x
 	 * @return string
-	 * @throws Exception If no matching locale code is found.
+	 * @throws PinterestApiLocaleException If no matching locale code is found.
 	 */
 	public static function get_locale_for_api() {
 		$locale = self::get_wordpress_locale();
@@ -101,7 +101,7 @@ class LocaleMapper {
 		}
 
 		// If no match was found, throw an exception.
-		throw new Exception( 'No matching Pinterest API locale found for ' . $locale );
+		throw new PinterestApiLocaleException( 'No matching Pinterest API locale found for ' . $locale );
 	}
 
 	/**
