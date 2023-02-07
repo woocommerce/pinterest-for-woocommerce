@@ -128,14 +128,7 @@ class Feeds {
 		$configured_path = dirname( $feed->location_config->full_feed_fetch_location );
 		$local_path      = dirname( $config['feed_url'] );
 		$local_country   = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
-
-		try {
-			$local_locale = LocaleMapper::get_locale_for_api();
-		} catch ( PinterestApiLocaleException $e ) {
-			// Local feed locale is not supported by Pinterest.
-			return '';
-		}
-
+		$local_locale    = LocaleMapper::get_locale_for_api();
 		$registered_feed = '';
 
 		if ( $configured_path === $local_path && $local_country === $feed->country && $local_locale === $feed->locale ) {

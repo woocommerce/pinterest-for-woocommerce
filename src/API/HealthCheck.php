@@ -54,6 +54,11 @@ class HealthCheck extends VendorAPI {
 				return array( 'status' => 'merchant_connected_diff_platform' );
 			}
 
+			$locale_error = Pinterest_For_Woocommerce()::get_data( 'merchant_locale_not_valid' );
+			if ( $locale_error ) {
+				return array( 'status' => 'merchant_locale_not_valid' );
+			}
+
 			$merchant = Pinterest\Merchants::get_merchant();
 
 			if ( 'success' !== $merchant['status'] || empty( $merchant['data']->product_pin_approval_status ) ) {
