@@ -91,6 +91,13 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.11 - 2023-02-07 =
+* Dev - Fix deprecated method argument version.
+* Dev - Fix php8.2 deprecation notices.
+* Fix - Inconsistencies with the add to cart tracking event.
+* Tweak - WC 7.4 compatibility.
+* Update - The Onboarding task to use `TaskLists::add_task` method instead of the deprecated `woocommerce_admin_onboarding_task_list` filter.
+
 = 1.2.10 - 2023-01-26 =
 * Add - Pull supported countries from the API.
 * Fix - Disable pin button if Chrome extension is detected.
