@@ -1240,7 +1240,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Adds the onboarding task to the Tasklists.
 		 *
-		 * @since x.x.x
+		 * @since 1.2.11
 		 */
 		public function add_onboarding_task() {
 			if ( class_exists( TaskLists::class ) ) { // compatibility-code "< WC 5.9". This is added for backward compatibility.
