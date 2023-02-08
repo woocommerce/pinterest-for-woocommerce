@@ -1,7 +1,5 @@
 <?php
 
-namespace Automattic\WooCommerce\Pinterest\Tests\Unit\PluginUpdate;
-
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 use Automattic\WooCommerce\Pinterest\LocaleMapper;
 
@@ -10,7 +8,7 @@ use Exception;
 /**
  * Class for testing locale mapper.
  */
-class Pinterest_Test_LocaleMapper extends TestCase {
+class PinterestTestLocaleMapper extends TestCase {
 
 	private $locale;
 
