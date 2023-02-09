@@ -3,6 +3,7 @@
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
+use \Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
 use Automattic\WooCommerce\Pinterest\FeedFileOperations;
 use Automattic\WooCommerce\Pinterest\FeedGenerator;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
@@ -10,7 +11,6 @@ use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Exception;
 use Pinterest_For_Woocommerce;
 use Throwable;
-use wpdb;
 
 class FeedGeneratorTest extends \WP_UnitTestCase {
 
@@ -248,6 +248,29 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	public function test_handle_batch_action_retries_up_to_two_times_on_timeout() {
-		$this->markTestIncomplete( 'This test awaits something.' );
+
+		\WC_Helper_Product::create_simple_product();
+
+		$this->action_scheduler
+			->expects( $this->exactly( FeedGenerator::MAX_RETRIES_PER_BATCH ) )
+			->method( 'schedule_immediate' )
+			->with(
+				'pinterest/jobs/generate_feed/chain_batch',
+				array( 1, array() ),
+				''
+			);
+		
+		$action_scheduler = new ActionSchedulerProxy();
+		$action_id        = $action_scheduler->schedule_immediate( 'pinterest/jobs/generate_feed/chain_batch', array( 1, array() ) );
+
+		$retries = 0;
+
+		while( $retries < FeedGenerator::MAX_RETRIES_PER_BATCH ) {
+			$this->feed_generator->maybe_handle_error_on_timeout( $action_id );
+			$this->assertEquals( ++$retries, (int) Pinterest_For_Woocommerce::get_data( 'feed_generation_retries' ) );
+		}
+		$this->feed_generator->maybe_handle_error_on_timeout( $action_id );
+
+		$this->assertEquals( 'error', ProductFeedStatus::get()['status'] );
 	}
 }
