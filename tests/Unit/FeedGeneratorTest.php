@@ -2,6 +2,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
+use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
 use \Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
 use Automattic\WooCommerce\Pinterest\FeedFileOperations;
@@ -38,6 +39,18 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->feed_generator = new FeedGenerator( $this->action_scheduler, $this->feed_file_operations, $this->local_feed_configs );
 
 		ProductFeedStatus::set( ProductFeedStatus::STATE_PROPS );
+	}
+
+	public function test_init_adds_action_scheduler_failed_action_hook() {
+		$this->feed_generator->init();
+
+		$this->assertEquals(
+			10,
+			has_action(
+				'action_scheduler_failed_action',
+				array( $this->feed_generator, 'maybe_handle_error_on_timeout' )
+			)
+		);
 	}
 
 	public function test_feed_generator_start_sets_product_feed_status_generation_start_time() {
@@ -259,7 +272,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 				array( 1, array() ),
 				''
 			);
-		
+
 		$action_scheduler = new ActionSchedulerProxy();
 		$action_id        = $action_scheduler->schedule_immediate( 'pinterest/jobs/generate_feed/chain_batch', array( 1, array() ) );
 
