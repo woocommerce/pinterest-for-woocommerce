@@ -118,6 +118,60 @@ class FeedRegistration {
 	 */
 	private static function register_feed() {
 
+		$merchant_id = self::check_merchant_approval_status();
+
+		if ( ! $merchant_id ) {
+			return false;
+		}
+
+		$feed_id = self::get_locally_stored_registered_feed_id();
+
+		// If the feed is not registered, try to match it to a registered feed.
+		if ( ! $feed_id ) {
+			$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( $merchant_id );
+		}
+
+		// If no matching registered feed found try to create it.
+		if ( ! $feed_id ) {
+			$response = Merchants::update_or_create_merchant();
+			$feed_id  = $response['feed_id'] ?? '';
+		}
+
+		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $feed_id );
+
+		self::feed_enable_status_maintenance( $merchant_id, $feed_id );
+
+		return true;
+	}
+
+	/**
+	 * Maintenance function for feed enable status.
+	 * Enable the registered feed if it is not enabled.
+	 * Disable all other feed configurations for the merchant.
+	 *
+	 * @since x.x.x
+	 * @param string $merchant_id Merchant ID.
+	 * @param string $feed_id Feed ID.
+	 * @return void
+	 */
+	private static function feed_enable_status_maintenance( $merchant_id, $feed_id ) {
+		// Check if the feed is enabled. If not, enable it.
+		if ( ! Feeds::is_local_feed_enabled( $merchant_id, $feed_id ) ) {
+			Feeds::enabled_feed( $merchant_id, $feed_id );
+		}
+
+		// Cleanup feeds that are registered but not in the local feed configurations.
+		self::maybe_disable_stale_feeds_for_merchant( $merchant_id, $feed_id );
+	}
+
+	/**
+	 * Check if the merchant is approved.
+	 * This is a helper function for the register_feed method.
+	 *
+	 * @return mixed False if the merchant is not approved, merchant id otherwise.
+	 */
+	private static function check_merchant_approval_status() {
+
 		$merchant = Merchants::get_merchant();
 
 		if ( ! empty( $merchant['data']->id ) && 'declined' === $merchant['data']->product_pin_approval_status ) {
@@ -126,27 +180,7 @@ class FeedRegistration {
 			return false;
 		}
 
-		$merchant_id   = $merchant['data']->id;
-		$local_feed_id = self::get_locally_stored_registered_feed_id();
-
-		if ( ! $local_feed_id || ! Feeds::match_local_feed_configuration_to_registered_feeds( $merchant_id ) ) {
-
-			$response = Merchants::update_or_create_merchant();
-
-			// If he response contains an array with the feed id this means that it is registered.
-			if ( $response['feed_id'] ) {
-				$local_feed_id = $response['feed_id'];
-			}
-		}
-
-		if ( $local_feed_id && ( ! Feeds::is_local_feed_enabled( $merchant_id, $local_feed_id ) ) ) {
-			Feeds::enabled_feed( $merchant_id, $local_feed_id );
-		}
-
-		// Cleanup feeds that are registered but not in the local feed configurations.
-		self::maybe_disable_stale_feeds_for_merchant( $merchant_id );
-
-		return true;
+		return $merchant['data']->id;
 	}
 
 	/**
@@ -156,10 +190,11 @@ class FeedRegistration {
 	 * @since x.x.x
 	 *
 	 * @param string $merchant_id Merchant ID.
+	 * @param string $feed_id Feed ID.
 	 *
 	 * @return void
 	 */
-	public static function maybe_disable_stale_feeds_for_merchant( $merchant_id ) {
+	public static function maybe_disable_stale_feeds_for_merchant( $merchant_id, $feed_id ) {
 
 		$feed_profiles = Feeds::get_merchant_feeds( $merchant_id );
 
@@ -167,16 +202,23 @@ class FeedRegistration {
 			return;
 		}
 
-		$local_feed_id = self::get_locally_stored_registered_feed_id();
+		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
+		$config        = reset( $configs );
+		$local_path    = dirname( $config['feed_url'] );
 
 		foreach ( $feed_profiles as $feed ) {
 			// Local feed should not be disabled.
-			if ( $local_feed_id === $feed->id ) {
+			if ( $feed_id === $feed->id ) {
 				continue;
 			}
 
 			// Only disable feeds that are registered as WooCommerce integration.
 			if ( 'WOOCOMMERCE' !== $feed->integration_platform_type ) {
+				continue;
+			}
+
+			// Only disable feeds that have matching feed file URL.
+			if ( $local_path !== dirname( $feed->location_config->full_feed_fetch_location ) ) {
 				continue;
 			}
 
