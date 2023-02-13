@@ -35,7 +35,7 @@ class Feeds {
 		try {
 
 			// Get the feeds of the merchant.
-			$feeds = Base::get_merchant_feeds( $merchant_id );
+			$feeds = Base::get_merchant_feeds( $merchant_id, true );
 
 			if ( 'success' !== $feeds['status'] ) {
 				throw new Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
@@ -158,7 +158,7 @@ class Feeds {
 		try {
 			$result = Base::enable_merchant_feed( $merchant_id, $feed_profile_id );
 
-			return true;
+			return 'success' === $result['status'];
 		} catch ( \Throwable $th ) {
 			Logger::log( $th->getMessage(), 'error' );
 			return false;

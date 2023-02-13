@@ -202,9 +202,9 @@ class FeedRegistration {
 			return;
 		}
 
-		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
-		$config        = reset( $configs );
-		$local_path    = dirname( $config['feed_url'] );
+		$configs    = LocalFeedConfigs::get_instance()->get_configurations();
+		$config     = reset( $configs );
+		$local_path = dirname( $config['feed_url'] );
 
 		foreach ( $feed_profiles as $feed ) {
 			// Local feed should not be disabled.
@@ -218,7 +218,7 @@ class FeedRegistration {
 			}
 
 			// Only disable feeds that have matching feed file URL.
-			if ( $local_path !== dirname( $feed->location_config->full_feed_fetch_location ) ) {
+			if ( dirname( $feed->location_config->full_feed_fetch_location ) !== $local_path ) {
 				continue;
 			}
 
