@@ -566,6 +566,7 @@ class Base {
 	 * Get a merchant's feeds.
 	 *
 	 * @param string $merchant_id The merchant ID the feed belongs to.
+	 * @param bool   $include_disabled Whether to include disabled feeds.
 	 *
 	 * @return mixed
 	 */
