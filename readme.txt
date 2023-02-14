@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.12 - 2023-02-14 =
+* Dev - Remove deprecated argument call from inside a hook action handler function.
+
 = 1.2.11 - 2023-02-07 =
 * Dev - Fix deprecated method argument version.
 * Dev - Fix php8.2 deprecation notices.
