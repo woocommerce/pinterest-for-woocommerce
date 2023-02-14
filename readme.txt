@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.1
 Requires PHP: 7.3
-Stable tag: 1.2.11
+Stable tag: 1.2.12
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.12 - 2023-02-14 =
+* Dev - Remove deprecated argument call from inside a hook action handler function.
 
 = 1.2.11 - 2023-02-07 =
 * Dev - Fix deprecated method argument version.
