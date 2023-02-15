@@ -172,7 +172,7 @@ class Merchants {
 			throw new Exception( __( 'Response error when trying to create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
-		$feed_id    = Feeds::match_local_feed_configuration_to_registered_feeds( $response['data'] );
+		$feed_id     = Feeds::match_local_feed_configuration_to_registered_feeds( $response['data'] );
 		$merchant_id = $response['data'];
 
 		// Clean the cached delay.
