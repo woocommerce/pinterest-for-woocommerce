@@ -130,7 +130,12 @@ class Merchants {
 		$configs = LocalFeedConfigs::get_instance()->get_configurations();
 		$config  = reset( $configs );
 
-		// TODO: Add comment.
+		/**
+		 * Filters the default merchant name: pinterest_for_woocommerce_default_merchant_name. This vale appears in the
+		 * feed configuration page in Pinterest.
+		 *
+		 * @param string $merchant_name The default merchant name.
+		 */
 		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		$args = array(
