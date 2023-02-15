@@ -157,7 +157,6 @@ class Merchants {
 
 		try {
 			$response = Base::update_or_create_merchant( $args );
-			// TODO: invalidate cache for feed fetch.
 		} catch ( Throwable $th ) {
 			$delay = Pinterest_For_Woocommerce()::get_data( 'create_merchant_delay' ) ?? MINUTE_IN_SECONDS;
 
@@ -173,17 +172,19 @@ class Merchants {
 			throw new Exception( __( 'Response error when trying to create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
-		$registered_feed = Feeds::match_local_feed_configuration_to_registered_feeds( $response['data'] );
+		$feed_id    = Feeds::match_local_feed_configuration_to_registered_feeds( $response['data'] );
+		$merchant_id = $response['data'];
 
 		// Clean the cached delay.
 		Pinterest_For_Woocommerce()::save_data( 'create_merchant_delay', false );
 
 		// Update the registered feed id setting.
-		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $registered_feed );
+		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $feed_id );
 
+		Feeds::invalidate_get_merchant_feeds_cache( $merchant_id, true );
 		return array(
-			'merchant_id' => $response['data'],
-			'feed_id'     => $registered_feed,
+			'merchant_id' => $merchant_id,
+			'feed_id'     => $feed_id,
 		);
 	}
 

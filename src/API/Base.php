@@ -632,6 +632,29 @@ class Base {
 		);
 	}
 
+	/**
+	 * Invalidate the merchant's feeds cache.
+	 *
+	 * @param string $merchant_id The merchant ID the feed belongs to.
+	 * @param bool   $include_disabled Whether to include disabled feeds.
+	 *
+	 * @return void
+	 */
+	public static function invalidate_merchant_feeds_cache( $merchant_id, $include_disabled = false ) {
+
+		$args = array();
+
+		if ( $include_disabled ) {
+			$args['include_disabled'] = 'true';
+		}
+
+		self::invalidate_cached_response(
+			"catalogs/{$merchant_id}/feed_profiles/",
+			'GET',
+			$args,
+			'',
+		);
+	}
 
 	/**
 	 * Get a specific merchant's feed report using the given arguments.

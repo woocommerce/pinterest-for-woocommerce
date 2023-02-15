@@ -97,6 +97,16 @@ class Feeds {
 		}
 	}
 
+	/**
+	 * Invalidate the merchant feeds cache.
+	 *
+	 * @since x.x.x
+	 * @param string $merchant_id The merchant ID.
+	 * @return void
+	 */
+	public static function invalidate_get_merchant_feeds_cache( $merchant_id ) {
+		API\Base::invalidate_merchant_feeds_cache( $merchant_id, true );
+	}
 
 	/**
 	 * Verify if the local feed is already registered to the merchant.
@@ -157,6 +167,9 @@ class Feeds {
 	public static function enabled_feed( $merchant_id, $feed_profile_id ) {
 		try {
 			$result = Base::enable_merchant_feed( $merchant_id, $feed_profile_id );
+
+			// We don't need to check the status, lets just invalidate the cache for extra safety.
+			self::invalidate_get_merchant_feeds_cache( $merchant_id, true );
 
 			return 'success' === $result['status'];
 		} catch ( \Throwable $th ) {

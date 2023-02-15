@@ -206,6 +206,8 @@ class FeedRegistration {
 		$config     = reset( $configs );
 		$local_path = dirname( $config['feed_url'] );
 
+		$invalidate_cache = false;
+
 		foreach ( $feed_profiles as $feed ) {
 			// Local feed should not be disabled.
 			if ( $feed_id === $feed->id ) {
@@ -222,12 +224,16 @@ class FeedRegistration {
 				continue;
 			}
 
+			// Disable the feed if it is active.
 			if ( 'ACTIVE' === $feed->feed_status ) {
 				Feeds::disable_feed( $merchant_id, $feed->id );
+				$invalidate_cache = true;
 			}
 		}
 
-		// TODO: Invalidate cache.
+		if ( $invalidate_cache ) {
+			Feeds::invalidate_get_merchant_feeds_cache( $merchant_id );
+		}
 	}
 
 	/**
