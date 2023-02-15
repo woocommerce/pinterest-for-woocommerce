@@ -83,8 +83,7 @@ class Base {
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 
 		if ( ! empty( $cache_expiry ) ) {
-			$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( $endpoint . $method . wp_json_encode( $payload ) . $api );
-			$cache     = get_transient( $cache_key );
+			$cache = self::get_cached_response( $endpoint, $method, $payload, $api );
 
 			if ( $cache ) {
 				return $cache;
@@ -165,6 +164,52 @@ class Base {
 
 	}
 
+	/**
+	 * Get the cache key.
+	 *
+	 * @since x.x.x
+	 * @param string $endpoint Endpoint.
+	 * @param string $method   Request method.
+	 * @param array  $payload  Request payload.
+	 * @param string $api      Request API.
+	 *
+	 * @return string The cache key.
+	 */
+	public static function get_cache_key( $endpoint, $method, $payload, $api ) {
+		return PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( $endpoint . $method . wp_json_encode( $payload ) . $api );
+	}
+
+	/**
+	 * Get the cached value.
+	 *
+	 * @since x.x.x
+	 * @param string $endpoint Endpoint.
+	 * @param string $method   Request method.
+	 * @param array  $payload  Request payload.
+	 * @param string $api      Request API.
+	 *
+	 * @return mixed Value of the transient or false if it doesn't exist.
+	 */
+	public static function get_cached_response( $endpoint, $method, $payload, $api ) {
+		$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
+		return get_transient( $cache_key );
+	}
+
+	/**
+	 * Invalidate the cached value.
+	 *
+	 * @since x.x.x
+	 * @param string $endpoint Endpoint.
+	 * @param string $method   Request method.
+	 * @param array  $payload  Request payload.
+	 * @param string $api      Request API.
+	 *
+	 * @return void
+	 */
+	public static function invalidate_cached_response( $endpoint, $method, $payload, $api ) {
+		$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
+		delete_transient( $cache_key );
+	}
 
 	/**
 	 * Handle the request
