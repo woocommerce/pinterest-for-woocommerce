@@ -116,6 +116,7 @@ class Feeds {
 	 *
 	 * @param string $merchant_id The merchant ID.
 	 *
+	 * @throws PinterestApiLocaleException No valid locale found to check for the registered feed.
 	 * @return string Returns the ID of the feed if properly registered or an empty string otherwise.
 	 */
 	public static function is_local_feed_registered( $merchant_id ) {
