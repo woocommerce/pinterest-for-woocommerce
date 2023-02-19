@@ -3,8 +3,6 @@
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 use Automattic\WooCommerce\Pinterest\LocaleMapper;
 
-use Exception;
-
 /**
  * Class for testing locale mapper.
  */
