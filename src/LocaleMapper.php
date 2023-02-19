@@ -101,7 +101,8 @@ class LocaleMapper {
 		}
 
 		// If no match was found, throw an exception.
-		throw new PinterestApiLocaleException( 'No matching Pinterest API locale found for ' . $locale );
+		// translators: %s is the locale code.
+		throw new PinterestApiLocaleException( sprintf( __( 'No matching Pinterest API locale found for %s', 'pinterest-for-woocommerce' ), $locale ) );
 	}
 
 	/**
