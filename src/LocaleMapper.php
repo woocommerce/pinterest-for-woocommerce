@@ -29,52 +29,52 @@ class LocaleMapper {
 	 * Locales have been collected on 01.02.2023 from Pinterest API response message.
 	 */
 	const PINTEREST_LOCALE_CODES = array(
-		'it',
-		'es-419',
-		'ru-RU',
-		'hu-HU',
-		'hr-HR',
-		'sv-SE',
-		'de',
-		'nb-NO',
-		'th-TH',
-		'sk-SK',
-		'ro-RO',
-		'es-MX',
-		'uk-UA',
-		'nl',
-		'en-AU',
-		'he-IL',
-		'tr',
-		'es-ES',
-		'pl-PL',
-		'cs-CZ',
-		'en-CA',
-		'fi-FI',
-		'pt-PT',
-		'el-GR',
-		'ja',
-		'ar-SA',
-		'fr-CA',
-		'en-GB',
-		'es-AR',
-		'da-DK',
-		'zh-CN',
-		'en-US',
-		'vi-VN',
-		'id-ID',
-		'bg-BG',
-		'zh-TW',
-		'en-IN',
-		'tl-PH',
-		'ko-KR',
-		'af-ZA',
-		'ms-MY',
-		'bn-IN',
-		'te-IN',
-		'fr',
-		'hi-IN',
-		'pt-BR',
+		'it'     => 1,
+		'es-419' => 1,
+		'ru-RU'  => 1,
+		'hu-HU'  => 1,
+		'hr-HR'  => 1,
+		'sv-SE'  => 1,
+		'de'     => 1,
+		'nb-NO'  => 1,
+		'th-TH'  => 1,
+		'sk-SK'  => 1,
+		'ro-RO'  => 1,
+		'es-MX'  => 1,
+		'uk-UA'  => 1,
+		'nl'     => 1,
+		'en-AU'  => 1,
+		'he-IL'  => 1,
+		'tr'     => 1,
+		'es-ES'  => 1,
+		'pl-PL'  => 1,
+		'cs-CZ'  => 1,
+		'en-CA'  => 1,
+		'fi-FI'  => 1,
+		'pt-PT'  => 1,
+		'el-GR'  => 1,
+		'ja'     => 1,
+		'ar-SA'  => 1,
+		'fr-CA'  => 1,
+		'en-GB'  => 1,
+		'es-AR'  => 1,
+		'da-DK'  => 1,
+		'zh-CN'  => 1,
+		'en-US'  => 1,
+		'vi-VN'  => 1,
+		'id-ID'  => 1,
+		'bg-BG'  => 1,
+		'zh-TW'  => 1,
+		'en-IN'  => 1,
+		'tl-PH'  => 1,
+		'ko-KR'  => 1,
+		'af-ZA'  => 1,
+		'ms-MY'  => 1,
+		'bn-IN'  => 1,
+		'te-IN'  => 1,
+		'fr'     => 1,
+		'hi-IN'  => 1,
+		'pt-BR'  => 1,
 	);
 
 	/**
@@ -89,15 +89,15 @@ class LocaleMapper {
 		$locale = self::get_wordpress_locale();
 
 		// If the locale is in the list of Pinterest locales, return it.
-		if ( in_array( $locale, self::PINTEREST_LOCALE_CODES, true ) ) {
+		if ( array_key_exists( $locale, self::PINTEREST_LOCALE_CODES ) ) {
 			return $locale;
 		}
 
 		// If the locale is not in the list of Pinterest locales, try to find a match for just the language code.
-		$locale_parts = explode( '-', $locale );
+		[ $language ] = explode( '-', $locale );
 
-		if ( in_array( $locale_parts[0], self::PINTEREST_LOCALE_CODES, true ) ) {
-			return $locale_parts[0];
+		if ( array_key_exists( $language, self::PINTEREST_LOCALE_CODES ) ) {
+			return $language;
 		}
 
 		// If no match was found, throw an exception.
