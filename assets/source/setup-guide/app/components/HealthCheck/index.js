@@ -17,6 +17,15 @@ import './style.scss';
 import { useSettingsSelect, useCreateNotice } from '../../helpers/effects';
 import { DISAPPROVAL_COPY_STATES } from '../../constants';
 
+/**
+ * Render the list of the disapproval reasons.
+ *
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'merchant-guidelines', context: 'merchant-disapproval-reasons' }`
+ *
+ * @param {Object} props React props
+ * @param {Array} props.reasons
+ * @return { JSX.Element } The rendered element
+ */
 const FormattedReasons = ( { reasons } ) => {
 	if ( reasons === undefined ) {
 		return null;

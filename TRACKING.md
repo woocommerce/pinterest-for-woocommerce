@@ -87,6 +87,8 @@ Clicking on an external documentation link.
     - with `{ link_id: 'terms-of-service', context: 'ads-credits-terms-and-conditions' }`
 	- with `{ link_id: 'privacy-policy', context: 'ads-credits-terms-and-conditions' }`
 	- with `{ link_id: 'advertising-services-agreement', context: 'ads-credits-terms-and-conditions' }`
+- [FormattedReasons]( assets/source/setup-guide/app/components/HealthCheck/index.js#L29)
+    - with `{ link_id: 'merchant-guidelines', context: 'merchant-disapproval-reasons' }`
 ### [`wcadmin_pfw_domain_verify_failure`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L69)
 Triggered when domain verification fails.
 #### Properties
