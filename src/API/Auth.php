@@ -9,7 +9,7 @@
 namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
-
+use Throwable;
 use \WP_REST_Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -97,12 +97,6 @@ class Auth extends VendorAPI {
 			$error = esc_html__( 'Empty response, please try again later.', 'pinterest-for-woocommerce' );
 		}
 
-		if ( ! empty( $error ) ) {
-			$error_args = '&error=' . $error;
-			// Force the logs to debug the connection procedure.
-			Logger::log( wp_json_encode( $error ), 'error', null, true );
-		}
-
 		// Save token information.
 		if ( empty( $error ) ) {
 
@@ -112,7 +106,18 @@ class Auth extends VendorAPI {
 				)
 			);
 
-			do_action( 'pinterest_for_woocommerce_token_saved' );
+			try {
+				// Actions to perform after getting the authorization token.
+				do_action( 'pinterest_for_woocommerce_token_saved' );
+			} catch ( Throwable $th ) {
+				$error = esc_html__( 'There was an error getting the account data. Please try again later.', 'pinterest-for-woocommerce' );
+			}
+		}
+
+		if ( ! empty( $error ) ) {
+			$error_args = '&error=' . $error;
+			// Force the logs to debug the connection procedure.
+			Logger::log( wp_json_encode( $error ), 'error', null, true );
 		}
 
 		wp_safe_redirect( $this->get_redirect_url( $request->get_param( 'view' ), ! empty( $error ) ) . $error_args );
