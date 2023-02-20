@@ -31,18 +31,18 @@ const FormattedReasons = ( { reasons } ) => {
 		return null;
 	}
 
-	return (
-		<ul className="ul-square">
-			{ reasons.map(
-				( reason ) =>
-					undefined !== DISAPPROVAL_COPY_STATES[ reason ] && (
-						<li key={ reason }>
-							{ DISAPPROVAL_COPY_STATES[ reason ] }
-						</li>
-					)
-			) }
-		</ul>
+	const formattedReasons = reasons.map(
+		( reason ) =>
+			undefined !== DISAPPROVAL_COPY_STATES[ reason ] && (
+				<li key={ reason }>{ DISAPPROVAL_COPY_STATES[ reason ] }</li>
+			)
 	);
+
+	if ( ! formattedReasons ) {
+		return null;
+	}
+
+	return <ul className="ul-square">{ formattedReasons }</ul>;
 };
 
 const HealthCheck = () => {
