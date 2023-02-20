@@ -33,7 +33,7 @@ class HealthCheck extends VendorAPI {
 
 
 	/**
-	 * Get the merchant object from the API and return the status, and if exists, the dissapproval rationale.
+	 * Get the merchant object from the API and return the status, and if exists, the disapproval rationale.
 	 *
 	 * @return array
 	 *
