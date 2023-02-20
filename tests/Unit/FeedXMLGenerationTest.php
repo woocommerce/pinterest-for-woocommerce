@@ -8,6 +8,7 @@ use \WC_Helper_Product;
 use \WC_Unit_Test_Case;
 use \WC_Product_Variable;
 
+use Automattic\WooCommerce\Pinterest\FeedGenerator;
 use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
@@ -16,6 +17,7 @@ use Automattic\WooCommerce\Pinterest\Product\GoogleProductTaxonomy;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\Condition;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\GoogleCategory;
+use ShippingHelpers;
 
 /**
  * Feed file generation testing class.
@@ -567,6 +569,51 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 */
+	public function testPropertyPriceWithTaxesXML() {
+		$price_method = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
+		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
+
+		// Setup shipping.
+		$zone = ShippingHelpers::createZoneWithLocations(
+			array(
+				array( 'US', 'country' ),
+			)
+		);
+		ShippingHelpers::addFlatRateShippingMethodToZone( $zone );
+		ShippingHelpers::addFreeShipping( $zone );
+
+		// Set customer address on Spain and set a 20% tax for Spain based customers.
+		update_option( 'woocommerce_default_country', 'ES:B' );
+		ShippingHelpers::addTaxRate( 'ES' );
+
+		// Test if the price excludes taxes.
+		$old_tax_display_option = get_option( 'woocommerce_tax_display_shop' );
+		update_option( 'woocommerce_tax_display_shop', 'incl' );
+
+		// Setup taxes.
+		add_filter( 'wc_tax_enabled', '__return_true' );
+		add_filter( 'woocommerce_prices_include_tax', '__return_true' );
+		WC()->customer->set_shipping_location( 'US', 'CA' );
+
+		// Edge case where price is wrong.
+		$xml = $price_method( $product );
+		$this->assertEquals( '<g:price>12.50USD</g:price>', $xml );
+		
+		// Apply the filter.
+		add_filter( 'woocommerce_customer_taxable_address', array( $this, 'filter_taxable_location' ) );
+
+		$xml = $price_method( $product );
+
+		$this->assertEquals( '<g:price>15.00USD</g:price>', $xml );
+
+		// Back to the default options.
+		update_option( 'woocommerce_default_country', 'US:CA' );
+		update_option( 'woocommerce_tax_display_shop', $old_tax_display_option );
+	}
+
+	/**
+	 * @group feed
+	 */
 	public function testPropertyMpnXML() {
 		$mpn_method = $this->getProductsXmlFeedAttributeMethod( 'g:mpn' );
 		$product    = WC_Helper_Product::create_simple_product();
@@ -734,6 +781,20 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		// Reset logger.
 		Logger::$logger = null;
+	}
+
+	/**
+	 * Mimic the method on FeedGenerator.
+	 *
+	 * @param array $taxable_location The taxable location to filter.
+	 */
+	public function filter_taxable_location( array $taxable_location ) {
+
+		if ( isset( $taxable_location[0] ) ) {
+			$taxable_location[0] = Pinterest_For_Woocommerce()::get_base_country();
+		}
+
+		return $taxable_location;
 	}
 
 }
