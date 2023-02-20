@@ -124,12 +124,7 @@ class FeedRegistration {
 			return false;
 		}
 
-		$feed_id = self::get_locally_stored_registered_feed_id();
-
-		// If the feed is not registered, try to match it to a registered feed.
-		if ( ! $feed_id ) {
-			$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( $merchant_id );
-		}
+		$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( $merchant_id );
 
 		// If no matching registered feed found try to create it.
 		if ( ! $feed_id ) {
