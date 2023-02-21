@@ -52,7 +52,7 @@ class CatalogSyncErrors extends AbstractNote {
 		}
 
 		try {
-			$feed_id  = FeedRegistration::get_registered_feed_id();
+			$feed_id  = FeedRegistration::get_locally_stored_registered_feed_id();
 			$workflow = FeedIssues::get_feed_workflow( $feed_id );
 			if ( false === $workflow ) {
 				// No workflow to check.
