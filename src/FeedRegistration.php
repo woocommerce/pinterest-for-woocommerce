@@ -134,8 +134,11 @@ class FeedRegistration {
 
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $feed_id );
 
-		self::feed_enable_status_maintenance( $merchant_id, $feed_id );
+		if ( ! $feed_id ) {
+			return false;
+		}
 
+		self::feed_enable_status_maintenance( $merchant_id, $feed_id );
 		return true;
 	}
 
