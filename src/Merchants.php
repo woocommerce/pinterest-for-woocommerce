@@ -130,6 +130,12 @@ class Merchants {
 		$configs = LocalFeedConfigs::get_instance()->get_configurations();
 		$config  = reset( $configs );
 
+		/**
+		 * Filters the default merchant name: pinterest_for_woocommerce_default_merchant_name. This vale appears in the
+		 * feed configuration page in Pinterest.
+		 *
+		 * @param string $merchant_name The default merchant name.
+		 */
 		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		$args = array(
@@ -150,7 +156,6 @@ class Merchants {
 		}
 
 		try {
-			// The response only contains the merchant id.
 			$response = Base::update_or_create_merchant( $args );
 		} catch ( Throwable $th ) {
 			$delay = Pinterest_For_Woocommerce()::get_data( 'create_merchant_delay' ) ?? MINUTE_IN_SECONDS;
@@ -167,21 +172,24 @@ class Merchants {
 			throw new Exception( __( 'Response error when trying to create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
+		$merchant_id = $response['data'];
+
 		try {
-			$registered_feed = Feeds::is_local_feed_registered( $response['data'] );
+			$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( $response['data'] );
 		} catch ( Throwable $th ) {
-			$registered_feed = '';
+			$feed_id = '';
 		}
 
 		// Clean the cached delay.
 		Pinterest_For_Woocommerce()::save_data( 'create_merchant_delay', false );
 
 		// Update the registered feed id setting.
-		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $registered_feed );
+		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $feed_id );
 
+		Feeds::invalidate_get_merchant_feeds_cache( $merchant_id, true );
 		return array(
-			'merchant_id' => $response['data'],
-			'feed_id'     => $registered_feed,
+			'merchant_id' => $merchant_id,
+			'feed_id'     => $feed_id,
 		);
 	}
 

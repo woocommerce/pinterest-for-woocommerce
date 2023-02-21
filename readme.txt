@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.1
 Requires PHP: 7.3
-Stable tag: 1.2.10
+Stable tag: 1.2.12
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,16 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.12 - 2023-02-14 =
+* Dev - Remove deprecated argument call from inside a hook action handler function.
+
+= 1.2.11 - 2023-02-07 =
+* Dev - Fix deprecated method argument version.
+* Dev - Fix php8.2 deprecation notices.
+* Fix - Inconsistencies with the add to cart tracking event.
+* Tweak - WC 7.4 compatibility.
+* Update - The Onboarding task to use `TaskLists::add_task` method instead of the deprecated `woocommerce_admin_onboarding_task_list` filter.
 
 = 1.2.10 - 2023-01-26 =
 * Add - Pull supported countries from the API.
