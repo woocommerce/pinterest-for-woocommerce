@@ -167,7 +167,7 @@ class Base {
 	/**
 	 * Get the cache key.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 * @param string $endpoint Endpoint.
 	 * @param string $method   Request method.
 	 * @param array  $payload  Request payload.
@@ -182,7 +182,7 @@ class Base {
 	/**
 	 * Get the cached value.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 * @param string $endpoint Endpoint.
 	 * @param string $method   Request method.
 	 * @param array  $payload  Request payload.
@@ -198,7 +198,7 @@ class Base {
 	/**
 	 * Invalidate the cached value.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 * @param string $endpoint Endpoint.
 	 * @param string $method   Request method.
 	 * @param array  $payload  Request payload.
@@ -578,7 +578,7 @@ class Base {
 	/**
 	 * Disable a feed.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 *
 	 * @param string $merchant_id     The merchant ID the feed belongs to.
 	 * @param string $feed_profile_id The ID of the feed to be disabled.
@@ -594,7 +594,7 @@ class Base {
 	/**
 	 * Enable a feed.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 *
 	 * @param string $merchant_id     The merchant ID the feed belongs to.
 	 * @param string $feed_profile_id The ID of the feed to be enabled.

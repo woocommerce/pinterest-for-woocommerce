@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce locale mapping class.
  *
  * @package Pinterest_For_WooCommerce/Classes/
- * @version x.x.x
+ * @version 1.2.13
  */
 
 namespace Automattic\WooCommerce\Pinterest;
@@ -20,7 +20,7 @@ use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
  * Most of the time, the locale codes are the same, but there are some exceptions.
  * Like for example German Standard is de_DE in WordPress, but de in Pinterest.
  *
- * @since x.x.x
+ * @since 1.2.13
  */
 class LocaleMapper {
 
@@ -81,7 +81,7 @@ class LocaleMapper {
 	 * Get Pinterest locale code for API.
 	 * Pinterest API uses hyphens instead of underscores in locale codes so we need to replace them.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 * @return string
 	 * @throws PinterestApiLocaleException If no matching locale code is found.
 	 */
@@ -108,7 +108,7 @@ class LocaleMapper {
 	/**
 	 * Get WordPress locale code.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 * @return string
 	 */
 	private static function get_wordpress_locale() {

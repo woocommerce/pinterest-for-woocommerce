@@ -116,7 +116,7 @@ class FeedRegistration {
 	/**
 	 * Clear merchant error code.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 * @return void
 	 */
 	private function clear_merchant_error_code() {
@@ -165,7 +165,7 @@ class FeedRegistration {
 	 * Enable the registered feed if it is not enabled.
 	 * Disable all other feed configurations for the merchant.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 * @param string $merchant_id Merchant ID.
 	 * @param string $feed_id Feed ID.
 	 * @return void
@@ -203,7 +203,7 @@ class FeedRegistration {
 	 * Check if there are stale feeds that are registered but not in the local feed configurations.
 	 * Deregister them if they are registered as WooCommerce integration.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 *
 	 * @param string $merchant_id Merchant ID.
 	 * @param string $feed_id Feed ID.

@@ -488,7 +488,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Set the store address as taxable location.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 *
 	 * @param array $taxable_location The taxable location.
 	 */

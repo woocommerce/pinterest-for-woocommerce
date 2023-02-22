@@ -101,7 +101,7 @@ class Feeds {
 	/**
 	 * Invalidate the merchant feeds cache.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 * @param string $merchant_id The merchant ID.
 	 * @return void
 	 */
@@ -144,7 +144,7 @@ class Feeds {
 	/**
 	 * Check if the registered feed is enabled.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 *
 	 * @param string $merchant_id     The merchant ID.
 	 * @param string $feed_profile_id The ID of the feed.
@@ -159,7 +159,7 @@ class Feeds {
 	/**
 	 * Enabled the feed.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 *
 	 * @param string $merchant_id     The merchant ID.
 	 * @param string $feed_profile_id The ID of the feed.
@@ -183,7 +183,7 @@ class Feeds {
 	/**
 	 * Enabled the feed.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.13
 	 *
 	 * @param string $merchant_id     The merchant ID.
 	 * @param string $feed_profile_id The ID of the feed.
