@@ -230,6 +230,18 @@ const HealthCheck = () => {
 				'pinterest-for-woocommerce'
 			),
 		},
+		merchant_locale_not_valid: {
+			status: 'error',
+			dismissible: false,
+			message: __(
+				'Unable to register feed.',
+				'pinterest-for-woocommerce'
+			),
+			body: __(
+				'It looks like your WordPress language settings are not supported by Pinterest.',
+				'pinterest-for-woocommerce'
+			),
+		},
 		error: {
 			status: 'error',
 			dismissible: false,

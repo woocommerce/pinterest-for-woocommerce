@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest;
 use Exception;
 use Throwable;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
+use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -79,7 +80,7 @@ class FeedRegistration {
 	public function handle_feed_registration() {
 
 		// Clean merchants error code.
-		Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', false );
+		$this->clear_merchant_error_code();
 
 		if ( ! self::feed_file_exists() ) {
 			self::log( 'Feed didn\'t fully generate yet. Retrying later.', 'debug' );
@@ -94,9 +95,15 @@ class FeedRegistration {
 
 			throw new Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
 
+		} catch ( PinterestApiLocaleException $e ) {
+			Pinterest_For_Woocommerce()::save_data( 'merchant_locale_not_valid', true );
+
+			// translators: %s: Error message.
+			$error_message = "Could not register feed. Error: {$e->getMessage()}";
+			self::log( $error_message, 'error' );
+
 		} catch ( Throwable $th ) {
 			if ( method_exists( $th, 'get_pinterest_code' ) && 4163 === $th->get_pinterest_code() ) {
-				// Save the error to read it during the Health Check.
 				Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', true );
 			}
 
@@ -104,6 +111,17 @@ class FeedRegistration {
 			return false;
 		}
 
+	}
+
+	/**
+	 * Clear merchant error code.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	private function clear_merchant_error_code() {
+		Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', false );
+		Pinterest_For_Woocommerce()::save_data( 'merchant_locale_not_valid', false );
 	}
 
 	/**

@@ -12,8 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Automattic\WooCommerce\Pinterest\API\Base;
 use \Exception;
+use Automattic\WooCommerce\Pinterest\API\Base;
+use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 
 /**
  * Class handling fetch methods for feed profiles.
@@ -114,6 +115,7 @@ class Feeds {
 	 *
 	 * @param string $merchant_id The merchant ID.
 	 *
+	 * @throws PinterestApiLocaleException No valid locale found to check for the registered feed.
 	 * @return string Returns the ID of the feed if properly registered or an empty string otherwise.
 	 */
 	public static function match_local_feed_configuration_to_registered_feeds( $merchant_id ) {
@@ -121,7 +123,7 @@ class Feeds {
 		$config        = reset( $configs );
 		$local_path    = dirname( $config['feed_url'] );
 		$local_country = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
-		$local_locale  = str_replace( '_', '-', determine_locale() );
+		$local_locale  = LocaleMapper::get_locale_for_api();
 		$feeds         = self::get_merchant_feeds( $merchant_id );
 
 		foreach ( $feeds as $feed ) {

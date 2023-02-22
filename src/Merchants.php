@@ -143,7 +143,7 @@ class Merchants {
 			'feed_location'    => $config['feed_url'],
 			'feed_format'      => 'XML',
 			'country'          => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
-			'locale'           => str_replace( '_', '-', determine_locale() ),
+			'locale'           => LocaleMapper::get_locale_for_api(),
 			'currency'         => get_woocommerce_currency(),
 			'merchant_name'    => $merchant_name,
 		);
@@ -172,8 +172,13 @@ class Merchants {
 			throw new Exception( __( 'Response error when trying to create a merchant or update the existing one.', 'pinterest-for-woocommerce' ), 400 );
 		}
 
-		$feed_id     = Feeds::match_local_feed_configuration_to_registered_feeds( $response['data'] );
 		$merchant_id = $response['data'];
+
+		try {
+			$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( $response['data'] );
+		} catch ( Throwable $th ) {
+			$feed_id = '';
+		}
 
 		// Clean the cached delay.
 		Pinterest_For_Woocommerce()::save_data( 'create_merchant_delay', false );
