@@ -54,7 +54,7 @@ class PinterestTestLocaleMapper extends TestCase {
 	}
 
 	/**
-	 * Test that the locale that does not matches throws an exception.
+	 * Test that the locale that does not match throws an exception.
 	 * @group locale_mapper
 	 */
 	public function test_locale_with_no_match() {
