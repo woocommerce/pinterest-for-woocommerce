@@ -561,6 +561,7 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_product_regular_price( $product ) {
+
 		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
 			$price = $product->get_variation_regular_price( 'min', true );
 		} else {
@@ -574,6 +575,7 @@ class ProductsXmlFeed {
 
 		return $price;
 	}
+
 
 	/**
 	 * Sanitize XML.

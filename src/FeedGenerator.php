@@ -90,6 +90,9 @@ class FeedGenerator extends AbstractChainedJob {
 		if ( false === as_has_scheduled_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			$this->schedule_next_generator_start( time() );
 		}
+
+		// Set the store address as taxable location.
+		add_filter( 'woocommerce_customer_taxable_address', array( $this, 'set_store_address_as_taxable_location' ) );
 	}
 
 	/**
@@ -479,5 +482,26 @@ class FeedGenerator extends AbstractChainedJob {
 				)
 			)
 		);
+	}
+
+
+	/**
+	 * Set the store address as taxable location.
+	 *
+	 * @since 1.2.13
+	 *
+	 * @param array $taxable_location The taxable location.
+	 */
+	public function set_store_address_as_taxable_location( array $taxable_location ) {
+
+		if ( ! doing_action( $this->get_action_full_name( self::CHAIN_BATCH ) ) ) {
+			return $taxable_location;
+		}
+
+		if ( isset( $taxable_location[0] ) ) {
+			$taxable_location[0] = Pinterest_For_Woocommerce()::get_base_country();
+		}
+
+		return $taxable_location;
 	}
 }

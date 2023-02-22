@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.1
 Requires PHP: 7.3
-Stable tag: 1.2.12
+Stable tag: 1.2.13
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,12 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.13 - 2023-02-22 =
+* Add - WordPress locale to Pinterest locale mapping.
+* Fix - Prevent fatal error if retrieving account fails during onboarding.
+* Fix - Prevent multiple active feed files.
+* Fix - Price inconsistencies when tax region is different than shipping zone.
 
 = 1.2.12 - 2023-02-14 =
 * Dev - Remove deprecated argument call from inside a hook action handler function.
