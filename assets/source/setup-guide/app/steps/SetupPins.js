@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
+import { createInterpolateElement } from '@wordpress/element';
 import {
 	Tooltip,
 	Card,
@@ -17,6 +18,7 @@ import {
  * Internal dependencies
  */
 import StepOverview from '../components/StepOverview';
+import documentationLinkProps from '../helpers/documentation-link-props';
 import {
 	useSettingsSelect,
 	useSettingsDispatch,
@@ -31,6 +33,15 @@ function HelpTooltip( { text } ) {
 	);
 }
 
+/**
+ * Tracking setup component.
+ *
+ * To be used in onboarding stepper.
+ *
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'enhanced-match', context: 'settings' }`
+ *
+ * @return {JSX.Element} rendered component
+ */
 const SetupPins = ( {} ) => {
 	const appSettings = useSettingsSelect();
 	const setAppSettings = useSettingsDispatch( false );
@@ -112,9 +123,32 @@ const SetupPins = ( {} ) => {
 										) }
 										help={
 											<HelpTooltip
-												text={ __(
-													'Matches conversion data with the person responsible for the conversion and lets you track cross-device checkouts. Requires Track Conversion option to be enabled.',
-													'pinterest-for-woocommerce'
+												text={ createInterpolateElement(
+													__(
+														'Matches conversion data with the person responsible for the conversion and lets you track cross-device checkouts. Requires Track Conversion option to be enabled. <link>See more</link>',
+														'pinterest-for-woocommerce'
+													),
+													{
+														link: (
+															// eslint-disable-next-line jsx-a11y/anchor-has-content -- context passed via documentationLinkProps
+															<a
+																className="pinterest-tooltip-link"
+																{ ...documentationLinkProps(
+																	{
+																		href:
+																			wcSettings
+																				.pinterest_for_woocommerce
+																				.pinterestLinks
+																				.enhancedMatch,
+																		linkId:
+																			'enhanced-match',
+																		context:
+																			'settings',
+																	}
+																) }
+															/>
+														),
+													}
 												) }
 											/>
 										}

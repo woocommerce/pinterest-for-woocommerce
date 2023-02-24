@@ -379,6 +379,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'newAccount'             => 'https://business.pinterest.com/',
 					'claimWebsite'           => 'https://help.pinterest.com/en/business/article/claim-your-website',
 					'richPins'               => 'https://help.pinterest.com/en/business/article/rich-pins',
+					'enhancedMatch'          => 'https://help.pinterest.com/en/business/article/enhanced-match',
 					'createAdvertiser'       => 'https://help.pinterest.com/en/business/article/create-an-advertiser-account',
 					'adGuidelines'           => 'https://policy.pinterest.com/en/advertising-guidelines',
 					'adDataTerms'            => 'https://policy.pinterest.com/en/ad-data-terms',
