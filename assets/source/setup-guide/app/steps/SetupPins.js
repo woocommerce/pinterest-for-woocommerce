@@ -3,13 +3,13 @@
  */
 import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
-import { Spinner } from '@woocommerce/components';
 import {
 	Tooltip,
 	Card,
 	CardBody,
 	CheckboxControl,
 	Icon,
+	Spinner,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
