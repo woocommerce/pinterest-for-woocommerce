@@ -7,9 +7,10 @@ config.codekit
 node_modules
 .vscode
 coverage
+phplint.cache
 
 # Ignore assets except source files
-assets/*    
+assets/*
 !assets/source
 !assets/images
 !assets/fonts

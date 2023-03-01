@@ -98,6 +98,9 @@ class FeedGenerator extends AbstractChainedJob {
 			$this->schedule_next_generator_start( time() );
 		}
 
+		// Set the store address as taxable location.
+		add_filter( 'woocommerce_customer_taxable_address', array( $this, 'set_store_address_as_taxable_location' ) );
+
 		// Timeout actions.
 		add_action( 'action_scheduler_unexpected_shutdown', array( $this, 'handle_action_timeout' ), 10, 2 );
 		add_action( 'action_scheduler_failed_action', array( $this, 'maybe_handle_error_on_timeout' ) );
@@ -459,7 +462,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Return the list of supported product types.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.9
 	 *
 	 * @return array
 	 */
@@ -476,7 +479,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Return the list of excluded product types.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.9
 	 *
 	 * @return array
 	 */
@@ -495,7 +498,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Exclude products by parent (e.g. 'variation-subscriptions').
 	 *
-	 * @since x.x.x
+	 * @since 1.2.9
 	 *
 	 * @return array
 	 */
@@ -510,6 +513,27 @@ class FeedGenerator extends AbstractChainedJob {
 				)
 			)
 		);
+	}
+
+
+	/**
+	 * Set the store address as taxable location.
+	 *
+	 * @since 1.2.13
+	 *
+	 * @param array $taxable_location The taxable location.
+	 */
+	public function set_store_address_as_taxable_location( array $taxable_location ) {
+
+		if ( ! doing_action( $this->get_action_full_name( self::CHAIN_BATCH ) ) ) {
+			return $taxable_location;
+		}
+
+		if ( isset( $taxable_location[0] ) ) {
+			$taxable_location[0] = Pinterest_For_Woocommerce()::get_base_country();
+		}
+
+		return $taxable_location;
 	}
 
 	/**

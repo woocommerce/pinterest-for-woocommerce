@@ -266,30 +266,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 			$build_path = '/assets/build';
 
-			if ( Compat::should_show_tasks() ) {
-
-				$handle            = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-task';
-				$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/setup-task.asset.php';
-				$script_info       = file_exists( $script_asset_path )
-					? include $script_asset_path
-					: array(
-						'dependencies' => array(),
-						'version'      => PINTEREST_FOR_WOOCOMMERCE_VERSION,
-					);
-
-				$script_info['dependencies'][] = 'wc-settings';
-
-				wp_register_script(
-					$handle,
-					Pinterest_For_Woocommerce()->plugin_url() . $build_path . '/setup-task.js',
-					$script_info['dependencies'],
-					$script_info['version'],
-					true
-				);
-
-				wp_enqueue_script( $handle );
-			}
-
 			$handle            = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-setup-guide';
 			$script_asset_path = Pinterest_For_Woocommerce()->plugin_path() . $build_path . '/setup-guide.asset.php';
 			$script_info       = file_exists( $script_asset_path )

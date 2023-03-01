@@ -15,6 +15,8 @@ use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\Utilities\Tracks;
 use Automattic\WooCommerce\Pinterest\API\UserInteraction;
+use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
+use Automattic\WooCommerce\Pinterest\Admin\Tasks\Onboarding;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -282,6 +284,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Check available coupons and credits.
 			add_action( Heartbeat::HOURLY, array( $this, 'check_available_coupons_and_credits' ) );
+
+			// Hook the setup task. The hook admin_init is not triggered when the WC fetches the tasks using the endpoint: wp-json/wc-admin/onboarding/tasks and hence hooking into init.
+			add_action( 'init', array( $this, 'add_onboarding_task' ), 20 );
 
 		}
 
@@ -848,40 +853,51 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @return array() account_data from Pinterest
+		 * @return array Account data from Pinterest.
+		 *
+		 * @throws Exception PHP Exception.
 		 */
 		public static function update_account_data() {
 
-			$account_data = Pinterest\API\Base::get_account_info();
+			try {
 
-			if ( 'success' === $account_data['status'] ) {
+				$account_data = Pinterest\API\Base::get_account_info();
 
-				$data = array_intersect_key(
-					(array) $account_data['data'],
-					array(
-						'verified_user_websites'  => '',
-						'is_any_website_verified' => '',
-						'username'                => '',
-						'full_name'               => '',
-						'id'                      => '',
-						'image_medium_url'        => '',
-						'is_partner'              => '',
-					)
-				);
+				if ( 'success' === $account_data['status'] ) {
 
-				/*
-				 * For now we assume that the billing is not setup and credits are not redeemed.
-				 * We will be able to check that only when the advertiser will be connected.
-				 * The billing is tied to advertiser.
-				 */
-				$data['is_billing_setup']   = false;
-				$data['coupon_redeem_info'] = array( 'redeem_status' => false );
+					$data = array_intersect_key(
+						(array) $account_data['data'],
+						array(
+							'verified_user_websites'  => '',
+							'is_any_website_verified' => '',
+							'username'                => '',
+							'full_name'               => '',
+							'id'                      => '',
+							'image_medium_url'        => '',
+							'is_partner'              => '',
+						)
+					);
 
-				Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
-				return $data;
+					/*
+					 * For now we assume that the billing is not setup and credits are not redeemed.
+					 * We will be able to check that only when the advertiser will be connected.
+					 * The billing is tied to advertiser.
+					 */
+					$data['is_billing_setup']   = false;
+					$data['coupon_redeem_info'] = array( 'redeem_status' => false );
+
+					Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
+					return $data;
+				}
+
+				self::get_linked_businesses( true );
+
+			} catch ( Throwable $th ) {
+
+				self::disconnect();
+
+				throw new Exception( esc_html__( 'There was an error getting the account data.', 'pinterest-for-woocommerce' ) );
 			}
-
-			self::get_linked_businesses( true );
 
 			return array();
 
@@ -1230,6 +1246,22 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$base_location = wc_get_base_location();
 
 			return ! empty( $base_location['country'] ) ? $base_location['country'] : null;
+		}
+
+		/**
+		 * Adds the onboarding task to the Tasklists.
+		 *
+		 * @since 1.2.11
+		 */
+		public function add_onboarding_task() {
+			if ( class_exists( TaskLists::class ) ) { // compatibility-code "< WC 5.9". This is added for backward compatibility.
+				TaskLists::add_task(
+					'extended',
+					new Onboarding(
+						TaskLists::get_list( 'extended' )
+					)
+				);
+			}
 		}
 	}
 

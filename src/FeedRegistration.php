@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest;
 use Exception;
 use Throwable;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
+use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -79,7 +80,7 @@ class FeedRegistration {
 	public function handle_feed_registration() {
 
 		// Clean merchants error code.
-		Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', false );
+		$this->clear_merchant_error_code();
 
 		if ( ! self::feed_file_exists() ) {
 			self::log( 'Feed didn\'t fully generate yet. Retrying later.', 'debug' );
@@ -94,9 +95,15 @@ class FeedRegistration {
 
 			throw new Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
 
+		} catch ( PinterestApiLocaleException $e ) {
+			Pinterest_For_Woocommerce()::save_data( 'merchant_locale_not_valid', true );
+
+			// translators: %s: Error message.
+			$error_message = "Could not register feed. Error: {$e->getMessage()}";
+			self::log( $error_message, 'error' );
+
 		} catch ( Throwable $th ) {
 			if ( method_exists( $th, 'get_pinterest_code' ) && 4163 === $th->get_pinterest_code() ) {
-				// Save the error to read it during the Health Check.
 				Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', true );
 			}
 
@@ -107,42 +114,142 @@ class FeedRegistration {
 	}
 
 	/**
+	 * Clear merchant error code.
+	 *
+	 * @since 1.2.13
+	 * @return void
+	 */
+	private function clear_merchant_error_code() {
+		Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', false );
+		Pinterest_For_Woocommerce()::save_data( 'merchant_locale_not_valid', false );
+	}
+
+	/**
 	 * Handles feed registration using the given arguments.
 	 * Will try to create a merchant if none exists.
 	 * Also if a different feed is registered, it will update using the URL in the
 	 * $feed_args.
 	 *
-	 * @return boolean|string
+	 * @return boolean
 	 *
 	 * @throws Exception PHP Exception.
 	 */
 	private static function register_feed() {
 
-		// Get merchant object.
-		$merchant   = Merchants::get_merchant();
-		$registered = false;
+		$merchant_id = self::check_merchant_approval_status();
+
+		if ( ! $merchant_id ) {
+			return false;
+		}
+
+		$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( $merchant_id );
+
+		// If no matching registered feed found try to create it.
+		if ( ! $feed_id ) {
+			$response = Merchants::update_or_create_merchant();
+			$feed_id  = $response['feed_id'] ?? '';
+		}
+
+		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $feed_id );
+
+		if ( ! $feed_id ) {
+			return false;
+		}
+
+		self::feed_enable_status_maintenance( $merchant_id, $feed_id );
+		return true;
+	}
+
+	/**
+	 * Maintenance function for feed enable status.
+	 * Enable the registered feed if it is not enabled.
+	 * Disable all other feed configurations for the merchant.
+	 *
+	 * @since 1.2.13
+	 * @param string $merchant_id Merchant ID.
+	 * @param string $feed_id Feed ID.
+	 * @return void
+	 */
+	private static function feed_enable_status_maintenance( $merchant_id, $feed_id ) {
+		// Check if the feed is enabled. If not, enable it.
+		if ( ! Feeds::is_local_feed_enabled( $merchant_id, $feed_id ) ) {
+			Feeds::enabled_feed( $merchant_id, $feed_id );
+		}
+
+		// Cleanup feeds that are registered but not in the local feed configurations.
+		self::maybe_disable_stale_feeds_for_merchant( $merchant_id, $feed_id );
+	}
+
+	/**
+	 * Check if the merchant is approved.
+	 * This is a helper function for the register_feed method.
+	 *
+	 * @return mixed False if the merchant is not approved, merchant id otherwise.
+	 */
+	private static function check_merchant_approval_status() {
+
+		$merchant = Merchants::get_merchant();
 
 		if ( ! empty( $merchant['data']->id ) && 'declined' === $merchant['data']->product_pin_approval_status ) {
 
 			self::log( 'Pinterest returned a Declined status for product_pin_approval_status' );
+			return false;
+		}
 
-		} else {
+		return $merchant['data']->id;
+	}
 
-			// Update feed if we don't have a feed_id saved or if local feed is not properly registered.
-			// for cases where the already existed in the API.
-			$registered = self::get_registered_feed_id();
+	/**
+	 * Check if there are stale feeds that are registered but not in the local feed configurations.
+	 * Deregister them if they are registered as WooCommerce integration.
+	 *
+	 * @since 1.2.13
+	 *
+	 * @param string $merchant_id Merchant ID.
+	 * @param string $feed_id Feed ID.
+	 *
+	 * @return void
+	 */
+	public static function maybe_disable_stale_feeds_for_merchant( $merchant_id, $feed_id ) {
 
-			if ( ! $registered || ! Feeds::is_local_feed_registered( $merchant['data']->id ) ) {
+		$feed_profiles = Feeds::get_merchant_feeds( $merchant_id );
 
-				// The response only contains the merchant id.
-				$response = Merchants::update_or_create_merchant();
+		if ( empty( $feed_profiles ) ) {
+			return;
+		}
 
-				// The response contains an array with the ID of merchant and feed.
-				$registered = $response['feed_id'];
+		$configs    = LocalFeedConfigs::get_instance()->get_configurations();
+		$config     = reset( $configs );
+		$local_path = dirname( $config['feed_url'] );
+
+		$invalidate_cache = false;
+
+		foreach ( $feed_profiles as $feed ) {
+			// Local feed should not be disabled.
+			if ( $feed_id === $feed->id ) {
+				continue;
+			}
+
+			// Only disable feeds that are registered as WooCommerce integration.
+			if ( 'WOOCOMMERCE' !== $feed->integration_platform_type ) {
+				continue;
+			}
+
+			// Only disable feeds that have matching feed file URL.
+			if ( dirname( $feed->location_config->full_feed_fetch_location ) !== $local_path ) {
+				continue;
+			}
+
+			// Disable the feed if it is active.
+			if ( 'ACTIVE' === $feed->feed_status ) {
+				Feeds::disable_feed( $merchant_id, $feed->id );
+				$invalidate_cache = true;
 			}
 		}
 
-		return $registered;
+		if ( $invalidate_cache ) {
+			Feeds::invalidate_get_merchant_feeds_cache( $merchant_id );
+		}
 	}
 
 	/**
@@ -157,11 +264,14 @@ class FeedRegistration {
 	}
 
 	/**
-	 * Returns the feed profile ID if it's registered. Returns `false` otherwise.
+	 * Returns the feed profile ID stored locally if it's registered.
+	 * Returns `false` otherwise.
+	 * If everything is configured correctly, this feed profile id will match
+	 * the setup that the merchant has in Pinterest.
 	 *
 	 * @return string|boolean
 	 */
-	public static function get_registered_feed_id() {
+	public static function get_locally_stored_registered_feed_id() {
 		return Pinterest_For_Woocommerce()::get_data( 'feed_registered' ) ?? false;
 	}
 

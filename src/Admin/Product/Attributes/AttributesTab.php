@@ -89,14 +89,14 @@ class AttributesTab {
 	private function add_tab( array $tabs ): array {
 		$shown_types = array_map(
 			function ( string $product_type ) {
-				return "show_if_${product_type}";
+				return "show_if_{$product_type}";
 			},
 			array_keys( $this->get_applicable_product_types() )
 		);
 
 		$hidden_types = array_map(
 			function ( string $product_type ) {
-				return "hide_if_${product_type}";
+				return "hide_if_{$product_type}";
 			},
 			array_keys( $this->get_hidden_product_types() )
 		);
@@ -168,7 +168,7 @@ class AttributesTab {
 	 * @return AttributesForm
 	 */
 	protected function get_form( WC_Product $product ): AttributesForm {
-		$attribute_types = $this->attribute_manager->get_attribute_types_for_product_types( $this->get_applicable_product_types() );
+		$attribute_types = $this->attribute_manager->get_attribute_types_for_product_types( array_keys( $this->get_applicable_product_types() ) );
 
 		$form = new AttributesForm( $attribute_types, $this->attribute_manager->get_all_values( $product ) );
 		$form->set_name( 'attributes' );

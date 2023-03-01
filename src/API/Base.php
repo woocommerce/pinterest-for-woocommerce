@@ -83,8 +83,7 @@ class Base {
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 
 		if ( ! empty( $cache_expiry ) ) {
-			$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( $endpoint . $method . wp_json_encode( $payload ) . $api );
-			$cache     = get_transient( $cache_key );
+			$cache = self::get_cached_response( $endpoint, $method, $payload, $api );
 
 			if ( $cache ) {
 				return $cache;
@@ -165,6 +164,52 @@ class Base {
 
 	}
 
+	/**
+	 * Get the cache key.
+	 *
+	 * @since 1.2.13
+	 * @param string $endpoint Endpoint.
+	 * @param string $method   Request method.
+	 * @param array  $payload  Request payload.
+	 * @param string $api      Request API.
+	 *
+	 * @return string The cache key.
+	 */
+	public static function get_cache_key( $endpoint, $method, $payload, $api ) {
+		return PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( $endpoint . $method . wp_json_encode( $payload ) . $api );
+	}
+
+	/**
+	 * Get the cached value.
+	 *
+	 * @since 1.2.13
+	 * @param string $endpoint Endpoint.
+	 * @param string $method   Request method.
+	 * @param array  $payload  Request payload.
+	 * @param string $api      Request API.
+	 *
+	 * @return mixed Value of the transient or false if it doesn't exist.
+	 */
+	public static function get_cached_response( $endpoint, $method, $payload, $api ) {
+		$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
+		return get_transient( $cache_key );
+	}
+
+	/**
+	 * Invalidate the cached value.
+	 *
+	 * @since 1.2.13
+	 * @param string $endpoint Endpoint.
+	 * @param string $method   Request method.
+	 * @param array  $payload  Request payload.
+	 * @param string $api      Request API.
+	 *
+	 * @return void
+	 */
+	public static function invalidate_cached_response( $endpoint, $method, $payload, $api ) {
+		$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
+		delete_transient( $cache_key );
+	}
 
 	/**
 	 * Handle the request
@@ -530,24 +575,86 @@ class Base {
 		);
 	}
 
+	/**
+	 * Disable a feed.
+	 *
+	 * @since 1.2.13
+	 *
+	 * @param string $merchant_id     The merchant ID the feed belongs to.
+	 * @param string $feed_profile_id The ID of the feed to be disabled.
+	 *
+	 * @return mixed
+	 */
+	public static function disable_merchant_feed( $merchant_id, $feed_profile_id ) {
+		return self::make_request(
+			"catalogs/disable_feed_profile/{$merchant_id}/{$feed_profile_id}/"
+		);
+	}
+
+	/**
+	 * Enable a feed.
+	 *
+	 * @since 1.2.13
+	 *
+	 * @param string $merchant_id     The merchant ID the feed belongs to.
+	 * @param string $feed_profile_id The ID of the feed to be enabled.
+	 *
+	 * @return mixed
+	 */
+	public static function enable_merchant_feed( $merchant_id, $feed_profile_id ) {
+		return self::make_request(
+			"catalogs/enable_feed_profile/{$merchant_id}/{$feed_profile_id}/"
+		);
+	}
 
 	/**
 	 * Get a merchant's feeds.
 	 *
 	 * @param string $merchant_id The merchant ID the feed belongs to.
+	 * @param bool   $include_disabled Whether to include disabled feeds.
 	 *
 	 * @return mixed
 	 */
-	public static function get_merchant_feeds( $merchant_id ) {
+	public static function get_merchant_feeds( $merchant_id, $include_disabled = false ) {
+
+		$args = array();
+
+		if ( $include_disabled ) {
+			$args['include_disabled'] = 'true';
+		}
+
 		return self::make_request(
 			"catalogs/{$merchant_id}/feed_profiles/",
 			'GET',
-			array(),
+			$args,
 			'',
 			MINUTE_IN_SECONDS
 		);
 	}
 
+	/**
+	 * Invalidate the merchant's feeds cache.
+	 *
+	 * @param string $merchant_id The merchant ID the feed belongs to.
+	 * @param bool   $include_disabled Whether to include disabled feeds.
+	 *
+	 * @return void
+	 */
+	public static function invalidate_merchant_feeds_cache( $merchant_id, $include_disabled = false ) {
+
+		$args = array();
+
+		if ( $include_disabled ) {
+			$args['include_disabled'] = 'true';
+		}
+
+		self::invalidate_cached_response(
+			"catalogs/{$merchant_id}/feed_profiles/",
+			'GET',
+			$args,
+			'',
+		);
+	}
 
 	/**
 	 * Get a specific merchant's feed report using the given arguments.
@@ -643,5 +750,17 @@ class Base {
 		$request_url = add_query_arg( 'active', 'true', $request_url );
 
 		return self::make_request( $request_url, 'GET', array(), 'ads' );
+	}
+
+	/**
+	 * Pull ads supported countries information from the API.
+	 *
+	 * @since 1.2.10
+	 *
+	 * @return array
+	 */
+	public static function get_list_of_ads_supported_countries() {
+		$request_url = 'advertisers/countries';
+		return self::make_request( $request_url, 'GET', array(), 'ads', DAY_IN_SECONDS );
 	}
 }

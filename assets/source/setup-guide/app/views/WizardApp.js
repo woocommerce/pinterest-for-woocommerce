@@ -45,15 +45,16 @@ const WizardApp = ( { query } ) => {
 
 	const appSettings = useSettingsSelect();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
+	const createNotice = useCreateNotice();
 
 	useEffect( () => {
 		if ( ! isConnected ) {
 			setIsBusinessConnected( false );
 		}
-	}, [ isConnected, setIsBusinessConnected ] );
+		createNotice( 'error', wcSettings.pinterest_for_woocommerce.error );
+	}, [ isConnected, setIsBusinessConnected, createNotice ] );
 
 	useBodyClasses( 'wizard' );
-	useCreateNotice()( wcSettings.pinterest_for_woocommerce.error );
 
 	const steps = [
 		{
