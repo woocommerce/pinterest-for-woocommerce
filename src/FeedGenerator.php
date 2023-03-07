@@ -16,6 +16,8 @@ use Automattic\WooCommerce\ActionSchedulerJobFramework\Utilities\BatchQueryOffse
 use Automattic\WooCommerce\ActionSchedulerJobFramework\AbstractChainedJob;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
+use ActionScheduler;
+use Error;
 use Exception;
 use Throwable;
 
@@ -34,6 +36,11 @@ class FeedGenerator extends AbstractChainedJob {
 	 * before attempting a retry.
 	 */
 	const WAIT_ON_ERROR_BEFORE_RETRY = HOUR_IN_SECONDS;
+
+	/**
+	 * The max number of retries per batch before aborting the generation process.
+	 */
+	const MAX_RETRIES_PER_BATCH = 2;
 
 	/**
 	 * Feed file operations class.
@@ -93,6 +100,10 @@ class FeedGenerator extends AbstractChainedJob {
 
 		// Set the store address as taxable location.
 		add_filter( 'woocommerce_customer_taxable_address', array( $this, 'set_store_address_as_taxable_location' ) );
+
+		// Timeout actions.
+		add_action( 'action_scheduler_unexpected_shutdown', array( $this, 'handle_action_timeout' ), 10, 2 );
+		add_action( 'action_scheduler_failed_action', array( $this, 'maybe_handle_error_on_timeout' ) );
 	}
 
 	/**
@@ -151,6 +162,27 @@ class FeedGenerator extends AbstractChainedJob {
 		} catch ( Throwable $th ) {
 			$this->handle_error( $th );
 			throw $th;
+		}
+	}
+
+	/**
+	 * Handle processing a chain batch.
+	 *
+	 * @since 1.2.14
+	 *
+	 * @param int   $batch_number The batch number for the new batch.
+	 * @param array $args         The args for the job.
+	 *
+	 * @throws Throwable Related to issues possible when creating an empty feed temp file and populating the header.
+	 */
+	public function handle_batch_action( int $batch_number, array $args ) {
+		try {
+			parent::handle_batch_action( $batch_number, $args );
+
+			$this->clear_generation_retries_option();
+		} catch ( Throwable $th ) {
+
+			$this->handle_generation_retries( $batch_number, $args, $th );
 		}
 	}
 
@@ -278,7 +310,6 @@ class FeedGenerator extends AbstractChainedJob {
 
 			$this->feed_file_operations->write_buffers_to_temp_files( $this->buffers );
 		} catch ( Throwable $th ) {
-			$this->handle_error( $th );
 			throw $th;
 		}
 
@@ -503,5 +534,121 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 
 		return $taxable_location;
+	}
+
+	/**
+	 * Increase the feed generation retries by 1 or throw exception after MAX_RETRIES_PER_BATCH retries.
+	 *
+	 * @since 1.2.14
+	 *
+	 * @param int             $batch_number The batch number for the new batch.
+	 * @param array           $args         The args for the job.
+	 * @param Throwable|false $th           The exception catch by the generator.
+	 *
+	 * @throws Throwable Related to the exception thrown by the generation action.
+	 */
+	protected function handle_generation_retries( int $batch_number, array $args, $th = null ) {
+		$error_retries = (int) Pinterest_For_Woocommerce()::get_data( 'feed_generation_retries' ) ?? 0;
+
+		try {
+
+			// Abort generation after MAX_RETRIES_PER_BATCH retries.
+			if ( $error_retries >= self::MAX_RETRIES_PER_BATCH ) {
+				$this->clear_generation_retries_option();
+
+				$error_msg = __( 'Aborting the feed generation after too many retries.', 'pinterest-for-woocommerce' );
+
+				self::log( $error_msg, 'error' );
+
+				throw $th ? $th : new Exception( $error_msg );
+			}
+
+			Pinterest_For_Woocommerce()::save_data( 'feed_generation_retries', $error_retries + 1 );
+
+			/* Translators: The batch number. */
+			self::log( sprintf( __( 'There was an error running the batch #%s, it will be rescheduled to run again.', 'pinterest-for-woocommerce' ), $batch_number ), 'error' );
+
+			// Re-schedule the current batch item.
+			$this->queue_batch( $batch_number, $args );
+		} catch ( Throwable $th ) {
+			$this->handle_error( $th );
+		}
+	}
+
+	/**
+	 * Clear the retries option.
+	 *
+	 * @since 1.2.14
+	 */
+	protected function clear_generation_retries_option(): void {
+		Pinterest_For_Woocommerce()::save_data( 'feed_generation_retries', 0 );
+	}
+
+
+	/**
+	 * Reschedules an action if it has failed due to a timeout error.
+	 *
+	 * The number of previous failures will be checked before rescheduling the action, and it must be below the
+	 * specified threshold in `self::get_failure_rate_threshold` within the timeframe specified in
+	 * `self::get_failure_timeframe` for the action to be rescheduled.
+	 *
+	 * @param int   $action_id The ID of the action that threw the exception.
+	 * @param array $error     The error thrown by the action.
+	 *
+	 * @since 1.2.14
+	 */
+	public function handle_action_timeout( $action_id, $error ) {
+
+		if ( ! $this->is_timeout_error( $error ) ) {
+			return;
+		}
+
+		$this->maybe_handle_error_on_timeout( $action_id );
+	}
+
+	/**
+	 * Determines whether the given error is an execution "timeout" error.
+	 *
+	 * @param array $error An associative array describing the error with keys "type", "message", "file" and "line".
+	 *
+	 * @return bool
+	 *
+	 * @since 1.2.14
+	 */
+	protected function is_timeout_error( array $error ): bool {
+		return isset( $error['type'] ) &&
+				E_ERROR === $error['type'] &&
+				isset( $error['message'] ) &&
+				strpos( $error ['message'], 'Maximum execution time' ) !== false;
+	}
+
+	/**
+	 * Handle error on generate feed timeout.
+	 *
+	 * @since 1.2.14
+	 *
+	 * @param int $action_id The ID of the action marked as failed.
+	 *
+	 * @throws Exception Related to max retries reached or missing arguments on the action.
+	 */
+	public function maybe_handle_error_on_timeout( int $action_id ) {
+
+		$action = ActionScheduler::store()->fetch_action( $action_id );
+
+		if ( $this->get_action_full_name( self::CHAIN_BATCH ) !== $action->get_hook() ) {
+			return;
+		}
+
+		try {
+			$action_args = $action->get_args();
+
+			if ( ! isset( $action_args[0] ) || ! is_int( $action_args[0] ) || ! isset( $action_args[1] ) || ! is_array( $action_args[1] ) ) {
+				throw new Exception( __( 'There was not possible to re-schedule the action, no args available.', 'pinterest-for-woocommerce' ) );
+			}
+
+			$this->handle_generation_retries( $action_args[0], $action_args[1] );
+		} catch ( Throwable $th ) {
+			$this->handle_error( $th );
+		}
 	}
 }
