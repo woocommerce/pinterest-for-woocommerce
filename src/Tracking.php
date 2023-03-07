@@ -725,16 +725,16 @@ JS;
 	 * @return string
 	 */
 	protected static function get_product_display_price( $product ) {
-		return self::prices_include_tax() ? wc_get_price_including_tax( $product ) : NumberUtil::round( wc_get_price_excluding_tax( $product ), wc_get_price_decimals() );
+		return self::price_includes_tax() ? wc_get_price_including_tax( $product ) : NumberUtil::round( wc_get_price_excluding_tax( $product ), wc_get_price_decimals() );
 	}
 
 	/**
-	 * Get if prices should include/exclude tax.
+	 * Get if prices should include tax.
 	 *
 	 * @since x.x.x
 	 * @return bool
 	 */
-	protected static function prices_include_tax() {
+	protected static function price_includes_tax() {
 		if ( isset( WC()->cart ) ) {
 			return WC()->cart->display_prices_including_tax();
 		}
