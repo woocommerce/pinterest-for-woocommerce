@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.14 - 2023-03-07 =
+* Fix - Add retry mechanism for the feed generation.
+
 = 1.2.13 - 2023-02-22 =
 * Add - WordPress locale to Pinterest locale mapping.
 * Fix - Prevent fatal error if retrieving account fails during onboarding.
