@@ -168,7 +168,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Handle processing a chain batch.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.14
 	 *
 	 * @param int   $batch_number The batch number for the new batch.
 	 * @param array $args         The args for the job.
@@ -539,7 +539,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Increase the feed generation retries by 1 or throw exception after MAX_RETRIES_PER_BATCH retries.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.14
 	 *
 	 * @param int             $batch_number The batch number for the new batch.
 	 * @param array           $args         The args for the job.
@@ -578,7 +578,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Clear the retries option.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.14
 	 */
 	protected function clear_generation_retries_option(): void {
 		Pinterest_For_Woocommerce()::save_data( 'feed_generation_retries', 0 );
@@ -595,7 +595,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @param int   $action_id The ID of the action that threw the exception.
 	 * @param array $error     The error thrown by the action.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.14
 	 */
 	public function handle_action_timeout( $action_id, $error ) {
 
@@ -613,7 +613,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @return bool
 	 *
-	 * @since x.x.x
+	 * @since 1.2.14
 	 */
 	protected function is_timeout_error( array $error ): bool {
 		return isset( $error['type'] ) &&
@@ -625,7 +625,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Handle error on generate feed timeout.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.14
 	 *
 	 * @param int $action_id The ID of the action marked as failed.
 	 *
