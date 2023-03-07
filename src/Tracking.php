@@ -725,7 +725,25 @@ JS;
 	 * @return string
 	 */
 	protected static function get_product_display_price( $product ) {
-		return WC()->cart->display_prices_including_tax() ? wc_get_price_including_tax( $product ) : NumberUtil::round( wc_get_price_excluding_tax( $product ), wc_get_price_decimals() );
+		return self::prices_include_tax() ? wc_get_price_including_tax( $product ) : NumberUtil::round( wc_get_price_excluding_tax( $product ), wc_get_price_decimals() );
+	}
+
+	/**
+	 * Get if prices should include/exclude tax.
+	 *
+	 * @since x.x.x
+	 * @return bool
+	 */
+	protected static function prices_include_tax() {
+		if ( isset( WC()->cart ) ) {
+			return WC()->cart->display_prices_including_tax();
+		}
+
+		if ( ! empty( WC()->customer ) && WC()->customer->get_is_vat_exempt() ) {
+			return false;
+		}
+
+		return 'incl' === get_option( 'woocommerce_tax_display_cart' );
 	}
 
 }
