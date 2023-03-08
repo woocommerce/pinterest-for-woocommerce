@@ -20,7 +20,7 @@ class Logger {
 	/**
 	 * The single instance of the class.
 	 *
-	 * @var WC_Logger
+	 * @var \WC_Logger
 	 * @since 1.0.0
 	 */
 	public static $logger;
@@ -39,10 +39,8 @@ class Logger {
 	 * @param string $level   The level/context of the message.
 	 * @param string $feature Used to direct logs to a separate file.
 	 * @param string $force   Used to bypass system settings and force the logs.
-	 *
-	 * @return string
 	 */
-	public static function log( $message, $level = 'debug', $feature = null, $force = false ) {
+	public static function log( $message, $level = 'debug', $feature = null, $force = false ): void {
 
 		$allow_logging = true;
 		if ( 'debug' === $level ) {
@@ -69,15 +67,15 @@ class Logger {
 	/**
 	 * Helper for Logging API requests.
 	 *
-	 * @param string $url The URL of the request.
-	 * @param string $args The Arguments of the request.
-	 * @param string $level The default level/context of the message to be logged.
+	 * @param string   $url   The URL of the request.
+	 * @param string[] $args  The Arguments of the request.
+	 * @param string   $level The default level/context of the message to be logged.
 	 *
 	 * @return void
 	 */
 	public static function log_request( $url, $args, $level = 'debug' ) {
 		unset( $args['headers'] );
-		$method = isset( $args['method'] ) ? $args['method'] : 'POST';
+		$method = $args['method'] ?? 'POST';
 		$data   = ! empty( $args['body'] ) ? $args['body'] : '--- EMPTY STRING ---';
 		$data   = is_array( $data ) ? wp_json_encode( $data ) : $data;
 		self::log( "{$method} Request: " . $url . "\n\n" . $data . "\n", $level );
@@ -86,7 +84,7 @@ class Logger {
 	/**
 	 *  Helper for Logging API responses.
 	 *
-	 * @param array|WP_Error $response The body of the response.
+	 * @param array|\WP_Error $response The body of the response.
 	 * @param string         $level The default level/context of the message to be logged.
 	 *
 	 * @return void
