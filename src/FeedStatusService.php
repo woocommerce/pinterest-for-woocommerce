@@ -70,4 +70,61 @@ class FeedStatusService {
 		return $status;
 	}
 
+	/**
+	 * Get the sync process / feed ingestion status via Pinterest API.
+	 *
+	 * @return string The feed ingestion state. Possible values:
+	 *                - not_registered: Feed is not registered with Pinterest.
+	 *                - error_fetching_feed: Error when trying to get feed report from Pinterest.
+	 *                - no_workflows: Feed report contains no feed workflow.
+	 *                - completed: Feed automatically pulled by Pinterest / Feed ingestion completed.
+	 *                - completed_early: Feed automatically pulled by Pinterest / Feed ingestion completed early.
+	 *                - processing: Feed ingestion is processing.
+	 *                - under_review: Feed is under review.
+	 *                - queued_for_processing: Feed is queued for processing.
+	 *                - failed: Feed ingestion failed.
+	 *                - unknown: Unknown feed ingestion status in workflow (i.e. API returned an unknown status).
+	 *
+	 * @throws Exception PHP Exception.
+	 */
+	public static function get_feed_sync_status(): string {
+		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
+		$feed_id     = FeedRegistration::get_locally_stored_registered_feed_id();
+
+		try {
+			if ( empty( $merchant_id ) || empty( $feed_id ) ) {
+				throw new Exception( 'not_registered' );
+			}
+
+			try {
+				$workflow = Feeds::get_feed_latest_workflow( (string) $merchant_id, (string) $feed_id );
+			} catch ( Exception $e ) {
+				throw new Exception( 'error_fetching_feed' );
+			}
+			if ( ! $workflow ) {
+				throw new Exception( 'no_workflows' );
+			}
+
+			$status = strtolower( $workflow->workflow_status );
+			if ( ! in_array(
+				$status,
+				array(
+					'completed',
+					'completed_early',
+					'processing',
+					'under_review',
+					'queued_for_processing',
+					'failed',
+				),
+				true
+			) ) {
+				throw new Exception( 'unknown' );
+			}
+		} catch ( Exception $e ) {
+			$status = $e->getMessage();
+		}
+
+		return $status;
+	}
+
 }
