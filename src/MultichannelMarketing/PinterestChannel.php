@@ -70,9 +70,13 @@ class PinterestChannel implements MarketingChannelInterface {
 	 * @return string
 	 */
 	public function get_setup_url(): string {
-		// TODO: Implement get_setup_url() method.
-		return '';
+		if ( ! $this->is_setup_completed() ) {
+			return wc_admin_url( '&path=/pinterest/landing' );
+		}
+
+		return wc_admin_url( '&path=/pinterest/settings' );
 	}
+
 
 	/**
 	 * Returns the status of the marketing channel's product listings.
