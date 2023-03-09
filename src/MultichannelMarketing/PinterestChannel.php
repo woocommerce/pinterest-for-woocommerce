@@ -11,6 +11,9 @@ namespace Automattic\WooCommerce\Pinterest\MultichannelMarketing;
 use Automattic\WooCommerce\Admin\Marketing\MarketingCampaign;
 use Automattic\WooCommerce\Admin\Marketing\MarketingCampaignType;
 use Automattic\WooCommerce\Admin\Marketing\MarketingChannelInterface;
+use Automattic\WooCommerce\Pinterest\FeedStatusService;
+use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
+use Automattic\WooCommerce\Pinterest\ProductSync;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -77,15 +80,30 @@ class PinterestChannel implements MarketingChannelInterface {
 		return wc_admin_url( '&path=/pinterest/settings' );
 	}
 
-
 	/**
 	 * Returns the status of the marketing channel's product listings.
 	 *
 	 * @return string
 	 */
 	public function get_product_listings_status(): string {
-		// TODO: Implement get_product_listings_status() method.
-		return self::PRODUCT_LISTINGS_NOT_APPLICABLE;
+		if ( ! $this->is_setup_completed() || ! ProductSync::is_product_sync_enabled() ) {
+			return self::PRODUCT_LISTINGS_NOT_APPLICABLE;
+		}
+
+		$local_feed_status        = $this->get_local_feed_status();
+		$feed_registration_status = $this->get_feed_registration_status();
+
+		if ( self::PRODUCT_LISTINGS_SYNCED === $local_feed_status ) {
+			if ( self::PRODUCT_LISTINGS_SYNCED === $feed_registration_status ) {
+				$status = $this->get_feed_sync_status();
+			} else {
+				$status = $feed_registration_status;
+			}
+		} else {
+			$status = $local_feed_status;
+		}
+
+		return $status;
 	}
 
 	/**
@@ -116,5 +134,93 @@ class PinterestChannel implements MarketingChannelInterface {
 	public function get_campaigns(): array {
 		// TODO: Implement get_campaigns() method.
 		return array();
+	}
+
+	/**
+	 * Returns the status of local feed generation.
+	 *
+	 * @return string
+	 */
+	private function get_local_feed_status(): string {
+		$local_feed_status = ProductFeedStatus::get()['status'];
+		if ( in_array(
+			$local_feed_status,
+			array(
+				'in_progress',
+				'scheduled_for_generation',
+				'pending_config',
+			),
+			true
+		) ) {
+			$status = self::PRODUCT_LISTINGS_SYNC_IN_PROGRESS;
+		} elseif ( 'generated' === $local_feed_status ) {
+			$status = self::PRODUCT_LISTINGS_SYNCED;
+		} else {
+			$status = self::PRODUCT_LISTINGS_SYNC_FAILED;
+		}
+
+		return $status;
+	}
+
+	/**
+	 * Returns the status of feed registration.
+	 *
+	 * @return string
+	 */
+	private function get_feed_registration_status(): string {
+		try {
+			$feed_registration_status = FeedStatusService::get_feed_registration_status();
+		} catch ( \Exception $e ) {
+			return self::PRODUCT_LISTINGS_SYNC_FAILED;
+		}
+
+		if ( in_array(
+			$feed_registration_status,
+			array(
+				'not_registered',
+				'pending',
+				'appeal_pending',
+			),
+			true
+		) ) {
+			$status = self::PRODUCT_LISTINGS_SYNC_IN_PROGRESS;
+		} elseif ( 'approved' === $feed_registration_status ) {
+			$status = self::PRODUCT_LISTINGS_SYNCED;
+		} else {
+			$status = self::PRODUCT_LISTINGS_SYNC_FAILED;
+		}
+
+		return $status;
+	}
+
+	/**
+	 * Returns the status of feed sync.
+	 *
+	 * @return string
+	 */
+	private function get_feed_sync_status(): string {
+		try {
+			$feed_sync_status = FeedStatusService::get_feed_sync_status();
+		} catch ( \Exception $e ) {
+			return self::PRODUCT_LISTINGS_SYNC_FAILED;
+		}
+
+		if ( in_array(
+			$feed_sync_status,
+			array(
+				'processing',
+				'under_review',
+				'queued_for_processing',
+			),
+			true
+		) ) {
+			$status = self::PRODUCT_LISTINGS_SYNC_IN_PROGRESS;
+		} elseif ( in_array( $feed_sync_status, array( 'completed', 'completed_early' ), true ) ) {
+			$status = self::PRODUCT_LISTINGS_SYNCED;
+		} else {
+			$status = self::PRODUCT_LISTINGS_SYNC_FAILED;
+		}
+
+		return $status;
 	}
 }
