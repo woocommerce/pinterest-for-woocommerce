@@ -31,6 +31,28 @@ class FeedStatusService {
 	);
 
 	/**
+	 * The error codes that are related to the feed itself, and not a specific product.
+	 * Source: https://help.pinterest.com/en/business/article/data-source-ingestion
+	 *
+	 * @var array
+	 */
+	const GLOBAL_ERROR_CODES = array(
+		'3',
+		'100',
+		'101',
+		'102',
+		'103',
+		'129',
+		'138',
+		'139',
+		'140',
+		'143',
+		'150',
+		'152',
+		'155',
+	);
+
+	/**
 	 * Get the feed registration status.
 	 *
 	 * @return string The feed registration state. Possible values:
@@ -169,6 +191,40 @@ class FeedStatusService {
 			'warnings'   => $sums['warnings'],
 			'errors'     => $sums['errors'],
 		);
+	}
+
+	/**
+	 * Parses the given workflow and returns a string which contains the first error message found to be related to the feed globally and not a specific product.
+	 *
+	 * @param object $workflow The workflow object.
+	 *
+	 * @return string|null The error message or null if no global error was found.
+	 */
+	public static function get_global_error_from_workflow( object $workflow ): ?string {
+		$error_code = null;
+		$workflow   = (array) $workflow;
+		foreach ( self::ERROR_CONTEXTS as $context ) {
+			if ( ! empty( (array) $workflow[ $context ] ) ) {
+
+				foreach ( (array) $workflow[ $context ] as $code => $count ) {
+					if ( in_array( $code, self::GLOBAL_ERROR_CODES, true ) ) {
+						$error_code = $code;
+						break 2;
+					}
+				}
+			}
+		}
+
+		if ( $error_code ) {
+			$messages_map = Base::get_message_map();
+
+			if ( 'success' === $messages_map['status'] && isset( $messages_map['data']->$error_code ) ) {
+				/* Translators: The error message as returned by the Pinterest API */
+				return sprintf( esc_html__( 'Pinterest returned: %1$s', 'pinterest-for-woocommerce' ), $messages_map['data']->$error_code );
+			}
+		}
+
+		return null;
 	}
 
 }
