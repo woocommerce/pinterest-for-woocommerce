@@ -11,6 +11,8 @@ namespace Automattic\WooCommerce\Pinterest\MultichannelMarketing;
 use Automattic\WooCommerce\Admin\Marketing\MarketingCampaign;
 use Automattic\WooCommerce\Admin\Marketing\MarketingCampaignType;
 use Automattic\WooCommerce\Admin\Marketing\MarketingChannelInterface;
+use Automattic\WooCommerce\Pinterest\FeedRegistration;
+use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\FeedStatusService;
 use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Automattic\WooCommerce\Pinterest\ProductSync;
@@ -112,8 +114,22 @@ class PinterestChannel implements MarketingChannelInterface {
 	 * @return int The number of issues to resolve, or 0 if there are no issues with the channel.
 	 */
 	public function get_errors_count(): int {
-		// TODO: Implement get_errors_count() method.
-		return 0;
+		$count = 0;
+
+		try {
+			$feed_id     = FeedRegistration::get_locally_stored_registered_feed_id();
+			$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
+			if ( $feed_id && $merchant_id ) {
+				$workflow = Feeds::get_feed_latest_workflow( (string) $merchant_id, (string) $feed_id );
+				if ( $workflow ) {
+					$count = FeedStatusService::get_workflow_overview_stats( $workflow )['errors'];
+				}
+			}
+		} catch ( \Exception $e ) {
+			return 0;
+		}
+
+		return $count;
 	}
 
 	/**
