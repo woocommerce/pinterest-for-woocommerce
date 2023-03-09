@@ -19,6 +19,18 @@ defined( 'ABSPATH' ) || exit;
 class FeedStatusService {
 
 	/**
+	 * The error contexts to search for in the workflow responses.
+	 *
+	 * @var array
+	 */
+	const ERROR_CONTEXTS = array(
+		'validation_stats_warnings',
+		'ingestion_stats_warnings',
+		'validation_stats_errors',
+		'ingestion_stats_errors',
+	);
+
+	/**
 	 * Get the feed registration status.
 	 *
 	 * @return string The feed registration state. Possible values:
@@ -125,6 +137,38 @@ class FeedStatusService {
 		}
 
 		return $status;
+	}
+
+	/**
+	 * Gets the overview totals from the given workflow array.
+	 *
+	 * @param object $workflow The workflow object.
+	 *
+	 * @return array A multidimensional array of numbers indicating the following stats about the workflow:
+	 *               - total: The total number of products in the feed.
+	 *               - not_synced: The number of products not synced to Pinterest.
+	 *               - warnings: The number of warnings.
+	 *               - errors: The number of errors.
+	 */
+	public static function get_workflow_overview_stats( object $workflow ): array {
+		$sums     = array(
+			'warnings' => 0,
+			'errors'   => 0,
+		);
+		$workflow = (array) $workflow;
+		foreach ( self::ERROR_CONTEXTS as $context ) {
+			if ( ! empty( (array) $workflow[ $context ] ) ) {
+				$what           = strpos( $context, 'errors' ) ? 'errors' : 'warnings';
+				$sums[ $what ] += array_sum( (array) $workflow[ $context ] );
+			}
+		}
+
+		return array(
+			'total'      => $workflow['original_product_count'],
+			'not_synced' => $workflow['original_product_count'] - $workflow['product_count'],
+			'warnings'   => $sums['warnings'],
+			'errors'     => $sums['errors'],
+		);
 	}
 
 }
