@@ -20,6 +20,26 @@ defined( 'ABSPATH' ) || exit;
 class PinterestChannel implements MarketingChannelInterface {
 
 	/**
+	 * The Singleton's instance.
+	 *
+	 * @var PinterestChannel|null Instance object.
+	 */
+	private static $instance = null;
+
+	/**
+	 * Singleton initialization and instance fetching method.
+	 *
+	 * @return PinterestChannel Singleton instance.
+	 */
+	public static function get_instance(): PinterestChannel {
+		if ( null === self::$instance ) {
+			self::$instance = new static();
+		}
+
+		return self::$instance;
+	}
+
+	/**
 	 * Returns the unique identifier string for the marketing channel extension, also known as the plugin slug.
 	 *
 	 * @return string
