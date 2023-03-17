@@ -39,6 +39,8 @@ class Logger {
 	 * @param string $level   The level/context of the message.
 	 * @param string $feature Used to direct logs to a separate file.
 	 * @param string $force   Used to bypass system settings and force the logs.
+	 *
+	 * @return void
 	 */
 	public static function log( $message, $level = 'debug', $feature = null, $force = false ): void {
 
