@@ -113,6 +113,7 @@ class Base {
 			$response = self::handle_request( $request );
 
 			if ( ! empty( $cache_expiry ) ) {
+				$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
 				set_transient( $cache_key, $response, $cache_expiry );
 			}
 
