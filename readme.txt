@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.16 - 2023-03-21 =
+* Fix - Undefined variable when caching API requests.
+
 = 1.2.15 - 2023-03-14 =
 * Tweak - WC 7.5 compatibility.
 * Tweak - WP 6.2 compatibility.
