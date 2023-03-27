@@ -82,6 +82,7 @@ Clicking on an external documentation link.
 	- with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
+- [`SetupPins`](assets/source/setup-guide/app/steps/SetupPins.js#L45) with `{ link_id: 'enhanced-match', context: 'settings' }`
 - [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L48) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
 - [TermsAndConditionsModal]( assets/source/setup-guide/app/components/TermsAndConditionsModal.js#L24)
     - with `{ link_id: 'terms-of-service', context: 'ads-credits-terms-and-conditions' }`
