@@ -25,7 +25,6 @@ import {
 	useSettingsDispatch,
 	useCreateNotice,
 } from '../helpers/effects';
-import documentationLinkProps from '../helpers/documentation-link-props';
 
 function HelpTooltip( { text } ) {
 	return (
