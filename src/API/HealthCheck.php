@@ -33,7 +33,7 @@ class HealthCheck extends VendorAPI {
 
 
 	/**
-	 * Get the merchant object from the API and return the status, and if exists, the dissapproval rationale.
+	 * Get the merchant object from the API and return the status, and if exists, the disapproval rationale.
 	 *
 	 * @return array
 	 *
@@ -52,6 +52,11 @@ class HealthCheck extends VendorAPI {
 			$merchant_connected_diff_platform = Pinterest_For_Woocommerce()::get_data( 'merchant_connected_diff_platform' );
 			if ( $merchant_connected_diff_platform ) {
 				return array( 'status' => 'merchant_connected_diff_platform' );
+			}
+
+			$locale_error = Pinterest_For_Woocommerce()::get_data( 'merchant_locale_not_valid' );
+			if ( $locale_error ) {
+				return array( 'status' => 'merchant_locale_not_valid' );
 			}
 
 			$merchant = Pinterest\Merchants::get_merchant();

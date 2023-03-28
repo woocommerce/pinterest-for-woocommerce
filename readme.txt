@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
-Tested up to: 6.1
+Tested up to: 6.2
 Requires PHP: 7.3
-Stable tag: 1.2.10
+Stable tag: 1.2.16
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,32 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.16 - 2023-03-21 =
+* Fix - Undefined variable when caching API requests.
+
+= 1.2.15 - 2023-03-14 =
+* Tweak - WC 7.5 compatibility.
+* Tweak - WP 6.2 compatibility.
+
+= 1.2.14 - 2023-03-07 =
+* Fix - Add retry mechanism for the feed generation.
+
+= 1.2.13 - 2023-02-22 =
+* Add - WordPress locale to Pinterest locale mapping.
+* Fix - Prevent fatal error if retrieving account fails during onboarding.
+* Fix - Prevent multiple active feed files.
+* Fix - Price inconsistencies when tax region is different than shipping zone.
+
+= 1.2.12 - 2023-02-14 =
+* Dev - Remove deprecated argument call from inside a hook action handler function.
+
+= 1.2.11 - 2023-02-07 =
+* Dev - Fix deprecated method argument version.
+* Dev - Fix php8.2 deprecation notices.
+* Fix - Inconsistencies with the add to cart tracking event.
+* Tweak - WC 7.4 compatibility.
+* Update - The Onboarding task to use `TaskLists::add_task` method instead of the deprecated `woocommerce_admin_onboarding_task_list` filter.
 
 = 1.2.10 - 2023-01-26 =
 * Add - Pull supported countries from the API.
