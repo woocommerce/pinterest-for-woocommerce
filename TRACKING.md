@@ -83,7 +83,7 @@ Clicking on an external documentation link.
 	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'automatic-enhanced-match', context: 'wizard'|'settings' }`
-- [`SetupPins`](assets/source/setup-guide/app/steps/SetupPins.js#L46)
+- [`SetupPins`](assets/source/setup-guide/app/steps/SetupPins.js#L48)
 	- with `{ link_id: 'ads-manager', context: 'settings' }`
 	- with `{ link_id: 'enhanced-match', context: 'settings' }`
 - [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L48) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
