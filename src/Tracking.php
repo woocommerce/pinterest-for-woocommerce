@@ -735,7 +735,7 @@ JS;
 	 * @return bool
 	 */
 	protected static function price_includes_tax() {
-		if ( isset( WC()->cart ) ) {
+		if ( isset( WC()->cart ) && method_exists( WC()->cart, 'display_prices_including_tax' ) ) {
 			return WC()->cart->display_prices_including_tax();
 		}
 
