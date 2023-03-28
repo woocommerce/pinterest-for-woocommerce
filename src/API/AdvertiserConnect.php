@@ -179,7 +179,12 @@ class AdvertiserConnect extends VendorAPI {
 		Base::update_tag(
 			$tag_id,
 			array(
-				'aem_enabled' => true,
+				'aem_enabled'      => true,
+				'aem_fnln_enabled' => true,
+				'aem_ph_enabled'   => true,
+				'aem_ge_enabled'   => true,
+				'aem_db_enabled'   => true,
+				'aem_loc_enabled'  => true,
 			)
 		);
 	}
