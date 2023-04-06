@@ -15,6 +15,7 @@ use Automattic\WooCommerce\Blocks\Package;
 use Automattic\WooCommerce\Blocks\Assets\AssetDataRegistry;
 use Automattic\WooCommerce\Pinterest\Compat;
 use Automattic\WooCommerce\Pinterest\Tracking;
+use Automattic\WooCommerce\Pinterest\PinterestSyncSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -374,6 +375,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				'businessAccounts'         => Pinterest_For_Woocommerce()::get_linked_businesses(),
 				'apiRoute'                 => PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION,
 				'optionsName'              => PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME,
+				'syncedSettings'           => PinterestSyncSettings::get_synced_settings(),
 				'error'                    => isset( $_GET['error'] ) ? sanitize_text_field( wp_unslash( $_GET['error'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended --- not needed
 				'pinterestLinks'           => array(
 					'newAccount'             => 'https://business.pinterest.com/',
@@ -390,6 +392,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'adsManager'             => 'https://ads.pinterest.com/',
 					'preLaunchNotice'        => 'https://help.pinterest.com/en-gb/business/article/get-a-business-profile/',
 					'adsAvailability'        => 'https://help.pinterest.com/en/business/availability/ads-availability',
+					'automaticEnhancedMatch' => 'https://www.pinterest.com/_/_/help/business/article/automatic-enhanced-match',
+					'tagManager'             => $this->get_tag_manager_link(),
 				),
 				'isSetupComplete'          => Pinterest_For_Woocommerce()::is_setup_complete(),
 				'countryTos'               => Pinterest_For_Woocommerce()::get_applicable_tos(),
@@ -515,6 +519,25 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			$allowed_hosts[] = wp_parse_url( $service_domain, PHP_URL_HOST );
 
 			return $allowed_hosts;
+		}
+
+		/**
+		 * Get tags manager link if there is a connected advertiser or the ads manager link if not.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return string
+		 */
+		protected function get_tag_manager_link() {
+			$tag_manager_link = 'https://ads.pinterest.com/advertiser/';
+
+			$advertiser_id = Pinterest_For_Woocommerce()->get_setting( 'tracking_advertiser' );
+
+			if ( ! $advertiser_id ) {
+				return $tag_manager_link;
+			}
+
+			return "{$tag_manager_link}{$advertiser_id}/conversions/tag";
 		}
 	}
 

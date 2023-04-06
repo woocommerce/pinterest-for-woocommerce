@@ -7,6 +7,7 @@ import { Spinner } from '@woocommerce/components';
 /**
  * Internal dependencies
  */
+import SyncSettings from '../components/SyncSettings';
 import SetupProductSync from '../steps/SetupProductSync';
 import SetupPins from '../steps/SetupPins';
 import AdvancedSettings from '../steps/AdvancedSettings';
@@ -36,6 +37,7 @@ const SettingsApp = () => {
 			{ appSettings ? (
 				<div className="woocommerce-setup-guide__container">
 					<>
+						<SyncSettings view={ SETTINGS_VIEW } />
 						<SetupProductSync view={ SETTINGS_VIEW } />
 						<SetupPins view={ SETTINGS_VIEW } />
 						<AdvancedSettings view={ SETTINGS_VIEW } />
