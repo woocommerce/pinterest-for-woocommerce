@@ -286,4 +286,45 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$this->assertEquals( 'error', ProductFeedStatus::get()['status'] );
 	}
+
+	/**
+	 * Tests get feed products method returns products in stock including products on backorder.
+	 *
+	 * @return void
+	 */
+	public function test_get_feed_products_return_backorder_enabled_products() {
+		update_option( 'woocommerce_hide_out_of_stock_items', 'yes' );
+		$product_a = \WC_Helper_Product::create_simple_product(
+			true,
+			[
+				'name' => 'In stock product',
+			]
+		);
+		$product_b = \WC_Helper_Product::create_simple_product(
+			true,
+			[
+				'name'         => 'Product on backorder',
+				'stock_status' => 'onbackorder',
+			]
+		);
+		$product_c = \WC_Helper_Product::create_simple_product(
+			true,
+			[
+				'name'         => 'Out of stock product',
+				'stock_status' => 'outofstock',
+			]
+		);
+
+		$ids = [ $product_a->get_id(), $product_b->get_id(), $product_c->get_id() ];
+
+		$products = $this->feed_generator->get_feed_products( $ids );
+
+		$this->assertCount( 2, $products );
+		$this->assertEquals( $product_a->get_id(), $products[0]->get_id() );
+		$this->assertEquals( 'In stock product', $products[0]->get_name() );
+		$this->assertEquals( 'instock', $products[0]->get_stock_status() );
+		$this->assertEquals( $product_b->get_id(), $products[1]->get_id() );
+		$this->assertEquals( 'Product on backorder', $products[1]->get_name() );
+		$this->assertEquals( 'onbackorder', $products[1]->get_stock_status() );
+	}
 }
