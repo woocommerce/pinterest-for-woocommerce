@@ -7,6 +7,7 @@ describe( 'Prepare for Tracking function', () => {
 	const trackableData = {
 		enable_debug_logging: true,
 		enhanced_match_support: true,
+		automatic_enhanced_match_support: true,
 		erase_plugin_data: true,
 		product_sync_enabled: true,
 		rich_pins_on_posts: true,

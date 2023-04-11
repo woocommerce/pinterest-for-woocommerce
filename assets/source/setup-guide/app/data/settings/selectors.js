@@ -46,6 +46,15 @@ export const getSettingsUpdatingError = ( state ) => {
 };
 
 /**
+ * Determine if settings are being synced.
+ *
+ * @param {Object} state - Reducer state
+ */
+export const isSettingsSyncing = ( state ) => {
+	return state.isSyncing || false;
+};
+
+/**
  * Determine if the current domain was verified.
  *
  * @param {Object} state - Reducer state

@@ -52,9 +52,14 @@ class AdvertiserConnect extends VendorAPI {
 
 			$advertiser_id = $request->has_param( 'advrtsr_id' ) ? $request->get_param( 'advrtsr_id' ) : false;
 			$tag_id        = $request->has_param( 'tag_id' ) ? $request->get_param( 'tag_id' ) : false;
+			$enable_aem    = $request->has_param( 'enable_aem' ) ? $request->get_param( 'enable_aem' ) : false;
 
 			if ( ! $advertiser_id || ! $tag_id ) {
 				throw new \Exception( esc_html__( 'Missing advertiser or tag parameters.', 'pinterest-for-woocommerce' ), 400 );
+			}
+
+			if ( $enable_aem ) {
+				self::enable_aem_tag( $tag_id );
 			}
 
 			$is_connected = Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' );
@@ -162,5 +167,25 @@ class AdvertiserConnect extends VendorAPI {
 
 			throw new \Exception( esc_html__( 'The advertiser could not be disconnected from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
 		}
+	}
+
+
+	/**
+	 * Enable AEM during the onboarding process.
+	 *
+	 * @param string $tag_id The tracking tag identifier.
+	 */
+	protected static function enable_aem_tag( $tag_id ) {
+		Base::update_tag(
+			$tag_id,
+			array(
+				'aem_enabled'      => true,
+				'aem_fnln_enabled' => true,
+				'aem_ph_enabled'   => true,
+				'aem_ge_enabled'   => true,
+				'aem_db_enabled'   => true,
+				'aem_loc_enabled'  => true,
+			)
+		);
 	}
 }

@@ -9,15 +9,16 @@ use Pinterest_For_Woocommerce;
 class TrackerSnapshotTest extends \WP_UnitTestCase {
 
 	public static $default_settings = array(
-		'version'                => PINTEREST_FOR_WOOCOMMERCE_VERSION,
-		'track_conversions'      => true,
-		'enhanced_match_support' => true,
-		'save_to_pinterest'      => true,
-		'rich_pins_on_posts'     => true,
-		'rich_pins_on_products'  => true,
-		'product_sync_enabled'   => true,
-		'enable_debug_logging'   => false,
-		'erase_plugin_data'      => false,
+		'version'                          => PINTEREST_FOR_WOOCOMMERCE_VERSION,
+		'track_conversions'                => true,
+		'enhanced_match_support'           => true,
+		'automatic_enhanced_match_support' => true,
+		'save_to_pinterest'                => true,
+		'rich_pins_on_posts'               => true,
+		'rich_pins_on_products'            => true,
+		'product_sync_enabled'             => true,
+		'enable_debug_logging'             => false,
+		'erase_plugin_data'                => false,
 	);
 
 	function setUp() {

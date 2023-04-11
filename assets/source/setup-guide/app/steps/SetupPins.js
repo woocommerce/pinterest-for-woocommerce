@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import {
 	Tooltip,
+	ExternalLink,
 	Card,
 	CardBody,
 	CheckboxControl,
@@ -38,6 +39,7 @@ function HelpTooltip( { text } ) {
  *
  * To be used in onboarding stepper.
  *
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ads-manager', context: 'settings' }`
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'enhanced-match', context: 'settings' }`
  *
  * @return {JSX.Element} rendered component
@@ -170,6 +172,62 @@ const SetupPins = ( {} ) => {
 											)
 										}
 									/>
+									<CheckboxControl
+										label={ __(
+											'Automatic Enhanced Match support',
+											'pinterest-for-woocommerce'
+										) }
+										help={
+											<HelpTooltip
+												text={ __(
+													'Uses hashed information that your customers have already provided to your business to help match more of your website visitors and conversions to people on Pinterest. Enabling it may improve the performance of your campaigns and can help increase the size of your Pinterest tag audiences.',
+													'pinterest-for-woocommerce'
+												) }
+											/>
+										}
+										checked={
+											appSettings.automatic_enhanced_match_support
+										}
+										className={ classnames(
+											'woocommerce-setup-guide__checkbox-group woocommerce-setup-guide__checkbox-readonly woocommerce-setup-guide__with-help-description'
+										) }
+										disabled={ true }
+										onChange={ () =>
+											handleOptionChange(
+												'automatic_enhanced_match_support'
+											)
+										}
+									/>
+									<Text
+										className="woocommerce-setup-guide__help-description"
+										variant="caption"
+									>
+										{ createInterpolateElement(
+											__(
+												'Manage information shared on <linkAdsManager>Pinterest Ads Manager </linkAdsManager>',
+												'pinterest-for-woocommerce'
+											),
+											{
+												linkAdsManager: (
+													<ExternalLink
+														{ ...documentationLinkProps(
+															{
+																href:
+																	wcSettings
+																		.pinterest_for_woocommerce
+																		.pinterestLinks
+																		.tagManager,
+																linkId:
+																	'ads-manager',
+																context:
+																	'settings',
+															}
+														) }
+													/>
+												),
+											}
+										) }
+									</Text>
 									<Text
 										className="woocommerce-setup-guide__checkbox-heading"
 										variant="subtitle"

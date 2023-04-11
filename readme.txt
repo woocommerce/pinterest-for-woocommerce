@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.2
 Requires PHP: 7.3
-Stable tag: 1.2.17
+Stable tag: 1.2.18
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.18 - 2023-04-11 =
+* Add - Automatic enhanced match support.
+* Add - Support to sync setting changes from Pinterest to the plugin.
+* Fix - Fatal error if cart is not set.
 
 = 1.2.17 - 2023-04-05 =
 * Add - Enhanced match documentation link.
