@@ -731,7 +731,7 @@ JS;
 	/**
 	 * Get if prices should include tax.
 	 *
-	 * @since x.x.x
+	 * @since 1.2.18
 	 * @return bool
 	 */
 	protected static function price_includes_tax() {
