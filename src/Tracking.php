@@ -372,9 +372,9 @@ JS;
 
 		$product_id    = $product->get_id();
 		$product_name  = esc_js( $product->get_name() );
-		$product_price = self::get_product_display_price( $product );
+		$product_price = floatval( self::get_product_display_price( $product ) );
 
-		$wc_currency = get_woocommerce_currency();
+		$wc_currency = esc_js( get_woocommerce_currency() );
 		$tracking    = <<< JS
 jQuery( function( $ ) {
 	$( document.body ).on( 'added_to_cart', function( e, fragments, cart_hash, thisbutton ) {
