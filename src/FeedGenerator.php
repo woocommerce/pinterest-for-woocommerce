@@ -304,7 +304,10 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Returns WC products by product ids. Products returned are of either `in stock` or `on backorder` statuses.
 	 *
+	 * @since x.x.x
+	 *
 	 * @param int[] $ids - array of product ids.
+	 *
 	 * @return array|\stdClass
 	 */
 	public function get_feed_products( array $ids ) {
