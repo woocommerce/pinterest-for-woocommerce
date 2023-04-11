@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Sync Settings
  *
  * @package     Pinterest_For_WooCommerce/Classes/
- * @version     x.x.x
+ * @version     1.2.18
  */
 
 namespace Automattic\WooCommerce\Pinterest;

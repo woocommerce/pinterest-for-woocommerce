@@ -524,7 +524,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		/**
 		 * Get tags manager link if there is a connected advertiser or the ads manager link if not.
 		 *
-		 * @since x.x.x
+		 * @since 1.2.18
 		 *
 		 * @return string
 		 */
