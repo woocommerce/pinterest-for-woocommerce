@@ -91,6 +91,11 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.18 - 2023-04-11 =
+* Add - Automatic enhanced match support.
+* Add - Support to sync setting changes from Pinterest to the plugin.
+* Fix - Fatal error if cart is not set.
+
 = 1.2.17 - 2023-04-05 =
 * Add - Enhanced match documentation link.
 * Tweak - WC 7.6 compatibility.
