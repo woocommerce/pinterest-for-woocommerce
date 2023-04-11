@@ -188,7 +188,6 @@ class Merchants {
 		// Update the registered feed id setting.
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $feed_id );
 
-
 		return array(
 			'merchant_id' => $merchant_id,
 			'feed_id'     => $feed_id,
