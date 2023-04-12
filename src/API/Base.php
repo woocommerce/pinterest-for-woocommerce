@@ -480,6 +480,20 @@ class Base {
 
 
 	/**
+	 * Get the advertiser object from the Pinterest API given its ID. Caches the result for 12 hours.
+	 *
+	 * @param string $advertiser_id the advertiser_id to request for.
+	 *
+	 * @return array An array with the advertiser data.
+	 *
+	 * @throws ApiException If the request fails.
+	 */
+	public static function get_advertiser( string $advertiser_id ): array {
+		return self::make_request( "advertisers/{$advertiser_id}/", 'GET', array(), 'ads', 12 * HOUR_IN_SECONDS );
+	}
+
+
+	/**
 	 * Get the advertiser's tracking tags.
 	 *
 	 * @param string $advertiser_id the advertiser_id to request the tags for.
