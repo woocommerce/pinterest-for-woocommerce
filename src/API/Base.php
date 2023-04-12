@@ -764,4 +764,25 @@ class Base {
 		$request_url = 'advertisers/countries';
 		return self::make_request( $request_url, 'GET', array(), 'ads', DAY_IN_SECONDS );
 	}
+
+	/**
+	 * Returns the active campaigns for the given advertiser id. The campaigns are cached for 4 hours.
+	 *
+	 * @param string $advertiser_id The advertiser id for which to get the campaigns.
+	 *
+	 * @return array The campaigns' properties as a multidimensional array.
+	 *
+	 * @throws ApiException If the request fails.
+	 */
+	public static function get_active_campaigns( string $advertiser_id ): array {
+		return self::make_request(
+			"/advertisers/{$advertiser_id}/campaigns",
+			'GET',
+			array(
+				'campaign_status' => 'ACTIVE',
+			),
+			'ads',
+			4 * HOUR_IN_SECONDS
+		);
+	}
 }
