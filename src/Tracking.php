@@ -338,7 +338,7 @@ class Tracking {
 	 * @return string
 	 */
 	protected static function get_add_to_cart_snippet_archive() {
-		$wc_currency = get_woocommerce_currency();
+		$wc_currency = esc_js( get_woocommerce_currency() );
 		$tracking    = <<< JS
 jQuery( function( $ ) {
 	$( document.body ).on( 'added_to_cart', function( e, fragments, cart_hash, thisbutton ) {
