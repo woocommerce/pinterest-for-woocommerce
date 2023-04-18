@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.2
 Requires PHP: 7.3
-Stable tag: 1.2.18
+Stable tag: 1.2.19
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.19 - 2023-04-18 =
+* Fix - Escape product name for JS tracker.
+* Fix - On backorder items missing from the feed.
+* Fix - When a new feed configuration is created it should be updated in the pinterest.com config.
 
 = 1.2.18 - 2023-04-11 =
 * Add - Automatic enhanced match support.
