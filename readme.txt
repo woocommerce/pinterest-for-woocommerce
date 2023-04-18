@@ -91,6 +91,11 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.19 - 2023-04-18 =
+* Fix - Escape product name for JS tracker.
+* Fix - On backorder items missing from the feed.
+* Fix - When a new feed configuration is created it should be updated in the pinterest.com config.
+
 = 1.2.18 - 2023-04-11 =
 * Add - Automatic enhanced match support.
 * Add - Support to sync setting changes from Pinterest to the plugin.
