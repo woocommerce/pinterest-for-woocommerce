@@ -659,10 +659,8 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since 1.2.14
 	 */
 	protected function is_timeout_error( array $error ): bool {
-		return isset( $error['type'] ) &&
-				E_ERROR === $error['type'] &&
-				isset( $error['message'] ) &&
-				strpos( $error ['message'], 'Maximum execution time' ) !== false;
+		return isset( $error['type'] ) && E_ERROR === $error['type'] &&
+			isset( $error['message'] ) && strpos( $error ['message'], 'Maximum execution time' ) !== false;
 	}
 
 	/**
