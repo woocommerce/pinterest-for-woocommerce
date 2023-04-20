@@ -251,9 +251,11 @@ class FeedGenerator extends AbstractChainedJob {
 				FROM {$wpdb->posts} as post
 				LEFT JOIN {$wpdb->posts} as parent ON post.post_parent = parent.ID
 				WHERE
-					( post.post_type = 'product_variation' AND parent.post_status = 'publish' )
-				OR
-					( post.post_type = 'product' AND post.post_status = 'publish' )
+					(
+						( post.post_type = 'product_variation' AND parent.post_status = 'publish' )
+					OR
+						( post.post_type = 'product' AND post.post_status = 'publish' )
+					)
 				AND
 					post.ID > %d
 				ORDER BY post.ID ASC

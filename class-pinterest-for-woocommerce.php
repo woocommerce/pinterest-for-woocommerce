@@ -545,7 +545,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$settings = self::get_settings( $force, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 
-			return empty( $settings[ $key ] ) ? null : $settings[ $key ];
+			return $settings[ $key ] ?? null;
 		}
 
 
