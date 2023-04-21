@@ -17,7 +17,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 /**
  * Remove the feed configuration.
  */
-$data        = get_option( 'pinterest_for_woocommerce_data' );
+$data        = get_option( 'pinterest_for_woocommerce_data', [] );
 $merchant_id = $data['merchant_id'] ?? '';
 
 if ( $merchant_id ) {
