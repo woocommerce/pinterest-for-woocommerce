@@ -25,6 +25,8 @@ if ( $merchant_id ) {
 	FeedRegistration::maybe_disable_stale_feeds_for_merchant( $merchant_id, '' );
 }
 
+$plugin_settings = get_option( 'pinterest_for_woocommerce' );
+
 if ( $plugin_settings['erase_plugin_data'] ) {
 	delete_option( 'pinterest_for_woocommerce' );
 	delete_option( 'pinterest_for_woocommerce_data' );
