@@ -8,11 +8,22 @@
  * @version     1.0.0
  */
 
+ use Automattic\WooCommerce\Pinterest\FeedRegistration;
+
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-$plugin_settings = get_option( 'pinterest_for_woocommerce' );
+/**
+ * Remove the feed configuration.
+ */
+$data        = get_option( 'pinterest_for_woocommerce_data' );
+$merchant_id = $data['merchant_id'] ?? '';
+
+if ( $merchant_id ) {
+	// At this time all feeds are considered stale so we just need pass bogus value as the second argument.
+	FeedRegistration::maybe_disable_stale_feeds_for_merchant( $merchant_id, '' );
+}
 
 if ( $plugin_settings['erase_plugin_data'] ) {
 	delete_option( 'pinterest_for_woocommerce' );
