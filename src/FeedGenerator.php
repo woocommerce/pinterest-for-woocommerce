@@ -106,11 +106,144 @@ class FeedGenerator extends AbstractChainedJob {
 		add_filter( 'woocommerce_customer_taxable_address', array( $this, 'set_store_address_as_taxable_location' ) );
 
 		// PHP shuts down execution for some reason.
-		add_action( 'action_scheduler_unexpected_shutdown', array( $this, 'handle_action_timeout' ), 10, 2 );
+		add_action(
+			'action_scheduler_unexpected_shutdown',
+			function ( int $action_id, ?array $error ) {
+				if ( $error && $this->is_timeout_error( $error ) ) {
+					$action = ActionScheduler::store()->fetch_action( $action_id );
+					$hook   = $action->get_hook();
+					$args   = $action->get_args();
+
+					// If not Pinterest Feed Generator action - ignore.
+					if ( $hook !== $this->get_action_full_name( self::CHAIN_BATCH ) ) {
+						return;
+					}
+
+					// Check if the action had failed before.
+					if ( $this->is_failure_rate_above_threshold( $hook, $args ) ) {
+						self::log(
+							sprintf(
+								__(
+									'Feed Generator `%s` Action reschedule threshold has been reached. Quit.',
+									'pinterest-for-woocommerce'
+								),
+								$hook
+							)
+						);
+						return;
+					}
+
+					self::log(
+						sprintf(
+							__(
+								'Feed Generator `%s` Action timed out due to an unexpected shutdown. Rescheduling it.',
+								'pinterest-for-woocommerce'
+							),
+							$hook
+						)
+					);
+
+					// Register retry attempt.
+					Pinterest_For_Woocommerce::save_data(
+						'feed_product_batch_attempt',
+						Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) + 1
+					);
+					$this->action_scheduler->schedule_immediate( $hook, $args );
+				}
+			},
+			10,
+			2
+		);
 		// Timeout actions. Action need more time to run than it is available.
-		add_action( 'action_scheduler_failed_action', array( $this, 'maybe_handle_error_on_timeout' ) );
+		add_action(
+			'action_scheduler_failed_action',
+			function ( int $action_id, int $timeout ) {
+				$action = ActionScheduler::store()->fetch_action( $action_id );
+				$hook   = $action->get_hook();
+				$args   = $action->get_args();
+
+				// If not Pinterest Feed Generator action - ignore.
+				if ( $hook !== $this->get_action_full_name( self::CHAIN_BATCH ) ) {
+					return;
+				}
+
+				// Check if the action had failed before.
+				if ( $this->is_failure_rate_above_threshold( $hook, $args ) ) {
+					self::log(
+						sprintf(
+							__(
+								'Feed Generator %s Action reschedule threshold has been reached. Quit.',
+								'pinterest-for-woocommerce'
+							),
+							$hook
+						)
+					);
+					return;
+				}
+
+				self::log(
+					sprintf(
+						__( 'Feed Generator `%s` Action started %d second(s) ago has timed out.', 'pinterest-for-woocommerce' ),
+						$hook,
+						$timeout
+					)
+				);
+
+				// Decrease the number of products to retry.
+				$limit = (int) ceil( $this->get_batch_size() / ( Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) + 1 ) );
+				Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', $limit );
+				self::log(
+					sprintf(
+						__( 'Feed Generator `%s` Action product batch size decreased to %d.', 'pinterest-for-woocommerce' ),
+						$hook,
+						$timeout
+					)
+				);
+
+				// Register retry attempt.
+				$retry = Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) + 1;
+				Pinterest_For_Woocommerce::save_data( 'feed_product_batch_attempt', $retry );
+				self::log(
+					sprintf(
+						__( 'Feed Generator `%s` Action registering %d retry.', 'pinterest-for-woocommerce' ),
+						$hook,
+						$timeout
+					)
+				);
+				$this->action_scheduler->schedule_immediate( $hook, $args );
+			}
+		);
 		// Action got an exception thrown.
-		add_action( 'action_scheduler_failed_execution', array( $this, '' ) );
+		add_action(
+			'action_scheduler_failed_execution',
+			function ( int $action_id, Throwable $throwable, string $context ) {
+				$action = ActionScheduler::store()->fetch_action( $action_id );
+				$hook   = $action->get_hook();
+
+				// If not Pinterest Feed Generator action - ignore.
+				if ( $hook !== $this->get_action_full_name( self::CHAIN_BATCH ) ) {
+					return;
+				}
+
+				ProductFeedStatus::set(
+					[
+						'status'        => 'error',
+						'error_message' => $throwable->getMessage(),
+					]
+				);
+				ProductFeedStatus::mark_feed_file_generation_as_failed();
+				$this->schedule_next_generator_start( time() + self::WAIT_ON_ERROR_BEFORE_RETRY );
+
+				self::log(
+					sprintf(
+						__( 'Feed Generator `%s` Action failed to execute due to an error thrown `%s.`. A complete feed generation retry has been scheduled.' ),
+						$hook,
+						$throwable->getMessage()
+					),
+					\WC_Log_Levels::ERROR
+				);
+			}
+		);
 	}
 
 	/**
@@ -184,16 +317,14 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	public function handle_batch_action( int $batch_number, array $args ) {
 		parent::handle_batch_action( $batch_number, $args );
-		$this->clear_generation_retries_option();
-		/*try {
-			parent::handle_batch_action( $batch_number, $args );
-			$this->clear_generation_retries_option();
-		} catch ( FeedFileOperationsException $th ) {
-			$this->handle_error( $th );
-		} catch ( Throwable $th ) {
-			$this->handle_error( $th );
-			$this->handle_generation_retries( $batch_number, $args, $th );
-		}*/
+
+		/*
+		 * Action has finished successfully.
+		 *   - Reset product number per batch.
+		 *   - Reset retries counter.
+		 */
+		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', self::DEFAULT_PRODUCT_BATCH_SIZE );
+		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_attempt', 0 );
 	}
 
 	/**
@@ -267,7 +398,7 @@ class FeedGenerator extends AbstractChainedJob {
 
 		$product_ids = array_map( 'intval', $product_ids );
 		// We save the last product's id from the current batch to start from it next time when fetching the next batch.
-		$this->set_last_batch_id( $product_ids );
+		$this->set_last_batch_id( $product_ids[ count( $product_ids ) - 1 ] );
 		return $product_ids;
 	}
 
@@ -485,13 +616,13 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
-	 * Saves last product id from an array of product ids fetched at current step.
+	 * Saves last product id.
 	 *
-	 * @param int[] $ids - product ids.
+	 * @param int $id - product id.
 	 * @return void
 	 */
-	protected function set_last_batch_id( array $ids ): void {
-		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', $ids[ count( $ids ) - 1 ] );
+	protected function set_last_batch_id( int $id ): void {
+		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', $id );
 	}
 
 	/**
@@ -686,6 +817,34 @@ class FeedGenerator extends AbstractChainedJob {
 		} catch ( Throwable $th ) {
 			$this->handle_error( $th );
 		}
+	}
+
+	/**
+	 * Check whether the action's failure rate is above the specified threshold within the timeframe.
+	 *
+	 * @param string $hook The job action hook.
+	 * @param ?array $args The job arguments.
+	 *
+	 * @return bool True if the action's error rate is above the threshold, and false otherwise.
+	 *
+	 * @since x.x.x
+	 */
+	protected function is_failure_rate_above_threshold( string $hook, ?array $args = null ): bool {
+		$threshold   = apply_filters( 'pinterest_for_woocommerce_action_failure_threshold', 3 );
+		$time_period = apply_filters( 'pinterest_for_woocommerce_action_failure_time_period', 1800 ); // 30 minutes.
+		$failed_actions = $this->action_scheduler->search(
+			[
+				'hook'         => $hook,
+				'args'         => $args,
+				'status'       => ActionSchedulerInterface::STATUS_FAILED,
+				'per_page'     => $threshold,
+				'date'         => gmdate( 'U' ) - $time_period,
+				'date_compare' => '>',
+			],
+			'ids'
+		);
+
+		return count( $failed_actions ) >= $threshold;
 	}
 
 	protected function queue_batch_retry( int $retries, int $batch_number, array $args ) {

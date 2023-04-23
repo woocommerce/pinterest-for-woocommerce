@@ -124,6 +124,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			'product_sync_enabled'             => true,
 			'enable_debug_logging'             => false,
 			'erase_plugin_data'                => false,
+
+			'feed_product_batch_size'          => Pinterest\FeedGenerator::DEFAULT_PRODUCT_BATCH_SIZE,
+			'feed_product_batch_attempt'       => 0,
 		);
 
 		/**
