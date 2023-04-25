@@ -41,6 +41,30 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		ProductFeedStatus::set( ProductFeedStatus::STATE_PROPS );
 	}
 
+	public function test_init_adds_action_scheduler_failed_execution_hook() {
+		$this->feed_generator->init();
+
+		$this->assertEquals(
+			10,
+			has_action(
+				'action_scheduler_failed_execution',
+				array( $this->feed_generator, 'handle_failed_execution' )
+			)
+		);
+	}
+
+	public function test_init_adds_action_scheduler_unexpected_shutdown_hook() {
+		$this->feed_generator->init();
+
+		$this->assertEquals(
+			10,
+			has_action(
+				'action_scheduler_unexpected_shutdown',
+				array( $this->feed_generator, 'handle_unexpected_shutdown' )
+			)
+		);
+	}
+
 	public function test_init_adds_action_scheduler_failed_action_hook() {
 		$this->feed_generator->init();
 
@@ -225,66 +249,6 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->feed_generator->handle_batch_action( 1, array() );
 
 		$this->assertEquals( 0, (int) \Pinterest_For_Woocommerce::get_data( 'feed_generation_retries' ));
-	}
-
-	public function test_handle_batch_action_retries_up_to_two_times_on_exception() {
-		try {
-			\WC_Helper_Product::create_simple_product();
-			add_filter(
-				'pinterest_for_woocommerce_included_product_types',
-				function () {
-					throw new \Exception('Dummy exception to emulate processing items failure somewhere.');
-				}
-			);
-			$this->action_scheduler
-				->expects( $this->exactly( FeedGenerator::MAX_RETRIES_PER_BATCH ) )
-				->method( 'schedule_immediate' )
-				->with(
-					'pinterest/jobs/generate_feed/chain_batch',
-					array( 1, array() ),
-					''
-				);
-
-			$retries = 0;
-			while( $retries < FeedGenerator::MAX_RETRIES_PER_BATCH ) {
-				$this->feed_generator->handle_batch_action( 1, array() );
-				$this->assertEquals( ++$retries, (int) Pinterest_For_Woocommerce::get_data( 'feed_generation_retries' ) );
-			}
-			$this->feed_generator->handle_batch_action(1, array());
-		} catch ( Throwable $e ) {
-			$this->assertEquals(
-				'Dummy exception to emulate processing items failure somewhere.',
-				$e->getMessage()
-			);
-			$this->assertEquals( 0, (int) Pinterest_For_Woocommerce::get_data( 'feed_generation_retries' ) );
-		}
-	}
-
-	public function test_handle_batch_action_retries_up_to_two_times_on_timeout() {
-
-		\WC_Helper_Product::create_simple_product();
-
-		$this->action_scheduler
-			->expects( $this->exactly( FeedGenerator::MAX_RETRIES_PER_BATCH ) )
-			->method( 'schedule_immediate' )
-			->with(
-				'pinterest/jobs/generate_feed/chain_batch',
-				array( 1, array() ),
-				''
-			);
-
-		$action_scheduler = new ActionSchedulerProxy();
-		$action_id        = $action_scheduler->schedule_immediate( 'pinterest/jobs/generate_feed/chain_batch', array( 1, array() ) );
-
-		$retries = 0;
-
-		while( $retries < FeedGenerator::MAX_RETRIES_PER_BATCH ) {
-			$this->feed_generator->maybe_handle_error_on_timeout( $action_id );
-			$this->assertEquals( ++$retries, (int) Pinterest_For_Woocommerce::get_data( 'feed_generation_retries' ) );
-		}
-		$this->feed_generator->maybe_handle_error_on_timeout( $action_id );
-
-		$this->assertEquals( 'error', ProductFeedStatus::get()['status'] );
 	}
 
 	/**
