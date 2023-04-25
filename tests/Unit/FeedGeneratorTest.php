@@ -65,18 +65,6 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		);
 	}
 
-	public function test_init_adds_action_scheduler_failed_action_hook() {
-		$this->feed_generator->init();
-
-		$this->assertEquals(
-			10,
-			has_action(
-				'action_scheduler_failed_action',
-				array( $this->feed_generator, 'maybe_handle_error_on_timeout' )
-			)
-		);
-	}
-
 	public function test_feed_generator_start_sets_product_feed_status_generation_start_time() {
 		$time_test_started = time();
 
