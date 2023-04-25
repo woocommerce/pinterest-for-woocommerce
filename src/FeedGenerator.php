@@ -114,15 +114,15 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Unexpected shutdown handler.
 	 *
-	 * @param int $action_id
-	 * @param array|null $error
+	 * @param int        $action_id - Action Scheduler action ID.
+	 * @param array|null $error - Error details.
 	 *
 	 * @since x.x.x
 	 *
 	 * @return void
 	 */
 	public function handle_unexpected_shutdown( int $action_id, ?array $error ) {
-		if ( !$error || !$this->is_timeout_error( $error ) ) {
+		if ( ! $error || ! $this->is_timeout_error( $error ) ) {
 			return;
 		}
 		$action = ActionScheduler::store()->fetch_action( $action_id );
@@ -138,6 +138,7 @@ class FeedGenerator extends AbstractChainedJob {
 		if ( $this->is_failure_rate_above_threshold( $hook, $args ) ) {
 			self::log(
 				sprintf(
+					// Translators: 1. Action Scheduler hook name.
 					__(
 						'Feed Generator `%s` Action reschedule threshold has been reached. Quit.',
 						'pinterest-for-woocommerce'
@@ -150,6 +151,7 @@ class FeedGenerator extends AbstractChainedJob {
 
 		self::log(
 			sprintf(
+				// Translators: Action Scheduler hook name.
 				__(
 					'Feed Generator `%s` Action timed out due to an unexpected shutdown. Rescheduling it.',
 					'pinterest-for-woocommerce'
@@ -163,7 +165,11 @@ class FeedGenerator extends AbstractChainedJob {
 		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', $limit );
 		self::log(
 			sprintf(
-				__( 'Feed Generator `%s` Action product batch size decreased to %d.', 'pinterest-for-woocommerce' ),
+				// Translators: 1: Action Scheduler hook name, 2: New products number to process next action run.
+				__(
+					'Feed Generator `%1$s` Action product batch size decreased to %2$d.',
+					'pinterest-for-woocommerce'
+				),
 				$hook,
 				$limit
 			)
@@ -180,9 +186,9 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Action exception handler.
 	 *
-	 * @param int $action_id
-	 * @param Throwable $throwable
-	 * @param string $context
+	 * @param int       $action_id - Action Scheduler action id.
+	 * @param Throwable $throwable - Exception object.
+	 * @param string    $context - Action Scheduler context (e.g. WP CLI, Async Request or an empty string).
 	 *
 	 * @since x.x.x
 	 *
@@ -208,7 +214,11 @@ class FeedGenerator extends AbstractChainedJob {
 
 		self::log(
 			sprintf(
-				__( 'Feed Generator `%s` Action failed to execute due to an error thrown `%s.`. A complete feed generation retry has been scheduled.' ),
+				// Translators: 1: Action Scheduler hook name, 2: Error message about why action has failed to execute.
+				__(
+					'Feed Generator `%1$s` Action failed to execute due to an error thrown `%2$s.`. A complete feed generation retry has been scheduled.',
+					'pinterest-for-woocommerce'
+				),
 				$hook,
 				$throwable->getMessage()
 			),
@@ -400,7 +410,7 @@ class FeedGenerator extends AbstractChainedJob {
 			}
 		}
 
-		// May throw write to file exception
+		// May throw write to file exception.
 		$this->feed_file_operations->write_buffers_to_temp_files( $this->buffers );
 
 		$count = ProductFeedStatus::get()['product_count'] ?? 0;
@@ -573,7 +583,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Returns last product id from the last batch of products fetched at the previous step.
 	 *
-	 * @param int $batch_number
+	 * @param int $batch_number - Action Scheduler chain action batch number.
 	 * @return int
 	 */
 	protected function get_last_batch_id( int $batch_number ): int {
