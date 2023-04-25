@@ -808,7 +808,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$state_params = array(
 				'redirect' => $rest_url,
-				'nonce'    => $nonce
+				'nonce'    => $nonce,
 			);
 
 			switch ( $context ) {
