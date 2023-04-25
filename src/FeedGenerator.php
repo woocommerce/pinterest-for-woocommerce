@@ -105,21 +105,22 @@ class FeedGenerator extends AbstractChainedJob {
 		// Set the store address as taxable location.
 		add_filter( 'woocommerce_customer_taxable_address', array( $this, 'set_store_address_as_taxable_location' ) );
 
-		add_filter(
-			'action_scheduler_queue_runner_time_limit',
-			function ( $time_limit ) {
-				return 1;
-			}
-		);
-
 		// PHP shuts down execution for some reason.
 		add_action( 'action_scheduler_unexpected_shutdown', array( $this, 'handle_unexpected_shutdown' ), 10, 2 );
-		// Timeout actions. Action need more time to run than it is available.
-		add_action( 'action_scheduler_failed_action', array( $this, 'handle_failed_action' ), 10 ,2 );
 		// Action got an exception thrown.
 		add_action( 'action_scheduler_failed_execution', array( $this, 'handle_failed_execution' ), 10, 3 );
 	}
 
+	/**
+	 * Unexpected shutdown handler.
+	 *
+	 * @param int $action_id
+	 * @param array|null $error
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
 	public function handle_unexpected_shutdown( int $action_id, ?array $error ) {
 		if ( !$error || !$this->is_timeout_error( $error ) ) {
 			return;
@@ -157,6 +158,17 @@ class FeedGenerator extends AbstractChainedJob {
 			)
 		);
 
+		// Decrease the number of products to retry.
+		$limit = (int) ceil( $this->get_batch_size() / ( Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) + 1 ) );
+		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', $limit );
+		self::log(
+			sprintf(
+				__( 'Feed Generator `%s` Action product batch size decreased to %d.', 'pinterest-for-woocommerce' ),
+				$hook,
+				$limit
+			)
+		);
+
 		// Register retry attempt.
 		Pinterest_For_Woocommerce::save_data(
 			'feed_product_batch_attempt',
@@ -165,62 +177,17 @@ class FeedGenerator extends AbstractChainedJob {
 		$this->action_scheduler->schedule_immediate( $hook, $args );
 	}
 
-	public function handle_failed_action( int $action_id, int $timeout ) {
-		$action = ActionScheduler::store()->fetch_action( $action_id );
-		$hook   = $action->get_hook();
-		$args   = $action->get_args();
-
-		// If not Pinterest Feed Generator action - ignore.
-		if ( $hook !== $this->get_action_full_name( self::CHAIN_BATCH ) ) {
-			return;
-		}
-
-		// Check if the action had failed before.
-		if ( $this->is_failure_rate_above_threshold( $hook, $args ) ) {
-			self::log(
-				sprintf(
-					__(
-						'Feed Generator %s Action reschedule threshold has been reached. Quit.',
-						'pinterest-for-woocommerce'
-					),
-					$hook
-				)
-			);
-			return;
-		}
-
-		self::log(
-			sprintf(
-				__( 'Feed Generator `%s` Action started %d second(s) ago has timed out.', 'pinterest-for-woocommerce' ),
-				$hook,
-				$timeout
-			)
-		);
-
-		// Decrease the number of products to retry.
-		$limit = (int) ceil( $this->get_batch_size() / ( Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) + 1 ) );
-		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', $limit );
-		self::log(
-			sprintf(
-				__( 'Feed Generator `%s` Action product batch size decreased to %d.', 'pinterest-for-woocommerce' ),
-				$hook,
-				$timeout
-			)
-		);
-
-		// Register retry attempt.
-		$retry = Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) + 1;
-		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_attempt', $retry );
-		self::log(
-			sprintf(
-				__( 'Feed Generator `%s` Action registering %d retry.', 'pinterest-for-woocommerce' ),
-				$hook,
-				$timeout
-			)
-		);
-		$this->action_scheduler->schedule_immediate( $hook, $args );
-	}
-
+	/**
+	 * Action exception handler.
+	 *
+	 * @param int $action_id
+	 * @param Throwable $throwable
+	 * @param string $context
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
 	public function handle_failed_execution( int $action_id, Throwable $throwable, string $context ) {
 		$action = ActionScheduler::store()->fetch_action( $action_id );
 		$hook   = $action->get_hook();
@@ -327,7 +294,7 @@ class FeedGenerator extends AbstractChainedJob {
 		 *   - Reset action retries counter.
 		 */
 		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', self::DEFAULT_PRODUCT_BATCH_SIZE );
-		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_attempt', 0 );
+		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_attempt', 1 );
 	}
 
 	/**

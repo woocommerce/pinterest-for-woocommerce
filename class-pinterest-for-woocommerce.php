@@ -126,7 +126,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			'erase_plugin_data'                => false,
 
 			'feed_product_batch_size'          => Pinterest\FeedGenerator::DEFAULT_PRODUCT_BATCH_SIZE,
-			'feed_product_batch_attempt'       => 0,
+			'feed_product_batch_attempt'       => 1,
 		);
 
 		/**
