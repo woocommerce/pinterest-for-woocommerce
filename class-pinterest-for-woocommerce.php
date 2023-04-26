@@ -190,9 +190,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest_for_woocommerce' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_DATA_NAME', 'pinterest_for_woocommerce_data' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.com/' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.local/' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE', 'pinterestv5' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE', 'pinterest' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE', 'wp_rest' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_VERSION', '1' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT', 'oauth/callback' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_AUTH', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_auth_key' );
@@ -607,16 +608,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @return array
 		 */
-		public static function get_token() {
+		public static function get_access_token() {
 
-			$token = self::get_data( 'token', true );
+			$token_data = self::get_data( 'token_data', true );
+			$token      = array();
 
 			try {
-				$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::decrypt( $token['access_token'] );
+				$token['access_token'] = empty( $token_data['access_token'] ) ? '' : Pinterest\Crypto::decrypt( $token_data['access_token'] );
 			} catch ( \Exception $th ) {
 				/* Translators: The error description */
 				Pinterest\Logger::log( sprintf( esc_html__( 'Could not decrypt the Pinterest API access token. Try reconnecting to Pinterest. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() ), 'error' );
-				$token = array();
 			}
 
 			return $token;
@@ -632,10 +633,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @return boolean
 		 */
-		public static function save_token( $token ) {
+		public static function save_token_data( $token ) {
 
-			$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['access_token'] );
-			return self::save_data( 'token', $token );
+			$token['access_token']  = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['access_token'] );
+			$token['refresh_token'] = empty( $token['refresh_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['refresh_token'] );
+			return self::save_data( 'token_data', $token );
 		}
 
 
@@ -803,7 +805,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_middleware_url( $context = 'login', $args = array() ) {
 
-			$nonce    = wp_create_nonce( 'pinterest_login' );
+			$nonce    = wp_create_nonce( PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE );
+			set_transient( PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE, $nonce, 10 * MINUTE_IN_SECONDS );
+
 			$rest_url = get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT );
 
 			$state_params = array(
@@ -1172,7 +1176,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function is_connected() {
-			$token = self::get_token();
+			$token = self::get_access_token();
 			return $token && ! empty( $token['access_token'] );
 		}
 
