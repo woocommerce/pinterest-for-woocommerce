@@ -114,6 +114,12 @@ class Auth extends VendorAPI {
 		exit;
 	}
 
+	/**
+	 * Logs the error and redirects to the settings page.
+	 *
+	 * @param WP_REST_Request $request The request.
+	 * @param string          $error   The error message.
+	 */
 	public function log_error_and_redirect( WP_REST_Request $request, $error ) {
 		$error_args = '&error=' . $error;
 		Logger::log( wp_json_encode( $error ), 'error', null, true );
