@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.20 - 2023-04-26 =
+* Fix - Unescaped `add_query_arg` function calls.
+
 = 1.2.19 - 2023-04-18 =
 * Fix - Escape product name for JS tracker.
 * Fix - On backorder items missing from the feed.
