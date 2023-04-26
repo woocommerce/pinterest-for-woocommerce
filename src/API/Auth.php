@@ -46,11 +46,12 @@ class Auth extends VendorAPI {
 	public function permissions_check( WP_REST_Request $request ) {
 
 		$nonce = $request->get_param( 'state' ) ?? '';
+
 		/*
 		 * Check if the nonce is valid. We grab the nonce from the transient because wp_verify_nonce() in REST API call
 		 * is generated for user 0 and therefore it always returns false.
 		 */
-		return $nonce === get_transient( \PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE );
+		return get_transient( \PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE ) === $nonce;
 	}
 
 
