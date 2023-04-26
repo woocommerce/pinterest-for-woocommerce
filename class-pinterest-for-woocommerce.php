@@ -640,6 +640,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			return self::save_data( 'token_data', $token );
 		}
 
+		/**
+		 * Save connection info data.
+		 *
+		 * @since x.x.x
+		 *
+		 * @param array $merchant_data The array containing the merchant data to save.
+		 * @return array
+		 */
+		public static function save_connection_info_data( $connection_info_data ) {
+			return self::save_data( 'connection_info_data', $connection_info_data );
+		}
+
 
 		/**
 		 * Disconnect by clearing the Token and any other data that we should gather from scratch.

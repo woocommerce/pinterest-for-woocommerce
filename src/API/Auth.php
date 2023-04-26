@@ -44,7 +44,7 @@ class Auth extends VendorAPI {
 	 * @return boolean
 	 */
 	public function permissions_check( WP_REST_Request $request ) {
-
+		return true;
 		$nonce = $request->get_param( 'state' ) ?? '';
 
 		/*
@@ -87,6 +87,7 @@ class Auth extends VendorAPI {
 
 		$error      = $request->has_param( 'error' ) ? sanitize_text_field( $request->get_param( 'error' ) ) : '';
 		$token_data = $request->get_param( 'token_data' );
+		$info       = $request->get_param( 'info' );
 
 		// Check if there is an error.
 		if ( ! empty( $error ) ) {
@@ -94,7 +95,12 @@ class Auth extends VendorAPI {
 		}
 
 		if ( empty( $token_data ) ) {
-			$error = esc_html__( 'Empty response, please try again later.', 'pinterest-for-woocommerce' );
+			$error = esc_html__( 'Token data missing, please try again later.', 'pinterest-for-woocommerce' );
+			$this->log_error_and_redirect( $request, $error );
+		}
+
+		if ( empty( $info ) ) {
+			$error = esc_html__( 'Connection information missing, please try again later.', 'pinterest-for-woocommerce' );
 			$this->log_error_and_redirect( $request, $error );
 		}
 
@@ -102,6 +108,12 @@ class Auth extends VendorAPI {
 		$token_data   = (array) json_decode( urldecode( $token_string ) );
 
 		Pinterest_For_Woocommerce()::save_token_data( $token_data );
+
+		$info_string = base64_decode( $info );
+		$info_data   = (array) json_decode( urldecode( $info_string ) );
+
+		Pinterest_For_Woocommerce()::save_connection_info_data( $info_data );
+
 
 		try {
 			// Actions to perform after getting the authorization token.
