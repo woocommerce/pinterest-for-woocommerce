@@ -152,7 +152,7 @@ class FeedGenerator extends AbstractChainedJob {
 					// Translators: 1. Action Scheduler hook name.
 					__(
 						'Feed Generator `%s` Action reschedule threshold has been reached. Quit.',
-						PINTEREST_FOR_WOOCOMMERCE_PREFIX
+						'pinterest-for-woocommerce'
 					),
 					$hook
 				)
@@ -165,7 +165,7 @@ class FeedGenerator extends AbstractChainedJob {
 				// Translators: Action Scheduler hook name.
 				__(
 					'Feed Generator `%s` Action timed out due to an unexpected shutdown. Rescheduling it.',
-					PINTEREST_FOR_WOOCOMMERCE_PREFIX
+					'pinterest-for-woocommerce'
 				),
 				$hook
 			)
@@ -179,7 +179,7 @@ class FeedGenerator extends AbstractChainedJob {
 				// Translators: 1: Action Scheduler hook name, 2: New products number to process next action run.
 				__(
 					'Feed Generator `%1$s` Action product batch size decreased to %2$d.',
-					PINTEREST_FOR_WOOCOMMERCE_PREFIX
+					'pinterest-for-woocommerce'
 				),
 				$hook,
 				$limit
@@ -228,7 +228,7 @@ class FeedGenerator extends AbstractChainedJob {
 				// Translators: 1: Action Scheduler hook name, 2: Error message about why action has failed to execute.
 				__(
 					'Feed Generator `%1$s` Action failed to execute due to an error thrown `%2$s.`. A complete feed generation retry has been scheduled.',
-					PINTEREST_FOR_WOOCOMMERCE_PREFIX
+					'pinterest-for-woocommerce'
 				),
 				$hook,
 				$throwable->getMessage()
@@ -247,7 +247,7 @@ class FeedGenerator extends AbstractChainedJob {
 		as_unschedule_all_actions( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		as_schedule_recurring_action( $timestamp, DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		/* translators: time in the format hours:minutes:seconds */
-		self::log( sprintf( __( 'Feed scheduled to run at %s.', PINTEREST_FOR_WOOCOMMERCE_PREFIX ), gmdate( 'H:i:s', $timestamp ) ) );
+		self::log( sprintf( __( 'Feed scheduled to run at %s.', 'pinterest-for-woocommerce' ), gmdate( 'H:i:s', $timestamp ) ) );
 	}
 
 	/**
@@ -269,7 +269,7 @@ class FeedGenerator extends AbstractChainedJob {
 
 		$this->queue_start();
 		ProductFeedStatus::set( array( 'status' => 'scheduled_for_generation' ) );
-		self::log( __( 'Feed generation queued.', PINTEREST_FOR_WOOCOMMERCE_PREFIX ) );
+		self::log( __( 'Feed generation queued.', 'pinterest-for-woocommerce' ) );
 	}
 
 	/**
@@ -280,7 +280,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Throwable Related to creating an empty feed temp file and populating the header possible issues.
 	 */
 	protected function handle_start() {
-		self::log( __( 'Feed generation start. Preparing temporary files.', PINTEREST_FOR_WOOCOMMERCE_PREFIX ) );
+		self::log( __( 'Feed generation start. Preparing temporary files.', 'pinterest-for-woocommerce' ) );
 		try {
 			ProductFeedStatus::reset_feed_file_generation_time();
 			ProductFeedStatus::set(
@@ -327,7 +327,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Throwable Related to adding the footer or renaming the files possible issues.
 	 */
 	protected function handle_end() {
-		self::log( __( 'Feed generation end. Moving files to the final destination.', PINTEREST_FOR_WOOCOMMERCE_PREFIX ) );
+		self::log( __( 'Feed generation end. Moving files to the final destination.', 'pinterest-for-woocommerce' ) );
 		try {
 			$this->feed_file_operations->add_footer_to_temporary_feed_files();
 			$this->feed_file_operations->rename_temporary_feed_files_to_final();
@@ -342,7 +342,7 @@ class FeedGenerator extends AbstractChainedJob {
 			$this->handle_error( $th );
 			throw $th;
 		}
-		self::log( __( 'Feed generated successfully.', PINTEREST_FOR_WOOCOMMERCE_PREFIX ) );
+		self::log( __( 'Feed generated successfully.', 'pinterest-for-woocommerce' ) );
 
 		// Check if feed is dirty and reschedule in necessary.
 		if ( $this->feed_is_dirty() ) {
@@ -431,7 +431,7 @@ class FeedGenerator extends AbstractChainedJob {
 			)
 		);
 		/* translators: number of products */
-		self::log( sprintf( __( 'Feed batch generated. Wrote %s products to the feed file.', PINTEREST_FOR_WOOCOMMERCE_PREFIX ), $processed_products ) );
+		self::log( sprintf( __( 'Feed batch generated. Wrote %s products to the feed file.', 'pinterest-for-woocommerce' ), $processed_products ) );
 	}
 
 	/**
