@@ -27,7 +27,7 @@ class Auth extends VendorAPI {
 	public function __construct() {
 
 		$this->base              = \PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT;
-		$this->endpoint_callback = 'oauth_callback';
+		$this->endpoint_callback = 'connect_callback';
 		$this->methods           = 'GET';
 
 		$this->register_routes();
@@ -45,16 +45,12 @@ class Auth extends VendorAPI {
 	 */
 	public function permissions_check( WP_REST_Request $request ) {
 
-		$control = get_transient( \PINTEREST_FOR_WOOCOMMERCE_AUTH );
-
-		if ( ! $control || ! $request->has_param( 'control' ) || $control !== $request->get_param( 'control' ) ) {
-			add_filter( 'rest_pre_serve_request', array( $this, 'redirect_to_settings_page' ), 10, 3 );
-			return false;
-		}
-
-		delete_transient( \PINTEREST_FOR_WOOCOMMERCE_AUTH );
-
-		return true;
+		$nonce = $request->get_param( 'state' ) ?? '';
+		/*
+		 * Check if the nonce is valid. We grab the nonce from the transient because wp_verify_nonce() in REST API call
+		 * is generated for user 0 and therefore it always returns false.
+		 */
+		return $nonce === get_transient( \PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE );
 	}
 
 
@@ -86,40 +82,40 @@ class Auth extends VendorAPI {
 	 *
 	 * @param WP_REST_Request $request The request.
 	 */
-	public function oauth_callback( WP_REST_Request $request ) {
+	public function connect_callback( WP_REST_Request $request ) {
 
-		$error_args = '';
 		$error      = $request->has_param( 'error' ) ? sanitize_text_field( $request->get_param( 'error' ) ) : '';
-		$token      = $request->get_param( 'pinterestv3_access_token' );
-		$control    = $request->get_param( 'control' );
+		$token_data = $request->get_param( 'token_data' );
 
-		if ( empty( $token ) || empty( $control ) ) {
-			$error = esc_html__( 'Empty response, please try again later.', 'pinterest-for-woocommerce' );
-		}
-
-		// Save token information.
-		if ( empty( $error ) ) {
-
-			Pinterest_For_Woocommerce()::save_token(
-				array(
-					'access_token' => sanitize_text_field( $token ),
-				)
-			);
-
-			try {
-				// Actions to perform after getting the authorization token.
-				do_action( 'pinterest_for_woocommerce_token_saved' );
-			} catch ( Throwable $th ) {
-				$error = esc_html__( 'There was an error getting the account data. Please try again later.', 'pinterest-for-woocommerce' );
-			}
-		}
-
+		// Check if there is an error.
 		if ( ! empty( $error ) ) {
-			$error_args = '&error=' . $error;
-			// Force the logs to debug the connection procedure.
-			Logger::log( wp_json_encode( $error ), 'error', null, true );
+			$this->log_error_and_redirect( $request, $error );
 		}
 
+		if ( empty( $token_data ) ) {
+			$error = esc_html__( 'Empty response, please try again later.', 'pinterest-for-woocommerce' );
+			$this->log_error_and_redirect( $request, $error );
+		}
+
+		$token_string = base64_decode( $token_data );
+		$token_data   = (array) json_decode( urldecode( $token_string ) );
+
+		Pinterest_For_Woocommerce()::save_token_data( $token_data );
+
+		try {
+			// Actions to perform after getting the authorization token.
+			do_action( 'pinterest_for_woocommerce_token_saved' );
+		} catch ( Throwable $th ) {
+			$error = esc_html__( 'There was an error getting the account data. Please try again later.', 'pinterest-for-woocommerce' );
+			$this->log_error_and_redirect( $request, $error );
+		}
+
+		exit;
+	}
+
+	public function log_error_and_redirect( WP_REST_Request $request, $error ) {
+		$error_args = '&error=' . $error;
+		Logger::log( wp_json_encode( $error ), 'error', null, true );
 		wp_safe_redirect( $this->get_redirect_url( $request->get_param( 'view' ), ! empty( $error ) ) . $error_args );
 		exit;
 	}
