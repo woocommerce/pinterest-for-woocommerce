@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.2
 Requires PHP: 7.3
-Stable tag: 1.2.19
+Stable tag: 1.2.20
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
