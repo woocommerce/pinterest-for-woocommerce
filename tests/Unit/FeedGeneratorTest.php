@@ -2,16 +2,17 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
+use ActionScheduler_Action;
+use ActionScheduler_Store;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
-use \Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
+use Automattic\WooCommerce\Pinterest\Exception\FeedFileOperationsException;
 use Automattic\WooCommerce\Pinterest\FeedFileOperations;
 use Automattic\WooCommerce\Pinterest\FeedGenerator;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Exception;
-use Pinterest_For_Woocommerce;
-use Throwable;
+use WC_Helper_Product;
 
 class FeedGeneratorTest extends \WP_UnitTestCase {
 
@@ -214,7 +215,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			->with(
 				'pinterest/jobs/generate_feed/chain_end',
 				array( array() ),
-				''
+				PINTEREST_FOR_WOOCOMMERCE_PREFIX
 			);
 
 		$this->feed_generator->handle_batch_action( 1, array() );
@@ -231,7 +232,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			->with(
 				'pinterest/jobs/generate_feed/chain_batch',
 				array( 2, array() ),
-				''
+				PINTEREST_FOR_WOOCOMMERCE_PREFIX
 			);
 
 		$this->feed_generator->handle_batch_action( 1, array() );
