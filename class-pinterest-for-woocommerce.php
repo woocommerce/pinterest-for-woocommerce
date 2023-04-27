@@ -645,7 +645,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since x.x.x
 		 *
-		 * @param array $merchant_data The array containing the merchant data to save.
+		 * @param array $connection_info_data The array containing the connection info data.
 		 * @return array
 		 */
 		public static function save_connection_info_data( $connection_info_data ) {
