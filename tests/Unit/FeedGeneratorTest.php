@@ -3,8 +3,10 @@
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
 use ActionScheduler_Action;
+use ActionScheduler_QueueRunner;
+use ActionScheduler_SimpleSchedule;
 use ActionScheduler_Store;
-use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler;
+use ActionScheduler;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
 use Automattic\WooCommerce\Pinterest\Exception\FeedFileOperationsException;
 use Automattic\WooCommerce\Pinterest\FeedFileOperations;
@@ -42,6 +44,11 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		ProductFeedStatus::set( ProductFeedStatus::STATE_PROPS );
 	}
 
+	/**
+	 * Tests feed generator registers the action scheduler failed execution hook.
+	 *
+	 * @return void
+	 */
 	public function test_init_adds_action_scheduler_failed_execution_hook() {
 		$this->feed_generator->init();
 
@@ -54,6 +61,11 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Tests feed generator registers the action scheduler shutdown hook.
+	 *
+	 * @return void
+	 */
 	public function test_init_adds_action_scheduler_unexpected_shutdown_hook() {
 		$this->feed_generator->init();
 
@@ -64,6 +76,60 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 				array( $this->feed_generator, 'handle_unexpected_shutdown' )
 			)
 		);
+	}
+
+	/**
+	 * Tests that the feed generator reschedules itself when the feed file operations fail with exception.
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function test_action_scheduler_failed_execution_hook_calls_handle_failed_execution() {
+		add_action( 'action_scheduler_failed_execution', array( $this->feed_generator, 'handle_failed_execution' ), 10, 3 );
+
+		$action = new ActionScheduler_Action(
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 1, array() ),
+			new ActionScheduler_SimpleSchedule( as_get_datetime_object( '1 day ago' ) ),
+			'pinterest_for_woocommerce'
+		);
+
+		$store = ActionScheduler::store();
+
+		// Add a callback to throw an exception when the action is processed.
+		$callback = function () {
+			throw new Exception('Action `pinterest/jobs/generate_feed/chain_batch` failed to complete.' );
+		};
+		add_action( 'pinterest/jobs/generate_feed/chain_batch', $callback, 10, 2 );
+		$action_id = $store->save_action( $action );
+		$runner      = new ActionScheduler_QueueRunner( $store );
+		$runner->run(); // Another option is to call `$runner->process_action( $action_id, '' );` directly.
+		remove_action( 'pinterest/jobs/generate_feed/chain_batch', $callback );
+
+		// Check feed generation status.
+		list(
+			'status'                    => $status,
+			'error_message'             => $error_message,
+			'feed_generation_wall_time' => $feed_generation_wall_time,
+		) = ProductFeedStatus::get();
+		$this->assertEquals( 'error', $status );
+		$this->assertEquals( 'Action `pinterest/jobs/generate_feed/chain_batch` failed to complete.', $error_message );
+		$this->assertEquals( -1, $feed_generation_wall_time );
+
+		// Check the next scheduled action.
+		$future_actions = as_get_scheduled_actions(
+			array(
+				'hook'   => 'pinterest-for-woocommerce-start-feed-generation',
+				'status' => 'pending',
+				'group'  => 'pinterest-for-woocommerce',
+			)
+		);
+
+		$this->assertCount( 1, $future_actions );
+		/** @var ActionScheduler_Action $action */
+		$action = current( $future_actions );
+		$delay_in_hours = (int) ceil( ( $action->get_schedule()->get_date()->getTimestamp() - time() ) / 3600 );
+		$this->assertEquals( 1, $delay_in_hours );
 	}
 
 	public function test_feed_generator_start_sets_product_feed_status_generation_start_time() {

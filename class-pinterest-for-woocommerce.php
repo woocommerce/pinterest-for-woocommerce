@@ -124,9 +124,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			'product_sync_enabled'             => true,
 			'enable_debug_logging'             => false,
 			'erase_plugin_data'                => false,
-
-			'feed_product_batch_size'          => Pinterest\FeedGenerator::DEFAULT_PRODUCT_BATCH_SIZE,
-			'feed_product_batch_attempt'       => 1,
 		);
 
 		/**
@@ -571,6 +568,20 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			return self::save_settings( $settings, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 		}
 
+		/**
+		 * Remove APP Data key.
+		 *
+		 * @param string $key - The key of specific data to retrieve.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return bool - True if the data was removed, false otherwise.
+		 */
+		public static function remove_data( string $key ) {
+			$settings = self::get_settings( true, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+			unset( $settings[ $key ] );
+			return self::save_settings( $settings, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+		}
 
 		/**
 		 * Add API endpoints

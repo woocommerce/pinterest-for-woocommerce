@@ -172,8 +172,11 @@ class FeedGenerator extends AbstractChainedJob {
 		);
 
 		// Decrease the number of products to retry.
-		$limit = (int) ceil( $this->get_batch_size() / ( Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) + 1 ) );
+		$attempt = ( Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) ?? 1 ) + 1;
+		$limit   = (int) ceil( $this->get_batch_size() / $attempt );
 		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', $limit );
+		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_attempt', $attempt );
+
 		self::log(
 			sprintf(
 				// Translators: 1: Action Scheduler hook name, 2: New products number to process next action run.
@@ -187,10 +190,6 @@ class FeedGenerator extends AbstractChainedJob {
 		);
 
 		// Register retry attempt.
-		Pinterest_For_Woocommerce::save_data(
-			'feed_product_batch_attempt',
-			Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) + 1
-		);
 		$this->action_scheduler->schedule_immediate( $hook, $args, PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 	}
 
@@ -214,27 +213,7 @@ class FeedGenerator extends AbstractChainedJob {
 			return;
 		}
 
-		ProductFeedStatus::set(
-			[
-				'status'        => 'error',
-				'error_message' => $throwable->getMessage(),
-			]
-		);
-		ProductFeedStatus::mark_feed_file_generation_as_failed();
-		$this->schedule_next_generator_start( time() + self::WAIT_ON_ERROR_BEFORE_RETRY );
-
-		self::log(
-			sprintf(
-				// Translators: 1: Action Scheduler hook name, 2: Error message about why action has failed to execute.
-				__(
-					'Feed Generator `%1$s` Action failed to execute due to an error thrown `%2$s.`. A complete feed generation retry has been scheduled.',
-					'pinterest-for-woocommerce'
-				),
-				$hook,
-				$throwable->getMessage()
-			),
-			\WC_Log_Levels::ERROR
-		);
+		$this->handle_error( $throwable, $hook );
 	}
 
 	/**
@@ -291,7 +270,7 @@ class FeedGenerator extends AbstractChainedJob {
 			);
 			$this->feed_file_operations->prepare_temporary_files();
 		} catch ( Throwable $th ) {
-			$this->handle_error( $th );
+			$this->handle_error( $th, $this->get_action_full_name( self::CHAIN_START ) );
 			throw $th;
 		}
 	}
@@ -314,8 +293,8 @@ class FeedGenerator extends AbstractChainedJob {
 		 *   - Reset number of products per batch.
 		 *   - Reset action retries counter.
 		 */
-		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', self::DEFAULT_PRODUCT_BATCH_SIZE );
-		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_attempt', 1 );
+		Pinterest_For_Woocommerce::remove_data( 'feed_product_batch_size' );
+		Pinterest_For_Woocommerce::remove_data( 'feed_product_batch_attempt' );
 	}
 
 	/**
@@ -339,7 +318,7 @@ class FeedGenerator extends AbstractChainedJob {
 			);
 			ProductFeedStatus::set_feed_file_generation_time( time() );
 		} catch ( Throwable $th ) {
-			$this->handle_error( $th );
+			$this->handle_error( $th, $this->get_action_full_name( self::CHAIN_END ) );
 			throw $th;
 		}
 		self::log( __( 'Feed generated successfully.', 'pinterest-for-woocommerce' ) );
@@ -525,12 +504,14 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
-	 * React to errors during feed files generation process.
+	 * @param Throwable $th - An exception that was thrown.
+	 * @param string    $hook_name - The name of the hook that was being executed when the exception was thrown.
 	 *
 	 * @since 1.0.10
-	 * @param Throwable $th Exception handled.
+	 *
+	 * @return void
 	 */
-	private function handle_error( $th ) {
+	private function handle_error( Throwable $th, string $hook_name = '' ) {
 		ProductFeedStatus::set(
 			array(
 				'status'        => 'error',
@@ -539,7 +520,19 @@ class FeedGenerator extends AbstractChainedJob {
 		);
 		ProductFeedStatus::mark_feed_file_generation_as_failed();
 
-		self::log( $th->getMessage(), 'error' );
+		self::log(
+			sprintf(
+				// Translators: 1: Action Scheduler hook name, 2: Error message about why action has failed to execute.
+				__(
+					'Feed Generator `%1$s` Action failed to execute due to an error thrown `%2$s.`. A complete feed generation retry has been scheduled.',
+					'pinterest-for-woocommerce'
+				),
+				$hook_name,
+				$th->getMessage()
+			),
+			\WC_Log_Levels::ERROR
+		);
+
 		$this->schedule_next_generator_start( time() + self::WAIT_ON_ERROR_BEFORE_RETRY );
 	}
 
@@ -585,10 +578,13 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Get the job's batch size.
 	 *
-	 * @return int
+	 * @return int - The number of products to process per batch.
 	 */
 	protected function get_batch_size(): int {
-		return Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) ?? self::DEFAULT_PRODUCT_BATCH_SIZE;
+		return Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) ?? apply_filters(
+				PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_feed_product_batch_size',
+				self::DEFAULT_PRODUCT_BATCH_SIZE
+			);
 	}
 
 	/**
