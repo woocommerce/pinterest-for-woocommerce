@@ -4,11 +4,9 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
 use ActionScheduler_Action;
 use ActionScheduler_QueueRunner;
-use ActionScheduler_SimpleSchedule;
 use ActionScheduler_Store;
 use ActionScheduler;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
-use Automattic\WooCommerce\Pinterest\Exception\FeedFileOperationsException;
 use Automattic\WooCommerce\Pinterest\FeedFileOperations;
 use Automattic\WooCommerce\Pinterest\FeedGenerator;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
@@ -202,6 +200,33 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$this->assertNull( Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
 		$this->assertNull( Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) );
+	}
+
+	/**
+	 * Tests handler does nothing if the action is not found.
+	 *
+	 * @return void
+	 */
+	public function test_handle_failed_execution_does_nothing_if_a_different_action() {
+		$store     = ActionScheduler::store();
+		$action_id = as_schedule_single_action(
+			gmdate( 'U' ) - 1,
+			'pinterest/jobs/generate_feed/chain_batch_foo',
+			array( 1, array() ),
+			'pinterest-for-woocommerce'
+		);
+		$store->mark_failure( $action_id );
+
+		$this->feed_generator->handle_failed_execution( $action_id, new Exception( 'Some error msg.' ), '' );
+
+		$pending_actions = as_get_scheduled_actions(
+			[
+				'hook'   => 'pinterest/jobs/generate_feed/chain_batch_foo',
+				'status' => 'pending',
+			]
+		);
+
+		$this->assertCount( 0, $pending_actions );
 	}
 
 	/**
