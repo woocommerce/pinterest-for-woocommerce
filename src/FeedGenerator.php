@@ -582,9 +582,9 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	protected function get_batch_size(): int {
 		return Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) ?? apply_filters(
-				PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_feed_product_batch_size',
-				self::DEFAULT_PRODUCT_BATCH_SIZE
-			);
+			PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_feed_product_batch_size',
+			self::DEFAULT_PRODUCT_BATCH_SIZE
+		);
 	}
 
 	/**
