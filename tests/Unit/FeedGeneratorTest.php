@@ -14,6 +14,7 @@ use Automattic\WooCommerce\Pinterest\FeedGenerator;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Exception;
+use Pinterest_For_Woocommerce;
 use WC_Helper_Product;
 
 class FeedGeneratorTest extends \WP_UnitTestCase {
@@ -79,6 +80,131 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests feed generator does not reschedule other than pinterest feed generation actions.
+	 *
+	 * @return void
+	 */
+	public function test_handle_unexpected_shutdown_does_nothing_if_not_a_timeout_error() {
+		$action_id = as_schedule_single_action(
+			gmdate( 'U' ) - 1,
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 1, array() ),
+			'pinterest-for-woocommerce'
+		);
+
+		$this->action_scheduler->expects( $this->never() )
+			->method( 'schedule_immediate' );
+
+		$error = array(
+			'type'    => E_ERROR,
+			'message' => 'A non timeout error',
+		);
+		$this->feed_generator->handle_unexpected_shutdown( $action_id, $error );
+	}
+
+	/**
+	 * Tests feed generator does nothing if the action is not found.
+	 *
+	 * @return void
+	 */
+	public function test_handle_unexpected_shutdown_does_nothing_if_timeout_but_not_a_different_action() {
+		$action_id = as_schedule_single_action(
+			gmdate( 'U' ) - 1,
+			'pinterest/jobs/generate_feed/chain_batch_foo',
+			array( 1, array() ),
+			'pinterest-for-woocommerce'
+		);
+
+		$this->action_scheduler->expects( $this->never() )
+			->method( 'schedule_immediate' );
+
+		$error = array(
+			'type'    => E_ERROR,
+			'message' => 'A non timeout error',
+		);
+		$this->feed_generator->handle_unexpected_shutdown( $action_id, $error );
+	}
+
+	/**
+	 * Tests feed generator does throttle product number when rescheduling the action.
+	 *
+	 * @return void
+	 */
+	public function test_handle_unexpected_shutdown_does_throttle_product_number_when_rescheduling_the_action() {
+		$action_id = as_schedule_single_action(
+			gmdate( 'U' ) - 1,
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 1, array() ),
+			'pinterest-for-woocommerce'
+		);
+
+		$this->action_scheduler->expects( $this->exactly( 2 ) )
+			->method( 'schedule_immediate' )
+			->with(
+				'pinterest/jobs/generate_feed/chain_batch',
+				array( 1, array() ),
+				'pinterest-for-woocommerce'
+			);
+		$this->action_scheduler->method( 'search' )
+			->willReturn( array() );
+
+		$error = array(
+			'type'    => E_ERROR,
+			'message' => 'Maximum execution time',
+		);
+		$this->feed_generator->handle_unexpected_shutdown( $action_id, $error );
+
+		$this->assertEquals( 50, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
+		$this->assertEquals( 2, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) );
+
+		$this->feed_generator->handle_unexpected_shutdown( $action_id, $error );
+
+		$this->assertEquals( 17, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
+		$this->assertEquals( 3, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) );
+	}
+
+	/**
+	 * Tests if the feed generator reschedules the action if the failure threshold is not met.
+	 *
+	 * @return void
+	 */
+	public function test_handle_unexpected_shutdown_does_not_reschedule_the_action_if_failure_threshold_met() {
+		$this->action_scheduler->expects( $this->never() )
+			->method( 'schedule_immediate' );
+		// We do not care about the content, but we must return the number of elements in array.
+		$this->action_scheduler->method( 'search' )
+			->willReturn( array_fill( 0, 3, 1 ) );
+
+		$action_id = as_schedule_single_action(
+			gmdate( 'U' ) - 1,
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 1, array() ),
+			'pinterest-for-woocommerce'
+		);
+
+		$error = array(
+			'type'    => E_ERROR,
+			'message' => 'Maximum execution time',
+		);
+		$this->feed_generator->handle_unexpected_shutdown( $action_id, $error );
+	}
+
+	/**
+	 * Tests if a successfully executed action resets the batch size and batch attempts data key values.
+	 *
+	 * @return void
+	 */
+	public function test_successful_action_execution_resets_batch_size_and_batch_attempts_data_key_values() {
+		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', 345 );
+		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_attempt', 15239 );
+
+		$this->feed_generator->handle_batch_action( 1, array() );
+
+		$this->assertNull( Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
+		$this->assertNull( Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) );
+	}
+
+	/**
 	 * Tests that the feed generator reschedules itself when the feed file operations fail with exception.
 	 *
 	 * @return void
@@ -96,7 +222,12 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		};
 		add_action( 'pinterest/jobs/generate_feed/chain_batch', $callback, 10, 2 );
 
-		as_schedule_single_action( gmdate( 'U' ) - 1, 'pinterest/jobs/generate_feed/chain_batch', array( 1, array() ), 'pinterest_for_woocommerce' );
+		as_schedule_single_action(
+			gmdate( 'U' ) - 1,
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 1, array() ),
+			'pinterest-for-woocommerce'
+		);
 
 		$runner->run();
 
@@ -286,7 +417,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	public function test_handle_batch_action_queues_next_batch_when_there_are_items_to_process() {
-		\WC_Helper_Product::create_simple_product();
+		WC_Helper_Product::create_simple_product();
 
 		$this->action_scheduler
 			->expects( $this->once() )

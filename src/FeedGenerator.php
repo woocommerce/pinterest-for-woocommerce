@@ -18,7 +18,6 @@ use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerIn
 use Automattic\WooCommerce\Pinterest\Exception\FeedFileOperationsException;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
 use ActionScheduler;
-use Error;
 use Exception;
 use Pinterest_For_Woocommerce;
 use Throwable;
@@ -681,7 +680,6 @@ class FeedGenerator extends AbstractChainedJob {
 			)
 		);
 	}
-
 
 	/**
 	 * Set the store address as taxable location.
