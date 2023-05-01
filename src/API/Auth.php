@@ -44,7 +44,7 @@ class Auth extends VendorAPI {
 	 * @return boolean
 	 */
 	public function permissions_check( WP_REST_Request $request ) {
-		return true;
+
 		$nonce = $request->get_param( 'state' ) ?? '';
 
 		/*
