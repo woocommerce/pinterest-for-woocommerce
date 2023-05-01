@@ -4,7 +4,6 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
 use ActionScheduler_Action;
 use ActionScheduler_QueueRunner;
-use ActionScheduler_Store;
 use ActionScheduler;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
 use Automattic\WooCommerce\Pinterest\FeedFileOperations;
