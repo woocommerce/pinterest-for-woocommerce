@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.2.21 - 2023-05-02 =
+* Tweak - WC 7.7 compatibility.
+
 = 1.2.20 - 2023-04-26 =
 * Fix - Unescaped `add_query_arg` function calls.
 
