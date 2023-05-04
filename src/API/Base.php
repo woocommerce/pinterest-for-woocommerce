@@ -91,25 +91,8 @@ class Base {
 		}
 
 		try {
-			$api         = empty( $api ) ? '' : trailingslashit( $api );
-			$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
 
-			$request = array(
-				'url'     => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
-				'method'  => $method,
-				'args'    => $payload,
-				'headers' => array(
-					'Pinterest-Woocommerce-Version' => PINTEREST_FOR_WOOCOMMERCE_VERSION,
-				),
-			);
-
-			if ( 'ads/' === $api && in_array( $method, array( 'POST', 'PATCH' ), true ) ) {
-				// Force json content-type header and json encode payload.
-				$request['headers']['Content-Type'] = 'application/json';
-
-				$request['args'] = wp_json_encode( $payload );
-			}
-
+			$request  = self::prepare_request( $endpoint, $method, $payload, $api );
 			$response = self::handle_request( $request );
 
 			if ( ! empty( $cache_expiry ) ) {
@@ -163,6 +146,39 @@ class Base {
 			throw $e;
 		}
 
+	}
+
+	/**
+	 * Prepare request
+	 *
+	 * @param string $endpoint        the endpoint to perform the request on.
+	 * @param string $method          eg, POST, GET, PUT etc.
+	 * @param array  $payload         Payload to be sent on the request's body.
+	 * @param string $api             The specific Endpoints subset.
+	 *
+	 * @return array
+	 */
+	public static function prepare_request( $endpoint, $method = 'POST', $payload = array(), $api = '' ) {
+		$api         = empty( $api ) ? '' : trailingslashit( $api );
+		$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
+
+		$request = array(
+			'url'     => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
+			'method'  => $method,
+			'args'    => $payload,
+			'headers' => array(
+				'Pinterest-Woocommerce-Version' => PINTEREST_FOR_WOOCOMMERCE_VERSION,
+			),
+		);
+
+		if ( 'ads/' === $api && in_array( $method, array( 'POST', 'PATCH' ), true ) ) {
+			// Force json content-type header and json encode payload.
+			$request['headers']['Content-Type'] = 'application/json';
+
+			$request['args'] = wp_json_encode( $payload );
+		}
+
+		return $request;
 	}
 
 	/**
