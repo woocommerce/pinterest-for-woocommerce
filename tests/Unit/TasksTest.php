@@ -52,16 +52,16 @@ class TasksTest extends WP_UnitTestCase {
 		// Assert that the task is not completed.
 		$task        = TaskLists::get_task( 'setup-pinterest' );
 		$is_complete = $task->is_complete();
-		
+
 		$this->assertFalse( $is_complete, 'Cannot assert task not completed.' );
 
-		// Setup complete data. 
+		// Setup complete data.
 		$account_data = array(
 			'is_any_website_verified' => true,
 			'is_partner'              => true,
 		);
 		\Pinterest_For_Woocommerce::save_setting( 'account_data', $account_data );
-		\Pinterest_For_Woocommerce::save_token(
+		\Pinterest_For_Woocommerce::save_token_data(
 			array(
 				'access_token' => 'some-fake-access-token',
 			)

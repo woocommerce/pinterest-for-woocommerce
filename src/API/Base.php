@@ -320,7 +320,7 @@ class Base {
 	 */
 	public static function get_token() {
 		if ( is_null( self::$token ) ) {
-			self::$token = Pinterest_For_Woocommerce()::get_token();
+			self::$token = Pinterest_For_Woocommerce()::get_access_token();
 		}
 
 		return self::$token;

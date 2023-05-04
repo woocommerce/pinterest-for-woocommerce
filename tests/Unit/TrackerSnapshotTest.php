@@ -60,7 +60,7 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 
 	public function test_extension_connection_status_is_tracked_as_yes_if_opt_in() {
 		Pinterest_For_Woocommerce::save_settings( self::$default_settings );
-		Pinterest_For_Woocommerce::save_token(
+		Pinterest_For_Woocommerce::save_token_data(
 			array(
 				'access_token' => 'some-fake-access-token',
 			)
