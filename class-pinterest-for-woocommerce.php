@@ -191,7 +191,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			define( 'PINTEREST_FOR_WOOCOMMERCE_DATA_NAME', 'pinterest_for_woocommerce_data' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.com/' );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE', 'pinterestv3native' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE', 'pinterestv5' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE', 'pinterest' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_VERSION', '1' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT', 'oauth/callback' );
@@ -803,18 +803,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_middleware_url( $context = 'login', $args = array() ) {
 
-			$control_key = uniqid();
-			$view        = is_null( $args['view'] ) ? 'settings' : $args['view'];
-			$rest_url    = get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT );
+			$nonce    = wp_create_nonce( 'pinterest_login' );
+			$rest_url = get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT );
 
 			$state_params = array(
-				'redirect' => add_query_arg(
-					array(
-						'control' => $control_key,
-						'view'    => $view,
-					),
-					$rest_url
-				),
+				'redirect' => $rest_url,
+				'nonce'    => $nonce,
 			);
 
 			switch ( $context ) {
@@ -828,9 +822,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$state = http_build_query( $state_params );
 
-			set_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
-
-			return esc_url( self::get_connection_proxy_url() . 'login/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state );
+			return self::get_connection_proxy_url() . 'connect/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
 		}
 
 
