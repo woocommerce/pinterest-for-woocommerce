@@ -267,29 +267,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	protected function process_items( array $items, array $args ) {
 		try {
-			// Get included product types.
-			$included_product_types = array_diff(
-				self::get_included_product_types(),
-				self::get_excluded_product_types(),
-			);
-
-			$products_query_args = array(
-				'type'       => $included_product_types,
-				'include'    => $items,
-				'visibility' => 'catalog',
-				'orderby'    => 'none',
-				'limit'      => $this->get_batch_size(),
-			);
-
-			// Exclude variation subscriptions.
-			$products_query_args['parent_exclude'] = $this->get_excluded_products_by_parent();
-
-			// Do not sync out of stock products if woocommerce_hide_out_of_stock_items is set.
-			if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) ) {
-				$products_query_args['stock_status'] = 'instock';
-			}
-
-			$products = wc_get_products( $products_query_args );
+			$products = $this->get_feed_products( $items );
 
 			$this->prepare_feed_buffers();
 
@@ -321,6 +299,41 @@ class FeedGenerator extends AbstractChainedJob {
 		);
 		/* translators: number of products */
 		self::log( sprintf( __( 'Feed batch generated. Wrote %s products to the feed file.', 'pinterest-for-woocommerce' ), count( $products ) ) );
+	}
+
+	/**
+	 * Returns WC products by product ids. Products returned are of either `in stock` or `on backorder` statuses.
+	 *
+	 * @since 1.2.19
+	 *
+	 * @param int[] $ids - array of product ids.
+	 *
+	 * @return array|\stdClass
+	 */
+	public function get_feed_products( array $ids ) {
+		// Get included product types.
+		$included_product_types = array_diff(
+			self::get_included_product_types(),
+			self::get_excluded_product_types(),
+		);
+
+		$products_query_args = array(
+			'type'       => $included_product_types,
+			'include'    => $ids,
+			'visibility' => 'catalog',
+			'orderby'    => 'none',
+			'limit'      => $this->get_batch_size(),
+		);
+
+		// Exclude variation subscriptions.
+		$products_query_args['parent_exclude'] = $this->get_excluded_products_by_parent();
+
+		// Do not sync out of stock products which do not support backorders if woocommerce_hide_out_of_stock_items is set.
+		if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) ) {
+			$products_query_args['stock_status'] = [ 'instock', 'onbackorder' ];
+		}
+
+		return wc_get_products( $products_query_args );
 	}
 
 	/**

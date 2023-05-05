@@ -174,6 +174,8 @@ class Merchants {
 
 		$merchant_id = $response['data'];
 
+		Feeds::invalidate_get_merchant_feeds_cache( $merchant_id, true );
+
 		try {
 			$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( $response['data'] );
 		} catch ( Throwable $th ) {
@@ -186,7 +188,6 @@ class Merchants {
 		// Update the registered feed id setting.
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $feed_id );
 
-		Feeds::invalidate_get_merchant_feeds_cache( $merchant_id, true );
 		return array(
 			'merchant_id' => $merchant_id,
 			'feed_id'     => $feed_id,

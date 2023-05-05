@@ -21,11 +21,18 @@ export const useSettingsDispatch = ( saveToDb = false ) => {
 	return ( data ) => updateSettings( data, saveToDb );
 };
 
+export const useSyncSettingsDispatch = () => {
+	const { syncSettings } = useDispatch( SETTINGS_STORE_NAME );
+
+	return () => syncSettings();
+};
+
 export const useCreateNotice = () => {
 	const { createNotice } = useDispatch( 'core/notices' );
 
 	return useCallback(
-		( type, message ) => message && createNotice( type, message ),
+		( type, message, options = {} ) =>
+			message && createNotice( type, message, options ),
 		[ createNotice ]
 	);
 };

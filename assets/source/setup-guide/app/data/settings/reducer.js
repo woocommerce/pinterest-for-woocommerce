@@ -7,6 +7,7 @@ const settingsReducer = (
 	state = {
 		settings: {},
 		isUpdating: false,
+		isSyncing: false,
 		requestingErrors: {},
 	},
 	action
@@ -25,6 +26,12 @@ const settingsReducer = (
 			state = {
 				...state,
 				isUpdating: action.isUpdating,
+			};
+			break;
+		case TYPES.SET_IS_SYNCING:
+			state = {
+				...state,
+				isSyncing: action.isSyncing,
 			};
 			break;
 		case TYPES.SET_REQUESTING_ERROR:

@@ -86,9 +86,11 @@ class SaveToPinterest {
 		 */
 		return sprintf(
 			'<div class="pinterest-for-woocommerce-image-wrapper"><a data-pin-do="buttonPin" href="%s"></a></div>',
-			add_query_arg(
-				$attributes,
-				'https://www.pinterest.com/pin/create/button/'
+			esc_url(
+				add_query_arg(
+					$attributes,
+					'https://www.pinterest.com/pin/create/button/'
+				)
 			)
 		);
 	}

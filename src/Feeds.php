@@ -121,13 +121,13 @@ class Feeds {
 	public static function match_local_feed_configuration_to_registered_feeds( $merchant_id ) {
 		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
 		$config        = reset( $configs );
-		$local_path    = dirname( $config['feed_url'] );
+		$local_path    = $config['feed_url'];
 		$local_country = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
 		$local_locale  = LocaleMapper::get_locale_for_api();
 		$feeds         = self::get_merchant_feeds( $merchant_id );
 
 		foreach ( $feeds as $feed ) {
-			$configured_path = dirname( $feed->location_config->full_feed_fetch_location );
+			$configured_path = $feed->location_config->full_feed_fetch_location;
 			if (
 				$configured_path === $local_path &&
 				$local_country === $feed->country &&
