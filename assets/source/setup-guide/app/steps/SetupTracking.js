@@ -45,6 +45,7 @@ import documentationLinkProps from '../helpers/documentation-link-props';
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
+ * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'automatic-enhanced-match', context: 'wizard'|'settings' }`
  *
  * @fires wcadmin_pfw_setup with `{ target: 'complete', trigger: 'setup-tracking-complete' }` when "Complete setup" button is clicked.
  * @fires wcadmin_pfw_setup with `{ target: 'fetch-tags' | 'fetch-advertisers', trigger: 'setup-tracking-try-again' }` when "Try again" button is clicked.
@@ -290,7 +291,8 @@ const SetupTracking = ( { view = 'settings' } ) => {
 		try {
 			const result = await connectAdvertiser(
 				appSettings.tracking_advertiser,
-				appSettings.tracking_tag
+				appSettings.tracking_tag,
+				true
 			);
 
 			if ( result ) {
@@ -351,19 +353,37 @@ const SetupTracking = ( { view = 'settings' } ) => {
 						}
 						description={
 							<>
-								{ __(
-									'The Pinterest tag is a piece of JavaScript code you put on your website to gather conversion insights and build audiences to target based on actions people have taken on your site.',
-									'pinterest-for-woocommerce'
+								{ createInterpolateElement(
+									__(
+										'The <linkTag>Pinterest tag</linkTag> is a piece of JavaScript code you put on your website to gather conversion insights and build audiences to target based on actions people have taken on your site.',
+										'pinterest-for-woocommerce'
+									),
+									{
+										linkTag: (
+											<Button
+												isLink
+												{ ...documentationLinkProps( {
+													href:
+														wcSettings
+															.pinterest_for_woocommerce
+															.pinterestLinks
+															.installTag,
+													linkId: 'install-tag',
+													context: view,
+												} ) }
+											></Button>
+										),
+									}
 								) }
 								<br />
 								<br />
 								{ createInterpolateElement(
 									__(
-										'Using conversion tags means you agree to our <buttonGuidelines>Ad Guidelines</buttonGuidelines> and <buttonTerms>Ad Data Terms</buttonTerms>',
+										'Using conversion tags means you agree to our <linkGuidelines>Ad Guidelines</linkGuidelines> and <linkTerms>Ad Data Terms</linkTerms>.',
 										'pinterest-for-woocommerce'
 									),
 									{
-										buttonGuidelines: (
+										linkGuidelines: (
 											<Button
 												isLink
 												{ ...documentationLinkProps( {
@@ -375,9 +395,9 @@ const SetupTracking = ( { view = 'settings' } ) => {
 													linkId: 'ad-guidelines',
 													context: view,
 												} ) }
-											/>
+											></Button>
 										),
-										buttonTerms: (
+										linkTerms: (
 											<Button
 												isLink
 												{ ...documentationLinkProps( {
@@ -389,19 +409,37 @@ const SetupTracking = ( { view = 'settings' } ) => {
 													linkId: 'ad-data-terms',
 													context: view,
 												} ) }
-											/>
+											></Button>
+										),
+									}
+								) }
+								<br />
+								<br />
+								{ createInterpolateElement(
+									__(
+										'<linkAem>Automatic Enhanced Match</linkAem> is enabled by default to match more of your website visitors and conversions to people on Pinterest. You can manage this in Settings.',
+										'pinterest-for-woocommerce'
+									),
+									{
+										linkAem: (
+											<Button
+												isLink
+												{ ...documentationLinkProps( {
+													href:
+														wcSettings
+															.pinterest_for_woocommerce
+															.pinterestLinks
+															.automaticEnhancedMatch,
+													linkId:
+														'automatic-enhanced-match',
+													context: view,
+												} ) }
+											></Button>
 										),
 									}
 								) }
 							</>
 						}
-						readMore={ documentationLinkProps( {
-							href:
-								wcSettings.pinterest_for_woocommerce
-									.pinterestLinks.installTag,
-							linkId: 'install-tag',
-							context: view,
-						} ) }
 					/>
 					{ view === 'wizard' && <AdsCreditsPromo /> }
 				</div>

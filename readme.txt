@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.2
 Requires PHP: 7.3
-Stable tag: 1.2.16
+Stable tag: 1.2.21
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,27 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.2.21 - 2023-05-02 =
+* Tweak - WC 7.7 compatibility.
+
+= 1.2.20 - 2023-04-26 =
+* Fix - Unescaped `add_query_arg` function calls.
+
+= 1.2.19 - 2023-04-18 =
+* Fix - Escape product name for JS tracker.
+* Fix - On backorder items missing from the feed.
+* Fix - When a new feed configuration is created it should be updated in the pinterest.com config.
+
+= 1.2.18 - 2023-04-11 =
+* Add - Automatic enhanced match support.
+* Add - Support to sync setting changes from Pinterest to the plugin.
+* Fix - Fatal error if cart is not set.
+
+= 1.2.17 - 2023-04-05 =
+* Add - Enhanced match documentation link.
+* Tweak - WC 7.6 compatibility.
+* Update - Merchant disapproval reasons.
 
 = 1.2.16 - 2023-03-21 =
 * Fix - Undefined variable when caching API requests.

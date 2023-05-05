@@ -115,14 +115,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.0.0
 		 */
 		protected static $default_settings = array(
-			'track_conversions'      => true,
-			'enhanced_match_support' => true,
-			'save_to_pinterest'      => true,
-			'rich_pins_on_posts'     => true,
-			'rich_pins_on_products'  => true,
-			'product_sync_enabled'   => true,
-			'enable_debug_logging'   => false,
-			'erase_plugin_data'      => false,
+			'track_conversions'                => true,
+			'enhanced_match_support'           => true,
+			'automatic_enhanced_match_support' => true,
+			'save_to_pinterest'                => true,
+			'rich_pins_on_posts'               => true,
+			'rich_pins_on_products'            => true,
+			'product_sync_enabled'             => true,
+			'enable_debug_logging'             => false,
+			'erase_plugin_data'                => false,
 		);
 
 		/**
@@ -593,6 +594,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			new Pinterest\API\Tags();
 			new Pinterest\API\HealthCheck();
 			new Pinterest\API\Options();
+			new Pinterest\API\SyncSettings();
 			new Pinterest\API\UserInteraction();
 		}
 
@@ -836,7 +838,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			set_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
 
-			return self::get_connection_proxy_url() . 'login/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
+			return esc_url( self::get_connection_proxy_url() . 'login/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state );
 		}
 
 

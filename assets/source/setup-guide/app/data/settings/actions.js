@@ -40,6 +40,13 @@ export function setIsUpdating( isUpdating ) {
 	};
 }
 
+export function setIsSyncing( isSyncing ) {
+	return {
+		type: TYPES.SET_IS_SYNCING,
+		isSyncing,
+	};
+}
+
 /**
  * Update the settings in the store or in DB
  *
@@ -73,6 +80,29 @@ export function* updateSettings( data, saveToDb = false ) {
 		return { success: results[ OPTIONS_NAME ] };
 	} catch ( error ) {
 		yield setUpdatingError( error );
+		throw error;
+	}
+}
+
+export function* syncSettings() {
+	yield setIsSyncing( true );
+
+	try {
+		const results = yield apiFetch( {
+			path:
+				wcSettings.pinterest_for_woocommerce.apiRoute +
+				'/sync_settings/',
+			method: 'GET',
+		} );
+
+		if ( results.success ) {
+			yield receiveSettings( results.synced_settings );
+		}
+
+		yield setIsSyncing( false );
+		return { success: results.success };
+	} catch ( error ) {
+		yield setIsSyncing( false );
 		throw error;
 	}
 }
