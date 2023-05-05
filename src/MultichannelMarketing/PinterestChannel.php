@@ -216,7 +216,7 @@ class PinterestChannel implements MarketingChannelInterface {
 						(string) $campaign_data['id'],
 						$this->campaign_types['pinterest-ad-campaign'],
 						$campaign_data['name'],
-						sprintf('https://ads.pinterest.com/advertiser/%s/reporting/adgroups/?campaignIds=[%s]', $advertiser_id, $campaign_data['id'] ),
+						sprintf( 'https://ads.pinterest.com/advertiser/%s/reporting/adgroups/?campaignIds=[%s]', $advertiser_id, $campaign_data['id'] ),
 						$cost,
 					);
 				},
