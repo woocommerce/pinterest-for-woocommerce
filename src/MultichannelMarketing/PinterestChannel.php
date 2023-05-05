@@ -11,9 +11,12 @@ namespace Automattic\WooCommerce\Pinterest\MultichannelMarketing;
 use Automattic\WooCommerce\Admin\Marketing\MarketingCampaign;
 use Automattic\WooCommerce\Admin\Marketing\MarketingCampaignType;
 use Automattic\WooCommerce\Admin\Marketing\MarketingChannelInterface;
+use Automattic\WooCommerce\Admin\Marketing\Price;
+use Automattic\WooCommerce\Pinterest\API\Base;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\FeedStatusService;
+use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Automattic\WooCommerce\Pinterest\ProductSync;
 
@@ -30,6 +33,18 @@ class PinterestChannel implements MarketingChannelInterface {
 	 * @var PinterestChannel|null Instance object.
 	 */
 	private static $instance = null;
+
+	/**
+	 * @var MarketingCampaignType[]
+	 */
+	protected $campaign_types;
+
+	/**
+	 * PinterestChannel constructor.
+	 */
+	public function __construct() {
+		$this->campaign_types = $this->generate_campaign_types();
+	}
 
 	/**
 	 * Singleton initialization and instance fetching method.
@@ -158,8 +173,7 @@ class PinterestChannel implements MarketingChannelInterface {
 	 * @return MarketingCampaignType[] Array of marketing campaign type objects.
 	 */
 	public function get_supported_campaign_types(): array {
-		// TODO: Implement get_supported_campaign_types() method.
-		return array();
+		return $this->campaign_types;
 	}
 
 	/**
@@ -168,8 +182,50 @@ class PinterestChannel implements MarketingChannelInterface {
 	 * @return MarketingCampaign[]
 	 */
 	public function get_campaigns(): array {
-		// TODO: Implement get_campaigns() method.
-		return array();
+		if ( ! $this->is_setup_completed() ) {
+			return array();
+		}
+		$advertiser_id = $this->get_advertiser_id();
+		if ( ! $advertiser_id ) {
+			return array();
+		}
+
+		try {
+			$response = Base::get_active_campaigns( $advertiser_id );
+			if ( 'success' !== $response['status'] ) {
+				return array();
+			}
+
+			$currency = $this->get_advertiser_currency();
+
+			return array_map(
+				function ( array $campaign_data ) use ( $currency, $advertiser_id ) {
+					$spend_cap = null;
+					if ( $campaign_data['daily_spend_cap'] ) {
+						$spend_cap = $campaign_data['daily_spend_cap'];
+					} elseif ( $campaign_data['lifetime_spend_cap'] ) {
+						$spend_cap = $campaign_data['lifetime_spend_cap'];
+					}
+
+					$cost = null;
+					if ( $spend_cap ) {
+						$cost = new Price( (string) $spend_cap, $currency );
+					}
+
+					return new MarketingCampaign(
+						(string) $campaign_data['id'],
+						$this->campaign_types['pinterest-ad-campaign'],
+						$campaign_data['name'],
+						sprintf('https://ads.pinterest.com/advertiser/%s/reporting/adgroups/?campaignIds=[%s]', $advertiser_id, $campaign_data['id'] ),
+						$cost,
+					);
+				},
+				(array) $response['data']
+			);
+		} catch ( PinterestApiException $e ) {
+			return array();
+		}
+
 	}
 
 	/**
@@ -258,5 +314,62 @@ class PinterestChannel implements MarketingChannelInterface {
 		}
 
 		return $status;
+	}
+
+	/**
+	 * Generate an array of supported marketing campaign types.
+	 *
+	 * @return MarketingCampaignType[]
+	 */
+	private function generate_campaign_types(): array {
+		$advertiser_id = $this->get_advertiser_id();
+		if ( ! $advertiser_id ) {
+			return array();
+		}
+
+		return [
+			'pinterest-ad-campaign' => new MarketingCampaignType(
+				'pinterest-ad-campaign',
+				$this,
+				'Pinterest Ad Campaign',
+				'Use Pinterest ads to reach shoppers when they\'re actively looking for new ideas.',
+				sprintf( 'https://ads.pinterest.com/advertiser/%s/ads/campaign_mode/', $advertiser_id ),
+				$this->get_icon_url()
+			),
+		];
+	}
+
+	/**
+	 * Get advertiser currency. If we can't get the currency, return the store currency.
+	 *
+	 * @return string The advertiser currency. e.g. USD, EUR, etc.
+	 */
+	private function get_advertiser_currency(): string {
+		$store_currency = get_woocommerce_currency();
+
+		$advertiser_id = $this->get_advertiser_id();
+		if ( ! $advertiser_id ) {
+			return $store_currency;
+		}
+		try {
+			$response = Base::get_advertiser( $advertiser_id );
+			if ( 'success' !== $response['status'] ) {
+				// If we can't get the currency, return the store currency.
+				return $store_currency;
+			}
+
+			return $response['data']['currency'];
+		} catch ( PinterestApiException $e ) {
+			return $store_currency;
+		}
+	}
+
+	/**
+	 * Get the advertiser ID.
+	 *
+	 * @return string|null The advertiser ID.
+	 */
+	private function get_advertiser_id(): ?string {
+		return Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' ) ? (string) Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' ) : null;
 	}
 }
