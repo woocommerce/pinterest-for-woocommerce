@@ -268,6 +268,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'init', array( Pinterest\TrackerSnapshot::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\Billing::class, 'schedule_event' ) );
 			add_action( 'init', array( Pinterest\AdCredits::class, 'schedule_event' ) );
+			add_action( 'init', array( Pinterest\RefreshToken::class, 'schedule_event' ) );
 
 			// Verify that the ads_campaign is active or not.
 			add_action( 'admin_init', array( Pinterest\AdCredits::class, 'check_if_ads_campaign_is_active' ) );
@@ -637,6 +638,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$token['access_token']  = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['access_token'] );
 			$token['refresh_token'] = empty( $token['refresh_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['refresh_token'] );
+			$token['refresh_date']  = time();
 			return self::save_data( 'token_data', $token );
 		}
 
