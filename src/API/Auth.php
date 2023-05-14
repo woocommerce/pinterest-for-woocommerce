@@ -122,6 +122,7 @@ class Auth extends VendorAPI {
 			$this->log_error_and_redirect( $request, $error );
 		}
 
+		wp_safe_redirect( $this->get_redirect_url( $request->get_param( 'view' ) ) );
 		exit;
 	}
 

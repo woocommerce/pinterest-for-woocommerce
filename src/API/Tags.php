@@ -45,16 +45,15 @@ class Tags extends VendorAPI {
 
 		try {
 
-			$tags          = array();
-			$advertiser_id = $request->get_param( 'advrtsr_id' );
+			$ad_account_id = $request->get_param( 'advrtsr_id' );
 
-			if ( ! $advertiser_id ) {
+			if ( ! $ad_account_id ) {
 				throw new \Exception( esc_html__( 'Advertiser missing', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$response = Base::get_advertiser_tags( $advertiser_id );
+			$tags = APIV5::get_advertiser_tags( $ad_account_id );
 
-			if ( 'success' !== $response['status'] ) {
+			/*if ( 'success' !== $response['status'] ) {
 				throw new \Exception( esc_html__( 'Response error', 'pinterest-for-woocommerce' ), 400 );
 			}
 
@@ -62,17 +61,24 @@ class Tags extends VendorAPI {
 
 			if ( empty( $tags ) ) {
 				// No tag created yet. Lets create one.
-				$tag = Base::create_tag( $advertiser_id );
+				$tag = Base::create_tag( $ad_account_id );
 
 				if ( 'success' === $tag['status'] ) {
 					$tags[ $tag['data']->id ] = $tag['data'];
 				} else {
 					throw new \Exception( esc_html__( 'Could not create a tag. Please check the logs for additional information.', 'pinterest-for-woocommerce' ), 400 );
 				}
-			}
+			}*/
 
-			return $tags;
-
+			return array_map(
+				function( $tag ) {
+					return array(
+						'id'   => $tag['id'],
+						'name' => $tag['name'],
+					);
+				},
+				$tags['items'] ?? array()
+			);
 		} catch ( \Throwable $th ) {
 
 			/* Translators: The error description as returned from the API */
