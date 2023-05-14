@@ -44,8 +44,13 @@ class Options extends VendorAPI {
 	 */
 	public function get_settings() {
 		Pinterest_For_Woocommerce()::maybe_check_billing_setup();
+		$settings = Pinterest_For_Woocommerce()::get_settings( true );
+		if ( empty( $settings['account_data']['id'] ) ) {
+			$integration_data = \Pinterest_For_Woocommerce::get_data( 'integration_data' );
+			$settings['account_data']['id'] = $integration_data['connected_user_id'] ?? '';
+		}
 		return array(
-			PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => Pinterest_For_Woocommerce()::get_settings( true ),
+			PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => $settings,
 		);
 	}
 

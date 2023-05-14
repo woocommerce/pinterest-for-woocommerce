@@ -92,8 +92,8 @@ class Base {
 
 		try {
 
-			$request  = self::prepare_request( $endpoint, $method, $payload, $api );
-			$response = self::handle_request( $request );
+			$request  = static::prepare_request( $endpoint, $method, $payload, $api );
+			$response = static::handle_request( $request );
 
 			if ( ! empty( $cache_expiry ) ) {
 				$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
@@ -163,7 +163,7 @@ class Base {
 		$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
 
 		$request = array(
-			'url'     => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
+			'url'     => static::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
 			'method'  => $method,
 			'args'    => $payload,
 			'headers' => array(
@@ -248,7 +248,7 @@ class Base {
 	 * @throws Exception PHP exception.
 	 * @throws ApiException PHP exception.
 	 */
-	public static function handle_request( $request ) {
+	protected static function handle_request( $request ) {
 
 		$request = wp_parse_args(
 			$request,
@@ -260,14 +260,9 @@ class Base {
 			)
 		);
 
-		$body = '';
-
 		try {
-
-			self::get_token();
-
 			if ( $request['auth_header'] ) {
-				$request['headers']['Authorization'] = 'Bearer ' . self::$token['access_token'];
+				$request['headers']['Authorization'] = 'Bearer ' . self::get_token()['access_token'];
 			}
 
 			$request_args = array(
@@ -360,7 +355,7 @@ class Base {
 			throw new Exception( __( 'Empty body', 'pinterest-for-woocommerce' ), 204 );
 		}
 
-		return (array) json_decode( $response['body'] );
+		return json_decode( $response['body'], true );
 	}
 
 

@@ -8,7 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
-use \WP_REST_Request;
+use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
