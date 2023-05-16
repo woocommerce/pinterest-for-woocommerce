@@ -238,7 +238,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$store  = ActionScheduler::store();
 		$runner = new ActionScheduler_QueueRunner( $store );
 
-		add_action( 'action_scheduler_failed_execution', array( $this->feed_generator, 'handle_failed_execution' ), 10, 3 );
+		add_action( 'action_scheduler_failed_execution', array( $this->feed_generator, 'handle_failed_execution' ), 10, 2 );
 
 		// Add a callback to throw an exception when the action is processed.
 		$callback = function () {

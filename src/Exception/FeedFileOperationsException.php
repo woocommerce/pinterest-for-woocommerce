@@ -14,7 +14,7 @@ use Exception;
 /**
  * An exception thrown then something went wrong writing into a feed file.
  */
-class FeedFileOperationsException extends Exception {
+class FeedFileOperationsException extends Exception implements PinterestException {
 	public const CODE_COULD_NOT_RENAME_ERROR = 10;
 
 	public const CODE_COULD_NOT_OPEN_FILE_ERROR = 20;

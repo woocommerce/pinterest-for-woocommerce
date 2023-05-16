@@ -107,7 +107,7 @@ class FeedGenerator extends AbstractChainedJob {
 		// PHP shuts down execution for some reason.
 		add_action( 'action_scheduler_unexpected_shutdown', array( $this, 'handle_unexpected_shutdown' ), 10, 2 );
 		// Action got an exception thrown.
-		add_action( 'action_scheduler_failed_execution', array( $this, 'handle_failed_execution' ), 10, 3 );
+		add_action( 'action_scheduler_failed_execution', array( $this, 'handle_failed_execution' ), 10, 2 );
 	}
 
 	/**
@@ -197,13 +197,12 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @param int       $action_id - Action Scheduler action id.
 	 * @param Throwable $throwable - Exception object.
-	 * @param string    $context - Action Scheduler context (e.g. WP CLI, Async Request or an empty string).
 	 *
 	 * @since x.x.x
 	 *
 	 * @return void
 	 */
-	public function handle_failed_execution( int $action_id, Throwable $throwable, string $context ) {
+	public function handle_failed_execution( int $action_id, Throwable $throwable ) {
 		$action = ActionScheduler::store()->fetch_action( $action_id );
 		$hook   = $action->get_hook();
 
@@ -711,8 +710,9 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since 1.2.14
 	 */
 	protected function is_timeout_error( array $error ): bool {
-		return isset( $error['type'] ) && E_ERROR === $error['type'] &&
-			isset( $error['message'] ) && strpos( $error ['message'], 'Maximum execution time' ) !== false;
+		$is_error              = E_ERROR === $error['type'] ?? 0;
+		$is_max_execution_time = strpos( $error['message'] ?? '', 'Maximum execution time' ) !== false;
+		return $is_error && $is_max_execution_time;
 	}
 
 	/**
@@ -740,6 +740,6 @@ class FeedGenerator extends AbstractChainedJob {
 			'ids'
 		);
 
-		return count( $failed_actions ) >= $threshold;
+		return count( $failed_actions ) === $threshold;
 	}
 }
