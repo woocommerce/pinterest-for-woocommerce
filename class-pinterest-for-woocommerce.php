@@ -282,7 +282,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
 
 			// Disconnect advertiser if advertiser or tag change.
-			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
+			//add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
 
 			// Init marketing notifications.
 			add_action( Heartbeat::DAILY, array( $this, 'init_marketing_notifications' ) );
@@ -681,60 +681,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			 * Just need to clean account data in these cases.
 			 */
 			if ( ! self::is_business_connected() ) {
-
 				self::flush_options();
-
 				// At this point we're disconnected.
 				return true;
 			}
 
 			try {
 				// Disconnect merchant from Pinterest.
-				$result = Pinterest\API\Base::disconnect_merchant();
-
-				if ( 'success' !== $result['status'] ) {
-					throw new \Exception( esc_html__( 'Response error on disconnect merchant.', 'pinterest-for-woocommerce' ), 400 );
-				}
-
-				// Disconnect the advertiser from Pinterest.
-				$connected_advertiser = self::get_setting( 'tracking_advertiser', null );
-				$connected_tag        = self::get_setting( 'tracking_tag', null );
-
-				if ( $connected_advertiser && $connected_tag ) {
-
-					try {
-
-						Pinterest\API\AdvertiserConnect::disconnect_advertiser( $connected_advertiser, $connected_tag );
-
-					} catch ( \Exception $th ) {
-
-						Pinterest\Logger::log( esc_html__( 'There was an error disconnecting the Advertiser.', 'pinterest-for-woocommerce' ) );
-						self::flush_options();
-						throw new \Exception( esc_html__( 'There was an error disconnecting the Advertiser. Please try again.', 'pinterest-for-woocommerce' ), 400 );
-					}
-				}
-
+				self::delete_commerce_integration();
 				self::flush_options();
-
 				// At this point we're disconnected.
 				return true;
-			} catch ( PinterestApiException $e ) {
-				$code = $e->get_pinterest_code();
-
-				if ( PinterestApiException::MERCHANT_NOT_FOUND === $code ) {
-					Pinterest\Logger::log( esc_html__( 'Trying to disconnect while the merchant (id) was not found.', 'pinterest-for-woocommerce' ) );
-
-					/*
-					 * This is an abnormal state of the application. Caused probably by issues during the connection process.
-					 * It looks like the best course of actions is to flush the options and assume that we are disconnected.
-					 * This way we restore UI connect functionality and allow merchant to retry.
-					 */
-					self::flush_options();
-					return true;
-				}
-
-				return false;
-
 			} catch ( \Exception $th ) {
 				// There was an error disconnecting merchant.
 				return false;
@@ -903,7 +860,31 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			 * 	etc.
 			 */
 			Pinterest_For_Woocommerce::save_integration_data( $response );
+
+			self::save_setting( 'tracking_advertiser', $response['connected_advertiser_id'] );
+			self::save_setting( 'tracking_tag', $response['connected_tag_id'] );
+
 			return $response;
+		}
+
+		/**
+		 * Disconnects WC from Pinterest.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return bool
+		 * @throws PinterestApiException
+		 */
+		public static function delete_commerce_integration(): bool {
+			$external_business_id = Pinterest_For_Woocommerce::get_data( 'integration_data' )['external_business_id'];
+
+			$response = Pinterest\API\APIV5::make_request(
+				"integrations/commerce/{$external_business_id}",
+				'DELETE'
+			);
+
+			// @TODO: add proper response handling. Check for success http status 204 or unexpected error in return.
+			return true;
 		}
 
 		/**

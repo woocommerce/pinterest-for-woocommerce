@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Pinterest_For_Woocommerce;
 use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -41,7 +42,7 @@ class AuthDisconnect extends VendorAPI {
 	 */
 	public function handle_disconnect() {
 		return array(
-			'disconnected' => Pinterest_For_Woocommerce()::disconnect(),
+			'disconnected' => Pinterest_For_Woocommerce::disconnect(),
 		);
 	}
 }
