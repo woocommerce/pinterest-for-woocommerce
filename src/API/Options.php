@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Pinterest_For_Woocommerce;
 use \WP_Error;
 use \WP_REST_Server;
 use \WP_REST_Request;

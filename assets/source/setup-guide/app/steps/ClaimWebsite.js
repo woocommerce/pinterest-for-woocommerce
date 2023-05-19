@@ -34,6 +34,8 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 import documentationLinkProps from '../helpers/documentation-link-props';
+import connectAdvertiser from "../helpers/connect-advertiser";
+import {getNewPath} from "@woocommerce/navigation";
 
 const StaticError = ( { reqError } ) => {
 	if ( reqError?.data?.pinterest_code === undefined ) {
@@ -106,6 +108,10 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 	const pfwSettings = wcSettings.pinterest_for_woocommerce;
 
 	useEffect( () => {
+		// If domain is not verified and verification status is not pending nor success - start verification.
+		if ( ! Object.values( LABEL_STATUS ).includes( status ) && ! isDomainVerified ) {
+			handleClaimWebsite();
+		}
 		if ( status !== STATUS.PENDING && isDomainVerified ) {
 			setStatus( STATUS.SUCCESS );
 		}
@@ -149,10 +155,7 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 
 	const VerifyButton = () => {
 		const buttonLabels = {
-			[ STATUS.IDLE ]: __(
-				'Start verification',
-				'pinterest-for-woocommerce'
-			),
+			[ STATUS.IDLE ]: __( 'Start verification', 'pinterest-for-woocommerce' ),
 			[ STATUS.PENDING ]: __( 'Verifying…', 'pinterest-for-woocommerce' ),
 			[ STATUS.ERROR ]: __( 'Try again', 'pinterest-for-woocommerce' ),
 			[ STATUS.SUCCESS ]: __( 'Verified', 'pinterest-for-woocommerce' ),
@@ -160,13 +163,56 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 
 		const text = buttonLabels[ status ];
 
-		if ( Object.values( LABEL_STATUS ).includes( status ) ) {
-			return <StatusLabel status={ status } text={ text } />;
-		}
+		return <StatusLabel status={ status } text={ text } />;
+	};
+
+	const CompleteSetupButton = () => {
+		const buttonLabels = {
+			error: __( 'Try Again', 'pinterest-for-woocommerce' ),
+			success: __( 'Complete Setup', 'pinterest-for-woocommerce' ),
+		};
 
 		return (
-			<Button isSecondary text={ text } onClick={ handleClaimWebsite } />
+			<Button
+				isPrimary
+				disabled={ status !== STATUS.SUCCESS && status !== STATUS.ERROR }
+				onClick={
+					status === STATUS.SUCCESS ? handleCompleteSetup : handleClaimWebsite
+				}
+			>
+				{ buttonLabels[ status ] }
+			</Button>
 		);
+	};
+
+	const handleCompleteSetup = async () => {
+		try {
+			createNotice(
+				'success',
+				__(
+					'Connected successfully.',
+					'pinterest-for-woocommerce'
+				)
+			);
+
+			recordEvent( 'pfw_setup', {
+				target: 'complete',
+				trigger: 'setup-complete',
+			} );
+
+			// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
+			const path = getNewPath( {}, '/pinterest/settings', {} );
+
+			window.location = new URL( wcSettings.adminUrl + path );
+		} catch ( error ) {
+			createNotice(
+				'error',
+				__(
+					'There was a problem connecting the advertiser.',
+					'pinterest-for-woocommerce'
+				)
+			);
+		}
 	};
 
 	return (
@@ -242,15 +288,9 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 
 					{ view === 'wizard' && (
 						<div className="woocommerce-setup-guide__footer-button">
-							<Button
-								isPrimary
-								disabled={ status !== STATUS.SUCCESS }
-								onClick={ goToNextStep }
-								text={ __(
-									'Continue',
-									'pinterest-for-woocommerce'
-								) }
-							/>
+							{ status !== STATUS.IDLE && (
+								<CompleteSetupButton />
+							) }
 						</div>
 					) }
 				</div>
