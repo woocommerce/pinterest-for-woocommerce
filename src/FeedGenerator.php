@@ -726,7 +726,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Exception Related to max retries reached or missing arguments on the action.
 	 */
 	public function maybe_handle_error_on_timeout( int $action_id ) {
-		wc_deprecated_function( __CLASS__ . '::' . __FUNCTION__, 'x.x.x' );
+		wc_deprecated_function( __METHOD__, 'x.x.x' );
 	}
 
 	/**
@@ -747,13 +747,12 @@ class FeedGenerator extends AbstractChainedJob {
 				'hook'         => $hook,
 				'args'         => $args,
 				'status'       => ActionSchedulerInterface::STATUS_FAILED,
-				'per_page'     => $threshold,
 				'date'         => gmdate( 'U' ) - $time_period,
 				'date_compare' => '>',
 			],
 			'ids'
 		);
 
-		return count( $failed_actions ) === $threshold;
+		return count( $failed_actions ) >= $threshold;
 	}
 }
