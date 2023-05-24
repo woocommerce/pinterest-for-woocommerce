@@ -716,6 +716,20 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
+	 * Handle error on generate feed timeout.
+	 *
+	 * @since 1.2.14
+	 * @deprecated x.x.x
+	 *
+	 * @param int $action_id The ID of the action marked as failed.
+	 *
+	 * @throws Exception Related to max retries reached or missing arguments on the action.
+	 */
+	public function maybe_handle_error_on_timeout( int $action_id ) {
+		wc_deprecated_function( __CLASS__ . '::' . __FUNCTION__, 'x.x.x' );
+	}
+
+	/**
 	 * Check whether the action's failure rate is above the specified threshold within the timeframe.
 	 *
 	 * @param string $hook The job action hook.
@@ -727,7 +741,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	protected function is_failure_rate_above_threshold( string $hook, ?array $args = null ): bool {
 		$threshold   = apply_filters( 'pinterest_for_woocommerce_action_failure_threshold', 3 );
-		$time_period = apply_filters( 'pinterest_for_woocommerce_action_failure_time_period', 1800 ); // 30 minutes.
+		$time_period = apply_filters( 'pinterest_for_woocommerce_action_failure_time_period', 30 * MINUTE_IN_SECONDS );
 		$failed_actions = $this->action_scheduler->search(
 			[
 				'hook'         => $hook,
