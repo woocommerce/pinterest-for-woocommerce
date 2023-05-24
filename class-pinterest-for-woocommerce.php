@@ -808,11 +808,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$state = http_build_query( $state_params );
 
-			set_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
-
 			// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
 			// nosemgrep: audit.php.wp.security.xss.query-arg
-			return self::get_connection_proxy_url() . 'login/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
+			return self::get_connection_proxy_url() . 'connect/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
 		}
 
 
