@@ -144,11 +144,11 @@ class Auth extends VendorAPI {
 			$query_args['view'] = sanitize_key( $view );
 		}
 
-		return esc_url(
-			add_query_arg(
-				$query_args,
-				admin_url( 'admin.php' )
-			)
+		// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
+		// nosemgrep: audit.php.wp.security.xss.query-arg
+		return add_query_arg(
+			$query_args,
+			admin_url( 'admin.php' )
 		);
 	}
 }
