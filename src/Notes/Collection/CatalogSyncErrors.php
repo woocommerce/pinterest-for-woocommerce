@@ -9,9 +9,9 @@
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
 
 use Automattic\WooCommerce\Admin\Notes\Note;
+use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\ProductSync;
 use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
-use Automattic\WooCommerce\Pinterest\API\FeedIssues;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Throwable;
 
@@ -38,7 +38,9 @@ class CatalogSyncErrors extends AbstractNote {
 			return false;
 		}
 
-		if ( ! ProductSync::is_product_sync_enabled() ) {
+		$feed_id     = FeedRegistration::get_locally_stored_registered_feed_id();
+		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
+		if ( ! ProductSync::is_product_sync_enabled() || ! $feed_id || ! $merchant_id ) {
 			return false;
 		}
 
@@ -52,9 +54,8 @@ class CatalogSyncErrors extends AbstractNote {
 		}
 
 		try {
-			$feed_id  = FeedRegistration::get_locally_stored_registered_feed_id();
-			$workflow = FeedIssues::get_feed_workflow( $feed_id );
-			if ( false === $workflow ) {
+			$workflow = Feeds::get_feed_latest_workflow( (string) $merchant_id, (string) $feed_id );
+			if ( ! $workflow ) {
 				// No workflow to check.
 				return false;
 			}
