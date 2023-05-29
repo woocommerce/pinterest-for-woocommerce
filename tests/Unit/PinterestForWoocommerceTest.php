@@ -1,9 +1,15 @@
 <?php
 
+namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
+
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\RefreshToken;
+use Pinterest_For_Woocommerce;
+use WP_HTTP_Requests_Response;
+use WP_UnitTestCase;
+use WpOrg\Requests\Response;
 
-class PinterestForWoocommerceTest extends \WP_UnitTestCase {
+class PinterestForWoocommerceTest extends WP_UnitTestCase {
 
 	/**
 	 * Test of the plugin has refresh token action initialised.
@@ -49,7 +55,7 @@ class PinterestForWoocommerceTest extends \WP_UnitTestCase {
 					'cookies'  => array(),
 					'filename' => '',
 					'http_response' => new WP_HTTP_Requests_Response(
-						new WpOrg\Requests\Response(),
+						new Response(),
 						''
 					),
 				);
@@ -121,7 +127,7 @@ class PinterestForWoocommerceTest extends \WP_UnitTestCase {
 					'cookies'  => array(),
 					'filename' => '',
 					'http_response' => new WP_HTTP_Requests_Response(
-						new WpOrg\Requests\Response(),
+						new Response(),
 						''
 					),
 				);
@@ -172,7 +178,7 @@ class PinterestForWoocommerceTest extends \WP_UnitTestCase {
 					'cookies'  => array(),
 					'filename' => '',
 					'http_response' => new WP_HTTP_Requests_Response(
-						new WpOrg\Requests\Response(),
+						new Response(),
 						''
 					),
 				);
@@ -223,7 +229,7 @@ class PinterestForWoocommerceTest extends \WP_UnitTestCase {
 					'cookies'  => array(),
 					'filename' => '',
 					'http_response' => new WP_HTTP_Requests_Response(
-						new WpOrg\Requests\Response(),
+						new Response(),
 						''
 					),
 				);
