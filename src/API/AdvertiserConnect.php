@@ -95,11 +95,17 @@ class AdvertiserConnect extends VendorAPI {
 	 * @param string $advertiser_id The ID of the advertiser.
 	 * @param string $tag_id        The ID of the tag.
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @return array {
+	 * 		Updates Pinterest integration with the new advertiser and tag.
+	 *
+	 * 		@type string $connected   The ID of the connected advertiser.
+	 * 		@type bool   $reconnected Whether the advertiser was reconnected.
+	 * }
+	 * @throws Exception PHP Exception.
 	 */
-	public static function connect_advertiser_and_tag( $advertiser_id, $tag_id ) {
+	public static function connect_advertiser_and_tag( string $advertiser_id, string $tag_id ): array {
 
-		$external_business_id = Pinterest_For_Woocommerce()::get_data( 'external_business_id' );
+		$external_business_id = Pinterest_For_Woocommerce::get_data( 'external_business_id' );
 		$data = array(
 			'connected_advertiser_id' => $advertiser_id,
 			'connected_tag_id'        => $tag_id,
@@ -111,10 +117,10 @@ class AdvertiserConnect extends VendorAPI {
 			throw new Exception( $th->getMessage(), 400 );
 		}
 
-		Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', true );
+		Pinterest_For_Woocommerce::save_data( 'is_advertiser_connected', true );
 
 		// At this stage we can check if the connected advertiser has billing setup.
-		$has_billing = Pinterest_For_Woocommerce()::add_billing_setup_info_to_account_data();
+		$has_billing = Pinterest_For_Woocommerce::add_billing_setup_info_to_account_data();
 
 		/*
 		 * If the advertiser does not have a correct billing lets check for the setup frequently for the next hour.
