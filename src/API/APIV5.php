@@ -9,6 +9,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -115,5 +116,51 @@ class APIV5 extends Base {
 	 */
 	public static function get_advertiser_tags( $ad_account_id ) {
 		return self::make_request( "ad_accounts/{$ad_account_id}/conversion_tags", 'GET' );
+	}
+
+	/**
+	 * Returns Pinterest user verification code for website verification.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array {
+	 * 		Data needed to verify a website.
+	 *
+	 * 		@type string $verification_code Code to check against the user claiming the website.
+	 * 		@type string $dns_txt_record 	DNS TXT record to check against for the website to be claimed.
+	 * 		@type string $metatag 			META tag the verification process searches for the website to be claimed.
+	 * 		@type string $filename 			File expected to find on the website being claimed.
+	 * 		@type string $file_content 		A full html file to upload to the website in order for it to be claimed.
+	 * }
+	 * @throws PinterestApiException
+	 */
+	public static function domain_verification_data(): array {
+		return self::make_request( 'user_account/websites/verification' );
+	}
+
+	/**
+	 * Sends domain verification request to Pinterest.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $domain Domain to verify.
+	 * @return array {
+	 * 		Data returned by Pinterest after the verification request.
+	 *
+	 * 		@type string $website 		Website with path or domain only.
+	 * 		@type string $status 		Status of the verification process.
+	 * 		@type string $verified_at 	UTC timestamp when the verification happened - sometimes missing.
+	 * }
+	 * @throws PinterestApiException
+	 */
+	public static function domain_metatag_verification_request( string $domain ): array {
+		return self::make_request(
+			'user_account/websites',
+			'POST',
+			array(
+				'website'             => $domain,
+				'verification_method' => 'METATAG',
+			)
+		);
 	}
 }

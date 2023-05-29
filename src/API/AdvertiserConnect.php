@@ -11,6 +11,9 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest\AdCredits;
 use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
+use Exception;
+use Pinterest_For_Woocommerce;
+use Throwable;
 use \WP_REST_Server;
 use \WP_REST_Request;
 use \WP_Error;
@@ -59,7 +62,8 @@ class AdvertiserConnect extends VendorAPI {
 			}
 
 			if ( $enable_aem ) {
-				self::enable_aem_tag( $tag_id );
+				// @TODO: We do not have an API v5 analog for this call. Commenting it out temporarily.
+				#self::enable_aem_tag( $tag_id );
 			}
 
 			$is_connected = Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' );
@@ -72,7 +76,7 @@ class AdvertiserConnect extends VendorAPI {
 				);
 			}
 
-			// Connect new advertiser and tag.
+			// Update integration with new advertiser and a tag.
 			return self::connect_advertiser_and_tag( $advertiser_id, $tag_id );
 
 		} catch ( \Throwable $th ) {
@@ -95,14 +99,16 @@ class AdvertiserConnect extends VendorAPI {
 	 */
 	public static function connect_advertiser_and_tag( $advertiser_id, $tag_id ) {
 
-		$response = Base::connect_advertiser( $advertiser_id, $tag_id );
+		$external_business_id = Pinterest_For_Woocommerce()::get_data( 'external_business_id' );
+		$data = array(
+			'connected_advertiser_id' => $advertiser_id,
+			'connected_tag_id'        => $tag_id,
+		);
 
-		if ( 'success' !== $response['status'] ) {
-			throw new \Exception( esc_html__( 'The advertiser could not be connected to Pinterest.', 'pinterest-for-woocommerce' ), 400 );
-		}
-
-		if ( $advertiser_id !== $response['data']->advertiser_id ) {
-			throw new \Exception( esc_html__( 'Incorrect advertiser ID.', 'pinterest-for-woocommerce' ), 400 );
+		try {
+			$response = Pinterest_For_Woocommerce::update_commerce_integration( $external_business_id, $data );
+		} catch ( Throwable $th ) {
+			throw new Exception( $th->getMessage(), 400 );
 		}
 
 		Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', true );
@@ -130,7 +136,7 @@ class AdvertiserConnect extends VendorAPI {
 		UserInteraction::flush_options();
 
 		return array(
-			'connected'   => $response['data']->advertiser_id,
+			'connected'   => $response['connected_advertiser_id'],
 			'reconnected' => true,
 		);
 	}
