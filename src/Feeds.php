@@ -211,7 +211,7 @@ class Feeds {
 	 *
 	 * @throws Exception If there is an error getting the feed report.
 	 *
-	 * @since x.x.x
+	 * @since 1.3.0
 	 */
 	public static function get_feed_latest_workflow( string $merchant_id, string $feed_id ): ?object {
 		$feed_report = Base::get_merchant_feed_report( $merchant_id, $feed_id );

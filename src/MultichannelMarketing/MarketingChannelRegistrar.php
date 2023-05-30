@@ -3,7 +3,7 @@
  * Service class to register the Pinterest marketing channel.
  *
  * @package     Automattic\WooCommerce\Pinterest\MultichannelMarketing
- * @version     x.x.x
+ * @version     1.3.0
  */
 
 namespace Automattic\WooCommerce\Pinterest\MultichannelMarketing;
