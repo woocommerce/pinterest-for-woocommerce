@@ -268,6 +268,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'init', array( Pinterest\Billing::class, 'schedule_event' ) );
 			add_action( 'init', array( Pinterest\AdCredits::class, 'schedule_event' ) );
 
+			// Register the marketing channel if the feature is included.
+			if ( defined( 'WC_MCM_EXISTS' ) ) {
+				add_action(
+					'init',
+					array( Pinterest\MultichannelMarketing\MarketingChannelRegistrar::class, 'register' )
+				);
+			}
+
 			// Verify that the ads_campaign is active or not.
 			add_action( 'admin_init', array( Pinterest\AdCredits::class, 'check_if_ads_campaign_is_active' ) );
 
@@ -830,7 +838,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			set_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
 
-			return esc_url( self::get_connection_proxy_url() . 'login/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state );
+			// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
+			// nosemgrep: audit.php.wp.security.xss.query-arg
+			return self::get_connection_proxy_url() . 'login/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
 		}
 
 
