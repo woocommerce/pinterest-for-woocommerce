@@ -3,7 +3,7 @@
  * Service class to handle & return Pinterest Feed Status
  *
  * @package     Automattic\WooCommerce\Pinterest
- * @version     x.x.x
+ * @version     1.3.0
  */
 
 namespace Automattic\WooCommerce\Pinterest;

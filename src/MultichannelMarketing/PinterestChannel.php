@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Marketing Channel
  *
  * @package     Automattic\WooCommerce\Pinterest\MultichannelMarketing
- * @version     x.x.x
+ * @version     1.3.0
  */
 
 namespace Automattic\WooCommerce\Pinterest\MultichannelMarketing;
