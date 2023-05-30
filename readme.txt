@@ -91,6 +91,11 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.0 - 2023-05-30 =
+* Add - Integration with WooCommerce multichannel marketing dashboard.
+* Fix  -  Remove feed configuration during plugin uninstall procedure.
+* Fix - Connection flow not redirection the wizard view.
+
 = 1.2.21 - 2023-05-02 =
 * Tweak - WC 7.7 compatibility.
 
