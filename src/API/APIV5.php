@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
+use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -112,10 +113,62 @@ class APIV5 extends Base {
 	 *
 	 * @param string $ad_account_id the advertiser_id to request the tags for.
 	 *
-	 * @return mixed
+	 * @return array
+	 * @throws ApiException|Exception
 	 */
 	public static function get_advertiser_tags( $ad_account_id ) {
 		return self::make_request( "ad_accounts/{$ad_account_id}/conversion_tags", 'GET' );
+	}
+
+	/**
+	 * Create a tag for the given advertiser.
+	 * @link https://developers.pinterest.com/docs/api/v5/#operation/conversion_tags/create
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $ad_account_id the advertiser_id to create a tag for.
+	 *
+	 * @return array {
+	 * 		Tag object.
+	 *
+	 * 		@type string 	$ad_account_id 			Ad account ID.
+	 * 		@type string 	$code_snippet 			Tag code snippet.
+	 * 		@type ?string 	$enhanced_match_status 	The enhanced match status of the tag.
+	 * 		@type string 	$id 					Tag ID.
+	 * 		@type ?int   	$last_fired_time_ms 	Time for the last event fired.
+	 * 		@type string 	$name 					Conversion tag name.
+	 * 		@type string 	$status 				Entity status.
+	 * 		@type string 	$version 				Version number.
+	 * 		@type array  	$configs {
+	 * 			Tag configuration.
+	 *
+	 * 			@type ?bool $aem_enabled 		Whether Automatic Enhanced Match email is enabled.
+	 * 			@type ?int  $md_frequency 		Metadata ingestion frequency.
+	 * 			@type ?bool $aem_fnln_enabled 	Whether Automatic Enhanced Match name is enabled.
+	 * 			@type ?bool $aem_ph_enabled 	Whether Automatic Enhanced Match phone is enabled.
+	 * 			@type ?bool $aem_ge_enabled 	Whether Automatic Enhanced Match gender is enabled.
+	 * 			@type ?bool $aem_db_enabled 	Whether Automatic Enhanced Match birthdate is enabled.
+	 * 			@type ?bool $aem_loc_enabled 	Whether Automatic Enhanced Match location is enabled.
+	 * 		}
+	 * }
+	 * @throws ApiException|Exception
+	 */
+	public static function create_tag( $ad_account_id ) {
+		$tag_name = self::get_tag_name();
+		return self::make_request(
+			"ad_accounts/{$ad_account_id}/conversion_tags",
+			'POST',
+			array(
+				'name'             => $tag_name,
+				'aem_enabled'      => true,
+				'md_frequency'     => 1,
+				'aem_fnln_enabled' => true,
+				'aem_ph_enabled'   => true,
+				'aem_ge_enabled'   => true,
+				'aem_db_enabled'   => true,
+				'ae_loc_enabled'   => true,
+			)
+		);
 	}
 
 	/**

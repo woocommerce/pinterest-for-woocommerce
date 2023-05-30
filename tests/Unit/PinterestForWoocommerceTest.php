@@ -47,7 +47,7 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 								},
 								ARRAY_FILTER_USE_KEY
 							)
-						),
+						)
 					),
 					'response' => array(
 						'code' => 200,
