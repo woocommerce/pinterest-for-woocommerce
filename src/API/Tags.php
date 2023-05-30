@@ -8,6 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Exception;
+use Throwable;
 use \WP_REST_Server;
 use \WP_REST_Request;
 
@@ -42,22 +44,18 @@ class Tags extends VendorAPI {
 	 * @throws \Exception PHP Exception.
 	 */
 	public function get_tags( WP_REST_Request $request ) {
-
 		try {
-
 			$ad_account_id = $request->get_param( 'advrtsr_id' );
-
 			if ( ! $ad_account_id ) {
-				throw new \Exception( esc_html__( 'Advertiser missing', 'pinterest-for-woocommerce' ), 400 );
+				throw new Exception( esc_html__( 'Advertiser missing', 'pinterest-for-woocommerce' ), 400 );
+			}
+			try {
+				$tags = APIV5::get_advertiser_tags( $ad_account_id );
+			} catch ( Throwable $th ) {
+				throw new Exception( esc_html__( 'Response error', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$tags = APIV5::get_advertiser_tags( $ad_account_id );
-
-			/*if ( 'success' !== $response['status'] ) {
-				throw new \Exception( esc_html__( 'Response error', 'pinterest-for-woocommerce' ), 400 );
-			}
-
-			$tags = (array) $response['data'];
+			/*$tags = (array) $response['data'];
 
 			if ( empty( $tags ) ) {
 				// No tag created yet. Lets create one.

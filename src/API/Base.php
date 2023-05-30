@@ -524,7 +524,7 @@ class Base {
 	 */
 	public static function create_tag( $advertiser_id ) {
 
-		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
+		$tag_name = static::get_tag_name();
 
 		return self::make_request(
 			"advertisers/{$advertiser_id}/conversion_tags",
@@ -813,5 +813,26 @@ class Base {
 	public static function get_list_of_ads_supported_countries() {
 		$request_url = 'advertisers/countries';
 		return self::make_request( $request_url, 'GET', array(), 'ads', DAY_IN_SECONDS );
+	}
+
+	/**
+	 * Generates a tag name.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return string The tag name.
+	 */
+	protected static function get_tag_name(): string {
+		/**
+		 * Filters the default tag name.
+		 *
+		 * @since Unknown
+		 *
+		 * @param string $tag_name The default tag name.
+		 */
+		return apply_filters(
+			'pinterest_for_woocommerce_default_tag_name',
+			esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' )
+		);
 	}
 }
