@@ -113,7 +113,35 @@ class APIV5 extends Base {
 	 *
 	 * @param string $ad_account_id the advertiser_id to request the tags for.
 	 *
-	 * @return array
+	 * @return array {
+	 * 		Tag objects list.
+	 *
+	 * 		@type array[] $items {
+	 * 			Tag object.
+	 *
+	 * 			@type string 	$ad_account_id 			Ad account ID.
+	 * 			@type string 	$code_snippet 			Tag code snippet.
+	 * 			@type ?string 	$enhanced_match_status 	The enhanced match status of the tag.
+	 * 			@type string 	$id 					Tag ID.
+	 * 			@type ?int   	$last_fired_time_ms 	Time for the last event fired.
+	 *
+	 * 			@type string 	$name 					Conversion tag name.
+	 * 			@type string 	$status 				Entity status.
+	 * 			@type string 	$version 				Version number.
+	 * 			@type array  	$configs {
+	 * 				Tag Enhanced Match configuration.
+	 *
+	 * 				@type ?bool $aem_enabled 		Whether Automatic Enhanced Match email is enabled.
+	 * 				@type ?int  $md_frequency 		Metadata ingestion frequency.
+	 * 				@type ?bool $aem_fnln_enabled 	Whether Automatic Enhanced Match first name and last name is enabled.
+	 * 				@type ?bool $aem_ph_enabled 	Whether Automatic Enhanced Match phone is enabled.
+	 * 				@type ?bool $aem_ge_enabled 	Whether Automatic Enhanced Match gender is enabled.
+	 * 				@type ?bool $aem_db_enabled 	Whether Automatic Enhanced Match birthdate is enabled.
+	 * 				@type ?bool $aem_loc_enabled 	Whether Automatic Enhanced Match location is enabled.
+	 * 			}
+	 * 		}
+	 * }
+	 *
 	 * @throws ApiException|Exception
 	 */
 	public static function get_advertiser_tags( $ad_account_id ) {

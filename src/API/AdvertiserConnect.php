@@ -47,7 +47,7 @@ class AdvertiserConnect extends VendorAPI {
 	 *
 	 * @return array|WP_Error
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	public function connect_advertiser( WP_REST_Request $request ) {
 
@@ -58,7 +58,7 @@ class AdvertiserConnect extends VendorAPI {
 			$enable_aem    = $request->has_param( 'enable_aem' ) ? $request->get_param( 'enable_aem' ) : false;
 
 			if ( ! $advertiser_id || ! $tag_id ) {
-				throw new \Exception( esc_html__( 'Missing advertiser or tag parameters.', 'pinterest-for-woocommerce' ), 400 );
+				throw new Exception( esc_html__( 'Missing advertiser or tag parameters.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
 			if ( $enable_aem ) {
