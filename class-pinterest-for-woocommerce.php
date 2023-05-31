@@ -589,7 +589,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			new Pinterest\API\FeedIssues();
 			new Pinterest\API\Tags();
 			new Pinterest\API\HealthCheck();
-			new Pinterest\API\Options();
+			new Pinterest\API\Settings();
 			new Pinterest\API\SyncSettings();
 			new Pinterest\API\UserInteraction();
 		}

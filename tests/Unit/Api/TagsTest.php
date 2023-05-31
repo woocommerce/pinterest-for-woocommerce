@@ -20,7 +20,7 @@ class TagsTest extends WP_Test_REST_TestCase {
 	 *
 	 * @return void
 	 */
-	public function test_tags_route() {
+	public function test_tags_route_registered() {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey( '/pinterest/v1/tags', $routes );
 	}
