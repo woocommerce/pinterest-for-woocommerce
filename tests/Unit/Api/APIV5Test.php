@@ -36,7 +36,7 @@ class APIV5Test extends WP_UnitTestCase {
 							'code_snippet'       => '<!-- Pinterest Tag -->',
 							'id'                 => '9876543210123456789',
 							'last_fired_time_ms' => 123456789,
-							'name'               => $parsed_args['body']['name'],
+							'name'               => 'Some tag name 42',
 							'status'             => 'ACTIVE',
 							'version'            => 'v1',
 							'configs' => array(

@@ -860,13 +860,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$response = Pinterest\API\APIV5::make_request(
 				'integrations/commerce',
 				'POST',
-				json_encode(
-					array(
-						'external_business_id'    => $external_business_id,
-						'connected_merchant_id'   => $connection_data['merchant_id'] ?? '',
-						'connected_advertiser_id' => $connection_data['advertiser_id'] ?? '',
-						'connected_tag_id'        => $connection_data['tag_id'] ?? '',
-					)
+				array(
+					'external_business_id'    => $external_business_id,
+					'connected_merchant_id'   => $connection_data['merchant_id'] ?? '',
+					'connected_advertiser_id' => $connection_data['advertiser_id'] ?? '',
+					'connected_tag_id'        => $connection_data['tag_id'] ?? '',
 				)
 			);
 
@@ -934,7 +932,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			return Pinterest\API\APIV5::make_request(
 				"integrations/commerce/{$external_business_id}",
 				'PATCH',
-				json_encode( $data )
+				$data
 			);
 		}
 
