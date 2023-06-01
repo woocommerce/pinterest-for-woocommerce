@@ -196,7 +196,7 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 
 	public function test_update_commerce_integration_returns_unexpected_error() {
 		$this->expectException( PinterestApiException::class );
-		$this->expectExceptionCode( 0 );
+		$this->expectExceptionCode( 500 );
 		$this->expectExceptionMessage( 'Any other message from Pinterest which falls under Unexpected error.' );
 
 		add_filter(
