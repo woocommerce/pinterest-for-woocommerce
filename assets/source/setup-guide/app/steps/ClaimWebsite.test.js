@@ -20,7 +20,7 @@ jest.mock( '@wordpress/api-fetch', () => {
  */
 import { recordEvent } from '@woocommerce/tracks';
 import apiFetch from '@wordpress/api-fetch';
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -41,7 +41,6 @@ describe( 'Claim Website Record Events', () => {
 			<ClaimWebsite goToNextStep={ () => {} } view="wizard" />
 		);
 
-		fireEvent.click( getByText( 'Start verification' ) );
 		expect( recordEvent ).toHaveBeenCalledWith(
 			'pfw_domain_verify_failure',
 			expect.any( Object )
@@ -56,8 +55,6 @@ describe( 'Claim Website Record Events', () => {
 		const { getByText } = render(
 			<ClaimWebsite goToNextStep={ () => {} } view="wizard" />
 		);
-
-		fireEvent.click( getByText( 'Start verification' ) );
 
 		// Wait for async click handler and apiFetch resolution.
 		await waitFor( () =>
