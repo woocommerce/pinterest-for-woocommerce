@@ -553,7 +553,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$settings = self::get_settings( $force, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 
-			return empty( $settings[ $key ] ) ? null : $settings[ $key ];
+			return $settings[ $key ] ?? null;
 		}
 
 
@@ -576,6 +576,20 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			return self::save_settings( $settings, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 		}
 
+		/**
+		 * Remove APP Data key.
+		 *
+		 * @param string $key - The key of specific data to retrieve.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return bool - True if the data was removed, false otherwise.
+		 */
+		public static function remove_data( string $key ) {
+			$settings = self::get_settings( true, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+			unset( $settings[ $key ] );
+			return self::save_settings( $settings, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+		}
 
 		/**
 		 * Add API endpoints
