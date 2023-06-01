@@ -282,7 +282,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
 
 			// Disconnect advertiser if advertiser or tag change.
-			//add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
+			// add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );.
 
 			// Init marketing notifications.
 			add_action( Heartbeat::DAILY, array( $this, 'init_marketing_notifications' ) );
@@ -650,19 +650,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since x.x.x
 		 *
 		 * @param array $connection_info_data The array containing the connection info data.
-		 * @return array
+		 * @return bool True if the data was saved successfully.
 		 */
-		public static function save_connection_info_data( $connection_info_data ) {
+		public static function save_connection_info_data( array $connection_info_data ): bool {
 			return self::save_data( 'connection_info_data', $connection_info_data );
 		}
 
 		/**
 		 * Saves the integration data.
 		 *
-		 * @param $integration_data
-		 * @return bool
+		 * @param array $integration_data The array containing the integration data.
+		 * @return bool True if the data was saved successfully.
 		 */
-		public static function save_integration_data( $integration_data ) {
+		public static function save_integration_data( array $integration_data ): bool {
 			return self::save_data( 'integration_data', $integration_data );
 		}
 
@@ -671,11 +671,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @return boolean True if disconnection was successful.
+		 * @return bool True if disconnection was successful.
 		 *
-		 * @throws \Exception PHP Exception.
+		 * @throws Exception PHP Exception.
 		 */
-		public static function disconnect() {
+		public static function disconnect(): bool {
 			/*
 			 * If there is no business connected, disconnecting merchant will throw error.
 			 * Just need to clean account data in these cases.
@@ -834,28 +834,28 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since x.x.x
 		 *
 		 * @return array {
-		 *		Integration data returned by Pinterest.
+		 *      Integration data returned by Pinterest.
 		 *
-		 * 		@type string 	$id 							ID of the integration (string all digits).
-		 * 		@type string 	$external_business_id 			External business ID for the integration.
-		 * 		@type string 	$connected_merchant_id 			Connected merchant ID for the integration.
-		 * 		@type string 	$connected_user_id 				Connected user ID for the integration.
-		 * 		@type string 	$connected_advertiser_id 		Connected advertiser ID for the integration.
-		 * 		@type string 	$connected_lba_id				Connected LBA ID for the integration.
-		 * 		@type string 	$connected_tag_id 				Connected tag ID for the integration.
-		 * 		@type int 		$partner_access_token_expiry 	Partner access token expiry for the integration.
-		 * 		@type int 		$partner_refresh_token_expiry 	Partner refresh token expiry for the integration.
-		 * 		@type string 	$scopes 						Scopes for the integration.
-		 * 		@type int 		$created_timestamp 				Created timestamp for the integration.
-		 * 		@type int 		$updated_timestamp 				Updated timestamp for the integration.
-		 * 		@type string 	$additional_id_1 				Additional ID 1 for the integration.
-		 * 		@type string 	$partner_metadata 				Partner metadata for the integration.
+		 *      @type string    $id                             ID of the integration (string all digits).
+		 *      @type string    $external_business_id           External business ID for the integration.
+		 *      @type string    $connected_merchant_id          Connected merchant ID for the integration.
+		 *      @type string    $connected_user_id              Connected user ID for the integration.
+		 *      @type string    $connected_advertiser_id        Connected advertiser ID for the integration.
+		 *      @type string    $connected_lba_id               Connected LBA ID for the integration.
+		 *      @type string    $connected_tag_id               Connected tag ID for the integration.
+		 *      @type int       $partner_access_token_expiry    Partner access token expiry for the integration.
+		 *      @type int       $partner_refresh_token_expiry   Partner refresh token expiry for the integration.
+		 *      @type string    $scopes                         Scopes for the integration.
+		 *      @type int       $created_timestamp              Created timestamp for the integration.
+		 *      @type int       $updated_timestamp              Updated timestamp for the integration.
+		 *      @type string    $additional_id_1                Additional ID 1 for the integration.
+		 *      @type string    $partner_metadata               Partner metadata for the integration.
 		 * }
-		 * @throws PinterestApiException
+		 * @throws PinterestApiException In case of 404, 409 and 500 errors from Pinterest.
 		 */
 		public static function create_commerce_integration(): array {
 			$external_business_id = self::generate_external_business_id();
-			$connection_data      = Pinterest_For_Woocommerce::get_data( 'connection_info_data', true );
+			$connection_data      = self::get_data( 'connection_info_data', true );
 
 			$response = Pinterest\API\APIV5::make_request(
 				'integrations/commerce',
@@ -873,12 +873,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			/*
 			 * In case of successful response we save our integration data into a database.
 			 * Data we save includes but not limited to:
-			 * 	external business id,
-			 * 	id,
-			 * 	connected_user_id,
-			 * 	etc.
+			 *  external business id,
+			 *  id,
+			 *  connected_user_id,
+			 *  etc.
 			 */
-			Pinterest_For_Woocommerce::save_integration_data( $response );
+			self::save_integration_data( $response );
 
 			self::save_setting( 'tracking_advertiser', $response['connected_advertiser_id'] );
 			self::save_setting( 'tracking_tag', $response['connected_tag_id'] );
@@ -891,48 +891,50 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since x.x.x
 		 *
-		 * @param string $external_business_id
-		 * @param array {
-		 * 		@type string 	$external_business_id			External business ID for the integration.
-		 * 		@type string 	$connected_merchant_id			Connected merchant ID for the integration.
-		 * 		@type string 	$connected_advertiser_id		Connected advertiser ID for the integration.
-		 * 		@type string 	$connected_lba_id				Connected LBA ID for the integration.
-		 * 		@type string 	$connected_tag_id				Connected tag ID for the integration.
-		 * 		@type string 	$partner_access_token			Partner access token for the integration.
-		 * 		@type string 	$partner_refresh_token			Partner refresh token for the integration.
-		 * 		@type string 	$partner_primary_email			Partner primary email for the integration.
-		 * 		@type int 		$partner_access_token_expiry	Partner access token expiry for the integration.
-		 * 		@type int 		$partner_refresh_token_expiry	Partner refresh token expiry for the integration.
-		 * 		@type string 	$scopes							Scopes for the integration.
-		 * 		@type string 	$additional_id_1				Additional ID 1 for the integration.
-		 * 		@type string 	$partner_metadata				Partner metadata for the integration.
+		 * @param string $external_business_id External business ID for the integration.
+		 * @param array  $data {
+		 *      Integration data to update with Pinterest.
+		 *
+		 *      @type string    $external_business_id           External business ID for the integration.
+		 *      @type string    $connected_merchant_id          Connected merchant ID for the integration.
+		 *      @type string    $connected_advertiser_id        Connected advertiser ID for the integration.
+		 *      @type string    $connected_lba_id               Connected LBA ID for the integration.
+		 *      @type string    $connected_tag_id               Connected tag ID for the integration.
+		 *      @type string    $partner_access_token           Partner access token for the integration.
+		 *      @type string    $partner_refresh_token          Partner refresh token for the integration.
+		 *      @type string    $partner_primary_email          Partner primary email for the integration.
+		 *      @type int       $partner_access_token_expiry    Partner access token expiry for the integration.
+		 *      @type int       $partner_refresh_token_expiry   Partner refresh token expiry for the integration.
+		 *      @type string    $scopes                         Scopes for the integration.
+		 *      @type string    $additional_id_1                Additional ID 1 for the integration.
+		 *      @type string    $partner_metadata               Partner metadata for the integration.
 		 * }
 		 *
 		 * @return array {
-		 *		Integration data returned by Pinterest.
+		 *      Integration data returned by Pinterest.
 		 *
-		 * 		@type string 	$id 							ID of the integration (string all digits).
-		 * 		@type string 	$external_business_id 			External business ID for the integration.
-		 * 		@type string 	$connected_merchant_id 			Connected merchant ID for the integration.
-		 * 		@type string 	$connected_user_id 				Connected user ID for the integration.
-		 * 		@type string 	$connected_advertiser_id 		Connected advertiser ID for the integration.
-		 * 		@type string 	$connected_lba_id				Connected LBA ID for the integration.
-		 * 		@type string 	$connected_tag_id 				Connected tag ID for the integration.
-		 * 		@type int 		$partner_access_token_expiry 	Partner access token expiry for the integration.
-		 * 		@type int 		$partner_refresh_token_expiry 	Partner refresh token expiry for the integration.
-		 * 		@type string 	$scopes 						Scopes for the integration.
-		 * 		@type int 		$created_timestamp 				Created timestamp for the integration.
-		 * 		@type int 		$updated_timestamp 				Updated timestamp for the integration.
-		 * 		@type string 	$additional_id_1 				Additional ID 1 for the integration.
-		 * 		@type string 	$partner_metadata 				Partner metadata for the integration.
+		 *      @type string    $id                             ID of the integration (string all digits).
+		 *      @type string    $external_business_id           External business ID for the integration.
+		 *      @type string    $connected_merchant_id          Connected merchant ID for the integration.
+		 *      @type string    $connected_user_id              Connected user ID for the integration.
+		 *      @type string    $connected_advertiser_id        Connected advertiser ID for the integration.
+		 *      @type string    $connected_lba_id               Connected LBA ID for the integration.
+		 *      @type string    $connected_tag_id               Connected tag ID for the integration.
+		 *      @type int       $partner_access_token_expiry    Partner access token expiry for the integration.
+		 *      @type int       $partner_refresh_token_expiry   Partner refresh token expiry for the integration.
+		 *      @type string    $scopes                         Scopes for the integration.
+		 *      @type int       $created_timestamp              Created timestamp for the integration.
+		 *      @type int       $updated_timestamp              Updated timestamp for the integration.
+		 *      @type string    $additional_id_1                Additional ID 1 for the integration.
+		 *      @type string    $partner_metadata               Partner metadata for the integration.
 		 * }
-		 * @throws PinterestApiException
+		 * @throws PinterestApiException In case of 404, 409 and 500 errors from Pinterest.
 		 */
 		public static function update_commerce_integration( string $external_business_id, array $data ): array {
 			return Pinterest\API\APIV5::make_request(
 				"integrations/commerce/{$external_business_id}",
-					'PATCH',
-					json_encode( $data )
+				'PATCH',
+				json_encode( $data )
 			);
 		}
 
@@ -942,10 +944,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since x.x.x
 		 *
 		 * @return bool
-		 * @throws PinterestApiException
+		 * @throws PinterestApiException In case of 500 unexpected error from Pinterest.
 		 */
 		public static function delete_commerce_integration(): bool {
-			$external_business_id = Pinterest_For_Woocommerce::get_data( 'integration_data' )['external_business_id'];
+			$external_business_id = self::get_data( 'integration_data' )['external_business_id'];
 
 			Pinterest\API\APIV5::make_request(
 				"integrations/commerce/{$external_business_id}",
@@ -1214,7 +1216,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				self::save_data( 'linked_businesses', $linked_businesses );
 			}
 
-			/*$linked_businesses = array_map(
+			/*
+			 * $linked_businesses = array_map(
 				function ( $business ) {
 					return array(
 						'value' => $business->id,
@@ -1222,7 +1225,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					);
 				},
 				$linked_businesses
-			);*/
+			);
+			*/
 
 			return $linked_businesses;
 		}
