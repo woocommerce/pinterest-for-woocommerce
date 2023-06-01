@@ -31,7 +31,6 @@ jest.mock( '../steps/SetupTracking', () => () => null );
 
 const stepOne = /Set up your business account/;
 const stepTwo = /Claim your website/;
-const stepThree = /Track conversions/;
 
 describe( 'WizardApp component', () => {
 	describe( 'First rendering', () => {

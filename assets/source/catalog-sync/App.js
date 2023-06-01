@@ -46,16 +46,14 @@ import { useSettingsSelect } from '../setup-guide/app/helpers/effects';
 const CatalogSyncApp = () => {
 	const adsCampaignIsActive = useSettingsSelect()?.ads_campaign_is_active;
 
-	const couponRedeemErrorID = useSettingsSelect()?.account_data
-		?.coupon_redeem_info?.error_id;
+	const couponRedeemErrorID =
+		useSettingsSelect()?.account_data?.coupon_redeem_info?.error_id;
 
 	useCreateNotice( wcSettings.pinterest_for_woocommerce.error );
-	const [ isOnboardingModalOpen, setIsOnboardingModalOpen ] = useState(
-		false
-	);
-	const [ isAdCreditsNoticeOpen, setIsAdCreditsNoticeOpen ] = useState(
-		false
-	);
+	const [ isOnboardingModalOpen, setIsOnboardingModalOpen ] =
+		useState( false );
+	const [ isAdCreditsNoticeOpen, setIsAdCreditsNoticeOpen ] =
+		useState( false );
 
 	const userInteractions = useSelect( ( select ) =>
 		select( USER_INTERACTION_STORE_NAME ).getUserInteractions()

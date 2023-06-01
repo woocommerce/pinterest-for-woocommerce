@@ -37,9 +37,7 @@ describe( 'Claim Website Record Events', () => {
 			throw 'Ups';
 		} );
 
-		const { getByText } = render(
-			<ClaimWebsite goToNextStep={ () => {} } view="wizard" />
-		);
+		render( <ClaimWebsite goToNextStep={ () => {} } view="wizard" /> );
 
 		expect( recordEvent ).toHaveBeenCalledWith(
 			'pfw_domain_verify_failure',
@@ -52,9 +50,7 @@ describe( 'Claim Website Record Events', () => {
 			return { account_data: { id: 'foo' } };
 		} );
 
-		const { getByText } = render(
-			<ClaimWebsite goToNextStep={ () => {} } view="wizard" />
-		);
+		render( <ClaimWebsite goToNextStep={ () => {} } view="wizard" /> );
 
 		// Wait for async click handler and apiFetch resolution.
 		await waitFor( () =>

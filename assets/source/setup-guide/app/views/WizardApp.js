@@ -13,7 +13,6 @@ import { updateQueryString } from '@woocommerce/navigation';
  */
 import SetupAccount from '../steps/SetupAccount';
 import ClaimWebsite from '../steps/ClaimWebsite';
-import SetupTracking from '../steps/SetupTracking';
 import OnboardingTopBar from '../components/TopBar';
 import TransientNotices from '../components/TransientNotices';
 import {
@@ -43,7 +42,6 @@ const WizardApp = ( { query } ) => {
 	);
 
 	const appSettings = useSettingsSelect();
-	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
 	const createNotice = useCreateNotice();
 
 	useEffect( () => {

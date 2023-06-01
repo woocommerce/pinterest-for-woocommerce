@@ -139,11 +139,9 @@ const SetupAccount = ( {
 									// eslint-disable-next-line jsx-a11y/anchor-has-content
 									<a
 										{ ...documentationLinkProps( {
-											href:
-												wcSettings
-													.pinterest_for_woocommerce
-													.pinterestLinks
-													.adGuidelines,
+											href: wcSettings
+												.pinterest_for_woocommerce
+												.pinterestLinks.adGuidelines,
 											linkId: 'ad-guidelines',
 											context,
 											rel: 'noreferrer',
@@ -155,11 +153,10 @@ const SetupAccount = ( {
 									// eslint-disable-next-line jsx-a11y/anchor-has-content
 									<a
 										{ ...documentationLinkProps( {
-											href:
-												wcSettings
-													.pinterest_for_woocommerce
-													.pinterestLinks
-													.merchantGuidelines,
+											href: wcSettings
+												.pinterest_for_woocommerce
+												.pinterestLinks
+												.merchantGuidelines,
 											linkId: 'merchant-guidelines',
 											context,
 											rel: 'noreferrer',
