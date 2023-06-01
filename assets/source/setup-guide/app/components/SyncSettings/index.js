@@ -30,9 +30,8 @@ const SyncSettings = () => {
 	const syncAppSettings = useSyncSettingsDispatch();
 	const createNotice = useCreateNotice();
 	const { removeNotice } = useDispatch( 'core/notices' );
-	const [ triggeredSyncSettings, setTriggeredSyncSettings ] = useState(
-		false
-	);
+	const [ triggeredSyncSettings, setTriggeredSyncSettings ] =
+		useState( false );
 
 	const syncSettings = async () => {
 		try {

@@ -34,8 +34,7 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 import documentationLinkProps from '../helpers/documentation-link-props';
-import connectAdvertiser from "../helpers/connect-advertiser";
-import {getNewPath} from "@woocommerce/navigation";
+import { getNewPath } from '@woocommerce/navigation'; // eslint-disable-line
 
 const StaticError = ( { reqError } ) => {
 	if ( reqError?.data?.pinterest_code === undefined ) {
@@ -94,12 +93,11 @@ const StaticError = ( { reqError } ) => {
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'claim-website', context: props.view }`
  * @param {Object} props React props.
  * @param {'wizard'|'settings'} props.view Indicate which view this component is rendered on.
- * @param {Function} [props.goToNextStep]
  *   When the website claim is complete, called when clicking the "Continue" button.
  *   The "Continue" button is only displayed when `props.view` is 'wizard'.
  * @return {JSX.Element} Rendered component.
  */
-const ClaimWebsite = ( { goToNextStep, view } ) => {
+const ClaimWebsite = ( { view } ) => {
 	const [ status, setStatus ] = useState( STATUS.IDLE );
 	const [ reqError, setReqError ] = useState();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
@@ -109,13 +107,16 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 
 	useEffect( () => {
 		// If domain is not verified and verification status is not pending nor success - start verification.
-		if ( ! Object.values( LABEL_STATUS ).includes( status ) && ! isDomainVerified ) {
+		if (
+			! Object.values( LABEL_STATUS ).includes( status ) &&
+			! isDomainVerified
+		) {
 			handleClaimWebsite();
 		}
 		if ( status !== STATUS.PENDING && isDomainVerified ) {
 			setStatus( STATUS.SUCCESS );
 		}
-	}, [ status, isDomainVerified ] );
+	}, [ status, isDomainVerified ] ); // eslint-disable-line
 
 	const handleClaimWebsite = async () => {
 		setStatus( STATUS.PENDING );
@@ -155,7 +156,10 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 
 	const VerifyButton = () => {
 		const buttonLabels = {
-			[ STATUS.IDLE ]: __( 'Start verification', 'pinterest-for-woocommerce' ),
+			[ STATUS.IDLE ]: __(
+				'Start verification',
+				'pinterest-for-woocommerce'
+			),
 			[ STATUS.PENDING ]: __( 'Verifying…', 'pinterest-for-woocommerce' ),
 			[ STATUS.ERROR ]: __( 'Try again', 'pinterest-for-woocommerce' ),
 			[ STATUS.SUCCESS ]: __( 'Verified', 'pinterest-for-woocommerce' ),
@@ -175,9 +179,13 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 		return (
 			<Button
 				isPrimary
-				disabled={ status !== STATUS.SUCCESS && status !== STATUS.ERROR }
+				disabled={
+					status !== STATUS.SUCCESS && status !== STATUS.ERROR
+				}
 				onClick={
-					status === STATUS.SUCCESS ? handleCompleteSetup : handleClaimWebsite
+					status === STATUS.SUCCESS
+						? handleCompleteSetup
+						: handleClaimWebsite
 				}
 			>
 				{ buttonLabels[ status ] }
@@ -189,10 +197,7 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 		try {
 			createNotice(
 				'success',
-				__(
-					'Connected successfully.',
-					'pinterest-for-woocommerce'
-				)
+				__( 'Connected successfully.', 'pinterest-for-woocommerce' )
 			);
 
 			recordEvent( 'pfw_setup', {

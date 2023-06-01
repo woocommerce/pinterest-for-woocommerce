@@ -179,9 +179,8 @@ export const DISAPPROVAL_COPY_STATES = Object.freeze( {
 				// eslint-disable-next-line jsx-a11y/anchor-has-content
 				<a
 					{ ...documentationLinkProps( {
-						href:
-							wcSettings.pinterest_for_woocommerce.pinterestLinks
-								.merchantGuidelines,
+						href: wcSettings.pinterest_for_woocommerce
+							.pinterestLinks.merchantGuidelines,
 						linkId: 'merchant-guidelines',
 						context: 'merchant-disapproval-reasons',
 						rel: 'noreferrer',

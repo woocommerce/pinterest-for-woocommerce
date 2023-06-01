@@ -63,9 +63,8 @@ function UnsupportedCountryNotice( { countryCode } ) {
 					supportedCountriesLink: (
 						<ExternalLink
 							{ ...documentationLinkProps( {
-								href:
-									wcSettings.pinterest_for_woocommerce
-										.pinterestLinks.adsAvailability,
+								href: wcSettings.pinterest_for_woocommerce
+									.pinterestLinks.adsAvailability,
 								eventName: 'pfw_get_started_notice_link_click',
 								linkId: 'ads-availability',
 								context: 'pinterest-landing',
