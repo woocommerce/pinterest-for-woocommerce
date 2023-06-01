@@ -67,7 +67,7 @@ class APIV5 extends Base {
 	 *      @type int $following_count  User account following count.
 	 *      @type int $monthly_views    User account monthly views.
 	 * }
-	 * @throws ApiException
+	 * @throws ApiException Throws 403 and 500 exceptions.
 	 */
 	public static function get_account_info() {
 		return self::make_request( 'user_account', 'GET' );
@@ -89,7 +89,7 @@ class APIV5 extends Base {
 	 *     }
 	 *     @type string $bookmark
 	 * }
-	 * @throws ApiException
+	 * @throws ApiException Throws 403 and 500 exceptions.
 	 */
 	public static function get_user_websites() {
 		return self::make_request( 'user_account/websites', 'GET' );
@@ -100,8 +100,16 @@ class APIV5 extends Base {
 	 *
 	 * @since x.x.x
 	 *
-	 * @return array|mixed
-	 * @throws ApiException
+	 * @return mixed|array[] {
+	 *      Linked businesses list.
+	 *
+	 *      @type string $username
+	 *      @type string $image_small_url
+	 *      @type string $image_medium_url
+	 *      @type string $image_large_url
+	 *      @type string $image_xlarge_url
+	 * }
+	 * @throws ApiException Throws 500 exception in case of unexpected error.
 	 */
 	public static function get_linked_businesses() {
 		return self::make_request( 'user_account/businesses', 'GET' );
@@ -111,6 +119,8 @@ class APIV5 extends Base {
 	 * Get the advertiser object from the Pinterest API for the given User ID.
 	 *
 	 * @since x.x.x
+	 *
+	 * @param string $pinterest_user The Pinterest User ID.
 	 *
 	 * @return mixed
 	 */
@@ -152,7 +162,7 @@ class APIV5 extends Base {
 	 *      }
 	 * }
 	 *
-	 * @throws ApiException|Exception
+	 * @throws ApiException|Exception Throws 500 exception.
 	 */
 	public static function get_advertiser_tags( $ad_account_id ) {
 		return self::make_request( "ad_accounts/{$ad_account_id}/conversion_tags", 'GET' );
@@ -160,6 +170,7 @@ class APIV5 extends Base {
 
 	/**
 	 * Create a tag for the given advertiser.
+	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/conversion_tags/create
 	 *
 	 * @since x.x.x
@@ -189,7 +200,7 @@ class APIV5 extends Base {
 	 *          @type ?bool $aem_loc_enabled    Whether Automatic Enhanced Match location is enabled.
 	 *      }
 	 * }
-	 * @throws ApiException|Exception
+	 * @throws ApiException|Exception Throws 500 exception.
 	 */
 	public static function create_tag( $ad_account_id ) {
 		$tag_name = self::get_tag_name();
@@ -225,7 +236,7 @@ class APIV5 extends Base {
 	 *      @type string $filename          File expected to find on the website being claimed.
 	 *      @type string $file_content      A full html file to upload to the website in order for it to be claimed.
 	 * }
-	 * @throws PinterestApiException
+	 * @throws PinterestApiException If the request fails with 403 or 500 status.
 	 */
 	public static function domain_verification_data(): array {
 		return self::make_request( 'user_account/websites/verification' );
@@ -244,7 +255,7 @@ class APIV5 extends Base {
 	 *      @type string $status        Status of the verification process.
 	 *      @type string $verified_at   UTC timestamp when the verification happened - sometimes missing.
 	 * }
-	 * @throws PinterestApiException
+	 * @throws PinterestApiException If the request fails with 500 status.
 	 */
 	public static function domain_metatag_verification_request( string $domain ): array {
 		return self::make_request(

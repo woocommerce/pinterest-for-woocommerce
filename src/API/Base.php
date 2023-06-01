@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
+use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
 use \Exception;
 
@@ -77,8 +78,8 @@ class Base {
 	 *
 	 * @return array
 	 *
-	 * @throws ApiException PHP exception.
-	 * @throws Exception    PHP exception.
+	 * @throws PinterestApiException Pinterest API exception in case of API error in response.
+	 * @throws Exception             PHP exception.
 	 */
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 
