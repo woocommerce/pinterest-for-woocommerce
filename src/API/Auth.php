@@ -10,7 +10,8 @@ namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Throwable;
-use \WP_REST_Request;
+use WP_HTTP_Response;
+use WP_REST_Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
