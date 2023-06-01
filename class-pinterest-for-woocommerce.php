@@ -588,7 +588,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			new Pinterest\API\FeedState();
 			new Pinterest\API\FeedIssues();
 			new Pinterest\API\Tags();
-			new Pinterest\API\HealthCheck();
+			new Pinterest\API\Health();
 			new Pinterest\API\Settings();
 			new Pinterest\API\SyncSettings();
 			new Pinterest\API\UserInteraction();
@@ -692,7 +692,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				self::flush_options();
 				// At this point we're disconnected.
 				return true;
-			} catch ( \Exception $th ) {
+			} catch ( Exception $th ) {
 				// There was an error disconnecting merchant.
 				return false;
 			}
@@ -947,12 +947,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function delete_commerce_integration(): bool {
 			$external_business_id = Pinterest_For_Woocommerce::get_data( 'integration_data' )['external_business_id'];
 
-			$response = Pinterest\API\APIV5::make_request(
+			Pinterest\API\APIV5::make_request(
 				"integrations/commerce/{$external_business_id}",
 				'DELETE'
 			);
 
-			// @TODO: add proper response handling. Check for success http status 204 or unexpected error in return.
 			return true;
 		}
 
@@ -996,20 +995,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			try {
 				$integration_data = self::get_data( 'integration_data' );
 				$account_data     = Pinterest\API\APIV5::get_account_info();
-				/*
-				Example of $account_data
-					array (
-						'monthly_views' => -1,
-						'following_count' => 0,
-						'account_type' => 'BUSINESS',
-						'website_url' => 'http://pinterest.dima.works',
-						'username' => 'dmytromaksiuta1',
-						'board_count' => 0,
-						'pin_count' => -20,
-						'profile_image' => 'https://i.pinimg.com/600x600_R/42/f5/36/42f5364f737aff4749a8e9046510828f.jpg',
-						'follower_count' => 1,
-						'business_name' => 'WooCommerce',
-				)*/
 
 				$data = array(
 					'username'         => $account_data['username'] ?? '',

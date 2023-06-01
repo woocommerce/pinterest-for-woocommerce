@@ -186,15 +186,17 @@ class APIV5 extends Base {
 		return self::make_request(
 			"ad_accounts/{$ad_account_id}/conversion_tags",
 			'POST',
-			array(
-				'name'             => $tag_name,
-				'aem_enabled'      => true,
-				'md_frequency'     => 1,
-				'aem_fnln_enabled' => true,
-				'aem_ph_enabled'   => true,
-				'aem_ge_enabled'   => true,
-				'aem_db_enabled'   => true,
-				'ae_loc_enabled'   => true,
+			json_encode(
+				array(
+					'name'             => $tag_name,
+					'aem_enabled'      => true,
+					'md_frequency'     => 1,
+					'aem_fnln_enabled' => true,
+					'aem_ph_enabled'   => true,
+					'aem_ge_enabled'   => true,
+					'aem_db_enabled'   => true,
+					'ae_loc_enabled'   => true,
+				)
 			)
 		);
 	}

@@ -61,6 +61,7 @@ class AdvertiserConnect extends VendorAPI {
 				throw new Exception( esc_html__( 'Missing advertiser or tag parameters.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
+			// Automatic Enhanced Match is enabled by default (at least Pinterest said so).
 			if ( $enable_aem ) {
 				// @TODO: We do not have an API v5 analog for this call. Commenting it out temporarily.
 				#self::enable_aem_tag( $tag_id );
@@ -79,7 +80,7 @@ class AdvertiserConnect extends VendorAPI {
 			// Update integration with new advertiser and a tag.
 			return self::connect_advertiser_and_tag( $advertiser_id, $tag_id );
 
-		} catch ( \Throwable $th ) {
+		} catch ( Throwable $th ) {
 
 			/* Translators: The error description as returned from the API */
 			$error_message = sprintf( esc_html__( 'Could not connect advertiser with Pinterest. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
@@ -105,7 +106,9 @@ class AdvertiserConnect extends VendorAPI {
 	 */
 	public static function connect_advertiser_and_tag( string $advertiser_id, string $tag_id ): array {
 
-		$external_business_id = Pinterest_For_Woocommerce::get_data( 'external_business_id' );
+		$integration_data     = Pinterest_For_Woocommerce::get_data( 'integration_data' );
+		$external_business_id = $integration_data['external_business_id'] ?? '';
+
 		$data = array(
 			'connected_advertiser_id' => $advertiser_id,
 			'connected_tag_id'        => $tag_id,
