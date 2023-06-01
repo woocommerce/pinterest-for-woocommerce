@@ -64,7 +64,7 @@ class AdvertiserConnect extends VendorAPI {
 			// Automatic Enhanced Match is enabled by default (at least Pinterest said so).
 			// if ( $enable_aem ) {
 				// @TODO: We do not have an API v5 analog for this call. Commenting it out temporarily.
-				# self::enable_aem_tag( $tag_id );
+				// self::enable_aem_tag( $tag_id );
 			// }
 
 			$is_connected = Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' );
