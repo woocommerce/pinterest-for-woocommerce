@@ -39,7 +39,7 @@ class APIV5 extends Base {
 		return array(
 			'url'         => static::API_DOMAIN . "/{$endpoint}",
 			'method'      => $method,
-			'args'        => $payload,
+			'args'        => wp_json_encode( $payload ),
 			'headers'     => array(
 				'Pinterest-Woocommerce-Version' => PINTEREST_FOR_WOOCOMMERCE_VERSION,
 				'Content-Type'                  => 'application/json',
@@ -207,17 +207,15 @@ class APIV5 extends Base {
 		return self::make_request(
 			"ad_accounts/{$ad_account_id}/conversion_tags",
 			'POST',
-			json_encode(
-				array(
-					'name'             => $tag_name,
-					'aem_enabled'      => true,
-					'md_frequency'     => 1,
-					'aem_fnln_enabled' => true,
-					'aem_ph_enabled'   => true,
-					'aem_ge_enabled'   => true,
-					'aem_db_enabled'   => true,
-					'ae_loc_enabled'   => true,
-				)
+			array(
+				'name'             => $tag_name,
+				'aem_enabled'      => true,
+				'md_frequency'     => 1,
+				'aem_fnln_enabled' => true,
+				'aem_ph_enabled'   => true,
+				'aem_ge_enabled'   => true,
+				'aem_db_enabled'   => true,
+				'ae_loc_enabled'   => true,
 			)
 		);
 	}
