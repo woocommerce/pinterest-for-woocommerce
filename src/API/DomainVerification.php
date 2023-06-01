@@ -77,7 +77,7 @@ class DomainVerification extends VendorAPI {
 				)
 			);
 		}
-		// return self::trigger_domain_verification();
+		// return self::trigger_domain_verification();.
 	}
 
 
