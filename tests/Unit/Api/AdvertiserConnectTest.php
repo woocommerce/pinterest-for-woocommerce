@@ -10,8 +10,6 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
 
 use Automattic\WooCommerce\Pinterest\API\AdvertiserConnect;
 use Exception;
-use WP_HTTP_Requests_Response;
-use WpOrg\Requests\Response;
 
 class AdvertiserConnectTest extends \WP_UnitTestCase {
 
@@ -42,14 +40,11 @@ class AdvertiserConnectTest extends \WP_UnitTestCase {
 						)
 					),
 					'response' => array(
-						'code' => 200,
+						'code'    => 200,
+						'message' => 'OK',
 					),
 					'cookies'  => array(),
 					'filename' => '',
-					'http_response' => new WP_HTTP_Requests_Response(
-						new Response(),
-						''
-					),
 				);
 			},
 			10,
@@ -89,14 +84,11 @@ class AdvertiserConnectTest extends \WP_UnitTestCase {
 						)
 					),
 					'response' => array(
-						'code' => 404,
+						'code'    => 404,
+						'message' => 'Not Found',
 					),
 					'cookies'  => array(),
 					'filename' => '',
-					'http_response' => new WP_HTTP_Requests_Response(
-						new Response(),
-						''
-					),
 				);
 			},
 			10,

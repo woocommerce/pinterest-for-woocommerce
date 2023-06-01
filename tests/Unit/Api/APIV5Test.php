@@ -10,9 +10,7 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
-use WP_HTTP_Requests_Response;
 use WP_UnitTestCase;
-use WpOrg\Requests\Response;
 
 class APIV5Test extends WP_UnitTestCase {
 
@@ -51,14 +49,11 @@ class APIV5Test extends WP_UnitTestCase {
 						)
 					),
 					'response' => array(
-						'code' => 200,
+						'code'    => 200,
+						'message' => 'OK',
 					),
 					'cookies'  => array(),
 					'filename' => '',
-					'http_response' => new WP_HTTP_Requests_Response(
-						new Response(),
-						''
-					),
 				);
 			},
 			10,
@@ -106,14 +101,11 @@ class APIV5Test extends WP_UnitTestCase {
 						)
 					),
 					'response' => array(
-						'code' => 0,
+						'code'    => 500,
+						'message' => 'Unexpected error',
 					),
 					'cookies'  => array(),
 					'filename' => '',
-					'http_response' => new WP_HTTP_Requests_Response(
-						new Response(),
-						''
-					),
 				);
 			},
 			10,

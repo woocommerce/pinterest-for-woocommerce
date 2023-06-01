@@ -8,10 +8,8 @@ declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
 
-use WP_HTTP_Requests_Response;
 use WP_REST_Request;
 use WP_Test_REST_TestCase;
-use WpOrg\Requests\Response;
 
 class TagsTest extends WP_Test_REST_TestCase {
 
@@ -147,14 +145,11 @@ class TagsTest extends WP_Test_REST_TestCase {
 						)
 					),
 					'response' => array(
-						'code' => 200,
+						'code'    => 200,
+						'message' => 'OK',
 					),
 					'cookies'  => array(),
 					'filename' => '',
-					'http_response' => new WP_HTTP_Requests_Response(
-						new Response(),
-						''
-					),
 				);
 			},
 			10,
@@ -243,14 +238,11 @@ class TagsTest extends WP_Test_REST_TestCase {
 					),
 					'body' => json_encode( $body ),
 					'response' => array(
-						'code' => 200,
+						'code'    => 200,
+						'message' => 'OK',
 					),
 					'cookies'  => array(),
 					'filename' => '',
-					'http_response' => new WP_HTTP_Requests_Response(
-						new Response(),
-						''
-					),
 				);
 			},
 			10,
@@ -304,10 +296,6 @@ class TagsTest extends WP_Test_REST_TestCase {
 					),
 					'cookies'  => array(),
 					'filename' => '',
-					'http_response' => new WP_HTTP_Requests_Response(
-						new Response(),
-						''
-					),
 				);
 			},
 			10,
@@ -341,8 +329,9 @@ class TagsTest extends WP_Test_REST_TestCase {
 		add_filter(
 			'pre_http_request',
 			function ( $response, $parsed_args, $url ) {
-				$body = array();
-				$code = 200;
+				$body    = array();
+				$code    = 200;
+				$message = 'OK';
 
 				// 1. GET tags list.
 				if ( 'GET' === $parsed_args['method'] ) {
@@ -353,8 +342,9 @@ class TagsTest extends WP_Test_REST_TestCase {
 
 				// 2. POST new tag.
 				if ( 'POST' === $parsed_args['method'] ) {
-					$code = 500;
-					$body = array(
+					$code    = 500;
+					$message = 'Unexpected error';
+					$body    = array(
 						'code' => 0,
 						'message' => 'string',
 					);
@@ -366,14 +356,11 @@ class TagsTest extends WP_Test_REST_TestCase {
 					),
 					'body' => json_encode( $body ),
 					'response' => array(
-						'code' => $code,
+						'code'    => $code,
+						'message' => $message,
 					),
 					'cookies'  => array(),
 					'filename' => '',
-					'http_response' => new WP_HTTP_Requests_Response(
-						new Response(),
-						''
-					),
 				);
 			},
 			10,
