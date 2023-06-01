@@ -5,9 +5,7 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\RefreshToken;
 use Pinterest_For_Woocommerce;
-use WP_HTTP_Requests_Response;
 use WP_UnitTestCase;
-use WpOrg\Requests\Response;
 
 class PinterestForWoocommerceTest extends WP_UnitTestCase {
 
@@ -50,14 +48,11 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 						)
 					),
 					'response' => array(
-						'code' => 200,
+						'code'    => 200,
+						'message' => 'OK',
 					),
 					'cookies'  => array(),
 					'filename' => '',
-					'http_response' => new WP_HTTP_Requests_Response(
-						new Response(),
-						''
-					),
 				);
 			},
 			10,
@@ -122,14 +117,11 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 						)
 					),
 					'response' => array(
-						'code' => 404,
+						'code'    => 404,
+						'message' => 'Not Found',
 					),
 					'cookies'  => array(),
 					'filename' => '',
-					'http_response' => new WP_HTTP_Requests_Response(
-						new Response(),
-						''
-					),
 				);
 			},
 			10,
@@ -173,14 +165,11 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 						)
 					),
 					'response' => array(
-						'code' => 409,
+						'code'    => 409,
+						'message' => 'Conflict',
 					),
 					'cookies'  => array(),
 					'filename' => '',
-					'http_response' => new WP_HTTP_Requests_Response(
-						new Response(),
-						''
-					),
 				);
 			},
 			10,
@@ -224,14 +213,11 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 						)
 					),
 					'response' => array(
-						'code' => 0,
+						'code'    => 500,
+						'message' => 'Unexpected error',
 					),
 					'cookies'  => array(),
 					'filename' => '',
-					'http_response' => new WP_HTTP_Requests_Response(
-						new Response(),
-						''
-					),
 				);
 			},
 			10,
