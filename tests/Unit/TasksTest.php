@@ -5,6 +5,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
+use Pinterest_For_Woocommerce;
 use \WP_UnitTestCase;
 use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
 use Automattic\WooCommerce\Pinterest\Admin\Tasks\Onboarding;
@@ -49,6 +50,13 @@ class TasksTest extends WP_UnitTestCase {
 	 * Tasks to assert the completion of the Onboarding task.
 	 */
 	public function test_onboarding_task_completed() {
+		add_filter(
+			'home_url',
+			function() {
+				return 'https://somedomain.com/';
+			}
+		);
+
 		// Assert that the task is not completed.
 		$task        = TaskLists::get_task( 'setup-pinterest' );
 		$is_complete = $task->is_complete();
@@ -58,15 +66,16 @@ class TasksTest extends WP_UnitTestCase {
 		// Setup complete data.
 		$account_data = array(
 			'is_any_website_verified' => true,
+			'verified_user_websites'  => array( 'somedomain.com' ),
 			'is_partner'              => true,
 		);
-		\Pinterest_For_Woocommerce::save_setting( 'account_data', $account_data );
-		\Pinterest_For_Woocommerce::save_token_data(
+		Pinterest_For_Woocommerce::save_setting( 'account_data', $account_data );
+		Pinterest_For_Woocommerce::save_token_data(
 			array(
 				'access_token' => 'some-fake-access-token',
 			)
 		);
-		\Pinterest_For_Woocommerce::save_setting( 'tracking_tag', true );
+		Pinterest_For_Woocommerce::save_setting( 'tracking_tag', true );
 
 		// Assert that the task is completed.
 		$is_complete = $task->is_complete();
