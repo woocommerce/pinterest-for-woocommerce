@@ -28,10 +28,7 @@ import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import UrlInputControl from '../components/UrlInputControl';
 import StatusLabel from '../components/StatusLabel';
-import {
-	useSettingsSelect,
-	useCreateNotice,
-} from '../helpers/effects';
+import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
 import documentationLinkProps from '../helpers/documentation-link-props';
 import { getNewPath } from '@woocommerce/navigation'; // eslint-disable-line
 
