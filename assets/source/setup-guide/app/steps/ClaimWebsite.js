@@ -30,7 +30,6 @@ import UrlInputControl from '../components/UrlInputControl';
 import StatusLabel from '../components/StatusLabel';
 import {
 	useSettingsSelect,
-	useSettingsDispatch,
 	useCreateNotice,
 } from '../helpers/effects';
 import documentationLinkProps from '../helpers/documentation-link-props';
