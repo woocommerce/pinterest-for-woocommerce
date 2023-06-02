@@ -828,6 +828,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 		}
 
+		public static function unverify_website() {
+			var_export( 'Unverify website.' );
+			$website  = wp_parse_url( get_home_url() )['host'];
+			$response = Pinterest\API\APIV5::make_request(
+				"user_account/websites?website={$website}",
+				'DELETE'
+			);
+			var_export( $response );
+			exit;
+		}
+
 		/**
 		 * Connects WC to Pinterest.
 		 *
@@ -1236,7 +1247,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_account_id() {
 			$account_data = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
-			return isset( $account_data['id'] ) ? $account_data['id'] : false;
+			return $account_data['id'] ?? false;
 		}
 
 		/**
@@ -1334,14 +1345,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Checks whether we have verified our domain, by checking account_data as
+		 * Checks whether we have verified our current domain, by checking account_data as
 		 * returned by Pinterest.
 		 *
-		 * @return boolean
+		 * @return bool
 		 */
-		public static function is_domain_verified() {
+		public static function is_domain_verified(): bool {
 			$account_data = self::get_setting( 'account_data' );
-			return isset( $account_data['is_any_website_verified'] ) ? (bool) $account_data['is_any_website_verified'] : false;
+			$verified_domains = $account_data['verified_user_websites'] ?? array();
+			return in_array( wp_parse_url( get_home_url() )['host'] ?? '' , $verified_domains );
 		}
 
 		/**

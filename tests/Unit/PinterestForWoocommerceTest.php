@@ -10,6 +10,34 @@ use WP_UnitTestCase;
 class PinterestForWoocommerceTest extends WP_UnitTestCase {
 
 	/**
+	 * Tests default settings are set.
+	 *
+	 * @return void
+	 */
+	public function test_set_default_settings() {
+		// Make sure settings are empty.
+		Pinterest_For_Woocommerce::save_settings( array() );
+
+		Pinterest_For_Woocommerce::set_default_settings();
+
+		$settings = Pinterest_For_Woocommerce::get_settings( true );
+		$this->assertEquals(
+			array(
+				'track_conversions'                => true,
+				'enhanced_match_support'           => true,
+				'automatic_enhanced_match_support' => true,
+				'save_to_pinterest'                => true,
+				'rich_pins_on_posts'               => true,
+				'rich_pins_on_products'            => true,
+				'product_sync_enabled'             => true,
+				'enable_debug_logging'             => false,
+				'erase_plugin_data'                => false,
+			),
+			$settings
+		);
+	}
+
+	/**
 	 * Test of the plugin has refresh token action initialised.
 	 *
 	 * @return void

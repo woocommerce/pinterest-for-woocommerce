@@ -123,14 +123,11 @@ const ClaimWebsite = ( { view } ) => {
 		setReqError();
 
 		try {
-			const results = await apiFetch( {
+			await apiFetch( {
 				path: pfwSettings.apiRoute + '/domain_verification',
 				method: 'POST',
 			} );
-			await setAppSettings( { account_data: results.account_data } );
-
 			recordEvent( 'pfw_domain_verify_success' );
-
 			setStatus( STATUS.SUCCESS );
 		} catch ( error ) {
 			setStatus( STATUS.ERROR );
