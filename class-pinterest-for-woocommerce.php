@@ -828,17 +828,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 		}
 
-		public static function unverify_website() {
-			var_export( 'Unverify website.' );
-			$website  = wp_parse_url( get_home_url() )['host'];
-			$response = Pinterest\API\APIV5::make_request(
-				"user_account/websites?website={$website}",
-				'DELETE'
-			);
-			var_export( $response );
-			exit;
-		}
-
 		/**
 		 * Connects WC to Pinterest.
 		 *
@@ -1353,7 +1342,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function is_domain_verified(): bool {
 			$account_data = self::get_setting( 'account_data' );
 			$verified_domains = $account_data['verified_user_websites'] ?? array();
-			return in_array( wp_parse_url( get_home_url() )['host'] ?? '' , $verified_domains );
+			return in_array( wp_parse_url( get_home_url() )['host'] ?? '', $verified_domains );
 		}
 
 		/**
