@@ -39,7 +39,7 @@ class APIV5 extends Base {
 		return array(
 			'url'         => static::API_DOMAIN . "/{$endpoint}",
 			'method'      => $method,
-			'args'        => wp_json_encode( $payload ),
+			'args'        => ! empty( $payload ) ? wp_json_encode( $payload ) : array(),
 			'headers'     => array(
 				'Pinterest-Woocommerce-Version' => PINTEREST_FOR_WOOCOMMERCE_VERSION,
 				'Content-Type'                  => 'application/json',
@@ -169,6 +169,47 @@ class APIV5 extends Base {
 	}
 
 	/**
+	 * Get the advertiser's tracking tag config and details.
+	 *
+	 * @link https://developers.pinterest.com/docs/api/v5/#operation/conversion_tags/get
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $ad_account_id         Ad account ID.
+	 * @param string $conversion_tag_id     Conversion tag ID.
+	 *
+	 * @return mixed|array {
+	 *      Tag object.
+	 *
+	 *      @type string    $ad_account_id          Ad account ID.
+	 *      @type string    $code_snippet           Tag code snippet.
+	 *      @type string    $enhanced_match_status  Enum: "UNKNOWN" "NOT_VALIDATED" "VALIDATING_IN_PROGRESS" "VALIDATION_COMPLETE" null
+	 *                                              The enhanced match status of the tag
+	 *      @type string    $id                     Tag ID.
+	 *      @type int       $last_fired_time_ms     Time for the last event fired.
+	 *      @type string    $name                   Conversion tag name.
+	 *      @type string    $status                 Enum: "ACTIVE" "PAUSED" "ARCHIVED"
+	 *                                              Entity status
+	 *      @type string    $version                Version number.
+	 *      @type array     $configs {
+	 *          Tag Enhanced Match configuration.
+	 *
+	 *          @type bool    $aem_enabled         Whether Automatic Enhanced Match email is enabled.
+	 *          @type int     $md_frequency        Metadata ingestion frequency.
+	 *          @type bool    $aem_fnln_enabled    Whether Automatic Enhanced Match name is enabled.
+	 *          @type bool    $aem_ph_enabled      Whether Automatic Enhanced Match phone is enabled.
+	 *          @type bool    $aem_ge_enabled      Whether Automatic Enhanced Match gender is enabled.
+	 *          @type bool    $aem_db_enabled      Whether Automatic Enhanced Match birthdate is enabled.
+	 *          @type bool    $aem_loc_enabled     Whether Automatic Enhanced Match location is enabled.
+	 *      }
+	 * }
+	 * @throws ApiException Throws 500 exception in case of unexpected error.
+	 */
+	public static function get_advertiser_tag( $ad_account_id, $conversion_tag_id ) {
+		return self::make_request( "ad_accounts/{$ad_account_id}/conversion_tags/{$conversion_tag_id}", 'GET' );
+	}
+
+	/**
 	 * Create a tag for the given advertiser.
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/conversion_tags/create
@@ -237,7 +278,7 @@ class APIV5 extends Base {
 	 * @throws PinterestApiException If the request fails with 403 or 500 status.
 	 */
 	public static function domain_verification_data(): array {
-		return self::make_request( 'user_account/websites/verification' );
+		return self::make_request( 'user_account/websites/verification', 'GET' );
 	}
 
 	/**
