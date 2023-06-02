@@ -101,7 +101,6 @@ const ClaimWebsite = ( { view } ) => {
 	const [ status, setStatus ] = useState( STATUS.IDLE );
 	const [ reqError, setReqError ] = useState();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
-	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
 	const pfwSettings = wcSettings.pinterest_for_woocommerce;
 
