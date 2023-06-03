@@ -283,11 +283,9 @@ const ClaimWebsite = ( { view } ) => {
 						) }
 					</Card>
 
-					{ view === 'wizard' && (
+					{ view === 'wizard' && status !== STATUS.IDLE && (
 						<div className="woocommerce-setup-guide__footer-button">
-							{ status !== STATUS.IDLE && (
-								<CompleteSetupButton />
-							) }
+							<CompleteSetupButton />
 						</div>
 					) }
 				</div>
