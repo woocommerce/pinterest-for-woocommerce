@@ -57,15 +57,19 @@ class DomainVerification extends VendorAPI {
 	 */
 	public function maybe_handle_verification() {
 		try {
-			$result = array();
+			$result       = array();
+			$account_data = Pinterest_For_Woocommerce()::get_setting( 'account_data', true );
 			if ( ! Pinterest_For_Woocommerce::is_domain_verified() ) {
 				$domain_verification_data = APIV5::domain_verification_data();
 				Pinterest_For_Woocommerce()::save_data( 'verification_data', $domain_verification_data );
-
 				$parsed_website = wp_parse_url( get_home_url() );
 				$result         = APIV5::domain_metatag_verification_request( $parsed_website['host'] . $parsed_website['path'] );
+				if ( 'success' === $result['status'] ) {
+					$account_data['verified_user_websites'][] = $result['website'];
+					$account_data['is_any_website_verified']  = 0 < count( $account_data['verified_user_websites'] );
+					Pinterest_For_Woocommerce()::save_setting( 'account_data', $account_data );
+				}
 			}
-			$account_data = Pinterest_For_Woocommerce()::update_account_data();
 			return array_merge( $result, array( 'account_data' => $account_data ) );
 		} catch ( PinterestApiException $th ) {
 			return new WP_Error(
@@ -77,7 +81,6 @@ class DomainVerification extends VendorAPI {
 				)
 			);
 		}
-		// return self::trigger_domain_verification();.
 	}
 
 
