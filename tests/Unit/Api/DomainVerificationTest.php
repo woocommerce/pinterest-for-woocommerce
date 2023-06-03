@@ -67,7 +67,12 @@ class DomainVerificationTest extends WP_Test_REST_TestCase {
 			)
 		);
 
-		add_filter( 'home_url', fn () => 'https://mysite.test/' );
+		add_filter(
+			'home_url',
+			function () {
+				return 'https://mysite.test/';
+			}
+		);
 
 		add_filter(
 			'pre_http_request',
