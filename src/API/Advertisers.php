@@ -48,12 +48,16 @@ class Advertisers extends VendorAPI {
 	public function get_advertisers( WP_REST_Request $request ) {
 		try {
 			$advertisers  = APIV5::get_advertisers();
-			$terms_agreed = $request->has_param( 'terms_agreed' ) ? (int) $request->get_param( 'terms_agreed' ) : false;
 
-			if ( empty( $advertisers['items'] ) && ! empty( $terms_agreed ) ) {
-				$advertiser          = Base::create_advertiser( $terms_agreed );
-				$advertisers['data'] = 'success' === $advertiser['status'] ? array( $advertiser['data'] ) : array();
-			}
+			/*
+			 * With the new Pinterest on-boarding popup we do not need to create and advertiser. We will always have it.
+			 *
+			 * $terms_agreed = $request->has_param( 'terms_agreed' ) ? (int) $request->get_param( 'terms_agreed' ) : false;
+			 * if ( empty( $advertisers['items'] ) && ! empty( $terms_agreed ) ) {
+			 * 		$advertiser          = Base::create_advertiser( $terms_agreed );
+			 * 		$advertisers['data'] = 'success' === $advertiser['status'] ? array( $advertiser['data'] ) : array();
+			 * }
+			 */
 
 			return array(
 				'advertisers' => array_map(
