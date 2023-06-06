@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.2 - 2023-06-06 =
+* Fix - Ensure there is no fatal error for PHP 8+ during activation.
+
 = 1.3.1 - 2023-06-06 =
 * Update - Pinterest feed generator backoff adjustments.
 
