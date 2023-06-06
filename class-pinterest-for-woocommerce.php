@@ -581,7 +581,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @param string $key - The key of specific data to retrieve.
 		 *
-		 * @since x.x.x
+		 * @since 1.3.1
 		 *
 		 * @return bool - True if the data was removed, false otherwise.
 		 */
