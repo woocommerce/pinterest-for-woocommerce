@@ -9,7 +9,6 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { Spinner } from '@woocommerce/components';
 import {
 	Button,
 	Card,
@@ -180,7 +179,8 @@ const ClaimWebsite = ( { view } ) => {
 						: handleClaimWebsite
 				}
 			>
-				{ buttonLabels[ status ] }
+				{ buttonLabels[ status ] ??
+					__( 'Verifying…', 'pinterest-for-woocommerce' ) }
 			</Button>
 		);
 	};
@@ -251,39 +251,33 @@ const ClaimWebsite = ( { view } ) => {
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
-						{ undefined !== isDomainVerified ? (
-							<CardBody size="large">
-								<Text variant="subtitle">
-									{ __(
-										'Verify your domain to claim your website',
-										'pinterest-for-woocommerce'
-									) }
-								</Text>
-								<Text variant="body">
-									{ __(
-										'This will allow access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site, and let people know where they can find more of your content.',
-										'pinterest-for-woocommerce'
-									) }
-								</Text>
+						<CardBody size="large">
+							<Text variant="subtitle">
+								{ __(
+									'Verify your domain to claim your website',
+									'pinterest-for-woocommerce'
+								) }
+							</Text>
+							<Text variant="body">
+								{ __(
+									'This will allow access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site, and let people know where they can find more of your content.',
+									'pinterest-for-woocommerce'
+								) }
+							</Text>
 
-								<Flex gap={ 6 }>
-									<UrlInputControl
-										disabled
-										value={ pfwSettings.homeUrlToVerify }
-									/>
-									<VerifyButton />
-								</Flex>
+							<Flex gap={ 6 }>
+								<UrlInputControl
+									disabled
+									value={ pfwSettings.homeUrlToVerify }
+								/>
+								<VerifyButton />
+							</Flex>
 
-								<StaticError reqError={ reqError } />
-							</CardBody>
-						) : (
-							<CardBody size="large">
-								<Spinner />
-							</CardBody>
-						) }
+							<StaticError reqError={ reqError } />
+						</CardBody>
 					</Card>
 
-					{ view === 'wizard' && status !== STATUS.IDLE && (
+					{ view === 'wizard' && (
 						<div className="woocommerce-setup-guide__footer-button">
 							<CompleteSetupButton />
 						</div>
