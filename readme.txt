@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.1 - 2023-06-06 =
+* Update - Pinterest feed generator backoff adjustments.
+
 = 1.3.0 - 2023-05-30 =
 * Add - Integration with WooCommerce multichannel marketing dashboard.
 * Fix  -  Remove feed configuration during plugin uninstall procedure.
