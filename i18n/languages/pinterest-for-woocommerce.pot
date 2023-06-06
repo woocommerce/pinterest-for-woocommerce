@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-06-02T11:24:52+00:00\n"
+"POT-Creation-Date: 2023-06-06T19:20:31+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: pinterest-for-woocommerce\n"
@@ -79,11 +79,11 @@ msgstr ""
 msgid "There was an error disconnecting the Advertiser. Please try again."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:1051
+#: class-pinterest-for-woocommerce.php:1048
 msgid "There was an error getting the account data."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:1291
+#: class-pinterest-for-woocommerce.php:1288
 msgid "Pinterest for WooCommerce verification page"
 msgstr ""
 
@@ -200,7 +200,7 @@ msgid "The advertiser could not be disconnected from Pinterest."
 msgstr ""
 
 #. Translators: The error description as returned from the API
-#: src/API/Advertisers.php:71
+#: src/API/Advertisers.php:75
 msgid "Could not fetch advertisers for Pinterest account ID. [%s]"
 msgstr ""
 
@@ -467,7 +467,7 @@ msgid "Advertiser missing"
 msgstr ""
 
 #: src/API/Tags.php:56
-#: src/PinterestSyncSettings.php:113
+#: src/PinterestSyncSettings.php:111
 msgid "Response error"
 msgstr ""
 
@@ -630,11 +630,11 @@ msgstr ""
 msgid "Enable Sync"
 msgstr ""
 
-#: src/PinterestSyncSettings.php:85
+#: src/PinterestSyncSettings.php:83
 msgid "Missing method to sync the setting."
 msgstr ""
 
-#: src/PinterestSyncSettings.php:107
+#: src/PinterestSyncSettings.php:103
 msgid "Tracking advertiser or tag missing"
 msgstr ""
 
@@ -1241,68 +1241,69 @@ msgid "Erase Plugin Data"
 msgstr ""
 
 #. translators: %s: error reason returned by Pinterest when verifying website claim fail.
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:53
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:48
 msgid "<strong>We were unable to verify this domain.</strong> %s"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:139
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:136
 msgid "Couldn’t verify your domain."
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:156
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:153
 msgid "Start verification"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:160
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:157
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:197
 msgid "Verifying…"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:161
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:158
 msgid "Try again"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:162
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:159
 msgid "Verified"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:172
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:180
 #: assets/source/setup-guide/app/steps/SetupTracking.js:273
 msgid "Try Again"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:173
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:181
 #: assets/source/setup-guide/app/steps/SetupTracking.js:274
 msgid "Complete Setup"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:197
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:206
 msgid "Connected successfully."
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:212
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:221
 #: assets/source/setup-guide/app/steps/SetupTracking.js:320
 msgid "There was a problem connecting the advertiser."
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:224
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:237
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:233
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:246
 #: assets/source/setup-guide/app/views/WizardApp.js:75
 msgid "Claim your website"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:228
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:237
 msgid "Step Two"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:241
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:250
 msgid "Verified domain"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:262
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:270
 msgid "Verify your domain to claim your website"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/ClaimWebsite.js:268
+#: assets/source/setup-guide/app/steps/ClaimWebsite.js:276
 msgid "This will allow access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site, and let people know where they can find more of your content."
 msgstr ""
 

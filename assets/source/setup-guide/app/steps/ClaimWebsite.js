@@ -100,9 +100,12 @@ const ClaimWebsite = ( { view } ) => {
 	const pfwSettings = wcSettings.pinterest_for_woocommerce;
 
 	useEffect( () => {
-		// If domain is not verified and verification status is not pending nor success - start verification.
+		// If domain is not verified and verification status is not pending, error nor success - start verification.
 		if (
-			! Object.values( LABEL_STATUS ).includes( status ) &&
+			! Object.values( {
+				...LABEL_STATUS,
+				ERROR: STATUS.ERROR,
+			} ).includes( status ) &&
 			! isDomainVerified
 		) {
 			handleClaimWebsite();
@@ -158,7 +161,18 @@ const ClaimWebsite = ( { view } ) => {
 
 		const text = buttonLabels[ status ];
 
-		return <StatusLabel status={ status } text={ text } />;
+		if (
+			Object.values( {
+				...LABEL_STATUS,
+				IDLE: STATUS.IDLE,
+			} ).includes( status )
+		) {
+			return <StatusLabel status={ status } text={ text } />;
+		}
+
+		return (
+			<Button isSecondary text={ text } onClick={ handleClaimWebsite } />
+		);
 	};
 
 	const CompleteSetupButton = () => {
