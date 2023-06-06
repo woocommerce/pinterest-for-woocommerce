@@ -113,7 +113,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Returns feed generator actions group name.
 	 *
-	 * @since x.x.x
+	 * @since 1.3.1
 	 *
 	 * @return string
 	 */
@@ -127,7 +127,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @param int        $action_id - Action Scheduler action ID.
 	 * @param array|null $error - Error details.
 	 *
-	 * @since x.x.x
+	 * @since 1.3.1
 	 *
 	 * @return void
 	 */
@@ -198,7 +198,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @param int       $action_id - Action Scheduler action id.
 	 * @param Throwable $throwable - Exception object.
 	 *
-	 * @since x.x.x
+	 * @since 1.3.1
 	 *
 	 * @return void
 	 */
@@ -737,7 +737,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @return bool True if the action's error rate is above the threshold, and false otherwise.
 	 *
-	 * @since x.x.x
+	 * @since 1.3.1
 	 */
 	protected function is_failure_rate_above_threshold( string $hook, ?array $args = null ): bool {
 		$threshold   = apply_filters( 'pinterest_for_woocommerce_action_failure_threshold', 3 );
