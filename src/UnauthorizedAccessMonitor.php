@@ -23,11 +23,11 @@ class UnauthorizedAccessMonitor {
 	 * If the exception is thrown by Pinterest API and the code is 401,
 	 * then it marks that access token renewal is required.
 	 *
-	 * @param Throwable $throwable
+	 * @param Throwable $throwable The exception thrown by Pinterest api call.
 	 *
 	 * @return void
 	 */
-	public static function monitor( Throwable $throwable): void {
+	public static function monitor( Throwable $throwable ): void {
 		if ( $throwable instanceof PinterestApiException && 401 === $throwable->getCode() ) {
 			self::pause_as_tasks();
 		}
