@@ -7,8 +7,8 @@
 
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
 
-use UnauthorizedAccessMonitor;
 use Automattic\WooCommerce\Admin\Notes\Note;
+use Automattic\WooCommerce\Pinterest\UnauthorizedAccessMonitor;
 
 /**
  * Class ReconnectMerchant.
