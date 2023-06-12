@@ -7,6 +7,9 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Admin\Notes\DataStore;
+use Automattic\WooCommerce\Admin\Notes\Note;
+use Automattic\WooCommerce\Admin\Notes\Notes;
 use Automattic\WooCommerce\Pinterest\Notes\Collection\ReconnectMerchant;
 use Throwable;
 
@@ -42,7 +45,20 @@ class UnauthorizedAccessMonitor {
 	 */
 	public static function maybe_show_error(): void {
 		if ( self::is_as_task_paused() ) {
-			( new ReconnectMerchant() )->prepare_note()->save();
+			/** @var DataStore $data_store */
+			$data_store = Notes::load_data_store();
+			$note_ids   = $data_store->get_notes_with_name( ReconnectMerchant::NOTE_NAME );
+			if ( 0 === count( $note_ids ) ) {
+				( new ReconnectMerchant() )->prepare_note()->save();
+			} else {
+				$note_id = current( $note_ids );
+				/** @var Note $note */
+				$note    = Notes::get_note( $note_id );
+				if ( $note instanceof Note ) {
+					$note->set_status( Note::E_WC_ADMIN_NOTE_UNACTIONED );
+					$note->save();
+				}
+			}
 		}
 	}
 
@@ -54,8 +70,8 @@ class UnauthorizedAccessMonitor {
 	public static function pause_as_tasks(): void {
 		set_transient( 'pinterest_for_woocommerce_renew_token_required', true, 2 * HOUR_IN_SECONDS );
 
-		FeedGenerator::cancel_jobs();
 		FeedRegistration::cancel_jobs();
+		FeedGenerator::cancel_jobs();
 	}
 
 	/**

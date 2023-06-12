@@ -9,6 +9,7 @@ namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
 
 use Automattic\WooCommerce\Admin\Notes\Note;
 use Automattic\WooCommerce\Pinterest\UnauthorizedAccessMonitor;
+use Exception;
 
 /**
  * Class ReconnectMerchant.
@@ -38,10 +39,11 @@ class ReconnectMerchant extends AbstractNote {
 	 *
 	 * @since x.x.x
 	 *
+	 * @throws Exception
 	 * @return bool
 	 */
 	public static function should_be_added(): bool {
-		return UnauthorizedAccessMonitor::is_as_task_paused();
+		return UnauthorizedAccessMonitor::is_as_task_paused() && ! self::note_exists();
 	}
 
 	/**

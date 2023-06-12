@@ -288,10 +288,6 @@ class Base {
 
 		$response_code = absint( wp_remote_retrieve_response_code( $response ) );
 
-		if ( 401 === $response_code ) {
-			throw new Exception( __( 'Reconnect to your Pinterest account', 'pinterest-for-woocommerce' ), 401 );
-		}
-
 		if ( ! in_array( absint( $response_code ), array( 200, 201, 204 ), true ) ) {
 
 			$message = '';
