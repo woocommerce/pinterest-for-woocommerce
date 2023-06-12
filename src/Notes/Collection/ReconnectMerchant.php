@@ -64,9 +64,7 @@ class ReconnectMerchant extends AbstractNote {
 	 */
 	protected function get_note_content(): string {
 		return __(
-			'Pinterest did not authorize the request. Please, reconnect your Pinterest account.\n'
-			. 'Meanwhile all the scheduled tasks like feed generation and synchronization were put on '
-			. 'hold until the access is restored.',
+			'Pinterest did not authorize the request. Please, reconnect your Pinterest account. Meanwhile all the scheduled tasks like feed generation and synchronization were put on hold until the access is restored.',
 			'pinterest-for-woocommerce'
 		);
 	}
