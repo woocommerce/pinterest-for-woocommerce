@@ -7,6 +7,7 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Notes\Collection\ReconnectMerchant;
 use Throwable;
 
 /**
@@ -29,6 +30,19 @@ class UnauthorizedAccessMonitor {
 	public static function monitor( Throwable $throwable): void {
 		if ( $throwable instanceof PinterestApiException && 401 === $throwable->getCode() ) {
 			self::pause_as_tasks();
+		}
+	}
+
+	/**
+	 * Checks if access token renewal is required and shows the corresponding note.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	public static function maybe_show_error(): void {
+		if ( self::is_as_task_paused() ) {
+			( new ReconnectMerchant() )->prepare_note()->save();
 		}
 	}
 

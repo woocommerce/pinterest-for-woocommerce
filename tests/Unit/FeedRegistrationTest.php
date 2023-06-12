@@ -10,7 +10,8 @@ use WP_UnitTestCase;
 
 class FeedRegistrationTest extends WP_UnitTestCase {
 
-	private FeedRegistration $feed_registration;
+	/** @var FeedRegistration */
+	private $feed_registration;
 
 	public function setUp() {
 		parent::setUp();
