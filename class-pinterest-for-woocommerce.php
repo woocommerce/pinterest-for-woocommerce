@@ -287,7 +287,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
 
 			// Renders `Reconnect your Pinterest account.` error message on admin pages if the token is invalid.
-			add_action('admin_init', array( UnauthorizedAccessMonitor::class, 'maybe_show_error' ) );
+			add_action( 'admin_init', array( UnauthorizedAccessMonitor::class, 'maybe_show_error' ) );
 
 			// Disconnect advertiser if advertiser or tag change.
 			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
