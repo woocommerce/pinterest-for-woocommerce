@@ -285,6 +285,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Handle the Pinterest verification URL.
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
 
+			add_action(
+				'admin_init',
+				function () {
+					//( new Pinterest\Notes\Collection\ReconnectMerchant() )->prepare_note()->save();
+				}
+			);
+
 			// Disconnect advertiser if advertiser or tag change.
 			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
 

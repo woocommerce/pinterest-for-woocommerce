@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest\UnauthorizedAccessMonitor;
 use Automattic\WooCommerce\Pinterest\AdCredits;
 use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
@@ -128,6 +129,9 @@ class AdvertiserConnect extends VendorAPI {
 
 		// Reset UI state when the new advertiser is connected.
 		UserInteraction::flush_options();
+
+		// Update UnauthorizedAccessMonitor with information about token being renewed.
+		UnauthorizedAccessMonitor::unpause_as_tasks();
 
 		return array(
 			'connected'   => $response['data']->advertiser_id,

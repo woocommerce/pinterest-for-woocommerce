@@ -24,7 +24,7 @@ class FeedRegistration {
 
 	use ProductFeedLogger;
 
-	const ACTION_HANDLE_FEED_REGISTRATION = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-handle-feed-registration';
+	const ACTION_HANDLE_FEED_REGISTRATION = 'pinterest-for-woocommerce-handle-feed-registration';
 
 	/**
 	 * Local Feed Configurations class.
@@ -58,8 +58,16 @@ class FeedRegistration {
 	 * @since 1.0.10
 	 */
 	public function init() {
+		// Check if Pinterest API denied access for us with 401 Unauthorized before.
+		$is_paused = UnauthorizedAccessMonitor::is_as_task_paused();
+		if ( $is_paused ) {
+			return;
+		}
+
 		add_action( self::ACTION_HANDLE_FEED_REGISTRATION, array( $this, 'handle_feed_registration' ) );
-		if ( false === as_has_scheduled_action( self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+
+		$not_scheduled = false === as_has_scheduled_action( self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		if ( $not_scheduled ) {
 			as_schedule_recurring_action( time() + 10, 10 * MINUTE_IN_SECONDS, self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 	}

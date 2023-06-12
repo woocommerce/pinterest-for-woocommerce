@@ -10,6 +10,7 @@ use Automattic\WooCommerce\Pinterest\FeedFileOperations;
 use Automattic\WooCommerce\Pinterest\FeedGenerator;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
+use Automattic\WooCommerce\Pinterest\UnauthorizedAccessMonitor;
 use Exception;
 use Pinterest_For_Woocommerce;
 use WC_Helper_Product;
@@ -40,6 +41,55 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->feed_generator = new FeedGenerator( $this->action_scheduler, $this->feed_file_operations, $this->local_feed_configs );
 
 		ProductFeedStatus::set( ProductFeedStatus::STATE_PROPS );
+	}
+
+	public function test_init_does_not_add_action_scheduler_action_if_action_is_on_pause() {
+		UnauthorizedAccessMonitor::pause_as_tasks();
+
+		$this->feed_generator->init();
+
+		$has_action = has_action(
+			'pinterest-for-woocommerce-start-feed-generation',
+			array( $this->feed_generator, 'start_generation' )
+		);
+		$this->assertFalse( $has_action );
+
+		$has_action = as_has_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation' );
+		$this->assertFalse( $has_action );
+
+		$this->assertFalse(
+			has_filter(
+				'woocommerce_customer_taxable_address',
+				array( $this->feed_generator, 'set_store_address_as_taxable_location' )
+			)
+		);
+		$this->assertFalse(
+			has_action(
+				'action_scheduler_unexpected_shutdown',
+				array( $this->feed_generator, 'handle_unexpected_shutdown' )
+			)
+		);
+		$this->assertFalse(
+			has_action(
+				'action_scheduler_failed_execution',
+				array( $this->feed_generator, 'handle_failed_execution' )
+			)
+		);
+	}
+
+	public function test_init_adds_as_recurring_action() {
+		$this->feed_generator->init();
+
+		$this->assertEquals(
+			10,
+			has_action(
+				'pinterest-for-woocommerce-start-feed-generation',
+				array( $this->feed_generator, 'start_generation' )
+			)
+		);
+
+		$has_action = as_has_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation' );
+		$this->assertTrue( $has_action );
 	}
 
 	/**

@@ -30,7 +30,7 @@ class FeedGenerator extends AbstractChainedJob {
 	use BatchQueryOffset;
 	use ProductFeedLogger;
 
-	const ACTION_START_FEED_GENERATOR = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-start-feed-generation';
+	const ACTION_START_FEED_GENERATOR = 'pinterest-for-woocommerce-start-feed-generation';
 
 	/**
 	 * The time in seconds to wait after a failed feed generation attempt,
@@ -90,14 +90,19 @@ class FeedGenerator extends AbstractChainedJob {
 		// Initialize the action handlers.
 		parent::init();
 
+		// Check if Pinterest API denied access for us with 401 Unauthorized before.
+		$is_paused = UnauthorizedAccessMonitor::is_as_task_paused();
+		if ( $is_paused ) {
+			return;
+		}
+
 		add_action(
 			self::ACTION_START_FEED_GENERATOR,
-			function () {
-				$this->start_generation();
-			}
+			array( $this, 'start_generation' )
 		);
 
-		if ( false === as_has_scheduled_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+		$not_scheduled = false === as_has_scheduled_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		if ( $not_scheduled ) {
 			$this->schedule_next_generator_start( time() );
 		}
 
@@ -221,7 +226,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @param integer $timestamp Next feed generator timestamp.
 	 */
 	public function schedule_next_generator_start( $timestamp ) {
-		as_unschedule_all_actions( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		self::cancel_jobs();
 		as_schedule_recurring_action( $timestamp, DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		/* translators: time in the format hours:minutes:seconds */
 		self::log( sprintf( __( 'Feed scheduled to run at %s.', 'pinterest-for-woocommerce' ), gmdate( 'H:i:s', $timestamp ) ) );
@@ -239,7 +244,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @since 1.0.10
 	 */
-	private function start_generation() {
+	public function start_generation() {
 		if ( $this->is_running() ) {
 			return;
 		}
@@ -550,7 +555,7 @@ class FeedGenerator extends AbstractChainedJob {
 				unlink( $config['tmp_file'] );
 			}
 		}
-		as_unschedule_all_actions( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		self::cancel_jobs();
 	}
 
 	/**
