@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.3 - 2023-06-13 =
+* Tweak - WC 7.8 compatibility.
+
 = 1.3.2 - 2023-06-06 =
 * Fix - Ensure there is no fatal error for PHP 8+ during activation.
 
