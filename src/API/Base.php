@@ -622,7 +622,7 @@ class Base {
 	public static function update_merchant_feed( $merchant_id, $feed_id, $args ) {
 
 		return self::make_request(
-			esc_url( add_query_arg( $args, 'commerce/product_pin_merchants/' . $merchant_id . '/feed/' . $feed_id . '/' ) ),
+			add_query_arg( $args, 'commerce/product_pin_merchants/' . $merchant_id . '/feed/' . $feed_id . '/' ),
 			'PUT'
 		);
 	}
