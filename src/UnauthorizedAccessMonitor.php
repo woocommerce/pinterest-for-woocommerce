@@ -10,6 +10,7 @@ namespace Automattic\WooCommerce\Pinterest;
 use Automattic\WooCommerce\Admin\Notes\DataStore;
 use Automattic\WooCommerce\Admin\Notes\Note;
 use Automattic\WooCommerce\Admin\Notes\Notes;
+use Automattic\WooCommerce\Admin\Notes\NotesUnavailableException;
 use Automattic\WooCommerce\Pinterest\Notes\Collection\ReconnectMerchant;
 use Throwable;
 
@@ -45,19 +46,23 @@ class UnauthorizedAccessMonitor {
 	 */
 	public static function maybe_show_error(): void {
 		if ( self::is_as_task_paused() ) {
-			/** @var DataStore $data_store */
-			$data_store = Notes::load_data_store();
-			$note_ids   = $data_store->get_notes_with_name( ReconnectMerchant::NOTE_NAME );
-			if ( 0 === count( $note_ids ) ) {
-				( new ReconnectMerchant() )->prepare_note()->save();
-			} else {
-				$note_id = current( $note_ids );
-				/** @var Note $note */
-				$note    = Notes::get_note( $note_id );
-				if ( $note instanceof Note ) {
-					$note->set_status( Note::E_WC_ADMIN_NOTE_UNACTIONED );
-					$note->save();
+			try {
+				/** @var DataStore $data_store */
+				$data_store = Notes::load_data_store();
+				$note_ids   = $data_store->get_notes_with_name( ReconnectMerchant::NOTE_NAME );
+				if ( 0 === count( $note_ids ) ) {
+					( new ReconnectMerchant() )->prepare_note()->save();
+				} else {
+					$note_id = current( $note_ids );
+					/** @var Note $note */
+					$note    = Notes::get_note( $note_id );
+					if ( $note instanceof Note ) {
+						$note->set_status( Note::E_WC_ADMIN_NOTE_UNACTIONED );
+						$note->save();
+					}
 				}
+			} catch ( NotesUnavailableException $exception ) {
+				( new ReconnectMerchant() )->prepare_note()->save();
 			}
 		}
 	}
