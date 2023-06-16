@@ -21,10 +21,8 @@ import GiftIcon from '../../components/GiftIcon';
 
 const AdsCreditsPromo = () => {
 	const appSettings = useSettingsSelect();
-	const [
-		isTermsAndConditionsModalOpen,
-		setIsTermsAndConditionsModalOpen,
-	] = useState( false );
+	const [ isTermsAndConditionsModalOpen, setIsTermsAndConditionsModalOpen ] =
+		useState( false );
 
 	const openTermsAndConditionsModal = () => {
 		setIsTermsAndConditionsModalOpen( true );

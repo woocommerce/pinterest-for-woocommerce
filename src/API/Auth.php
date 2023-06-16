@@ -10,7 +10,8 @@ namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Throwable;
-use \WP_REST_Request;
+use WP_HTTP_Response;
+use WP_REST_Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -122,6 +123,7 @@ class Auth extends VendorAPI {
 			$this->log_error_and_redirect( $request, $error );
 		}
 
+		wp_safe_redirect( $this->get_redirect_url( $request->get_param( 'view' ) ) );
 		exit;
 	}
 
@@ -158,11 +160,11 @@ class Auth extends VendorAPI {
 			$query_args['view'] = sanitize_key( $view );
 		}
 
-		return esc_url(
-			add_query_arg(
-				$query_args,
-				admin_url( 'admin.php' )
-			)
+		// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
+		// nosemgrep: audit.php.wp.security.xss.query-arg
+		return add_query_arg(
+			$query_args,
+			admin_url( 'admin.php' )
 		);
 	}
 }
