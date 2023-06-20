@@ -78,7 +78,7 @@ class Tracking {
 	 */
 	public static function maybe_init() {
 
-		if ( ! self::tracking_enabled() || wp_doing_cron() || is_admin() || WC()->is_rest_api_request() ) {
+		if ( ! self::tracking_enabled() || wp_doing_cron() || is_admin() ) {
 			return;
 		}
 
