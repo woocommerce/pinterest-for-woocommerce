@@ -139,14 +139,14 @@ class Tracking {
 	 */
 	private static function load_async_events() {
 
-    if ( self::$deferred_conversion_events_transient_key ) {
-      $async_events = get_transient( self::$deferred_conversion_events_transient_key );
+		if ( self::$deferred_conversion_events_transient_key ) {
+			$async_events = get_transient( self::$deferred_conversion_events_transient_key );
 
-      if ( $async_events ) {
-        self::$events = array_merge( self::$events, $async_events );
-        delete_transient( self::$deferred_conversion_events_transient_key );
-      }
-    }
+			if ( $async_events ) {
+				self::$events = array_merge( self::$events, $async_events );
+				delete_transient( self::$deferred_conversion_events_transient_key );
+			}
+		}
 	}
 
 
