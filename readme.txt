@@ -16,10 +16,6 @@ Pinterest gives people their next great idea. Part collection, part marketplace,
 
 With the Pinterest for WooCommerce extension, you can put your products in front of Pinterest users who are already looking for ideas and things to buy. Connect your WooCommerce store to your *[Pinterest business account](https://business.pinterest.com/)* directly in the WooCommerce app. Your entire catalog will become browsable on Pinterest in just a few clicks.
 
-= Pinterest Ads =
-
-Get started with Pinterest Ads with **$125 free ad credit\*** from Pinterest when you set up Pinterest for WooCommerce and spend $15 on ads! Pinterest *[terms and conditions](https://business.pinterest.com/en-us/business-terms-of-service/)* apply.
-
 = Open-minded and undecided =
 
 People on Pinterest are eager for new ideas, which means they want to hear from you. In fact, 97% of top Pinterest searches are unbranded. Content from brands doesn’t interrupt on Pinterest—it inspires. Shopping features are built into both the organic Pinner experience, and our ad solutions.
