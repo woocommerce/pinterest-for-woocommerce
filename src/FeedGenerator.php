@@ -726,7 +726,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Exception Related to max retries reached or missing arguments on the action.
 	 */
 	public function maybe_handle_error_on_timeout( int $action_id ) {
-		wc_deprecated_function( __METHOD__, 'x.x.x' );
+		wc_deprecated_function( __METHOD__, '1.3.5' );
 	}
 
 	/**
