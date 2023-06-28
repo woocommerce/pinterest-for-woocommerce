@@ -87,6 +87,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.5 - 2023-06-28 =
+* Tweak - WC 7.9 compatibility.
+
 = 1.3.4 - 2023-06-21 =
 * Fix - Fixed error when getting transient for a key of null value.
 * Fix - Release 1.3.3 - merge trunk into develop.
