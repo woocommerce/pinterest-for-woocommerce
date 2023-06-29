@@ -64,11 +64,11 @@ class FeedRegistration {
 			return;
 		}
 
-		add_action( self::ACTION_HANDLE_FEED_REGISTRATION, array( $this, 'handle_feed_registration' ) );
+		add_action( 'pinterest-for-woocommerce-handle-feed-registration', array( $this, 'handle_feed_registration' ) );
 
-		$not_scheduled = false === as_has_scheduled_action( self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		if ( $not_scheduled ) {
-			as_schedule_recurring_action( time() + 10, 10 * MINUTE_IN_SECONDS, self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		$is_scheduled = as_has_scheduled_action( 'pinterest-for-woocommerce-handle-feed-registration', array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		if ( ! $is_scheduled ) {
+			as_schedule_recurring_action( time() + 10, 10 * MINUTE_IN_SECONDS, 'pinterest-for-woocommerce-handle-feed-registration', array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
 	}
 
@@ -291,10 +291,13 @@ class FeedRegistration {
 	}
 
 	/**
-	 * Stop feed generator jobs.
+	 * Stop feed registration jobs and since the action might be in running state, we can not use as_unschedule_all_actions
+	 * here since it cancels only pending actions and ignores those in running state.
+	 *
+	 * @return void
 	 */
 	public static function cancel_jobs() {
-		as_unschedule_all_actions( self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-handle-feed-registration' );
 	}
 
 	/**

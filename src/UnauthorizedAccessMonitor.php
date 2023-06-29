@@ -67,6 +67,10 @@ class UnauthorizedAccessMonitor {
 		}
 	}
 
+	public static function show_error() {
+		static::maybe_show_error();
+	}
+
 	/**
 	 * Marks that access token renewal is required and pause all corresponding Action Scheduler tasks.
 	 *
@@ -75,8 +79,12 @@ class UnauthorizedAccessMonitor {
 	public static function pause_as_tasks(): void {
 		set_transient( 'pinterest_for_woocommerce_renew_token_required', true, 2 * HOUR_IN_SECONDS );
 
+		// Cancel all Action Scheduler tasks.
 		FeedRegistration::cancel_jobs();
 		FeedGenerator::cancel_jobs();
+
+		// Show Notification.
+		self::show_error();
 	}
 
 	/**
@@ -99,5 +107,16 @@ class UnauthorizedAccessMonitor {
 	 */
 	public static function unpause_as_tasks(): bool {
 		return delete_transient( 'pinterest_for_woocommerce_renew_token_required' );
+	}
+
+	/**
+	 * Resets access token renewal status.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	public static function reset() {
+		static::unpause_as_tasks();
 	}
 }

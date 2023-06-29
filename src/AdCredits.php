@@ -259,7 +259,7 @@ class AdCredits {
 
 		$remaining_discount_value = 0;
 		if ( array_key_exists( self::ADS_CREDIT_MARKETING_OFFER, $discounts ) ) {
-			// Sum all of the available coupons values.
+			// Sum of all the available coupons values.
 			foreach ( $discounts[ self::ADS_CREDIT_MARKETING_OFFER ] as $discount ) {
 				$discount_information      = (array) $discount;
 				$remaining_discount_value += ( (float) $discount_information['remaining_discount_in_micro_currency'] ) / 1000000;

@@ -90,19 +90,15 @@ class FeedGenerator extends AbstractChainedJob {
 		// Initialize the action handlers.
 		parent::init();
 
-		// Check if Pinterest API denied access for us with 401 Unauthorized before.
-		$is_paused = UnauthorizedAccessMonitor::is_as_task_paused();
-		if ( $is_paused ) {
-			return;
-		}
-
 		add_action(
-			self::ACTION_START_FEED_GENERATOR,
+			'pinterest-for-woocommerce-start-feed-generation',
 			array( $this, 'start_generation' )
 		);
 
-		$not_scheduled = false === as_has_scheduled_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		if ( $not_scheduled ) {
+		$is_scheduled = as_has_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		// Check if Pinterest API denied access for us with 401 Unauthorized before.
+		$is_paused = UnauthorizedAccessMonitor::is_as_task_paused();
+		if ( ! $is_scheduled && ! $is_paused ) {
 			$this->schedule_next_generator_start( time() );
 		}
 
@@ -222,21 +218,26 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Reschedule the next feed generator start.
 	 *
+	 * @param int $timestamp Next feed generator timestamp.
 	 * @since 1.0.10
-	 * @param integer $timestamp Next feed generator timestamp.
 	 */
-	public function schedule_next_generator_start( $timestamp ) {
+	public function schedule_next_generator_start( int $timestamp ) {
 		self::cancel_jobs();
-		as_schedule_recurring_action( $timestamp, DAY_IN_SECONDS, self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		/* translators: time in the format hours:minutes:seconds */
-		self::log( sprintf( __( 'Feed scheduled to run at %s.', 'pinterest-for-woocommerce' ), gmdate( 'H:i:s', $timestamp ) ) );
+		if ( ! UnauthorizedAccessMonitor::is_as_task_paused() ) {
+			as_schedule_recurring_action( $timestamp, DAY_IN_SECONDS, 'pinterest-for-woocommerce-start-feed-generation', array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+			/* translators: time in the format hours:minutes:seconds */
+			self::log( sprintf( __( 'Feed scheduled to run at %s.', 'pinterest-for-woocommerce' ), gmdate( 'H:i:s', $timestamp ) ) );
+		}
 	}
 
 	/**
-	 * Stop feed generator jobs.
+	 * Stop feed generator jobs and since the action might be in running state, we can not use as_unschedule_all_actions
+	 * here since it cancels only pending actions and ignores those in running state.
+	 *
+	 * @return void
 	 */
 	public static function cancel_jobs() {
-		as_unschedule_all_actions( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation' );
 	}
 
 	/**

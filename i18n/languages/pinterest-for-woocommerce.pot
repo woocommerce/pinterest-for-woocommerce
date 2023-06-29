@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-06-09T12:34:35+00:00\n"
+"POT-Creation-Date: 2023-06-15T17:53:45+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: pinterest-for-woocommerce\n"
@@ -36,69 +36,69 @@ msgstr ""
 msgid "https://woocommerce.com"
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:153
+#: class-pinterest-for-woocommerce.php:154
 msgid "Cloning this class is forbidden."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:162
+#: class-pinterest-for-woocommerce.php:163
 msgid "Unserializing instances of this class is forbidden."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:170
+#: class-pinterest-for-woocommerce.php:171
 msgid "Only a single instance of this class is allowed. Use singleton."
 msgstr ""
 
 #. Translators: The minimum PHP version
-#: class-pinterest-for-woocommerce.php:355
+#: class-pinterest-for-woocommerce.php:359
 msgid "Pinterest for WooCommerce requires a minimum PHP version of %s."
 msgstr ""
 
 #. Translators: The minimum WP version
-#: class-pinterest-for-woocommerce.php:360
+#: class-pinterest-for-woocommerce.php:364
 msgid "Pinterest for WooCommerce requires a minimum WordPress version of %s."
 msgstr ""
 
 #. Translators: The minimum WC version
-#: class-pinterest-for-woocommerce.php:365
+#: class-pinterest-for-woocommerce.php:369
 msgid "Pinterest for WooCommerce requires a minimum WooCommerce version of %s."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:369
+#: class-pinterest-for-woocommerce.php:373
 msgid "Pinterest for WooCommerce requires WooCommerce Admin to be enabled."
 msgstr ""
 
 #. Translators: The minimum Action Scheduler version
-#: class-pinterest-for-woocommerce.php:374
+#: class-pinterest-for-woocommerce.php:378
 msgid "Pinterest for WooCommerce requires a minimum Action Scheduler package of %s. It can be caused by old version of the WooCommerce extensions."
 msgstr ""
 
 #. Translators: The error description
-#: class-pinterest-for-woocommerce.php:640
+#: class-pinterest-for-woocommerce.php:644
 msgid "Could not decrypt the Pinterest API access token. Try reconnecting to Pinterest. [%s]"
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:691
+#: class-pinterest-for-woocommerce.php:695
 msgid "Response error on disconnect merchant."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:706
+#: class-pinterest-for-woocommerce.php:710
 msgid "There was an error disconnecting the Advertiser."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:708
-#: class-pinterest-for-woocommerce.php:791
+#: class-pinterest-for-woocommerce.php:712
+#: class-pinterest-for-woocommerce.php:795
 msgid "There was an error disconnecting the Advertiser. Please try again."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:720
+#: class-pinterest-for-woocommerce.php:724
 msgid "Trying to disconnect while the merchant (id) was not found."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:925
+#: class-pinterest-for-woocommerce.php:929
 msgid "There was an error getting the account data."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:1173
+#: class-pinterest-for-woocommerce.php:1177
 msgid "Pinterest for WooCommerce verification page"
 msgstr ""
 
@@ -200,25 +200,25 @@ msgstr ""
 msgid "20 minutes"
 msgstr ""
 
-#: src/API/AdvertiserConnect.php:58
+#: src/API/AdvertiserConnect.php:59
 msgid "Missing advertiser or tag parameters."
 msgstr ""
 
 #. Translators: The error description as returned from the API
-#: src/API/AdvertiserConnect.php:81
+#: src/API/AdvertiserConnect.php:82
 msgid "Could not connect advertiser with Pinterest. [%s]"
 msgstr ""
 
-#: src/API/AdvertiserConnect.php:101
+#: src/API/AdvertiserConnect.php:102
 msgid "The advertiser could not be connected to Pinterest."
 msgstr ""
 
-#: src/API/AdvertiserConnect.php:105
+#: src/API/AdvertiserConnect.php:106
 msgid "Incorrect advertiser ID."
 msgstr ""
 
-#: src/API/AdvertiserConnect.php:154
-#: src/API/AdvertiserConnect.php:168
+#: src/API/AdvertiserConnect.php:158
+#: src/API/AdvertiserConnect.php:172
 msgid "The advertiser could not be disconnected from Pinterest."
 msgstr ""
 
@@ -250,7 +250,7 @@ msgid "There was an error getting the account data. Please try again later."
 msgstr ""
 
 #. Translators: 1: Request method 2: Request endpoint 3: Response status code 4: Response message 5: Pinterest code
-#: src/API/Base.php:131
+#: src/API/Base.php:134
 msgid ""
 "%1$s Request: %2$s\n"
 "Status Code: %3$s\n"
@@ -259,23 +259,19 @@ msgid ""
 msgstr ""
 
 #. Translators: 1: Request method 2: Request endpoint 3: Response status code 4: Response message
-#: src/API/Base.php:153
+#: src/API/Base.php:156
 msgid ""
 "%1$s Request: %2$s\n"
 "Status Code: %3$s\n"
 "API response: %4$s"
 msgstr ""
 
-#: src/API/Base.php:289
-msgid "Reconnect to your Pinterest account"
-msgstr ""
-
-#: src/API/Base.php:344
+#: src/API/Base.php:343
 msgid "Empty body"
 msgstr ""
 
-#: src/API/Base.php:415
-#: src/API/Base.php:516
+#: src/API/Base.php:414
+#: src/API/Base.php:515
 #: src/Merchants.php:139
 msgid "Auto-created by Pinterest for WooCommerce"
 msgstr ""
@@ -512,52 +508,52 @@ msgid "Could not rename %1$s to %2$s"
 msgstr ""
 
 #. Translators: 1. Action Scheduler hook name.
-#: src/FeedGenerator.php:152
+#: src/FeedGenerator.php:157
 msgid "Feed Generator `%s` Action reschedule threshold has been reached. Quit."
 msgstr ""
 
 #. Translators: Action Scheduler hook name.
-#: src/FeedGenerator.php:165
+#: src/FeedGenerator.php:170
 msgid "Feed Generator `%s` Action timed out due to an unexpected shutdown. Rescheduling it."
 msgstr ""
 
 #. Translators: 1: Action Scheduler hook name, 2: New products number to process next action run.
-#: src/FeedGenerator.php:182
+#: src/FeedGenerator.php:187
 msgid "Feed Generator `%1$s` Action product batch size decreased to %2$d."
 msgstr ""
 
 #. translators: time in the format hours:minutes:seconds
-#: src/FeedGenerator.php:227
+#: src/FeedGenerator.php:232
 msgid "Feed scheduled to run at %s."
 msgstr ""
 
-#: src/FeedGenerator.php:249
+#: src/FeedGenerator.php:254
 msgid "Feed generation queued."
 msgstr ""
 
-#: src/FeedGenerator.php:260
+#: src/FeedGenerator.php:265
 msgid "Feed generation start. Preparing temporary files."
 msgstr ""
 
-#: src/FeedGenerator.php:307
+#: src/FeedGenerator.php:312
 msgid "Feed generation end. Moving files to the final destination."
 msgstr ""
 
-#: src/FeedGenerator.php:322
+#: src/FeedGenerator.php:327
 msgid "Feed generated successfully."
 msgstr ""
 
 #. translators: number of products
-#: src/FeedGenerator.php:411
+#: src/FeedGenerator.php:416
 msgid "Feed batch generated. Wrote %s products to the feed file."
 msgstr ""
 
 #. Translators: 1: Action Scheduler hook name, 2: Error message about why action has failed to execute.
-#: src/FeedGenerator.php:524
+#: src/FeedGenerator.php:529
 msgid "Feed Generator `%1$s` Action failed to execute due to an error thrown `%2$s.`. A complete feed generation retry has been scheduled."
 msgstr ""
 
-#: src/FeedRegistration.php:96
+#: src/FeedRegistration.php:104
 msgid "Could not register feed."
 msgstr ""
 
@@ -655,6 +651,18 @@ msgstr ""
 
 #: src/Notes/Collection/EnableCatalogSync.php:84
 msgid "Enable Sync"
+msgstr ""
+
+#: src/Notes/Collection/ReconnectMerchant.php:63
+msgid "Reconnect your Pinterest account."
+msgstr ""
+
+#: src/Notes/Collection/ReconnectMerchant.php:74
+msgid "Pinterest did not authorize the request. Please, reconnect your Pinterest account. Meanwhile all the scheduled tasks like feed generation and synchronization were put on hold until the access is restored."
+msgstr ""
+
+#: src/Notes/Collection/ReconnectMerchant.php:90
+msgid "Reconnect"
 msgstr ""
 
 #: src/PinterestSyncSettings.php:85
