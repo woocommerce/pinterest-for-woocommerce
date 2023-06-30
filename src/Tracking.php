@@ -13,11 +13,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Automattic\WooCommerce\Pinterest\API\AdvertiserConnect;
-use Conversions;
-use PinterestConversionsEventIdProvider;
-use WC_Product;
+use Automattic\WooCommerce\Pinterest\API\Conversions;
+use Automattic\WooCommerce\Pinterest\API\Conversions\PinterestConversionsEventIdProvider;
 use Automattic\WooCommerce\Utilities\NumberUtil;
-use \Premmerce\WooCommercePinterest\PinterestPlugin;
+use Premmerce\WooCommercePinterest\PinterestPlugin;
+use WC_Geolocation;
+use WC_Product;
 
 /**
  * Class adding Save Pin support.
@@ -514,7 +515,18 @@ JS;
 		call_user_func_array( array( __CLASS__, $action ), array( $event, $data ) );
 
 		// Firing Pinterest Conversions event as well.
-		Conversions::add_event( $event, $data );
+		$user_data   = new Conversions\UserData( WC_Geolocation::get_ip_address(), wc_get_user_agent() );
+		$custom_data = new Conversions\NoData();
+
+		if ( in_array( $event, array( 'add_to_cart', 'checkout' ), true ) ) {
+			$custom_data = new Conversions\CartData( '', '', array(), array(), 0, '' );
+		}
+
+		if ( 'search' === $event ) {
+			$custom_data = new Conversions\SearchData( '' );
+		}
+
+		( new Conversions( $user_data, $custom_data ) )->add_event( $event, $data );
 	}
 
 
