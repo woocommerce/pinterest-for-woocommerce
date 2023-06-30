@@ -1,6 +1,9 @@
 <?php
 /**
+ * Pinterest Tag and Conversion API event ID provider.
+ *
  * @since x.x.x
+ * @package Pinterest_For_Woocommerce/API
  */
 
 namespace Automattic\WooCommerce\Pinterest\API\Conversions;
@@ -17,7 +20,7 @@ class PinterestConversionsEventIdProvider {
 	 *
 	 * @var string[]
 	 */
-	private static array $event_ids = [];
+	private static $event_ids = [];
 
 	/**
 	 * Pinterest Tag and Pinterest API for Conversions have different event names.
@@ -27,16 +30,16 @@ class PinterestConversionsEventIdProvider {
 	 *
 	 * @var array|string[] An array of event names to Pinterest Tag API names map.
 	 */
-	private static array $tag_api_name_map = [
-		 'pagevisit'         => 'page_view',
-		 'addtocart'         => 'add_to_cart',
-		 'checkout'          => 'checkout',
-		 'lead'              => 'lead',
-		 'purchase'          => 'purchase',
-		 'search'            => 'search',
-		 'viewcategory'      => 'view_category',
-		 'viewitem'          => 'view_item',
-		 'viewsearchresults' => 'view_search_results',
+	private static $tag_api_name_map = [
+		'pagevisit'         => 'page_view',
+		'addtocart'         => 'add_to_cart',
+		'checkout'          => 'checkout',
+		'lead'              => 'lead',
+		'purchase'          => 'purchase',
+		'search'            => 'search',
+		'viewcategory'      => 'view_category',
+		'viewitem'          => 'view_item',
+		'viewsearchresults' => 'view_search_results',
 	];
 
 	/**
