@@ -13,6 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Automattic\WooCommerce\Pinterest\API\AdvertiserConnect;
+use Conversions;
+use PinterestConversionsEventIdProvider;
 use WC_Product;
 use Automattic\WooCommerce\Utilities\NumberUtil;
 use \Premmerce\WooCommercePinterest\PinterestPlugin;
@@ -504,10 +506,15 @@ JS;
 	 * @return void
 	 */
 	private static function add_event( $event, $data = array() ) {
-
 		$action = did_action( 'wp_head' ) ? 'print_event' : 'enqueue_event';
+
+		// Adding event_id to data array as part of Pinterest API for Conversions even deduplication program.
+		$data['event_id'] = PinterestConversionsEventIdProvider::get_event_id( $event );
+
 		call_user_func_array( array( __CLASS__, $action ), array( $event, $data ) );
 
+		// Firing Pinterest Conversions event as well.
+		Conversions::add_event( $event, $data );
 	}
 
 
