@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package Pinterest_For_Woocommerce/API
+ */
 namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest\API\Conversions\CartData;
@@ -32,10 +34,12 @@ class Conversions {
 	 * @param array $data
 	 */
 	public function add_event( string $event_name, array $data = array() ) {
+		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+
 		$data = array_merge(
 			$data,
 			array(
-				'ad_account_id' => '',
+				'ad_account_id' => $ad_account_id,
 				'event_name'    => $event_name,
 				'action_source' => 'website',
 				'event_time'    => time(),
@@ -48,9 +52,18 @@ class Conversions {
 			)
 		);
 
+		$conversions_event_name = PinterestConversionsEventIdProvider::get_event_name_by_pinterest_tag_event_name( $event );
+		if ( in_array( $conversions_event_name, array( 'add_to_cart', 'checkout', 'purchase' ), true ) ) {
+			$data = $this->add_cart_and_checkout_custom_data( $data );
+		}
+
+		if ( in_array( $conversions_event_name, array( 'search', 'view_search_results' ), true ) ) {
+			$data = $this->add_search_custom_data( $data );
+		}
+
 		try {
 			APIV5::make_request(
-				'',
+				"ad_accounts/{$ad_account_id}/events",
 				'POST',
 				$data
 			);

@@ -518,11 +518,12 @@ JS;
 		$user_data   = new Conversions\UserData( WC_Geolocation::get_ip_address(), wc_get_user_agent() );
 		$custom_data = new Conversions\NoData();
 
-		if ( in_array( $event, array( 'add_to_cart', 'checkout' ), true ) ) {
+		$conversions_event_name = PinterestConversionsEventIdProvider::get_event_name_by_pinterest_tag_event_name( $event );
+		if ( in_array( $conversions_event_name, array( 'add_to_cart', 'checkout', 'purchase' ), true ) ) {
 			$custom_data = new Conversions\CartData( '', '', array(), array(), 0, '' );
 		}
 
-		if ( 'search' === $event ) {
+		if ( in_array( $conversions_event_name, array( 'search', 'view_search_results' ), true ) ) {
 			$custom_data = new Conversions\SearchData( '' );
 		}
 

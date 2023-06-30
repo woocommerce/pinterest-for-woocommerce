@@ -3,7 +3,7 @@
  * Pinterest Tag and Conversion API event ID provider.
  *
  * @since x.x.x
- * @package Pinterest_For_Woocommerce/API
+ * @package Pinterest_For_Woocommerce/API/Conversions
  */
 
 namespace Automattic\WooCommerce\Pinterest\API\Conversions;

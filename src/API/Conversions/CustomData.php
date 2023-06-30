@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package Pinterest_For_Woocommerce/API/Conversions
+ */
 namespace Automattic\WooCommerce\Pinterest\API\Conversions;
 
 /**

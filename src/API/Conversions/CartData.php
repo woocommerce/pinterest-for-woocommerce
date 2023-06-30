@@ -1,8 +1,12 @@
 <?php
-
+/**
+ * @package Pinterest_For_Woocommerce/API/Conversions
+ */
 namespace Automattic\WooCommerce\Pinterest\API\Conversions;
 
 /**
+ * Custom data for events which require cart data e.g. add to cart, checkout, purchase, etc.
+ *
  * @link https://developers.pinterest.com/docs/conversions/best/#Required,%20recommended,%20and%20optional%20fields
  *
  * @since x.x.x
