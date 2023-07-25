@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.6 - 2023-07-25 =
+* Dev - Add release preparation GH workflow.
+
 = 1.3.5 - 2023-06-28 =
 * Tweak - WC 7.9 compatibility.
 
