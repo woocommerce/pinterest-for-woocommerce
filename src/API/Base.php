@@ -396,7 +396,9 @@ class Base {
 	/**
 	 * Get the linked business accounts from the API.
 	 *
-	 * @return mixed
+	 * @return array
+	 *
+	 * @throws ApiException|Exception
 	 */
 	public static function get_linked_businesses() {
 		return self::make_request( 'users/me/businesses', 'GET' );

@@ -1109,7 +1109,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				array_key_exists( 'is_partner', $account_data ) &&
 				! $account_data['is_partner'];
 
-			$fetched_businesses = $fetch_linked_businesses ? Pinterest\API\Base::get_linked_businesses() : array();
+			try {
+				$fetched_businesses = $fetch_linked_businesses ? Pinterest\API\Base::get_linked_businesses() : array();
+			} catch ( Exception $e ) {
+				$fetched_businesses = array();
+			}
 
 			if ( ! empty( $fetched_businesses ) && 'success' === $fetched_businesses['status'] ) {
 				$linked_businesses = $fetched_businesses['data'];
