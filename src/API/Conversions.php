@@ -6,7 +6,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest\API\Conversions\CartData;
 use Automattic\WooCommerce\Pinterest\API\Conversions\CustomData;
-use Automattic\WooCommerce\Pinterest\API\Conversions\PinterestConversionsEventIdProvider;
+use Automattic\WooCommerce\Pinterest\API\Conversions\EventIdProvider;
 use Automattic\WooCommerce\Pinterest\API\Conversions\SearchData;
 use Automattic\WooCommerce\Pinterest\API\Conversions\UserData;
 use Exception;
@@ -47,12 +47,12 @@ class Conversions {
 					'client_ip_address' => $this->user_data->get_client_ip_address(),
 					'client_user_agent' => $this->user_data->get_client_user_agent(),
 				),
-				'event_id'         => PinterestConversionsEventIdProvider::get_event_id( $event_name ),
+				'event_id'         => EventIdProvider::get_event_id( $event_name ),
 				'event_source_url' => '',
 			)
 		);
 
-		$conversions_event_name = PinterestConversionsEventIdProvider::get_event_name_by_pinterest_tag_event_name( $event );
+		$conversions_event_name = EventIdProvider::get_event_name_by_pinterest_tag_event_name( $event_name );
 		if ( in_array( $conversions_event_name, array( 'add_to_cart', 'checkout', 'purchase' ), true ) ) {
 			$data = $this->add_cart_and_checkout_custom_data( $data );
 		}

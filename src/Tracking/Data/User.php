@@ -2,14 +2,16 @@
 /**
  * @package Pinterest_For_Woocommerce/API/Conversions
  */
-namespace Automattic\WooCommerce\Pinterest\API\Conversions;
+namespace Automattic\WooCommerce\Pinterest\Tracking\Data;
+
+use Automattic\WooCommerce\Pinterest\Tracking\Data;
 
 /**
  * @link https://developers.pinterest.com/docs/conversions/best/#Required,%20recommended,%20and%20optional%20fields
  *
  * @since x.x.x
  */
-class UserData {
+class User extends Data {
 
 	/**
 	 * @var string User's IP address.

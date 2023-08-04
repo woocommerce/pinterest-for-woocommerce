@@ -10,8 +10,10 @@ namespace Automattic\WooCommerce\Pinterest\Tracking;
 
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Category;
+use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
+use Automattic\WooCommerce\Pinterest\Tracking\Data\Search;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -57,7 +59,7 @@ class Tag implements Tracker {
 	private static $deferred_events = array();
 
 	public function __construct() {
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
+		// add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 		add_action( 'wp_head', array( __CLASS__, 'print_script' ) );
 		add_action( 'wp_body_open', array( __CLASS__, 'print_noscript' ), 0 );
 		add_action( 'shutdown', array( __CLASS__, 'save_deferred_events' ) );
@@ -66,12 +68,19 @@ class Tag implements Tracker {
 	/**
 	 * Enqueue JS files necessary to properly track actions such as search.
 	 *
+	 * @since x.x.x
+	 *
 	 * @return void
 	 */
 	public static function enqueue_scripts() {
 		$ext = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+		/*wp_localize_script(
+			'pinterest-for-woocommerce-tracking-scripts',
+			'PinterestTagSearch',
+
+		);*/
 		wp_enqueue_script(
-			PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-tracking-scripts',
+			'pinterest-for-woocommerce-tracking-scripts',
 			Pinterest_For_Woocommerce()->plugin_url() . '/assets/js/pinterest-for-woocommerce-tracking' . $ext . '.js',
 			array(),
 			PINTEREST_FOR_WOOCOMMERCE_VERSION,
@@ -81,6 +90,8 @@ class Tag implements Tracker {
 
 	/**
 	 * Renders Pinterest Tag script part.
+	 *
+	 * @since x.x.x
 	 *
 	 * @return void
 	 */
@@ -103,6 +114,8 @@ class Tag implements Tracker {
 	/**
 	 * Renders Pinterest Tag <noscript/> part.
 	 *
+	 * @since x.x.x
+	 *
 	 * @return void
 	 */
 	public static function print_noscript() {
@@ -121,6 +134,8 @@ class Tag implements Tracker {
 
 	/**
 	 * Loads deferred event from the storage.
+	 *
+	 * @since x.x.x
 	 *
 	 * @return array
 	 */
@@ -181,11 +196,18 @@ class Tag implements Tracker {
 	 * @return true
 	 */
 	public function track_event( string $event_name, Data $data ) {
-		$data = array();
+		if ( Tracking::EVENT_SEARCH === $event_name ) {
+			/** @var Search $data */
+			$data = array(
+				'event_id'      => $data->get_event_id(),
+				'search_query'  => $data->get_search_query(),
+			);
+		}
 
-		if ( Tracking::EVENT_PAGE_VISIT === $event_name ) {
+		if ( Tracking::EVENT_PAGE_VISIT === $event_name && ! ( $data instanceof None ) ) {
 			/** @var Product $data */
 			$data = array(
+				'event_id'      => $data->get_event_id(),
 				'product_id'    => $data->get_id(),
 				'product_name'  => $data->get_name(),
 				'product_price' => $data->get_price(),
@@ -196,6 +218,7 @@ class Tag implements Tracker {
 		if ( Tracking::EVENT_VIEW_CATEGORY === $event_name ) {
 			/** @var Category $data */
 			$data = array(
+				'event_id'         => $data->get_event_id(),
 				'product_category' => $data->getProductCategory(),
 				'category_name'    => $data->getCategoryName(),
 			);
@@ -204,6 +227,7 @@ class Tag implements Tracker {
 		if ( Tracking::EVENT_ADD_TO_CART === $event_name ) {
 			/** @var Product $data */
 			$data = array(
+				'event_id'       => $data->get_event_id(),
 				'product_id'     => $data->get_id(),
 				'product_name'   => $data->get_name(),
 				'value'          => ( $data->get_price() * $data->get_quantity() ),
@@ -215,6 +239,7 @@ class Tag implements Tracker {
 		if ( Tracking::EVENT_CHECKOUT === $event_name ) {
 			/** @var Checkout $data */
 			$data = array(
+				'event_id'       => $data->get_event_id(),
 				'order_id'       => $data->get_order_id(),
 				'value'          => $data->get_price() * $data->get_quantity(),
 				'order_quantity' => $data->get_quantity(),
@@ -234,10 +259,13 @@ class Tag implements Tracker {
 			);
 		}
 
-		# Adding unique event id.
-		$data['event_id'] = EventIdProvider::get_event_id( $event_name );
+		if ( $data instanceof None ) {
+			$data = array(
+				'event_id' => $data->get_event_id(),
+			);
+		}
 
-		return static::add_deferred_event( $event_name, $data );
+		return static::add_deferred_event( $event_name, $data ?? array() );
 	}
 
 	/**
@@ -245,6 +273,58 @@ class Tag implements Tracker {
 	 */
 	public static function get_active_tag() {
 		return Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
+	}
+
+	/**
+	 * Get the formatted warning message for the potential conflicting tags.
+	 *
+	 * @since 1.2.3
+	 *
+	 * @return string The warning message.
+	 */
+	public static function get_third_party_tags_warning_message() {
+
+		$third_party_tags = self::get_third_party_installed_tags();
+
+		if ( empty( $third_party_tags ) ) {
+			return '';
+		}
+
+		return sprintf(
+		/* Translators: 1: Conflicting plugins, 2: Plugins Admin page opening tag, 3: Pinterest settings opening tag, 4: Closing anchor tag */
+			esc_html__( 'The following installed plugin(s) can potentially cause problems with tracking: %1$s. %2$sRemove conflicting plugins%4$s or %3$smanage tracking settings%4$s.', 'pinterest-for-woocommerce' ),
+			implode( ', ', $third_party_tags ),
+			sprintf( '<a href="%s" target="_blank">', esc_url( admin_url( 'plugins.php' ) ) ),
+			sprintf( '<a href="%s" target="_blank">', esc_url( wc_admin_url( '&path=/pinterest/settings' ) ) ),
+			'</a>',
+		);
+
+	}
+
+	/**
+	 * Detect if there are other tags installed on the site.
+	 *
+	 * @since 1.2.3
+	 *
+	 * @return array The list of installed tags.
+	 */
+	public static function get_third_party_installed_tags() {
+
+		$third_party_tags = array();
+
+		if ( defined( 'GTM4WP_VERSION' ) ) {
+			$third_party_tags['gtm'] = 'Google Tag Manager';
+		}
+
+		if ( defined( 'PYS_PINTEREST_VERSION' ) ) {
+			$third_party_tags['pys'] = 'Pixel Your Site - Pinterest Addon';
+		}
+
+		if ( class_exists( PinterestPlugin::class ) ) {
+			$third_party_tags['softblues'] = 'Pinterest for WooCommerce by Softblues';
+		}
+
+		return $third_party_tags;
 	}
 
 	/**

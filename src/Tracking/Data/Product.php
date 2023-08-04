@@ -4,7 +4,7 @@ namespace Automattic\WooCommerce\Pinterest\Tracking\Data;
 
 use Automattic\WooCommerce\Pinterest\Tracking\Data;
 
-class Product implements Data {
+class Product extends Data {
 
 	private $id;
 
@@ -20,7 +20,8 @@ class Product implements Data {
 
 	private $quantity;
 
-	public function __construct( $id, $name, $category, $brand, $price, $currency, $quantity ) {
+	public function __construct( $event_id, $id, $name, $category, $brand, $price, $currency, $quantity ) {
+		parent::__construct( $event_id );
 		$this->id       = $id;
 		$this->name     = $name;
 		$this->category = $category;

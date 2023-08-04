@@ -263,7 +263,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// ActionScheduler is activated on init 1 so lets make sure we are updating after that.
 			add_action( 'init', array( $this, 'maybe_update_plugin' ), 5 );
-			add_action( 'init', array( Pinterest\Tracking::class, 'maybe_init' ) );
+			add_action( 'init', array( self::class, 'init_tracking' ) );
 			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\TrackerSnapshot::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\Billing::class, 'schedule_event' ) );
@@ -295,6 +295,21 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		}
 
+		/**
+		 * Initialise Tracker and add trackers to it.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public static function init_tracking() {
+			$tracking = new Pinterest\Tracking();
+
+			$tracking->add_tracker( new Pinterest\Tracking\Tag() );
+
+			$user = new Pinterest\Tracking\Data\User( WC_Geolocation::get_ip_address(), wc_get_user_agent() );
+			$tracking->add_tracker( new Pinterest\Tracking\Conversions( $user ) );
+		}
 
 		/**
 		 * Init Pinterest_For_Woocommerce when WordPress Initialises.
@@ -1351,9 +1366,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function is_tracking_configured() {
-			return false !== Pinterest\Tracking::get_active_tag();
+			return false !== Pinterest\Tracking\Tag::get_active_tag();
 		}
-
 
 		/**
 		 * Returns the Terms object for the currently configured base country.

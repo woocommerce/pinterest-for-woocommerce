@@ -6,31 +6,45 @@ use Automattic\WooCommerce\Pinterest\API\APIV5;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Category;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
+use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Search;
+use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
 use Throwable;
 
 class Conversions implements Tracker {
 
-	private UserData $user_data;
+	const EVENT_MAP = array(
+		Tracking::EVENT_PAGE_VISIT    => 'page_visit',
+		Tracking::EVENT_SEARCH        => 'search',
+		Tracking::EVENT_VIEW_CATEGORY => 'view_category',
+		Tracking::EVENT_ADD_TO_CART   => 'add_to_cart',
+		Tracking::EVENT_CHECKOUT      => 'checkout',
+	);
 
-	public function __construct( UserData $user_data ) {
-		$this->user_data = $user_data;
+	private User $user;
+
+	public function __construct( User $user ) {
+		$this->user = $user;
 	}
 
 	public function track_event( string $event_name, Data $data ) {
+		global $wp;
+
 		if ( Tracking::EVENT_SEARCH === $event_name ) {
 			/** @var Search $data */
 			$data = array(
+				'event_id'    => $data->get_event_id(),
 				'custom_data' => array(
 					'search_string' => $data->get_search_query(),
 				),
 			);
 		}
 
-		if ( Tracking::EVENT_PAGE_VISIT === $event_name ) {
+		if ( Tracking::EVENT_PAGE_VISIT === $event_name && ! ( $data instanceof None ) ) {
 			/** @var Product $data */
 			$data = array(
+				'event_id'    => $data->get_event_id(),
 				'custom_data' => array(
 					'currency'    => $data->get_currency(),
 					'value'       => $data->get_price() * $data->get_quantity(),
@@ -50,6 +64,7 @@ class Conversions implements Tracker {
 		if ( Tracking::EVENT_VIEW_CATEGORY === $event_name ) {
 			/** @var Category $data */
 			$data = array(
+				'event_id'    => $data->get_event_id(),
 				'custom_data' => array(
 					'category_name' => $data->getCategoryName(),
 				),
@@ -59,6 +74,7 @@ class Conversions implements Tracker {
 		if ( Tracking::EVENT_ADD_TO_CART === $event_name ) {
 			/** @var Product $data */
 			$data = array(
+				'event_id'    => $data->get_event_id(),
 				'custom_data' => array(
 					'currency'    => $data->get_currency(),
 					'value'       => $data->get_price() * $data->get_quantity(),
@@ -78,6 +94,7 @@ class Conversions implements Tracker {
 		if ( Tracking::EVENT_CHECKOUT === $event_name ) {
 			/** @var Checkout $data */
 			$data = array(
+				'event_id'    => $data->get_event_id(),
 				'custom_data' => array(
 					'currency'    => $data->get_currency(),
 					'value'       => $data->get_price() * $data->get_quantity(),
@@ -102,23 +119,27 @@ class Conversions implements Tracker {
 			);
 		}
 
+		if ( $data instanceof None ) {
+			$data = array(
+				'event_id' => $data->get_event_id(),
+			);
+		}
+
 		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
-		$event_name    = 'page_visit';
+		$event_name    = static::EVENT_MAP[ $event_name ] ?? '';
 
 		/** @var array $data */
 		$data = array_merge(
 			$data,
 			array(
-				'ad_account_id'    => $ad_account_id,
 				'event_name'       => $event_name,
-				'action_source'    => 'website',
+				'action_source'    => 'web',
 				'event_time'       => time(),
-				'event_id'         => EventIdProvider::get_event_id( $event_name ),
-				'event_source_url' => '',
+				'event_source_url' => home_url( $wp->request ),
 				'partner_name'     => 'ss-woocommerce',
 				'user_data'        => array(
-					'client_ip_address' => $this->user_data->get_client_ip_address(),
-					'client_user_agent' => $this->user_data->get_client_user_agent(),
+					'client_ip_address' => $this->user->get_client_ip_address(),
+					'client_user_agent' => $this->user->get_client_user_agent(),
 				),
 				'language'         => 'en',
 			)
@@ -128,7 +149,7 @@ class Conversions implements Tracker {
 			APIV5::make_request(
 				"ad_accounts/{$ad_account_id}/events",
 				'POST',
-				$data
+				array( 'data' => array( $data ) )
 			);
 		} catch ( Throwable $e ) {
 			// Do nothing.

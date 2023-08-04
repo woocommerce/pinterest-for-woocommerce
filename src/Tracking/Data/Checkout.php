@@ -4,7 +4,7 @@ namespace Automattic\WooCommerce\Pinterest\Tracking\Data;
 
 use Automattic\WooCommerce\Pinterest\Tracking\Data;
 
-class Checkout implements Data {
+class Checkout extends Data {
 
 	private $order_id;
 
@@ -16,7 +16,8 @@ class Checkout implements Data {
 
 	private $items;
 
-	public function __construct( $order_id, $price, $quantity, $currency, $items ) {
+	public function __construct( $event_id, $order_id, $price, $quantity, $currency, $items ) {
+		parent::__construct( $event_id );
 		$this->order_id = $order_id;
 		$this->price    = $price;
 		$this->quantity = $quantity;

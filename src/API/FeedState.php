@@ -350,7 +350,7 @@ class FeedState extends VendorAPI {
 	 */
 	public function add_third_party_tags_warning( $result ) {
 
-		$warning_message = Tracking::get_third_party_tags_warning_message();
+		$warning_message = Tracking\Tag::get_third_party_tags_warning_message();
 
 		if ( empty( $warning_message ) ) {
 			return $result;

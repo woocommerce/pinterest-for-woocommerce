@@ -7,6 +7,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data\Category;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
+use Automattic\WooCommerce\Pinterest\Tracking\Data\Search;
 use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Automattic\WooCommerce\Pinterest\Tracking\Tracker;
 
@@ -35,6 +36,22 @@ class Tracking {
 	 */
 	private $trackers = array();
 
+	/**
+	 * Init Tracking.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	public static function maybe_init() {
+		$is_tracking_enabled             = apply_filters( 'woocommerce_pinterest_disable_tracking', false );
+		$is_tracking_conversions_enabled = Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
+		$is_tracked_site                 = ! wp_doing_cron() && ! is_admin();
+		if ( $is_tracking_enabled && $is_tracking_conversions_enabled && $is_tracked_site ) {
+			new self();
+		}
+	}
+
 	public function __construct() {
 		// Tracks page visit events.
 		add_action('wp_footer', array( $this, 'handle_page_visit' ) );
@@ -48,7 +65,9 @@ class Tracking {
 		// Tracks checkout events.
 		add_action( 'woocommerce_checkout_order_created', array( $this, 'handle_checkout' ), 10, 2 );
 
-		add_action( '', array( $this, 'handle_search' ) );
+		// Tracks search events.
+		// @TODO add search tracking on search ajax calls maybe?
+		add_action( 'wp_footer', array( $this, 'handle_search' ) );
 	}
 
 	/**
@@ -57,10 +76,11 @@ class Tracking {
 	 * @return void
 	 */
 	public function handle_page_visit() {
-		$data = new None();
+		$data = new None( uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ) );
 		if ( is_product() ) {
 			$product = wc_get_product();
 			$data    = new Product(
+				uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ),
 				$product->get_id(),
 				$product->get_name(),
 				wc_get_product_category_list( $product->get_id() ),
@@ -83,7 +103,11 @@ class Tracking {
 			return;
 		}
 		$queried_object = get_queried_object();
-		$data           = new Category( $queried_object->term_id, $queried_object->name );
+		$data           = new Category(
+			uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ),
+			$queried_object->term_id,
+			$queried_object->name
+		);
 		$this->maybe_track_event( static::EVENT_VIEW_CATEGORY, $data );
 	}
 
@@ -96,6 +120,7 @@ class Tracking {
 		$object_id = empty( $variation_id ) ? $product_id : $variation_id;
 		$product   = wc_get_product( $object_id );
 		$data      = new Product(
+			uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ),
 			$product->get_id(),
 			$product->get_name(),
 			wc_get_product_category_list( $product->get_id() ),
@@ -131,6 +156,7 @@ class Tracking {
 			$categories    = ! empty( $terms ) ? wp_list_pluck( $terms, 'name' ) : array();
 
 			$items[] = new Product(
+				uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ),
 				$product->get_id(),
 				$order_item->get_name(),
 				$categories,
@@ -139,13 +165,6 @@ class Tracking {
 				get_woocommerce_currency(),
 				$order_item->get_quantity()
 			);
-			/*$items[] = array(
-				'product_id'       => $product->get_id(),
-				'product_name'     => $order_item->get_name(),
-				'product_price'    => $product_price,
-				'product_quantity' => $order_item->get_quantity(),
-				'product_category' => $categories,
-			);*/
 
 			$total_quantity += $order_item->get_quantity();
 		}
@@ -165,12 +184,15 @@ class Tracking {
 			return;
 		}
 
-		$data = new Search( get_search_query() );
+		$data = new Search(
+			uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ),
+			get_search_query()
+		);
 		$this->maybe_track_event( static::EVENT_SEARCH, $data );
 	}
 
 	public function maybe_track_event( string $event_name, Data $data ) {
-		$is_tracking_enabled             = apply_filters( 'woocommerce_pinterest_disable_tracking', false );
+		$is_tracking_enabled             = ! apply_filters( 'woocommerce_pinterest_disable_tracking', false );
 		$is_tracking_conversions_enabled = Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
 		$is_tracked_site                 = ! wp_doing_cron() && ! is_admin();
 
@@ -195,8 +217,6 @@ class Tracking {
 	 * @return Tracker[]
 	 */
 	public function get_trackers() {
-		$this->trackers[] = new Tag();
-		// $this->trackers[] = new PinterestConversions( new Conversions\UserData( WC_Geolocation::get_ip_address(), wc_get_user_agent() ), new Conversions\NoData() );
 		return $this->trackers;
 	}
 
