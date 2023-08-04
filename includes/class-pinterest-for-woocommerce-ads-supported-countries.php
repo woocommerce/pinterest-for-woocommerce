@@ -6,7 +6,8 @@
  * @since 1.0.5
  */
 
-use  Automattic\WooCommerce\Pinterest\API\Base;
+use Automattic\WooCommerce\Pinterest\API\Base;
+use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,11 +24,21 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 		 * Get the alpha-2 country codes where Pinterest advertises.
 		 *
 		 * @see https://help.pinterest.com/en/business/availability/ads-availability
+		 * 
+		 * @since x.x.x Don't fetch the list of supported countries if the user is not connected. Use a fallback instead.
 		 *
 		 * @return string[]
 		 */
 		public static function get_countries() {
 			try {
+
+				/*
+				 * If the user is not connected, we can't get the list of supported countries.
+				 * We throw an exception and use a fallback.
+				 */
+				if ( ! Pinterest_For_Woocommerce()::is_connected() ) {
+					throw new Exception( 'Pinterest user is not connected, using fallback.' );
+				}
 
 				$allowed_countries = Base::get_list_of_ads_supported_countries();
 				$get_country_code  = function( $country_object ) {
@@ -41,7 +52,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 				);
 
 				return $allowed_countries_codes;
-			} catch ( \Exception $th ) {
+			} catch ( Exception $th ) {
 				// A fallback in case of error.
 				return array(
 					'AR', // Argentina.
