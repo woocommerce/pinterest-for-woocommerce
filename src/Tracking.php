@@ -36,22 +36,6 @@ class Tracking {
 	 */
 	private $trackers = array();
 
-	/**
-	 * Init Tracking.
-	 *
-	 * @since x.x.x
-	 *
-	 * @return void
-	 */
-	public static function maybe_init() {
-		$is_tracking_enabled             = apply_filters( 'woocommerce_pinterest_disable_tracking', false );
-		$is_tracking_conversions_enabled = Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
-		$is_tracked_site                 = ! wp_doing_cron() && ! is_admin();
-		if ( $is_tracking_enabled && $is_tracking_conversions_enabled && $is_tracked_site ) {
-			new self();
-		}
-	}
-
 	public function __construct() {
 		// Tracks page visit events.
 		add_action('wp_footer', array( $this, 'handle_page_visit' ) );
@@ -170,6 +154,7 @@ class Tracking {
 		}
 
 		$data = new Checkout(
+			uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ),
 			$order_id,
 			$order->get_total(),
 			$total_quantity,
@@ -192,21 +177,13 @@ class Tracking {
 	}
 
 	public function maybe_track_event( string $event_name, Data $data ) {
-		$is_tracking_enabled             = ! apply_filters( 'woocommerce_pinterest_disable_tracking', false );
-		$is_tracking_conversions_enabled = Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
-		$is_tracked_site                 = ! wp_doing_cron() && ! is_admin();
-
-		if ( $is_tracking_enabled && $is_tracking_conversions_enabled && $is_tracked_site ) {
-			foreach ( $this->get_trackers() as $tracker ) {
-				// Skip Pinterest tag tracking if tag is not active.
-				if ( $tracker instanceof Tag && ! Tag::get_active_tag() ) {
-					continue;
-				}
-				$tracker->track_event( $event_name, $data );
+		foreach ( $this->get_trackers() as $tracker ) {
+			// Skip Pinterest tag tracking if tag is not active.
+			if ( $tracker instanceof Tag && ! Tag::get_active_tag() ) {
+				continue;
 			}
-			return true;
+			$tracker->track_event( $event_name, $data );
 		}
-		return false;
 	}
 
 	/**

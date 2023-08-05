@@ -2,28 +2,38 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Pinterest_For_Woocommerce;
+
 class TrackingTest extends \WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
-		update_option( 'woocommerce_allow_tracking', 'yes' );
 	}
 
-	function test_ajax_tracking_snippet_action_added() {
-		add_option( 'woocommerce_enable_ajax_add_to_cart', 'yes' );
-		add_option( 'woocommerce_cart_redirect_after_add', 'no' );
-		\Pinterest_For_Woocommerce::save_setting( 'track_conversions', true );
-		\Pinterest_For_Woocommerce::save_setting( 'tracking_tag', 'some-tag-id' );
+	public function test_init_tracking_inits() {
+		Pinterest_For_Woocommerce::save_settings( array( 'track_conversions' => true ) );
+		add_filter( 'wp_doing_cron', '__return_false' );
 
-		Tracking::maybe_init();
+		$tracking = Pinterest_For_Woocommerce::init_tracking();
 
-		$this->assertEquals(
-			20,
-			has_action( 'wp_enqueue_scripts', array( Tracking::class, 'ajax_tracking_snippet' ) )
-		);
-		$this->assertEquals(
-			10,
-			has_filter( 'woocommerce_loop_add_to_cart_args', array( Tracking::class, 'filter_add_to_cart_attributes' ) )
-		);
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_page_visit' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_view_category' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_add_to_cart', array( $tracking, 'handle_add_to_cart' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_checkout_order_created', array( $tracking, 'handle_checkout' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_search' ) ) );
+	}
+
+	function test_tracking_adds_actions_monitoring() {
+		$tracking = new Tracking();
+
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_page_visit' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_view_category' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_add_to_cart', array( $tracking, 'handle_add_to_cart' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_checkout_order_created', array( $tracking, 'handle_checkout' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_search' ) ) );
+	}
+
+	public function test_tracker_is_added() {
+
 	}
 }
