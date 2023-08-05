@@ -205,7 +205,7 @@ class Tracking {
 	 * @return void
 	 */
 	public function add_tracker( Tracker $tracker ) {
-		$this->trackers[] = $tracker;
+		$this->trackers[ get_class( $tracker ) ] = $tracker;
 	}
 
 	/**
