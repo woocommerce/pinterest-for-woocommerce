@@ -76,6 +76,6 @@ class TrackingTest extends \WP_UnitTestCase {
 			->method( 'track_event' )
 			->with( 'test', $data );
 
-		$tracking->maybe_track_event( 'test', $data );
+		$tracking->track_event( 'test', $data );
 	}
 }

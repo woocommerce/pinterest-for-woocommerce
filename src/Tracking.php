@@ -36,26 +36,32 @@ class Tracking {
 	 */
 	private $trackers = array();
 
+	/**
+	 * Attaches all the required tracking events to corresponding WP/WC hooks.
+	 *
+	 * @since x.x.x
+	 */
 	public function __construct() {
 		// Tracks page visit events.
-		add_action('wp_footer', array( $this, 'handle_page_visit' ) );
+		add_action( 'wp_footer', array( $this, 'handle_page_visit' ) );
 
 		// Tracks category visit events.
 		add_action( 'wp_footer', array( $this, 'handle_view_category' ) );
+
+		// Tracks search events.
+		add_action( 'wp_footer', array( $this, 'handle_search' ) );
 
 		// Tracks add to cart events.
 		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_add_to_cart' ), 10, 6 );
 
 		// Tracks checkout events.
 		add_action( 'woocommerce_checkout_order_created', array( $this, 'handle_checkout' ), 10, 2 );
-
-		// Tracks search events.
-		// @TODO add search tracking on search ajax calls maybe?
-		add_action( 'wp_footer', array( $this, 'handle_search' ) );
 	}
 
 	/**
 	 * Used as a callback for the wp_footer hook.
+	 *
+	 * @since x.x.x
 	 *
 	 * @return void
 	 */
@@ -74,11 +80,13 @@ class Tracking {
 				1
 			);
 		}
-		$this->maybe_track_event( static::EVENT_PAGE_VISIT, $data );
+		$this->track_event( static::EVENT_PAGE_VISIT, $data );
 	}
 
 	/**
 	 * Used as a callback for the wp_footer hook.
+	 *
+	 * @since x.x.x
 	 *
 	 * @return void
 	 */
@@ -92,11 +100,13 @@ class Tracking {
 			$queried_object->term_id,
 			$queried_object->name
 		);
-		$this->maybe_track_event( static::EVENT_VIEW_CATEGORY, $data );
+		$this->track_event( static::EVENT_VIEW_CATEGORY, $data );
 	}
 
 	/**
 	 * Used as a callback for the woocommerce_add_to_cart hook.
+	 *
+	 * @since x.x.x
 	 *
 	 * @return void
 	 */
@@ -113,11 +123,13 @@ class Tracking {
 			get_woocommerce_currency(),
 			$quantity
 		);
-		$this->maybe_track_event( static::EVENT_ADD_TO_CART, $data );
+		$this->track_event( static::EVENT_ADD_TO_CART, $data );
 	}
 
 	/**
 	 * Used as a callback for the woocommerce_checkout_order_created hook.
+	 *
+	 * @since x.x.x
 	 *
 	 * @return void
 	 */
@@ -127,7 +139,7 @@ class Tracking {
 			return;
 		}
 
-		$items    = array();
+		$items          = array();
 		$total_quantity = 0;
 		foreach ( $order->get_items() as $order_item ) {
 			if ( ! method_exists( $order_item, 'get_product' ) ) {
@@ -161,9 +173,16 @@ class Tracking {
 			$order->get_currency(),
 			$items
 		);
-		$this->maybe_track_event( static::EVENT_CHECKOUT, $data );
+		$this->track_event( static::EVENT_CHECKOUT, $data );
 	}
 
+	/**
+	 * Search event handler.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
 	public function handle_search() {
 		if ( ! is_search() ) {
 			return;
@@ -173,10 +192,20 @@ class Tracking {
 			uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ),
 			get_search_query()
 		);
-		$this->maybe_track_event( static::EVENT_SEARCH, $data );
+		$this->track_event( static::EVENT_SEARCH, $data );
 	}
 
-	public function maybe_track_event( string $event_name, Data $data ) {
+	/**
+	 * Method which iterates over all the attached trackers and delegates the event to them.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $event_name Tracking event name.
+	 * @param Data   $data       Event Data object.
+	 *
+	 * @return void
+	 */
+	public function track_event(string $event_name, Data $data ) {
 		foreach ( $this->get_trackers() as $tracker ) {
 			// Skip Pinterest tag tracking if tag is not active.
 			if ( $tracker instanceof Tag && ! Tag::get_active_tag() ) {
@@ -200,6 +229,8 @@ class Tracking {
 	/**
 	 * Adds a tracker to the array of trackers.
 	 *
+	 * @since x.x.x
+	 *
 	 * @param Tracker $tracker
 	 *
 	 * @return void
@@ -211,7 +242,10 @@ class Tracking {
 	/**
 	 * Removes a tracker.
 	 *
-	 * @param string $tracker Tracker class name to be removed. e.g. PinterestTag::class
+	 * @since x.x.x
+	 *
+	 * @param string $tracker Tracker class name to be removed. e.g. Tag::class, Conversions::class
+	 *
 	 * @return void
 	 */
 	public function remove_tracker( string $tracker ) {

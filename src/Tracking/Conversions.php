@@ -1,4 +1,10 @@
 <?php
+/**
+ * Pinterest for WooCommerce Tracking. Conversions API.
+ *
+ * @package     Pinterest_For_WooCommerce/Classes/
+ * @version     1.0.0
+ */
 
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
@@ -12,6 +18,9 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data\Search;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
 use Throwable;
 
+/**
+ * Class adds Pinterest Conversions API support.
+ */
 class Conversions implements Tracker {
 
 	const EVENT_MAP = array(
@@ -22,12 +31,28 @@ class Conversions implements Tracker {
 		Tracking::EVENT_CHECKOUT      => 'checkout',
 	);
 
-	private User $user;
+	/**
+	 * @var User User data object. Stores data for Conversions API needs.
+	 */
+	private $user;
 
+	/**
+	 * Pinterest Conversions API class constructor.
+	 *
+	 * @param User $user
+	 */
 	public function __construct( User $user ) {
 		$this->user = $user;
 	}
 
+	/**
+	 * Track event function implementation. Used to send event data to a destination.
+	 *
+	 * @param string $event_name Tracking event name.
+	 * @param Data   $data       Tracking event data class.
+	 *
+	 * @return void
+	 */
 	public function track_event( string $event_name, Data $data ) {
 		global $wp;
 
@@ -154,12 +179,5 @@ class Conversions implements Tracker {
 		} catch ( Throwable $e ) {
 			// Do nothing.
 		}
-	}
-
-	/**
-	 * @return bool
-	 */
-	public static function is_conversions_api_enabled() {
-		return true;
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Pinterest for WooCommerce Tracking
+ * Pinterest for WooCommerce Tracking. Pinterest Tag.
  *
  * @package     Pinterest_For_WooCommerce/Classes/
  * @version     1.0.0
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class adding Save Pin support.
+ * Class adds PinterestTag tracker support.
  */
 class Tag implements Tracker {
 
