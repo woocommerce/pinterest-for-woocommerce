@@ -58,34 +58,15 @@ class Tag implements Tracker {
 	 */
 	private static $deferred_events = array();
 
-	public function __construct() {
-		// add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
-		add_action( 'wp_head', array( __CLASS__, 'print_script' ) );
-		add_action( 'wp_body_open', array( __CLASS__, 'print_noscript' ), 0 );
-		add_action( 'shutdown', array( __CLASS__, 'save_deferred_events' ) );
-	}
-
 	/**
-	 * Enqueue JS files necessary to properly track actions such as search.
-	 *
-	 * @since x.x.x
+	 * Initialises Tag tracker and adds hooks trackers needs to operate.
 	 *
 	 * @return void
 	 */
-	public static function enqueue_scripts() {
-		$ext = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-		/*wp_localize_script(
-			'pinterest-for-woocommerce-tracking-scripts',
-			'PinterestTagSearch',
-
-		);*/
-		wp_enqueue_script(
-			'pinterest-for-woocommerce-tracking-scripts',
-			Pinterest_For_Woocommerce()->plugin_url() . '/assets/js/pinterest-for-woocommerce-tracking' . $ext . '.js',
-			array(),
-			PINTEREST_FOR_WOOCOMMERCE_VERSION,
-			true
-		);
+	public function __construct() {
+		add_action( 'wp_head', array( $this, 'print_script' ) );
+		add_action( 'wp_body_open', array( $this, 'print_noscript' ), 0 );
+		add_action( 'shutdown', array( $this, 'save_deferred_events' ) );
 	}
 
 	/**
@@ -95,7 +76,7 @@ class Tag implements Tracker {
 	 *
 	 * @return void
 	 */
-	public static function print_script() {
+	public function print_script() {
 		$active_tag = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
 		$email      = Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) ? static::maybe_get_hashed_customer_email() : '';
 		$script     = ! empty( $email ) ? self::$base_tag_em : self::$base_tag;
@@ -118,7 +99,7 @@ class Tag implements Tracker {
 	 *
 	 * @return void
 	 */
-	public static function print_noscript() {
+	public function print_noscript() {
 		$active_tag = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
 		if ( ! $active_tag ) {
 			return;
@@ -139,7 +120,7 @@ class Tag implements Tracker {
 	 *
 	 * @return array
 	 */
-	public static function load_deferred_events() {
+	public function load_deferred_events() {
 		$transient_key = static::get_deferred_events_transient_key();
 		if ( $transient_key ) {
 			$async_events = get_transient( $transient_key );
