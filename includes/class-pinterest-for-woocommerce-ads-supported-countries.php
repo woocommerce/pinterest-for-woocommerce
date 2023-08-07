@@ -7,7 +7,7 @@
  */
 
 use Automattic\WooCommerce\Pinterest\API\Base;
-use Exception;
+use \Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
