@@ -1,4 +1,10 @@
 <?php
+/**
+ * Pinterest tracking main class.
+ *
+ * @package Pinterest_For_WooCommerce/Classes/
+ * @version 1.0.0
+ */
 
 namespace Automattic\WooCommerce\Pinterest;
 
@@ -16,8 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Tracker responsible for tracking events on the website and call corresponding trackers to send events to
- * their systems.
+ * Class Tracker responsible for hooking into system events.
  */
 class Tracking {
 

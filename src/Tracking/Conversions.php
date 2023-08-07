@@ -91,7 +91,7 @@ class Conversions implements Tracker {
 			$data = array(
 				'event_id'    => $data->get_event_id(),
 				'custom_data' => array(
-					'category_name' => $data->getCategoryName(),
+					'category_name' => $data->getName(),
 				),
 			);
 		}

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Pinterest Tracking data class.
+ *
+ * @package Pinterest_For_WooCommerce/Classes/
+ * @version 1.0.0
+ */
 
 namespace Automattic\WooCommerce\Pinterest\Tracking\Data;
 

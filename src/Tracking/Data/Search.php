@@ -1,4 +1,10 @@
 <?php
+/**
+ * Pinterest tracking search data class.
+ *
+ * @package Pinterest_For_WooCommerce/Classes/
+ * @version 1.0.0
+ */
 
 namespace Automattic\WooCommerce\Pinterest\Tracking\Data;
 
@@ -15,6 +21,10 @@ class Search extends Data {
 
 	private $search_query;
 
+	/**
+	 * @param string $event_id     - A unique event id.
+	 * @param string $search_query - Search query.
+	 */
 	public function __construct( $event_id, $search_query ) {
 		parent::__construct( $event_id );
 		$this->search_query = $search_query;

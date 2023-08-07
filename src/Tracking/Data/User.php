@@ -1,12 +1,17 @@
 <?php
 /**
- * @package Pinterest_For_Woocommerce/API/Conversions
+ * Pinterest tracking user data class.
+ *
+ * @package Pinterest_For_WooCommerce/Classes/
+ * @version 1.0.0
  */
 namespace Automattic\WooCommerce\Pinterest\Tracking\Data;
 
 use Automattic\WooCommerce\Pinterest\Tracking\Data;
 
 /**
+ * User data class holds user ip address and a user agent string.
+ *
  * @link https://developers.pinterest.com/docs/conversions/best/#Required,%20recommended,%20and%20optional%20fields
  *
  * @since x.x.x

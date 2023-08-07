@@ -200,8 +200,8 @@ class Tag implements Tracker {
 			/** @var Category $data */
 			$data = array(
 				'event_id'         => $data->get_event_id(),
-				'product_category' => $data->getProductCategory(),
-				'category_name'    => $data->getCategoryName(),
+				'product_category' => $data->getId(),
+				'category_name'    => $data->getName(),
 			);
 		}
 
@@ -259,7 +259,7 @@ class Tag implements Tracker {
 	/**
 	 * Get the formatted warning message for the potential conflicting tags.
 	 *
-	 * @since 1.2.3
+	 * @since x.x.x
 	 *
 	 * @return string The warning message.
 	 */
@@ -285,7 +285,7 @@ class Tag implements Tracker {
 	/**
 	 * Detect if there are other tags installed on the site.
 	 *
-	 * @since 1.2.3
+	 * @since x.x.x
 	 *
 	 * @return array The list of installed tags.
 	 */

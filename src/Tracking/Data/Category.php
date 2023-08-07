@@ -1,32 +1,46 @@
 <?php
+/**
+ * Pinterest tracking category data class.
+ *
+ * @package Pinterest_For_WooCommerce/Classes/
+ * @version 1.0.0
+ */
 
 namespace Automattic\WooCommerce\Pinterest\Tracking\Data;
 
 use Automattic\WooCommerce\Pinterest\Tracking\Data;
 
+/**
+ * Category data class to hold category name and id data.
+ */
 class Category extends Data {
 
-	private $product_category;
+	private $id;
 
-	private $category_name;
+	private $name;
 
-	public function __construct( $event_id, $product_category, $category_name ) {
+	/**
+	 * @param string $event_id - A unique event id.
+	 * @param string $id       - Product category id.
+	 * @param string $name     - Product category name.
+	 */
+	public function __construct( $event_id, $id, $name ) {
 		parent::__construct( $event_id );
-		$this->product_category = $product_category;
-		$this->category_name  = $category_name;
+		$this->id    = $id;
+		$this->name  = $name;
 	}
 
 	/**
 	 * @return mixed
 	 */
-	public function getProductCategory() {
-		return $this->product_category;
+	public function getId() {
+		return $this->id;
 	}
 
 	/**
 	 * @return mixed
 	 */
-	public function getCategoryName() {
-		return $this->category_name;
+	public function getName() {
+		return $this->name;
 	}
 }
