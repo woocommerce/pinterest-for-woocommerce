@@ -113,6 +113,11 @@ class Tracking {
 	 *
 	 * @since x.x.x
 	 *
+	 * @param string $cart_item_key - WooCommerce cart item key.
+	 * @param string $product_id           - WooCommerce product id.
+	 * @param string $quantity             - Number of products.
+	 * @param string $variation_id         - Product variation id if any.
+	 *
 	 * @return void
 	 */
 	public function handle_add_to_cart( $cart_item_key, $product_id, $quantity, $variation_id ) {
@@ -135,6 +140,8 @@ class Tracking {
 	 * Used as a callback for the woocommerce_checkout_order_created hook.
 	 *
 	 * @since x.x.x
+	 *
+	 * @param string $order_id - WooCommerce order id.
 	 *
 	 * @return void
 	 */
@@ -210,7 +217,7 @@ class Tracking {
 	 *
 	 * @return void
 	 */
-	public function track_event(string $event_name, Data $data ) {
+	public function track_event( string $event_name, Data $data ) {
 		foreach ( $this->get_trackers() as $tracker ) {
 			// Skip Pinterest tag tracking if tag is not active.
 			if ( $tracker instanceof Tag && ! Tag::get_active_tag() ) {
@@ -236,7 +243,7 @@ class Tracking {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param Tracker $tracker
+	 * @param Tracker $tracker - One of objects implementing Tracker interface.
 	 *
 	 * @return void
 	 */
@@ -249,7 +256,7 @@ class Tracking {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $tracker Tracker class name to be removed. e.g. Tag::class, Conversions::class
+	 * @param string $tracker Tracker class name to be removed. e.g. Tag::class, Conversions::class.
 	 *
 	 * @return void
 	 */

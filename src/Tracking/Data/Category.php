@@ -15,8 +15,18 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
  */
 class Category extends Data {
 
+	/**
+	 * WooCommerce category id.
+	 *
+	 * @var string
+	 */
 	private $id;
 
+	/**
+	 * Category name.
+	 *
+	 * @var string
+	 */
 	private $name;
 
 	/**

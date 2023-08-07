@@ -17,6 +17,9 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
  */
 class None extends Data {
 
+	/**
+	 * @param string $event_id - A unique event id.
+	 */
 	public function __construct( $event_id ) {
 		parent::__construct( $event_id );
 	}

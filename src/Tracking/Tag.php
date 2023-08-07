@@ -106,11 +106,6 @@ class Tag implements Tracker {
 		}
 		$noscript = str_replace( self::TAG_ID_SLUG, sanitize_key( $active_tag ), self::$noscript_base_tag );
 		echo $noscript; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
-		# @TODO: Render all `delayed` events in noscript.
-		/*if ( ! empty( self::$deferred_events ) ) {
-			echo '<script>' . implode( PHP_EOL, self::$deferred_events ) . '</script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
-			self::$deferred_events = array();
-		}*/
 	}
 
 	/**
@@ -137,8 +132,8 @@ class Tag implements Tracker {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $event_name
-	 * @param array  $data
+	 * @param string $event_name - Event name. e.g. Checkout, AddToCart, etc.
+	 * @param array  $data       - Corresponding event data object.
 	 *
 	 * @return true
 	 */
@@ -171,8 +166,8 @@ class Tag implements Tracker {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $event_name
-	 * @param Data   $data
+	 * @param string $event_name - Event name. e.g. Checkout, AddToCart, etc.
+	 * @param Data   $data       - Corresponding event data object.
 	 *
 	 * @return true
 	 */

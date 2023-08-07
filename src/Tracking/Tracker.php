@@ -1,7 +1,16 @@
 <?php
+/**
+ * Pinterest tracker interface.
+ *
+ * @package Pinterest_For_WooCommerce/Classes/
+ * @version 1.0.0
+ */
 
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
+/**
+ * Interface for Pinterest tracker implementations.
+ */
 interface Tracker {
 
 	/**
@@ -9,8 +18,8 @@ interface Tracker {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $event_name
-	 * @param Data   $data
+	 * @param string $event_name - A unique event id.
+	 * @param Data   $data       - Data class which holds corresponding even data.
 	 *
 	 * @return true
 	 */

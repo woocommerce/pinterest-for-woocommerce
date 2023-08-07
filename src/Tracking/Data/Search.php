@@ -19,6 +19,11 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
  */
 class Search extends Data {
 
+	/**
+	 * Search query string.
+	 *
+	 * @var string
+	 */
 	private $search_query;
 
 	/**

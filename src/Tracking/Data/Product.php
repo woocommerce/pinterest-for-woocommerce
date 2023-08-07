@@ -17,18 +17,53 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
  */
 class Product extends Data {
 
+	/**
+	 * Product WooCommerce id.
+	 *
+	 * @var string
+	 */
 	private $id;
 
+	/**
+	 * Product name.
+	 *
+	 * @var string
+	 */
 	private $name;
 
+	/**
+	 * Product category.
+	 *
+	 * @var string
+	 */
 	private $category;
 
+	/**
+	 * Product brand.
+	 *
+	 * @var string
+	 */
 	private $brand;
 
+	/**
+	 * Product price.
+	 *
+	 * @var string
+	 */
 	private $price;
 
+	/**
+	 * Currency code.
+	 *
+	 * @var string
+	 */
 	private $currency;
 
+	/**
+	 * Number of products.
+	 *
+	 * @var string
+	 */
 	private $quantity;
 
 	/**

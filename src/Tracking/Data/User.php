@@ -5,6 +5,7 @@
  * @package Pinterest_For_WooCommerce/Classes/
  * @version 1.0.0
  */
+
 namespace Automattic\WooCommerce\Pinterest\Tracking\Data;
 
 use Automattic\WooCommerce\Pinterest\Tracking\Data;
@@ -21,13 +22,17 @@ class User extends Data {
 	/**
 	 * @var string User's IP address.
 	 */
-	private string $client_ip_address;
+	private $client_ip_address;
 
 	/**
 	 * @var string User's user agent.
 	 */
-	private string $client_user_agent;
+	private $client_user_agent;
 
+	/**
+	 * @param string $client_ip_address - IP address.
+	 * @param string $client_user_agent - User Agent string.
+	 */
 	public function __construct( string $client_ip_address, string $client_user_agent ) {
 		$this->client_ip_address = $client_ip_address;
 		$this->client_user_agent = $client_user_agent;

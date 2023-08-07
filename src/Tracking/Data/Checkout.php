@@ -16,35 +16,45 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
 class Checkout extends Data {
 
 	/**
-	 * @var string WooCommerce order id.
+	 * WooCommerce order id.
+	 *
+	 * @var string
 	 */
 	private $order_id;
 
 	/**
-	 * @var string WooCommerce order amount.
+	 * WooCommerce order amount.
+	 *
+	 * @var string
 	 */
 	private $price;
 
 	/**
-	 * @var int Number of items in the order.
+	 * Number of items in the order.
+	 *
+	 * @var int
 	 */
 	private $quantity;
 
 	/**
-	 * @var string order currency code.
+	 * Order currency code.
+	 *
+	 * @var string
 	 */
 	private $currency;
 
 	/**
-	 * @var Product[] an array of products involved into checkout.
+	 * An array of products involved into checkout.
+	 *
+	 * @var Product[]
 	 */
 	private $items;
 
 	/**
 	 * @param string    $event_id - A unique event id as a requirement by Pinterest for deduplication purposes.
-	 * @param           $order_id - WooCommerce Order ID.
-	 * @param           $price    - WooCommerce total order amount.
-	 * @param           $quantity - Number of items.
+	 * @param string    $order_id - WooCommerce Order ID.
+	 * @param string    $price    - WooCommerce total order amount.
+	 * @param string    $quantity - Number of items.
 	 * @param string    $currency - Order currency.
 	 * @param Product[] $items    - An array of ordered items.
 	 */
