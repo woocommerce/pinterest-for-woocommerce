@@ -37,7 +37,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 				 * We throw an exception and use a fallback.
 				 */
 				if ( ! Pinterest_For_Woocommerce()::is_connected() ) {
-					throw new Exception( 'Pinterest user is not connected, using fallback.' );
+					throw new Exception( 'Pinterest user is not connected, using fallback list of supported countries.' );
 				}
 
 				$allowed_countries = Base::get_list_of_ads_supported_countries();
