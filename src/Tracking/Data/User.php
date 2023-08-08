@@ -30,6 +30,8 @@ class User extends Data {
 	private $client_user_agent;
 
 	/**
+	 * @NOTE: We skipped call to parent constructor on purpose, we do not need event id here.
+	 *
 	 * @param string $client_ip_address - IP address.
 	 * @param string $client_user_agent - User Agent string.
 	 */
