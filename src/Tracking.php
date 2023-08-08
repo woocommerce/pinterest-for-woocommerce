@@ -60,7 +60,7 @@ class Tracking {
 		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_add_to_cart' ), 10, 6 );
 
 		// Tracks checkout events.
-		add_action( 'woocommerce_checkout_order_created', array( $this, 'handle_checkout' ), 10, 2 );
+		add_action( 'woocommerce_before_thankyou', array( $this, 'handle_checkout' ), 10, 2 );
 	}
 
 	/**
