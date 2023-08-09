@@ -91,6 +91,13 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.7 - 2023-08-09 =
+* Tweak - Don't fetch the allowed countries list when not connected.
+* Tweak - Increase allowed countries cache lifetime to two days.
+* Tweak - WC 8.0 compatibility.
+* Tweak - WP 6.3 compatibility.
+* Update - Add missing countries to the allowed countries list.
+
 = 1.3.6 - 2023-07-25 =
 * Dev - Add release preparation GH workflow.
 
