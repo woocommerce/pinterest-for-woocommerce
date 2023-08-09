@@ -90,31 +90,32 @@ class Base {
 			}
 		}
 
+
+		$api         = empty( $api ) ? '' : trailingslashit( $api );
+		$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
+
+		$request = array(
+			'url'     => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
+			'method'  => $method,
+			'args'    => $payload,
+			'headers' => array(
+				'Pinterest-Woocommerce-Version' => PINTEREST_FOR_WOOCOMMERCE_VERSION,
+			),
+		);
+
+		if ( 'ads/' === $api && in_array( $method, array( 'POST', 'PATCH' ), true ) ) {
+			// Force json content-type header and json encode payload.
+			$request['headers']['Content-Type'] = 'application/json';
+
+			$request['args'] = wp_json_encode( $payload );
+		}
+
 		try {
-			$api         = empty( $api ) ? '' : trailingslashit( $api );
-			$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
-
-			$request = array(
-				'url'     => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
-				'method'  => $method,
-				'args'    => $payload,
-				'headers' => array(
-					'Pinterest-Woocommerce-Version' => PINTEREST_FOR_WOOCOMMERCE_VERSION,
-				),
-			);
-
-			if ( 'ads/' === $api && in_array( $method, array( 'POST', 'PATCH' ), true ) ) {
-				// Force json content-type header and json encode payload.
-				$request['headers']['Content-Type'] = 'application/json';
-
-				$request['args'] = wp_json_encode( $payload );
-			}
 
 			$response = self::handle_request( $request );
-
 			self::maybe_cache_api_response( $endpoint, $method, $payload, $api, $response, $cache_expiry );
-
 			return $response;
+			
 		} catch ( ApiException $e ) {
 
 			if ( ! empty( Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' ) ) ) {
