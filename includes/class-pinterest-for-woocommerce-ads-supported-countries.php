@@ -59,8 +59,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 					'FR', // France.
 					'DE', // Germany.
 					'GR', // Greece.
+					'HK', // Hong Kong.
 					'HU', // Hungary.
 					'IE', // Ireland.
+					'IL', // Israel.
 					'IT', // Italy.
 					'JP', // Japan.
 					'LU', // Luxembourg.
@@ -72,7 +74,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 					'PL', // Poland.
 					'PT', // Portugal.
 					'RO', // Romania.
+					'SG', // Singapore.
 					'SK', // Slovakia.
+					'KR', // South Korea.
 					'ES', // Spain.
 					'SE', // Sweden.
 					'CH', // Switzerland.
