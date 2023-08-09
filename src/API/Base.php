@@ -82,6 +82,9 @@ class Base {
 	 */
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 
+		$api         = empty( $api ) ? '' : trailingslashit( $api );
+		$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
+		
 		if ( ! empty( $cache_expiry ) ) {
 			$cache = self::get_cached_response( $endpoint, $method, $payload, $api );
 
@@ -89,10 +92,6 @@ class Base {
 				return $cache;
 			}
 		}
-
-
-		$api         = empty( $api ) ? '' : trailingslashit( $api );
-		$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
 
 		$request = array(
 			'url'     => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
@@ -115,7 +114,7 @@ class Base {
 			$response = self::handle_request( $request );
 			self::maybe_cache_api_response( $endpoint, $method, $payload, $api, $response, $cache_expiry );
 			return $response;
-			
+
 		} catch ( ApiException $e ) {
 
 			if ( ! empty( Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' ) ) ) {
