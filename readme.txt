@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
-Tested up to: 6.2
+Tested up to: 6.3
 Requires PHP: 7.3
-Stable tag: 1.3.6
+Stable tag: 1.3.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,13 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.3.7 - 2023-08-09 =
+* Tweak - Don't fetch the allowed countries list when not connected.
+* Tweak - Increase allowed countries cache lifetime to two days.
+* Tweak - WC 8.0 compatibility.
+* Tweak - WP 6.3 compatibility.
+* Update - Add missing countries to the allowed countries list.
 
 = 1.3.6 - 2023-07-25 =
 * Dev - Add release preparation GH workflow.
