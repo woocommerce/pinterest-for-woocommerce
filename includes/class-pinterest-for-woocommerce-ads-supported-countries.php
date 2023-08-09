@@ -25,7 +25,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 		 * @see https://help.pinterest.com/en/business/availability/ads-availability
 		 *
 		 * @since x.x.x Don't fetch the list of supported countries if the user is not connected. Use a fallback instead.
-		 * 
+		 *
 		 * @throws Exception If the user is not connected and the list of supported countries can't be fetched.
 		 *
 		 * @return string[]
