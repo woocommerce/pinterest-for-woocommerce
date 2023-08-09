@@ -84,7 +84,7 @@ class Base {
 
 		$api         = empty( $api ) ? '' : trailingslashit( $api );
 		$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
-		
+
 		if ( ! empty( $cache_expiry ) ) {
 			$cache = self::get_cached_response( $endpoint, $method, $payload, $api );
 
@@ -195,7 +195,7 @@ class Base {
 
 	/**
 	 * Caches the API response if cache expiry is set.
-	 * 
+	 *
 	 * @since x.x.x
 	 * @param string $endpoint     The API endpoint.
 	 * @param string $method       The HTTP method.
@@ -203,7 +203,7 @@ class Base {
 	 * @param string $api          The API version.
 	 * @param mixed  $response     The API response.
 	 * @param int    $cache_expiry The cache expiry in seconds.
-	 * 
+	 *
 	 * @return void
 	 */
 	private static function maybe_cache_api_response( $endpoint, $method, $payload, $api, $response, $cache_expiry ) {
