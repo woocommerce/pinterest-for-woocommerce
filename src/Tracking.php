@@ -16,6 +16,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Search;
 use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Automattic\WooCommerce\Pinterest\Tracking\Tracker;
+use Throwable;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -223,7 +224,19 @@ class Tracking {
 			if ( $tracker instanceof Tag && ! Tag::get_active_tag() ) {
 				continue;
 			}
-			$tracker->track_event( $event_name, $data );
+
+			try {
+				$tracker->track_event( $event_name, $data );
+			} catch ( Throwable $e ) {
+				/* translators: %1$s - event name, %2$s - tracker class name, %3$s - error message */
+				$message = sprintf(
+					'Error while tracking event %1$s with tracker %2$s. Error: %3$s',
+					$event_name,
+					get_class( $tracker ),
+					$e->getMessage()
+				);
+				Logger::log( $message, 'error' );
+			}
 		}
 	}
 

@@ -8,6 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
+use Throwable;
+
 /**
  * Interface for Pinterest tracker implementations.
  */
@@ -20,6 +22,8 @@ interface Tracker {
 	 *
 	 * @param string $event_name - A unique event id.
 	 * @param Data   $data       - Data class which holds corresponding even data.
+	 *
+	 * @throws Throwable In case of an API error.
 	 *
 	 * @return true
 	 */

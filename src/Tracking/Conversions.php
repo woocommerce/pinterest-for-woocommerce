@@ -50,97 +50,34 @@ class Conversions implements Tracker {
 	 * @param string $event_name Tracking event name.
 	 * @param Data   $data       Tracking event data class.
 	 *
+	 * @throws Throwable In case of an API error.
+	 *
 	 * @return void
 	 */
 	public function track_event( string $event_name, Data $data ) {
-		global $wp;
-
 		if ( Tracking::EVENT_SEARCH === $event_name ) {
 			/** @var Search $data */
-			$data = array(
-				'event_id'    => $data->get_event_id(),
-				'custom_data' => array(
-					'search_string' => $data->get_search_query(),
-				),
-			);
+			$data = $this->get_search_data( $data );
 		}
 
 		if ( Tracking::EVENT_PAGE_VISIT === $event_name && ! ( $data instanceof None ) ) {
 			/** @var Product $data */
-			$data = array(
-				'event_id'    => $data->get_event_id(),
-				'custom_data' => array(
-					'currency'    => $data->get_currency(),
-					'value'       => $data->get_price() * $data->get_quantity(),
-					'content_ids' => array( $data->get_id() ),
-					'contents'    => array(
-						array(
-							'id'         => $data->get_id(),
-							'item_price' => $data->get_price(),
-							'quantity'   => $data->get_quantity(),
-						),
-					),
-					'num_items'   => $data->get_quantity(),
-				),
-			);
+			$data = $this->get_page_visit_data( $data );
 		}
 
 		if ( Tracking::EVENT_VIEW_CATEGORY === $event_name ) {
 			/** @var Category $data */
-			$data = array(
-				'event_id'    => $data->get_event_id(),
-				'custom_data' => array(
-					'category_name' => $data->getName(),
-				),
-			);
+			$data = $this->get_view_category_data( $data );
 		}
 
 		if ( Tracking::EVENT_ADD_TO_CART === $event_name ) {
 			/** @var Product $data */
-			$data = array(
-				'event_id'    => $data->get_event_id(),
-				'custom_data' => array(
-					'currency'    => $data->get_currency(),
-					'value'       => $data->get_price() * $data->get_quantity(),
-					'content_ids' => array( $data->get_id() ),
-					'contents'    => array(
-						array(
-							'id'         => $data->get_id(),
-							'item_price' => $data->get_price(),
-							'quantity'   => $data->get_quantity(),
-						),
-					),
-					'num_items'   => $data->get_quantity(),
-				),
-			);
+			$data = $this->get_add_to_cart_data( $data );
 		}
 
 		if ( Tracking::EVENT_CHECKOUT === $event_name ) {
 			/** @var Checkout $data */
-			$data = array(
-				'event_id'    => $data->get_event_id(),
-				'custom_data' => array(
-					'currency'    => $data->get_currency(),
-					'value'       => $data->get_price() * $data->get_quantity(),
-					'content_ids' => array_map(
-						function ( Product $product ) {
-							return $product->get_id();
-						},
-						$data->get_items()
-					),
-					'contents'    => array_map(
-						function ( Product $product ) {
-							return array(
-								'id'         => $product->get_id(),
-								'item_price' => $product->get_price(),
-								'quantity'   => $product->get_quantity(),
-							);
-						},
-						$data->get_items()
-					),
-					'num_items'   => $data->get_quantity(),
-				),
-			);
+			$data = $this->get_checkout_data( $data );
 		}
 
 		if ( $data instanceof None ) {
@@ -153,21 +90,7 @@ class Conversions implements Tracker {
 		$event_name    = static::EVENT_MAP[ $event_name ] ?? '';
 
 		/** @var array $data */
-		$data = array_merge(
-			$data,
-			array(
-				'event_name'       => $event_name,
-				'action_source'    => 'web',
-				'event_time'       => time(),
-				'event_source_url' => home_url( $wp->request ),
-				'partner_name'     => 'ss-woocommerce',
-				'user_data'        => array(
-					'client_ip_address' => $this->user->get_client_ip_address(),
-					'client_user_agent' => $this->user->get_client_user_agent(),
-				),
-				'language'         => 'en',
-			)
-		);
+		$data = array_merge( $data, $this->get_default_data( $event_name ) );
 
 		try {
 			/* translators: 1: Conversions API event name, 2: JSON encoded event data. */
@@ -186,13 +109,167 @@ class Conversions implements Tracker {
 		} catch ( Throwable $e ) {
 			/* Translators: 1: Conversions API event name, 2: JSON encoded event data, 3: Error code, 4: Error message. */
 			$messages = sprintf(
-				'Sending Pinterest Conversions API event %1$s with a payload %2$s has failed with the error %3$d code and %4$s mesasge',
+				'Sending Pinterest Conversions API event %1$s with a payload %2$s has failed with the error %3$d code and %4$s message',
 				$event_name,
 				json_encode( $data ),
 				$e->getCode(),
 				$e->getMessage()
 			);
 			Logger::log( $messages, 'error', 'conversions' );
+
+			throw $e;
 		}
+	}
+
+	/**
+	 * Prepares default event data.
+	 *
+	 * @param string $event_name
+	 *
+	 * @return array
+	 */
+	public function get_default_data( string $event_name ) {
+		global $wp;
+
+		return array(
+			'event_name'       => $event_name,
+			'action_source'    => 'web',
+			'event_time'       => time(),
+			'event_source_url' => home_url( $wp->request ),
+			'partner_name'     => 'ss-woocommerce',
+			'user_data'        => array(
+				'client_ip_address' => $this->user->get_client_ip_address(),
+				'client_user_agent' => $this->user->get_client_user_agent(),
+			),
+			'language'         => 'en',
+		);
+	}
+
+	/**
+	 * Prepares data for the checkout event.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param Checkout $data
+	 *
+	 * @return array
+	 */
+	public function get_checkout_data( Checkout $data ) {
+		return array(
+			'event_id'    => $data->get_event_id(),
+			'custom_data' => array(
+				'currency'    => $data->get_currency(),
+				'value'       => $data->get_price(),
+				'content_ids' => array_map(
+					function ( Product $product ) {
+						return $product->get_id();
+					},
+					$data->get_items()
+				),
+				'contents'    => array_map(
+					function ( Product $product ) {
+						return array(
+							'id'         => $product->get_id(),
+							'item_price' => $product->get_price(),
+							'quantity'   => $product->get_quantity(),
+						);
+					},
+					$data->get_items()
+				),
+				'num_items'   => $data->get_quantity(),
+			),
+		);
+	}
+
+	/**
+	 * Prepares data for add to cart event.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param Product $data
+	 *
+	 * @return array
+	 */
+	public function get_add_to_cart_data( Product $data ) {
+		return array(
+			'event_id'    => $data->get_event_id(),
+			'custom_data' => array(
+				'currency'    => $data->get_currency(),
+				'value'       => $data->get_price() * $data->get_quantity(),
+				'content_ids' => array( $data->get_id() ),
+				'contents'    => array(
+					array(
+						'id'         => $data->get_id(),
+						'item_price' => $data->get_price(),
+						'quantity'   => $data->get_quantity(),
+					),
+				),
+				'num_items'   => $data->get_quantity(),
+			),
+		);
+	}
+
+	/**
+	 * Prepares data for view category event.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param Category $data
+	 *
+	 * @return array
+	 */
+	public function get_view_category_data( Category $data ) {
+		return array(
+			'event_id'    => $data->get_event_id(),
+			'custom_data' => array(
+				'category_name' => $data->getName(),
+			),
+		);
+	}
+
+	/**
+	 * Prepares data for page visit event.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param Product $data
+	 *
+	 * @return array
+	 */
+	public function get_page_visit_data( Product $data ) {
+		return array(
+			'event_id'    => $data->get_event_id(),
+			'custom_data' => array(
+				'currency'    => $data->get_currency(),
+				'value'       => $data->get_price() * $data->get_quantity(),
+				'content_ids' => array( $data->get_id() ),
+				'contents'    => array(
+					array(
+						'id'         => $data->get_id(),
+						'item_price' => $data->get_price(),
+						'quantity'   => $data->get_quantity(),
+					),
+				),
+				'num_items'   => $data->get_quantity(),
+			),
+		);
+	}
+
+	/**
+	 * Prepares data for the search event.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param Search $data
+	 *
+	 * @return array
+	 */
+	public function get_search_data( Search $data ) {
+		return array(
+			'event_id'    => $data->get_event_id(),
+			'custom_data' => array(
+				'search_string' => $data->get_search_query(),
+			),
+		);
 	}
 }
