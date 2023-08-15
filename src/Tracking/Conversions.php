@@ -55,42 +55,8 @@ class Conversions implements Tracker {
 	 * @return void
 	 */
 	public function track_event( string $event_name, Data $data ) {
-		if ( Tracking::EVENT_SEARCH === $event_name ) {
-			/** @var Search $data */
-			$data = $this->get_search_data( $data );
-		}
-
-		if ( Tracking::EVENT_PAGE_VISIT === $event_name && ! ( $data instanceof None ) ) {
-			/** @var Product $data */
-			$data = $this->get_page_visit_data( $data );
-		}
-
-		if ( Tracking::EVENT_VIEW_CATEGORY === $event_name ) {
-			/** @var Category $data */
-			$data = $this->get_view_category_data( $data );
-		}
-
-		if ( Tracking::EVENT_ADD_TO_CART === $event_name ) {
-			/** @var Product $data */
-			$data = $this->get_add_to_cart_data( $data );
-		}
-
-		if ( Tracking::EVENT_CHECKOUT === $event_name ) {
-			/** @var Checkout $data */
-			$data = $this->get_checkout_data( $data );
-		}
-
-		if ( $data instanceof None ) {
-			$data = array(
-				'event_id' => $data->get_event_id(),
-			);
-		}
-
+		$data          = $this->prepare_request_data( $event_name, $data );
 		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
-		$event_name    = static::EVENT_MAP[ $event_name ] ?? '';
-
-		/** @var array $data */
-		$data = array_merge( $data, $this->get_default_data( $event_name ) );
 
 		try {
 			/* translators: 1: Conversions API event name, 2: JSON encoded event data. */
@@ -122,13 +88,59 @@ class Conversions implements Tracker {
 	}
 
 	/**
+	 * Prepares event data for the request.
+	 *
+	 * @param string $event_name
+	 * @param Data   $data
+	 *
+	 * @return array
+	 */
+	public function prepare_request_data( string $event_name, Data $data ) {
+		if ( Tracking::EVENT_SEARCH === $event_name ) {
+			/** @var Search $data */
+			$data = $this->get_search_data( $data );
+		}
+
+		if ( Tracking::EVENT_PAGE_VISIT === $event_name && ! ( $data instanceof None ) ) {
+			/** @var Product $data */
+			$data = $this->get_page_visit_data( $data );
+		}
+
+		if ( Tracking::EVENT_VIEW_CATEGORY === $event_name ) {
+			/** @var Category $data */
+			$data = $this->get_view_category_data( $data );
+		}
+
+		if ( Tracking::EVENT_ADD_TO_CART === $event_name ) {
+			/** @var Product $data */
+			$data = $this->get_add_to_cart_data( $data );
+		}
+
+		if ( Tracking::EVENT_CHECKOUT === $event_name ) {
+			/** @var Checkout $data */
+			$data = $this->get_checkout_data( $data );
+		}
+
+		if ( $data instanceof None ) {
+			$data = array(
+				'event_id' => $data->get_event_id(),
+			);
+		}
+
+		$event_name = static::EVENT_MAP[ $event_name ] ?? '';
+
+		/** @var array $data */
+		return array_merge( $data, $this->get_default_data( $event_name ) );
+	}
+
+	/**
 	 * Prepares default event data.
 	 *
 	 * @param string $event_name
 	 *
 	 * @return array
 	 */
-	public function get_default_data( string $event_name ) {
+	private function get_default_data( string $event_name ) {
 		global $wp;
 
 		return array(
@@ -154,7 +166,7 @@ class Conversions implements Tracker {
 	 *
 	 * @return array
 	 */
-	public function get_checkout_data( Checkout $data ) {
+	private function get_checkout_data( Checkout $data ) {
 		return array(
 			'event_id'    => $data->get_event_id(),
 			'custom_data' => array(
@@ -190,7 +202,7 @@ class Conversions implements Tracker {
 	 *
 	 * @return array
 	 */
-	public function get_add_to_cart_data( Product $data ) {
+	private function get_add_to_cart_data( Product $data ) {
 		return array(
 			'event_id'    => $data->get_event_id(),
 			'custom_data' => array(
@@ -218,7 +230,7 @@ class Conversions implements Tracker {
 	 *
 	 * @return array
 	 */
-	public function get_view_category_data( Category $data ) {
+	private function get_view_category_data( Category $data ) {
 		return array(
 			'event_id'    => $data->get_event_id(),
 			'custom_data' => array(
@@ -236,7 +248,7 @@ class Conversions implements Tracker {
 	 *
 	 * @return array
 	 */
-	public function get_page_visit_data( Product $data ) {
+	private function get_page_visit_data( Product $data ) {
 		return array(
 			'event_id'    => $data->get_event_id(),
 			'custom_data' => array(
@@ -264,7 +276,7 @@ class Conversions implements Tracker {
 	 *
 	 * @return array
 	 */
-	public function get_search_data( Search $data ) {
+	private function get_search_data( Search $data ) {
 		return array(
 			'event_id'    => $data->get_event_id(),
 			'custom_data' => array(

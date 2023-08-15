@@ -72,11 +72,11 @@ class Tracking {
 	 * @return void
 	 */
 	public function handle_page_visit() {
-		$data = new None( uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ) );
+		$data = new None( uniqid( 'page' ) );
 		if ( is_product() ) {
 			$product = wc_get_product();
 			$data    = new Product(
-				uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ),
+				uniqid( 'page' ),
 				$product->get_id(),
 				$product->get_name(),
 				wc_get_product_category_list( $product->get_id() ),
@@ -102,7 +102,7 @@ class Tracking {
 		}
 		$queried_object = get_queried_object();
 		$data           = new Category(
-			uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ),
+			uniqid( 'category' ),
 			$queried_object->term_id,
 			$queried_object->name
 		);
@@ -125,7 +125,7 @@ class Tracking {
 		$object_id = empty( $variation_id ) ? $product_id : $variation_id;
 		$product   = wc_get_product( $object_id );
 		$data      = new Product(
-			uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ),
+			uniqid( 'product' ),
 			$product->get_id(),
 			$product->get_name(),
 			wc_get_product_category_list( $product->get_id() ),
@@ -161,14 +161,12 @@ class Tracking {
 
 			$product       = $order_item->get_product();
 			$product_price = $product->get_price();
-			$terms         = wc_get_object_terms( $product->get_id(), 'product_cat' );
-			$categories    = ! empty( $terms ) ? wp_list_pluck( $terms, 'name' ) : array();
 
 			$items[] = new Product(
-				uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ),
+				uniqid( 'product' ),
 				$product->get_id(),
 				$order_item->get_name(),
-				$categories,
+				wc_get_product_category_list( $product->get_id() ),
 				'brand',
 				$product_price,
 				get_woocommerce_currency(),
@@ -179,7 +177,7 @@ class Tracking {
 		}
 
 		$data = new Checkout(
-			uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ),
+			uniqid( 'checkout' ),
 			$order_id,
 			$order->get_total(),
 			$total_quantity,
