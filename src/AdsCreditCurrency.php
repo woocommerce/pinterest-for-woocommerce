@@ -56,8 +56,8 @@ class AdsCreditCurrency {
         list( $spend_require, $credits_given ) = $credits_array;
 
         $result = array(
-            'spendReq' => $spend_require,
-            'creditGiven' => $credits_given,
+            'spendRequire' => $spend_require,
+            'creditsGiven' => $credits_given,
             'currency' => $currency_symbol
         );
 

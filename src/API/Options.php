@@ -45,10 +45,6 @@ class Options extends VendorAPI {
 	public function get_settings() {
 		Pinterest_For_Woocommerce()::maybe_check_billing_setup();
 		Pinterest_For_Woocommerce()::add_currency_credits_info_to_account_data();
-		// $myarray = array(
-		// 	PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => Pinterest_For_Woocommerce()::get_settings( true ),
-		// );
-		// error_log(print_r($myarray, true));
 		return array(
 			PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => Pinterest_For_Woocommerce()::get_settings( true ),
 		);
