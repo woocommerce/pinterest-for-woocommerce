@@ -67,14 +67,14 @@ class Product extends Data {
 	private $quantity;
 
 	/**
-	 * @param string $event_id - A unique event ID.
-	 * @param string $id       - Product ID.
-	 * @param string $name     - Product name.
-	 * @param string $category - Product categories.
-	 * @param string $brand    - Product brand.
-	 * @param string $price    - Product price.
-	 * @param string $currency - Product currency.
-	 * @param string $quantity - Product quantity.
+	 * @param string $event_id  A unique event ID.
+	 * @param string $id        Product ID.
+	 * @param string $name      Product name.
+	 * @param string $category  Product categories.
+	 * @param string $brand     Product brand.
+	 * @param string $price     Product price.
+	 * @param string $currency  Product currency.
+	 * @param string $quantity  Product quantity.
 	 */
 	public function __construct( $event_id, $id, $name, $category, $brand, $price, $currency, $quantity ) {
 		parent::__construct( $event_id );

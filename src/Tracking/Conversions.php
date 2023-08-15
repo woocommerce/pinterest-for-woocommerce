@@ -20,7 +20,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
 use Throwable;
 
 /**
- * Class adds Pinterest Conversions API support.
+ * Pinterest Conversions API support.
  */
 class Conversions implements Tracker {
 
@@ -32,15 +32,13 @@ class Conversions implements Tracker {
 		Tracking::EVENT_CHECKOUT      => 'checkout',
 	);
 
-	/**
-	 * @var User User data object. Stores data for Conversions API needs.
-	 */
+	/** @var User $user User data object. Data for Conversions API. */
 	private $user;
 
 	/**
 	 * Pinterest Conversions API class constructor.
 	 *
-	 * @param User $user - User data object to hold ip address and user agent string.
+	 * @param User $user User data object to hold ip address and agent string.
 	 */
 	public function __construct( User $user ) {
 		$this->user = $user;
@@ -172,7 +170,7 @@ class Conversions implements Tracker {
 		);
 
 		try {
-			/* Translators: 1: Conversions API event name, 2: JSON encoded event data. */
+			/* translators: 1: Conversions API event name, 2: JSON encoded event data. */
 			$messages = sprintf(
 				'Sending Pinterest Conversions API event %1$s with a payload: %2$s',
 				$event_name,

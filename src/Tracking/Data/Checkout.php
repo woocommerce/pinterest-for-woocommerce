@@ -51,12 +51,12 @@ class Checkout extends Data {
 	private $items;
 
 	/**
-	 * @param string    $event_id - A unique event id as a requirement by Pinterest for deduplication purposes.
-	 * @param string    $order_id - WooCommerce Order ID.
-	 * @param string    $price    - WooCommerce total order amount.
-	 * @param string    $quantity - Number of items.
-	 * @param string    $currency - Order currency.
-	 * @param Product[] $items    - An array of ordered items.
+	 * @param string    $event_id  A unique event id as a requirement by Pinterest for deduplication purposes.
+	 * @param string    $order_id  WooCommerce Order ID.
+	 * @param string    $price     WooCommerce total order amount.
+	 * @param string    $quantity  Number of items.
+	 * @param string    $currency  Order currency.
+	 * @param Product[] $items     An array of ordered items.
 	 */
 	public function __construct( $event_id, $order_id, $price, $quantity, $currency, $items ) {
 		parent::__construct( $event_id );

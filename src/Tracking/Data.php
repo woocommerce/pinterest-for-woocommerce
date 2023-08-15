@@ -21,7 +21,7 @@ class Data {
 	private $event_id;
 
 	/**
-	 * @param string $event_id - A unique event id.
+	 * @param string $event_id  A unique event id.
 	 */
 	public function __construct( $event_id ) {
 		$this->event_id = $event_id;

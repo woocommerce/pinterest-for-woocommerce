@@ -30,9 +30,9 @@ class Category extends Data {
 	private $name;
 
 	/**
-	 * @param string $event_id - A unique event id.
-	 * @param string $id       - Product category id.
-	 * @param string $name     - Product category name.
+	 * @param string $event_id  A unique event id.
+	 * @param string $id        Product category id.
+	 * @param string $name      Product category name.
 	 */
 	public function __construct( $event_id, $id, $name ) {
 		parent::__construct( $event_id );
