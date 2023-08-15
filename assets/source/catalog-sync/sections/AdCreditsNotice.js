@@ -49,6 +49,11 @@ const AdCreditsNotice = () => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
 	const trackingAdvertiser = appSettings?.tracking_advertiser;
+	const currencyCreditInfo = appSettings?.account_data?.currency_credit_info;
+	// console.log ( 'test Hello' );
+	// console.log ( appSettings );
+	// console.log(currencyCreditInfo);
+	// console.log(currencyCreditInfo['currency'])
 
 	const closeAdCreditsNotice = () => {
 		setIsNoticeDisplayed( false );
@@ -80,14 +85,15 @@ const AdCreditsNotice = () => {
 				{ isBillingSetup ? (
 					<Text>
 						{ __(
-							'Spend $15 to claim $125 Pinterest ad credits. (Ad credits may take up to 24 hours to be credited to account).'
+							`Spend ${ currencyCreditInfo['currency'] }${ currencyCreditInfo['spendReq'] } to claim ${ currencyCreditInfo['currency'] }${ currencyCreditInfo['creditGiven'] } in Pinterest ad credits. (Ad credits may take up to 24 hours to be credited to account).`,
+							'pinterest-for-woocommerce'
 						) }
 					</Text>
 				) : (
 					<Text>
 						{ createInterpolateElement(
 							__(
-								'Spend $15 to get $125 in Pinterest ad credits. To claim the credits, <adsBillingDetails>add your billing details.</adsBillingDetails>',
+								`Spend ${ currencyCreditInfo['currency'] }${ currencyCreditInfo['spendReq'] } to claim ${ currencyCreditInfo['currency'] }${ currencyCreditInfo['creditGiven'] } in Pinterest ad credits. To claim the credits, <adsBillingDetails>add your billing details.</adsBillingDetails>`,
 								'pinterest-for-woocommerce'
 							),
 							{
