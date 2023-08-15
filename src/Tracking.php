@@ -46,8 +46,12 @@ class Tracking {
 	 * Attaches all the required tracking events to corresponding WP/WC hooks.
 	 *
 	 * @since x.x.x
+	 *
+	 * @param array $trackers A list of trackers to track events with.
 	 */
-	public function __construct() {
+	public function __construct( array $trackers = array() ) {
+		$this->trackers = $trackers;
+
 		// Tracks page visit events.
 		add_action( 'wp_footer', array( $this, 'handle_page_visit' ) );
 

@@ -6,17 +6,21 @@
  * @version  1.0.0
  */
 
-use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
+use Automattic\WooCommerce\Pinterest;
 use Automattic\WooCommerce\Pinterest\AdCredits;
 use Automattic\WooCommerce\Pinterest\AdCreditsCoupons;
+use Automattic\WooCommerce\Pinterest\Admin\Tasks\Onboarding;
+use Automattic\WooCommerce\Pinterest\API\UserInteraction;
 use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
+use Automattic\WooCommerce\Pinterest\Tracking;
+use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
+use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
+use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Automattic\WooCommerce\Pinterest\Utilities\Tracks;
-use Automattic\WooCommerce\Pinterest\API\UserInteraction;
-use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
-use Automattic\WooCommerce\Pinterest\Admin\Tasks\Onboarding;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -303,22 +307,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return Pinterest\Tracking|false
 		 */
 		public static function init_tracking() {
-			$is_tracking_enabled             = ! apply_filters( 'woocommerce_pinterest_disable_tracking', false );
-			$is_tracking_conversions_enabled = Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
-			$is_tracked_site                 = ! wp_doing_cron() && ! is_admin();
+			$is_tracking_disabled             = apply_filters( 'woocommerce_pinterest_disable_tracking', false );
+			$is_tracking_conversions_disabled = ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
+			$is_not_a_site                    = wp_doing_cron() || is_admin();
 
-			if ( ! $is_tracking_enabled || ! $is_tracking_conversions_enabled || ! $is_tracked_site ) {
+			if ( $is_tracking_disabled || $is_tracking_conversions_disabled || $is_not_a_site ) {
 				return false;
 			}
 
-			$tracking = new Pinterest\Tracking();
+			$tag_tracker         = new Tag();
+			$user                = new User( WC_Geolocation::get_ip_address(), wc_get_user_agent() );
+			$conversions_tracker = new Conversions( $user );
 
-			$tracking->add_tracker( new Pinterest\Tracking\Tag() );
-
-			$user = new Pinterest\Tracking\Data\User( WC_Geolocation::get_ip_address(), wc_get_user_agent() );
-			$tracking->add_tracker( new Pinterest\Tracking\Conversions( $user ) );
-
-			return $tracking;
+			return new Tracking( array( $tag_tracker, $conversions_tracker ) );
 		}
 
 		/**
