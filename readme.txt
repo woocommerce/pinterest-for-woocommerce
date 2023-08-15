@@ -91,6 +91,10 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.8 - 2023-08-15 =
+* Fix - Caching of API calls.
+* Fix - Make add to cart events independent from WooCommerce archive page settings.
+
 = 1.3.7 - 2023-08-09 =
 * Tweak - Don't fetch the allowed countries list when not connected.
 * Tweak - Increase allowed countries cache lifetime to two days.
