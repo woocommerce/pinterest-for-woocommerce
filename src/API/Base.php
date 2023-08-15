@@ -196,7 +196,7 @@ class Base {
 	/**
 	 * Caches the API response if cache expiry is set.
 	 *
-	 * @since x.x.x
+	 * @since 1.3.8
 	 * @param string $endpoint     The API endpoint.
 	 * @param string $method       The HTTP method.
 	 * @param array  $payload      The API request payload.
