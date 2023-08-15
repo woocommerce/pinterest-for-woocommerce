@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.3
 Requires PHP: 7.3
-Stable tag: 1.3.7
+Stable tag: 1.3.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,10 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.3.8 - 2023-08-15 =
+* Fix - Caching of API calls.
+* Fix - Make add to cart events independent from WooCommerce archive page settings.
 
 = 1.3.7 - 2023-08-09 =
 * Tweak - Don't fetch the allowed countries list when not connected.
