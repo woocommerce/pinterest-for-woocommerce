@@ -82,6 +82,9 @@ class Base {
 	 */
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 
+		$api         = empty( $api ) ? '' : trailingslashit( $api );
+		$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
+
 		if ( ! empty( $cache_expiry ) ) {
 			$cache = self::get_cached_response( $endpoint, $method, $payload, $api );
 
@@ -90,34 +93,28 @@ class Base {
 			}
 		}
 
+		$request = array(
+			'url'     => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
+			'method'  => $method,
+			'args'    => $payload,
+			'headers' => array(
+				'Pinterest-Woocommerce-Version' => PINTEREST_FOR_WOOCOMMERCE_VERSION,
+			),
+		);
+
+		if ( 'ads/' === $api && in_array( $method, array( 'POST', 'PATCH' ), true ) ) {
+			// Force json content-type header and json encode payload.
+			$request['headers']['Content-Type'] = 'application/json';
+
+			$request['args'] = wp_json_encode( $payload );
+		}
+
 		try {
-			$api         = empty( $api ) ? '' : trailingslashit( $api );
-			$api_version = 'ads/' === $api ? self::API_ADS_VERSION : self::API_VERSION;
-
-			$request = array(
-				'url'     => self::API_DOMAIN . "/{$api}v{$api_version}/{$endpoint}",
-				'method'  => $method,
-				'args'    => $payload,
-				'headers' => array(
-					'Pinterest-Woocommerce-Version' => PINTEREST_FOR_WOOCOMMERCE_VERSION,
-				),
-			);
-
-			if ( 'ads/' === $api && in_array( $method, array( 'POST', 'PATCH' ), true ) ) {
-				// Force json content-type header and json encode payload.
-				$request['headers']['Content-Type'] = 'application/json';
-
-				$request['args'] = wp_json_encode( $payload );
-			}
 
 			$response = self::handle_request( $request );
-
-			if ( ! empty( $cache_expiry ) ) {
-				$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
-				set_transient( $cache_key, $response, $cache_expiry );
-			}
-
+			self::maybe_cache_api_response( $endpoint, $method, $payload, $api, $response, $cache_expiry );
 			return $response;
+
 		} catch ( ApiException $e ) {
 
 			if ( ! empty( Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' ) ) ) {
@@ -194,6 +191,26 @@ class Base {
 	public static function get_cached_response( $endpoint, $method, $payload, $api ) {
 		$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
 		return get_transient( $cache_key );
+	}
+
+	/**
+	 * Caches the API response if cache expiry is set.
+	 *
+	 * @since 1.3.8
+	 * @param string $endpoint     The API endpoint.
+	 * @param string $method       The HTTP method.
+	 * @param array  $payload      The API request payload.
+	 * @param string $api          The API version.
+	 * @param mixed  $response     The API response.
+	 * @param int    $cache_expiry The cache expiry in seconds.
+	 *
+	 * @return void
+	 */
+	private static function maybe_cache_api_response( $endpoint, $method, $payload, $api, $response, $cache_expiry ) {
+		if ( ! empty( $cache_expiry ) ) {
+			$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
+			set_transient( $cache_key, $response, $cache_expiry );
+		}
 	}
 
 	/**
