@@ -73,7 +73,7 @@ class Conversions implements Tracker {
 				array( 'data' => array( $data ) )
 			);
 		} catch ( Throwable $e ) {
-			/* Translators: 1: Conversions API event name, 2: JSON encoded event data, 3: Error code, 4: Error message. */
+			/* translators: 1: Conversions API event name, 2: JSON encoded event data, 3: Error code, 4: Error message. */
 			$messages = sprintf(
 				'Sending Pinterest Conversions API event %1$s with a payload %2$s has failed with the error %3$d code and %4$s message',
 				$event_name,
@@ -90,46 +90,47 @@ class Conversions implements Tracker {
 	/**
 	 * Prepares event data for the request.
 	 *
+	 * @since x.x.x
+	 *
 	 * @param string $event_name
 	 * @param Data   $data
 	 *
 	 * @return array
 	 */
 	public function prepare_request_data( string $event_name, Data $data ) {
-		if ( Tracking::EVENT_SEARCH === $event_name ) {
-			/** @var Search $data */
-			$data = $this->get_search_data( $data );
-		}
+		switch ( $event_name ) {
+			case Tracking::EVENT_SEARCH:
+				/** @var Search $data */
+				$data = $this->get_search_data( $data );
+				break;
 
-		if ( Tracking::EVENT_PAGE_VISIT === $event_name && ! ( $data instanceof None ) ) {
-			/** @var Product $data */
-			$data = $this->get_page_visit_data( $data );
-		}
+			case Tracking::EVENT_PAGE_VISIT:
+				/** @var Product $data */
+				$data = $this->get_page_visit_data( $data );
+				break;
 
-		if ( Tracking::EVENT_VIEW_CATEGORY === $event_name ) {
-			/** @var Category $data */
-			$data = $this->get_view_category_data( $data );
-		}
+			case Tracking::EVENT_VIEW_CATEGORY:
+				/** @var Category $data */
+				$data = $this->get_view_category_data( $data );
+				break;
 
-		if ( Tracking::EVENT_ADD_TO_CART === $event_name ) {
-			/** @var Product $data */
-			$data = $this->get_add_to_cart_data( $data );
-		}
+			case Tracking::EVENT_ADD_TO_CART:
+				/** @var Product $data */
+				$data = $this->get_add_to_cart_data( $data );
+				break;
 
-		if ( Tracking::EVENT_CHECKOUT === $event_name ) {
-			/** @var Checkout $data */
-			$data = $this->get_checkout_data( $data );
-		}
+			case Tracking::EVENT_CHECKOUT:
+				/** @var Checkout $data */
+				$data = $this->get_checkout_data( $data );
+				break;
 
-		if ( $data instanceof None ) {
-			$data = array(
-				'event_id' => $data->get_event_id(),
-			);
+			default:
+				$data = array(
+					'event_id' => $data->get_event_id(),
+				);
 		}
 
 		$event_name = static::EVENT_MAP[ $event_name ] ?? '';
-
-		/** @var array $data */
 		return array_merge( $data, $this->get_default_data( $event_name ) );
 	}
 
@@ -234,7 +235,7 @@ class Conversions implements Tracker {
 		return array(
 			'event_id'    => $data->get_event_id(),
 			'custom_data' => array(
-				'category_name' => $data->getName(),
+				'category_name' => $data->get_name(),
 			),
 		);
 	}
@@ -244,11 +245,17 @@ class Conversions implements Tracker {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param Product $data
+	 * @param Product|None $data
 	 *
 	 * @return array
 	 */
-	private function get_page_visit_data( Product $data ) {
+	private function get_page_visit_data( Data $data ) {
+		if ( $data instanceof None ) {
+			return array(
+				'event_id' => $data->get_event_id(),
+			);
+		}
+
 		return array(
 			'event_id'    => $data->get_event_id(),
 			'custom_data' => array(

@@ -43,14 +43,14 @@ class Category extends Data {
 	/**
 	 * @return mixed
 	 */
-	public function getId() {
+	public function get_id() {
 		return $this->id;
 	}
 
 	/**
 	 * @return mixed
 	 */
-	public function getName() {
+	public function get_name() {
 		return $this->name;
 	}
 }

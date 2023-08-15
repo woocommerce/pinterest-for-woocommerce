@@ -172,76 +172,153 @@ class Tag implements Tracker {
 	 * @return true
 	 */
 	public function track_event( string $event_name, Data $data ) {
-		if ( Tracking::EVENT_SEARCH === $event_name ) {
-			/** @var Search $data */
-			$data = array(
-				'event_id'      => $data->get_event_id(),
-				'search_query'  => $data->get_search_query(),
-			);
-		}
+		$data = $this->prepare_request_data( $event_name, $data );
+		return static::add_deferred_event( $event_name, $data );
+	}
 
-		if ( Tracking::EVENT_PAGE_VISIT === $event_name && ! ( $data instanceof None ) ) {
-			/** @var Product $data */
-			$data = array(
-				'event_id'      => $data->get_event_id(),
-				'product_id'    => $data->get_id(),
-				'product_name'  => $data->get_name(),
-				'product_price' => $data->get_price(),
-				'currency'      => $data->get_currency(),
-			);
-		}
+	/**
+	 * Prepares event data for the request.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $event_name
+	 * @param Data $data
+	 *
+	 * @return array
+	 */
+	public function prepare_request_data( string $event_name, Data $data ) {
+		switch ( $event_name ) {
+			case Tracking::EVENT_SEARCH:
+				/** @var Search $data */
+				return $this->get_search_data( $data );
 
-		if ( Tracking::EVENT_VIEW_CATEGORY === $event_name ) {
-			/** @var Category $data */
-			$data = array(
-				'event_id'         => $data->get_event_id(),
-				'product_category' => $data->getId(),
-				'category_name'    => $data->getName(),
-			);
-		}
+			case Tracking::EVENT_PAGE_VISIT:
+				/** @var Product $data */
+				return $this->get_page_visit_data( $data );
 
-		if ( Tracking::EVENT_ADD_TO_CART === $event_name ) {
-			/** @var Product $data */
-			$data = array(
-				'event_id'       => $data->get_event_id(),
-				'product_id'     => $data->get_id(),
-				'product_name'   => $data->get_name(),
-				'value'          => ( $data->get_price() * $data->get_quantity() ),
-				'order_quantity' => $data->get_quantity(),
-				'currency'       => $data->get_currency(),
-			);
-		}
+			case Tracking::EVENT_VIEW_CATEGORY:
+				/** @var Category $data */
+				return $this->get_view_category_data( $data );
 
-		if ( Tracking::EVENT_CHECKOUT === $event_name ) {
-			/** @var Checkout $data */
-			$data = array(
-				'event_id'       => $data->get_event_id(),
-				'order_id'       => $data->get_order_id(),
-				'value'          => $data->get_price() * $data->get_quantity(),
-				'order_quantity' => $data->get_quantity(),
-				'currency'       => $data->get_currency(),
-				'line_items'     => array_map(
-					function ( $item ) {
-						return array(
-							'product_id'       => $item->get_id(),
-							'product_name'     => $item->get_name(),
-							'product_price'    => $item->get_price(),
-							'product_quantity' => $item->get_quantity(),
-							'product_category' => $item->get_category(),
-						);
-					},
-					$data->get_items()
-				),
-			);
-		}
+			case Tracking::EVENT_ADD_TO_CART:
+				/** @var Product $data */
+				return $this->get_add_to_cart_data( $data );
 
+			case Tracking::EVENT_CHECKOUT:
+				/** @var Checkout $data */
+				return $this->get_checkout_data( $data );
+
+			default:
+				return array(
+					'event_id' => $data->get_event_id(),
+				);
+		}
+	}
+
+	/**
+	 * Prepares data for search event.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param Search $data
+	 *
+	 * @return array
+	 */
+	private function get_search_data( Search $data ) {
+		return array(
+			'event_id'     => $data->get_event_id(),
+			'search_query' => $data->get_search_query(),
+		);
+	}
+
+	/**
+	 * Prepares data for page visit event.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param Product|None $data
+	 *
+	 * @return array
+	 */
+	private function get_page_visit_data( Data $data ) {
 		if ( $data instanceof None ) {
-			$data = array(
+			return array(
 				'event_id' => $data->get_event_id(),
 			);
 		}
 
-		return static::add_deferred_event( $event_name, $data ?? array() );
+		return array(
+			'event_id'      => $data->get_event_id(),
+			'product_id'    => $data->get_id(),
+			'product_name'  => $data->get_name(),
+			'product_price' => $data->get_price(),
+			'currency'      => $data->get_currency(),
+		);
+	}
+
+	/**
+	 * Prepares data for view category event.
+	 * @since x.x.x
+	 * @param Category $data
+	 * @return array
+	 */
+	private function get_view_category_data( Category $data ) {
+		return array(
+			'event_id'         => $data->get_event_id(),
+			'product_category' => $data->get_id(),
+			'category_name'    => $data->get_name(),
+		);
+	}
+
+	/**
+	 * Prepares data for checkout event.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param Checkout $data
+	 *
+	 * @return array
+	 */
+	private function get_checkout_data( Checkout $data ) {
+		return array(
+			'event_id'       => $data->get_event_id(),
+			'order_id'       => $data->get_order_id(),
+			'value'          => $data->get_price() * $data->get_quantity(),
+			'order_quantity' => $data->get_quantity(),
+			'currency'       => $data->get_currency(),
+			'line_items'     => array_map(
+				function ( $item ) {
+					return array(
+						'product_id'       => $item->get_id(),
+						'product_name'     => $item->get_name(),
+						'product_price'    => $item->get_price(),
+						'product_quantity' => $item->get_quantity(),
+						'product_category' => $item->get_category(),
+					);
+				},
+				$data->get_items()
+			),
+		);
+	}
+
+	/**
+	 * Prepares data for add to cart event.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param Product $data
+	 *
+	 * @return array
+	 */
+	private function get_add_to_cart_data( Product $data ) {
+		return array(
+			'event_id'       => $data->get_event_id(),
+			'product_id'     => $data->get_id(),
+			'product_name'   => $data->get_name(),
+			'value'          => ( $data->get_price() * $data->get_quantity() ),
+			'order_quantity' => $data->get_quantity(),
+			'currency'       => $data->get_currency(),
+		);
 	}
 
 	/**
