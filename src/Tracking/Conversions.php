@@ -92,54 +92,31 @@ class Conversions implements Tracker {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $event_name
-	 * @param Data   $data
+	 * @param string $event_name Tracking event name.
+	 * @param Data   $data       Tracking event data.
 	 *
-	 * @return array
+	 * @return array Prepared data.
 	 */
 	public function prepare_request_data( string $event_name, Data $data ) {
-		switch ( $event_name ) {
-			case Tracking::EVENT_SEARCH:
-				/** @var Search $data */
-				$data = $this->get_search_data( $data );
-				break;
-
-			case Tracking::EVENT_PAGE_VISIT:
-				/** @var Product $data */
-				$data = $this->get_page_visit_data( $data );
-				break;
-
-			case Tracking::EVENT_VIEW_CATEGORY:
-				/** @var Category $data */
-				$data = $this->get_view_category_data( $data );
-				break;
-
-			case Tracking::EVENT_ADD_TO_CART:
-				/** @var Product $data */
-				$data = $this->get_add_to_cart_data( $data );
-				break;
-
-			case Tracking::EVENT_CHECKOUT:
-				/** @var Checkout $data */
-				$data = $this->get_checkout_data( $data );
-				break;
-
-			default:
-				$data = array(
-					'event_id' => $data->get_event_id(),
-				);
+		$event_name = static::EVENT_MAP[ $event_name ] ?? '';
+		$method     = "get_{$event_name}_data";
+		if ( method_exists( $this, $method ) ) {
+			$prepared_data = call_user_func( array( $this, $method ), $data );
+		} else {
+			$prepared_data = array(
+				'event_id' => $data->get_event_id(),
+			);
 		}
 
-		$event_name = static::EVENT_MAP[ $event_name ] ?? '';
-		return array_merge( $data, $this->get_default_data( $event_name ) );
+		return array_merge( $prepared_data, $this->get_default_data( $event_name ) );
 	}
 
 	/**
 	 * Prepares default event data.
 	 *
-	 * @param string $event_name
+	 * @param string $event_name Tracking event name.
 	 *
-	 * @return array
+	 * @return array Common data for every event.
 	 */
 	private function get_default_data( string $event_name ) {
 		global $wp;
@@ -163,9 +140,9 @@ class Conversions implements Tracker {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param Checkout $data
+	 * @param Checkout $data Checkout data.
 	 *
-	 * @return array
+	 * @return array Prepared checkout event specific data.
 	 */
 	private function get_checkout_data( Checkout $data ) {
 		return array(
@@ -199,9 +176,9 @@ class Conversions implements Tracker {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param Product $data
+	 * @param Product $data Product data.
 	 *
-	 * @return array
+	 * @return array Prepared add to cart event specific data.
 	 */
 	private function get_add_to_cart_data( Product $data ) {
 		return array(
@@ -227,9 +204,9 @@ class Conversions implements Tracker {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param Category $data
+	 * @param Category $data Category data.
 	 *
-	 * @return array
+	 * @return array Prepared view category event specific data.
 	 */
 	private function get_view_category_data( Category $data ) {
 		return array(
@@ -245,9 +222,9 @@ class Conversions implements Tracker {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param Product|None $data
+	 * @param Product|None $data Product or None data.
 	 *
-	 * @return array
+	 * @return array Prepared page visit event specific data.
 	 */
 	private function get_page_visit_data( Data $data ) {
 		if ( $data instanceof None ) {
@@ -279,9 +256,9 @@ class Conversions implements Tracker {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param Search $data
+	 * @param Search $data Search data.
 	 *
-	 * @return array
+	 * @return array Prepared search event specific data.
 	 */
 	private function get_search_data( Search $data ) {
 		return array(

@@ -27,8 +27,8 @@ class Search extends Data {
 	private $search_query;
 
 	/**
-	 * @param string $event_id     - A unique event id.
-	 * @param string $search_query - Search query.
+	 * @param string $event_id     A unique event id.
+	 * @param string $search_query Search query.
 	 */
 	public function __construct( $event_id, $search_query ) {
 		parent::__construct( $event_id );

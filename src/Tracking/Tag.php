@@ -132,8 +132,8 @@ class Tag implements Tracker {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $event_name - Event name. e.g. Checkout, AddToCart, etc.
-	 * @param array  $data       - Corresponding event data object.
+	 * @param string $event_name Event name. e.g. Checkout, AddToCart, etc.
+	 * @param array  $data       Corresponding event data object.
 	 *
 	 * @return true
 	 */
@@ -166,8 +166,8 @@ class Tag implements Tracker {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $event_name - Event name. e.g. Checkout, AddToCart, etc.
-	 * @param Data   $data       - Corresponding event data object.
+	 * @param string $event_name Event name. e.g. Checkout, AddToCart, etc.
+	 * @param Data   $data       Corresponding event data object.
 	 *
 	 * @return true
 	 */

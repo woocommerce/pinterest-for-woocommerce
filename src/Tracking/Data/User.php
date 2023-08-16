@@ -32,8 +32,8 @@ class User extends Data {
 	/**
 	 * @NOTE: We skipped call to parent constructor on purpose, we do not need event id here.
 	 *
-	 * @param string $client_ip_address - IP address.
-	 * @param string $client_user_agent - User Agent string.
+	 * @param string $client_ip_address IP address.
+	 * @param string $client_user_agent User Agent string.
 	 */
 	public function __construct( string $client_ip_address, string $client_user_agent ) {
 		$this->client_ip_address = $client_ip_address;
