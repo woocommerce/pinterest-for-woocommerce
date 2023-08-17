@@ -10,7 +10,6 @@ namespace Automattic\WooCommerce\Pinterest\Tracking;
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
-use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Category;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
@@ -23,14 +22,6 @@ use Throwable;
  * Pinterest Conversions API support.
  */
 class Conversions implements Tracker {
-
-	const EVENT_MAP = array(
-		Tracking::EVENT_PAGE_VISIT    => 'page_visit',
-		Tracking::EVENT_SEARCH        => 'search',
-		Tracking::EVENT_VIEW_CATEGORY => 'view_category',
-		Tracking::EVENT_ADD_TO_CART   => 'add_to_cart',
-		Tracking::EVENT_CHECKOUT      => 'checkout',
-	);
 
 	/** @var User $user User data object. Data for Conversions API. */
 	private $user;
@@ -138,6 +129,7 @@ class Conversions implements Tracker {
 	/**
 	 * Prepares data for the checkout event.
 	 *
+	 * @see Conversions::prepare_request_data()
 	 * @since x.x.x
 	 *
 	 * @param Checkout $data Checkout data.
@@ -174,6 +166,7 @@ class Conversions implements Tracker {
 	/**
 	 * Prepares data for add to cart event.
 	 *
+	 * @see Conversions::prepare_request_data()
 	 * @since x.x.x
 	 *
 	 * @param Product $data Product data.
@@ -202,6 +195,7 @@ class Conversions implements Tracker {
 	/**
 	 * Prepares data for view category event.
 	 *
+	 * @see Conversions::prepare_request_data()
 	 * @since x.x.x
 	 *
 	 * @param Category $data Category data.
@@ -220,6 +214,7 @@ class Conversions implements Tracker {
 	/**
 	 * Prepares data for page visit event.
 	 *
+	 * @see Conversions::prepare_request_data()
 	 * @since x.x.x
 	 *
 	 * @param Product|None $data Product or None data.
@@ -254,6 +249,7 @@ class Conversions implements Tracker {
 	/**
 	 * Prepares data for the search event.
 	 *
+	 * @see Conversions::prepare_request_data()
 	 * @since x.x.x
 	 *
 	 * @param Search $data Search data.

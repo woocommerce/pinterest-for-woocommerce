@@ -8,12 +8,26 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
+use Automattic\WooCommerce\Pinterest\Tracking;
 use Throwable;
 
 /**
  * Interface for Pinterest tracker implementations.
  */
 interface Tracker {
+
+	/**
+	 * Maps tracking events to corresponding tracker methods and conversions API events names.
+	 *
+	 * @since x.x.x
+	 */
+	const EVENT_MAP = array(
+		Tracking::EVENT_PAGE_VISIT    => 'page_visit',
+		Tracking::EVENT_SEARCH        => 'search',
+		Tracking::EVENT_VIEW_CATEGORY => 'view_category',
+		Tracking::EVENT_ADD_TO_CART   => 'add_to_cart',
+		Tracking::EVENT_CHECKOUT      => 'checkout',
+	);
 
 	/**
 	 * Tracks the event.

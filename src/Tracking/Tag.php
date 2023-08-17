@@ -8,11 +8,10 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
-use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Category;
+use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
-use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Search;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -181,43 +180,28 @@ class Tag implements Tracker {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $event_name
-	 * @param Data $data
+	 * @param string $event_name Event name. e.g. Checkout, AddToCart, etc.
+	 * @param Data   $data       Corresponding event data object.
 	 *
-	 * @return array
+	 * @return array Event data.
 	 */
 	public function prepare_request_data( string $event_name, Data $data ) {
-		switch ( $event_name ) {
-			case Tracking::EVENT_SEARCH:
-				/** @var Search $data */
-				return $this->get_search_data( $data );
-
-			case Tracking::EVENT_PAGE_VISIT:
-				/** @var Product $data */
-				return $this->get_page_visit_data( $data );
-
-			case Tracking::EVENT_VIEW_CATEGORY:
-				/** @var Category $data */
-				return $this->get_view_category_data( $data );
-
-			case Tracking::EVENT_ADD_TO_CART:
-				/** @var Product $data */
-				return $this->get_add_to_cart_data( $data );
-
-			case Tracking::EVENT_CHECKOUT:
-				/** @var Checkout $data */
-				return $this->get_checkout_data( $data );
-
-			default:
-				return array(
-					'event_id' => $data->get_event_id(),
-				);
+		$event_name = static::EVENT_MAP[ $event_name ] ?? '';
+		$method     = "get_{$event_name}_data";
+		if ( method_exists( $this, $method ) ) {
+			$prepared_data = call_user_func( array( $this, $method ), $data );
+		} else {
+			$prepared_data = array(
+				'event_id' => $data->get_event_id(),
+			);
 		}
+		return $prepared_data;
 	}
 
 	/**
 	 * Prepares data for search event.
 	 *
+	 * @see Tag::prepare_request_data()
 	 * @since x.x.x
 	 *
 	 * @param Search $data
@@ -234,6 +218,7 @@ class Tag implements Tracker {
 	/**
 	 * Prepares data for page visit event.
 	 *
+	 * @see Tag::prepare_request_data()
 	 * @since x.x.x
 	 *
 	 * @param Product|None $data
@@ -258,8 +243,12 @@ class Tag implements Tracker {
 
 	/**
 	 * Prepares data for view category event.
+	 *
+	 * @see Tag::prepare_request_data()
 	 * @since x.x.x
+	 *
 	 * @param Category $data
+	 *
 	 * @return array
 	 */
 	private function get_view_category_data( Category $data ) {
@@ -273,6 +262,7 @@ class Tag implements Tracker {
 	/**
 	 * Prepares data for checkout event.
 	 *
+	 * @see Tag::prepare_request_data()
 	 * @since x.x.x
 	 *
 	 * @param Checkout $data
@@ -304,6 +294,7 @@ class Tag implements Tracker {
 	/**
 	 * Prepares data for add to cart event.
 	 *
+	 * @see Tag::prepare_request_data()
 	 * @since x.x.x
 	 *
 	 * @param Product $data
