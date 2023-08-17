@@ -204,9 +204,9 @@ class Tag implements Tracker {
 	 * @see Tag::prepare_request_data()
 	 * @since x.x.x
 	 *
-	 * @param Search $data
+	 * @param Search $data Search tracking data.
 	 *
-	 * @return array
+	 * @return array Prepared request data.
 	 */
 	private function get_search_data( Search $data ) {
 		return array(
@@ -221,9 +221,9 @@ class Tag implements Tracker {
 	 * @see Tag::prepare_request_data()
 	 * @since x.x.x
 	 *
-	 * @param Product|None $data
+	 * @param Product|None $data Product tracking data.
 	 *
-	 * @return array
+	 * @return array Prepared request data.
 	 */
 	private function get_page_visit_data( Data $data ) {
 		if ( $data instanceof None ) {
@@ -247,9 +247,9 @@ class Tag implements Tracker {
 	 * @see Tag::prepare_request_data()
 	 * @since x.x.x
 	 *
-	 * @param Category $data
+	 * @param Category $data Category tracking data.
 	 *
-	 * @return array
+	 * @return array Prepared request data.
 	 */
 	private function get_view_category_data( Category $data ) {
 		return array(
@@ -265,9 +265,9 @@ class Tag implements Tracker {
 	 * @see Tag::prepare_request_data()
 	 * @since x.x.x
 	 *
-	 * @param Checkout $data
+	 * @param Checkout $data Checkout tracking data.
 	 *
-	 * @return array
+	 * @return array Prepared request data.
 	 */
 	private function get_checkout_data( Checkout $data ) {
 		return array(
@@ -297,9 +297,9 @@ class Tag implements Tracker {
 	 * @see Tag::prepare_request_data()
 	 * @since x.x.x
 	 *
-	 * @param Product $data
+	 * @param Product $data Product tracking data.
 	 *
-	 * @return array
+	 * @return array Prepared request data.
 	 */
 	private function get_add_to_cart_data( Product $data ) {
 		return array(
