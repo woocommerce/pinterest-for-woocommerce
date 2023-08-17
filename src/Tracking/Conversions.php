@@ -261,8 +261,7 @@ class Conversions implements Tracker {
 	 * @param string $event_name Event name.
 	 * @param array  $data       Event data.
 	 *
-	 * @throws Exception If response was not successful enough.
-	 * @throws Throwable If any exception during the request happen.
+	 * @throws Throwable|Exception If any exception during the request happen.|If response was not successful enough.
 	 * @return void
 	 */
 	private function send_request( string $event_name, array $data ) {
