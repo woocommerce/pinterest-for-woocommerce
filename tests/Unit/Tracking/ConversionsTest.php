@@ -54,7 +54,17 @@ class ConversionsTest extends WP_UnitTestCase {
 					'headers'  => array(
 						'content-type' => 'application/json',
 					),
-					'body'     => '',
+					'body'     => json_encode(
+						array(
+							'num_events_received'  => 1,
+							'num_events_processed' => 1,
+							'events'               => array(
+								array(
+									'status' => 'processed',
+								)
+							),
+						),
+					),
 					'response' => array(
 						'code'    => 200,
 						'message' => 'OK',
