@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { recordEvent } from '@woocommerce/tracks';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	createInterpolateElement,
 	useCallback,
@@ -80,18 +80,22 @@ const AdCreditsNotice = () => {
 				/>
 				{ isBillingSetup ? (
 					<Text>
-						{ __(
-							`Spend ${ currencyCreditInfo.currency }${ currencyCreditInfo.spendRequire } to claim ${ currencyCreditInfo.currency }${ currencyCreditInfo.creditsGiven } in Pinterest ad credits. (Ad credits may take up to 24 hours to be credited to account).`,
-							'pinterest-for-woocommerce'
-						) }
+						{ sprintf(
+							// translators: %1$s: Currency symbol. %2$s: Amount of money required to spend to claim ad credits. %3$s: Amount of ad credits given.
+							__(
+								'Spend %1$s%2$s to claim %1$s%3$s in Pinterest ad credits. (Ad credits may take up to 24 hours to be credited to account).', 'pinterest-for-woocommerce'
+								), currencyCreditInfo.currency, currencyCreditInfo.spendRequire, currencyCreditInfo.creditsGiven
+								) }
 					</Text>
 				) : (
 					<Text>
 						{ createInterpolateElement(
-							__(
-								`Spend ${ currencyCreditInfo.currency }${ currencyCreditInfo.spendRequire } to claim ${ currencyCreditInfo.currency }${ currencyCreditInfo.creditsGiven } in Pinterest ad credits. To claim the credits, <adsBillingDetails>add your billing details.</adsBillingDetails>`,
-								'pinterest-for-woocommerce'
-							),
+							sprintf(
+								// translators: %1: Currency symbol. %2$s: Amount of money required to spend to claim ad credits. %3$s: Amount of ad credits given.
+								__(
+									'Spend %1$s%2$s to claim %1$s%3$s in Pinterest ad credits. To claim the credits, <adsBillingDetails>add your billing details.</adsBillingDetails>', 'pinterest-for-woocommerce'
+									), currencyCreditInfo.currency, currencyCreditInfo.spendRequire, currencyCreditInfo.creditsGiven
+									),
 							{
 								adsBillingDetails: trackingAdvertiser ? (
 									<ExternalLink
