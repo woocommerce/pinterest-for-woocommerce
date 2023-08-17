@@ -51,14 +51,12 @@ class AdsCreditCurrency {
 	public static function get_currency_credits() {
 
 		$currency                              = get_woocommerce_currency();
-		$currency_symbol                       = html_entity_decode( get_woocommerce_currency_symbol() );
 		$credits_array                         = ( ! array_key_exists( $currency, self::$currency_credits_map ) || 'USD' === $currency ) ? self::$currency_credits_map['USD'] : self::$currency_credits_map[ $currency ];
 		list( $spend_require, $credits_given ) = $credits_array;
 
 		$result = array(
-			'spendRequire' => $spend_require,
-			'creditsGiven' => $credits_given,
-			'currency'     => $currency_symbol,
+			'spendRequire' => html_entity_decode( wp_strip_all_tags( wc_price( $spend_require ) ) ),
+			'creditsGiven' => html_entity_decode( wp_strip_all_tags( wc_price( $credits_given ) ) ),
 		);
 
 		return $result;

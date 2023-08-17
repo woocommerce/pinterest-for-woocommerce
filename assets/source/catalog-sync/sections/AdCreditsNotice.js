@@ -81,21 +81,27 @@ const AdCreditsNotice = () => {
 				{ isBillingSetup ? (
 					<Text>
 						{ sprintf(
-							// translators: %1$s: Currency symbol. %2$s: Amount of money required to spend to claim ad credits. %3$s: Amount of ad credits given.
+							// translators: %1$s: Amount of money required to spend to claim ad credits with currency. %2$s: Amount of ad credits given with currency.
 							__(
-								'Spend %1$s%2$s to claim %1$s%3$s in Pinterest ad credits. (Ad credits may take up to 24 hours to be credited to account).', 'pinterest-for-woocommerce'
-								), currencyCreditInfo.currency, currencyCreditInfo.spendRequire, currencyCreditInfo.creditsGiven
-								) }
+								'Spend %1$s to claim %2$s in Pinterest ad credits. (Ad credits may take up to 24 hours to be credited to account).',
+								'pinterest-for-woocommerce'
+							),
+							currencyCreditInfo.spendRequire,
+							currencyCreditInfo.creditsGiven
+						) }
 					</Text>
 				) : (
 					<Text>
 						{ createInterpolateElement(
 							sprintf(
-								// translators: %1: Currency symbol. %2$s: Amount of money required to spend to claim ad credits. %3$s: Amount of ad credits given.
+								// translators: %1$s: Amount of money required to spend to claim ad credits with currency. %2$s: Amount of ad credits given with currency.
 								__(
-									'Spend %1$s%2$s to claim %1$s%3$s in Pinterest ad credits. To claim the credits, <adsBillingDetails>add your billing details.</adsBillingDetails>', 'pinterest-for-woocommerce'
-									), currencyCreditInfo.currency, currencyCreditInfo.spendRequire, currencyCreditInfo.creditsGiven
-									),
+									'Spend %1$s to claim %2$s in Pinterest ad credits. To claim the credits, <adsBillingDetails>add your billing details.</adsBillingDetails>',
+									'pinterest-for-woocommerce'
+								),
+								currencyCreditInfo.spendRequire,
+								currencyCreditInfo.creditsGiven
+							),
 							{
 								adsBillingDetails: trackingAdvertiser ? (
 									<ExternalLink
