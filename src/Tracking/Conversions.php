@@ -9,7 +9,7 @@
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
-use Automattic\WooCommerce\Pinterest\Logger as Logger;
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Category;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
@@ -287,7 +287,7 @@ class Conversions implements Tracker {
 		if ( $is_error ) {
 			throw new Exception( $response['message'], $response['code'] );
 		} else {
-			$data    = current( $response['events'] ?? array() ) ?: array();
+			$data    = $response['events'][0] ?? array();
 			$status  = $data['status'] ?? 'failed';
 			$message = $data['error_message'] ?? $data['warning_message'] ?? 'Unknown';
 			if ( 'failed' === $status ) {
