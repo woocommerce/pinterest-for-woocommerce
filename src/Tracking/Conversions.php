@@ -16,6 +16,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Search;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
+use Exception;
 use Throwable;
 
 /**
@@ -46,23 +47,10 @@ class Conversions implements Tracker {
 	 * @return void
 	 */
 	public function track_event( string $event_name, Data $data ) {
-		$data          = $this->prepare_request_data( $event_name, $data );
-		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+		$data = $this->prepare_request_data( $event_name, $data );
 
 		try {
-			/* translators: 1: Conversions API event name, 2: JSON encoded event data. */
-			$messages = sprintf(
-				'Sending Pinterest Conversions API event %1$s with a payload: %2$s',
-				$event_name,
-				json_encode( $data )
-			);
-			Logger::log( $messages, 'debug', 'conversions' );
-
-			APIV5::make_request(
-				"ad_accounts/{$ad_account_id}/events",
-				'POST',
-				array( 'data' => array( $data ) )
-			);
+			$this->send_request( $event_name, $data );
 		} catch ( Throwable $e ) {
 			/* translators: 1: Conversions API event name, 2: JSON encoded event data, 3: Error code, 4: Error message. */
 			$messages = sprintf(
@@ -263,5 +251,48 @@ class Conversions implements Tracker {
 				'search_string' => $data->get_search_query(),
 			),
 		);
+	}
+
+	/**
+	 * Sends request to Pinterest Conversions API.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $event_name Event name.
+	 * @param array  $data       Event data.
+	 *
+	 * @throws Throwable If error occurred or the response was not successful enough.
+	 * @return void
+	 */
+	private function send_request( string $event_name, array $data ) {
+		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+
+		/* translators: 1: Conversions API event name, 2: JSON encoded event data. */
+		$messages = sprintf(
+			'Sending Pinterest Conversions API event %1$s with a payload: %2$s',
+			$event_name,
+			json_encode( $data )
+		);
+		Logger::log( $messages, 'debug', 'conversions' );
+
+		$response = APIV5::make_request(
+			"ad_accounts/{$ad_account_id}/events",
+			'POST',
+			array( 'data' => array( $data ) )
+		);
+
+		// Processing the call results.
+		$is_error = isset( $response['code'] );
+		// Successful requests do not have a code nor a message.
+		if ( $is_error ) {
+			throw new Exception( $response['message'], $response['code'] );
+		} else {
+			$data    = current( $response['events'] ?? array() ) ?: array();
+			$status  = $data['status'] ?? 'failed';
+			$message = $data['error_message'] ?? $data['warning_message'] ?? 'Unknown';
+			if ( 'failed' === $status ) {
+				throw new Exception( $message, 0 );
+			}
+		}
 	}
 }
