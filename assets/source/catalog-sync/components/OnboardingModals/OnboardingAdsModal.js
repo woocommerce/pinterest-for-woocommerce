@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { Icon, external as externalIcon } from '@wordpress/icons';
 import {
@@ -18,21 +18,13 @@ import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
 import { useBillingSetupFlowEntered } from '../../helpers/effects';
 
 const OnboardingModalText = ( { isBillingSetup } ) => {
-	const appSettings = useSettingsSelect();
-	const currencyCreditInfo = appSettings?.account_data?.currency_credit_info;
-
 	if ( ! isBillingSetup ) {
 		return (
 			<Text variant="body">
 				{ createInterpolateElement(
-					sprintf(
-						// translators: %1$s: Amount of ad credit given with currency. %2$s: Amount of money required to spend to claim ad credits with currency.
-						__(
-							'You are eligible for %1$s of Pinterest ad credits. To claim the credits, <strong>you would need to add your billing details and spend %2$s on Pinterest ads.</strong>',
-							'pinterest-for-woocommerce'
-						),
-						currencyCreditInfo.creditsGiven,
-						currencyCreditInfo.spendRequire
+					__(
+						'You are eligible for $125 of Pinterest ad credits. To claim the credits, <strong>you would need to add your billing details and spend $15 on Pinterest ads.</strong>',
+						'pinterest-for-woocommerce'
 					),
 					{
 						strong: <strong />,
@@ -44,22 +36,14 @@ const OnboardingModalText = ( { isBillingSetup } ) => {
 
 	return (
 		<Text variant="body">
-			{ sprintf(
-				// translators: %s: Amount of ad credit given with currency.
-				__(
-					'You are eligible for %s of Pinterest ad credits. To claim the credits, head over to the Pinterest ads manager and ',
-					'pinterest-for-woocommerce'
-				),
-				currencyCreditInfo.creditsGiven
+			{ __(
+				'You are eligible for $125 of Pinterest ad credits. To claim the credits, head over to the Pinterest ads manager and ',
+				'pinterest-for-woocommerce'
 			) }
 			<strong>
-				{ sprintf(
-					// translators: %s: Amount of money required to spend to claim ad credits with currency.
-					__(
-						'spend %s on Pinterest ads.',
-						'pinterest-for-woocommerce'
-					),
-					currencyCreditInfo.spendRequire
+				{ __(
+					'spend $15 on Pinterest ads.',
+					'pinterest-for-woocommerce'
 				) }
 			</strong>
 		</Text>
@@ -77,7 +61,6 @@ const OnboardingModalText = ( { isBillingSetup } ) => {
 const OnboardingAdsModal = ( { onCloseModal } ) => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
-	const currencyCreditInfo = appSettings?.account_data?.currency_credit_info;
 	const billingSetupFlowEntered = useBillingSetupFlowEntered();
 
 	const onClickBilling = () => {
@@ -100,13 +83,9 @@ const OnboardingAdsModal = ( { onCloseModal } ) => {
 			className="pinterest-for-woocommerce-catalog-sync__onboarding-modal"
 		>
 			<Text variant="title.small">
-				{ sprintf(
-					// translators: %s: Amount of ad credit given with currency.
-					__(
-						'You are one step away from claiming %s of Pinterest ad credits.',
-						'pinterest-for-woocommerce'
-					),
-					currencyCreditInfo.creditsGiven
+				{ __(
+					'You are one step away from claiming $125 of Pinterest ad credits.',
+					'pinterest-for-woocommerce'
 				) }
 			</Text>
 			<Text variant="body">
