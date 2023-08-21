@@ -55,8 +55,8 @@ class AdsCreditCurrency {
 		list( $spend_require, $credits_given ) = $credits_array;
 
 		$result = array(
-			'spendRequire' => html_entity_decode( wp_strip_all_tags( wc_price( $spend_require ) ) ),
-			'creditsGiven' => html_entity_decode( wp_strip_all_tags( wc_price( $credits_given ) ) ),
+			'spendRequire' => html_entity_decode( wp_strip_all_tags( wc_price( $spend_require, array( 'decimals' => 0 ) ) ) ),
+			'creditsGiven' => html_entity_decode( wp_strip_all_tags( wc_price( $credits_given, array( 'decimals' => 0 ) ) ) ),
 		);
 
 		return $result;

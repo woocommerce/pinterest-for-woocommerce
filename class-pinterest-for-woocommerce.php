@@ -280,6 +280,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Verify that the ads_campaign is active or not.
 			add_action( 'admin_init', array( Pinterest\AdCredits::class, 'check_if_ads_campaign_is_active' ) );
 
+			// Append credits info to account data.
+			add_action( 'init', array( $this, 'add_currency_credits_info_to_account_data' ) );
+
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 
