@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { getNewPath, getHistory } from '@woocommerce/navigation';
 import {
 	createInterpolateElement,
@@ -159,6 +159,9 @@ const AdsCreditSection = () => {
 		} );
 	};
 
+	const appSettings = useSettingsSelect();
+	const currencyCreditInfo = appSettings?.account_data?.currency_credit_info;
+
 	return (
 		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__credits-section">
 			<Flex>
@@ -173,16 +176,25 @@ const AdsCreditSection = () => {
 				</FlexBlock>
 				<FlexBlock className="content-block">
 					<Text variant="subtitle">
-						{ __(
-							'Try Pinterest for WooCommerce and get $125 in ad credits!',
-							'pinterest-for-woocommerce'
+					{ sprintf(
+							// translators: %s: Amount of ad credits given with currency.
+							__(
+								'Try Pinterest for WooCommerce and get %s in ad credits!',
+								'pinterest-for-woocommerce'
+							),
+							currencyCreditInfo.creditsGiven
 						) }
 					</Text>
 					<Text variant="body">
 						{ createInterpolateElement(
-							__(
-								'To help you get started with Pinterest Ads, new Pinterest customers can get $125 in ad credits when they have successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Pinterest Terms and conditions</a> apply.',
-								'pinterest-for-woocommerce'
+							sprintf(
+								// translators: %1$s: Amount of ad credits given with currency. %2$s: Amount of money required to spend to claim ad credits with currency.
+								__(
+									'To help you get started with Pinterest Ads, new Pinterest customers can get %1$s in ad credits when they have successfully set up Pinterest for WooCommerce and spend %2$s on Pinterest Ads. <a>Pinterest Terms and conditions</a> apply.',
+									'pinterest-for-woocommerce'
+								),
+								currencyCreditInfo.creditsGiven,
+								currencyCreditInfo.spendRequire
 							),
 							{
 								a: (

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import {
 	Modal,
@@ -11,6 +11,7 @@ import {
 /**
  * Internal dependencies
  */
+import { useSettingsSelect } from '../helpers/effects';
 import documentationLinkProps from '../helpers/documentation-link-props';
 
 const tosHref = 'https://business.pinterest.com/business-terms-of-service/';
@@ -30,6 +31,9 @@ const advertisingServicesAgreementHref =
  * @return {JSX.Element} Rendered element.
  */
 const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
+	const appSettings = useSettingsSelect();
+	const currencyCreditInfo = appSettings?.account_data?.currency_credit_info;
+
 	return (
 		<Modal
 			title={
@@ -44,9 +48,14 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 			className="pinterest-for-woocommerce-landing-page__credits-section__tac-modal"
 		>
 			<Text>
-				{ __(
-					'To be eligible and redeem the $125 ad credit from Pinterest, you must complete the setup of Pinterest for WooCommerce, set up your billing with Pinterest Ads manager, and spend $15 with Pinterest ads. Credits may take up to 24 hours to be credited to the user.',
-					'pinterest-for-woocommerce'
+			{ sprintf(
+					// translators: %1$s: Amount of ad credit given with currency. %2$s: Amount of money required to spend to claim ad credits with currency.
+					__(
+						'To be eligible and redeem the %1$s ad credit from Pinterest, you must complete the setup of Pinterest for WooCommerce, set up your billing with Pinterest Ads manager, and spend %2$s with Pinterest ads. Credits may take up to 24 hours to be credited to the user.',
+						'pinterest-for-woocommerce'
+					),
+					currencyCreditInfo.creditsGiven,
+					currencyCreditInfo.spendRequire
 				) }
 			</Text>
 			<Text>
