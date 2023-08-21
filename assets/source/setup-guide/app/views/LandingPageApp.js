@@ -176,7 +176,7 @@ const AdsCreditSection = () => {
 				</FlexBlock>
 				<FlexBlock className="content-block">
 					<Text variant="subtitle">
-					{ sprintf(
+						{ sprintf(
 							// translators: %s: Amount of ad credits given with currency.
 							__(
 								'Try Pinterest for WooCommerce and get %s in ad credits!',
