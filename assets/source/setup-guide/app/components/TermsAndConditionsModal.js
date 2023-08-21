@@ -48,7 +48,7 @@ const AdsCreditsTermsAndConditionsModal = ( { onModalClose } ) => {
 			className="pinterest-for-woocommerce-landing-page__credits-section__tac-modal"
 		>
 			<Text>
-			{ sprintf(
+				{ sprintf(
 					// translators: %1$s: Amount of ad credit given with currency. %2$s: Amount of money required to spend to claim ad credits with currency.
 					__(
 						'To be eligible and redeem the %1$s ad credit from Pinterest, you must complete the setup of Pinterest for WooCommerce, set up your billing with Pinterest Ads manager, and spend %2$s with Pinterest ads. Credits may take up to 24 hours to be credited to the user.',
