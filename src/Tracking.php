@@ -129,7 +129,7 @@ class Tracking {
 		$object_id = empty( $variation_id ) ? $product_id : $variation_id;
 		$product   = wc_get_product( $object_id );
 		$data      = new Product(
-			uniqid( 'product' ),
+			uniqid( 'cart' ),
 			$product->get_id(),
 			$product->get_name(),
 			wc_get_product_category_list( $product->get_id() ),

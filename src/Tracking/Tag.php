@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
+use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Category;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
@@ -89,6 +90,7 @@ class Tag implements Tracker {
 		if ( ! empty( $deferred_events ) ) {
 			echo '<script>' . implode( PHP_EOL, $deferred_events ) . '</script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
 		}
+		echo '<script id="pinterest-tag-placeholder"></script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
 	}
 
 	/**
@@ -105,6 +107,25 @@ class Tag implements Tracker {
 		}
 		$noscript = str_replace( self::TAG_ID_SLUG, sanitize_key( $active_tag ), self::$noscript_base_tag );
 		echo $noscript; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
+	}
+
+	/**
+	 * Generates Pinterest Tag event call.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $event_name Event name. e.g. Checkout, AddToCart, etc.
+	 * @param array  $data       Corresponding event data object.
+	 *
+	 * @return string A generated event call.
+	 */
+	private static function get_event_code( string $event_name, array $data ) {
+		$data_string = empty( $data ) ? null : wp_json_encode( $data );
+		return sprintf(
+			'pintrk( \'track\', \'%s\' %s);',
+			$event_name,
+			empty( $data_string ) ? '' : ', ' . $data_string
+		);
 	}
 
 	/**
@@ -137,12 +158,7 @@ class Tag implements Tracker {
 	 * @return true
 	 */
 	public static function add_deferred_event( string $event_name, array $data ) {
-		$data_string = empty( $data ) ? null : wp_json_encode( $data );
-		static::$deferred_events[] = sprintf(
-			'pintrk( \'track\', \'%s\' %s);',
-			$event_name,
-			empty( $data_string ) ? '' : ', ' . $data_string
-		);
+		static::$deferred_events[] = static::get_event_code( $event_name, $data );
 		return true;
 	}
 
@@ -172,7 +188,12 @@ class Tag implements Tracker {
 	 */
 	public function track_event( string $event_name, Data $data ) {
 		$data = $this->prepare_request_data( $event_name, $data );
-		return static::add_deferred_event( $event_name, $data );
+		if ( wp_doing_ajax() ) {
+			static::maybe_add_fragment( $event_name, $data );
+			return true;
+		} else {
+			return static::add_deferred_event( $event_name, $data );
+		}
 	}
 
 	/**
@@ -399,5 +420,32 @@ class Tag implements Tracker {
 			return 'pinterest_for_woocommerce_async_events_' . md5( WC()->session->get_customer_id() );
 		}
 		return '';
+	}
+
+	/**
+	 * Adds a fragment to trigger Pinterest Tag event on add to cart event.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $event_name Event name.
+	 * @param array  $data       Event data.
+	 * @return bool
+	 */
+	private static function maybe_add_fragment( string $event_name, array $data ) {
+		if ( Tracking::EVENT_ADD_TO_CART === $event_name ) {
+			$event = static::get_event_code( $event_name, $data );
+			add_filter(
+				'woocommerce_add_to_cart_fragments',
+				function ( $fragments ) use ( $event ) {
+					$fragments['script#pinterest-tag-placeholder'] = <<<JS
+<script id="pinterest-tag-placeholder">
+	{$event}
+</script>
+JS;
+					return $fragments;
+				}
+			);
+		}
+		return true;
 	}
 }
