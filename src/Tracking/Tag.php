@@ -188,12 +188,10 @@ class Tag implements Tracker {
 	 */
 	public function track_event( string $event_name, Data $data ) {
 		$data = $this->prepare_request_data( $event_name, $data );
-		if ( wp_doing_ajax() ) {
-			static::maybe_add_fragment( $event_name, $data );
-			return true;
-		} else {
-			return static::add_deferred_event( $event_name, $data );
+		if ( wp_doing_ajax() && wp_script_is( 'wc-cart-fragments' ) ) {
+			return static::maybe_add_fragment( $event_name, $data );
 		}
+		return static::add_deferred_event( $event_name, $data );
 	}
 
 	/**
