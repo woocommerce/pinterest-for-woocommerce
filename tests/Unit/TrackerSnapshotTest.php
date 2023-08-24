@@ -21,7 +21,7 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		'erase_plugin_data'                => false,
 	);
 
-	function setUp() {
+	function setUp(): void {
 		parent::setUp();
 		update_option( 'woocommerce_allow_tracking', 'yes' );
 	}

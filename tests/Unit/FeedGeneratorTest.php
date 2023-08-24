@@ -28,7 +28,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	/** @var FeedGenerator */
 	private $feed_generator;
 
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 		$this->action_scheduler     = $this->createMock( ActionSchedulerInterface::class );
 		$this->feed_file_operations = $this->createMock( FeedFileOperations::class );
