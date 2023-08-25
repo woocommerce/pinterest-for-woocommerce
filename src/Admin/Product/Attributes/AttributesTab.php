@@ -182,6 +182,10 @@ class AttributesTab {
 	 * @return array of WooCommerce product types (e.g. 'simple', 'variable', etc.)
 	 */
 	public static function get_applicable_product_types(): array {
+		/**
+		 * Array of product types that the Pinterest tab can be displayed for.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
 		return apply_filters(
 			'wc_pinterest_attributes_tab_applicable_product_types',
 			array(
@@ -199,6 +203,10 @@ class AttributesTab {
 	 * @return array of WooCommerce product types (e.g. 'subscription', 'variable-subscription', etc.)
 	 */
 	protected function get_hidden_product_types(): array {
+		/**
+		 * Array of product types that the Pinterest tab cannot be displayed for.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
 		return apply_filters(
 			'wc_pinterest_attributes_tab_hidden_product_types',
 			array_diff_key(

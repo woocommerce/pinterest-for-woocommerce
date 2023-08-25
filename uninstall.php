@@ -8,7 +8,7 @@
  * @version     1.0.0
  */
 
- use Automattic\WooCommerce\Pinterest\FeedRegistration;
+use Automattic\WooCommerce\Pinterest\FeedRegistration;
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;

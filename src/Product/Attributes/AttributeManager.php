@@ -251,6 +251,7 @@ class AttributeManager {
 		 * Filters the list of available product attributes.
 		 *
 		 * @param string[] $attributes Array of attribute class names (FQN)
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 		 */
 		return apply_filters( 'wc_pinterest_product_attribute_types', self::ATTRIBUTES );
 	}
@@ -279,6 +280,9 @@ class AttributeManager {
 	protected function validate( WC_Product $product, string $attribute_id ) {
 		$attribute_types = $this->get_attribute_types_for_product( $product );
 		if ( ! isset( $attribute_types[ $attribute_id ] ) ) {
+			/**
+			 * Displays an error when an attribute is not supported for a product type.
+			 */
 			do_action(
 				'wc_pinterest_error',
 				sprintf( 'Attribute "%s" is not supported for a "%s" product (ID: %s).', $attribute_id, $product->get_type(), $product->get_id() ),
@@ -307,6 +311,7 @@ class AttributeManager {
 			 *
 			 * @param string[] $applicable_types Array of WooCommerce product types
 			 * @param string   $attribute_type   Attribute class name (FQN)
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 			 */
 			$applicable_types = apply_filters( "wc_pinterest_attribute_applicable_product_types_{$attribute_id}", $applicable_types, $attribute_type );
 

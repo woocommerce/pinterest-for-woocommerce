@@ -107,7 +107,10 @@ class Auth extends VendorAPI {
 			);
 
 			try {
-				// Actions to perform after getting the authorization token.
+				/**
+				 * Actions to perform after getting the authorization token.
+				 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+				 */
 				do_action( 'pinterest_for_woocommerce_token_saved' );
 			} catch ( Throwable $th ) {
 				$error = esc_html__( 'There was an error getting the account data. Please try again later.', 'pinterest-for-woocommerce' );

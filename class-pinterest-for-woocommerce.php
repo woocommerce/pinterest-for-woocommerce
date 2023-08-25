@@ -177,6 +177,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			add_action( 'plugins_loaded', array( $this, 'init_plugin' ) );
 
+			/**
+			 * Plugin loaded action.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+			 */
 			do_action( 'pinterest_for_woocommerce_loaded' );
 		}
 
@@ -304,13 +308,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Init Pinterest_For_Woocommerce when WordPress Initialises.
 		 */
 		public function init() {
-			// Before init action.
+			/**
+			 * Before init action.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+			 */
 			do_action( 'before_pinterest_for_woocommerce_init' );
 
 			// Set up localisation.
 			$this->load_plugin_textdomain();
 
-			// Init action.
+			/**
+			 * Init action.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+			 */
 			do_action( 'pinterest_for_woocommerce_init' );
 		}
 
@@ -365,6 +375,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				$errors[] = sprintf( esc_html__( 'Pinterest for WooCommerce requires a minimum WooCommerce version of %s.', 'pinterest-for-woocommerce' ), self::PLUGIN_REQUIREMENTS['wc_version'] );
 			}
 
+			/**
+			 * Check if WooCommerce Admin is enabled.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+			 */
 			if ( apply_filters( 'woocommerce_admin_disabled', false ) ) {
 				$errors[] = esc_html__( 'Pinterest for WooCommerce requires WooCommerce Admin to be enabled.', 'pinterest-for-woocommerce' );
 			}
@@ -420,6 +434,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *      - WP_LANG_DIR/plugins/pinterest-for-woocommerce-LOCALE.mo
 		 */
 		private function load_plugin_textdomain() {
+			/**
+			 * Get plugin locale.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+			 */
 			$locale = apply_filters( 'plugin_locale', get_locale(), 'pinterest-for-woocommerce' );
 
 			load_textdomain( 'pinterest-for-woocommerce', WP_LANG_DIR . '/pinterest-for-woocommerce/pinterest-for-woocommerce-' . $locale . '.mo' );
@@ -450,6 +468,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return string
 		 */
 		public function template_path() {
+			/**
+			 * Returns template path.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+			 */
 			return apply_filters( 'pinterest_for_woocommerce_template_path', 'pinterest-for-woocommerce/' );
 		}
 

@@ -579,6 +579,10 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @return int - The number of products to process per batch.
 	 */
 	protected function get_batch_size(): int {
+		/**
+		 * Returns products to process per batch.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
 		return Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) ?? apply_filters(
 			PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_feed_product_batch_size',
 			self::DEFAULT_PRODUCT_BATCH_SIZE
@@ -632,6 +636,10 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @return array
 	 */
 	private function get_included_product_types(): array {
+		/**
+		 * Returns array of included product types.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
 		return (array) apply_filters(
 			'pinterest_for_woocommerce_included_product_types',
 			array(
@@ -649,6 +657,10 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @return array
 	 */
 	private function get_excluded_product_types(): array {
+		/**
+		 * Returns array of excluded product types.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
 		return (array) apply_filters(
 			'pinterest_for_woocommerce_excluded_product_types',
 			array(
@@ -668,6 +680,10 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @return array
 	 */
 	private function get_excluded_products_by_parent(): array {
+		/**
+		 * Returns array of excluded products by parent.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
 		return (array) apply_filters(
 			'pinterest_for_woocommerce_excluded_products_by_parent',
 			wc_get_products(
@@ -740,7 +756,15 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since 1.3.1
 	 */
 	protected function is_failure_rate_above_threshold( string $hook, ?array $args = null ): bool {
+		/**
+		 * Threshold of failed actions.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
 		$threshold   = apply_filters( 'pinterest_for_woocommerce_action_failure_threshold', 3 );
+		/**
+		 * Time period of failed actions.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
 		$time_period = apply_filters( 'pinterest_for_woocommerce_action_failure_time_period', 30 * MINUTE_IN_SECONDS );
 		$failed_actions = $this->action_scheduler->search(
 			[

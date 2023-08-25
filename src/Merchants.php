@@ -135,6 +135,7 @@ class Merchants {
 		 * feed configuration page in Pinterest.
 		 *
 		 * @param string $merchant_name The default merchant name.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 		 */
 		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 

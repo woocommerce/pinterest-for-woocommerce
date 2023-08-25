@@ -56,6 +56,10 @@ class RichPins {
 
 			if ( $rich_pins_on_products || $rich_pins_on_posts ) {
 
+				/**
+				 * Rich Pins arguments.
+				 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+				 */
 				$args = apply_filters(
 					'pinterest_for_woocommerce_richpins_args',
 					array(
@@ -179,6 +183,7 @@ class RichPins {
 			 *
 			 * @param bool       $apply_shortcodes Shortcodes are applied if set to `true` and stripped out if set to `false`.
 			 * @param WC_Product $product          WooCommerce product object.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 			 */
 			$apply_shortcodes = apply_filters( 'pinterest_for_woocommerce_rich_pins_product_description_apply_shortcodes', false, $product );
 
@@ -231,6 +236,7 @@ class RichPins {
 		 *
 		 * @param bool $apply_shortcodes Shortcodes are applied if set to `true` and stripped out if set to `false`.
 		 * @param int  The post id.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 		 */
 		$apply_shortcodes = apply_filters( 'pinterest_for_woocommerce_rich_pins_post_description_apply_shortcodes', false, get_the_ID() );
 

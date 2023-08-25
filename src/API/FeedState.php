@@ -107,6 +107,10 @@ class FeedState extends VendorAPI {
 				);
 			}
 
+			/**
+			 * Returns feed state.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+			 */
 			return apply_filters( 'pinterest_for_woocommerce_feed_state', array() );
 
 		} catch ( \Throwable $th ) {

@@ -429,6 +429,10 @@ class Base {
 	 */
 	public static function create_advertiser( $tos_id ) {
 
+		/**
+		 * Advertiser name.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
 		$advertiser_name = apply_filters( 'pinterest_for_woocommerce_default_advertiser_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		return self::make_request(
@@ -529,7 +533,9 @@ class Base {
 	 * @return mixed
 	 */
 	public static function create_tag( $advertiser_id ) {
-
+		/**
+		 * Tag name.
+		 */
 		$tag_name = apply_filters( 'pinterest_for_woocommerce_default_tag_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		return self::make_request(
