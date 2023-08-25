@@ -49,7 +49,7 @@ class FeedIssues extends VendorAPI {
 	/**
 	 * Get the feed issue lines for the last workflow of the current feed.
 	 *
-	 * @return array|WP_Error
+	 * @return array|WP_REST_Response|\WP_Error
 	 *
 	 * @param WP_REST_Request $request The request.
 	 *
@@ -58,8 +58,9 @@ class FeedIssues extends VendorAPI {
 	public function get_feed_issues( WP_REST_Request $request ) {
 
 		try {
-			$feed_id = FeedRegistration::get_locally_stored_registered_feed_id();
-			if ( ! Pinterest\ProductSync::is_product_sync_enabled() || ! $feed_id ) {
+			$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
+			$feed_id     = FeedRegistration::get_locally_stored_registered_feed_id();
+			if ( ! Pinterest\ProductSync::is_product_sync_enabled() || ! $feed_id || ! $merchant_id ) {
 				return array( 'lines' => array() );
 			}
 
@@ -69,7 +70,7 @@ class FeedIssues extends VendorAPI {
 			$per_page        = $request->has_param( 'per_page' ) ? (int) $request->get_param( 'per_page' ) : 25;
 
 			if ( false === $issues_file_url ) {
-				$workflow = self::get_feed_workflow( $feed_id );
+				$workflow = Pinterest\Feeds::get_feed_latest_workflow( (string) $merchant_id, (string) $feed_id );
 
 				if ( $workflow && isset( $workflow->s3_validation_url ) ) {
 					$issues_file_url = $workflow->s3_validation_url;
@@ -267,45 +268,6 @@ class FeedIssues extends VendorAPI {
 	 */
 	private function save_feed_data_cache() {
 		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', $this->feed_data_files );
-	}
-
-	/**
-	 * Get the latest Workflow of the
-	 * active feed related to the last attempt to process and ingest our feed, for the Merchant saved in the settings.
-	 *
-	 * @param string $feed_id The ID of the feed.
-	 *
-	 * @return object
-	 *
-	 * @throws Exception PHP Exception.
-	 */
-	public static function get_feed_workflow( $feed_id ) {
-		if ( ! $feed_id ) {
-			throw new Exception( esc_html__( 'No feed ID provided.', 'pinterest-for-woocommerce' ) );
-		}
-
-		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-		$feed_report = $merchant_id ? Base::get_merchant_feed_report( $merchant_id, $feed_id ) : false;
-
-		if ( ! $feed_report || 'success' !== $feed_report['status'] ) {
-			throw new Exception( esc_html__( 'Could not get feed report from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
-		}
-
-		if ( ! property_exists( $feed_report['data'], 'workflows' ) || ! is_array( $feed_report['data']->workflows ) || empty( $feed_report['data']->workflows ) ) {
-			return false;
-		}
-
-		// Get latest workflow.
-		usort(
-			$feed_report['data']->workflows,
-			function ( $a, $b ) {
-				return $b->created_at - $a->created_at;
-			}
-		);
-
-		$workflow = reset( $feed_report['data']->workflows );
-
-		return $workflow;
 	}
 
 	/**

@@ -270,6 +270,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'init', array( Pinterest\AdCredits::class, 'schedule_event' ) );
 			add_action( 'init', array( Pinterest\RefreshToken::class, 'schedule_event' ) );
 
+			// Register the marketing channel if the feature is included.
+			if ( defined( 'WC_MCM_EXISTS' ) ) {
+				add_action(
+					'init',
+					array( Pinterest\MultichannelMarketing\MarketingChannelRegistrar::class, 'register' )
+				);
+			}
+
 			// Verify that the ads_campaign is active or not.
 			add_action( 'admin_init', array( Pinterest\AdCredits::class, 'check_if_ads_campaign_is_active' ) );
 
@@ -549,7 +557,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$settings = self::get_settings( $force, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 
-			return empty( $settings[ $key ] ) ? null : $settings[ $key ];
+			return $settings[ $key ] ?? null;
 		}
 
 
@@ -572,6 +580,20 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			return self::save_settings( $settings, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 		}
 
+		/**
+		 * Remove APP Data key.
+		 *
+		 * @param string $key - The key of specific data to retrieve.
+		 *
+		 * @since 1.3.1
+		 *
+		 * @return bool - True if the data was removed, false otherwise.
+		 */
+		public static function remove_data( string $key ) {
+			$settings = self::get_settings( true, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+			unset( $settings[ $key ] );
+			return self::save_settings( $settings, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+		}
 
 		/**
 		 * Add API endpoints
@@ -808,9 +830,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$state = http_build_query( $state_params );
 
+			set_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
+
 			// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
 			// nosemgrep: audit.php.wp.security.xss.query-arg
-			return self::get_connection_proxy_url() . 'connect/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
+			return self::get_connection_proxy_url() . 'login/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
 		}
 
 

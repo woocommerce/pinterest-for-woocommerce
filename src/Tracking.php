@@ -100,7 +100,7 @@ class Tracking {
 			}
 
 			// AddToCart - ajax.
-			if ( 'yes' === get_option( 'woocommerce_enable_ajax_add_to_cart' ) && 'yes' !== get_option( 'woocommerce_cart_redirect_after_add' ) ) {
+			if ( 'yes' !== get_option( 'woocommerce_cart_redirect_after_add' ) ) {
 				add_action( 'wp_enqueue_scripts', array( __CLASS__, 'ajax_tracking_snippet' ), 20 );
 				add_filter(
 					'woocommerce_loop_add_to_cart_args',
@@ -139,11 +139,13 @@ class Tracking {
 	 */
 	private static function load_async_events() {
 
-		$async_events = get_transient( self::$deferred_conversion_events_transient_key );
+		if ( self::$deferred_conversion_events_transient_key ) {
+			$async_events = get_transient( self::$deferred_conversion_events_transient_key );
 
-		if ( $async_events ) {
-			self::$events = array_merge( self::$events, $async_events );
-			delete_transient( self::$deferred_conversion_events_transient_key );
+			if ( $async_events ) {
+				self::$events = array_merge( self::$events, $async_events );
+				delete_transient( self::$deferred_conversion_events_transient_key );
+			}
 		}
 	}
 

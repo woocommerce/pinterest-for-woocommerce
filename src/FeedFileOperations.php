@@ -8,7 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
-use Exception;
+use Automattic\WooCommerce\Pinterest\Exception\FeedFileOperationsException;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -39,7 +39,7 @@ class FeedFileOperations {
 	 * Files is populated with the XML headers.
 	 *
 	 * @since 1.2.9
-	 * @throws Exception Can't open or write to the file.
+	 * @throws FeedFileOperationsException Can't open or write to the file.
 	 */
 	public function prepare_temporary_files(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
@@ -56,7 +56,7 @@ class FeedFileOperations {
 	 * Add XML footer to all temporary feed files.
 	 *
 	 * @since 1.2.9
-	 * @throws Exception Can't open or write to the file.
+	 * @throws FeedFileOperationsException Can't open or write to the file.
 	 */
 	public function add_footer_to_temporary_feed_files(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
@@ -93,27 +93,29 @@ class FeedFileOperations {
 	 * @param integer $bytes_written How much data was written to the file.
 	 * @param string  $file          File location.
 	 *
-	 * @throws Exception Can't open or write to the file.
+	 * @throws FeedFileOperationsException Can't open or write to the file.
 	 */
 	private function check_write_for_io_errors( $bytes_written, $file ): void {
 
 		if ( false === $bytes_written ) {
-			throw new Exception(
+			throw new FeedFileOperationsException(
 				sprintf(
 					/* translators: error message with file path */
 					__( 'Could not open temporary file %s for writing', 'pinterest-for-woocommerce' ),
 					$file
-				)
+				),
+				FeedFileOperationsException::CODE_COULD_NOT_OPEN_FILE_ERROR
 			);
 		}
 
 		if ( 0 === $bytes_written ) {
-			throw new Exception(
+			throw new FeedFileOperationsException(
 				sprintf(
 					/* translators: error message with file path */
 					__( 'Temporary file: %s is not writeable.', 'pinterest-for-woocommerce' ),
 					$file
-				)
+				),
+				FeedFileOperationsException::CODE_COULD_NOT_WRITE_FILE_ERROR
 			);
 		}
 	}
@@ -123,19 +125,20 @@ class FeedFileOperations {
 	 * This is the last step of the feed file generation process.
 	 *
 	 * @since 1.2.9
-	 * @throws \Exception Renaming not possible.
+	 * @throws FeedFileOperationsException Renaming not possible.
 	 */
 	public function rename_temporary_feed_files_to_final(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
 			$status = rename( $config['tmp_file'], $config['feed_file'] );
 			if ( false === $status ) {
-				throw new Exception(
+				throw new FeedFileOperationsException(
 					sprintf(
 						/* translators: 1: temporary file name 2: final file name */
 						__( 'Could not rename %1$s to %2$s', 'pinterest-for-woocommerce' ),
 						$config['tmp_file'],
 						$config['feed_file']
-					)
+					),
+					FeedFileOperationsException::CODE_COULD_NOT_RENAME_ERROR
 				);
 			}
 		}
@@ -146,7 +149,7 @@ class FeedFileOperations {
 	 *
 	 * @param array $buffers an array of (locale => content) elements.
 	 * @since 1.2.9
-	 * @throws Exception Can't open or write to the file.
+	 * @throws FeedFileOperationsException Can't open or write to the file.
 	 */
 	public function write_buffers_to_temp_files( array $buffers ): void {
 		foreach ( $this->configurations->get_configurations() as $location => $config ) {

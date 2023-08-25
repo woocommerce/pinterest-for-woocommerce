@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
-Tested up to: 6.2
+Tested up to: 6.3
 Requires PHP: 7.3
-Stable tag: 1.2.19
+Stable tag: 1.3.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,48 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.3.8 - 2023-08-15 =
+* Fix - Caching of API calls.
+* Fix - Make add to cart events independent from WooCommerce archive page settings.
+
+= 1.3.7 - 2023-08-09 =
+* Tweak - Don't fetch the allowed countries list when not connected.
+* Tweak - Increase allowed countries cache lifetime to two days.
+* Tweak - WC 8.0 compatibility.
+* Tweak - WP 6.3 compatibility.
+* Update - Add missing countries to the allowed countries list.
+
+= 1.3.6 - 2023-07-25 =
+* Dev - Add release preparation GH workflow.
+
+= 1.3.5 - 2023-06-28 =
+* Tweak - WC 7.9 compatibility.
+
+= 1.3.4 - 2023-06-21 =
+* Fix - Fixed error when getting transient for a key of null value.
+* Fix - Release 1.3.3 - merge trunk into develop.
+* Tweak - Generate a new pot file for translations.
+
+= 1.3.3 - 2023-06-13 =
+* Tweak - WC 7.8 compatibility.
+
+= 1.3.2 - 2023-06-06 =
+* Fix - Ensure there is no fatal error for PHP 8+ during activation.
+
+= 1.3.1 - 2023-06-06 =
+* Update - Pinterest feed generator backoff adjustments.
+
+= 1.3.0 - 2023-05-30 =
+* Add - Integration with WooCommerce multichannel marketing dashboard.
+* Fix  -  Remove feed configuration during plugin uninstall procedure.
+* Fix - Connection flow not redirection the wizard view.
+
+= 1.2.21 - 2023-05-02 =
+* Tweak - WC 7.7 compatibility.
+
+= 1.2.20 - 2023-04-26 =
+* Fix - Unescaped `add_query_arg` function calls.
 
 = 1.2.19 - 2023-04-18 =
 * Fix - Escape product name for JS tracker.
