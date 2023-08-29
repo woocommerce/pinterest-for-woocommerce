@@ -2,22 +2,20 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Feed;
 
-use ReflectionClass;
-use ReflectionMethod;
-use \WC_Helper_Product;
-use \WC_Unit_Test_Case;
-use \WC_Product_Variable;
-
-use Automattic\WooCommerce\Pinterest\FeedGenerator;
-use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
-use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
-use Automattic\WooCommerce\Pinterest\Product\GoogleCategorySearch;
-use Automattic\WooCommerce\Pinterest\Product\GoogleProductTaxonomy;
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\Condition;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\GoogleCategory;
+use Automattic\WooCommerce\Pinterest\Product\GoogleCategorySearch;
+use Automattic\WooCommerce\Pinterest\Product\GoogleProductTaxonomy;
+use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
+use ReflectionClass;
+use ReflectionMethod;
 use ShippingHelpers;
+use WC_Helper_Product;
+use WC_Product_Variable;
+use WC_Unit_Test_Case;
 
 /**
  * Feed file generation testing class.
@@ -471,8 +469,8 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
 		$xml          = $price_method( $product );
 		$this->assertEquals( '<g:price>15.00USD</g:price>', $xml );
-		
-		
+
+
 		// Test if the price excludes taxes.
 		$old_tax_display_option = get_option( 'woocommerce_tax_display_shop' );
 		update_option( 'woocommerce_tax_display_shop', 'excl' );
@@ -481,7 +479,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$price_decimals_method->setAccessible( true );
 		$price_decimals = $price_decimals_method->invoke( null );
 
-		$product_price = wc_get_price_excluding_tax( 
+		$product_price = wc_get_price_excluding_tax(
 			$product,
 			array(
 				'price' => $product->get_regular_price(),
@@ -535,7 +533,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$price_decimals_method->setAccessible( true );
 		$price_decimals = $price_decimals_method->invoke( null );
 
-		$product_price = wc_get_price_excluding_tax( 
+		$product_price = wc_get_price_excluding_tax(
 			$product,
 			array(
 				'price' => $product->get_sale_price(),
@@ -543,7 +541,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		);
 		$formatted_price = wc_format_decimal( $product_price, $price_decimals );
 		$this->assertEquals( '<sale_price>' . $formatted_price . get_woocommerce_currency() . '</sale_price>', $xml );
-	
+
 		update_option( 'woocommerce_tax_display_shop', $old_tax_display_option );
 	}
 
@@ -598,7 +596,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// Edge case where price is wrong.
 		$xml = $price_method( $product );
 		$this->assertEquals( '<g:price>12.50USD</g:price>', $xml );
-		
+
 		// Apply the filter.
 		add_filter( 'woocommerce_customer_taxable_address', array( $this, 'filter_taxable_location' ) );
 
