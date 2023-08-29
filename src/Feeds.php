@@ -201,4 +201,35 @@ class Feeds {
 		}
 	}
 
+	/**
+	 * Get the latest Workflow of the active feed related to the last attempt to process and ingest our feed.
+	 *
+	 * @param string $merchant_id The merchant ID.
+	 * @param string $feed_id     The ID of the feed.
+	 *
+	 * @return object|null The latest workflow object or null if there is no workflow.
+	 *
+	 * @throws Exception If there is an error getting the feed report.
+	 *
+	 * @since 1.3.0
+	 */
+	public static function get_feed_latest_workflow( string $merchant_id, string $feed_id ): ?object {
+		$feed_report = Base::get_merchant_feed_report( $merchant_id, $feed_id );
+		if ( ! $feed_report || 'success' !== $feed_report['status'] ) {
+			throw new Exception( esc_html__( 'Could not get feed report from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
+		}
+		if ( ! property_exists( $feed_report['data'], 'workflows' ) || ! is_array( $feed_report['data']->workflows ) || empty( $feed_report['data']->workflows ) ) {
+			return null;
+		}
+
+		usort(
+			$feed_report['data']->workflows,
+			function ( $a, $b ) {
+				return $b->created_at - $a->created_at;
+			}
+		);
+
+		return reset( $feed_report['data']->workflows );
+	}
+
 }

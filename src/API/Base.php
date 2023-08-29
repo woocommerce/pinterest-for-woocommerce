@@ -83,6 +83,8 @@ class Base {
 	 */
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 
+		$api = empty( $api ) ? '' : trailingslashit( $api );
+
 		if ( ! empty( $cache_expiry ) ) {
 			$cache = self::get_cached_response( $endpoint, $method, $payload, $api );
 
@@ -102,6 +104,7 @@ class Base {
 			}
 
 			return $response;
+
 		} catch ( ApiException $e ) {
 
 			if ( ! empty( Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' ) ) ) {
@@ -211,6 +214,26 @@ class Base {
 	public static function get_cached_response( $endpoint, $method, $payload, $api ) {
 		$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
 		return get_transient( $cache_key );
+	}
+
+	/**
+	 * Caches the API response if cache expiry is set.
+	 *
+	 * @since 1.3.8
+	 * @param string $endpoint     The API endpoint.
+	 * @param string $method       The HTTP method.
+	 * @param array  $payload      The API request payload.
+	 * @param string $api          The API version.
+	 * @param mixed  $response     The API response.
+	 * @param int    $cache_expiry The cache expiry in seconds.
+	 *
+	 * @return void
+	 */
+	private static function maybe_cache_api_response( $endpoint, $method, $payload, $api, $response, $cache_expiry ) {
+		if ( ! empty( $cache_expiry ) ) {
+			$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
+			set_transient( $cache_key, $response, $cache_expiry );
+		}
 	}
 
 	/**
@@ -621,6 +644,8 @@ class Base {
 	 */
 	public static function update_merchant_feed( $merchant_id, $feed_id, $args ) {
 
+		// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
+		// nosemgrep: audit.php.wp.security.xss.query-arg
 		return self::make_request(
 			add_query_arg( $args, 'commerce/product_pin_merchants/' . $merchant_id . '/feed/' . $feed_id . '/' ),
 			'PUT'
@@ -813,7 +838,7 @@ class Base {
 	 */
 	public static function get_list_of_ads_supported_countries() {
 		$request_url = 'advertisers/countries';
-		return self::make_request( $request_url, 'GET', array(), 'ads', DAY_IN_SECONDS );
+		return self::make_request( $request_url, 'GET', array(), 'ads', 2 * DAY_IN_SECONDS );
 	}
 
 	/**
