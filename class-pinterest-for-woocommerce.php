@@ -860,7 +860,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
 			// nosemgrep: audit.php.wp.security.xss.query-arg
-			return self::get_connection_proxy_url() . 'login/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
+			return self::get_connection_proxy_url() . 'connect/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
 		}
 
 
