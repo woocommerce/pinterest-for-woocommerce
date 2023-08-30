@@ -403,7 +403,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					406 => 'domain verification',
 					409 => 'meta-tag',
 					),
-				'conflictingTagsWarning'   => Tracking::get_third_party_tags_warning_message(),
+				'conflictingTagsWarning'   => Tracking\Tag::get_third_party_tags_warning_message(),
 			);
 		}
 

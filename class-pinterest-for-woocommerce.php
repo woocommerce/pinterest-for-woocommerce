@@ -6,17 +6,21 @@
  * @version  1.0.0
  */
 
-use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
+use Automattic\WooCommerce\Pinterest;
 use Automattic\WooCommerce\Pinterest\AdCredits;
 use Automattic\WooCommerce\Pinterest\AdCreditsCoupons;
+use Automattic\WooCommerce\Pinterest\Admin\Tasks\Onboarding;
+use Automattic\WooCommerce\Pinterest\API\UserInteraction;
 use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
+use Automattic\WooCommerce\Pinterest\Tracking;
+use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
+use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
+use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Automattic\WooCommerce\Pinterest\Utilities\Tracks;
-use Automattic\WooCommerce\Pinterest\API\UserInteraction;
-use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
-use Automattic\WooCommerce\Pinterest\Admin\Tasks\Onboarding;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -263,7 +267,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// ActionScheduler is activated on init 1 so lets make sure we are updating after that.
 			add_action( 'init', array( $this, 'maybe_update_plugin' ), 5 );
-			add_action( 'init', array( Pinterest\Tracking::class, 'maybe_init' ) );
+			add_action( 'init', array( self::class, 'init_tracking' ) );
 			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\TrackerSnapshot::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\Billing::class, 'schedule_event' ) );
@@ -303,6 +307,28 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		}
 
+		/**
+		 * Initialise Tracker and add trackers to it.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return Pinterest\Tracking|false
+		 */
+		public static function init_tracking() {
+			$is_tracking_disabled             = apply_filters( 'woocommerce_pinterest_disable_tracking', false );
+			$is_tracking_conversions_disabled = ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
+			$is_not_a_site                    = wp_doing_cron() || is_admin();
+
+			if ( $is_tracking_disabled || $is_tracking_conversions_disabled || $is_not_a_site ) {
+				return false;
+			}
+
+			$tag_tracker         = new Tag();
+			$user                = new User( WC_Geolocation::get_ip_address(), wc_get_user_agent() );
+			$conversions_tracker = new Conversions( $user );
+
+			return new Tracking( array( $tag_tracker, $conversions_tracker ) );
+		}
 
 		/**
 		 * Init Pinterest_For_Woocommerce when WordPress Initialises.
@@ -834,7 +860,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
 			// nosemgrep: audit.php.wp.security.xss.query-arg
-			return self::get_connection_proxy_url() . 'login/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
+			return self::get_connection_proxy_url() . 'connect/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
 		}
 
 
@@ -1375,9 +1401,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function is_tracking_configured() {
-			return false !== Pinterest\Tracking::get_active_tag();
+			return false !== Pinterest\Tracking\Tag::get_active_tag();
 		}
-
 
 		/**
 		 * Returns the Terms object for the currently configured base country.
