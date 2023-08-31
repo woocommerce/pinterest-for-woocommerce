@@ -14,15 +14,23 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-/**
- * Remove the feed configuration.
- */
-$data        = get_option( 'pinterest_for_woocommerce_data', [] );
-$merchant_id = $data['merchant_id'] ?? '';
+try {
+	// Load classes.
+	require_once __DIR__ . '/pinterest-for-woocommerce.php';
 
-if ( $merchant_id ) {
-	// At this time all feeds are considered stale so we just need pass bogus value as the second argument.
-	FeedRegistration::maybe_disable_stale_feeds_for_merchant( $merchant_id, '' );
+	/**
+	 * Remove the feed configuration.
+	 */
+	$data        = get_option( 'pinterest_for_woocommerce_data', [] );
+	$merchant_id = $data['merchant_id'] ?? '';
+
+	if ( $merchant_id ) {
+		// At this time all feeds are considered stale so we just need pass bogus value as the second argument.
+		FeedRegistration::maybe_disable_stale_feeds_for_merchant( $merchant_id, '' );
+	}
+
+} catch ( Exception $e ) {
+	// Do nothing.
 }
 
 $plugin_settings = get_option( 'pinterest_for_woocommerce' );
