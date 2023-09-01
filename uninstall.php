@@ -28,9 +28,8 @@ try {
 		// At this time all feeds are considered stale so we just need pass bogus value as the second argument.
 		FeedRegistration::maybe_disable_stale_feeds_for_merchant( $merchant_id, '' );
 	}
-
-} catch ( Exception $e ) {
-	// Do nothing.
+} catch ( Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+	// Do nothing - this is a cleanup routine.
 }
 
 $plugin_settings = get_option( 'pinterest_for_woocommerce' );
