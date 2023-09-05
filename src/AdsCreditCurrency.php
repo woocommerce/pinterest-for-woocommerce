@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Ads Credit Currency
  *
  * @package     Pinterest_For_WooCommerce/Classes/
- * @version     x.x.x
+ * @version     1.3.9
  */
 
 namespace Automattic\WooCommerce\Pinterest;
@@ -44,7 +44,7 @@ class AdsCreditCurrency {
 	/**
 	 * Get spend requirement and credits based on currency.
 	 *
-	 * @since x.x.x
+	 * @since 1.3.9
 	 *
 	 * @return array $result Amount to be spent, credits given and currency symbol.
 	 */

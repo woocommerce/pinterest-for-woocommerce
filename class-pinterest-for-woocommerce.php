@@ -1027,7 +1027,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Add currency_credit_info information to the account data option.
 		 *
-		 * @since x.x.x
+		 * @since 1.3.9
 		 *
 		 * @return void
 		 */
