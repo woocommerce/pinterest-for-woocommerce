@@ -88,6 +88,10 @@ class PHPView implements View {
 				ob_end_clean();
 			}
 
+			/**
+			 * Exception hook.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+			 */
 			do_action( 'wc_pinterest_exception', $exception, __METHOD__ );
 
 			throw ViewException::invalid_view_exception(
@@ -146,6 +150,10 @@ class PHPView implements View {
 			return $this->context[ $property ];
 		}
 
+		/**
+		 * Displays an error message when a view property is missing.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
 		do_action( 'wc_pinterest_error', sprintf( 'View property "%s" is missing or undefined.', $property ), __METHOD__ );
 
 		/*
@@ -174,6 +182,10 @@ class PHPView implements View {
 		$path = path_join( $this->get_views_base_path(), $path );
 
 		if ( ! is_readable( $path ) ) {
+			/**
+			 * View not found error.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+			 */
 			do_action( 'wc_pinterest_error', sprintf( 'View not found in path "%s".', $path ), __METHOD__ );
 
 			throw ViewException::invalid_path( $path );
@@ -218,6 +230,10 @@ class PHPView implements View {
 			return $this->sanitize_context_variable( $this->context[ $property ] );
 		}
 
+		/**
+		 * View property missing error.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
 		do_action( 'wc_pinterest_error', sprintf( 'View property "%s" is missing or undefined.', $property ), __METHOD__ );
 
 		/*

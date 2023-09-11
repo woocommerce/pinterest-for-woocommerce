@@ -123,10 +123,6 @@ $ vendor/bin/phpunit
 
 The tests will execute and you'll be presented with a summary.
 
-### Unit Tests and PHP 8
-
-We currently do not support running unit tests on PHP 8..
-
 <p align="center">
 	<br/><br/>
 	Made with 💜 by <a href="https://woocommerce.com/">WooCommerce</a>.<br/>
