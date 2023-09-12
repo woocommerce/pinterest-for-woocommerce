@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.10 - 2023-09-12 =
+* Dev - Updates PHPUnit version, unit tests, and matrix in git workflow for PHP8.2 compatibility.
+
 = 1.3.9 - 2023-09-05 =
 * Add - Adds logic to dynamically display spend requirement and credits given based on store currency.
 * Fix -  Uninstall procedure.
