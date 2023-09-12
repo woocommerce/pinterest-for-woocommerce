@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.3
 Requires PHP: 7.3
-Stable tag: 1.3.9
+Stable tag: 1.3.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.3.10 - 2023-09-12 =
+* Dev - Updates PHPUnit version, unit tests, and matrix in git workflow for PHP8.2 compatibility.
 
 = 1.3.9 - 2023-09-05 =
 * Add - Adds logic to dynamically display spend requirement and credits given based on store currency.
