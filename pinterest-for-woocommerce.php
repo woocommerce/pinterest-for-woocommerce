@@ -38,7 +38,6 @@
  * - `phpcs.xml`
  */
 
-require __DIR__ . '/vendor/autoload.php';
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
 
 // If this file is called directly, abort.
