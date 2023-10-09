@@ -1,6 +1,7 @@
 <?php
 /**
  * Test class doc block.
+ *
  * @package phpcs-changed/test
  */
 
