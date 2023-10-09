@@ -1,4 +1,8 @@
 <?php
+/**
+ * Test class doc block.
+ * @package phpcs-changed/test
+ */
 
 /**
  * Demo class to test inheritance compatibility between PHP versions.
