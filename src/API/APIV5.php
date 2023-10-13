@@ -73,6 +73,26 @@ class APIV5 extends Base {
 		return self::make_request( 'user_account', 'GET' );
 	}
 
+	/**
+	 * Pull ads supported countries information from the API.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array {
+	 *     Ad Accounts countries
+	 *
+	 *     @type array[]  $items {
+	 *         @type string $code     Country ID from ISO 3166-1 alpha-2.
+	 *         @type string $currency Country currency.
+	 *         @type int    $index    Country index
+	 *         @type string $name     Country name.
+	 *     }
+	 * }
+	 */
+	public static function get_list_of_ads_supported_countries() {
+		$request_url = 'resources/ad_account_countries';
+		return self::make_request( $request_url, 'GET', array(), '', 2 * DAY_IN_SECONDS );
+	}
 
 	/**
 	 * Returns the list of the user's websites.
