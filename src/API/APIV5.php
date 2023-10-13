@@ -78,7 +78,7 @@ class APIV5 extends Base {
 	 *
 	 * @since x.x.x
 	 *
- 	* @return array {
+	 * @return array {
 	 *     Ad Accounts countries
 	 *
 	 *     @type array[]  $items {
