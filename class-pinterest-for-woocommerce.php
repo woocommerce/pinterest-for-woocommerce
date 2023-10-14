@@ -907,15 +907,20 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$external_business_id = self::generate_external_business_id();
 			$connection_data      = self::get_data( 'connection_info_data', true );
 
+			$integration_data     = array(
+				'external_business_id'    => $external_business_id,
+				'connected_merchant_id'   => $connection_data['merchant_id'] ?? '',
+				'connected_advertiser_id' => $connection_data['advertiser_id'] ?? '',
+			);
+
+			if ( ! empty( $connection_data['tag_id'] ) ) {
+				$integration_data['connected_tag_id'] = $connection_data['tag_id'];
+			}
+
 			$response = Pinterest\API\APIV5::make_request(
 				'integrations/commerce',
 				'POST',
-				array(
-					'external_business_id'    => $external_business_id,
-					'connected_merchant_id'   => $connection_data['merchant_id'] ?? '',
-					'connected_advertiser_id' => $connection_data['advertiser_id'] ?? '',
-					'connected_tag_id'        => $connection_data['tag_id'] ?? '',
-				)
+				$integration_data
 			);
 
 			/*

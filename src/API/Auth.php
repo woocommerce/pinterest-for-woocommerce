@@ -113,6 +113,12 @@ class Auth extends VendorAPI {
 		$info_string = base64_decode( $info );
 		$info_data   = (array) json_decode( urldecode( $info_string ) );
 
+		$features    = (array) $info_data['feature_flags'] ?? array();
+
+		$this->apply_oauth_flow_features( $features );
+
+		unset( $info_data['feture_flags'] );
+
 		Pinterest_For_Woocommerce()::save_connection_info_data( $info_data );
 
 		try {
@@ -125,6 +131,16 @@ class Auth extends VendorAPI {
 
 		wp_safe_redirect( $this->get_redirect_url( $request->get_param( 'view' ) ) );
 		exit;
+	}
+
+	/**
+	 * Applies the features from the OAuth flow to the plugin settings.
+	 *
+	 * @param array $features The features selected by the merchant during the OAuth flow.
+	 */
+	private function apply_oauth_flow_features( $features ) {
+		Pinterest_For_Woocommerce()::save_setting( 'track_conversions', $features['tags'] ?? false );
+		Pinterest_For_Woocommerce()::save_setting( 'product_sync_enabled', $features['catalog'] ?? false );
 	}
 
 	/**
