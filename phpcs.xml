@@ -21,7 +21,6 @@
 		<exclude name="Generic.Files.LineEndings.InvalidEOLChar"/>
 		<exclude name="Generic.Commenting.DocComment.MissingShort"/>
 		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
-		<exclude name="WordPress.PHP.DisallowShortTernary"/>
 	</rule>
 
 	<!-- Specific excludes -->
