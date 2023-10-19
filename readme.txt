@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.12 - 2023-10-19 =
+* Dev - Add phpcs on changed files only.
+
 = 1.3.11 - 2023-10-10 =
 * Dev - automate merging trunk to develop after a release.
 * Tweak - WC 8.2 compatibility.
