@@ -14,7 +14,7 @@ A native integration which allows you to market your store on Pinterest, includi
 
 ## Status - _in development_
 
-Pinterest for WooCommerce is under development. To find out more about availability and release, refer to WooCommerce.com.
+Pinterest for WooCommerce is under development. To find out more about availability and release, refer to Woo.com.
 
 ## Support
 
@@ -125,7 +125,7 @@ The tests will execute and you'll be presented with a summary.
 
 <p align="center">
 	<br/><br/>
-	Made with 💜 by <a href="https://woocommerce.com/">WooCommerce</a>.<br/>
-	<a href="https://woocommerce.com/careers/">We're hiring</a>! Come work with us!
+	Made with 💜 by <a href="https://woo.com/">Woo</a>.<br/>
+	<a href="https://woo.com/careers/">We're hiring</a>! Come work with us!
 </p>
 
