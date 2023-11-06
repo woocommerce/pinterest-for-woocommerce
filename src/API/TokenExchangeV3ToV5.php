@@ -8,9 +8,6 @@
  */
 
 namespace Automattic\WooCommerce\Pinterest\API;
-
-use Automattic\WooCommerce\Pinterest\PinterestApiException;
-use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
 use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -61,7 +58,7 @@ class TokenExchangeV3ToV5 extends APIV5 {
 	 *     @type string $scope                          The scope for which the access token has permission.
 	 * }
 	 */
-	public static function exchange_the_token() {
+	public static function exchange_token() {
 		$request_url = 'oauth/commerce_integrations/token/exchange/';
 		return self::make_request( $request_url );
 	}
