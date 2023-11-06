@@ -1,21 +1,23 @@
 <?php
 /**
- * Pinterest API V5 class
+ * Pinterest API Token exchnge class.
  *
- * @class       Pinterest_For_Woocommerce_API
+ * @class       TokenExchangeV3ToV5
  * @version     x.x.x
  * @package     Pinterest_For_WordPress/Classes/
  */
 
 namespace Automattic\WooCommerce\Pinterest\API;
-use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 /**
- * API V5 Methods
+ * V3 to V5 token exchange class.
+ * Contains the methods API methods and the update procedure.
+ *
+ * @since x.x.x
  */
 class TokenExchangeV3ToV5 extends APIV5 {
 
