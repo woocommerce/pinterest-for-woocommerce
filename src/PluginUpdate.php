@@ -303,7 +303,7 @@ class PluginUpdate {
 	 */
 	protected function token_update(): void {
 		// Update should only happen if the plugin is connected using the V3 token.
-		if ( Pinterest_For_Woocommerce()::is_connected() ) {
+		if ( ! Pinterest_For_Woocommerce()::is_connected() ) {
 			return;
 		}
 
