@@ -2,7 +2,7 @@
 
 [![PHP Unit Tests](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-unit-tests.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-unit-tests.yml)
 [![JavaScript Unit Tests](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-unit-tests.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-unit-tests.yml)
-[![PHP Coding Standards](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-coding-standards.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-coding-standards.yml)
+[![PHP Coding Standards - PR Changed Files](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-cs-on-changes.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-cs-on-changes.yml)
 [![JavaScript and CSS Linting](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-css-linting.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-css-linting.yml)
 
 A native integration which allows you to market your store on Pinterest, including:
@@ -14,7 +14,7 @@ A native integration which allows you to market your store on Pinterest, includi
 
 ## Status - _in development_
 
-Pinterest for WooCommerce is under development. To find out more about availability and release, refer to WooCommerce.com.
+Pinterest for WooCommerce is under development. To find out more about availability and release, refer to Woo.com.
 
 ## Support
 
@@ -125,7 +125,7 @@ The tests will execute and you'll be presented with a summary.
 
 <p align="center">
 	<br/><br/>
-	Made with 💜 by <a href="https://woocommerce.com/">WooCommerce</a>.<br/>
-	<a href="https://woocommerce.com/careers/">We're hiring</a>! Come work with us!
+	Made with 💜 by <a href="https://woo.com/">Woo</a>.<br/>
+	<a href="https://woo.com/careers/">We're hiring</a>! Come work with us!
 </p>
 
