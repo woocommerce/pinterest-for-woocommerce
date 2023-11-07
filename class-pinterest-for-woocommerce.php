@@ -202,6 +202,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT', 'oauth/callback' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_AUTH', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_auth_key' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX', 'pfw' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_PINTEREST_API_VERSION', PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_pinterest_api_vertsion' );
 		}
 
 
@@ -568,6 +569,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			return update_option( $option, $settings );
 		}
 
+		/**
+		 * Set API version used by the plugin.
+		 *
+		 * @since x.x.x
+		 *
+		 * @param string $version The API version.
+		 *
+		 * @return boolean
+		 */
+		public static function set_api_version( $version ) {
+			return update_option( PINTEREST_FOR_WOOCOMMERCE_PINTEREST_API_VERSION, $version );
+		}
 
 		/**
 		 * Return APP Data based on its key
