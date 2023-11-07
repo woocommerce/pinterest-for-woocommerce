@@ -202,7 +202,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT', 'oauth/callback' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_AUTH', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_auth_key' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX', 'pfw' );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_PINTEREST_API_VERSION', PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_pinterest_api_vertsion' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_PINTEREST_API_VERSION', PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_pinterest_api_version' );
 		}
 
 
