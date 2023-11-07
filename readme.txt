@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
-Tested up to: 6.3
+Tested up to: 6.4
 Requires PHP: 7.3
-Stable tag: 1.3.12
+Stable tag: 1.3.13
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.3.13 - 2023-11-07 =
+* Fix - Doc - Use new Woo.com domain.
+* Tweak - WC 8.3 compatibility.
+* Tweak - WP 6.4 compatibility.
 
 = 1.3.12 - 2023-10-19 =
 * Dev - Add phpcs on changed files only.
