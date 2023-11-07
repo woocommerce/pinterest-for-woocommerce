@@ -43,5 +43,25 @@ class TokenExchangeV3ToV5 extends APIV5 {
 		$request_url = 'oauth/commerce_integrations/token/exchange/';
 		return self::make_request( $request_url );
 	}
+	/**
+	 * Update token from V3 to V5.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return bool $success Whether the token was updated successfully.
+	 */
+	public static function token_update() {
+		$respone = self::exchange_token();
+
+		if ( 'success' != $respone['status'] ) {
+			return false;
+		}
+
+		$token_data = $respone['data'];
+
+		Pinterest_For_Woocommerce()::save_token_data( $token_data );
+
+		return true;
+	}
 
 }
