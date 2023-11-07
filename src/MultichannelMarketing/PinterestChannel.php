@@ -77,7 +77,7 @@ class PinterestChannel implements MarketingChannelInterface {
 	 * @return string
 	 */
 	public function get_icon_url(): string {
-		return 'https://woocommerce.com/wp-content/plugins/wccom-plugins/marketing-tab-rest-api/icons/pinterest.svg';
+		return 'https://woo.com/wp-content/plugins/wccom-plugins/marketing-tab-rest-api/icons/pinterest.svg';
 	}
 
 	/**

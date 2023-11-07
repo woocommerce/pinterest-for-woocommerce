@@ -5,17 +5,17 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              https://woocommerce.com
+ * @link              https://woo.com
  * @since             1.0.0
  * @package           woocommerce/pinterest-for-woocommerce
  *
  * @wordpress-plugin
  * Plugin Name:       Pinterest for WooCommerce
- * Plugin URI:        https://woocommerce.com/products/pinterest-for-woocommerce/
+ * Plugin URI:        https://woo.com/products/pinterest-for-woocommerce/
  * Description:       Grow your business on Pinterest! Use this official plugin to allow shoppers to Pin products while browsing your store, track conversions, and advertise on Pinterest.
  * Version:           1.3.12
  * Author:            WooCommerce
- * Author URI:        https://woocommerce.com
+ * Author URI:        https://woo.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       pinterest-for-woocommerce
