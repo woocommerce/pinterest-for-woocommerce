@@ -91,6 +91,11 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.13 - 2023-11-07 =
+* Fix - Doc - Use new Woo.com domain.
+* Tweak - WC 8.3 compatibility.
+* Tweak - WP 6.4 compatibility.
+
 = 1.3.12 - 2023-10-19 =
 * Dev - Add phpcs on changed files only.
 
