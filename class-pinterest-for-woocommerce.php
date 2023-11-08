@@ -717,17 +717,20 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Save encrypted token data. See the documentation of the get_token() method for the expected format of the related data variables.
 		 *
 		 * @since 1.0.0
+		 * @since x.x.x Added refresh token and tokens expiration.
 		 *
 		 * @param array $token The array containing the token values to save.
 		 *
 		 * @return boolean
 		 */
 		public static function save_token_data( $token ) {
-
-			$token['access_token']  = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['access_token'] );
-			$token['refresh_token'] = empty( $token['refresh_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['refresh_token'] );
+			$token['access_token']             = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['access_token'] );
+			$token['expires_in']               = $token['expires_in'] ?? '';
+			$token['refresh_token']            = empty( $token['refresh_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['refresh_token'] );
+			$token['refresh_token_expires_in'] = $token['refresh_token_expires_in'] ?? '';
 			$token['scopes']        = empty( $token['scopes'] ) ? '' : $token['scopes'];
 			$token['refresh_date']  = time();
+
 			return self::save_data( 'token_data', $token );
 		}
 
