@@ -64,4 +64,15 @@ class TokenExchangeV3ToV5 extends APIV5 {
 		return true;
 	}
 
+	/**
+	 * Get the V3 token.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return string $token The V3 token.
+	 */
+	public static function get_token() {
+		return Pinterest_For_Woocommerce()::get_data( 'token', true );
+	}
+
 }
