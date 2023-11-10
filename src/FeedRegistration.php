@@ -211,22 +211,22 @@ class FeedRegistration {
 	 * @return void
 	 */
 	public static function maybe_disable_stale_feeds_for_merchant( $merchant_id, $feed_id ) {
+		$feeds = Feeds::get_ad_account_feeds();
 
-		$feed_profiles = Feeds::get_merchant_feeds( $merchant_id );
-
-		if ( empty( $feed_profiles ) ) {
+		if ( empty( $feeds ) ) {
 			return;
 		}
 
 		$configs    = LocalFeedConfigs::get_instance()->get_configurations();
 		$config     = reset( $configs );
-		$local_path = dirname( $config['feed_url'] );
+		// Make sure this $local_path has a domain name.
+		$local_path = $config['feed_url'];
 
 		$invalidate_cache = false;
 
-		foreach ( $feed_profiles as $feed ) {
+		foreach ( $feeds as $feed ) {
 			// Local feed should not be disabled.
-			if ( $feed_id === $feed->id ) {
+			if ( $feed_id === $feed['id'] ) {
 				continue;
 			}
 
@@ -243,13 +243,13 @@ class FeedRegistration {
 			 * class. Utilizing dirname eliminates the file name and suffix, leaving only the directory path for
 			 * comparison.
 			 */
-			if ( dirname( $feed->location_config->full_feed_fetch_location ) !== $local_path ) {
+			if ( dirname( $feed['location'] ) !== $local_path ) {
 				continue;
 			}
 
 			// Disable the feed if it is active.
-			if ( 'ACTIVE' === $feed->feed_status ) {
-				Feeds::disable_feed( $merchant_id, $feed->id );
+			if ( 'ACTIVE' === $feed['status'] ) {
+				Feeds::disable_feed( $merchant_id, $feed['id'] );
 				$invalidate_cache = true;
 			}
 		}

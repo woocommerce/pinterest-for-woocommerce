@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Automattic\WooCommerce\Pinterest\API\APIV5;
 use \Exception;
 use Automattic\WooCommerce\Pinterest\API\Base;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
@@ -24,43 +25,26 @@ class Feeds {
 	/**
 	 * Get a specific merchant feed using the given arguments.
 	 *
-	 * @param string $merchant_id The merchant ID the feed belongs to.
 	 * @param string $feed_id     The ID of the feed.
 	 *
 	 * @return object The feed profile object.
 	 *
 	 * @throws Exception PHP Exception.
 	 */
-	public static function get_merchant_feed( $merchant_id, $feed_id ) {
-
+	public static function get_ad_account_feed( $feed_id ) {
 		try {
-
-			// Get the feeds of the merchant.
-			$feeds = Base::get_merchant_feeds( $merchant_id, true );
-
-			if ( 'success' !== $feeds['status'] ) {
-				throw new Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
-			}
-
-			if ( ! is_array( $feeds['data'] ) ) {
-				throw new Exception( esc_html__( 'Wrong feed info.', 'pinterest-for-woocommerce' ) );
-			}
-
-			foreach ( $feeds['data'] as $feed_profile ) {
-
+			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+			$feeds         = APIV5::get_ad_account_feeds( $ad_account_id );
+			foreach ( $feeds['items'] as $feed ) {
 				// Get the feed with the requested id if exists.
-				if ( $feed_id === $feed_profile->id ) {
-					return $feed_profile;
+				if ( $feed_id === $feed['id'] ) {
+					return $feed;
 				}
 			}
-
 			// No feed found.
 			throw new Exception( esc_html__( 'No feed found with the requested ID.', 'pinterest-for-woocommerce' ) );
-
 		} catch ( Exception $e ) {
-
 			Logger::log( $e->getMessage(), 'error' );
-
 			throw $e;
 		}
 	}
@@ -69,31 +53,17 @@ class Feeds {
 	/**
 	 * Get merchant's feeds.
 	 *
-	 * @param string $merchant_id The merchant ID.
-	 *
 	 * @return array The feed profile objects.
 	 *
 	 * @throws Exception PHP Exception.
 	 */
-	public static function get_merchant_feeds( $merchant_id ) {
-
+	public static function get_ad_account_feeds() {
 		try {
-			$feeds = API\Base::get_merchant_feeds( $merchant_id, true );
-
-			if ( 'success' !== $feeds['status'] ) {
-				throw new Exception( esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' ) );
-			}
-
-			if ( ! is_array( $feeds['data'] ) ) {
-				throw new Exception( esc_html__( 'Wrong feed info.', 'pinterest-for-woocommerce' ) );
-			}
-
-			return $feeds['data'];
-
+			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+			$feeds         = APIV5::get_ad_account_feeds( $ad_account_id );
+			return $feeds['items'] ?? [];
 		} catch ( Exception $e ) {
-
 			Logger::log( $e->getMessage(), 'error' );
-
 			throw $e;
 		}
 	}
@@ -124,7 +94,7 @@ class Feeds {
 		$local_path    = $config['feed_url'];
 		$local_country = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
 		$local_locale  = LocaleMapper::get_locale_for_api();
-		$feeds         = self::get_merchant_feeds( $merchant_id );
+		$feeds         = self::get_ad_account_feeds();
 
 		foreach ( $feeds as $feed ) {
 			$configured_path = $feed->location_config->full_feed_fetch_location;
@@ -152,7 +122,7 @@ class Feeds {
 	 * @return bool True if the feed is active, false otherwise.
 	 */
 	public static function is_local_feed_enabled( $merchant_id, $feed_profile_id ) {
-		$feed = self::get_merchant_feed( $merchant_id, $feed_profile_id );
+		$feed = self::get_ad_account_feed( $feed_profile_id );
 		return 'ACTIVE' === $feed->feed_status;
 	}
 

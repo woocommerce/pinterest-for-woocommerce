@@ -326,4 +326,52 @@ class APIV5 extends Base {
 			)
 		);
 	}
+
+	/**
+	 * Get merchant's feeds.
+	 *
+	 * @param string $ad_account_id
+	 *
+	 * @return array {
+	 *      List of feeds.
+	 *
+	 *      @type array[] $items {              Feeds.
+	 *          @type string $id                Feed ID.
+	 *          @type string $name              A human-friendly name associated to a given feed. This value is currently nullable due to historical reasons. It is expected to become non-nullable in the future.
+	 *          @type string $status            ACTIVE, INACTIVE. Status for catalogs entities. Present in catalogs_feed values. When a feed is deleted, the response will inform DELETED as status.
+	 *          @type string $format            The file format of a feed: TSV, CSV, XML.
+	 *          @type string $location          The URL where a feed is available for download. This URL is what Pinterest will use to download a feed for processing.
+	 *          @type string $created_at
+	 *          @type string $updated_at
+	 *          @type string $catalog_type      Type of the catalog entity: RETAIL, HOTEL.
+	 *          @type array[] $credentials {    Use this if your feed file requires username and password.
+	 *              @type string $username  The required password for downloading a feed.
+	 *              @type string $password  The required username for downloading a feed.
+	 *          }
+	 *          @type array[] $preferred_processing_schedule {  Optional daily processing schedule. Use this to configure the preferred time for processing a feed (otherwise random).
+	 *              @type string $time      A time in format HH:MM with leading 0 (zero).
+	 *              @type string $timezone  The timezone considered for the processing schedule time.
+	 *          }
+	 *          @type string $default_currency      Currency Codes from ISO 4217.
+	 *          @type string $default_locale        The locale used within a feed for product descriptions.
+	 *          @type string $default_country       Country ID from ISO 3166-1 alpha-2.
+	 *          @type string $default_availability  Default availability for products in a feed.
+	 *      }
+	 *      @type string $bookmark              Cursor used to fetch the next page of items
+	 * }
+	 * @throws PinterestApiException If the request fails with 500 status.
+	 */
+	public static function get_ad_account_feeds( $ad_account_id ) {
+		$args = array(
+			'ad_account_id' => $ad_account_id,
+			'page_size'     => 25, // Default page size.
+		);
+		return self::make_request(
+			'catalogs/feeds',
+			'GET',
+			$args,
+			'',
+			MINUTE_IN_SECONDS
+		);
+	}
 }

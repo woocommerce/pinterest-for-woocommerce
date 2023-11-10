@@ -82,7 +82,7 @@ class FeedStatusService {
 			}
 
 			try {
-				$feed = Feeds::get_merchant_feed( $merchant_id, $feed_id );
+				$feed = Feeds::get_ad_account_feed( $feed_id );
 			} catch ( Exception $e ) {
 				throw new Exception( 'error_fetching_feed' );
 			}
