@@ -1,4 +1,4 @@
-<?php
+'url'           => get_site_url(),<?php
 /**
  * Pinterest for WooCommerce Refresh Token.
  *
@@ -42,7 +42,7 @@ class RefreshToken {
 	public static function handle_refresh(): bool {
 		$token_data   = Pinterest_For_Woocommerce::get_data( 'token_data', true );
 		$expires_in   = intval( $token_data['expires_in'] );
-		$refresh_date = intval( $token_data['refresh_date'] );
+		$refresh_time = intval( $token_data['refresh_time'] );
 
 		/**
 		 * Filters to determine if it is time to start refreshing the token.
@@ -53,43 +53,75 @@ class RefreshToken {
 		 */
 		$maybe_refresh = apply_filters(
 			PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_maybe_refresh_token',
-			$refresh_date + $expires_in - 2 * DAY_IN_SECONDS <= time()
+			( $refresh_time + $expires_in - 2 * DAY_IN_SECONDS ) <= time()
 		);
-
-		// Translators: %s is the value of $maybe_refresh.
-		$refresh_log = sprintf( 'Should refresh pinterest access token: %s', wc_bool_to_string( $maybe_refresh ) );
-		Logger::log( $refresh_log, WC_Log_Levels::DEBUG, 'pinterest-for-woocommerce' );
 
 		if ( $maybe_refresh ) {
 			try {
-				$endpoint = Pinterest_For_Woocommerce::get_connection_proxy_url() . 'renew/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE;
-				$options  = array(
-					'headers' => array(
-						'Content-Type' => 'application/x-www-form-urlencoded',
-					),
-					'body'    => array(
-						'refresh_token' => Crypto::decrypt( $token_data['refresh_token'] ),
-						'url'           => get_site_url(),
-					),
-					'sslverify' => false,
-				);
-
-				// Translators: %1$s is the endpoint, %2$s is the options.
-				$request_log = sprintf( 'Refresh token request to %1$s with %2$s', $endpoint, json_encode( $options ) );
-				Logger::log( $request_log, WC_Log_Levels::DEBUG, 'pinterest-for-woocommerce' );
-
-				$response = wp_safe_remote_post( $endpoint, $options );
-				$body     = trim( wp_remote_retrieve_body( $response ) );
-
-				Logger::log( $body, WC_Log_Levels::DEBUG, 'pinterest-for-woocommerce' );
-
-				$body = json_decode( $body, true );
-				Pinterest_For_Woocommerce::save_token_data( $body );
+				$refreshed_token_data = self::refresh_token( $token_data );
+				Pinterest_For_Woocommerce::save_token_data( $refreshed_token_data );
 			} catch ( Exception $e ) {
-				Logger::log( $e->getMessage(), WC_Log_Levels::ERROR, 'pinterest-for-woocommerce' );
+				self::log( $e->getMessage(), WC_Log_Levels::ERROR );
 				return false;
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Refreshes the token by sending a request to the Pinterest API.
+	 *
+	 * @param array $token_data The token data to be refreshed.
+	 *
+	 * @return array|false The refreshed token data or false if the request failed.
+	 */
+	private static function refresh_token( $token_data ) {
+		$endpoint = Pinterest_For_Woocommerce::get_connection_proxy_url() . 'renew/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE;
+		$options  = array(
+			'headers' => array(
+				'Content-Type' => 'application/x-www-form-urlencoded',
+			),
+			'body'    => array(
+				'refresh_token' => Crypto::decrypt( $token_data['refresh_token'] ),
+				'url'           => get_site_url(),
+			),
+			'sslverify' => false,
+		);
+
+		// Translators: %s is the endpoint.
+		$request_log = sprintf( __( 'Refresh token request to %s.', 'pinterest-for-woocommerce' ), $endpoint );
+		self::log( $request_log );
+
+		$response = wp_safe_remote_post( $endpoint, $options );
+
+		if ( is_wp_error( $response ) ) {
+			throw new Exception( $response->get_error_message() );
+		}
+
+		$body = trim( wp_remote_retrieve_body( $response ) );
+		$body = json_decode( $body, true );
+
+		$response['body'] = "**************";
+		self::log( $response );
+
+		if ( ! is_array( $body ) || ! isset( $body['access_token'], $body['expires_in'] ) ) {
+			return false;
+		}
+
+		return $body;
+	}
+
+	/**
+	 * Logs a message to the log file.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $message The message to be logged.
+	 * @param string $level The level of the message.
+	 *
+	 * @return void
+	 */
+	public static function log( $message, $level = WC_Log_Levels::DEBUG ) {
+		Logger::log( $message, $level, 'pinterest-for-woocommerce-oauth-refresh' );
 	}
 }

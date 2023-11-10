@@ -729,7 +729,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$token['refresh_token']            = empty( $token['refresh_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['refresh_token'] );
 			$token['refresh_token_expires_in'] = $token['refresh_token_expires_in'] ?? '';
 			$token['scopes']        = empty( $token['scopes'] ) ? '' : $token['scopes'];
-			$token['refresh_date']  = time();
+			$token['refresh_time']             = time();
 
 			return self::save_data( 'token_data', $token );
 		}
