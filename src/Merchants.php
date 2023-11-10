@@ -174,7 +174,7 @@ class Merchants {
 
 		$merchant_id = $response['data'];
 
-		Feeds::invalidate_get_merchant_feeds_cache( $merchant_id, true );
+		Feeds::invalidate_get_ad_account_feeds_cache();
 
 		try {
 			$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( $response['data'] );

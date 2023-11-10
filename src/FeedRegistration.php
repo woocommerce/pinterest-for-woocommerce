@@ -173,7 +173,7 @@ class FeedRegistration {
 	private static function feed_enable_status_maintenance( $merchant_id, $feed_id ) {
 		// Check if the feed is enabled. If not, enable it.
 		if ( ! Feeds::is_local_feed_enabled( $merchant_id, $feed_id ) ) {
-			Feeds::enabled_feed( $merchant_id, $feed_id );
+			Feeds::enabled_feed( $feed_id );
 		}
 
 		// Cleanup feeds that are registered but not in the local feed configurations.
@@ -231,9 +231,9 @@ class FeedRegistration {
 			}
 
 			// Only disable feeds that are registered as WooCommerce integration.
-			if ( 'WOOCOMMERCE' !== $feed->integration_platform_type ) {
+			/*if ( 'WOOCOMMERCE' !== $feed->integration_platform_type ) {
 				continue;
-			}
+			}*/
 
 			/**
 			 * Disable feeds only if their file URL matches, using the directory path for accurate identification. This
@@ -249,13 +249,13 @@ class FeedRegistration {
 
 			// Disable the feed if it is active.
 			if ( 'ACTIVE' === $feed['status'] ) {
-				Feeds::disable_feed( $merchant_id, $feed['id'] );
+				Feeds::disable_feed( $feed['id'] );
 				$invalidate_cache = true;
 			}
 		}
 
 		if ( $invalidate_cache ) {
-			Feeds::invalidate_get_merchant_feeds_cache( $merchant_id );
+			Feeds::invalidate_get_ad_account_feeds_cache();
 		}
 	}
 

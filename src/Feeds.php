@@ -16,6 +16,7 @@ use Automattic\WooCommerce\Pinterest\API\APIV5;
 use \Exception;
 use Automattic\WooCommerce\Pinterest\API\Base;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
+use Throwable;
 
 /**
  * Class handling fetch methods for feed profiles.
@@ -71,12 +72,13 @@ class Feeds {
 	/**
 	 * Invalidate the merchant feeds cache.
 	 *
-	 * @since 1.2.13
-	 * @param string $merchant_id The merchant ID.
+	 * @since x.x.x
+	 *
 	 * @return void
 	 */
-	public static function invalidate_get_merchant_feeds_cache( $merchant_id ) {
-		API\Base::invalidate_merchant_feeds_cache( $merchant_id, true );
+	public static function invalidate_get_ad_account_feeds_cache() {
+		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+		APIV5::invalidate_ad_account_feeds_cache( $ad_account_id );
 	}
 
 	/**
@@ -129,22 +131,20 @@ class Feeds {
 	/**
 	 * Enabled the feed.
 	 *
-	 * @since 1.2.13
+	 * @since x.x.x
 	 *
-	 * @param string $merchant_id     The merchant ID.
-	 * @param string $feed_profile_id The ID of the feed.
+	 * @param string $feed_id The ID of the feed.
 	 *
 	 * @return bool True if the feed is has been enabled, false otherwise.
 	 */
-	public static function enabled_feed( $merchant_id, $feed_profile_id ) {
+	public static function enabled_feed( $feed_id ) {
 		try {
-			$result = Base::enable_merchant_feed( $merchant_id, $feed_profile_id );
-
+			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+			APIV5::enable_merchant_feed( $ad_account_id, $feed_id );
 			// We don't need to check the status, lets just invalidate the cache for extra safety.
-			self::invalidate_get_merchant_feeds_cache( $merchant_id, true );
-
-			return 'success' === $result['status'];
-		} catch ( \Throwable $th ) {
+			self::invalidate_get_ad_account_feeds_cache();
+			return true;
+		} catch ( Throwable $th ) {
 			Logger::log( $th->getMessage(), 'error' );
 			return false;
 		}
@@ -153,19 +153,18 @@ class Feeds {
 	/**
 	 * Enabled the feed.
 	 *
-	 * @since 1.2.13
+	 * @since x.x.x
 	 *
-	 * @param string $merchant_id     The merchant ID.
-	 * @param string $feed_profile_id The ID of the feed.
+	 * @param string $feed_id The ID of the feed.
 	 *
 	 * @return bool True if the feed is has been disabled, false otherwise.
 	 */
-	public static function disable_feed( $merchant_id, $feed_profile_id ) {
+	public static function disable_feed( $feed_id ) {
 		try {
-			$result = Base::disable_merchant_feed( $merchant_id, $feed_profile_id );
-
-			return 'success' === $result['status'];
-		} catch ( \Throwable $th ) {
+			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+			APIV5::disable_merchant_feed( $ad_account_id, $feed_id );
+			return true;
+		} catch ( Throwable $th ) {
 			Logger::log( $th->getMessage(), 'error' );
 			return false;
 		}

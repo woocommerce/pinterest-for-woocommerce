@@ -374,4 +374,60 @@ class APIV5 extends Base {
 			MINUTE_IN_SECONDS
 		);
 	}
+
+	/**
+	 * Invalidate the ad account's feeds cache.
+	 *
+	 * @param string $ad_account_id Ad Account ID.
+	 *
+	 * @return void
+	 */
+	public static function invalidate_ad_account_feeds_cache( $ad_account_id ) {
+		$args = array(
+			'ad_account_id' => $ad_account_id,
+			'page_size'     => 25, // Default page size.
+		);
+		self::invalidate_cached_response(
+			'catalogs/feeds',
+			'GET',
+			$args,
+			'',
+		);
+	}
+
+	/**
+	 * Enable a feed.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $feed_id The ID of the feed to be enabled.
+	 *
+	 * @return mixed
+	 */
+	public static function enable_merchant_feed( $merchant_id, $feed_id ) {
+		return static::update_feed_status( $feed_id, 'ACTIVE' );
+	}
+
+	/**
+	 * Disable a feed.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $feed_id The ID of the feed to be disabled.
+	 *
+	 * @return mixed
+	 */
+	public static function disable_merchant_feed( $merchant_id, $feed_id ) {
+		return static::update_feed_status( $feed_id, 'INACTIVE' );
+	}
+
+	private static function update_feed_status( $feed_id, $status ) {
+		return self::make_request(
+			"catalog/feeds/{$feed_id}",
+			'PATCH',
+			array(
+				'status' => 'INACTIVE',
+			),
+		);
+	}
 }
