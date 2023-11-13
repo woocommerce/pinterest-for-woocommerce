@@ -231,9 +231,11 @@ class FeedRegistration {
 			}
 
 			// Only disable feeds that are registered as WooCommerce integration.
-			/*if ( 'WOOCOMMERCE' !== $feed->integration_platform_type ) {
+			/*
+			if ( 'WOOCOMMERCE' !== $feed->integration_platform_type ) {
 				continue;
-			}*/
+			}
+			*/
 
 			/**
 			 * Disable feeds only if their file URL matches, using the directory path for accurate identification. This

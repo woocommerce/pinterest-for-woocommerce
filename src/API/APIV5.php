@@ -9,6 +9,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
 use Exception;
@@ -330,7 +331,7 @@ class APIV5 extends Base {
 	/**
 	 * Get merchant's feeds.
 	 *
-	 * @param string $ad_account_id
+	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 *
 	 * @return array {
 	 *      List of feeds.
@@ -400,12 +401,13 @@ class APIV5 extends Base {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $feed_id The ID of the feed to be enabled.
+	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 * @param string $feed_id       The ID of the feed to be enabled.
 	 *
 	 * @return mixed
 	 */
-	public static function enable_merchant_feed( $merchant_id, $feed_id ) {
-		return static::update_feed_status( $feed_id, 'ACTIVE' );
+	public static function enable_merchant_feed( $ad_account_id, $feed_id ) {
+		return static::update_feed_status( $feed_id, Feeds::FEED_STATUS_ACTIVE, $ad_account_id );
 	}
 
 	/**
@@ -413,20 +415,33 @@ class APIV5 extends Base {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $feed_id The ID of the feed to be disabled.
+	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 * @param string $feed_id       The ID of the feed to be disabled.
 	 *
 	 * @return mixed
 	 */
-	public static function disable_merchant_feed( $merchant_id, $feed_id ) {
-		return static::update_feed_status( $feed_id, 'INACTIVE' );
+	public static function disable_merchant_feed( $ad_account_id, $feed_id ) {
+		return static::update_feed_status( $feed_id, Feeds::FEED_STATUS_INACTIVE, $ad_account_id );
 	}
 
-	private static function update_feed_status( $feed_id, $status ) {
+	/**
+	 * Update a feed status.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $feed_id       The ID of the feed to be updated.
+	 * @param string $status        The status to be set.
+	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 *
+	 * @return array
+	 * @throws ApiException
+	 */
+	private static function update_feed_status( $feed_id, $status, $ad_account_id ) {
 		return self::make_request(
-			"catalog/feeds/{$feed_id}",
+			"catalog/feeds/{$feed_id}?ad_account_id={$ad_account_id}",
 			'PATCH',
 			array(
-				'status' => 'INACTIVE',
+				'status' => $status,
 			),
 		);
 	}

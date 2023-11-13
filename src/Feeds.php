@@ -23,6 +23,10 @@ use Throwable;
  */
 class Feeds {
 
+	const FEED_STATUS_ACTIVE = 'ACTIVE';
+
+	const FEED_STATUS_INACTIVE = 'INACTIVE';
+
 	/**
 	 * Get a specific merchant feed using the given arguments.
 	 *
