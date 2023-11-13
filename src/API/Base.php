@@ -286,7 +286,7 @@ class Base {
 
 		try {
 			if ( $request['auth_header'] ) {
-				$request['headers']['Authorization'] = 'Bearer ' . self::get_token()['access_token'];
+				$request['headers']['Authorization'] = 'Bearer ' . static::get_token()['access_token'];
 			}
 
 			$request_args = array(
