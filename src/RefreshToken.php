@@ -73,6 +73,10 @@ class RefreshToken {
 	 *
 	 * @param array $token_data The token data to be refreshed.
 	 *
+	 * @since x.x.x
+	 *
+	 * @throws Exception If the request fails.
+	 *
 	 * @return array|false The refreshed token data or false if the request failed.
 	 */
 	private static function refresh_token( $token_data ) {
@@ -101,7 +105,7 @@ class RefreshToken {
 		$body = trim( wp_remote_retrieve_body( $response ) );
 		$body = json_decode( $body, true );
 
-		$response['body'] = "**************";
+		$response['body'] = '**************';
 		self::log( $response );
 
 		if ( ! is_array( $body ) || ! isset( $body['access_token'], $body['expires_in'] ) ) {
