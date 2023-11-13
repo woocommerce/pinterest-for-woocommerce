@@ -11,7 +11,6 @@ namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
-use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
 use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -68,7 +67,7 @@ class APIV5 extends Base {
 	 *      @type int $following_count  User account following count.
 	 *      @type int $monthly_views    User account monthly views.
 	 * }
-	 * @throws ApiException Throws 403 and 500 exceptions.
+	 * @throws PinterestApiException Throws 403 and 500 exceptions.
 	 */
 	public static function get_account_info() {
 		return self::make_request( 'user_account', 'GET' );
@@ -110,7 +109,7 @@ class APIV5 extends Base {
 	 *     }
 	 *     @type string $bookmark
 	 * }
-	 * @throws ApiException Throws 403 and 500 exceptions.
+	 * @throws PinterestApiException Throws 403 and 500 exceptions.
 	 */
 	public static function get_user_websites() {
 		return self::make_request( 'user_account/websites', 'GET' );
@@ -130,7 +129,7 @@ class APIV5 extends Base {
 	 *      @type string $image_large_url
 	 *      @type string $image_xlarge_url
 	 * }
-	 * @throws ApiException Throws 500 exception in case of unexpected error.
+	 * @throws PinterestApiException Throws 500 exception in case of unexpected error.
 	 */
 	public static function get_linked_businesses() {
 		return self::make_request( 'user_account/businesses', 'GET' );
@@ -183,7 +182,7 @@ class APIV5 extends Base {
 	 *      }
 	 * }
 	 *
-	 * @throws ApiException|Exception Throws 500 exception.
+	 * @throws PinterestApiException|Exception Throws 500 exception.
 	 */
 	public static function get_advertiser_tags( $ad_account_id ) {
 		return self::make_request( "ad_accounts/{$ad_account_id}/conversion_tags", 'GET' );
@@ -224,7 +223,7 @@ class APIV5 extends Base {
 	 *          @type bool    $aem_loc_enabled     Whether Automatic Enhanced Match location is enabled.
 	 *      }
 	 * }
-	 * @throws ApiException Throws 500 exception in case of unexpected error.
+	 * @throws PinterestApiException Throws 500 exception in case of unexpected error.
 	 */
 	public static function get_advertiser_tag( $ad_account_id, $conversion_tag_id ) {
 		return self::make_request( "ad_accounts/{$ad_account_id}/conversion_tags/{$conversion_tag_id}", 'GET' );
@@ -262,7 +261,7 @@ class APIV5 extends Base {
 	 *          @type ?bool $aem_loc_enabled    Whether Automatic Enhanced Match location is enabled.
 	 *      }
 	 * }
-	 * @throws ApiException|Exception Throws 500 exception.
+	 * @throws PinterestApiException|Exception Throws 500 exception.
 	 */
 	public static function create_tag( $ad_account_id ) {
 		$tag_name = self::get_tag_name();
@@ -434,7 +433,7 @@ class APIV5 extends Base {
 	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 *
 	 * @return array
-	 * @throws ApiException
+	 * @throws PinterestApiException If API request ends up other than 2xx status.
 	 */
 	private static function update_feed_status( $feed_id, $status, $ad_account_id ) {
 		return self::make_request(

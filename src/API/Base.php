@@ -9,11 +9,9 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
-use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
-use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
-use \Exception;
+use Exception;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -105,7 +103,7 @@ class Base {
 
 			return $response;
 
-		} catch ( ApiException $e ) {
+		} catch ( PinterestApiException $e ) {
 
 			if ( ! empty( Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' ) ) ) {
 				/* Translators: 1: Error message 2: Stack trace */
@@ -269,8 +267,8 @@ class Base {
 	 *
 	 * @return array
 	 *
-	 * @throws Exception PHP exception.
-	 * @throws ApiException PHP exception.
+	 * @throws Exception             PHP exception.
+	 * @throws PinterestApiException PHP exception.
 	 */
 	protected static function handle_request( $request ) {
 
@@ -335,7 +333,7 @@ class Base {
 			}
 
 			/* Translators: Additional message */
-			throw new ApiException(
+			throw new PinterestApiException(
 				array(
 					'message'       => $message,
 					'response_body' => $body,
