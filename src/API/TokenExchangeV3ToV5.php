@@ -9,6 +9,9 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest\Crypto;
+use Automattic\WooCommerce\Pinterest\Logger;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -72,7 +75,16 @@ class TokenExchangeV3ToV5 extends APIV5 {
 	 * @return string $token The V3 token.
 	 */
 	public static function get_token() {
-		return Pinterest_For_Woocommerce()::get_data( 'token', true );
+		$token = Pinterest_For_Woocommerce()::get_data( 'token', true );
+
+		try {
+			$token['access_token'] = empty( $token['access_token'] ) ? '' : Crypto::decrypt( $token['access_token'] );
+		} catch ( \Exception $th ) {
+			/* Translators: The error description */
+			Logger::log( sprintf( esc_html__( 'Could not decrypt the Pinterest API access token. Try reconnecting to Pinterest. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() ), 'error' );
+		}
+
+		return $token;
 	}
 
 }
