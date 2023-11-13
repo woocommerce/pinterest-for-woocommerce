@@ -362,14 +362,10 @@ class APIV5 extends Base {
 	 * @throws PinterestApiException If the request fails with 500 status.
 	 */
 	public static function get_ad_account_feeds( $ad_account_id ) {
-		$args = array(
-			'ad_account_id' => $ad_account_id,
-			'page_size'     => 25, // Default page size.
-		);
 		return self::make_request(
-			'catalogs/feeds',
+			"catalogs/feeds?ad_account_id={$ad_account_id}",
 			'GET',
-			$args,
+			array(),
 			'',
 			MINUTE_IN_SECONDS
 		);
@@ -383,15 +379,9 @@ class APIV5 extends Base {
 	 * @return void
 	 */
 	public static function invalidate_ad_account_feeds_cache( $ad_account_id ) {
-		$args = array(
-			'ad_account_id' => $ad_account_id,
-			'page_size'     => 25, // Default page size.
-		);
 		self::invalidate_cached_response(
-			'catalogs/feeds',
+			"catalogs/feeds?ad_account_id={$ad_account_id}",
 			'GET',
-			$args,
-			'',
 		);
 	}
 
@@ -442,6 +432,13 @@ class APIV5 extends Base {
 			array(
 				'status' => $status,
 			),
+		);
+	}
+
+	public static function get_feed_processing_results( $feed_id, $ad_account_id ) {
+		return self::make_request(
+			"catalogs/feeds/{$feed_id}/processing_results?ad_account_id={$ad_account_id}",
+			'GET'
 		);
 	}
 }

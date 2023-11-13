@@ -205,4 +205,17 @@ class Feeds {
 		return reset( $feed_report['data']->workflows );
 	}
 
+	/**
+	 * Get the latest Workflow of the active feed related to the last attempt to process and ingest our feed.
+	 *
+	 * @param string $feed_id       Pinterest feed ID.
+	 * @param string $ad_account_id Pinterest ad account ID.
+	 * @param string $bookmark      Bookmark to fetch results from.
+	 * @param int    $per_page      Number of results to fetch per page.
+	 *
+	 * @return void
+	 */
+	public static function get_feed_processing_results( $feed_id, $ad_account_id, $bookmark = '', $per_page = 25 ) {
+
+	}
 }
