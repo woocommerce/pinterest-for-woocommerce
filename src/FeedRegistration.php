@@ -135,19 +135,11 @@ class FeedRegistration {
 	 * @throws Exception PHP Exception.
 	 */
 	private static function register_feed() {
-
-		$merchant_id = self::check_merchant_approval_status();
-
-		if ( ! $merchant_id ) {
-			return false;
-		}
-
-		$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( $merchant_id );
+		$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds();
 
 		// If no matching registered feed found try to create it.
 		if ( ! $feed_id ) {
-			$response = Merchants::update_or_create_merchant();
-			$feed_id  = $response['feed_id'] ?? '';
+			$feed_id = Feeds::create_feed();
 		}
 
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $feed_id );
@@ -156,7 +148,7 @@ class FeedRegistration {
 			return false;
 		}
 
-		self::feed_enable_status_maintenance( $merchant_id, $feed_id );
+		self::feed_enable_status_maintenance( $feed_id );
 		return true;
 	}
 
@@ -166,37 +158,19 @@ class FeedRegistration {
 	 * Disable all other feed configurations for the merchant.
 	 *
 	 * @since 1.2.13
-	 * @param string $merchant_id Merchant ID.
+	 *
 	 * @param string $feed_id Feed ID.
+	 *
 	 * @return void
 	 */
-	private static function feed_enable_status_maintenance( $merchant_id, $feed_id ) {
+	private static function feed_enable_status_maintenance( $feed_id ) {
 		// Check if the feed is enabled. If not, enable it.
-		if ( ! Feeds::is_local_feed_enabled( $merchant_id, $feed_id ) ) {
+		if ( ! Feeds::is_local_feed_enabled( $feed_id ) ) {
 			Feeds::enabled_feed( $feed_id );
 		}
 
 		// Cleanup feeds that are registered but not in the local feed configurations.
-		self::maybe_disable_stale_feeds_for_merchant( $merchant_id, $feed_id );
-	}
-
-	/**
-	 * Check if the merchant is approved.
-	 * This is a helper function for the register_feed method.
-	 *
-	 * @return mixed False if the merchant is not approved, merchant id otherwise.
-	 */
-	private static function check_merchant_approval_status() {
-
-		$merchant = Merchants::get_merchant();
-
-		if ( ! empty( $merchant['data']->id ) && 'declined' === $merchant['data']->product_pin_approval_status ) {
-
-			self::log( 'Pinterest returned a Declined status for product_pin_approval_status' );
-			return false;
-		}
-
-		return $merchant['data']->id;
+		self::maybe_disable_stale_feeds_for_merchant( $feed_id );
 	}
 
 	/**
@@ -205,13 +179,12 @@ class FeedRegistration {
 	 *
 	 * @since 1.2.13
 	 *
-	 * @param string $merchant_id Merchant ID.
 	 * @param string $feed_id Feed ID.
 	 *
 	 * @return void
 	 */
-	public static function maybe_disable_stale_feeds_for_merchant( $merchant_id, $feed_id ) {
-		$feeds = Feeds::get_ad_account_feeds();
+	public static function maybe_disable_stale_feeds_for_merchant( $feed_id ) {
+		$feeds = Feeds::get_feeds();
 
 		if ( empty( $feeds ) ) {
 			return;
@@ -257,7 +230,7 @@ class FeedRegistration {
 		}
 
 		if ( $invalidate_cache ) {
-			Feeds::invalidate_get_ad_account_feeds_cache();
+			Feeds::invalidate_feeds_cache();
 		}
 	}
 

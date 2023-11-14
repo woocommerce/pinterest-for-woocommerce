@@ -243,11 +243,11 @@ class Base {
 	 * @param array  $payload  Request payload.
 	 * @param string $api      Request API.
 	 *
-	 * @return void
+	 * @return bool True if the transient was deleted, false otherwise.
 	 */
-	public static function invalidate_cached_response( $endpoint, $method, $payload, $api ) {
+	public static function invalidate_cached_response( $endpoint, $method, $payload, $api ): bool {
 		$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
-		delete_transient( $cache_key );
+		return delete_transient( $cache_key );
 	}
 
 	/**
@@ -660,7 +660,7 @@ class Base {
 	 *
 	 * @return mixed
 	 */
-	public static function disable_merchant_feed( $merchant_id, $feed_profile_id ) {
+	public static function disable_feed($merchant_id, $feed_profile_id ) {
 		return self::make_request(
 			"catalogs/disable_feed_profile/{$merchant_id}/{$feed_profile_id}/"
 		);
@@ -676,7 +676,7 @@ class Base {
 	 *
 	 * @return mixed
 	 */
-	public static function enable_merchant_feed( $merchant_id, $feed_profile_id ) {
+	public static function enable_feed($merchant_id, $feed_profile_id ) {
 		return self::make_request(
 			"catalogs/enable_feed_profile/{$merchant_id}/{$feed_profile_id}/"
 		);

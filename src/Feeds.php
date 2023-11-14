@@ -13,9 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
-use \Exception;
 use Automattic\WooCommerce\Pinterest\API\Base;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
+use Exception;
 use Throwable;
 
 /**
@@ -28,6 +28,78 @@ class Feeds {
 	const FEED_STATUS_INACTIVE = 'INACTIVE';
 
 	/**
+	 * Create a new feed for the given ad account.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return string The Feed ID or an empty string if failed.
+	 * @throws Exception PHP Exception if there is an error creating the feed, and we are throttling the requests.
+	 */
+	public static function create_feed(): string {
+		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
+		$config        = reset( $configs );
+
+		/**
+		 * Filters the default merchant name: pinterest_for_woocommerce_default_merchant_name.
+		 * This vale appears in the feed configuration page in Pinterest.
+		 *
+		 * @param string $feed_name The default feed name.
+		 */
+		$feed_name = apply_filters(
+			'pinterest_for_woocommerce_default_merchant_name',
+			esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' )
+		);
+
+		$data = array(
+			'name'                          => $feed_name,
+			'format'                        => 'XML',
+			'location'                      => $config['feed_url'],
+			'catalog_type'                  => 'RETAIL',
+			'default_currency'              => get_woocommerce_currency(),
+			'default_locale'                => LocaleMapper::get_locale_for_api(),
+			'default_country'               => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
+			'default_availability'          => 'IN_STOCK',
+		);
+
+		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( wp_json_encode( $data ) );
+		$cache     = get_transient( $cache_key );
+
+		if ( false !== $cache ) {
+			throw new Exception(
+				__( 'There was a previous error trying to create a feed.', 'pinterest-for-woocommerce' ),
+				(int) $cache
+			);
+		}
+
+		try {
+			$feed = APIV5::create_feed( $data, $ad_account_id );
+		} catch ( Throwable $th ) {
+			$delay = Pinterest_For_Woocommerce()::get_data( 'create_feed_delay' ) ?? MINUTE_IN_SECONDS;
+			set_transient( $cache_key, $th->getCode(), $delay );
+			// Double the delay.
+			Pinterest_For_Woocommerce()::save_data(
+				'create_feed_delay',
+				min( $delay * 2, 6 * HOUR_IN_SECONDS )
+			);
+			throw new Exception( $th->getMessage(), $th->getCode() );
+		}
+
+		static::invalidate_feeds_cache();
+
+		try {
+			$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( array( $feed ) );
+		} catch ( Throwable $th ) {
+			$feed_id = '';
+		}
+
+		// Clean the cached delay.
+		Pinterest_For_Woocommerce()::save_data( 'create_feed_delay', false );
+
+		return $feed_id;
+	}
+
+	/**
 	 * Get a specific merchant feed using the given arguments.
 	 *
 	 * @param string $feed_id     The ID of the feed.
@@ -36,10 +108,10 @@ class Feeds {
 	 *
 	 * @throws Exception PHP Exception.
 	 */
-	public static function get_ad_account_feed( $feed_id ) {
+	public static function get_feed( $feed_id ) {
 		try {
 			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
-			$feeds         = APIV5::get_ad_account_feeds( $ad_account_id );
+			$feeds         = APIV5::get_feeds( $ad_account_id );
 			foreach ( $feeds['items'] as $feed ) {
 				// Get the feed with the requested id if exists.
 				if ( $feed_id === $feed['id'] ) {
@@ -60,14 +132,14 @@ class Feeds {
 	 *
 	 * @return array The feed profile objects.
 	 *
-	 * @throws Exception PHP Exception.
+	 * @throws PinterestApiException Pinterest API Exception.
 	 */
-	public static function get_ad_account_feeds() {
+	public static function get_feeds(): array {
 		try {
 			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
-			$feeds         = APIV5::get_ad_account_feeds( $ad_account_id );
+			$feeds         = APIV5::get_feeds( $ad_account_id );
 			return $feeds['items'] ?? [];
-		} catch ( Exception $e ) {
+		} catch ( PinterestApiException $e ) {
 			Logger::log( $e->getMessage(), 'error' );
 			throw $e;
 		}
@@ -80,37 +152,39 @@ class Feeds {
 	 *
 	 * @return void
 	 */
-	public static function invalidate_get_ad_account_feeds_cache() {
+	public static function invalidate_feeds_cache() {
 		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
-		APIV5::invalidate_ad_account_feeds_cache( $ad_account_id );
+		APIV5::invalidate_feeds_cache( $ad_account_id );
 	}
 
 	/**
 	 * Verify if the local feed is already registered to the merchant.
 	 * Return its ID if it is.
 	 *
-	 * @param string $merchant_id The merchant ID.
+	 * @param array $feeds The list of feeds to check against. If not set, the list will be fetched from the API.
 	 *
-	 * @throws PinterestApiLocaleException No valid locale found to check for the registered feed.
 	 * @return string Returns the ID of the feed if properly registered or an empty string otherwise.
+	 * @throws PinterestApiException Pinterest API Exception.
+	 * @throws PinterestApiLocaleException No valid locale found to check for the registered feed.
 	 */
-	public static function match_local_feed_configuration_to_registered_feeds( $merchant_id ) {
+	public static function match_local_feed_configuration_to_registered_feeds( array $feeds = array() ): string {
 		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
 		$config        = reset( $configs );
 		$local_path    = $config['feed_url'];
 		$local_country = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
 		$local_locale  = LocaleMapper::get_locale_for_api();
-		$feeds         = self::get_ad_account_feeds();
+
+		if ( empty( $feeds ) ) {
+			$feeds = self::get_feeds();
+		}
 
 		foreach ( $feeds as $feed ) {
-			$configured_path = $feed->location_config->full_feed_fetch_location;
-			if (
-				$configured_path === $local_path &&
-				$local_country === $feed->country &&
-				$local_locale === $feed->locale
-			) {
+			$does_match = $local_path === $feed['location'];
+			$does_match = $does_match && $local_country === $feed['default_country'];
+			$does_match = $does_match && $local_locale === $feed['default_locale'];
+			if ( $does_match ) {
 				// We can assume we're on the same site.
-				return $feed->id;
+				return $feed['id'];
 			}
 		}
 
@@ -122,13 +196,12 @@ class Feeds {
 	 *
 	 * @since 1.2.13
 	 *
-	 * @param string $merchant_id     The merchant ID.
 	 * @param string $feed_profile_id The ID of the feed.
 	 *
 	 * @return bool True if the feed is active, false otherwise.
 	 */
-	public static function is_local_feed_enabled( $merchant_id, $feed_profile_id ) {
-		$feed = self::get_ad_account_feed( $feed_profile_id );
+	public static function is_local_feed_enabled( $feed_profile_id ) {
+		$feed = self::get_feed( $feed_profile_id );
 		return 'ACTIVE' === $feed->feed_status;
 	}
 
@@ -144,9 +217,9 @@ class Feeds {
 	public static function enabled_feed( $feed_id ) {
 		try {
 			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
-			APIV5::enable_merchant_feed( $ad_account_id, $feed_id );
+			APIV5::enable_feed( $ad_account_id, $feed_id );
 			// We don't need to check the status, lets just invalidate the cache for extra safety.
-			self::invalidate_get_ad_account_feeds_cache();
+			self::invalidate_feeds_cache();
 			return true;
 		} catch ( Throwable $th ) {
 			Logger::log( $th->getMessage(), 'error' );
@@ -166,7 +239,7 @@ class Feeds {
 	public static function disable_feed( $feed_id ) {
 		try {
 			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
-			APIV5::disable_merchant_feed( $ad_account_id, $feed_id );
+			APIV5::disable_feed( $ad_account_id, $feed_id );
 			return true;
 		} catch ( Throwable $th ) {
 			Logger::log( $th->getMessage(), 'error' );
@@ -206,16 +279,18 @@ class Feeds {
 	}
 
 	/**
-	 * Get the latest Workflow of the active feed related to the last attempt to process and ingest our feed.
+	 * Get the latest report of the active feed related to the last attempt to process and ingest our feed.
 	 *
 	 * @param string $feed_id       Pinterest feed ID.
-	 * @param string $ad_account_id Pinterest ad account ID.
-	 * @param string $bookmark      Bookmark to fetch results from.
-	 * @param int    $per_page      Number of results to fetch per page.
+	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 *
-	 * @return void
+	 * @return array The feed ingestion and processing report or null.
 	 */
-	public static function get_feed_processing_results( $feed_id, $ad_account_id, $bookmark = '', $per_page = 25 ) {
-
+	public static function get_feed_processing_results( $feed_id, $ad_account_id ): array {
+		$feed_report   = APIV5::get_feed_processing_results( $feed_id, $ad_account_id );
+		if ( empty( $feed_report ) ) {
+			return array();
+		}
+		return $feed_report;
 	}
 }
