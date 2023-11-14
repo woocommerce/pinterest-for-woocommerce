@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.14 - 2023-11-14 =
+* Tweak - Add Pinterest businesses API exception handling.
+
 = 1.3.13 - 2023-11-07 =
 * Fix - Doc - Use new Woo.com domain.
 * Tweak - WC 8.3 compatibility.
