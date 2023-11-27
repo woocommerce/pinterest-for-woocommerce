@@ -79,17 +79,18 @@ class APIV5 extends Base {
 	 * @since x.x.x
 	 *
 	 * @return array {
-	 *     Ad Accounts countries
+	 *      Ad Accounts countries
 	 *
-	 *     @type array[]  $items {
-	 *         @type string $code     Country ID from ISO 3166-1 alpha-2.
-	 *         @type string $currency Country currency.
-	 *         @type int    $index    Country index
-	 *         @type string $name     Country name.
-	 *     }
+	 *      @type array[] $items {
+	 *          @type string $code Country ID from ISO 3166-1 alpha-2.
+	 *          @type string $currency Country currency.
+	 *          @type int $index Country index
+	 *          @type string $name Country name.
+	 *      }
 	 * }
+	 * @throws PinterestApiException
 	 */
-	public static function get_list_of_ads_supported_countries() {
+	public static function get_list_of_ads_supported_countries(): array {
 		$request_url = 'resources/ad_account_countries';
 		return self::make_request( $request_url, 'GET', array(), '', 2 * DAY_IN_SECONDS );
 	}
@@ -334,7 +335,7 @@ class APIV5 extends Base {
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/feeds/create
 	 *
-	 * @param array $data {
+	 * @param array  $data {
 	 *      Feed data.
 	 *
 	 *      @type string $name                 A human-friendly name associated to a given feed. This value is currently nullable due to historical reasons. It is expected to become non-nullable in the future.
@@ -362,9 +363,9 @@ class APIV5 extends Base {
 	 *
 	 * @return array
 	 *
-	 * @throws PinterestApiException
+	 * @throws PinterestApiException If the request fails with other than 2xx status.
 	 */
-	public static function create_feed( $data, $ad_account_id ): array {
+	public static function create_feed( array $data, string $ad_account_id ): array {
 		return self::make_request(
 			"catalogs/feeds?ad_account_id={$ad_account_id}",
 			'POST',
@@ -412,7 +413,7 @@ class APIV5 extends Base {
 	 * }
 	 * @throws PinterestApiException If the request fails with 500 status.
 	 */
-	public static function get_feeds($ad_account_id ) {
+	public static function get_feeds( string $ad_account_id ): array {
 		return self::make_request(
 			"catalogs/feeds?ad_account_id={$ad_account_id}",
 			'GET',
@@ -449,8 +450,9 @@ class APIV5 extends Base {
 	 * @param string $feed_id       The ID of the feed to be enabled.
 	 *
 	 * @return mixed
+	 * @throws PinterestApiException If API request ends up other than 2xx status.
 	 */
-	public static function enable_feed($ad_account_id, $feed_id ) {
+	public static function enable_feed( string $ad_account_id, string $feed_id ): array {
 		return static::update_feed_status( $feed_id, Feeds::FEED_STATUS_ACTIVE, $ad_account_id );
 	}
 
@@ -463,8 +465,9 @@ class APIV5 extends Base {
 	 * @param string $feed_id       The ID of the feed to be disabled.
 	 *
 	 * @return mixed
+	 * @throws PinterestApiException If API request ends up other than 2xx status.
 	 */
-	public static function disable_feed($ad_account_id, $feed_id ) {
+	public static function disable_feed( string $ad_account_id, string $feed_id ): array {
 		return static::update_feed_status( $feed_id, Feeds::FEED_STATUS_INACTIVE, $ad_account_id );
 	}
 
@@ -480,9 +483,9 @@ class APIV5 extends Base {
 	 * @return array
 	 * @throws PinterestApiException If API request ends up other than 2xx status.
 	 */
-	private static function update_feed_status( $feed_id, $status, $ad_account_id ) {
+	private static function update_feed_status( string $feed_id, string $status, string $ad_account_id ): array {
 		return self::make_request(
-			"catalog/feeds/{$feed_id}?ad_account_id={$ad_account_id}",
+			"catalogs/feeds/{$feed_id}?ad_account_id={$ad_account_id}",
 			'PATCH',
 			array(
 				'status' => $status,

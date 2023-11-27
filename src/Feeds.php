@@ -40,15 +40,22 @@ class Feeds {
 		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
 		$config        = reset( $configs );
 
+
+		$default_country  = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
+		$default_currency = get_woocommerce_currency();
+
 		/**
-		 * Filters the default merchant name: pinterest_for_woocommerce_default_merchant_name.
-		 * This vale appears in the feed configuration page in Pinterest.
+		 * Filters the default feed name: pinterest_for_woocommerce_unique_feed_name.
+		 * This vale appears in the Catalogues - Data sources page at Pinterest.
 		 *
 		 * @param string $feed_name The default feed name.
 		 */
 		$feed_name = apply_filters(
-			'pinterest_for_woocommerce_default_merchant_name',
-			esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' )
+			'pinterest_for_woocommerce_unique_feed_name',
+			esc_html__(
+				"Created by Pinterest for WooCommerce {$default_country}-{$default_currency}.",
+				'pinterest-for-woocommerce'
+			)
 		);
 
 		$data = array(
@@ -56,9 +63,9 @@ class Feeds {
 			'format'                        => 'XML',
 			'location'                      => $config['feed_url'],
 			'catalog_type'                  => 'RETAIL',
-			'default_currency'              => get_woocommerce_currency(),
+			'default_currency'              => $default_currency,
 			'default_locale'                => LocaleMapper::get_locale_for_api(),
-			'default_country'               => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
+			'default_country'               => $default_country,
 			'default_availability'          => 'IN_STOCK',
 		);
 
@@ -141,7 +148,7 @@ class Feeds {
 			return $feeds['items'] ?? [];
 		} catch ( PinterestApiException $e ) {
 			Logger::log( $e->getMessage(), 'error' );
-			throw $e;
+			return [];
 		}
 	}
 

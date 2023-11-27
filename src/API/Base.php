@@ -655,12 +655,13 @@ class Base {
 	 *
 	 * @since 1.2.13
 	 *
-	 * @param string $merchant_id     The merchant ID the feed belongs to.
+	 * @param string $merchant_id The merchant ID the feed belongs to.
 	 * @param string $feed_profile_id The ID of the feed to be disabled.
 	 *
 	 * @return mixed
+	 * @throws PinterestApiException
 	 */
-	public static function disable_feed($merchant_id, $feed_profile_id ) {
+	public static function disable_merchant_feed( $merchant_id, $feed_profile_id ): array {
 		return self::make_request(
 			"catalogs/disable_feed_profile/{$merchant_id}/{$feed_profile_id}/"
 		);
@@ -671,12 +672,13 @@ class Base {
 	 *
 	 * @since 1.2.13
 	 *
-	 * @param string $merchant_id     The merchant ID the feed belongs to.
+	 * @param string $merchant_id The merchant ID the feed belongs to.
 	 * @param string $feed_profile_id The ID of the feed to be enabled.
 	 *
 	 * @return mixed
+	 * @throws PinterestApiException
 	 */
-	public static function enable_feed($merchant_id, $feed_profile_id ) {
+	public static function enable_merchant_feed( $merchant_id, $feed_profile_id ): array {
 		return self::make_request(
 			"catalogs/enable_feed_profile/{$merchant_id}/{$feed_profile_id}/"
 		);
@@ -735,9 +737,10 @@ class Base {
 	 * Get a specific merchant's feed report using the given arguments.
 	 *
 	 * @param string $merchant_id The merchant ID the feed belongs to.
-	 * @param string $feed_id     The ID of the feed.
+	 * @param string $feed_id The ID of the feed.
 	 *
 	 * @return mixed
+	 * @throws PinterestApiException
 	 */
 	public static function get_merchant_feed_report( $merchant_id, $feed_id ) {
 		return self::make_request(
