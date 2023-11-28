@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.15 - 2023-11-28 =
+* Add - Compatibility with the Cart and Checkout blocks.
+
 = 1.3.14 - 2023-11-14 =
 * Tweak - Add Pinterest businesses API exception handling.
 
