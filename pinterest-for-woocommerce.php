@@ -13,7 +13,7 @@
  * Plugin Name:       Pinterest for WooCommerce
  * Plugin URI:        https://woo.com/products/pinterest-for-woocommerce/
  * Description:       Grow your business on Pinterest! Use this official plugin to allow shoppers to Pin products while browsing your store, track conversions, and advertise on Pinterest.
- * Version:           1.3.14
+ * Version:           1.3.15
  * Author:            WooCommerce
  * Author URI:        https://woo.com
  * License:           GPL-2.0+
@@ -46,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE', __FILE__ );
-define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', '1.3.14' ); // WRCS: DEFINED_VERSION.
+define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', '1.3.15' ); // WRCS: DEFINED_VERSION.
 
 // HPOS compatibility declaration.
 add_action(
@@ -54,6 +54,7 @@ add_action(
 	function() {
 		if ( class_exists( FeaturesUtil::class ) ) {
 			FeaturesUtil::declare_compatibility( 'custom_order_tables', plugin_basename( __FILE__ ) );
+			FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', plugin_basename( __FILE__ ) );
 		}
 	}
 );
