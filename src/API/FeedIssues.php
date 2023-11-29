@@ -58,9 +58,9 @@ class FeedIssues extends VendorAPI {
 	public function get_feed_issues( WP_REST_Request $request ) {
 
 		try {
-			$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-			$feed_id     = FeedRegistration::get_locally_stored_registered_feed_id();
-			if ( ! Pinterest\ProductSync::is_product_sync_enabled() || ! $feed_id || ! $merchant_id ) {
+			$ad_account_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
+			$feed_id       = FeedRegistration::get_locally_stored_registered_feed_id();
+			if ( ! Pinterest\ProductSync::is_product_sync_enabled() || ! $feed_id || ! $ad_account_id ) {
 				return array( 'lines' => array() );
 			}
 
@@ -70,7 +70,9 @@ class FeedIssues extends VendorAPI {
 			$per_page        = $request->has_param( 'per_page' ) ? (int) $request->get_param( 'per_page' ) : 25;
 
 			if ( false === $issues_file_url ) {
-				$workflow = Pinterest\Feeds::get_feed_latest_workflow( (string) $merchant_id, (string) $feed_id );
+
+				// $workflow = Pinterest\Feeds::get_feed_latest_workflow( (string) $merchant_id, (string) $feed_id );
+				$results = Pinterest\Feeds::get_feed_processing_results( $feed_id, $ad_account_id );
 
 				if ( $workflow && isset( $workflow->s3_validation_url ) ) {
 					$issues_file_url = $workflow->s3_validation_url;

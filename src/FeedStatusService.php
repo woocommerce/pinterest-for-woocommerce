@@ -122,24 +122,24 @@ class FeedStatusService {
 	 * @throws Exception PHP Exception.
 	 */
 	public static function get_feed_sync_status(): string {
-		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-		$feed_id     = FeedRegistration::get_locally_stored_registered_feed_id();
+		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+		$feed_id       = FeedRegistration::get_locally_stored_registered_feed_id();
+
+		if ( empty( $ad_account_id ) || empty( $feed_id ) ) {
+			throw new Exception( 'not_registered' );
+		}
 
 		try {
-			if ( empty( $merchant_id ) || empty( $feed_id ) ) {
-				throw new Exception( 'not_registered' );
-			}
-
 			try {
-				$workflow = Feeds::get_feed_latest_workflow( (string) $merchant_id, (string) $feed_id );
+				$feed_results = Feeds::get_feed_processing_results( $feed_id, $ad_account_id );
 			} catch ( Exception $e ) {
 				throw new Exception( 'error_fetching_feed' );
 			}
-			if ( ! $workflow ) {
+			if ( empty( $feed_results ) ) {
 				throw new Exception( 'no_workflows' );
 			}
 
-			$status = strtolower( $workflow->workflow_status );
+			$status = strtolower( $feed_results['status'] ?? '' );
 			if ( ! in_array(
 				$status,
 				array(
