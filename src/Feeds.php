@@ -92,7 +92,8 @@ class Feeds {
 				'create_feed_delay',
 				min( $delay * 2, 6 * HOUR_IN_SECONDS )
 			);
-			throw new Exception( esc_html( $th->getMessage() ), $th->getCode() );
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			throw new Exception( $th->getMessage(), $th->getCode() );
 		}
 
 		static::invalidate_feeds_cache();
