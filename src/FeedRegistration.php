@@ -200,8 +200,10 @@ class FeedRegistration {
 				continue;
 			}
 
-			// Disable the feed if it is active.
-			if ( Feeds::FEED_STATUS_ACTIVE === $feed['status'] ) {
+			// Disable the feed if it is active and originated from the current website.
+			$is_active_feed      = Feeds::FEED_STATUS_ACTIVE === $feed['status'];
+			$is_woocommerce_feed = 0 === strpos( $feed['location'], get_site_url() );
+			if ( $is_active_feed && $is_woocommerce_feed ) {
 				Feeds::disable_feed( $feed['id'] );
 				$invalidate_cache = true;
 			}
