@@ -13,7 +13,7 @@ class FeedFileOperationsTest extends \WP_UnitTestCase {
 	/** @var LocalFeedConfigs */
 	private $local_feed_configs;
 
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 		$this->local_feed_configs = $this->createMock( LocalFeedConfigs::class );
 		ProductFeedStatus::set( ProductFeedStatus::STATE_PROPS );

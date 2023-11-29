@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { recordEvent } from '@woocommerce/tracks';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	createInterpolateElement,
 	useCallback,
@@ -49,6 +49,7 @@ const AdCreditsNotice = () => {
 	const appSettings = useSettingsSelect();
 	const isBillingSetup = appSettings?.account_data?.is_billing_setup;
 	const trackingAdvertiser = appSettings?.tracking_advertiser;
+	const currencyCreditInfo = appSettings?.account_data?.currency_credit_info;
 
 	const closeAdCreditsNotice = () => {
 		setIsNoticeDisplayed( false );
@@ -79,16 +80,27 @@ const AdCreditsNotice = () => {
 				/>
 				{ isBillingSetup ? (
 					<Text>
-						{ __(
-							'Spend $15 to claim $125 Pinterest ad credits. (Ad credits may take up to 24 hours to be credited to account).'
+						{ sprintf(
+							// translators: %1$s: Amount of money required to spend to claim ad credits with currency. %2$s: Amount of ad credits given with currency.
+							__(
+								'Spend %1$s to claim %2$s in Pinterest ad credits. (Ad credits may take up to 24 hours to be credited to account).',
+								'pinterest-for-woocommerce'
+							),
+							currencyCreditInfo.spendRequire,
+							currencyCreditInfo.creditsGiven
 						) }
 					</Text>
 				) : (
 					<Text>
 						{ createInterpolateElement(
-							__(
-								'Spend $15 to get $125 in Pinterest ad credits. To claim the credits, <adsBillingDetails>add your billing details.</adsBillingDetails>',
-								'pinterest-for-woocommerce'
+							sprintf(
+								// translators: %1$s: Amount of money required to spend to claim ad credits with currency. %2$s: Amount of ad credits given with currency.
+								__(
+									'Spend %1$s to claim %2$s in Pinterest ad credits. To claim the credits, <adsBillingDetails>add your billing details.</adsBillingDetails>',
+									'pinterest-for-woocommerce'
+								),
+								currencyCreditInfo.spendRequire,
+								currencyCreditInfo.creditsGiven
 							),
 							{
 								adsBillingDetails: trackingAdvertiser ? (
