@@ -54,8 +54,8 @@ class Feeds {
 			sprintf(
 				// translators: %1$s is a country ISO 2 code, %2$s is a currency ISO 3 code.
 				esc_html__( 'Created by Pinterest for WooCommerce %1$s-%2$s', 'pinterest-for-woocommerce' ),
-				$default_country,
-				$default_currency
+				esc_html( $default_country ),
+				esc_html( $default_currency )
 			)
 		);
 
@@ -75,7 +75,7 @@ class Feeds {
 
 		if ( false !== $cache ) {
 			throw new Exception(
-				__( 'There was a previous error trying to create a feed.', 'pinterest-for-woocommerce' ),
+				esc_html__( 'There was a previous error trying to create a feed.', 'pinterest-for-woocommerce' ),
 				(int) $cache
 			);
 		}
@@ -90,7 +90,7 @@ class Feeds {
 				'create_feed_delay',
 				min( $delay * 2, 6 * HOUR_IN_SECONDS )
 			);
-			throw new Exception( $th->getMessage(), $th->getCode() );
+			throw new Exception( esc_html__( $th->getMessage() ), $th->getCode() );
 		}
 
 		static::invalidate_feeds_cache();
@@ -146,10 +146,10 @@ class Feeds {
 		try {
 			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 			$feeds         = APIV5::get_feeds( $ad_account_id );
-			return $feeds['items'] ?? [];
+			return $feeds['items'] ?? array();
 		} catch ( PinterestApiException $e ) {
 			Logger::log( $e->getMessage(), 'error' );
-			return [];
+			return array();
 		}
 	}
 

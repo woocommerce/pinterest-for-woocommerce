@@ -21,7 +21,7 @@ try {
 	/**
 	 * Remove the feed configuration.
 	 */
-	$data        = get_option( 'pinterest_for_woocommerce_data', [] );
+	$data        = get_option( 'pinterest_for_woocommerce_data', array() );
 	$merchant_id = $data['merchant_id'] ?? '';
 
 	if ( $merchant_id ) {
