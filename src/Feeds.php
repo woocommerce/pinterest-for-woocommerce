@@ -47,6 +47,8 @@ class Feeds {
 		 * Filters the default feed name: pinterest_for_woocommerce_unique_feed_name.
 		 * This vale appears in the Catalogues - Data sources page at Pinterest.
 		 *
+		 * @since x.x.x
+		 *
 		 * @param string $feed_name The default feed name.
 		 */
 		$feed_name = apply_filters(
@@ -90,7 +92,7 @@ class Feeds {
 				'create_feed_delay',
 				min( $delay * 2, 6 * HOUR_IN_SECONDS )
 			);
-			throw new Exception( esc_html__( $th->getMessage() ), $th->getCode() );
+			throw new Exception( esc_html( $th->getMessage() ), $th->getCode() );
 		}
 
 		static::invalidate_feeds_cache();
