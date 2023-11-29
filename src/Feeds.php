@@ -62,14 +62,14 @@ class Feeds {
 		);
 
 		$data = array(
-			'name'                          => $feed_name,
-			'format'                        => 'XML',
-			'location'                      => $config['feed_url'],
-			'catalog_type'                  => 'RETAIL',
-			'default_currency'              => $default_currency,
-			'default_locale'                => LocaleMapper::get_locale_for_api(),
-			'default_country'               => $default_country,
-			'default_availability'          => 'IN_STOCK',
+			'name'                 => $feed_name,
+			'format'               => 'XML',
+			'location'             => $config['feed_url'],
+			'catalog_type'         => 'RETAIL',
+			'default_currency'     => $default_currency,
+			'default_locale'       => LocaleMapper::get_locale_for_api(),
+			'default_country'      => $default_country,
+			'default_availability' => 'IN_STOCK',
 		);
 
 		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( wp_json_encode( $data ) );
@@ -298,7 +298,7 @@ class Feeds {
 	 * @return array The feed ingestion and processing report or null.
 	 */
 	public static function get_feed_processing_results( $feed_id, $ad_account_id ): array {
-		$feed_report   = APIV5::get_feed_processing_results( $feed_id, $ad_account_id );
+		$feed_report = APIV5::get_feed_processing_results( $feed_id, $ad_account_id );
 		if ( empty( $feed_report ) ) {
 			return array();
 		}

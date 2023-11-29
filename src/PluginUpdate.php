@@ -115,7 +115,7 @@ class PluginUpdate {
 			'1.2.5'  => array(
 				'ads_credits_integration',
 			),
-			'1.4.0' => array(
+			'1.4.0'  => array(
 				'token_update',
 			),
 		);
