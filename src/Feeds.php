@@ -51,9 +51,11 @@ class Feeds {
 		 */
 		$feed_name = apply_filters(
 			'pinterest_for_woocommerce_unique_feed_name',
-			esc_html__(
-				'Created by Pinterest for WooCommerce ' . $default_country . '-' . $default_currency,
-				'pinterest-for-woocommerce'
+			sprintf(
+				// translators: %1$s is a country ISO 2 code, %2$s is a currency ISO 3 code.
+				esc_html__( 'Created by Pinterest for WooCommerce %1$s-%2$s', 'pinterest-for-woocommerce' ),
+				$default_country,
+				$default_currency
 			)
 		);
 
