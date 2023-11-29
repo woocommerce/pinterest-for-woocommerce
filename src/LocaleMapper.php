@@ -101,9 +101,9 @@ class LocaleMapper {
 		}
 
 		// If no match was found, throw an exception.
-		// translators: %s is the locale code.
 		throw new PinterestApiLocaleException(
 			sprintf(
+				// translators: %s is the locale code.
 				__( 'No matching Pinterest API locale found for %s', 'pinterest-for-woocommerce' ),
 				$locale
 			)

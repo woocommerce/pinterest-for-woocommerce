@@ -659,7 +659,7 @@ class Base {
 	 * @param string $feed_profile_id The ID of the feed to be disabled.
 	 *
 	 * @return mixed
-	 * @throws PinterestApiException
+	 * @throws PinterestApiException If the API request fails with other than 2xx status code.
 	 */
 	public static function disable_merchant_feed( $merchant_id, $feed_profile_id ): array {
 		return self::make_request(
@@ -676,7 +676,7 @@ class Base {
 	 * @param string $feed_profile_id The ID of the feed to be enabled.
 	 *
 	 * @return mixed
-	 * @throws PinterestApiException
+	 * @throws PinterestApiException If the API request fails with other than 2xx status code.
 	 */
 	public static function enable_merchant_feed( $merchant_id, $feed_profile_id ): array {
 		return self::make_request(
@@ -740,7 +740,7 @@ class Base {
 	 * @param string $feed_id The ID of the feed.
 	 *
 	 * @return mixed
-	 * @throws PinterestApiException
+	 * @throws PinterestApiException If the API request fails with other than 2xx status code.
 	 */
 	public static function get_merchant_feed_report( $merchant_id, $feed_id ) {
 		return self::make_request(

@@ -40,7 +40,6 @@ class Feeds {
 		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
 		$config        = reset( $configs );
 
-
 		$default_country  = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
 		$default_currency = get_woocommerce_currency();
 
@@ -53,7 +52,7 @@ class Feeds {
 		$feed_name = apply_filters(
 			'pinterest_for_woocommerce_unique_feed_name',
 			esc_html__(
-				"Created by Pinterest for WooCommerce {$default_country}-{$default_currency}.",
+				sprintf( 'Created by Pinterest for WooCommerce %s-%s', $default_country, $default_currency ),
 				'pinterest-for-woocommerce'
 			)
 		);
@@ -95,7 +94,7 @@ class Feeds {
 		static::invalidate_feeds_cache();
 
 		try {
-			$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( array( $feed ) );
+			$feed_id = static::match_local_feed_configuration_to_registered_feeds( array( $feed ) );
 		} catch ( Throwable $th ) {
 			$feed_id = '';
 		}

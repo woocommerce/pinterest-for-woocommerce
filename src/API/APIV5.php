@@ -88,7 +88,7 @@ class APIV5 extends Base {
 	 *          @type string $name Country name.
 	 *      }
 	 * }
-	 * @throws PinterestApiException
+	 * @throws PinterestApiException If API request ends up other than 2xx status.
 	 */
 	public static function get_list_of_ads_supported_countries(): array {
 		$request_url = 'resources/ad_account_countries';
@@ -315,7 +315,7 @@ class APIV5 extends Base {
 	 *      @type string $status        Status of the verification process.
 	 *      @type string $verified_at   UTC timestamp when the verification happened - sometimes missing.
 	 * }
-	 * @throws PinterestApiException If the request fails with 500 status.
+	 * @throws PinterestApiException If the request fails with 2xx status.
 	 */
 	public static function domain_metatag_verification_request( string $domain ): array {
 		return self::make_request(
@@ -411,7 +411,7 @@ class APIV5 extends Base {
 	 *      }
 	 *      @type string $bookmark              Cursor used to fetch the next page of items
 	 * }
-	 * @throws PinterestApiException If the request fails with 500 status.
+	 * @throws PinterestApiException If the request fails with 2xx status.
 	 */
 	public static function get_feeds( string $ad_account_id ): array {
 		return self::make_request(
@@ -535,7 +535,7 @@ class APIV5 extends Base {
 	 *      }
 	 *      @type string $bookmark      Cursor used to fetch the next page of items
 	 * }
-	 * @throws PinterestApiException
+	 * @throws PinterestApiException If the request fails with other than 2xx status.
 	 */
 	public static function get_feed_processing_results( $feed_id, $ad_account_id ): array {
 		return self::make_request(
