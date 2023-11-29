@@ -23,7 +23,11 @@
 		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
 	</rule>
 
-	<!-- Specific excludes -->
+	<rule ref="WooCommerce.Commenting">
+		<!-- It wants @since to contain defined version and does not allow just x.x.x -->
+		<exclude name="WooCommerce.Commenting.CommentHooks.MissingSinceVersionComment"/>
+	</rule>
+
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
 		<exclude-pattern>src/*</exclude-pattern>
 		<exclude-pattern>bin/*</exclude-pattern>
