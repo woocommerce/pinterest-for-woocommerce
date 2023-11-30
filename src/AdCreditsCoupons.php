@@ -8,6 +8,9 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use DateTime;
+use DateTimeZone;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -68,15 +71,16 @@ class AdCreditsCoupons {
 	 * @return string|false Coupon string or false if no coupon was found.
 	 */
 	public static function get_coupon_for_merchant() {
-		$current_date = gmdate( 'Y-m-d' );
-		$switch_date  = '2023-12-31';
-		$currency     = get_woocommerce_currency();
+		$switch_date       = new DateTime( '2023-12-31 23:59:59', new DateTimeZone( 'GMT' ) );
+		$switch_timestamp  = $switch_date->getTimestamp();
+		$current_timestamp = time();
+		$currency          = get_woocommerce_currency();
 
 		if ( ! in_array( $currency, self::$allowed_currencies, true ) ) {
 			return false;
 		}
 
-		return ( $current_date > $switch_date ) ? self::$coupon_for_2024 : self::$coupon_for_2023;
+		return ( $current_timestamp >= $switch_timestamp ) ? self::$coupon_for_2024 : self::$coupon_for_2023;
 	}
 
 	/**
