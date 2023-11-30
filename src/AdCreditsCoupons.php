@@ -18,39 +18,65 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AdCreditsCoupons {
 
 	/**
-	 * @var array $currency_coupons_map Mapping of coupons to currency available for that currency.
+	 * List of Ads Credits allowed currencies.
+	 *
+	 * @since x.x.x
+	 *
+	 * @var array
 	 */
-	public static $currency_coupons_map = array(
-		'USD' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'GBP' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'EUR' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'BRL' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'AUD' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'CAD' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'MXN' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'PLN' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'CHF' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'DKK' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'RON' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'SEK' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'NZD' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'HUF' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'NOK' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'JPY' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'CZK' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
-		'ARS' => 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==',
+	public static $allowed_currencies = array(
+		'USD',
+		'GBP',
+		'EUR',
+		'BRL',
+		'AUD',
+		'CAD',
+		'MXN',
+		'PLN',
+		'CHF',
+		'DKK',
+		'RON',
+		'SEK',
+		'NZD',
+		'HUF',
+		'NOK',
+		'JPY',
+		'CZK',
+		'ARS',
 	);
 
 	/**
-	 * Get a valid coupon for merchant.
+	 * 2023 copon code.
+	 *
+	 * @var string
+	 */
+	public static $coupon_for_2023 = 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT';
+
+	/**
+	 * 2024 copon code.
+	 *
+	 * @var string
+	 */
+	public static $coupon_for_2024 = 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==';
+
+	/**
+	 * Get a valid coupon for the merchant.
 	 *
 	 * @since 1.2.5
+	 * @since x.x.x update logic for new data format.
 	 *
-	 * @return string|false Coupon string of false if no coupon was found.
+	 * @return string|false Coupon string or false if no coupon was found.
 	 */
 	public static function get_coupon_for_merchant() {
-		$currency = get_woocommerce_currency();
-		return self::$currency_coupons_map[ $currency ] ?? false;
+		$current_date = gmdate( 'Y-m-d' );
+		$switch_date  = '2023-12-31';
+		$currency     = get_woocommerce_currency();
+
+		if ( ! in_array( $currency, self::$allowed_currencies, true ) ) {
+			return false;
+		}
+
+		return ( $current_date > $switch_date ) ? self::$coupon_for_2024 : self::$coupon_for_2023;
 	}
 
 	/**
