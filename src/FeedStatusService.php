@@ -52,56 +52,57 @@ class FeedStatusService {
 		'155',
 	);
 
+	const FEED_STATUS_NOT_REGISTERED = 'not_registered';
+
+	const FEED_STATUS_ERROR_FETCHING_FEED = 'error_fetching_feed';
+
+	const FEED_STATUS_INACTIVE = 'inactive';
+
+	const FEED_STATUS_ACTIVE = 'active';
+
+	const FEED_STATUS_DELETED = 'deleted';
+
 	/**
 	 * Get the feed registration status.
 	 *
 	 * @return string The feed registration state. Possible values:
 	 *                - not_registered: Feed is not yet configured on Pinterest.
-	 *                - error_fetching_merchant: Could not get merchant info.
-	 *                - error_fetching_feed: Could not get feed info.
-	 *                - inactive_feed: The feed is registered but inactive.
-	 *                - approved: The feed is registered and approved.
-	 *                - pending: Product feed pending approval on Pinterest.
-	 *                - appeal_pending: Product feed pending approval on Pinterest.
-	 *                - declined: The feed is registered but declined by Pinterest.
+	 *                - error_fetching_feed: Could not get feed info from Pinterest.
+	 *                - inactive: The feed is registered but inactive at Pinterest.
+	 *                - active: The feed is registered and active at Pinterest.
+	 *                - deleted: The feed is registered but marked as deleted at Pinterest.
 	 *
 	 * @throws Exception PHP Exception.
 	 */
-	public static function get_feed_registration_status(): string {
-		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-		$feed_id     = FeedRegistration::get_locally_stored_registered_feed_id();
+	public static function get_feed_status(): string {
+		$feed_id = FeedRegistration::get_locally_stored_registered_feed_id();
 
-		try {
-			if ( empty( $merchant_id ) || empty( $feed_id ) ) {
-				throw new Exception( 'not_registered' );
-			}
-
-			$merchant = Base::get_merchant( $merchant_id );
-			if ( 'success' !== $merchant['status'] ) {
-				throw new Exception( 'error_fetching_merchant' );
-			}
-
-			try {
-				$feed = Feeds::get_feed( $feed_id );
-			} catch ( Exception $e ) {
-				throw new Exception( 'error_fetching_feed' );
-			}
-			if ( ! $feed ) {
-				throw new Exception( 'error_fetching_feed' );
-			}
-			if ( 'ACTIVE' !== $feed->feed_status ) {
-				throw new Exception( 'inactive_feed' );
-			}
-
-			$status = strtolower( $merchant['data']->product_pin_approval_status );
-			if ( ! in_array( $status, array( 'approved', 'pending', 'appeal_pending', 'declined' ), true ) ) {
-				throw new Exception( 'not_registered' );
-			}
-		} catch ( Exception $e ) {
-			$status = $e->getMessage();
+		if ( empty( $feed_id ) ) {
+			return static::FEED_STATUS_NOT_REGISTERED;
 		}
 
-		return $status;
+		try {
+			$feed = Feeds::get_feed( $feed_id );
+
+			if ( empty( $feed ) ) {
+				return static::FEED_STATUS_NOT_REGISTERED;
+			}
+
+			$is_deleted = Feeds::FEED_STATUS_DELETED === ( $feed['status'] ?? '' );
+			$is_paused  = Feeds::FEED_STATUS_INACTIVE === ( $feed['status'] ?? '' );
+
+			if ( $is_deleted ) {
+				return static::FEED_STATUS_DELETED;
+			}
+
+			if ( $is_paused ) {
+				return static::FEED_STATUS_INACTIVE;
+			}
+
+			return static::FEED_STATUS_ACTIVE;
+		} catch ( PinterestApiException $e ) {
+			return static::FEED_STATUS_ERROR_FETCHING_FEED;
+		}
 	}
 
 	/**
@@ -131,7 +132,7 @@ class FeedStatusService {
 
 		try {
 			try {
-				$feed_results = Feeds::get_feed_processing_results( $feed_id, $ad_account_id );
+				$feed_results = Feeds::get_feed_recent_processing_results( $feed_id );
 			} catch ( Exception $e ) {
 				throw new Exception( 'error_fetching_feed' );
 			}
@@ -162,35 +163,65 @@ class FeedStatusService {
 	}
 
 	/**
-	 * Gets the overview totals from the given workflow array.
+	 * Gets the overview totals from the given processing results array.
 	 *
-	 * @param object $workflow The workflow object.
+	 * @param   array $processing_results The processing results array.
+	 * @return  array A multidimensional array of numbers indicating the following stats about the workflow:
+	 *                  - total: The total number of products in the feed.
+	 *                  - not_synced: The number of products not synced to Pinterest.
+	 *                  - warnings: The number of warnings.
+	 *                  - errors: The number of errors.
 	 *
-	 * @return array A multidimensional array of numbers indicating the following stats about the workflow:
-	 *               - total: The total number of products in the feed.
-	 *               - not_synced: The number of products not synced to Pinterest.
-	 *               - warnings: The number of warnings.
-	 *               - errors: The number of errors.
+	 * @since x.x.x
 	 */
-	public static function get_workflow_overview_stats( object $workflow ): array {
-		$sums     = array(
-			'warnings' => 0,
+	public static function get_processing_result_overview_stats(array $processing_results ): array {
+		$sums = array(
 			'errors'   => 0,
+			'warnings' => 0,
 		);
-		$workflow = (array) $workflow;
-		foreach ( self::ERROR_CONTEXTS as $context ) {
-			if ( ! empty( (array) $workflow[ $context ] ) ) {
-				$what           = strpos( $context, 'errors' ) ? 'errors' : 'warnings';
-				$sums[ $what ] += array_sum( (array) $workflow[ $context ] );
-			}
-		}
+
+		$sums['errors'] += array_sum( $processing_results['ingestion_details']['errors'] );
+		$sums['errors'] += array_sum( $processing_results['validation_details']['errors'] );
+
+		$sums['warnings'] += array_sum( $processing_results['ingestion_details']['warnings'] );
+		$sums['warnings'] += array_sum( $processing_results['validation_details']['warnings'] );
+
+		$original = $processing_results['product_counts']['original'] ?? 0;
+		$ingested = $processing_results['product_counts']['ingested'] ?? 0;
 
 		return array(
-			'total'      => $workflow['original_product_count'],
-			'not_synced' => $workflow['original_product_count'] - $workflow['product_count'],
+			'total'      => $original,
+			'not_synced' => $original - $ingested,
 			'warnings'   => $sums['warnings'],
 			'errors'     => $sums['errors'],
 		);
+	}
+
+	/**
+	 * Gets the global error code for the given processing results.
+	 *
+	 * @param array $processing_results Recent processing results array.
+	 * @return string
+	 *
+	 * @since x.x.x
+	 */
+	public static function get_processing_results_global_error( array $processing_results ): string {
+		$error_code = '';
+
+		$codes_map = [];
+
+		foreach ( $processing_results['validation_details']['errors'] as $error_code => $count ) {
+			if ( in_array( $error_code, self::GLOBAL_ERROR_CODES, true ) ) {
+				break;
+			}
+		}
+
+		if ( $error_code ) {
+			/* Translators: The error message as returned by the Pinterest API */
+			return sprintf( esc_html__( 'Pinterest returned: %1$s', 'pinterest-for-woocommerce' ), $codes_map[ $error_code ] ?? '' );
+		}
+
+		return '';
 	}
 
 	/**

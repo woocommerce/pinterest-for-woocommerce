@@ -498,11 +498,9 @@ class APIV5 extends Base {
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/feed_processing_results/list
 	 *
-	 * @since x.x.x
 	 *
 	 * @param string $feed_id       Feed ID.
 	 * @param string $ad_account_id Pinterest Ad Account ID.
-	 *
 	 * @return array {
 	 *      Feed Processing Results.
 	 *
@@ -535,11 +533,49 @@ class APIV5 extends Base {
 	 *      }
 	 *      @type string $bookmark      Cursor used to fetch the next page of items
 	 * }
+	 *
 	 * @throws PinterestApiException If the request fails with other than 2xx status.
+	 * @since x.x.x
 	 */
 	public static function get_feed_processing_results( $feed_id, $ad_account_id ): array {
 		return self::make_request(
 			"catalogs/feeds/{$feed_id}/processing_results?ad_account_id={$ad_account_id}&page_size=1",
+			'GET'
+		);
+	}
+
+	/**
+	 * List item issues for a given processing result.
+	 *
+	 * @param string    $feed_processing_result_id  Feed Processing Results ID.
+	 * @param int       $limit                      Number of items to return.
+	 * @return array {
+	 *      Items and their corresponding issues.
+	 *
+	 *      @type array[] $items {
+	 *          @type int       $item_number
+	 *          @type string    $item_id
+	 *          @type array     $errors {
+	 *              An array of errors where keys are error codes e.g. (DUPLICATE_PRODUCTS, AVAILABILITY_INVALID, etc.).
+	 *
+	 *              @type ?string $attribute_name The name of the attribute that caused the error.
+	 *              @type ?string $provided_value The value of the attribute that caused the error.
+	 *          }
+	 *          @type array     $warnings {
+	 *              An array of warnings where keys are warning codes e.g. (SHIPPING_INVALID, TAX_INVALID, etc.).
+	 *
+	 *              @type ?string $attribute_name The name of the attribute that caused the warning.
+	 *              @type ?string $provided_value The value of the attribute that caused the warning.
+	 *          }
+	 *      }
+	 * }
+	 *
+	 * @throws PinterestApiException
+	 * @since x.x.x
+	 */
+	public static function get_feed_processing_result_items_issues( string $feed_processing_result_id, $limit = 25 ): array {
+		return self::make_request(
+			"catalogs/processing_results/{$feed_processing_result_id}/item_issues?page_size={$limit}",
 			'GET'
 		);
 	}

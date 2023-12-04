@@ -23,9 +23,67 @@ use Throwable;
  */
 class Feeds {
 
+	/**
+	 * Feed ACTIVE status which mirrors the Pinterest API feed status.
+	 */
 	const FEED_STATUS_ACTIVE = 'ACTIVE';
 
+	/**
+	 * Feed INACTIVE status which mirrors the Pinterest API feed status.
+	 */
 	const FEED_STATUS_INACTIVE = 'INACTIVE';
+
+	/**
+	 * Feed DELETED status which mirrors the Pinterest API feed status.
+	 */
+	const FEED_STATUS_DELETED = 'DELETED';
+
+	/**
+	 * Feed DOES_NOT_EXIST status which is a custom status.
+	 * Represents a feed that was never created.
+	 * In case fetching the feed returns no results.
+	 */
+	const FEED_STATUS_DOES_NOT_EXIST = 'DOES_NOT_EXIST';
+
+	/**
+	 * Feed COMPLETED status which mirrors the Pinterest API feed processing result status.
+	 */
+	const FEED_PROCESSING_STATUS_COMPLETED = 'COMPLETED';
+
+	/**
+	 * Feed COMPLETED_EARLY status which mirrors the Pinterest API feed processing result status.
+	 */
+	const FEED_PROCESSING_STATUS_COMPLETED_EARLY = 'COMPLETED_EARLY';
+
+	/**
+	 * Feed DISAPPROVED status which mirrors the Pinterest API feed processing result status.
+	 */
+	const FEED_PROCESSING_STATUS_DISAPPROVED = 'DISAPPROVED';
+
+	/**
+	 * Feed STATUS_FAILED status which mirrors the Pinterest API feed processing result status.
+	 */
+	const FEED_PROCESSING_STATUS_FAILED = 'FAILED';
+
+	/**
+	 * Feed PROCESSING status which mirrors the Pinterest API feed processing result status.
+	 */
+	const FEED_PROCESSING_STATUS_PROCESSING = 'PROCESSING';
+
+	/**
+	 * Feed QUEUED_FOR_PROCESSING status which mirrors the Pinterest API feed processing result status.
+	 */
+	const FEED_PROCESSING_STATUS_QUEUED_FOR_PROCESSING = 'QUEUED_FOR_PROCESSING';
+
+	/**
+	 * Feed UNDER_APPEAL status which mirrors the Pinterest API feed processing result status.
+	 */
+	const FEED_PROCESSING_STATUS_UNDER_APPEAL = 'UNDER_APPEAL';
+
+	/**
+	 * Feed UNDER_REVIEW status which mirrors the Pinterest API feed processing result status.
+	 */
+	const FEED_PROCESSING_STATUS_UNDER_REVIEW = 'UNDER_REVIEW';
 
 	/**
 	 * Create a new feed for the given ad account.
@@ -47,7 +105,7 @@ class Feeds {
 		 * Filters the default feed name: pinterest_for_woocommerce_unique_feed_name.
 		 * This vale appears in the Catalogues - Data sources page at Pinterest.
 		 *
-		 * @since <x.x.x>
+		 * @since x.x.x
 		 *
 		 * @param string $feed_name The default feed name.
 		 */
@@ -115,9 +173,9 @@ class Feeds {
 	 *
 	 * @param string $feed_id     The ID of the feed.
 	 *
-	 * @return object The feed profile object.
+	 * @return array The feed profile object.
 	 *
-	 * @throws Exception PHP Exception.
+	 * @throws PinterestApiException Pinterest API Exception.
 	 */
 	public static function get_feed( $feed_id ) {
 		try {
@@ -130,13 +188,12 @@ class Feeds {
 				}
 			}
 			// No feed found.
-			throw new Exception( esc_html__( 'No feed found with the requested ID.', 'pinterest-for-woocommerce' ) );
-		} catch ( Exception $e ) {
+			return array();
+		} catch ( PinterestApiException $e ) {
 			Logger::log( $e->getMessage(), 'error' );
 			throw $e;
 		}
 	}
-
 
 	/**
 	 * Get merchant's feeds.
@@ -161,11 +218,11 @@ class Feeds {
 	 *
 	 * @since x.x.x
 	 *
-	 * @return void
+	 * @return bool True if the cache was invalidated, false otherwise.
 	 */
 	public static function invalidate_feeds_cache() {
 		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
-		APIV5::invalidate_feeds_cache( $ad_account_id );
+		return APIV5::invalidate_feeds_cache( $ad_account_id );
 	}
 
 	/**
@@ -186,7 +243,7 @@ class Feeds {
 		$local_locale  = LocaleMapper::get_locale_for_api();
 
 		if ( empty( $feeds ) ) {
-			$feeds = self::get_feeds();
+			$feeds = static::get_feeds();
 		}
 
 		foreach ( $feeds as $feed ) {
@@ -205,15 +262,19 @@ class Feeds {
 	/**
 	 * Check if the registered feed is enabled.
 	 *
-	 * @since 1.2.13
-	 *
-	 * @param string $feed_profile_id The ID of the feed.
+	 * @param string $feed_id The ID of the feed.
 	 *
 	 * @return bool True if the feed is active, false otherwise.
+	 *@since 1.2.13
+	 *
 	 */
-	public static function is_local_feed_enabled( $feed_profile_id ) {
-		$feed = self::get_feed( $feed_profile_id );
-		return 'ACTIVE' === $feed->feed_status;
+	public static function is_local_feed_enabled( string $feed_id ): bool {
+		if ( empty( $feed_id ) ) {
+			return false;
+		}
+
+		$feed = static::get_feed( $feed_id );
+		return 'ACTIVE' === ( $feed['status'] ?? '' );
 	}
 
 	/**
@@ -225,7 +286,7 @@ class Feeds {
 	 *
 	 * @return bool True if the feed is has been enabled, false otherwise.
 	 */
-	public static function enabled_feed( $feed_id ) {
+	public static function enabled_feed( string $feed_id ): bool {
 		try {
 			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 			APIV5::enable_feed( $ad_account_id, $feed_id );
@@ -247,7 +308,7 @@ class Feeds {
 	 *
 	 * @return bool True if the feed is has been disabled, false otherwise.
 	 */
-	public static function disable_feed( $feed_id ) {
+	public static function disable_feed( string $feed_id ): bool {
 		try {
 			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 			APIV5::disable_feed( $ad_account_id, $feed_id );
@@ -259,49 +320,42 @@ class Feeds {
 	}
 
 	/**
-	 * Get the latest Workflow of the active feed related to the last attempt to process and ingest our feed.
+	 * Get the latest report of the active feed related to the last attempt to process and ingest our feed.
 	 *
-	 * @param string $merchant_id The merchant ID.
-	 * @param string $feed_id     The ID of the feed.
+	 * @since x.x.x
 	 *
-	 * @return object|null The latest workflow object or null if there is no workflow.
+	 * @param string $feed_id Pinterest feed ID.
 	 *
-	 * @throws Exception If there is an error getting the feed report.
-	 *
-	 * @since 1.3.0
+	 * @return array The feed ingestion and processing report or empty array.
 	 */
-	public static function get_feed_latest_workflow( string $merchant_id, string $feed_id ): ?object {
-		$feed_report = Base::get_merchant_feed_report( $merchant_id, $feed_id );
-		if ( ! $feed_report || 'success' !== $feed_report['status'] ) {
-			throw new Exception( esc_html__( 'Could not get feed report from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
-		}
-		if ( ! property_exists( $feed_report['data'], 'workflows' ) || ! is_array( $feed_report['data']->workflows ) || empty( $feed_report['data']->workflows ) ) {
-			return null;
+	public static function get_feed_recent_processing_results( $feed_id ): array {
+		try {
+			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+			$feed_report   = APIV5::get_feed_processing_results( $feed_id, $ad_account_id );
+		} catch ( PinterestApiException $e ) {
+			return array();
 		}
 
-		usort(
-			$feed_report['data']->workflows,
-			function ( $a, $b ) {
-				return $b->created_at - $a->created_at;
-			}
-		);
-
-		return reset( $feed_report['data']->workflows );
+		return $feed_report['items'][0] ?? array();
 	}
 
 	/**
-	 * Get the latest report of the active feed related to the last attempt to process and ingest our feed.
+	 * Get the feed report items issues.
 	 *
-	 * @param string $feed_id       Pinterest feed ID.
-	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 * @since x.x.x
 	 *
-	 * @return array The feed ingestion and processing report or null.
+	 * @param string $feed_processing_result_id The feed processing result ID.
+	 * @param int    $per_page                  The number of items to return per page. Default 25.
+	 *
+	 * @return array
 	 */
-	public static function get_feed_processing_results( $feed_id, $ad_account_id ): array {
-		$feed_report = APIV5::get_feed_processing_results( $feed_id, $ad_account_id );
-		if ( empty( $feed_report ) ) {
+	public static function get_feed_processing_result_items_issues( $feed_processing_result_id, $per_page = 25 ): array {
+		try {
+			$feed_report = APIV5::get_feed_processing_result_items_issues( $feed_processing_result_id, $per_page );
+		} catch ( PinterestApiException $e ) {
 			return array();
 		}
-		return $feed_report;
+
+		return $feed_report['items'] ?? array();
 	}
 }
