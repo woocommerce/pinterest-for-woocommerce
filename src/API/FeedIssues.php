@@ -48,7 +48,7 @@ class FeedIssues extends VendorAPI {
 	/**
 	 * Main endpoint callback.
 	 *
-	 * @param WP_REST_Request $request
+	 * @param WP_REST_Request $request The request object.
 	 * @return array[]|WP_REST_Response
 	 */
 	public function get_feed_issues( WP_REST_Request $request ) {
