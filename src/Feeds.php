@@ -263,10 +263,10 @@ class Feeds {
 	 * Check if the registered feed is enabled.
 	 *
 	 * @param string $feed_id The ID of the feed.
-	 *
 	 * @return bool True if the feed is active, false otherwise.
-	 *@since 1.2.13
 	 *
+	 * @throws PinterestApiException Pinterest API Exception.
+	 * @since 1.2.13
 	 */
 	public static function is_local_feed_enabled( string $feed_id ): bool {
 		if ( empty( $feed_id ) ) {

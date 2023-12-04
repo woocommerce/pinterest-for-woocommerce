@@ -61,7 +61,7 @@ class FeedIssues extends VendorAPI {
 		$per_page          = $request->has_param( 'per_page' ) ? (int) $request->get_param( 'per_page' ) : 25;
 		$feed_item_details = Pinterest\Feeds::get_feed_processing_result_items_issues( $results['id'], $per_page );
 
-		$lines    = array_reduce( $feed_item_details, array( __CLASS__, 'prepare_issue_lines' ), [] );
+		$lines    = array_reduce( $feed_item_details, array( __CLASS__, 'prepare_issue_lines' ), array() );
 		$response = new WP_REST_Response(
 			array(
 				'lines'      => $lines,
@@ -78,11 +78,13 @@ class FeedIssues extends VendorAPI {
 	/**
 	 * Add product specific data to each line.
 	 *
-	 * @param array $line The array contaning each col value for the line.
-	 *
+	 * @param array $acc  The accumulator array.
+	 * @param array $item The array containing each col value for the line.
 	 * @return array
+	 *
+	 * @since x.x.x
 	 */
-	private static function prepare_issue_lines( $acc, $item ) {
+	private static function prepare_issue_lines( array $acc, array $item ): array {
 
 		$product      = wc_get_product( $item['item_id'] ?? '' );
 		$edit_link    = '';

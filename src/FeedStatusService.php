@@ -174,7 +174,7 @@ class FeedStatusService {
 	 *
 	 * @since x.x.x
 	 */
-	public static function get_processing_result_overview_stats(array $processing_results ): array {
+	public static function get_processing_result_overview_stats( array $processing_results ): array {
 		$sums = array(
 			'errors'   => 0,
 			'warnings' => 0,
@@ -207,8 +207,7 @@ class FeedStatusService {
 	 */
 	public static function get_processing_results_global_error( array $processing_results ): string {
 		$error_code = '';
-
-		$codes_map = [];
+		$codes_map  = array();
 
 		foreach ( $processing_results['validation_details']['errors'] as $error_code => $count ) {
 			if ( in_array( $error_code, self::GLOBAL_ERROR_CODES, true ) ) {

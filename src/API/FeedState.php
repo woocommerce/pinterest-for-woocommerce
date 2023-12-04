@@ -295,8 +295,7 @@ class FeedState extends VendorAPI {
 	 * @return array
 	 *
 	 * @throws \Exception PHP Exception.
-	 *@since 1.2.3
-	 *
+	 * @since 1.2.3
 	 */
 	public function add_third_party_tags_warning( array $result ): array {
 		$warning_message = Tracking\Tag::get_third_party_tags_warning_message();
@@ -325,9 +324,8 @@ class FeedState extends VendorAPI {
 	 * @return array
 	 *
 	 * @throws \Exception PHP Exception.
-	 *@since 1.2.7
-	 *
-	 */
+	 * @since 1.2.7
+ 	 */
 	public function add_rich_pins_conflict_warning( array $result ): array {
 		$warning_message = RichPins::get_third_party_conflict_warning_message();
 
@@ -460,7 +458,7 @@ class FeedState extends VendorAPI {
 		$original_products_count = (int) $processing_results['product_counts']['original'] ?? 0;
 		$processing_date         = date_create_from_format(
 			'Y-m-d\TH:i:s',
-			$processing_results['created_at'] ?? date( 'Y-m-d\TH:i:s' )
+			$processing_results['created_at'] ?? gmdate( 'Y-m-d\TH:i:s' )
 		);
 
 		switch ( $status ) {

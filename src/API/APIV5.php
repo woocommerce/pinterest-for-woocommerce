@@ -498,7 +498,6 @@ class APIV5 extends Base {
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/feed_processing_results/list
 	 *
-	 *
 	 * @param string $feed_id       Feed ID.
 	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 * @return array {
@@ -547,8 +546,8 @@ class APIV5 extends Base {
 	/**
 	 * List item issues for a given processing result.
 	 *
-	 * @param string    $feed_processing_result_id  Feed Processing Results ID.
-	 * @param int       $limit                      Number of items to return.
+	 * @param string $feed_processing_result_id  Feed Processing Results ID.
+	 * @param int    $limit                      Number of items to return.
 	 * @return array {
 	 *      Items and their corresponding issues.
 	 *
@@ -570,7 +569,7 @@ class APIV5 extends Base {
 	 *      }
 	 * }
 	 *
-	 * @throws PinterestApiException
+	 * @throws PinterestApiException If the request fails with other than 2xx status.
 	 * @since x.x.x
 	 */
 	public static function get_feed_processing_result_items_issues( string $feed_processing_result_id, $limit = 25 ): array {
