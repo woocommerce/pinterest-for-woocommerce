@@ -325,7 +325,7 @@ class FeedState extends VendorAPI {
 	 *
 	 * @throws \Exception PHP Exception.
 	 * @since 1.2.7
- 	 */
+	 */
 	public function add_rich_pins_conflict_warning( array $result ): array {
 		$warning_message = RichPins::get_third_party_conflict_warning_message();
 

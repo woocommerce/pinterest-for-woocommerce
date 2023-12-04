@@ -45,6 +45,12 @@ class FeedIssues extends VendorAPI {
 		$this->register_routes();
 	}
 
+	/**
+	 * Main endpoint callback.
+	 *
+	 * @param WP_REST_Request $request
+	 * @return array[]|WP_REST_Response
+	 */
 	public function get_feed_issues( WP_REST_Request $request ) {
 		$ad_account_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
 		$feed_id       = FeedRegistration::get_locally_stored_registered_feed_id();
