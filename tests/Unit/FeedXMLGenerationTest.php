@@ -752,7 +752,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 * Gets the property method then just pass the product and voila.
 	 *
 	 * @param string $attribute
-	 * @return function
+	 * @return callable
 	 */
 	private function getProductsXmlFeedAttributeMethod( $attribute ) {
 		$method_name = 'get_property_' . str_replace( ':', '_', $attribute );
@@ -789,7 +789,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	public function filter_taxable_location( array $taxable_location ) {
 
 		if ( isset( $taxable_location[0] ) ) {
-			$taxable_location[0] = Pinterest_For_Woocommerce()::get_base_country();
+			$taxable_location[0] = Pinterest_For_Woocommerce()::get_base_country( null );
 		}
 
 		return $taxable_location;
