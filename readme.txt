@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps:
 
 == Changelog ==
 
+= 1.3.16 - 2023-12-13 =
+* Tweak - Make sure `feed_location` has a full URL.
+
 = 1.3.15 - 2023-11-28 =
 * Add - Compatibility with the Cart and Checkout blocks.
 
