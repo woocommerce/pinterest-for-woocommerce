@@ -87,7 +87,7 @@ Bugs should be reported in the [Pinterest for WooCommerce repository](https://gi
 
 Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/pinterest-for-woocommerce/) :)
 
-Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
+Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woo.com/)
 
 == Changelog ==
 
