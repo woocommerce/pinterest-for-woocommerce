@@ -23,7 +23,7 @@ class AdCreditsCoupons {
 	/**
 	 * List of Ads Credits allowed currencies.
 	 *
-	 * @since x.x.x
+	 * @since 1.3.17
 	 *
 	 * @var array
 	 */
@@ -66,7 +66,7 @@ class AdCreditsCoupons {
 	 * Get a valid coupon for the merchant.
 	 *
 	 * @since 1.2.5
-	 * @since x.x.x update logic for new data format.
+	 * @since 1.3.17 update logic for new data format.
 	 *
 	 * @return string|false Coupon string or false if no coupon was found.
 	 */
