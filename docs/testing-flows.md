@@ -143,4 +143,4 @@ The Pinterest plugin will add these fields in an attributes tab on the product e
 
 ## Miscellaneous
 
-- Pinterest admin screens are visible and accessible in all supported WooCommerce Admin navigation variations (current WP sidebar and [forthcoming unified nav](https://developer.woocommerce.com/2021/01/15/call-to-action-create-access-for-your-extension-in-the-new-woocommerce-navigation/)).
+- Pinterest admin screens are visible and accessible in all supported WooCommerce Admin navigation variations (current WP sidebar and [forthcoming unified nav](https://developer.woo.com/2021/01/15/call-to-action-create-access-for-your-extension-in-the-new-woocommerce-navigation/)).
