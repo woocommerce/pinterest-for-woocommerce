@@ -91,6 +91,10 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.3.17 - 2023-12-19 =
+* Dev - Update Woo.com developer blog URLs.
+* Update - promo code for 2024.
+
 = 1.3.16 - 2023-12-13 =
 * Tweak - Make sure `feed_location` has a full URL.
 
