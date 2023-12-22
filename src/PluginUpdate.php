@@ -115,7 +115,7 @@ class PluginUpdate {
 			'1.2.5'  => array(
 				'ads_credits_integration',
 			),
-			'1.4.0' => array(
+			'1.4.0'  => array(
 				'token_update',
 			),
 		);
@@ -275,7 +275,9 @@ class PluginUpdate {
 		 */
 		$settings = Pinterest_For_Woocommerce()::get_settings( true, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 
-		unset( $settings['local_feed_id'] );
+		if ( isset( $settings['local_feed_id'] ) ) {
+			unset( $settings['local_feed_id'] );
+		}
 
 		Pinterest_For_Woocommerce()::save_settings( $settings, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 

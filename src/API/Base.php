@@ -9,11 +9,9 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
-use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
-use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
-use \Exception;
+use Exception;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -105,7 +103,7 @@ class Base {
 
 			return $response;
 
-		} catch ( ApiException $e ) {
+		} catch ( PinterestApiException $e ) {
 
 			if ( ! empty( Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' ) ) ) {
 				/* Translators: 1: Error message 2: Stack trace */
@@ -245,11 +243,11 @@ class Base {
 	 * @param array  $payload  Request payload.
 	 * @param string $api      Request API.
 	 *
-	 * @return void
+	 * @return bool True if the transient was deleted, false otherwise.
 	 */
-	public static function invalidate_cached_response( $endpoint, $method, $payload, $api ) {
+	public static function invalidate_cached_response( $endpoint, $method, $payload, $api ): bool {
 		$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
-		delete_transient( $cache_key );
+		return delete_transient( $cache_key );
 	}
 
 	/**
@@ -269,8 +267,8 @@ class Base {
 	 *
 	 * @return array
 	 *
-	 * @throws Exception PHP exception.
-	 * @throws ApiException PHP exception.
+	 * @throws Exception             PHP exception.
+	 * @throws PinterestApiException PHP exception.
 	 */
 	protected static function handle_request( $request ) {
 
@@ -335,7 +333,7 @@ class Base {
 			}
 
 			/* Translators: Additional message */
-			throw new ApiException(
+			throw new PinterestApiException(
 				array(
 					'message'       => $message,
 					'response_body' => $body,
@@ -447,6 +445,10 @@ class Base {
 	 */
 	public static function create_advertiser( $tos_id ) {
 
+		/**
+		 * Advertiser name.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
 		$advertiser_name = apply_filters( 'pinterest_for_woocommerce_default_advertiser_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
 		return self::make_request(
@@ -657,12 +659,13 @@ class Base {
 	 *
 	 * @since 1.2.13
 	 *
-	 * @param string $merchant_id     The merchant ID the feed belongs to.
+	 * @param string $merchant_id The merchant ID the feed belongs to.
 	 * @param string $feed_profile_id The ID of the feed to be disabled.
 	 *
 	 * @return mixed
+	 * @throws PinterestApiException If the API request fails with other than 2xx status code.
 	 */
-	public static function disable_merchant_feed( $merchant_id, $feed_profile_id ) {
+	public static function disable_merchant_feed( $merchant_id, $feed_profile_id ): array {
 		return self::make_request(
 			"catalogs/disable_feed_profile/{$merchant_id}/{$feed_profile_id}/"
 		);
@@ -673,12 +676,13 @@ class Base {
 	 *
 	 * @since 1.2.13
 	 *
-	 * @param string $merchant_id     The merchant ID the feed belongs to.
+	 * @param string $merchant_id The merchant ID the feed belongs to.
 	 * @param string $feed_profile_id The ID of the feed to be enabled.
 	 *
 	 * @return mixed
+	 * @throws PinterestApiException If the API request fails with other than 2xx status code.
 	 */
-	public static function enable_merchant_feed( $merchant_id, $feed_profile_id ) {
+	public static function enable_merchant_feed( $merchant_id, $feed_profile_id ): array {
 		return self::make_request(
 			"catalogs/enable_feed_profile/{$merchant_id}/{$feed_profile_id}/"
 		);
@@ -737,9 +741,10 @@ class Base {
 	 * Get a specific merchant's feed report using the given arguments.
 	 *
 	 * @param string $merchant_id The merchant ID the feed belongs to.
-	 * @param string $feed_id     The ID of the feed.
+	 * @param string $feed_id The ID of the feed.
 	 *
 	 * @return mixed
+	 * @throws PinterestApiException If the API request fails with other than 2xx status code.
 	 */
 	public static function get_merchant_feed_report( $merchant_id, $feed_id ) {
 		return self::make_request(

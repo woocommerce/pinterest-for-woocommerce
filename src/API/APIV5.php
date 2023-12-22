@@ -9,8 +9,8 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
+use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
-use Automattic\WooCommerce\Pinterest\PinterestApiException as ApiException;
 use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -67,7 +67,7 @@ class APIV5 extends Base {
 	 *      @type int $following_count  User account following count.
 	 *      @type int $monthly_views    User account monthly views.
 	 * }
-	 * @throws ApiException Throws 403 and 500 exceptions.
+	 * @throws PinterestApiException Throws 403 and 500 exceptions.
 	 */
 	public static function get_account_info() {
 		return self::make_request( 'user_account', 'GET' );
@@ -79,17 +79,18 @@ class APIV5 extends Base {
 	 * @since x.x.x
 	 *
 	 * @return array {
-	 *     Ad Accounts countries
+	 *      Ad Accounts countries
 	 *
-	 *     @type array[]  $items {
-	 *         @type string $code     Country ID from ISO 3166-1 alpha-2.
-	 *         @type string $currency Country currency.
-	 *         @type int    $index    Country index
-	 *         @type string $name     Country name.
-	 *     }
+	 *      @type array[] $items {
+	 *          @type string $code Country ID from ISO 3166-1 alpha-2.
+	 *          @type string $currency Country currency.
+	 *          @type int $index Country index
+	 *          @type string $name Country name.
+	 *      }
 	 * }
+	 * @throws PinterestApiException If API request ends up other than 2xx status.
 	 */
-	public static function get_list_of_ads_supported_countries() {
+	public static function get_list_of_ads_supported_countries(): array {
 		$request_url = 'resources/ad_account_countries';
 		return self::make_request( $request_url, 'GET', array(), '', 2 * DAY_IN_SECONDS );
 	}
@@ -109,7 +110,7 @@ class APIV5 extends Base {
 	 *     }
 	 *     @type string $bookmark
 	 * }
-	 * @throws ApiException Throws 403 and 500 exceptions.
+	 * @throws PinterestApiException Throws 403 and 500 exceptions.
 	 */
 	public static function get_user_websites() {
 		return self::make_request( 'user_account/websites', 'GET' );
@@ -129,7 +130,7 @@ class APIV5 extends Base {
 	 *      @type string $image_large_url
 	 *      @type string $image_xlarge_url
 	 * }
-	 * @throws ApiException Throws 500 exception in case of unexpected error.
+	 * @throws PinterestApiException Throws 500 exception in case of unexpected error.
 	 */
 	public static function get_linked_businesses() {
 		return self::make_request( 'user_account/businesses', 'GET' );
@@ -182,7 +183,7 @@ class APIV5 extends Base {
 	 *      }
 	 * }
 	 *
-	 * @throws ApiException|Exception Throws 500 exception.
+	 * @throws PinterestApiException|Exception Throws 500 exception.
 	 */
 	public static function get_advertiser_tags( $ad_account_id ) {
 		return self::make_request( "ad_accounts/{$ad_account_id}/conversion_tags", 'GET' );
@@ -223,7 +224,7 @@ class APIV5 extends Base {
 	 *          @type bool    $aem_loc_enabled     Whether Automatic Enhanced Match location is enabled.
 	 *      }
 	 * }
-	 * @throws ApiException Throws 500 exception in case of unexpected error.
+	 * @throws PinterestApiException Throws 500 exception in case of unexpected error.
 	 */
 	public static function get_advertiser_tag( $ad_account_id, $conversion_tag_id ) {
 		return self::make_request( "ad_accounts/{$ad_account_id}/conversion_tags/{$conversion_tag_id}", 'GET' );
@@ -261,7 +262,7 @@ class APIV5 extends Base {
 	 *          @type ?bool $aem_loc_enabled    Whether Automatic Enhanced Match location is enabled.
 	 *      }
 	 * }
-	 * @throws ApiException|Exception Throws 500 exception.
+	 * @throws PinterestApiException|Exception Throws 500 exception.
 	 */
 	public static function create_tag( $ad_account_id ) {
 		$tag_name = self::get_tag_name();
@@ -314,7 +315,7 @@ class APIV5 extends Base {
 	 *      @type string $status        Status of the verification process.
 	 *      @type string $verified_at   UTC timestamp when the verification happened - sometimes missing.
 	 * }
-	 * @throws PinterestApiException If the request fails with 500 status.
+	 * @throws PinterestApiException If the request fails with 2xx status.
 	 */
 	public static function domain_metatag_verification_request( string $domain ): array {
 		return self::make_request(
@@ -324,6 +325,222 @@ class APIV5 extends Base {
 				'website'             => $domain,
 				'verification_method' => 'METATAG',
 			)
+		);
+	}
+
+	/**
+	 * Sends create feed request to Pinterest API.
+	 *
+	 * @since x.x.x
+	 *
+	 * @link https://developers.pinterest.com/docs/api/v5/#operation/feeds/create
+	 *
+	 * @param array  $data {
+	 *      Feed data.
+	 *
+	 *      @type string $name                 A human-friendly name associated to a given feed. This value is currently nullable due to historical reasons. It is expected to become non-nullable in the future.
+	 *      @type string $format               The file format of a feed: TSV, CSV, XML.
+	 *      @type string $location             The URL where a feed is available for download. This URL is what Pinterest will use to download a feed for processing.
+	 *      @type string $catalog_type         Type of the catalog entity: RETAIL, HOTEL.
+	 *      @type string $default_currency     Currency Codes from ISO 4217.
+	 *      @type string $default_locale       The locale used within a feed for product descriptions.
+	 *      @type string $default_country      Country ID from ISO 3166-1 alpha-2.
+	 *      @type string $default_availability Default availability for products in a feed.
+	 *      @type array[] $credentials {
+	 *          Use this if your feed file requires username and password.
+	 *
+	 *          @type string $username  The required password for downloading a feed.
+	 *          @type string $password  The required username for downloading a feed.
+	 *      }
+	 *      @type array[] $preferred_processing_schedule {
+	 *          Optional daily processing schedule. Use this to configure the preferred time for processing a feed (otherwise random).
+	 *
+	 *          @type string $time      A time in format HH:MM with leading 0 (zero).
+	 *          @type string $timezone  The timezone considered for the processing schedule time.
+	 *      }
+	 * }
+	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 *
+	 * @return array
+	 *
+	 * @throws PinterestApiException If the request fails with other than 2xx status.
+	 */
+	public static function create_feed( array $data, string $ad_account_id ): array {
+		return self::make_request(
+			"catalogs/feeds?ad_account_id={$ad_account_id}",
+			'POST',
+			$data
+		);
+	}
+
+	/**
+	 * Get merchant's feeds.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 *
+	 * @return array {
+	 *      List of feeds.
+	 *
+	 *      @type array[] $items {              Feeds.
+	 *          @type string $id                Feed ID.
+	 *          @type string $name              A human-friendly name associated to a given feed. This value is currently nullable due to historical reasons. It is expected to become non-nullable in the future.
+	 *          @type string $status            ACTIVE, INACTIVE. Status for catalogs entities. Present in catalogs_feed values. When a feed is deleted, the response will inform DELETED as status.
+	 *          @type string $format            The file format of a feed: TSV, CSV, XML.
+	 *          @type string $location          The URL where a feed is available for download. This URL is what Pinterest will use to download a feed for processing.
+	 *          @type string $created_at
+	 *          @type string $updated_at
+	 *          @type string $catalog_type      Type of the catalog entity: RETAIL, HOTEL.
+	 *          @type array[] $credentials {
+	 *              Use this if your feed file requires username and password.
+	 *
+	 *              @type string $username  The required password for downloading a feed.
+	 *              @type string $password  The required username for downloading a feed.
+	 *          }
+	 *          @type array[] $preferred_processing_schedule {
+	 *              Optional daily processing schedule. Use this to configure the preferred time for processing a feed (otherwise random).
+	 *
+	 *              @type string $time      A time in format HH:MM with leading 0 (zero).
+	 *              @type string $timezone  The timezone considered for the processing schedule time.
+	 *          }
+	 *          @type string $default_currency      Currency Codes from ISO 4217.
+	 *          @type string $default_locale        The locale used within a feed for product descriptions.
+	 *          @type string $default_country       Country ID from ISO 3166-1 alpha-2.
+	 *          @type string $default_availability  Default availability for products in a feed.
+	 *      }
+	 *      @type string $bookmark              Cursor used to fetch the next page of items
+	 * }
+	 * @throws PinterestApiException If the request fails with 2xx status.
+	 */
+	public static function get_feeds( string $ad_account_id ): array {
+		return self::make_request(
+			"catalogs/feeds?ad_account_id={$ad_account_id}",
+			'GET',
+			array(),
+			'',
+			MINUTE_IN_SECONDS
+		);
+	}
+
+	/**
+	 * Invalidate the ad account's feeds cache.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $ad_account_id Ad Account ID.
+	 *
+	 * @return bool True if the cache was invalidated, false otherwise.
+	 */
+	public static function invalidate_feeds_cache( string $ad_account_id ): bool {
+		return self::invalidate_cached_response(
+			"catalogs/feeds?ad_account_id={$ad_account_id}",
+			'GET',
+			array(),
+			''
+		);
+	}
+
+	/**
+	 * Enable a feed.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 * @param string $feed_id       The ID of the feed to be enabled.
+	 *
+	 * @return mixed
+	 * @throws PinterestApiException If API request ends up other than 2xx status.
+	 */
+	public static function enable_feed( string $ad_account_id, string $feed_id ): array {
+		return static::update_feed_status( $feed_id, Feeds::FEED_STATUS_ACTIVE, $ad_account_id );
+	}
+
+	/**
+	 * Disable a feed.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 * @param string $feed_id       The ID of the feed to be disabled.
+	 *
+	 * @return mixed
+	 * @throws PinterestApiException If API request ends up other than 2xx status.
+	 */
+	public static function disable_feed( string $ad_account_id, string $feed_id ): array {
+		return static::update_feed_status( $feed_id, Feeds::FEED_STATUS_INACTIVE, $ad_account_id );
+	}
+
+	/**
+	 * Update a feed status.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $feed_id       The ID of the feed to be updated.
+	 * @param string $status        The status to be set.
+	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 *
+	 * @return array
+	 * @throws PinterestApiException If API request ends up other than 2xx status.
+	 */
+	private static function update_feed_status( string $feed_id, string $status, string $ad_account_id ): array {
+		return self::make_request(
+			"catalogs/feeds/{$feed_id}?ad_account_id={$ad_account_id}",
+			'PATCH',
+			array(
+				'status' => $status,
+			),
+		);
+	}
+
+	/**
+	 * Get the latest workflow for the given feed.
+	 *
+	 * @link https://developers.pinterest.com/docs/api/v5/#operation/feed_processing_results/list
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $feed_id       Feed ID.
+	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 *
+	 * @return array {
+	 *      Feed Processing Results.
+	 *
+	 *      @type array[] $items {
+	 *          Feed processing results.
+	 *
+	 *          @type string $id        Feed Processing Results ID.
+	 *          @type string $status    Feed Processing status. "COMPLETED", "COMPLETED_EARLY", "DISAPPROVED", etc.
+	 *          @type array $product_counts {
+	 *              Feed product counts.
+	 *
+	 *              @type int $original Original product count.
+	 *              @type int $ingested Ingested product count.
+	 *          }
+	 *          @type array $ingestion_details {
+	 *              Processing details.
+	 *
+	 *              @type array $errors {}      Errors.
+	 *              @type array $info {}        Info
+	 *              @type array $warnings {}    Warnings.
+	 *          }
+	 *          @type array $validation_details {
+	 *              Validation details.
+	 *
+	 *              @type array $errors {}      Errors.
+	 *              @type array $warnings {}    Warnings.
+	 *          }
+	 *          @type string $created_at Feed Processing Results creation time.
+	 *          @type string $updated_at Feed Processing Results update time.
+	 *      }
+	 *      @type string $bookmark      Cursor used to fetch the next page of items
+	 * }
+	 * @throws PinterestApiException If the request fails with other than 2xx status.
+	 */
+	public static function get_feed_processing_results( $feed_id, $ad_account_id ): array {
+		return self::make_request(
+			"catalogs/feeds/{$feed_id}/processing_results?ad_account_id={$ad_account_id}&page_size=1",
+			'GET'
 		);
 	}
 }

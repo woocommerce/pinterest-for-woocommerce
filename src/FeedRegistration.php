@@ -73,17 +73,17 @@ class FeedRegistration {
 	 * Should be run on demand when settings change,
 	 * and on a scheduled basis.
 	 *
-	 * @return mixed
+	 * @return bool
 	 *
 	 * @throws Exception PHP Exception.
 	 */
-	public function handle_feed_registration() {
+	public function handle_feed_registration(): bool {
 
 		// Clean merchants error code.
 		$this->clear_merchant_error_code();
 
 		if ( ! self::feed_file_exists() ) {
-			self::log( 'Feed didn\'t fully generate yet. Retrying later.', 'debug' );
+			self::log( 'Feed did not fully generate yet. Retrying later.' );
 			// Feed is not generated yet, lets wait a bit longer.
 			return true;
 		}
@@ -101,7 +101,7 @@ class FeedRegistration {
 			// translators: %s: Error message.
 			$error_message = "Could not register feed. Error: {$e->getMessage()}";
 			self::log( $error_message, 'error' );
-
+			return false;
 		} catch ( Throwable $th ) {
 			if ( method_exists( $th, 'get_pinterest_code' ) && 4163 === $th->get_pinterest_code() ) {
 				Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', true );
@@ -127,27 +127,19 @@ class FeedRegistration {
 	/**
 	 * Handles feed registration using the given arguments.
 	 * Will try to create a merchant if none exists.
-	 * Also if a different feed is registered, it will update using the URL in the
+	 * Also, if a different feed is registered, it will update using the URL in the
 	 * $feed_args.
 	 *
 	 * @return boolean
 	 *
 	 * @throws Exception PHP Exception.
 	 */
-	private static function register_feed() {
-
-		$merchant_id = self::check_merchant_approval_status();
-
-		if ( ! $merchant_id ) {
-			return false;
-		}
-
-		$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( $merchant_id );
+	private static function register_feed(): bool {
+		$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds();
 
 		// If no matching registered feed found try to create it.
 		if ( ! $feed_id ) {
-			$response = Merchants::update_or_create_merchant();
-			$feed_id  = $response['feed_id'] ?? '';
+			$feed_id = Feeds::create_feed();
 		}
 
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $feed_id );
@@ -156,7 +148,7 @@ class FeedRegistration {
 			return false;
 		}
 
-		self::feed_enable_status_maintenance( $merchant_id, $feed_id );
+		self::feed_enable_status_maintenance( $feed_id );
 		return true;
 	}
 
@@ -166,37 +158,20 @@ class FeedRegistration {
 	 * Disable all other feed configurations for the merchant.
 	 *
 	 * @since 1.2.13
-	 * @param string $merchant_id Merchant ID.
+	 *
 	 * @param string $feed_id Feed ID.
+	 *
 	 * @return void
+	 * @throws Exception PHP Exception.
 	 */
-	private static function feed_enable_status_maintenance( $merchant_id, $feed_id ) {
+	private static function feed_enable_status_maintenance( $feed_id ) {
 		// Check if the feed is enabled. If not, enable it.
-		if ( ! Feeds::is_local_feed_enabled( $merchant_id, $feed_id ) ) {
-			Feeds::enabled_feed( $merchant_id, $feed_id );
+		if ( ! Feeds::is_local_feed_enabled( $feed_id ) ) {
+			Feeds::enabled_feed( $feed_id );
 		}
 
 		// Cleanup feeds that are registered but not in the local feed configurations.
-		self::maybe_disable_stale_feeds_for_merchant( $merchant_id, $feed_id );
-	}
-
-	/**
-	 * Check if the merchant is approved.
-	 * This is a helper function for the register_feed method.
-	 *
-	 * @return mixed False if the merchant is not approved, merchant id otherwise.
-	 */
-	private static function check_merchant_approval_status() {
-
-		$merchant = Merchants::get_merchant();
-
-		if ( ! empty( $merchant['data']->id ) && 'declined' === $merchant['data']->product_pin_approval_status ) {
-
-			self::log( 'Pinterest returned a Declined status for product_pin_approval_status' );
-			return false;
-		}
-
-		return $merchant['data']->id;
+		self::maybe_disable_stale_feeds_for_merchant( $feed_id );
 	}
 
 	/**
@@ -205,68 +180,48 @@ class FeedRegistration {
 	 *
 	 * @since 1.2.13
 	 *
-	 * @param string $merchant_id Merchant ID.
 	 * @param string $feed_id Feed ID.
 	 *
 	 * @return void
+	 * @throws Exception PHP Exception.
 	 */
-	public static function maybe_disable_stale_feeds_for_merchant( $merchant_id, $feed_id ) {
+	public static function maybe_disable_stale_feeds_for_merchant( $feed_id ) {
+		$feeds = Feeds::get_feeds();
 
-		$feed_profiles = Feeds::get_merchant_feeds( $merchant_id );
-
-		if ( empty( $feed_profiles ) ) {
+		if ( empty( $feeds ) ) {
 			return;
 		}
 
-		$configs    = LocalFeedConfigs::get_instance()->get_configurations();
-		$config     = reset( $configs );
-		$local_path = dirname( $config['feed_url'] );
-
 		$invalidate_cache = false;
 
-		foreach ( $feed_profiles as $feed ) {
+		foreach ( $feeds as $feed ) {
 			// Local feed should not be disabled.
-			if ( $feed_id === $feed->id ) {
+			if ( $feed_id === $feed['id'] ) {
 				continue;
 			}
 
-			// Only disable feeds that are registered as WooCommerce integration.
-			if ( 'WOOCOMMERCE' !== $feed->integration_platform_type ) {
-				continue;
-			}
-
-			/**
-			 * Disable feeds only if their file URL matches, using the directory path for accurate identification. This
-			 * method prevents the disabling of non-WooCommerce feeds that share the same merchant registration.
-			 * Simultaneously, disable feeds registered for WooCommerce from the same host with different file names,
-			 * ending with a suffix generated by the wp_generate_password function, as outlined in the LocalFeedConfigs
-			 * class. Utilizing dirname eliminates the file name and suffix, leaving only the directory path for
-			 * comparison.
-			 */
-			if ( dirname( $feed->location_config->full_feed_fetch_location ) !== $local_path ) {
-				continue;
-			}
-
-			// Disable the feed if it is active.
-			if ( 'ACTIVE' === $feed->feed_status ) {
-				Feeds::disable_feed( $merchant_id, $feed->id );
+			// Disable the feed if it is active and originated from the current website.
+			$is_active_feed      = Feeds::FEED_STATUS_ACTIVE === $feed['status'];
+			$is_woocommerce_feed = 0 === strpos( $feed['location'], get_site_url() );
+			if ( $is_active_feed && $is_woocommerce_feed ) {
+				Feeds::disable_feed( $feed['id'] );
 				$invalidate_cache = true;
 			}
 		}
 
 		if ( $invalidate_cache ) {
-			Feeds::invalidate_get_merchant_feeds_cache( $merchant_id );
+			Feeds::invalidate_feeds_cache();
 		}
 	}
 
 	/**
 	 * Checks if the feed file for the configured (In $state var) feed exists.
-	 * This could be true as the feed is being generated, if its not the 1st time
-	 * its been generated.
+	 * This could be true as the feed is being generated, if it's not the 1st time
+	 * it's been generated.
 	 *
 	 * @return bool
 	 */
-	public function feed_file_exists() {
+	public function feed_file_exists(): bool {
 		return $this->feed_file_operations->check_if_feed_file_exists();
 	}
 

@@ -89,6 +89,12 @@ class ProductFeedStatus {
 		}
 
 		if ( ! empty( $state['status'] ) ) {
+			/**
+			 * Feed status hook.
+			 *
+			 * @param array $state The array holding the feed state props.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+			 */
 			do_action( 'pinterest_for_woocommerce_feed_' . $state['status'], $state );
 		}
 	}

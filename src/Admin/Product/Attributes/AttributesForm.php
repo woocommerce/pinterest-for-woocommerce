@@ -71,11 +71,13 @@ class AttributesForm extends Form {
 			 * This filter is documented in AttributeManager::map_attribute_types
 			 *
 			 * @see AttributeManager::map_attribute_types
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 			 */
 			$applicable_types = apply_filters( "wc_pinterest_attribute_applicable_product_types_{$attribute_id}", $applicable_types, $attribute_type );
 
 			/**
 			 * Filters the list of product types to hide the attribute for.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 			 */
 			$hidden_types = apply_filters( "wc_pinterest_attribute_hidden_product_types_{$attribute_id}", array() );
 
@@ -113,6 +115,9 @@ class AttributesForm extends Form {
 		if ( $attribute instanceof WithValueOptionsInterface ) {
 			$value_options = $attribute::get_value_options();
 		}
+		/**
+		 * Filters the list of value options for the given attribute.
+		 */
 		$value_options = apply_filters( "wc_pinterest_product_attribute_value_options_{$attribute::get_id()}", $value_options );
 
 		if ( ! empty( $value_options ) ) {

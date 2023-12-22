@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { getNewPath, getHistory } from '@woocommerce/navigation';
 import {
 	createInterpolateElement,
@@ -157,6 +157,9 @@ const AdsCreditSection = () => {
 		} );
 	};
 
+	const appSettings = useSettingsSelect();
+	const currencyCreditInfo = appSettings?.account_data?.currency_credit_info;
+
 	return (
 		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__credits-section">
 			<Flex>
@@ -171,16 +174,25 @@ const AdsCreditSection = () => {
 				</FlexBlock>
 				<FlexBlock className="content-block">
 					<Text variant="subtitle">
-						{ __(
-							'Try Pinterest for WooCommerce and get $125 in ad credits!',
-							'pinterest-for-woocommerce'
+						{ sprintf(
+							// translators: %s: Amount of ad credits given with currency.
+							__(
+								'Try Pinterest for WooCommerce and get %s in ad credits!',
+								'pinterest-for-woocommerce'
+							),
+							currencyCreditInfo.creditsGiven
 						) }
 					</Text>
 					<Text variant="body">
 						{ createInterpolateElement(
-							__(
-								'To help you get started with Pinterest Ads, new Pinterest customers can get $125 in ad credits when they have successfully set up Pinterest for WooCommerce and spend $15 on Pinterest Ads. <a>Pinterest Terms and conditions</a> apply.',
-								'pinterest-for-woocommerce'
+							sprintf(
+								// translators: %1$s: Amount of ad credits given with currency. %2$s: Amount of money required to spend to claim ad credits with currency.
+								__(
+									'To help you get started with Pinterest Ads, new Pinterest customers can get %1$s in ad credits when they have successfully set up Pinterest for WooCommerce and spend %2$s on Pinterest Ads. <a>Pinterest Terms and conditions</a> apply.',
+									'pinterest-for-woocommerce'
+								),
+								currencyCreditInfo.creditsGiven,
+								currencyCreditInfo.spendRequire
 							),
 							{
 								a: (
@@ -267,6 +279,9 @@ const Feature = ( { title, text, imageUrl } ) => {
 };
 
 const FaqSection = () => {
+	const appSettings = useSettingsSelect();
+	const currencyCreditInfo = appSettings?.account_data?.currency_credit_info;
+
 	return (
 		<Card className="woocommerce-table pinterest-for-woocommerce-landing-page__faq-section">
 			<Panel
@@ -297,17 +312,28 @@ const FaqSection = () => {
 						'pinterest-for-woocommerce'
 					) }
 				/>
-				<FaqQuestion
-					questionId={ 'can-i-connect-to-multiple-accounts' }
-					question={ __(
-						'How do I redeem the $125 ad credit from Pinterest?',
-						'pinterest-for-woocommerce'
-					) }
-					answer={ __(
-						'To be eligible and redeem the $125 ad credit from Pinterest, you must complete the setup of Pinterest for WooCommerce, set up your billing with Pinterest Ads manager, and spend $15 with Pinterest ads. Ad credits may vary by country and is subject to availability. Credits may take up to 24 hours to be credited to the user. Each user is only eligible to receive the ad credits once.',
-						'pinterest-for-woocommerce'
-					) }
-				/>
+				{ currencyCreditInfo && (
+					<FaqQuestion
+						questionId={ 'how-to-redeem-ad-credits' }
+						question={ sprintf(
+							// translators: %s: Amount of ad credits given with currency.
+							__(
+								'How do I redeem the %s ad credit from Pinterest?',
+								'pinterest-for-woocommerce'
+							),
+							currencyCreditInfo.creditsGiven
+						) }
+						answer={ sprintf(
+							// translators: %1$s: Amount of ad credits given with currency. %2$s: Amount of money required to spend to claim ad credits with currency.
+							__(
+								'To be eligible and redeem the %1$s ad credit from Pinterest, you must complete the setup of Pinterest for WooCommerce, set up your billing with Pinterest Ads manager, and spend %2$s with Pinterest ads. Ad credits may vary by country and is subject to availability. Credits may take up to 24 hours to be credited to the user. Each user is only eligible to receive the ad credits once.',
+								'pinterest-for-woocommerce'
+							),
+							currencyCreditInfo.creditsGiven,
+							currencyCreditInfo.spendRequire
+						) }
+					/>
+				) }
 			</Panel>
 		</Card>
 	);

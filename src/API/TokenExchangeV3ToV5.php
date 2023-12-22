@@ -56,7 +56,7 @@ class TokenExchangeV3ToV5 extends APIV5 {
 	public static function token_update() {
 		$respone = self::exchange_token();
 
-		if ( 'success' != $respone['status'] ) {
+		if ( 'success' !== $respone['status'] ) {
 			return false;
 		}
 

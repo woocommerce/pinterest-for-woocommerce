@@ -6,7 +6,7 @@ use Pinterest_For_Woocommerce;
 
 class TagTest extends \WP_UnitTestCase {
 
-	function setUp() {
+	function setUp(): void {
 		parent::setUp();
 	}
 

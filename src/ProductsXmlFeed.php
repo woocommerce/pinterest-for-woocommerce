@@ -256,6 +256,7 @@ class ProductsXmlFeed {
 		 *
 		 * @param bool       $apply_shortcodes Shortcodes are applied if set to `true` and stripped out if set to `false`.
 		 * @param WC_Product $product          WooCommerce product object.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 		 */
 		$apply_shortcodes = apply_filters( 'pinterest_for_woocommerce_product_description_apply_shortcodes', false, $product );
 
@@ -323,7 +324,9 @@ class ProductsXmlFeed {
 			return '';
 		}
 
-		// Get the image with a filter for default size.
+		/**
+		 * Get the image with a filter for default size.
+		 */
 		$image = wp_get_attachment_image_src( $image_id, apply_filters( 'pinterest_for_woocommerce_feed_image_size', 'full' ) );
 
 		if ( ! $image ) {
@@ -441,7 +444,9 @@ class ProductsXmlFeed {
 
 		if ( $attachment_ids && $product->get_image_id() ) {
 			foreach ( $attachment_ids as $attachment_id ) {
-				// Get the image with a filter for default size.
+				/**
+				 * Get the image with a filter for default size.
+				 */
 				$image = wp_get_attachment_image_src( $attachment_id, apply_filters( 'pinterest_for_woocommerce_feed_image_size', 'full' ) );
 
 				$images[] = $image ? $image[0] : false;

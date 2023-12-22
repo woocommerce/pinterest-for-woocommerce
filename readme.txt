@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
-Tested up to: 6.3
+Tested up to: 6.4
 Requires PHP: 7.3
-Stable tag: 1.3.8
+Stable tag: 1.3.13
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -67,7 +67,7 @@ Pinterest is a visual discovery engine people use to find inspiration for their 
 * PHP version 7.3 or greater (PHP 7.4 or greater is recommended)
 * MySQL version 5.6 or greater
 
-Visit the [WooCommerce server requirements documentation](https://docs.woocommerce.com/document/server-requirements/) for a detailed list of server requirements.
+Visit the [WooCommerce server requirements documentation](https://woo.com/document/server-requirements/) for a detailed list of server requirements.
 
 = Automatic installation =
 
@@ -90,6 +90,26 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.3.13 - 2023-11-07 =
+* Fix - Doc - Use new Woo.com domain.
+* Tweak - WC 8.3 compatibility.
+* Tweak - WP 6.4 compatibility.
+
+= 1.3.12 - 2023-10-19 =
+* Dev - Add phpcs on changed files only.
+
+= 1.3.11 - 2023-10-10 =
+* Dev - automate merging trunk to develop after a release.
+* Tweak - WC 8.2 compatibility.
+
+= 1.3.10 - 2023-09-12 =
+* Dev - Updates PHPUnit version, unit tests, and matrix in git workflow for PHP8.2 compatibility.
+
+= 1.3.9 - 2023-09-05 =
+* Add - Adds logic to dynamically display spend requirement and credits given based on store currency.
+* Fix -  Uninstall procedure.
+* Tweak - WC 8.1 compatibility.
 
 = 1.3.8 - 2023-08-15 =
 * Fix - Caching of API calls.

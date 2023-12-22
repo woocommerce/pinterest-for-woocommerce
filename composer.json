@@ -1,7 +1,7 @@
 {
 	"name": "woocommerce/pinterest-for-woocommerce",
 	"description": "",
-	"homepage": "https://woocommerce.com/",
+	"homepage": "https://woo.com/",
 	"type": "wordpress-plugin",
 	"keywords": [
 		"pinterest",
@@ -17,7 +17,7 @@
 		}
 	  ],
 	"require": {
-		"php": ">=7.3",
+		"php": ">=7.4",
 		"ext-json": "*",
 		"automattic/jetpack-autoloader": "^2.10.1",
 		"defuse/php-encryption": "^2.2",
@@ -25,11 +25,10 @@
 	},
 	"require-dev": {
 		"composer/installers": "^1.7.0",
-		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
-		"woocommerce/woocommerce-sniffs": "^0.1.0",
-		"wp-coding-standards/wpcs": "^2.3",
-		"phpunit/phpunit": "^7.5",
-		"yoast/phpunit-polyfills": "^1.1.0",
+		"woocommerce/woocommerce-sniffs": "1.0.0",
+		"sirbrillig/phpcs-changed": "^2.11.1",
+		"phpunit/phpunit": "^9.6",
+		"yoast/phpunit-polyfills": "^1.0",
 		"wp-cli/i18n-command": "^2.3"
 	},
 	"autoload": {
@@ -39,7 +38,7 @@
 	},
 	"config": {
 		"platform": {
-			"php": "7.3.0"
+			"php": "7.4"
 		},
 		"allow-plugins": {
 			"composer/installers": true,
@@ -48,15 +47,12 @@
 		}
 	},
 	"scripts": {
-		"phpcs": [
-			"phpcs --extensions=php -s -p"
-		],
-		"phpcbf": [
-			"phpcbf -p"
-		],
-	  	"test-unit": [
-		  "./vendor/bin/phpunit"
-		]
+		"phpcs": "phpcs --extensions=php -s -p",
+		"lint": "chg=$(git diff --relative --name-only -- '*.php'); [[ -z $chg ]] || phpcs-changed -s --git --git-unstaged $chg",
+		"lint-staged": "chg=$(git diff HEAD --relative --name-only -- '*.php'); [[ -z $chg ]] || phpcs-changed -s --git $chg",
+		"lint-branch": "sh ./bin/lint-branch.sh",
+		"phpcbf": "phpcbf -p",
+		"test-unit": "./vendor/bin/phpunit"
 	},
 	"extra": {
 		"scripts-description": {

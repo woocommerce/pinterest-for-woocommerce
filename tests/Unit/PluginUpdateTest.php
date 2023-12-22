@@ -123,8 +123,7 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 			->setMethods( ['perform_plugin_update_procedure'] )
 			->getMock();
 
-		$mock_plugin_update->method('perform_plugin_update_procedure')
-			->willReturn( null );
+		$mock_plugin_update->method('perform_plugin_update_procedure');
 
 		$mock_plugin_update->maybe_update();
 
@@ -178,8 +177,7 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 			->setMethods( ['perform_plugin_update_procedure'] )
 			->getMock();
 
-		$mock_plugin_update->method('perform_plugin_update_procedure')
-			->willReturn( null );
+		$mock_plugin_update->method('perform_plugin_update_procedure');
 
 		$mock_plugin_update->maybe_update();
 

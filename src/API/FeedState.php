@@ -107,6 +107,10 @@ class FeedState extends VendorAPI {
 				);
 			}
 
+			/**
+			 * Returns feed state.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+			 */
 			return apply_filters( 'pinterest_for_woocommerce_feed_state', array() );
 
 		} catch ( \Throwable $th ) {
@@ -243,7 +247,7 @@ class FeedState extends VendorAPI {
 
 				$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
 				$feed_id     = FeedRegistration::get_locally_stored_registered_feed_id();
-				$feed        = Pinterest\Feeds::get_merchant_feed( $merchant_id, $feed_id );
+				$feed        = Pinterest\Feeds::get_feed( $feed_id );
 				if ( ! empty( $feed->location_config->full_feed_fetch_freq ) ) {
 					$extra_info = wp_kses_post(
 						sprintf(
