@@ -12,7 +12,6 @@ import SetupAccount from '../steps/SetupAccount';
 import ClaimWebsite from '../steps/ClaimWebsite';
 import SetupTracking from '../steps/SetupTracking';
 import SaveSettingsButton from '../components/SaveSettingsButton';
-import TransientNotices from '../components/TransientNotices';
 import HealthCheck from '../components/HealthCheck';
 import {
 	useSettingsSelect,
@@ -51,7 +50,6 @@ const SettingsApp = () => {
 			<HealthCheck />
 			<NavigationClassic />
 
-			<TransientNotices />
 			{ appSettings ? (
 				<div className="woocommerce-setup-guide__container">
 					<SetupAccount

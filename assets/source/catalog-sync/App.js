@@ -12,7 +12,6 @@ import { recordEvent } from '@woocommerce/tracks';
 import SyncState from './sections/SyncState';
 import AdCreditsNotice from './sections/AdCreditsNotice';
 import SyncIssues from './sections/SyncIssues';
-import TransientNotices from './components/TransientNotices';
 import HealthCheck from '../setup-guide/app/components/HealthCheck';
 import { useCreateNotice, useDismissAdsModalDispatch } from './helpers/effects';
 import NavigationClassic from '../components/navigation-classic';
@@ -128,7 +127,6 @@ const CatalogSyncApp = () => {
 			<HealthCheck />
 			<NavigationClassic />
 
-			<TransientNotices />
 			<div className="pinterest-for-woocommerce-catalog-sync__container">
 				<SyncState />
 				{ isAdCreditsNoticeOpen && adsCampaignIsActive && (
