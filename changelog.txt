@@ -1,5 +1,10 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.3.18 - 2023-12-27 =
+* Fix - Pinterest duplicated notices.
+* Fix - Product Editor transient notice shift.
+* Fix - Wrong feed generation items counter.
+
 = 1.3.17 - 2023-12-19 =
 * Dev - Update Woo.com developer blog URLs.
 * Update - promo code for 2024.

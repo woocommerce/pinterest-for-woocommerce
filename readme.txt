@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.4
 Requires PHP: 7.3
-Stable tag: 1.3.17
+Stable tag: 1.3.18
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woo.com/)
 
 == Changelog ==
+
+= 1.3.18 - 2023-12-27 =
+* Fix - Pinterest duplicated notices.
+* Fix - Product Editor transient notice shift.
+* Fix - Wrong feed generation items counter.
 
 = 1.3.17 - 2023-12-19 =
 * Dev - Update Woo.com developer blog URLs.
