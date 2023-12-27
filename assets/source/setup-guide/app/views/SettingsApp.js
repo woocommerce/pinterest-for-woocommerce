@@ -12,7 +12,6 @@ import SetupProductSync from '../steps/SetupProductSync';
 import SetupPins from '../steps/SetupPins';
 import AdvancedSettings from '../steps/AdvancedSettings';
 import SaveSettingsButton from '../components/SaveSettingsButton';
-import TransientNotices from '../components/TransientNotices';
 import HealthCheck from '../components/HealthCheck';
 import {
 	useSettingsSelect,
@@ -33,7 +32,6 @@ const SettingsApp = () => {
 			<HealthCheck />
 			<NavigationClassic />
 
-			<TransientNotices />
 			{ appSettings ? (
 				<div className="woocommerce-setup-guide__container">
 					<>
