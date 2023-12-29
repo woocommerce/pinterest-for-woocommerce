@@ -1,4 +1,4 @@
-'url'           => get_site_url(),<?php
+<?php
 /**
  * Pinterest for WooCommerce Refresh Token.
  *
