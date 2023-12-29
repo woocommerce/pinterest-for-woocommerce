@@ -99,7 +99,7 @@ class RefreshToken {
 		$response = wp_safe_remote_post( $endpoint, $options );
 
 		if ( is_wp_error( $response ) ) {
-			throw new Exception( $response->get_error_message() );
+			throw new Exception( $response->get_error_message() ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		}
 
 		$body = trim( wp_remote_retrieve_body( $response ) );
