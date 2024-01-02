@@ -284,6 +284,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Verify that the ads_campaign is active or not.
 			add_action( 'admin_init', array( Pinterest\AdCredits::class, 'check_if_ads_campaign_is_active' ) );
 
+			// Append credits info to account data.
+			add_action( 'init', array( $this, 'add_currency_credits_info_to_account_data' ) );
+
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 
@@ -1041,6 +1044,21 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$account_data['coupon_redeem_info'] = $redeem_information;
 
 			self::save_setting( 'account_data', $account_data );
+		}
+
+		/**
+		 * Add currency_credit_info information to the account data option.
+		 *
+		 * @since 1.3.9
+		 *
+		 * @return void
+		 */
+		public static function add_currency_credits_info_to_account_data() {
+			$account_data = self::get_setting( 'account_data' );
+			if ( ! isset( $account_data['currency_credit_info'] ) ) {
+				$account_data['currency_credit_info'] = AdsCreditCurrency::get_currency_credits();
+				self::save_setting( 'account_data', $account_data );
+			}
 		}
 
 		/**
