@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.4
 Requires PHP: 7.3
-Stable tag: 1.3.18
+Stable tag: 1.3.19
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,10 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woo.com/)
 
 == Changelog ==
+
+= 1.3.19 - 2024-01-09 =
+* Tweak - Changed minimum WC version to 6.3.
+* Tweak - WC 8.5 compatibility.
 
 = 1.3.18 - 2023-12-27 =
 * Fix - Pinterest duplicated notices.
