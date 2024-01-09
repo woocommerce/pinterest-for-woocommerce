@@ -91,6 +91,10 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.3.19 - 2024-01-09 =
+* Tweak - Changed minimum WC version to 6.3.
+* Tweak - WC 8.5 compatibility.
+
 = 1.3.18 - 2023-12-27 =
 * Fix - Pinterest duplicated notices.
 * Fix - Product Editor transient notice shift.
