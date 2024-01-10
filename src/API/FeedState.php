@@ -464,8 +464,9 @@ class FeedState extends VendorAPI {
 		switch ( $status ) {
 			case 'COMPLETED':
 			case 'COMPLETED_EARLY':
+			case 'PROCESSING':
 				return sprintf(
-					/* Translators: %1$s Time string, %2$s number of products */
+					/* Translators: %1$s Time difference string, %2$s number of products */
 					esc_html__( 'Last pulled: %1$s ago, containing %2$d products', 'pinterest-for-woocommerce' ),
 					human_time_diff( $processing_date->getTimestamp() ),
 					$original_products_count
@@ -474,18 +475,10 @@ class FeedState extends VendorAPI {
 				$info = sprintf(
 					/* Translators: %1$s Time difference string */
 					esc_html__( 'Last attempt: %1$s ago', 'pinterest-for-woocommerce' ),
-					human_time_diff( $processing_date->getTimestamp() ),
-					$original_products_count
+					human_time_diff( $processing_date->getTimestamp() )
 				);
 				$global_error = Pinterest\FeedStatusService::get_processing_results_global_error( $processing_results );
-				return $info . $global_error ? ' - ' . $global_error : '';
-			case 'PROCESSING':
-				return sprintf(
-					/* Translators: %1$s Time string, %2$s number of products */
-					esc_html__( 'Last pulled: %1$s ago, containing %2$d products', 'pinterest-for-woocommerce' ),
-					human_time_diff( ( $processing_date->getTimestamp() / 1000 ) ),
-					$original_products_count
-				);
+				return $info . ( $global_error ? ' - ' . $global_error : '' );
 			case 'DISAPPROVED':
 			case 'QUEUED_FOR_PROCESSING':
 			case 'UNDER_APPEAL':
@@ -494,11 +487,11 @@ class FeedState extends VendorAPI {
 			default:
 				$info = sprintf(
 					/* Translators: The status text returned by the API. */
-					esc_html__( 'API returned an unknown status: %1$s', 'pinterest-for-woocommerce' ),
-					$status
+					esc_html__( 'Pinterest returned an unknown feed status: %1$s', 'pinterest-for-woocommerce' ),
+					$status ?? '<empty string>'
 				);
 				$global_error = Pinterest\FeedStatusService::get_processing_results_global_error( $processing_results );
-				return $info . $global_error ? ' - ' . $global_error : '';
+				return $info . ( $global_error ? ' - ' . $global_error : '' );
 		}
 	}
 

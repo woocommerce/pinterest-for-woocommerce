@@ -359,7 +359,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		 * @return array
 		 */
 		private function get_component_settings() {
-			$store_country = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
+			$store_country = Pinterest_For_Woocommerce()::get_base_country();
 
 			return array(
 				'pluginVersion'            => PINTEREST_FOR_WOOCOMMERCE_VERSION,

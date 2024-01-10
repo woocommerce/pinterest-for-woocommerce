@@ -11,10 +11,10 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 
+use Automattic\WooCommerce\Pinterest\FeedStatusService;
 use \WP_REST_Server;
 use \WP_REST_Request;
 use \WP_REST_Response;
-use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -108,20 +108,22 @@ class FeedIssues extends VendorAPI {
 		$edit_link = empty( $edit_link ) && $product ? get_edit_post_link( $product->get_id(), 'not_display' ) : $edit_link; // get_edit_post_link() will return '&' instead of  '&amp;' for anything other than the 'display' context.
 
 		foreach ( $item['errors'] as $key => $error ) {
-			$acc[] = array(
+			$description = FeedStatusService::ERROR_MESSAGES[ $key ] ?? $key;
+			$acc[]       = array(
 				'status'            => 'error',
 				'product_name'      => $product_name,
 				'product_edit_link' => $edit_link,
-				'issue_description' => "{$key}: {$error['attribute_name']} - {$error['provided_value']}",
+				'issue_description' => "{$description}: {$error['attribute_name']} - {$error['provided_value']}",
 			);
 		}
 
 		foreach ( $item['warnings'] as $key => $warning ) {
-			$acc[] = array(
+			$description = FeedStatusService::ERROR_MESSAGES[ $key ] ?? $key;
+			$acc[]       = array(
 				'status'            => 'warning',
 				'product_name'      => $product_name,
 				'product_edit_link' => $edit_link,
-				'issue_description' => "{$key}: {$warning['attribute_name']} - {$warning['provided_value']}",
+				'issue_description' => "{$description}: {$warning['attribute_name']} - {$warning['provided_value']}",
 			);
 		}
 

@@ -13,7 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
-use Automattic\WooCommerce\Pinterest\API\Base;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 use Exception;
 use Throwable;
@@ -98,8 +97,8 @@ class Feeds {
 		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
 		$config        = reset( $configs );
 
-		$default_country  = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
-		$default_currency = get_woocommerce_currency();
+		$default_country = Pinterest_For_Woocommerce()::get_base_country();
+		$default_locale  = LocaleMapper::get_locale_for_api();
 
 		/**
 		 * Filters the default feed name: pinterest_for_woocommerce_unique_feed_name.
@@ -115,19 +114,23 @@ class Feeds {
 				// translators: %1$s is a country ISO 2 code, %2$s is a currency ISO 3 code.
 				esc_html__( 'Created by Pinterest for WooCommerce %1$s-%2$s', 'pinterest-for-woocommerce' ),
 				esc_html( $default_country ),
-				esc_html( $default_currency )
+				esc_html( $default_locale )
 			)
 		);
 
 		$data = array(
-			'name'                 => $feed_name,
-			'format'               => 'XML',
-			'location'             => $config['feed_url'],
-			'catalog_type'         => 'RETAIL',
-			'default_currency'     => $default_currency,
-			'default_locale'       => LocaleMapper::get_locale_for_api(),
-			'default_country'      => $default_country,
-			'default_availability' => 'IN_STOCK',
+			'name'                          => $feed_name,
+			'format'                        => 'XML',
+			'location'                      => $config['feed_url'],
+			'catalog_type'                  => 'RETAIL',
+			'default_currency'              => get_woocommerce_currency(),
+			'default_locale'                => $default_locale,
+			'default_country'               => $default_country,
+			'default_availability'          => 'IN_STOCK',
+			'preferred_processing_schedule' => array(
+				'time'     => gmdate( 'H:i', time() + 5 * MINUTE_IN_SECONDS ),
+				'timezone' => 'Etc/UTC',
+			),
 		);
 
 		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( wp_json_encode( $data ) );
@@ -168,6 +171,12 @@ class Feeds {
 		return $feed_id;
 	}
 
+	public static function delete_feed() {
+		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+		$feed_id       = '';
+		APIV5::delete_feed( $feed_id, $ad_account_id );
+	}
+
 	/**
 	 * Get a specific merchant feed using the given arguments.
 	 *
@@ -199,8 +208,6 @@ class Feeds {
 	 * Get merchant's feeds.
 	 *
 	 * @return array The feed profile objects.
-	 *
-	 * @throws PinterestApiException Pinterest API Exception.
 	 */
 	public static function get_feeds(): array {
 		try {
@@ -230,16 +237,15 @@ class Feeds {
 	 * Return its ID if it is.
 	 *
 	 * @param array $feeds The list of feeds to check against. If not set, the list will be fetched from the API.
-	 *
 	 * @return string Returns the ID of the feed if properly registered or an empty string otherwise.
-	 * @throws PinterestApiException Pinterest API Exception.
+	 *
 	 * @throws PinterestApiLocaleException No valid locale found to check for the registered feed.
 	 */
 	public static function match_local_feed_configuration_to_registered_feeds( array $feeds = array() ): string {
 		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
 		$config        = reset( $configs );
 		$local_path    = $config['feed_url'];
-		$local_country = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
+		$local_country = Pinterest_For_Woocommerce()::get_base_country();
 		$local_locale  = LocaleMapper::get_locale_for_api();
 
 		if ( empty( $feeds ) ) {
@@ -247,8 +253,9 @@ class Feeds {
 		}
 
 		foreach ( $feeds as $feed ) {
-			$does_match = $local_path === $feed['location'];
-			$does_match = $does_match && $local_country === $feed['default_country'];
+			// $does_match = $local_path === $feed['location'];
+			// $does_match = $does_match && $local_country === $feed['default_country'];
+			$does_match = $local_country === $feed['default_country'];
 			$does_match = $does_match && $local_locale === $feed['default_locale'];
 			if ( $does_match ) {
 				// We can assume we're on the same site.

@@ -363,7 +363,7 @@ class APIV5 extends Base {
 	 *
 	 * @return array
 	 *
-	 * @throws PinterestApiException If the request fails with other than 2xx status.
+	 * @throws PinterestApiException If the request fail with other than 201 status.
 	 */
 	public static function create_feed( array $data, string $ad_account_id ): array {
 		return self::make_request(
