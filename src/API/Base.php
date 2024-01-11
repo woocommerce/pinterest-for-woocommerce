@@ -785,8 +785,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function redeem_ads_offer_code( $advertiser_id, $offer_code ) {
-		$request_url = "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem";
-		$request_url = add_query_arg( 'is_encoded', 'true', $request_url );
+		$request_url = "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem?is_encoded=true";
 		return self::make_request( $request_url, 'POST', array(), 'ads' );
 	}
 
@@ -799,9 +798,7 @@ class Base {
 	 * @return mixed
 	 */
 	public static function validate_ads_offer_code( $advertiser_id, $offer_code ) {
-		$url = "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem";
-		$url = add_query_arg( 'validate_only', 'true', $url );
-
+		$url = "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem?validate_only=true";
 		return self::make_request( $url, 'POST', array(), 'ads' );
 	}
 
