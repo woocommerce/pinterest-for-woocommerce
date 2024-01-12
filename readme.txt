@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.3.20 - 2024-01-12 =
+* Fix - Use proper redeem code format.
+
 = 1.3.19 - 2024-01-09 =
 * Tweak - Changed minimum WC version to 6.3.
 * Tweak - WC 8.5 compatibility.
