@@ -171,12 +171,6 @@ class Feeds {
 		return $feed_id;
 	}
 
-	public static function delete_feed() {
-		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
-		$feed_id       = '';
-		APIV5::delete_feed( $feed_id, $ad_account_id );
-	}
-
 	/**
 	 * Get a specific merchant feed using the given arguments.
 	 *

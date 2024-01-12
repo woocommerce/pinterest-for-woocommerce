@@ -66,7 +66,10 @@ class LocalFeedConfigs {
 	 * @param array $locations Array of location to generate the feed files for.
 	 */
 	private function initialize_local_feeds_config( $locations ) {
-		$feed_ids = Pinterest_For_Woocommerce()::get_data( 'local_feed_ids' ) ?: array();
+		$feed_ids = Pinterest_For_Woocommerce()::get_data( 'local_feed_ids' );
+		if ( empty( $feed_ids ) ) {
+			$feed_ids = array();
+		}
 
 		foreach ( $locations as $location ) {
 			if ( array_key_exists( $location, $feed_ids ) ) {

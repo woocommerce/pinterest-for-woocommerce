@@ -157,7 +157,7 @@ class FeedRegistration {
 	 * @param string $feed_id Feed ID.
 	 * @return void
 	 *
-	 * @throws PinterestApiException in case feed could not be fetched.
+	 * @throws PinterestApiException Feed could not be fetched.
 	 * @since 1.2.13
 	 */
 	private static function feed_enable_status_maintenance( string $feed_id ) {
