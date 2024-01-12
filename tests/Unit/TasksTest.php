@@ -70,6 +70,24 @@ class TasksTest extends WP_UnitTestCase {
 			'is_partner'              => true,
 		);
 		Pinterest_For_Woocommerce::save_setting( 'account_data', $account_data );
+		Pinterest_For_Woocommerce::save_integration_data(
+			array(
+				'id'                           => '438304186899501392',
+				'external_business_id'         => 'wordpresspinterest-65a04926ed482',
+				'connected_merchant_id'        => '1479839719476',
+				'connected_user_id'            => '1144266355231574943',
+				'connected_advertiser_id'      => '549765662491',
+				'connected_tag_id'             => '2613286171854',
+				'connected_lba_id'             => '0',
+				'partner_access_token_expiry'  => 0,
+				'partner_refresh_token_expiry' => 0,
+				'scopes'                       => '',
+				'created_timestamp'            => 1705003303000,
+				'updated_timestamp'            => 1705003303000,
+				'additional_id_1'              => '',
+				'partner_metadata'             => '',
+			)
+		);
 		Pinterest_For_Woocommerce::save_token_data(
 			array(
 				'access_token' => 'some-fake-access-token',
