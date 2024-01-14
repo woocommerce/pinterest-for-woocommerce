@@ -568,7 +568,7 @@ class APIV5 extends Base {
 			"ad_accounts/{$ad_account_id}/ads_credit/redeem",
 			'POST',
 			array(
-				'offerCodeHash' => $offer_code
+				'offerCodeHash' => $offer_code,
 			)
 		);
 	}
