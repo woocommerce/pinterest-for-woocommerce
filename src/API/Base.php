@@ -792,32 +792,6 @@ class Base {
 	}
 
 	/**
-	 * Redeem advertisement offer code ( ads credit ).
-	 *
-	 * @param string $advertiser_id The advertiser id for which we redeem the offer code.
-	 * @param string $offer_code Promotional ads credit offer code.
-	 *
-	 * @return mixed
-	 */
-	public static function redeem_ads_offer_code( $advertiser_id, $offer_code ) {
-		$request_url = "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem?is_encoded=true";
-		return self::make_request( $request_url, 'POST', array(), 'ads' );
-	}
-
-	/**
-	 * Validate advertisement offer code ( ads credit ).
-	 *
-	 * @param string $advertiser_id The advertiser id for which we validate the offer code.
-	 * @param string $offer_code Promotional ads credit offer code.
-	 *
-	 * @return mixed
-	 */
-	public static function validate_ads_offer_code( $advertiser_id, $offer_code ) {
-		$url = "advertisers/{$advertiser_id}/marketing_offer/{$offer_code}/redeem?validate_only=true";
-		return self::make_request( $url, 'POST', array(), 'ads' );
-	}
-
-	/**
 	 * Pull information about available ads credits for advertiser.
 	 *
 	 * @param string $advertiser_id The advertiser id for which we check the available ads credits.

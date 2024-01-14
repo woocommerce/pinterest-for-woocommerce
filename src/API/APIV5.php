@@ -551,7 +551,7 @@ class APIV5 extends Base {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $advertiser_id Advertiser ID.
+	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 * @param string $offer_code    Offer code (hash).
 	 *
 	 * @return array {
@@ -563,9 +563,9 @@ class APIV5 extends Base {
 	 * }
 	 * @throws PinterestApiException When unable to redeem the offer code or any unexpected error occur.
 	 */
-	public static function redeem_ads_offer_code( $advertiser_id, $offer_code ) {
+	public static function redeem_ads_offer_code( string $ad_account_id, string $offer_code ): array {
 		return self::make_request(
-			"ad_accounts/{$advertiser_id}/ads_credit/redeem",
+			"ad_accounts/{$ad_account_id}/ads_credit/redeem",
 			'POST',
 			array(
 				'offerCodeHash' => $offer_code
