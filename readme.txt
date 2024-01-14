@@ -4,7 +4,7 @@ Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
 Tested up to: 6.4
 Requires PHP: 7.3
-Stable tag: 1.3.13
+Stable tag: 1.3.20
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -87,9 +87,34 @@ Bugs should be reported in the [Pinterest for WooCommerce repository](https://gi
 
 Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/pinterest-for-woocommerce/) :)
 
-Release and roadmap notes available on the [WooCommerce Developers Blog](hhttps://developer.woocommerce.com/)
+Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woo.com/)
 
 == Changelog ==
+
+= 1.3.20 - 2024-01-12 =
+* Fix - Use proper redeem code format.
+
+= 1.3.19 - 2024-01-09 =
+* Tweak - Changed minimum WC version to 6.3.
+* Tweak - WC 8.5 compatibility.
+
+= 1.3.18 - 2023-12-27 =
+* Fix - Pinterest duplicated notices.
+* Fix - Product Editor transient notice shift.
+* Fix - Wrong feed generation items counter.
+
+= 1.3.17 - 2023-12-19 =
+* Dev - Update Woo.com developer blog URLs.
+* Update - promo code for 2024.
+
+= 1.3.16 - 2023-12-13 =
+* Tweak - Make sure `feed_location` has a full URL.
+
+= 1.3.15 - 2023-11-28 =
+* Add - Compatibility with the Cart and Checkout blocks.
+
+= 1.3.14 - 2023-11-14 =
+* Tweak - Add Pinterest businesses API exception handling.
 
 = 1.3.13 - 2023-11-07 =
 * Fix - Doc - Use new Woo.com domain.

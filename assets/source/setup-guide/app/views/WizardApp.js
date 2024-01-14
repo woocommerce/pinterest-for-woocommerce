@@ -14,7 +14,6 @@ import { updateQueryString } from '@woocommerce/navigation';
 import SetupAccount from '../steps/SetupAccount';
 import ClaimWebsite from '../steps/ClaimWebsite';
 import OnboardingTopBar from '../components/TopBar';
-import TransientNotices from '../components/TransientNotices';
 import {
 	useSettingsSelect,
 	useBodyClasses,
@@ -141,7 +140,6 @@ const WizardApp = ( { query } ) => {
 		<>
 			<OnboardingTopBar />
 			<div className="woocommerce-setup-guide__main">
-				<TransientNotices />
 				{ appSettings ? (
 					<Stepper currentStep={ currentStep } steps={ getSteps() } />
 				) : (

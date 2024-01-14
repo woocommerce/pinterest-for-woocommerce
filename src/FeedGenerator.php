@@ -394,8 +394,8 @@ class FeedGenerator extends AbstractChainedJob {
 					continue;
 				}
 				$this->buffers[ $location ] .= $product_xml;
-				++$processed_products;
 			}
+			++$processed_products;
 		}
 
 		// May throw write to file exception.
