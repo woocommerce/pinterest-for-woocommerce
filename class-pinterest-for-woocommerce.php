@@ -1418,7 +1418,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function is_connected() {
 			$integration = self::get_data( 'integration_data' );
-			return ! is_null( $integration );
+			return ! empty( $integration['id'] ?? '' );
 		}
 
 
