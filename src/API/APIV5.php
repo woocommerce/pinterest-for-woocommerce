@@ -543,4 +543,33 @@ class APIV5 extends Base {
 			'GET'
 		);
 	}
+
+	/**
+	 * Attempts to redeem the offer code for the given advertiser.
+	 *
+	 * @link https://developers.pinterest.com/docs/api/v5/#operation/ads_credit/redeem
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $advertiser_id Advertiser ID.
+	 * @param string $offer_code    Offer code (hash).
+	 *
+	 * @return array {
+	 *     Credits redeem status.
+	 *
+	 *     @type bool    $success       Whether the offer code was successfully redeemed or not.
+	 *     @type ?int    $errorCode     Error code type if error occurs.
+	 *     @type ?string $errorMessage  Reason for failure.
+	 * }
+	 * @throws PinterestApiException When unable to redeem the offer code or any unexpected error occur.
+	 */
+	public static function redeem_ads_offer_code( $advertiser_id, $offer_code ) {
+		return self::make_request(
+			"ad_accounts/{$advertiser_id}/ads_credit/redeem",
+			'POST',
+			array(
+				'offerCodeHash' => $offer_code
+			)
+		);
+	}
 }
