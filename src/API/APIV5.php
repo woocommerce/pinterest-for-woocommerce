@@ -572,4 +572,38 @@ class APIV5 extends Base {
 			)
 		);
 	}
+
+	/**
+	 * Get active billing profiles in the advertiser account.
+	 *
+	 * @link https://developers.pinterest.com/docs/api/v5/#operation/billing_profiles/get
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 *
+	 * @return array {
+	 *     Billing profiles in the advertiser account.
+	 *
+	 *     @type array[] $items {
+	 *         @type string $id                     Billing ID.
+	 *         @type string $card_type              Type of the card ("UNKNOWN" "VISA" "MASTERCARD" "AMERICAN_EXPRESS"
+	 *                                              "DISCOVER" "ELO").
+	 *         @type string $status                 Status of the billing. ("UNSPECIFIED" "VALID" "INVALID" "PENDING"
+	 *                                              "DELETED" "SECONDARY" "PENDING_SECONDARY").
+	 *         @type string $advertiser_id          Advertiser ID of the billing.
+	 *         @type string $payment_method_brand   Brand of the payment method. ("UNKNOWN" "VISA" "MASTERCARD"
+	 *                                              "AMERICAN_EXPRESS" "DISCOVER" "SOFORT" "DINERS_CLUB" "ELO"
+	 *                                              "CARTE_BANCAIRE").
+	 *     }
+	 *     @type string $bookmark Cursor used to fetch the next page of items.
+	 * }
+	 * @throws PinterestApiException If the request fails with other than 2xx status.
+	 */
+	public static function get_active_billing_profiles( string $ad_account_id ): array {
+		return self::make_request(
+			"ad_accounts/{$ad_account_id}/billing_profiles?is_active=true",
+			'GET'
+		);
+	}
 }

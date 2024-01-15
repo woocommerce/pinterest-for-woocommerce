@@ -46,8 +46,7 @@ class AdCredits {
 	 * @return mixed
 	 */
 	public static function handle_redeem_credit() {
-
-		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
 			// Advertiser not connected redeem operation makes no sense.
 			return true;
 		}
@@ -86,7 +85,7 @@ class AdCredits {
 	 * @return bool Weather the coupon was successfully redeemed or not.
 	 */
 	public static function redeem_credits( $offer_code, &$error_code = null, &$error_message = null ) {
-		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
 			// Advertiser not connected, we can't check if credits were redeemed.
 			return false;
 		}
@@ -201,7 +200,7 @@ class AdCredits {
 	 * @return mixed False when no info is available, discounts object when discounts are available.
 	 */
 	public static function process_available_discounts() {
-		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
 			// Advertiser not connected, we can't check if credits were redeemed.
 			return false;
 		}
