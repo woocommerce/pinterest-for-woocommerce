@@ -9,6 +9,7 @@ namespace Automattic\WooCommerce\Pinterest;
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
 use Automattic\WooCommerce\Pinterest\API\Base;
+use Pinterest_For_Woocommerce;
 use Throwable;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -133,11 +134,11 @@ class Billing {
 
 			return array_reduce(
 				$active_profiles['items'] ?? array(),
-				function( $carry, $item ) {
+				function ( $carry, $item ) {
 					if ( $carry ) {
 						return $carry;
 					}
-					return $item['status'] === 'VALID';
+					return 'VALID' === $item['status'];
 				},
 				false
 			);

@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest;
 use Automattic\WooCommerce\Pinterest\API\APIV5;
 use Automattic\WooCommerce\Pinterest\API\Base;
 use Exception;
+use Pinterest_For_Woocommerce;
 use Pinterest_For_Woocommerce_Ads_Supported_Countries;
 use Throwable;
 
