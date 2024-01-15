@@ -97,8 +97,9 @@ class Feeds {
 		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
 		$config        = reset( $configs );
 
-		$default_country = Pinterest_For_Woocommerce()::get_base_country();
-		$default_locale  = LocaleMapper::get_locale_for_api();
+		$default_country  = Pinterest_For_Woocommerce()::get_base_country();
+		$default_currency = get_woocommerce_currency();
+		$default_locale   = LocaleMapper::get_locale_for_api();
 
 		/**
 		 * Filters the default feed name: pinterest_for_woocommerce_unique_feed_name.
@@ -114,7 +115,7 @@ class Feeds {
 				// translators: %1$s is a country ISO 2 code, %2$s is a currency ISO 3 code.
 				esc_html__( 'Created by Pinterest for WooCommerce %1$s-%2$s', 'pinterest-for-woocommerce' ),
 				esc_html( $default_country ),
-				esc_html( $default_locale )
+				esc_html( $default_currency )
 			)
 		);
 
@@ -123,7 +124,7 @@ class Feeds {
 			'format'                        => 'XML',
 			'location'                      => $config['feed_url'],
 			'catalog_type'                  => 'RETAIL',
-			'default_currency'              => get_woocommerce_currency(),
+			'default_currency'              => $default_currency,
 			'default_locale'                => $default_locale,
 			'default_country'               => $default_country,
 			'default_availability'          => 'IN_STOCK',
