@@ -374,6 +374,28 @@ class APIV5 extends Base {
 	}
 
 	/**
+	 * Sends update feed request to Pinterest API.
+	 *
+	 * @since x.x.x
+	 *
+	 * @link https://developers.pinterest.com/docs/api/v5/#operation/feeds/update
+	 *
+	 * @param string $feed_id       Feed ID.
+	 * @param array  $data          Feed data.
+	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 *
+	 * @return array
+	 * @throws PinterestApiException If the request fails with other than 200 status.
+	 */
+	public static function update_feed( string $feed_id, array $data, string $ad_account_id ): array {
+		return self::make_request(
+			"catalogs/feeds/{$feed_id}?ad_account_id={$ad_account_id}",
+			'PATCH',
+			$data
+		);
+	}
+
+	/**
 	 * Get merchant's feeds.
 	 *
 	 * @since x.x.x

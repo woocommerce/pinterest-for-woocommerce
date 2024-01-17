@@ -137,6 +137,14 @@ class FeedRegistration {
 		// If no matching registered feed found try to create it.
 		if ( ! $feed_id ) {
 			$feed_id = Feeds::create_feed();
+		} else {
+			// If a matching feed is found, update feed file location for it.
+			$configs = LocalFeedConfigs::get_instance()->get_configurations();
+			$config  = reset( $configs );
+			$data    = array(
+				'location' => $config['feed_url'],
+			);
+			$feed_id = Feeds::update_feed( $feed_id, $data )['id'] ?? '';
 		}
 
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', $feed_id );

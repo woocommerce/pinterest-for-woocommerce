@@ -173,6 +173,39 @@ class Feeds {
 	}
 
 	/**
+	 * Update a feed for the given ad account.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $feed_id The ID of the feed.
+	 * @param array  $data    The data to update the feed with.
+	 *
+	 * @return array
+	 */
+	public static function update_feed( string $feed_id, array $data ) {
+		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+		$data          = array_merge(
+			$data,
+			array(
+				'status'                        => 'ACTIVE',
+				'preferred_processing_schedule' => array(
+					'time'     => gmdate( 'H:i', time() + 5 * MINUTE_IN_SECONDS ),
+					'timezone' => 'Etc/UTC',
+				),
+				'catalog_type'                  => 'RETAIL',
+			)
+		);
+
+		try {
+			return APIV5::update_feed( $feed_id, $data, $ad_account_id );
+		} catch ( Throwable $th ) {
+			//throw $th;
+		}
+
+		return array();
+	}
+
+	/**
 	 * Get a specific merchant feed using the given arguments.
 	 *
 	 * @param string $feed_id     The ID of the feed.
