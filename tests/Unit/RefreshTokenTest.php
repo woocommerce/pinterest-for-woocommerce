@@ -54,7 +54,18 @@ class RefreshTokenTest extends \WP_UnitTestCase {
 					$url
 				);
 				$this->assertEquals( 'pinr.refresh_token', $parsed_args['body']['refresh_token'] ?? '' );
-				return true;
+				return array(
+					'body' =>
+						json_encode(
+							array(
+								'token_type'    => 'bearer',
+								'access_token'  => 'pina.access_token',
+								'expires_in'    => 30 * DAY_IN_SECONDS,
+								'refresh_token' => 'pinr.new_refresh_token',
+								'scope'         => 'ads:read ads:write catalogs:read catalogs:write pins:read pins:write user_accounts:read user_accounts:write',
+							),
+					),
+				);
 			},
 			10,
 			3
