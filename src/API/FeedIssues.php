@@ -11,10 +11,10 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 
+use Automattic\WooCommerce\Pinterest\FeedStatusService;
 use \WP_REST_Server;
 use \WP_REST_Request;
 use \WP_REST_Response;
-use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -45,89 +45,54 @@ class FeedIssues extends VendorAPI {
 		$this->register_routes();
 	}
 
-
 	/**
-	 * Get the feed issue lines for the last workflow of the current feed.
+	 * Main endpoint callback.
 	 *
-	 * @return array|WP_REST_Response|\WP_Error
-	 *
-	 * @param WP_REST_Request $request The request.
-	 *
-	 * @throws Exception PHP Exception.
+	 * @param WP_REST_Request $request The request object.
+	 * @return array[]|WP_REST_Response
 	 */
 	public function get_feed_issues( WP_REST_Request $request ) {
+		$ad_account_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
+		$feed_id       = FeedRegistration::get_locally_stored_registered_feed_id();
 
-		try {
-			$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-			$feed_id     = FeedRegistration::get_locally_stored_registered_feed_id();
-			if ( ! Pinterest\ProductSync::is_product_sync_enabled() || ! $feed_id || ! $merchant_id ) {
-				return array( 'lines' => array() );
-			}
-
-			$workflow        = false;
-			$issues_file_url = $request->has_param( 'feed_issues_url' ) ? $request->get_param( 'feed_issues_url' ) : false;
-			$paged           = $request->has_param( 'paged' ) ? (int) $request->get_param( 'paged' ) : 1;
-			$per_page        = $request->has_param( 'per_page' ) ? (int) $request->get_param( 'per_page' ) : 25;
-
-			if ( false === $issues_file_url ) {
-				$workflow = Pinterest\Feeds::get_feed_latest_workflow( (string) $merchant_id, (string) $feed_id );
-
-				if ( $workflow && isset( $workflow->s3_validation_url ) ) {
-					$issues_file_url = $workflow->s3_validation_url;
-				}
-			}
-
-			if ( empty( $issues_file_url ) ) {
-				return array( 'lines' => array() );
-			}
-
-			// Get file.
-			$issues_file = $this->get_remote_file( $issues_file_url, (array) $workflow );
-
-			if ( empty( $issues_file ) ) {
-				throw new Exception( esc_html__( 'Error downloading feed issues file from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
-			}
-
-			$start_line  = ( ( $paged - 1 ) * $per_page );
-			$end_line    = $start_line + $per_page - 1; // Starting from 0.
-			$issues_data = self::parse_lines( $issues_file, $start_line, $end_line );
-
-			if ( ! empty( $issues_data['lines'] ) ) {
-				$issues_data['lines'] = array_map( array( __CLASS__, 'prepare_issue_lines' ), $issues_data['lines'] );
-			}
-
-			$response = new WP_REST_Response(
-				array(
-					'lines'      => $issues_data['lines'],
-					'total_rows' => $issues_data['total'],
-				)
-			);
-
-			$response->header( 'X-WP-Total', $issues_data['total'] );
-			$response->header( 'X-WP-TotalPages', ceil( $issues_data['total'] / $per_page ) );
-
-			return $response;
-
-		} catch ( \Throwable $th ) {
-
-			/* Translators: The error description as returned from the API */
-			$error_message = sprintf( esc_html__( 'Could not get current feed\'s issues. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
-
-			return new \WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_advertisers_error', $error_message, array( 'status' => $th->getCode() ) );
+		if ( ! Pinterest\ProductSync::is_product_sync_enabled() || ! $feed_id || ! $ad_account_id ) {
+			return array( 'lines' => array() );
 		}
-	}
 
+		$results = Pinterest\Feeds::get_feed_recent_processing_results( $feed_id );
+		if ( empty( $results ) ) {
+			return array( 'lines' => array() );
+		}
+
+		$per_page          = $request->has_param( 'per_page' ) ? (int) $request->get_param( 'per_page' ) : 25;
+		$feed_item_details = Pinterest\Feeds::get_feed_processing_result_items_issues( $results['id'], $per_page );
+
+		$lines    = array_reduce( $feed_item_details, array( __CLASS__, 'prepare_issue_lines' ), array() );
+		$response = new WP_REST_Response(
+			array(
+				'lines'      => $lines,
+				'total_rows' => count( $lines ),
+			)
+		);
+
+		$response->header( 'X-WP-Total', count( $lines ) );
+		$response->header( 'X-WP-TotalPages', ceil( count( $lines ) / $per_page ) );
+
+		return $response;
+	}
 
 	/**
 	 * Add product specific data to each line.
 	 *
-	 * @param array $line The array contaning each col value for the line.
-	 *
+	 * @param array $acc  The accumulator array.
+	 * @param array $item The array containing each col value for the line.
 	 * @return array
+	 *
+	 * @since x.x.x
 	 */
-	private static function prepare_issue_lines( $line ) {
+	private static function prepare_issue_lines( array $acc, array $item ): array {
 
-		$product      = wc_get_product( $line['ItemId'] );
+		$product      = wc_get_product( $item['item_id'] ?? '' );
 		$edit_link    = '';
 		$product_name = esc_html__( 'Invalid product', 'pinterest-for-woocommerce' );
 
@@ -142,15 +107,28 @@ class FeedIssues extends VendorAPI {
 
 		$edit_link = empty( $edit_link ) && $product ? get_edit_post_link( $product->get_id(), 'not_display' ) : $edit_link; // get_edit_post_link() will return '&' instead of  '&amp;' for anything other than the 'display' context.
 
-		return array(
-			'status'            => 'ERROR' === $line['Code'] ? 'error' : 'warning',
-			'product_name'      => $product_name,
-			'product_edit_link' => $edit_link,
-			'issue_description' => $line['Message'],
-		);
+		foreach ( $item['errors'] as $key => $error ) {
+			$description = FeedStatusService::ERROR_MESSAGES[ $key ] ?? $key;
+			$acc[]       = array(
+				'status'            => 'error',
+				'product_name'      => $product_name,
+				'product_edit_link' => $edit_link,
+				'issue_description' => "{$description}: {$error['attribute_name']} - {$error['provided_value']}",
+			);
+		}
+
+		foreach ( $item['warnings'] as $key => $warning ) {
+			$description = FeedStatusService::ERROR_MESSAGES[ $key ] ?? $key;
+			$acc[]       = array(
+				'status'            => 'warning',
+				'product_name'      => $product_name,
+				'product_edit_link' => $edit_link,
+				'issue_description' => "{$description}: {$warning['attribute_name']} - {$warning['provided_value']}",
+			);
+		}
+
+		return $acc;
 	}
-
-
 
 	/**
 	 * Reads the file given in $issues_file, parses and returns the content of lines

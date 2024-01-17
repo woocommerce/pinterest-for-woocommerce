@@ -9,11 +9,10 @@
 namespace Automattic\WooCommerce\Pinterest\Notes\Collection;
 
 use Automattic\WooCommerce\Admin\Notes\Note;
+use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\ProductSync;
 use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
-use Automattic\WooCommerce\Pinterest\FeedRegistration;
-use Throwable;
 
 /**
  * Class CatalogSyncErrors.
@@ -38,9 +37,8 @@ class CatalogSyncErrors extends AbstractNote {
 			return false;
 		}
 
-		$feed_id     = FeedRegistration::get_locally_stored_registered_feed_id();
-		$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-		if ( ! ProductSync::is_product_sync_enabled() || ! $feed_id || ! $merchant_id ) {
+		$feed_id = FeedRegistration::get_locally_stored_registered_feed_id();
+		if ( ! ProductSync::is_product_sync_enabled() || ! $feed_id ) {
 			return false;
 		}
 
@@ -53,29 +51,25 @@ class CatalogSyncErrors extends AbstractNote {
 			return false;
 		}
 
-		try {
-			$workflow = Feeds::get_feed_latest_workflow( (string) $merchant_id, (string) $feed_id );
-			if ( ! $workflow ) {
-				// No workflow to check.
-				return false;
-			}
-			switch ( $workflow->workflow_status ) {
-				case 'COMPLETED':
-				case 'COMPLETED_EARLY':
-				case 'PROCESSING':
-				case 'UNDER_REVIEW':
-				case 'QUEUED_FOR_PROCESSING':
-					return false;
-
-				case 'FAILED':
-				default:
-					return true;
-			}
-		} catch ( Throwable $th ) {
-			// Whatever failed we don't care about it in this process.
+		$processing_results = Feeds::get_feed_recent_processing_results( $feed_id );
+		if ( empty( $processing_results ) ) {
+			// No workflow to check.
 			return false;
 		}
+		switch ( $processing_results['status'] ?? '' ) {
+			case Feeds::FEED_PROCESSING_STATUS_COMPLETED:
+			case Feeds::FEED_PROCESSING_STATUS_COMPLETED_EARLY:
+			case Feeds::FEED_PROCESSING_STATUS_PROCESSING:
+			case Feeds::FEED_PROCESSING_STATUS_QUEUED_FOR_PROCESSING:
+			case Feeds::FEED_PROCESSING_STATUS_UNDER_APPEAL:
+			case Feeds::FEED_PROCESSING_STATUS_UNDER_REVIEW:
+				return false;
 
+			case Feeds::FEED_PROCESSING_STATUS_DISAPPROVED:
+			case Feeds::FEED_PROCESSING_STATUS_FAILED:
+			default:
+				return true;
+		}
 	}
 
 	/**

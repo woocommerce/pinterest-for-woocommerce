@@ -137,12 +137,11 @@ class PinterestChannel implements MarketingChannelInterface {
 		$count = 0;
 
 		try {
-			$feed_id     = FeedRegistration::get_locally_stored_registered_feed_id();
-			$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-			if ( $feed_id && $merchant_id ) {
-				$workflow = Feeds::get_feed_latest_workflow( (string) $merchant_id, (string) $feed_id );
-				if ( $workflow ) {
-					$count = FeedStatusService::get_workflow_overview_stats( $workflow )['errors'];
+			$feed_id = FeedRegistration::get_locally_stored_registered_feed_id();
+			if ( $feed_id ) {
+				$processing_results = Feeds::get_feed_recent_processing_results( $feed_id );
+				if ( $processing_results ) {
+					$count = FeedStatusService::get_processing_result_overview_stats( $processing_results )['errors'] ?? 0;
 				}
 			}
 		} catch ( \Exception $e ) {
@@ -205,7 +204,7 @@ class PinterestChannel implements MarketingChannelInterface {
 	 */
 	private function get_feed_registration_status(): string {
 		try {
-			$feed_registration_status = FeedStatusService::get_feed_registration_status();
+			$feed_registration_status = FeedStatusService::get_feed_status();
 		} catch ( \Exception $e ) {
 			return self::PRODUCT_LISTINGS_SYNC_FAILED;
 		}

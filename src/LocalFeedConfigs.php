@@ -55,7 +55,7 @@ class LocalFeedConfigs {
 	 * @since 1.0.10
 	 */
 	protected function __construct() {
-		$locations = array( Pinterest_For_Woocommerce()::get_base_country() ?? 'US' ); // Replace with multiple countries array for multiple feed config.
+		$locations = array( Pinterest_For_Woocommerce()::get_base_country() ); // Replace with multiple countries array for multiple feed config.
 		$this->initialize_local_feeds_config( $locations );
 	}
 
@@ -66,8 +66,10 @@ class LocalFeedConfigs {
 	 * @param array $locations Array of location to generate the feed files for.
 	 */
 	private function initialize_local_feeds_config( $locations ) {
-
-		$feed_ids = (array) Pinterest_For_Woocommerce()::get_data( 'local_feed_ids' ) ?: array();
+		$feed_ids = Pinterest_For_Woocommerce()::get_data( 'local_feed_ids' );
+		if ( empty( $feed_ids ) ) {
+			$feed_ids = array();
+		}
 
 		foreach ( $locations as $location ) {
 			if ( array_key_exists( $location, $feed_ids ) ) {

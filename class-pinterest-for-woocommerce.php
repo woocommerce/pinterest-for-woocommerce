@@ -205,7 +205,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			define( 'PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE', 'wp_rest' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_VERSION', '1' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT', 'oauth/callback' );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_AUTH', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_auth_key' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX', 'pfw' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_PINTEREST_API_VERSION', PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_pinterest_api_version' );
 		}
@@ -896,8 +895,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$state = http_build_query( $state_params );
 
-			set_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
-
 			// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
 			// nosemgrep: audit.php.wp.security.xss.query-arg
 			return self::get_connection_proxy_url() . 'connect/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
@@ -1415,13 +1412,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Checks if connected by checking if we got a token in the db.
+		 * Checks if connected by checking if there is integration key in the data store.
 		 *
 		 * @return boolean
 		 */
 		public static function is_connected() {
-			$token = self::get_access_token();
-			return $token && ! empty( $token['access_token'] );
+			$integration = self::get_data( 'integration_data' );
+			return ! empty( $integration['id'] ?? '' );
 		}
 
 
@@ -1470,7 +1467,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_applicable_tos() {
 
-			$base_country = self::get_base_country();
+			$base_country = self::get_base_country( null );
 
 			return $base_country && isset( self::TOS_PER_COUNTRY[ $base_country ] ) ? self::TOS_PER_COUNTRY[ $base_country ] : self::TOS_PER_COUNTRY['*'];
 		}
@@ -1478,16 +1475,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Helper function to return the country set in WC's settings using wc_get_base_location().
 		 *
-		 * @return string|null
+		 * @param string $default Default country code to return if no country is set.
+		 *
+		 * @return mixed|string|null
 		 */
-		public static function get_base_country() {
+		public static function get_base_country( $default = 'US' ) {
 			if ( ! function_exists( 'wc_get_base_location' ) ) {
 				return null;
 			}
 
 			$base_location = wc_get_base_location();
 
-			return ! empty( $base_location['country'] ) ? $base_location['country'] : null;
+			return ! empty( $base_location['country'] ) ? $base_location['country'] : $default;
 		}
 
 		/**

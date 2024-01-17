@@ -64,9 +64,7 @@ class TagTest extends \WP_UnitTestCase {
 	}
 
 	public function test_load_deferred_events_returns_empty_array_after_init() {
-		$tag = new Tag();
-
-		$events = $tag->load_deferred_events();
+		$events = Tag::load_deferred_events();
 
 		$this->assertEmpty( $events );
 	}
@@ -78,9 +76,7 @@ class TagTest extends \WP_UnitTestCase {
 		Tag::add_deferred_event( 'some_event_name_13512345', array( 'data' => 'James B0nd' ) );
 		Tag::save_deferred_events();
 
-		$tag = new Tag();
-
-		$events = $tag->load_deferred_events();
+		$events = Tag::load_deferred_events();
 
 		$expected = array(
 			"pintrk( 'track', 'some_event_name_13512345' , {\"data\":\"James B0nd\"});"
