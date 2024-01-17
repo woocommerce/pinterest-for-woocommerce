@@ -8,8 +8,10 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\API\APIV5;
 use Automattic\WooCommerce\Pinterest\API\Base;
 use Exception;
+use Pinterest_For_Woocommerce;
 use Pinterest_For_Woocommerce_Ads_Supported_Countries;
 use Throwable;
 
@@ -45,8 +47,7 @@ class AdCredits {
 	 * @return mixed
 	 */
 	public static function handle_redeem_credit() {
-
-		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
 			// Advertiser not connected redeem operation makes no sense.
 			return true;
 		}
@@ -85,49 +86,24 @@ class AdCredits {
 	 * @return bool Weather the coupon was successfully redeemed or not.
 	 */
 	public static function redeem_credits( $offer_code, &$error_code = null, &$error_message = null ) {
-
-		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
 			// Advertiser not connected, we can't check if credits were redeemed.
 			return false;
 		}
 
-		$advertiser_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
-
-		if ( false === $advertiser_id ) {
-			// No advertiser id stored. But we are connected. This is an abnormal state that should not happen.
-			Logger::log( __( 'Advertiser connected but the connection id is missing.', 'pinterest-for-woocommerce' ) );
-			return false;
-		}
-
+		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 		try {
-			$result = Base::redeem_ads_offer_code( $advertiser_id, $offer_code );
-			if ( 'success' !== $result['status'] ) {
+			$offer_code_credits_data = APIV5::redeem_ads_offer_code( $ad_account_id, $offer_code );
+			if ( ! $offer_code_credits_data['success'] ) {
+				$error_code    = $offer_code_credits_data['errorCode'];
+				$error_message = $offer_code_credits_data['errorMessage'];
+				Logger::log( "{$error_code}: {$error_message}", 'error' );
 				return false;
 			}
-
-			$redeem_credits_data     = (array) $result['data'];
-			$offer_code_credits_data = reset( $redeem_credits_data );
-			if ( false === $offer_code_credits_data ) {
-				// No data for the requested offer code.
-				Logger::log( __( 'There is no available data for the requested offer code.', 'pinterest-for-woocommerce' ) );
-				return false;
-			}
-
-			if ( ! $offer_code_credits_data->success ) {
-				Logger::log( $offer_code_credits_data->failure_reason, 'error' );
-				$error_code    = $offer_code_credits_data->error_code;
-				$error_message = $offer_code_credits_data->failure_reason;
-
-				return false;
-			}
-
 			return true;
-
 		} catch ( Throwable $th ) {
-
 			Logger::log( $th->getMessage(), 'error' );
 			return false;
-
 		}
 	}
 
@@ -225,7 +201,7 @@ class AdCredits {
 	 * @return mixed False when no info is available, discounts object when discounts are available.
 	 */
 	public static function process_available_discounts() {
-		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
 			// Advertiser not connected, we can't check if credits were redeemed.
 			return false;
 		}
