@@ -135,16 +135,19 @@ class Tag implements Tracker {
 	 *
 	 * @return array
 	 */
-	public function load_deferred_events() {
+	public static function load_deferred_events() {
 		$transient_key = static::get_deferred_events_transient_key();
-		if ( $transient_key ) {
-			$async_events = get_transient( $transient_key );
-			if ( $async_events ) {
-				delete_transient( $transient_key );
-				return $async_events;
-			}
+		if ( ! $transient_key ) {
+			return array();
 		}
-		return array();
+
+		$async_events = get_transient( $transient_key );
+		if ( ! $async_events ) {
+			return array();
+		}
+
+		delete_transient( $transient_key );
+		return $async_events;
 	}
 
 	/**
@@ -171,8 +174,15 @@ class Tag implements Tracker {
 	 */
 	public static function save_deferred_events() {
 		$transient_key = static::get_deferred_events_transient_key();
+		if ( ! $transient_key ) {
+			return;
+		}
+
+		$existing_events         = static::load_deferred_events();
+		static::$deferred_events = array_merge( $existing_events, static::$deferred_events );
+
 		if ( ! empty( static::$deferred_events ) ) {
-			set_transient( $transient_key, static::$deferred_events, 60 * 60 * 24 );
+			set_transient( $transient_key, static::$deferred_events, DAY_IN_SECONDS );
 		}
 	}
 

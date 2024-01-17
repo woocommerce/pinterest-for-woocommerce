@@ -92,9 +92,7 @@ class FeedRegistration {
 			if ( self::register_feed() ) {
 				return true;
 			}
-
 			throw new Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
-
 		} catch ( PinterestApiLocaleException $e ) {
 			Pinterest_For_Woocommerce()::save_data( 'merchant_locale_not_valid', true );
 
@@ -110,7 +108,6 @@ class FeedRegistration {
 			self::log( $th->getMessage(), 'error' );
 			return false;
 		}
-
 	}
 
 	/**
@@ -157,14 +154,13 @@ class FeedRegistration {
 	 * Enable the registered feed if it is not enabled.
 	 * Disable all other feed configurations for the merchant.
 	 *
-	 * @since 1.2.13
-	 *
 	 * @param string $feed_id Feed ID.
-	 *
 	 * @return void
-	 * @throws Exception PHP Exception.
+	 *
+	 * @throws PinterestApiException Feed could not be fetched.
+	 * @since 1.2.13
 	 */
-	private static function feed_enable_status_maintenance( $feed_id ) {
+	private static function feed_enable_status_maintenance( string $feed_id ) {
 		// Check if the feed is enabled. If not, enable it.
 		if ( ! Feeds::is_local_feed_enabled( $feed_id ) ) {
 			Feeds::enabled_feed( $feed_id );
@@ -178,14 +174,12 @@ class FeedRegistration {
 	 * Check if there are stale feeds that are registered but not in the local feed configurations.
 	 * Deregister them if they are registered as WooCommerce integration.
 	 *
-	 * @since 1.2.13
-	 *
 	 * @param string $feed_id Feed ID.
-	 *
 	 * @return void
-	 * @throws Exception PHP Exception.
+	 *
+	 * @since 1.2.13
 	 */
-	public static function maybe_disable_stale_feeds_for_merchant( $feed_id ) {
+	public static function maybe_disable_stale_feeds_for_merchant( string $feed_id ) {
 		$feeds = Feeds::get_feeds();
 
 		if ( empty( $feeds ) ) {

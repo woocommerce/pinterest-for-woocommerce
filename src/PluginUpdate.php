@@ -235,12 +235,12 @@ class PluginUpdate {
 		 * 2. Move feed file id to a new location.
 		 */
 		$feed_id = Pinterest_For_Woocommerce()::get_data( 'local_feed_id' );
-		if ( null !== $feed_id ) {
+		if ( $feed_id ) {
 			/*
 			 * 2-a. Move location id to array of ids.
 			 */
 			$feed_ids = array(
-				Pinterest_For_Woocommerce()::get_base_country() ?? 'US' => $feed_id,
+				Pinterest_For_Woocommerce()::get_base_country() => $feed_id,
 			);
 			Pinterest_For_Woocommerce()::save_data( 'local_feed_ids', $feed_ids );
 

@@ -99,7 +99,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 		 * @return bool Wether this is ads supported location.
 		 */
 		public static function is_ads_supported_country() {
-			$store_country = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
+			$store_country = Pinterest_For_Woocommerce()::get_base_country();
 			return in_array( $store_country, self::get_countries(), true );
 		}
 	}
