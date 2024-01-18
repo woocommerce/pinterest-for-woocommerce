@@ -113,8 +113,9 @@ class Feeds {
 			'pinterest_for_woocommerce_unique_feed_name',
 			sprintf(
 				// translators: %1$s is a country ISO 2 code, %2$s is a currency ISO 3 code.
-				esc_html__( 'Created by Pinterest for WooCommerce %1$s-%2$s', 'pinterest-for-woocommerce' ),
+				esc_html__( 'Created by Pinterest for WooCommerce %1$s|%2$s|%3$s', 'pinterest-for-woocommerce' ),
 				esc_html( $default_country ),
+				esc_html( $default_locale ),
 				esc_html( $default_currency )
 			)
 		);
@@ -181,6 +182,7 @@ class Feeds {
 	 * @param array  $data    The data to update the feed with.
 	 *
 	 * @return array
+	 * @throws Throwable PHP Exception if there is an error updating the feed.
 	 */
 	public static function update_feed( string $feed_id, array $data ) {
 		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
@@ -199,10 +201,9 @@ class Feeds {
 		try {
 			return APIV5::update_feed( $feed_id, $data, $ad_account_id );
 		} catch ( Throwable $th ) {
-			//throw $th;
+			Logger::log( $th->getMessage(), 'error' );
+			throw $th;
 		}
-
-		return array();
 	}
 
 	/**
@@ -270,9 +271,6 @@ class Feeds {
 	 * @throws PinterestApiLocaleException No valid locale found to check for the registered feed.
 	 */
 	public static function match_local_feed_configuration_to_registered_feeds( array $feeds = array() ): string {
-		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
-		$config        = reset( $configs );
-		$local_path    = $config['feed_url'];
 		$local_country = Pinterest_For_Woocommerce()::get_base_country();
 		$local_locale  = LocaleMapper::get_locale_for_api();
 
@@ -281,10 +279,10 @@ class Feeds {
 		}
 
 		foreach ( $feeds as $feed ) {
-			// $does_match = $local_path === $feed['location'];
-			// $does_match = $does_match && $local_country === $feed['default_country'];
-			$does_match = $local_country === $feed['default_country'];
-			$does_match = $does_match && $local_locale === $feed['default_locale'];
+			// Match feeds created by Pinterest for WooCommerce extension.
+			$does_match = 0 === strpos( $feed['name'] ?? '', 'Created by Pinterest for WooCommerce' );
+			$does_match = $does_match && $local_country === $feed['default_country'] ?? '';
+			$does_match = $does_match && $local_locale === $feed['default_locale'] ?? '';
 			if ( $does_match ) {
 				// We can assume we're on the same site.
 				return $feed['id'];
