@@ -284,7 +284,6 @@ class Feeds {
 			$does_match = $does_match && $local_country === $feed['default_country'] ?? '';
 			$does_match = $does_match && $local_locale === $feed['default_locale'] ?? '';
 			if ( $does_match ) {
-				// We can assume we're on the same site.
 				return $feed['id'];
 			}
 		}
