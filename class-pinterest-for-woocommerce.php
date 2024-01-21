@@ -1415,7 +1415,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Checks if connected by checking if there is integration key in the data store.
+		 * Checks if connected by checking if there is integration ID in the data store.
 		 *
 		 * @return boolean
 		 */
