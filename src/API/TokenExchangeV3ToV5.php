@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest\Crypto;
 use Automattic\WooCommerce\Pinterest\Logger;
+use Throwable;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -63,6 +64,34 @@ class TokenExchangeV3ToV5 extends APIV5 {
 		$token_data = $respone['data'];
 
 		Pinterest_For_Woocommerce()::save_token_data( $token_data );
+
+		$info_data = array(
+			'advertiser_id' => '',
+			'tag_id'        => '',
+			'merchant_id'   => '',
+			'feature_flags' => array(
+				'tags'    => true,
+				'CAPI'    => true,
+				'catalog' => true,
+			),
+		);
+		Pinterest_For_Woocommerce()::save_connection_info_data( $info_data );
+
+		try {
+			do_action( 'pinterest_for_woocommerce_token_saved' );
+		} catch ( Throwable $th ) {
+			/* Translators: The error description */
+			Logger::log(
+				sprintf(
+					esc_html__(
+						'Could not finish the Pinterest API connection flow. Try reconnecting to Pinterest. [%s]',
+						'pinterest-for-woocommerce'
+					),
+					$th->getMessage()
+				),
+				'error'
+			);
+		}
 
 		return true;
 	}
