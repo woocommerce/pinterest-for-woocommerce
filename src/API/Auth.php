@@ -122,7 +122,9 @@ class Auth extends VendorAPI {
 		Pinterest_For_Woocommerce()::save_connection_info_data( $info_data );
 
 		try {
-			// Actions to perform after getting the authorization token.
+			/**
+			 * Actions to perform after getting the authorization token.
+			 */
 			do_action( 'pinterest_for_woocommerce_token_saved' );
 		} catch ( Throwable $th ) {
 			$error = esc_html__( 'There was an error getting the account data. Please try again later.', 'pinterest-for-woocommerce' );

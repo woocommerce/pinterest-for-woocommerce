@@ -323,6 +323,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return Pinterest\Tracking|false
 		 */
 		public static function init_tracking() {
+			/**
+			 * Filters whether to disable tracking.
+			 *
+			 * @since x.x.x
+			 *
+			 * @param bool $disable_tracking Whether to disable tracking.
+			 */
 			$is_tracking_disabled             = apply_filters( 'woocommerce_pinterest_disable_tracking', false );
 			$is_tracking_conversions_disabled = ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
 			$is_not_a_site                    = wp_doing_cron() || is_admin();
@@ -1102,7 +1109,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 				$verified_websites = array_reduce(
 					Pinterest\API\APIV5::get_user_websites()['items'] ?? array(),
-					function( $carry, $item ) {
+					function ( $carry, $item ) {
 						if ( 'verified' === $item['status'] ) {
 							$carry[] = $item['website'];
 						}

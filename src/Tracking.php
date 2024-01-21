@@ -278,7 +278,7 @@ class Tracking {
 	public function remove_tracker( string $tracker ) {
 		$this->trackers = array_filter(
 			$this->trackers,
-			function( $item ) use ( $tracker ) {
+			function ( $item ) use ( $tracker ) {
 				return get_class( $item ) !== $tracker;
 			}
 		);

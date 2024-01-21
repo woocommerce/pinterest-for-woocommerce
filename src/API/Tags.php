@@ -60,14 +60,14 @@ class Tags extends VendorAPI {
 			if ( empty( $tags ) ) {
 				try {
 					$tag  = APIV5::create_tag( $ad_account_id );
-					$tags = [ $tag ];
+					$tags = array( $tag );
 				} catch ( Throwable $th ) {
 					throw new Exception( esc_html__( 'Could not create a tag. Please check the logs for additional information.', 'pinterest-for-woocommerce' ), 400 );
 				}
 			}
 
 			return array_map(
-				function( $tag ) {
+				function ( $tag ) {
 					return array(
 						'id'   => $tag['id'],
 						'name' => $tag['name'],

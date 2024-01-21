@@ -285,13 +285,16 @@ class Conversions implements Tracker {
 		$is_error = isset( $response['code'] );
 		// Successful requests do not have a code nor a message.
 		if ( $is_error ) {
-			throw new Exception( $response['message'], $response['code'] );
+			throw new Exception(
+				esc_html__( $response['message'], 'pinterest-for-woocommerce' ),
+				esc_html__( $response['code'], 'pinterest-for-woocommerce' )
+			);
 		} else {
 			$data    = $response['events'][0] ?? array();
 			$status  = $data['status'] ?? 'failed';
 			$message = $data['error_message'] ?? $data['warning_message'] ?? 'Unknown';
 			if ( 'failed' === $status ) {
-				throw new Exception( $message, 0 );
+				throw new Exception( esc_html__( $message, 'pinterest-for-woocommerce' ), 0 );
 			}
 		}
 	}

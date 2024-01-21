@@ -76,8 +76,7 @@ class Base {
 	 *
 	 * @return array
 	 *
-	 * @throws PinterestApiException Pinterest API exception in case of API error in response.
-	 * @throws Exception             PHP exception.
+	 * @throws PinterestApiException|Exception Pinterest API exception in case of API error in response.
 	 */
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 		$api = empty( $api ) ? '' : trailingslashit( $api );

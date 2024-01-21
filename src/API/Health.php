@@ -8,7 +8,6 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
-use Automattic\WooCommerce\Pinterest as Pinterest;
 use WP_REST_Server;
 
 if ( ! defined( 'ABSPATH' ) ) {

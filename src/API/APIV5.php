@@ -686,7 +686,7 @@ class APIV5 extends Base {
 	 *     }
 	 *     @type string $bookmark Cursor used to fetch the next page of items.
 	 * }
-	 * @throws PinterestApiException
+	 * @throws PinterestApiException If the request fails with other than 2xx status.
 	 */
 	public static function get_ads_credit_discounts( string $ad_account_id ): array {
 		return self::make_request(

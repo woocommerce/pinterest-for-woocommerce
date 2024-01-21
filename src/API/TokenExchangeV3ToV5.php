@@ -78,13 +78,18 @@ class TokenExchangeV3ToV5 extends APIV5 {
 		Pinterest_For_Woocommerce()::save_connection_info_data( $info_data );
 
 		try {
+			/**
+			 * Actions to perform after getting the authorization token.
+			 *
+			 * @since x.x.x
+			 */
 			do_action( 'pinterest_for_woocommerce_token_saved' );
 		} catch ( Throwable $th ) {
-			/* Translators: The error description */
 			Logger::log(
 				sprintf(
 					esc_html__(
-						'Could not finish the Pinterest API connection flow. Try reconnecting to Pinterest. [%s]',
+						/* translators: 1. Error message. */
+						'Could not finish the Pinterest API connection flow. Try reconnecting to Pinterest. [%1$s]',
 						'pinterest-for-woocommerce'
 					),
 					$th->getMessage()
@@ -116,5 +121,4 @@ class TokenExchangeV3ToV5 extends APIV5 {
 
 		return $token;
 	}
-
 }

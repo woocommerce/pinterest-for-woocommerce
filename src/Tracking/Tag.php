@@ -371,7 +371,6 @@ class Tag implements Tracker {
 			sprintf( '<a href="%s" target="_blank">', esc_url( wc_admin_url( '&path=/pinterest/settings' ) ) ),
 			'</a>',
 		);
-
 	}
 
 	/**
