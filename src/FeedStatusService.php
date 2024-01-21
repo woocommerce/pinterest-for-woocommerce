@@ -168,11 +168,21 @@ class FeedStatusService {
 
 	const FEED_STATUS_ERROR_FETCHING_FEED = 'error_fetching_feed';
 
-	const FEED_STATUS_INACTIVE = 'inactive';
+	const FEED_STATUS_COMPLETED = 'completed';
 
-	const FEED_STATUS_ACTIVE = 'active';
+	const FEED_STATUS_COMPLETED_EARLY = 'completed_early';
 
-	const FEED_STATUS_DELETED = 'deleted';
+	const FEED_STATUS_DISAPPROVED = 'disapproved';
+
+	const FEED_STATUS_FAILED = 'failed';
+
+	const FEED_STATUS_PROCESSING = 'processing';
+
+	const FEED_STATUS_QUEUED_FOR_PROCESSING = 'queued_for_processing';
+
+	const FEED_STATUS_UNDER_APPEAL = 'under_appeal';
+
+	const FEED_STATUS_UNDER_REVIEW = 'under_review';
 
 	/**
 	 * Get the feed registration status.
@@ -183,38 +193,21 @@ class FeedStatusService {
 	 *                - inactive: The feed is registered but inactive at Pinterest.
 	 *                - active: The feed is registered and active at Pinterest.
 	 *                - deleted: The feed is registered but marked as deleted at Pinterest.
-	 *
-	 * @throws Exception PHP Exception.
 	 */
-	public static function get_feed_status(): string {
+	public static function get_feed_registration_status(): string {
 		$feed_id = FeedRegistration::get_locally_stored_registered_feed_id();
 
 		if ( empty( $feed_id ) ) {
 			return static::FEED_STATUS_NOT_REGISTERED;
 		}
 
-		try {
-			$feed = Feeds::get_feed( $feed_id );
+		$feed = Feeds::get_feed_recent_processing_results( $feed_id );
 
-			if ( empty( $feed ) ) {
-				return static::FEED_STATUS_NOT_REGISTERED;
-			}
-
-			$is_deleted = Feeds::FEED_STATUS_DELETED === ( $feed['status'] ?? '' );
-			$is_paused  = Feeds::FEED_STATUS_INACTIVE === ( $feed['status'] ?? '' );
-
-			if ( $is_deleted ) {
-				return static::FEED_STATUS_DELETED;
-			}
-
-			if ( $is_paused ) {
-				return static::FEED_STATUS_INACTIVE;
-			}
-
-			return static::FEED_STATUS_ACTIVE;
-		} catch ( PinterestApiException $e ) {
-			return static::FEED_STATUS_ERROR_FETCHING_FEED;
+		if ( empty( $feed ) ) {
+			return static::FEED_STATUS_NOT_REGISTERED;
 		}
+
+		return strtolower( $feed['status'] ) ?? static::FEED_STATUS_NOT_REGISTERED;
 	}
 
 	/**

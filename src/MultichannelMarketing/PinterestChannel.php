@@ -16,6 +16,7 @@ use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\FeedStatusService;
 use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Automattic\WooCommerce\Pinterest\ProductSync;
+use Exception;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -203,29 +204,25 @@ class PinterestChannel implements MarketingChannelInterface {
 	 * @return string
 	 */
 	private function get_feed_registration_status(): string {
-		try {
-			$feed_registration_status = FeedStatusService::get_feed_status();
-		} catch ( \Exception $e ) {
+		$feed_registration_status = FeedStatusService::get_feed_registration_status();
+
+		$failed = array(
+			FeedStatusService::FEED_STATUS_DISAPPROVED,
+			FeedStatusService::FEED_STATUS_FAILED,
+		);
+		if ( in_array( $feed_registration_status, $failed, true ) ) {
 			return self::PRODUCT_LISTINGS_SYNC_FAILED;
 		}
 
-		if ( in_array(
-			$feed_registration_status,
-			array(
-				'not_registered',
-				'pending',
-				'appeal_pending',
-			),
-			true
-		) ) {
-			$status = self::PRODUCT_LISTINGS_SYNC_IN_PROGRESS;
-		} elseif ( 'approved' === $feed_registration_status ) {
-			$status = self::PRODUCT_LISTINGS_SYNCED;
-		} else {
-			$status = self::PRODUCT_LISTINGS_SYNC_FAILED;
+		$succeeded = array(
+			FeedStatusService::FEED_STATUS_COMPLETED,
+			FeedStatusService::FEED_STATUS_COMPLETED_EARLY,
+		);
+		if ( in_array( $feed_registration_status, $succeeded, true ) ) {
+			return self::PRODUCT_LISTINGS_SYNCED;
 		}
 
-		return $status;
+		return self::PRODUCT_LISTINGS_SYNC_IN_PROGRESS;
 	}
 
 	/**

@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest as Pinterest;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\Feeds;
+use Automattic\WooCommerce\Pinterest\FeedStatusService;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductSync;
 use Automattic\WooCommerce\Pinterest\RichPins;
@@ -224,8 +225,8 @@ class FeedState extends VendorAPI {
 			'pinterest-for-woocommerce'
 		);
 
-		$status = Pinterest\FeedStatusService::get_feed_status();
-		if ( Pinterest\FeedStatusService::FEED_STATUS_NOT_REGISTERED === $status ) {
+		$status = FeedStatusService::get_feed_registration_status();
+		if ( FeedStatusService::FEED_STATUS_NOT_REGISTERED === $status ) {
 			$status       = 'pending';
 			$status_label = esc_html__(
 				'Product feed not yet configured on Pinterest.',
@@ -233,36 +234,44 @@ class FeedState extends VendorAPI {
 			);
 		}
 
-		if ( Pinterest\FeedStatusService::FEED_STATUS_ERROR_FETCHING_FEED === $status ) {
+		if ( FeedStatusService::FEED_STATUS_ERROR_FETCHING_FEED === $status ) {
 			$status       = 'error';
-			$status_label = esc_html__(
-				'Could not get feed info.',
-				'pinterest-for-woocommerce'
-			);
+			$status_label = esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' );
 		}
 
-		if ( Pinterest\FeedStatusService::FEED_STATUS_INACTIVE === $status ) {
+		if ( FeedStatusService::FEED_STATUS_DISAPPROVED === $status ) {
 			$status       = 'error';
-			$status_label = esc_html__(
-				'Product feed not active.',
-				'pinterest-for-woocommerce'
-			);
+			$status_label = esc_html__( 'Product feed declined by Pinterest', 'pinterest-for-woocommerce' );
 		}
 
-		if ( Pinterest\FeedStatusService::FEED_STATUS_DELETED === $status ) {
-			$status       = 'error';
-			$status_label = esc_html__(
-				'Product feed not active.',
-				'pinterest-for-woocommerce'
-			);
-		}
-
-		if ( Pinterest\FeedStatusService::FEED_STATUS_ACTIVE === $status ) {
+		$succeeded = array(
+			FeedStatusService::FEED_STATUS_COMPLETED,
+			FeedStatusService::FEED_STATUS_COMPLETED_EARLY,
+		);
+		if ( in_array( $status, $succeeded, true ) ) {
 			$status       = 'success';
-			$status_label = esc_html__(
-				'Product feed configured for ingestion on Pinterest',
-				'pinterest-for-woocommerce'
-			);
+			$status_label = esc_html__( 'Product feed configured for ingestion on Pinterest', 'pinterest-for-woocommerce' );
+		}
+
+		$pending = array(
+			FeedStatusService::FEED_STATUS_QUEUED_FOR_PROCESSING,
+			FeedStatusService::FEED_STATUS_UNDER_APPEAL,
+			FeedStatusService::FEED_STATUS_UNDER_REVIEW,
+			FeedStatusService::FEED_STATUS_PROCESSING,
+		);
+		if ( in_array( $status, $pending, true ) ) {
+			$status       = 'pending';
+			$status_label = esc_html__( 'Product feed pending approval on Pinterest.', 'pinterest-for-woocommerce' );
+		}
+
+		if ( FeedStatusService::FEED_STATUS_FAILED === $status ) {
+			$status       = 'error';
+			$status_label = esc_html__( 'Product feed failed.', 'pinterest-for-woocommerce' );
+		}
+
+		if ( FeedStatusService::FEED_STATUS_FAILED === $status ) {
+			$status       = 'error';
+			$status_label = esc_html__( 'Product feed disapproved by Pinterest', 'pinterest-for-woocommerce' );
 		}
 
 		$result['workflow'][] = array(
