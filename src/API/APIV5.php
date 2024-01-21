@@ -663,4 +663,35 @@ class APIV5 extends Base {
 			'GET'
 		);
 	}
+
+	/**
+	 * Returns the list of discounts applied to the account.
+	 *
+	 * @link https://developers.pinterest.com/docs/api/v5/#operation/ads_credits_discounts/get
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 *
+	 * @return array {
+	 *     The list of discounts applied to the account.
+	 *
+	 *     @type array[] $items {
+	 *         @type bool   $active                             True if the offer code is currently active.
+	 *         @type string $advertiser_id                      Advertiser ID the offer was applied to.
+	 *         @type int    $discountInMicroCurrency            The discount applied in the offer’s currency value.
+	 *         @type string $discountCurrency                   Currency value for the discount.
+	 *         @type string $title                              Human-readable title of the offer code.
+	 *         @type int    $remainingDiscountInMicroCurrency   The credits left to spend.
+	 *     }
+	 *     @type string $bookmark Cursor used to fetch the next page of items.
+	 * }
+	 * @throws PinterestApiException
+	 */
+	public static function get_ads_credit_discounts( string $ad_account_id ): array {
+		return self::make_request(
+			"ad_accounts/{$ad_account_id}/ads_credit/discounts?page_size=25",
+			'GET'
+		);
+	}
 }

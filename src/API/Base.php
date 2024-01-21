@@ -80,36 +80,27 @@ class Base {
 	 * @throws Exception             PHP exception.
 	 */
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
-
 		$api = empty( $api ) ? '' : trailingslashit( $api );
-
 		if ( ! empty( $cache_expiry ) ) {
 			$cache = self::get_cached_response( $endpoint, $method, $payload, $api );
-
 			if ( $cache ) {
 				return $cache;
 			}
 		}
 
+		$request = static::prepare_request( $endpoint, $method, $payload, $api );
 		try {
-
-			$request  = static::prepare_request( $endpoint, $method, $payload, $api );
 			$response = static::handle_request( $request );
-
 			if ( ! empty( $cache_expiry ) ) {
 				$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
 				set_transient( $cache_key, $response, $cache_expiry );
 			}
-
 			return $response;
-
 		} catch ( PinterestApiException $e ) {
-
 			if ( ! empty( Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' ) ) ) {
 				/* Translators: 1: Error message 2: Stack trace */
 				Logger::log( sprintf( "%1\$s\n%2\$s", $e->getMessage(), $e->getTraceAsString() ), 'error' );
 			} else {
-
 				Logger::log(
 					sprintf(
 						/* Translators: 1: Request method 2: Request endpoint 3: Response status code 4: Response message 5: Pinterest code */
@@ -123,31 +114,8 @@ class Base {
 					'error'
 				);
 			}
-
-			throw $e;
-		} catch ( Exception $e ) {
-
-			if ( ! empty( Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' ) ) ) {
-				/* Translators: 1: Error message 2: Stack trace */
-				Logger::log( sprintf( "%1\$s\n%2\$s", $e->getMessage(), $e->getTraceAsString() ), 'error' );
-			} else {
-
-				Logger::log(
-					sprintf(
-						/* Translators: 1: Request method 2: Request endpoint 3: Response status code 4: Response message */
-						esc_html__( "%1\$s Request: %2\$s\nStatus Code: %3\$s\nAPI response: %4\$s", 'pinterest-for-woocommerce' ),
-						$method,
-						$request['url'],
-						$e->getCode(),
-						$e->getMessage(),
-					),
-					'error'
-				);
-			}
-
 			throw $e;
 		}
-
 	}
 
 	/**
@@ -295,54 +263,33 @@ class Base {
 				'timeout'   => 15,
 			);
 
-			// Log request.
-			Logger::log_request( $request['url'], $request_args, 'debug' );
-
+			Logger::log_request( $request['url'], $request_args );
 			$response = wp_remote_request( $request['url'], $request_args );
+			Logger::log_response( $response );
 
 			if ( is_wp_error( $response ) ) {
 				$error_message = ( is_wp_error( $response ) ) ? $response->get_error_message() : $response['body'];
-
 				throw new Exception( $error_message, 1 );
 			}
 
-			// Log response.
-			Logger::log_response( $response, 'debug' );
+			$body          = self::parse_response( $response );
+			$response_code = absint( wp_remote_retrieve_response_code( $response ) );
 
-			$body = self::parse_response( $response );
-
+			if ( ! in_array( absint( $response_code ), array( 200, 201, 204 ), true ) ) {
+				$message = $body['message'] ?? $body['error_description'] ?? '';
+				/* Translators: Additional message */
+				throw new PinterestApiException(
+					array(
+						'message'       => $message,
+						'response_body' => $body,
+					),
+					$response_code
+				);
+			}
+			return $body;
 		} catch ( Exception $e ) {
-
 			throw new Exception( $e->getMessage(), $e->getCode() );
 		}
-
-		$response_code = absint( wp_remote_retrieve_response_code( $response ) );
-
-		if ( 401 === $response_code ) {
-			throw new Exception( __( 'Reconnect to your Pinterest account', 'pinterest-for-woocommerce' ), 401 );
-		}
-
-		if ( ! in_array( absint( $response_code ), array( 200, 201, 204 ), true ) ) {
-
-			$message = '';
-			if ( ! empty( $body['message'] ) ) {
-				$message = $body['message'];
-			}
-			if ( ! empty( $body['error_description'] ) ) {
-				$message = $body['error_description'];
-			}
-
-			/* Translators: Additional message */
-			throw new PinterestApiException(
-				array(
-					'message'       => $message,
-					'response_body' => $body,
-				),
-				$response_code
-			);
-		}
-
-		return $body;
 	}
 
 

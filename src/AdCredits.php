@@ -214,7 +214,7 @@ class AdCredits {
 			return false;
 		}
 
-		$result = Base::get_available_discounts( $advertiser_id );
+		$result = APIV5::get_ads_credit_discounts( $advertiser_id );
 		if ( 'success' !== $result['status'] ) {
 			return false;
 		}
