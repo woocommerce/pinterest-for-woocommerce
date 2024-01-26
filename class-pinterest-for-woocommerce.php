@@ -307,9 +307,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Init marketing notifications.
 			add_action( Heartbeat::DAILY, array( $this, 'init_marketing_notifications' ) );
 
-			// Check available coupons and credits.
-			add_action( Heartbeat::HOURLY, array( $this, 'check_available_coupons_and_credits' ) );
-
 			// Hook the setup task. The hook admin_init is not triggered when the WC fetches the tasks using the endpoint: wp-json/wc-admin/onboarding/tasks and hence hooking into init.
 			add_action( 'init', array( $this, 'add_onboarding_task' ), 20 );
 
@@ -1407,9 +1404,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @return void
 		 */
-		public function check_available_coupons_and_credits() {
+		/*public function check_available_coupons_and_credits() {
 			Pinterest_For_Woocommerce()::add_available_credits_info_to_account_data();
-		}
+		}*/
 
 		/**
 		 * Checks if setup is completed and all requirements are set.

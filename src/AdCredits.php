@@ -27,10 +27,7 @@ class AdCredits {
 	const ADS_CREDIT_CAMPAIGN_TRANSIENT = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-ads-credit-campaign-transient';
 	const ADS_CREDIT_CAMPAIGN_OPTION    = 'ads_campaign_is_active';
 
-	const ADS_CREDIT_FUTURE_DISCOUNT = 16;
 	private const FUTURE_CREDIT = 'FUTURE_CREDIT';
-
-	const ADS_CREDIT_MARKETING_OFFER = 5;
 
 	private const MARKETING_OFFER_CREDIT = 'MARKETING_OFFER_CREDIT';
 
@@ -211,12 +208,6 @@ class AdCredits {
 		}
 
 		$advertiser_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
-
-		if ( false === $advertiser_id ) {
-			// No advertiser id stored. But we are connected. This is an abnormal state that should not happen.
-			Logger::log( __( 'Advertiser connected but the connection id is missing.', 'pinterest-for-woocommerce' ) );
-			return false;
-		}
 
 		$result = APIV5::get_ads_credit_discounts( $advertiser_id );
 
