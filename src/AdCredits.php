@@ -216,36 +216,21 @@ class AdCredits {
 
 		$result = APIV5::get_ads_credit_discounts( $advertiser_id );
 
-		$discounts = array_reduce(
-			array_filter(
-				$result['items'] ?? array(),
-				function ( $item ) {
-					return $item['active'];
-				}
-			),
-			function ( $carry, $item ) {
-				$is_future_discount = ( $item['discount_restrictions']['spend_threshold'] ?? 0 ) > 0;
-				$carry[ $is_future_discount ? 'future_discount' : 'marketing_offer' ][] = $item;
-				return $carry;
-			},
-			array()
-		);
-
-		$coupon = AdCreditsCoupons::get_coupon_for_merchant();
-
-		$found_discounts = array();
-		foreach ( $discounts[ 'future_discount' ] as $discount ) {
-			$offer_code = $discount['discount_restrictions']['marketing_offer_code'] ?? '';
-			if ( $offer_code === $coupon ) {
-				$found_discounts['future_discount'] = true;
-			}
-		}
-
+		$coupon                   = AdCreditsCoupons::get_coupon_for_merchant();
 		$remaining_discount_value = 0;
-		// Sum all of the available coupons values.
-		foreach ( $discounts[ 'marketing_offer' ] as $discount ) {
-			$information               = (array) $discount;
-			$remaining_discount_value += (float) $information['remaining_discount_in_micro_currency'] / 1000000;
+		$found_discounts          = array();
+		foreach ( $result as $discount ) {
+			if ( ! $discount['active'] ) {
+				continue;
+			}
+			if ( 'FUTURE_CREDIT' === $discount['discount_type'] ) {
+				$offer_code = $discount['discount_restrictions']['marketing_offer_code_hash'] ?? '';
+				if ( $offer_code === $coupon ) {
+					$found_discounts['future_discount'] = true;
+				}
+			} elseif ( 'MARKETING_OFFER_CREDIT' === $discount['discount_type'] ) {
+				$remaining_discount_value += (float) $discount['remaining_discount_in_micro_currency'] / 1000000;
+			}
 		}
 
 		$found_discounts['marketing_offer'] = array(
