@@ -28,7 +28,11 @@ class AdCredits {
 	const ADS_CREDIT_CAMPAIGN_OPTION    = 'ads_campaign_is_active';
 
 	const ADS_CREDIT_FUTURE_DISCOUNT = 16;
+	private const FUTURE_CREDIT = 'FUTURE_CREDIT';
+
 	const ADS_CREDIT_MARKETING_OFFER = 5;
+
+	private const MARKETING_OFFER_CREDIT = 'MARKETING_OFFER_CREDIT';
 
 	/**
 	 * Initialize Ad Credits actions and Action Scheduler hooks.
@@ -223,12 +227,12 @@ class AdCredits {
 			if ( ! $discount['active'] ) {
 				continue;
 			}
-			if ( 'FUTURE_CREDIT' === $discount['discount_type'] ) {
+			if ( static::FUTURE_CREDIT === $discount['discount_type'] ) {
 				$offer_code = $discount['discount_restrictions']['marketing_offer_code_hash'] ?? '';
 				if ( $offer_code === $coupon ) {
 					$found_discounts['future_discount'] = true;
 				}
-			} elseif ( 'MARKETING_OFFER_CREDIT' === $discount['discount_type'] ) {
+			} elseif ( static::MARKETING_OFFER_CREDIT === $discount['discount_type'] ) {
 				$remaining_discount_value += (float) $discount['remaining_discount_in_micro_currency'] / 1000000;
 			}
 		}
