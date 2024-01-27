@@ -26,21 +26,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class FeedIssues extends VendorAPI {
 
 	/**
-	 * Array used to hold the cached filenames for the feed Issues files.
-	 *
-	 * @var array
-	 */
-	private $feed_data_files = array();
-
-	/**
 	 * Initialize class
 	 */
 	public function __construct() {
-
 		$this->base              = 'feed_issues';
 		$this->endpoint_callback = 'get_feed_issues';
 		$this->methods           = WP_REST_Server::READABLE;
-		$this->feed_data_files   = Pinterest_For_Woocommerce()::get_data( 'feed_data_cache' ) ?? array();
 
 		$this->register_routes();
 	}
@@ -65,9 +56,10 @@ class FeedIssues extends VendorAPI {
 		}
 
 		$per_page          = $request->has_param( 'per_page' ) ? (int) $request->get_param( 'per_page' ) : 25;
-		$feed_item_details = Pinterest\Feeds::get_feed_processing_result_items_issues( $results['id'], $per_page );
+		$feed_item_details = Pinterest\Feeds::get_feed_processing_result_items_issues( $results['id'], 250 );
 
-		$lines    = array_reduce( $feed_item_details, array( __CLASS__, 'prepare_issue_lines' ), array() );
+		$lines = array_reduce( $feed_item_details, array( __CLASS__, 'prepare_issue_lines' ), array() );
+		array_multisort( $lines, SORT_ASC, array_column( $lines, 'status' ) );
 		$response = new WP_REST_Response(
 			array(
 				'lines'      => $lines,
@@ -100,7 +92,7 @@ class FeedIssues extends VendorAPI {
 			$product_name = $product->get_name();
 		}
 
-		if ( $product->get_parent_id() ) {
+		if ( $product && $product->get_parent_id() ) {
 			$product_name .= ' ' . esc_html__( '(Variation)', 'pinterest-for-woocommerce' );
 			$edit_link     = get_edit_post_link( $product->get_parent_id(), 'not_display' ); // get_edit_post_link() will return '&' instead of  '&amp;' for anything other than the 'display' context.
 		}
@@ -129,130 +121,4 @@ class FeedIssues extends VendorAPI {
 
 		return $acc;
 	}
-
-	/**
-	 * Reads the file given in $issues_file, parses and returns the content of lines
-	 * from $start_line to $end_line as array items.
-	 *
-	 * @param string  $issues_file The file path to read from.
-	 * @param int     $start_line  The first line to return.
-	 * @param int     $end_line    The last line to return.
-	 * @param boolean $has_keys    Whether or not the 1st line of the file holds the header keys.
-	 *
-	 * @return array
-	 */
-	private static function parse_lines( $issues_file, $start_line, $end_line, $has_keys = true ) {
-
-		$lines      = array();
-		$keys       = '';
-		$delim      = "\t";
-		$start_line = $has_keys ? $start_line + 1 : $start_line;
-		$end_line   = $has_keys ? $end_line + 1 : $end_line;
-
-		$spl = new \SplFileObject( $issues_file );
-
-		// Get last line.
-		$spl->seek( $spl->getSize() );
-		$last_line = (int) $spl->key();
-
-		if ( $has_keys ) {
-			$spl->seek( 0 );
-			$keys = $spl->current();
-			$last_line--;
-		}
-
-		// Don't go over last line.
-		$end_line = $end_line > $last_line ? $last_line : $end_line;
-
-		for ( $i = $start_line; $i <= $end_line; $i++ ) {
-			$spl->seek( $i );
-			$lines[] = $spl->current();
-		}
-
-		if ( ! empty( $keys ) ) {
-			$keys = array_map( 'trim', explode( $delim, $keys ) );
-		}
-
-		foreach ( $lines as &$line ) {
-			$line = array_combine( $keys, array_map( 'trim', explode( $delim, $line ) ) );
-		}
-
-		return array(
-			'lines' => $lines,
-			'total' => $last_line,
-		);
-	}
-
-
-	/**
-	 * Get the file from $url and save it to a temporary location.
-	 * Return the path of the temporary file.
-	 *
-	 * @param string $url             The URL to fetch the file from.
-	 * @param mixed  $cache_variables The variables to use in order to populate the cache key.
-	 *
-	 * @return string|boolean
-	 */
-	private function get_remote_file( $url, $cache_variables ) {
-
-		if ( is_array( $cache_variables ) && ! empty( $cache_variables ) ) {
-			$ignore_for_cache = array( 's3_source_url', 's3_validation_url' ); // These 2 are different on every response.
-			$cache_variables  = array_diff_key( $cache_variables, array_flip( $ignore_for_cache ) );
-		}
-
-		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_file_' . md5( $cache_variables ? wp_json_encode( $cache_variables ) : $url );
-
-		if ( isset( $this->feed_data_files[ $cache_key ] ) && file_exists( $this->feed_data_files[ $cache_key ] ) ) {
-			return $this->feed_data_files[ $cache_key ];
-		} elseif ( ! empty( $this->feed_data_files ) ) {
-
-			// Cleanup previously stored files.
-			foreach ( $this->feed_data_files as $key => $file ) {
-				@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged --- We don't care if the file is already gone.
-				unset( $this->feed_data_files[ $key ] );
-			}
-		}
-
-		if ( ! function_exists( 'wp_tempnam' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-		}
-
-		$target_file = wp_tempnam();
-
-		$response = wp_remote_get(
-			$url,
-			array(
-				'stream'   => true,
-				'filename' => $target_file,
-				'timeout'  => 300,
-			)
-		);
-
-		$result = $response && ! is_wp_error( $response ) ? $target_file : false;
-
-		if ( $result ) {
-			// Save to cache.
-			$this->feed_data_files[ $cache_key ] = $result;
-			$this->save_feed_data_cache();
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Save the current contents of feed_data_files to the options table.
-	 *
-	 * @return void
-	 */
-	private function save_feed_data_cache() {
-		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', $this->feed_data_files );
-	}
-
-	/**
-	 * Cleanup feed cached data.
-	 */
-	public static function deregister() {
-		Pinterest_For_Woocommerce()::save_data( 'feed_data_cache', false );
-	}
-
 }
