@@ -273,9 +273,9 @@ class Base {
 		try {
 			$body = self::parse_response( $response );
 		} catch ( Exception $e ) {
-			/* translators: Empty error body exception. */
 			throw new PinterestApiException(
 				sprintf(
+					/* translators: Empty error body exception. */
 					esc_html__( 'Error: $1%s', 'pinterest-for-woocommerce' ),
 					esc_html( $e->getMessage() )
 				),
