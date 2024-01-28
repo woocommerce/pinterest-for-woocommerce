@@ -78,7 +78,6 @@ class Base {
 	 * @return array
 	 *
 	 * @throws PinterestApiException Pinterest API exception in case of API error in response.
-	 * @throws Exception Pinterest API exception in case of API error in response.
 	 */
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 		$api = empty( $api ) ? '' : trailingslashit( $api );
@@ -236,8 +235,7 @@ class Base {
 	 *
 	 * @return array
 	 *
-	 * @throws Exception             PHP exception.
-	 * @throws PinterestApiException PHP exception.
+	 * @throws PinterestApiException Pinterest API exception in case of API error during response or problems with request.
 	 */
 	protected static function handle_request( $request ) {
 
@@ -269,19 +267,19 @@ class Base {
 
 		if ( is_wp_error( $response ) ) {
 			$error_message = ( is_wp_error( $response ) ) ? $response->get_error_message() : $response['body'];
-			throw new Exception( $error_message, 1 );
+			throw new PinterestApiException( esc_html( $error_message ), 1 );
 		}
 
 		try {
 			$body = self::parse_response( $response );
 		} catch ( Exception $e ) {
-			/* Translators: Additional message */
+			/* translators: Additional message */
 			throw new PinterestApiException(
 				array(
-					'message'       => $e->getMessage(),
+					'message'       => esc_html( $e->getMessage() ),
 					'response_body' => $response,
 				),
-				$e->getCode()
+				(int) $e->getCode()
 			);
 		}
 
@@ -289,7 +287,7 @@ class Base {
 
 		if ( ! in_array( absint( $response_code ), array( 200, 201, 204 ), true ) ) {
 			$message = $body['message'] ?? $body['error_description'] ?? '';
-			/* Translators: Additional message */
+			/* translators: Additional message */
 			throw new PinterestApiException(
 				array(
 					'message'       => $message,

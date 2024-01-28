@@ -106,8 +106,8 @@ class AdvertiserConnect extends VendorAPI {
 			throw new Exception(
 				sprintf(
 					/* translators: 1. Error message. */
-					esc_html__( 'Error: $1%s', 'pinterest-for-woocommerce' ),
-					$th->getMessage()
+					__( 'Error: $1%s', 'pinterest-for-woocommerce' ),
+					esc_html( $th->getMessage() )
 				),
 				400
 			);
