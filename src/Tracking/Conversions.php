@@ -288,7 +288,7 @@ class Conversions implements Tracker {
 			throw new Exception(
 				sprintf(
 					/* translators: 1. the error message as returned by the Pinterest API */
-					__( 'Error: $1%s', 'pinterest-for-woocommerce' ),
+					esc_html__( 'Error: $1%s', 'pinterest-for-woocommerce' ),
 					esc_html( $response['message'] )
 				),
 				(int) $response['code']
@@ -301,7 +301,7 @@ class Conversions implements Tracker {
 				throw new Exception(
 					sprintf(
 						/* translators: 1. the error message as returned by the Pinterest API */
-						__( 'Error: $1%s', 'pinterest-for-woocommerce' ),
+						esc_html__( 'Error: $1%s', 'pinterest-for-woocommerce' ),
 						esc_html( $message )
 					),
 					0
