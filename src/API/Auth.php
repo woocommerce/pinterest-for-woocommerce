@@ -124,6 +124,8 @@ class Auth extends VendorAPI {
 		try {
 			/**
 			 * Actions to perform after getting the authorization token.
+			 *
+			 * @since x.x.x
 			 */
 			do_action( 'pinterest_for_woocommerce_token_saved' );
 		} catch ( Throwable $th ) {

@@ -103,7 +103,14 @@ class AdvertiserConnect extends VendorAPI {
 		try {
 			$response = Pinterest_For_Woocommerce::update_commerce_integration( $external_business_id, $data );
 		} catch ( Throwable $th ) {
-			throw new Exception( esc_html__( $th->getMessage(), 'pinterest-for-woocommerce' ), 400 );
+			throw new Exception(
+				sprintf(
+					/* translators: 1. Error message. */
+					esc_html__( 'Error: $1%s', 'pinterest-for-woocommerce' ),
+					$th->getMessage()
+				),
+				400
+			);
 		}
 
 		// At this stage we can check if the connected advertiser has billing setup.

@@ -87,8 +87,8 @@ class TokenExchangeV3ToV5 extends APIV5 {
 		} catch ( Throwable $th ) {
 			Logger::log(
 				sprintf(
+					/* translators: 1. Error message. */
 					esc_html__(
-						/* translators: 1. Error message. */
 						'Could not finish the Pinterest API connection flow. Try reconnecting to Pinterest. [%1$s]',
 						'pinterest-for-woocommerce'
 					),

@@ -12,6 +12,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Exception;
+use function Automattic\WooCommerce\Pinterest\load_plugins;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -76,7 +77,8 @@ class Base {
 	 *
 	 * @return array
 	 *
-	 * @throws PinterestApiException|Exception Pinterest API exception in case of API error in response.
+	 * @throws PinterestApiException Pinterest API exception in case of API error in response.
+	 * @throws Exception Pinterest API exception in case of API error in response.
 	 */
 	public static function make_request( $endpoint, $method = 'POST', $payload = array(), $api = '', $cache_expiry = false ) {
 		$api = empty( $api ) ? '' : trailingslashit( $api );
@@ -249,46 +251,54 @@ class Base {
 			)
 		);
 
-		try {
-			if ( $request['auth_header'] ) {
-				$request['headers']['Authorization'] = 'Bearer ' . static::get_token()['access_token'];
-			}
-
-			$request_args = array(
-				'method'    => $request['method'],
-				'headers'   => $request['headers'],
-				'sslverify' => false,
-				'body'      => $request['args'],
-				'timeout'   => 15,
-			);
-
-			Logger::log_request( $request['url'], $request_args );
-			$response = wp_remote_request( $request['url'], $request_args );
-			Logger::log_response( $response );
-
-			if ( is_wp_error( $response ) ) {
-				$error_message = ( is_wp_error( $response ) ) ? $response->get_error_message() : $response['body'];
-				throw new Exception( $error_message, 1 );
-			}
-
-			$body          = self::parse_response( $response );
-			$response_code = absint( wp_remote_retrieve_response_code( $response ) );
-
-			if ( ! in_array( absint( $response_code ), array( 200, 201, 204 ), true ) ) {
-				$message = $body['message'] ?? $body['error_description'] ?? '';
-				/* Translators: Additional message */
-				throw new PinterestApiException(
-					array(
-						'message'       => $message,
-						'response_body' => $body,
-					),
-					$response_code
-				);
-			}
-			return $body;
-		} catch ( Exception $e ) {
-			throw new Exception( $e->getMessage(), $e->getCode() );
+		if ( $request['auth_header'] ) {
+			$request['headers']['Authorization'] = 'Bearer ' . static::get_token()['access_token'];
 		}
+
+		$request_args = array(
+			'method'    => $request['method'],
+			'headers'   => $request['headers'],
+			'sslverify' => false,
+			'body'      => $request['args'],
+			'timeout'   => 15,
+		);
+
+		Logger::log_request( $request['url'], $request_args );
+		$response = wp_remote_request( $request['url'], $request_args );
+		Logger::log_response( $response );
+
+		if ( is_wp_error( $response ) ) {
+			$error_message = ( is_wp_error( $response ) ) ? $response->get_error_message() : $response['body'];
+			throw new Exception( $error_message, 1 );
+		}
+
+		try {
+			$body = self::parse_response( $response );
+		} catch ( Exception $e ) {
+			/* Translators: Additional message */
+			throw new PinterestApiException(
+				array(
+					'message'       => $e->getMessage(),
+					'response_body' => $response,
+				),
+				$e->getCode()
+			);
+		}
+
+		$response_code = absint( wp_remote_retrieve_response_code( $response ) );
+
+		if ( ! in_array( absint( $response_code ), array( 200, 201, 204 ), true ) ) {
+			$message = $body['message'] ?? $body['error_description'] ?? '';
+			/* Translators: Additional message */
+			throw new PinterestApiException(
+				array(
+					'message'       => $message,
+					'response_body' => $body,
+				),
+				$response_code
+			);
+		}
+		return $body;
 	}
 
 

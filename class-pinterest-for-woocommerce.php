@@ -1398,17 +1398,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Trigger coupons check.
-		 *
-		 * @since 1.2.5
-		 *
-		 * @return void
-		 */
-		/*public function check_available_coupons_and_credits() {
-			Pinterest_For_Woocommerce()::add_available_credits_info_to_account_data();
-		}*/
-
-		/**
 		 * Checks if setup is completed and all requirements are set.
 		 *
 		 * @return boolean

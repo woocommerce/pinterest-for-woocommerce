@@ -286,15 +286,26 @@ class Conversions implements Tracker {
 		// Successful requests do not have a code nor a message.
 		if ( $is_error ) {
 			throw new Exception(
-				esc_html__( $response['message'], 'pinterest-for-woocommerce' ),
-				esc_html__( $response['code'], 'pinterest-for-woocommerce' )
+				sprintf(
+					/* translators: 1. the error message as returned by the Pinterest API */
+					esc_html__( "Error: $1%s", 'pinterest-for-woocommerce' ),
+					$response['message']
+				),
+				(int) $response['code']
 			);
 		} else {
 			$data    = $response['events'][0] ?? array();
 			$status  = $data['status'] ?? 'failed';
 			$message = $data['error_message'] ?? $data['warning_message'] ?? 'Unknown';
 			if ( 'failed' === $status ) {
-				throw new Exception( esc_html__( $message, 'pinterest-for-woocommerce' ), 0 );
+				throw new Exception(
+					sprintf(
+						/* translators: 1. the error message as returned by the Pinterest API */
+						esc_html__( 'Error: $1%s', 'pinterest-for-woocommerce' ),
+						$message
+					),
+					0
+				);
 			}
 		}
 	}
