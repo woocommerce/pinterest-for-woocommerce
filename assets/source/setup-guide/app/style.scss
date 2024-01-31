@@ -79,387 +79,394 @@ $root: ".woocommerce-setup-guide";
 			}
 		}
 
-		#{$root} {
+		.pinterest-for-woocommerce-connection,
+		.pinterest-for-woocommerce-settings,
+		.pinterest-for-woocommerce-catalog,
+		.pinterest-for-woocommerce-setup-guide {
+			#{$root} {
 
-			&__main {
+				&__main {
 
-				.woocommerce-stepper {
+					.woocommerce-stepper {
 
-					&__steps {
-						align-items: center;
-						display: flex;
-						height: 60px;
-						justify-content: center;
-						margin: 0 auto;
-						max-width: 850px;
-						position: relative;
+						&__steps {
+							align-items: center;
+							display: flex;
+							height: 60px;
+							justify-content: center;
+							margin: 0 auto;
+							max-width: 850px;
+							position: relative;
 
-						&::before {
-							background: #fff;
-							border-bottom: 1px solid #dcdcde;
-							content: "";
-							display: block;
-							height: 100%;
-							left: 50%;
-							position: absolute;
-							top: 0;
-							transform: translateX(-50%);
-							width: 100vw;
-							z-index: -1;
+							&::before {
+								background: #fff;
+								border-bottom: 1px solid #dcdcde;
+								content: "";
+								display: block;
+								height: 100%;
+								left: 50%;
+								position: absolute;
+								top: 0;
+								transform: translateX(-50%);
+								width: 100vw;
+								z-index: -1;
+							}
+						}
+
+						&__step {
+							padding-left: 12px;
+							padding-right: 12px;
+
+							&-divider {
+								align-self: center;
+								margin-top: 0;
+								flex-grow: 0;
+								width: 100px;
+							}
 						}
 					}
-
-					&__step {
-						padding-left: 12px;
-						padding-right: 12px;
-
-						&-divider {
-							align-self: center;
-							margin-top: 0;
-						}
-					}
-				}
-			}
-
-			&__container {
-				color: #000;
-				max-width: 1032px;
-
-				@include break-medium() {
-					margin: var(--large-gap) auto;
-					padding-left: 16px;
-					padding-right: 16px;
-
 				}
 
-				>div {
-
-					&:not(:first-child) {
-						margin-top: calc(var(--large-gap) + (var(--main-gap) / 2));
-					}
-				}
-
-				.components-card__body.is-size-large {
-					padding: var(--large-gap);
-				}
-
-				.components-card__footer {
-					padding-left: var(--large-gap);
-					padding-right: var(--large-gap);
-				}
-
-				.components-button.is-link.is-destructive {
-					color: #cc1818;
-
-					&:hover:not(:disabled) {
-						color: #710d0d;
-					}
-				}
-
-				.pinterest-for-woocommerce-sync-settings .woocommerce-spinner {
-					display: block;
-					margin: auto;
-					width: 15px;
-					min-width: 15px;
-					height: 15px;
-				}
-			}
-
-			&__step {
-
-				&-header {
-					margin: 16px auto 40px;
-					max-width: 490px;
-					text-align: center;
+				&__container {
+					color: #000;
+					max-width: 1032px;
 
 					@include break-medium() {
-						margin: 0 auto var(--large-gap);
-						min-height: 120px;
-					}
+						margin: var(--large-gap) auto;
+						padding-left: 16px;
+						padding-right: 16px;
 
-					>div {
-						margin: 12px 0;
 					}
-
-					&__subtitle {
-						text-transform: uppercase;
-					}
-
-					&__description {
-						color: #191e23;
-					}
-				}
-
-				&-overview {
-					margin-top: var(--large-gap);
 
 					> div {
-						margin: 8px 0;
-					}
 
-					&__description {
-						color: #191e23;
-					}
-
-					&__link {
-
-						a {
-							text-decoration: none;
-
-							&:hover {
-								text-decoration: underline;
-							}
+						&:not(:first-child) {
+							margin-top: calc(var(--large-gap) + (var(--main-gap) / 2));
 						}
 					}
-				}
 
-				&-columns {
-
-					@include break-medium() {
-						column-gap: 24px;
-						display: grid;
-						grid-template-columns: 328px auto;
-					}
-				}
-
-				&-column {
-					position: relative;
-					margin-bottom: var(--large-gap);
-
-					@include break-medium() {
-						margin-bottom: 0;
+					.components-card__body.is-size-large {
+						padding: var(--large-gap);
 					}
 
-					.woocommerce-spinner {
+					.components-card__footer {
+						padding-left: var(--large-gap);
+						padding-right: var(--large-gap);
+					}
+
+					.components-button.is-link.is-destructive {
+						color: #cc1818;
+
+						&:hover:not(:disabled) {
+							color: #710d0d;
+						}
+					}
+
+					.pinterest-for-woocommerce-sync-settings .woocommerce-spinner {
 						display: block;
-					}
-
-					.pinterest-tooltip-link {
-						color: #fff;
-					}
-				}
-
-				&-modal {
-
-					&__buttons {
-
-						button + button {
-							margin-left: 12px;
-						}
-					}
-				}
-			}
-
-			&__ad-credits {
-
-				&__divider {
-					margin: 20px 0;
-				}
-
-				.image-block {
-					align-items: center;
-					display: flex;
-					flex: 0 0 32px;
-
-					svg {
-						height: 100%;
-						width: 100%;
+						margin: auto;
+						width: 15px;
+						min-width: 15px;
+						height: 15px;
 					}
 				}
 
-				.content-block {
-					color: #757575;
-				}
-			}
+				&__step {
 
-			&__setup-pins {
+					&-header {
+						margin: 16px auto 40px;
+						max-width: 490px;
+						text-align: center;
 
-				.components-popover__content {
-					width: 180px;
-					white-space: normal;
-					text-align: left;
-					// `font-family` is overwritten when using dashicon as the hovering anchor.
-					font-family: $default-font;
-				}
-
-			}
-
-			&__setup-account {
-
-				.connection-info {
-					// Set minimum height to the height of the spinner preloader.
-					min-height: 40px;
-
-					.logo {
-						display: flex;
-						justify-self: start;
-					}
-
-					.connection-info__placeholder {
-
-						@include placeholder();
-						width: 50%;
-						min-width: 10em;
-						display: inline-block;
-					}
-
-					.connection-info__preloader {
-						flex: 1;
-					}
-
-					.account-label {
-
-						p {
-							font-weight: 600;
-
-							.account-type {
-								font-weight: 400; // normal
-							}
-						}
-					}
-				}
-
-				.business-connection {
-
-					p {
-						margin-bottom: 0.5em;
-
-						&:last-child {
-							margin-bottom: 0;
-						}
-					}
-				}
-
-				.components-flex {
-
-					>* {
-						margin: 0 6px;
-
-						&:first-child {
-							margin-left: 0;
+						@include break-medium() {
+							margin: 0 auto var(--large-gap);
+							min-height: 120px;
 						}
 
-						&:last-child {
-							margin-right: 0;
-						}
-					}
-				}
-
-				.components-base-control__field {
-					margin-bottom: 0;
-
-					.components-input-control__container {
-						margin-left: 0;
-					}
-
-					select.components-select-control__input {
-						min-height: 36px;
-					}
-				}
-			}
-
-			&__claim-website {
-
-				.components-card__body {
-
-					> :not(:last-child) {
-						margin-bottom: var(--main-gap);
-					}
-
-					> :first-child {
-						margin-bottom: $grid-unit-10;
-					}
-				}
-
-				.components-notice.is-error {
-					margin: 0;
-				}
-			}
-
-			&__setup-tracking {
-
-				.text-margin {
-					margin: 1em 0;
-				}
-
-				.components-base-control {
-
-					&__help {
-						margin: 0.2em 0 1.5em 0;
-					}
-
-					&:last-child .components-base-control {
-
-						&__help {
-							margin-bottom: 0;
-						}
-					}
-				}
-			}
-
-			&__checkbox {
-
-				&-heading {
-					margin: 24px 0;
-
-					&:first-child {
-						margin-top: 0;
-					}
-				}
-
-				&-group {
-					align-items: center;
-					display: flex;
-					margin-bottom: 16px;
-
-					&:last-child {
-						margin-bottom: 0;
-					}
-
-					.components-base-control {
-
-						&__field,
-						&__help {
-							margin: 0;
+						> div {
+							margin: 12px 0;
 						}
 
-						&__help {
-							margin-left: 12px;
+						&__subtitle {
+							text-transform: uppercase;
+						}
 
-							.components-button {
-								display: inline-block;
+						&__description {
+							color: #191e23;
+						}
+					}
+
+					&-overview {
+						margin-top: var(--large-gap);
+
+						> div {
+							margin: 8px 0;
+						}
+
+						&__description {
+							color: #191e23;
+						}
+
+						&__link {
+
+							a {
 								text-decoration: none;
 
-								&:not(:hover) {
-									color: inherit;
+								&:hover {
+									text-decoration: underline;
 								}
 							}
 						}
 					}
-				}
 
-				&-readonly {
+					&-columns {
 
-					.components-base-control__field {
-						color: $gray-700;
-						pointer-events: none;
+						@include break-medium() {
+							column-gap: 24px;
+							display: grid;
+							grid-template-columns: 328px auto;
+						}
+					}
+
+					&-column {
+						position: relative;
+						margin-bottom: var(--large-gap);
+
+						@include break-medium() {
+							margin-bottom: 0;
+						}
+
+						.woocommerce-spinner {
+							display: block;
+						}
+
+						.pinterest-tooltip-link {
+							color: #fff;
+						}
+					}
+
+					&-modal {
+
+						&__buttons {
+
+							button + button {
+								margin-left: 12px;
+							}
+						}
 					}
 				}
-			}
 
-			&__with-help-description {
-				margin-bottom: 6px;
-			}
+				&__ad-credits {
 
-			&__help-description {
-				color: $gray-700;
-				margin-bottom: 16px;
-			}
+					&__divider {
+						margin: 20px 0;
+					}
 
-			&__footer-button {
-				display: block;
-				margin-top: var(--large-gap);
-				text-align: right;
+					.image-block {
+						align-items: center;
+						display: flex;
+						flex: 0 0 32px;
+
+						svg {
+							height: 100%;
+							width: 100%;
+						}
+					}
+
+					.content-block {
+						color: #757575;
+					}
+				}
+
+				&__setup-pins {
+
+					.components-popover__content {
+						width: 180px;
+						white-space: normal;
+						text-align: left;
+						// `font-family` is overwritten when using dashicon as the hovering anchor.
+						font-family: $default-font;
+					}
+
+				}
+
+				&__setup-account {
+
+					.connection-info {
+						// Set minimum height to the height of the spinner preloader.
+						min-height: 40px;
+
+						.logo {
+							display: flex;
+							justify-self: start;
+						}
+
+						.connection-info__placeholder {
+
+							@include placeholder();
+							width: 50%;
+							min-width: 10em;
+							display: inline-block;
+						}
+
+						.connection-info__preloader {
+							flex: 1;
+						}
+
+						.account-label {
+
+							p {
+								font-weight: 600;
+
+								.account-type {
+									font-weight: 400; // normal
+								}
+							}
+						}
+					}
+
+					.business-connection {
+
+						p {
+							margin-bottom: 0.5em;
+
+							&:last-child {
+								margin-bottom: 0;
+							}
+						}
+					}
+
+					.components-flex {
+
+						> * {
+							margin: 0 6px;
+
+							&:first-child {
+								margin-left: 0;
+							}
+
+							&:last-child {
+								margin-right: 0;
+							}
+						}
+					}
+
+					.components-base-control__field {
+						margin-bottom: 0;
+
+						.components-input-control__container {
+							margin-left: 0;
+						}
+
+						select.components-select-control__input {
+							min-height: 36px;
+						}
+					}
+				}
+
+				&__claim-website {
+
+					.components-card__body {
+
+						> :not(:last-child) {
+							margin-bottom: var(--main-gap);
+						}
+
+						> :first-child {
+							margin-bottom: $grid-unit-10;
+						}
+					}
+
+					.components-notice.is-error {
+						margin: 0;
+					}
+				}
+
+				&__setup-tracking {
+
+					.text-margin {
+						margin: 1em 0;
+					}
+
+					.components-base-control {
+
+						&__help {
+							margin: 0.2em 0 1.5em 0;
+						}
+
+						&:last-child .components-base-control {
+
+							&__help {
+								margin-bottom: 0;
+							}
+						}
+					}
+				}
+
+				&__checkbox {
+
+					&-heading {
+						margin: 24px 0;
+
+						&:first-child {
+							margin-top: 0;
+						}
+					}
+
+					&-group {
+						align-items: center;
+						display: flex;
+						margin-bottom: 16px;
+
+						&:last-child {
+							margin-bottom: 0;
+						}
+
+						.components-base-control {
+
+							&__field,
+							&__help {
+								margin: 0;
+							}
+
+							&__help {
+								margin-left: 12px;
+
+								.components-button {
+									display: inline-block;
+									text-decoration: none;
+
+									&:not(:hover) {
+										color: inherit;
+									}
+								}
+							}
+						}
+					}
+
+					&-readonly {
+
+						.components-base-control__field {
+							color: $gray-700;
+							pointer-events: none;
+						}
+					}
+				}
+
+				&__with-help-description {
+					margin-bottom: 6px;
+				}
+
+				&__help-description {
+					color: $gray-700;
+					margin-bottom: 16px;
+				}
+
+				&__footer-button {
+					display: block;
+					margin-top: var(--large-gap);
+					text-align: right;
+				}
 			}
 		}
 	}
