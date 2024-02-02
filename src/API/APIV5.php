@@ -374,6 +374,22 @@ class APIV5 extends Base {
 	}
 
 	/**
+	 * Sends delete feed request to Pinterest API.
+	 *
+	 * @param string $feed_id       Feed ID.
+	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 *
+	 * @return array
+	 * @throws PinterestApiException
+	 */
+	public static function delete_feed( string $feed_id, string $ad_account_id ) {
+		return self::make_request(
+			"catalogs/feeds/{$feed_id}?ad_account_id={$ad_account_id}",
+			'DELETE'
+		);
+	}
+
+	/**
 	 * Sends update feed request to Pinterest API.
 	 *
 	 * @since x.x.x
