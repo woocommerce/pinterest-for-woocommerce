@@ -271,16 +271,19 @@ class Feeds {
 	 * @throws PinterestApiLocaleException No valid locale found to check for the registered feed.
 	 */
 	public static function match_local_feed_configuration_to_registered_feeds( array $feeds = array() ): string {
-		$local_country = Pinterest_For_Woocommerce()::get_base_country();
-		$local_locale  = LocaleMapper::get_locale_for_api();
+		$local_country  = Pinterest_For_Woocommerce()::get_base_country();
+		$local_locale   = LocaleMapper::get_locale_for_api();
 
 		if ( empty( $feeds ) ) {
 			$feeds = static::get_feeds();
 		}
 
 		foreach ( $feeds as $feed ) {
+			$old_name_match = 0 === strpos( $feed['name'] ?? '', 'Auto-created by Pinterest for WooCommerce' );
+			$new_name_match = 0 === strpos( $feed['name'] ?? '', 'Created by Pinterest for WooCommerce' );
+
 			// Match feeds created by Pinterest for WooCommerce extension.
-			$does_match = 0 === strpos( $feed['name'] ?? '', 'Created by Pinterest for WooCommerce' );
+			$does_match = $old_name_match || $new_name_match;
 			$does_match = $does_match && $local_country === $feed['default_country'] ?? '';
 			$does_match = $does_match && $local_locale === $feed['default_locale'] ?? '';
 			if ( $does_match ) {
