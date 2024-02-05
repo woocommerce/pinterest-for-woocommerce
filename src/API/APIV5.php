@@ -380,7 +380,7 @@ class APIV5 extends Base {
 	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 *
 	 * @return array
-	 * @throws PinterestApiException
+	 * @throws PinterestApiException If the request fails with other than 204 status.
 	 */
 	public static function delete_feed( string $feed_id, string $ad_account_id ) {
 		return self::make_request(

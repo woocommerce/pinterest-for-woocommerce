@@ -285,8 +285,8 @@ class Feeds {
 			/**
 			 * Match feeds created by Pinterest for WooCommerce extension in both API v3 and v5 versions.
 			 *
-			 * v3 API created feeds have no name, it is set to null instead.
-			 * v5 API created feeds have a name that starts with 'Created by Pinterest for WooCommerce'.
+			 * V3 API created feeds have no name, it is set to null instead.
+			 * V5 API created feeds have a name that starts with 'Created by Pinterest for WooCommerce'.
 			 *
 			 * When trying to match remote feed to a local configuration, we need to check both cases
 			 * not to create a new feed if the feed was created by the extension in the past.
