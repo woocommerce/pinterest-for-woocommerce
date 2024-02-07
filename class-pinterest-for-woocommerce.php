@@ -961,7 +961,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.2.5
 		 *
-		 * @return bool Wether billing is set up or not.
+		 * @return bool Whether billing is set up or not.
 		 */
 		public static function add_billing_setup_info_to_account_data() {
 			$account_data                     = self::get_setting( 'account_data' );
@@ -1110,7 +1110,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Fetches a fresh copy (if needed or explicitly requested), of the authenticated user's linked business accounts.
 		 *
-		 * @param boolean $force_refresh Wether to refresh the data from the API.
+		 * @param boolean $force_refresh Whether to refresh the data from the API.
 		 *
 		 * @return array
 		 */

@@ -1,7 +1,7 @@
 # local files
 .DS_Store
 
-# Ignore node_modules and oter local dev files
+# Ignore node_modules and other local dev files
 *.lessc.css
 config.codekit
 node_modules

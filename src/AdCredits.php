@@ -140,7 +140,7 @@ class AdCredits {
 	 *
 	 * @since 1.2.5
 	 *
-	 * @return bool Wether campaign is active or not.
+	 * @return bool Whether campaign is active or not.
 	 */
 	public static function check_if_ads_campaign_is_active() {
 
@@ -187,7 +187,7 @@ class AdCredits {
 	 *
 	 * @throws Exception API fetch error.
 	 *
-	 * @return bool Wether the campaign is active or not.
+	 * @return bool Whether the campaign is active or not.
 	 */
 	private static function get_is_campaign_active_from_recommendations() {
 		$request         = wp_remote_get( 'https://woo.com/wp-json/wccom/marketing-tab/1.2/recommendations.json' );

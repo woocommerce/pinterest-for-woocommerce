@@ -238,7 +238,7 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 = 1.2.7 - 2022-12-16 =
 * Add - Warning message duplicated meta tags.
 * Fix - Update Tracking.php.
-* Fix - Update wording in filter descriotion, tracking disable fiter.
+* Fix - Update wording in filter description, tracking disable filter.
 * Fix - Use min instead of max.
 * Tweak - Improve translators strings.
 * Tweak - Refactor update procedures.

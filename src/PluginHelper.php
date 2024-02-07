@@ -68,9 +68,9 @@ trait PluginHelper {
 	}
 
 	/**
-	 * Check wether if the current page is the Get Started page.
+	 * Check whether if the current page is the Get Started page.
 	 *
-	 * @return bool Wether the current page is the Get Started page.
+	 * @return bool Whether the current page is the Get Started page.
 	 */
 	protected function is_onboarding_page(): bool {
 

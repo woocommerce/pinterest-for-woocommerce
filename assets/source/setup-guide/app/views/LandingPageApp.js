@@ -355,7 +355,7 @@ const FaqSection = () => {
  *
  * @fires wcadmin_pfw_get_started_faq whenever the FAQ is toggled.
  * @param {Object} props React props
- * @param {string} props.questionId Question identifier, to be forwarded to the trackign event.
+ * @param {string} props.questionId Question identifier, to be forwarded to the tracking event.
  * @param {string} props.question Text of the question.
  * @param {string} props.answer Text of the answer.
  * @return {JSX.Element} FAQ component.

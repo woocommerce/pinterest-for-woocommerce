@@ -121,7 +121,7 @@ class FeedIssues extends VendorAPI {
 	/**
 	 * Add product specific data to each line.
 	 *
-	 * @param array $line The array contaning each col value for the line.
+	 * @param array $line The array containing each col value for the line.
 	 *
 	 * @return array
 	 */

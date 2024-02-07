@@ -44,7 +44,7 @@ As per [WordPress Core Handbook](https://make.wordpress.org/core/handbook/best-p
 
 ## Development
 
-After cloning the repo. Remember to use the appropiate node version
+After cloning the repo. Remember to use the appropriate node version
 
 - `nvm use` to autoselect the node version based on `.nvmrc` file.
 

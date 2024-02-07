@@ -31,7 +31,7 @@ These flows can be used when testing PRs or releases, and as a basis for documen
 
 ## Domain Verification
 
-- The store's webiste is verified during the onboarding process.
+- The store's website is verified during the onboarding process.
 - Stores located on subdomains and subdirectories (for example, `example.com/shop`) are supported since `v1.0.9`.
 - Stores whose URL contains uppercase letters (for example, `example.com/SHop`) are supported.
 - A URL can be claimed and verified only by a Merchant. A helpful error is displayed if a Merchant attempts to claim an already claimed website.
@@ -113,7 +113,7 @@ These flows can be used when testing PRs or releases, and as a basis for documen
 
 - Merchant will be able to track conversion events.
 - Merchant can enable/disable conversion tracking in the plugin's settings tab (Enabled by default).
-- Merchant can enable/disable `Enchanced Match Support`, which will add customer emails to conversion tracking.
+- Merchant can enable/disable `Enhanced Match Support`, which will add customer emails to conversion tracking.
 - If enabled, Conversion will [track activities](https://help.pinterest.com/en/business/article/track-conversions-with-pinterest-tag):
   - Page Visit: fires every time a user visits a page
 

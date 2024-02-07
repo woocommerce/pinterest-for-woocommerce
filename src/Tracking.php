@@ -49,7 +49,7 @@ class Tracking {
 	private static $base_tag = "<!-- Pinterest Pixel Base Code -->\n<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "', { np: \"woocommerce\" } );\n  pintrk('page');\n</script>\n<!-- End Pinterest Pixel Base Code -->\n";
 
 	/**
-	 * The base tracking snippet with Enchanced match support.
+	 * The base tracking snippet with Enhanced match support.
 	 * Documentation: https://help.pinterest.com/en/business/article/enhanced-match
 	 *
 	 * @var string
@@ -198,8 +198,8 @@ class Tracking {
 
 
 	/**
-	 * Retunrs the hashed e-mails from the logged in user or Session data,
-	 * to be used when Enchanced match is enabled.
+	 * Returns the hashed e-mails from the logged in user or Session data,
+	 * to be used when Enhanced match is enabled.
 	 * See https://help.pinterest.com/en/business/article/enhanced-match
 	 *
 	 * @return string|false
