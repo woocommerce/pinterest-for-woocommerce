@@ -199,8 +199,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest_for_woocommerce' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_DATA_NAME', 'pinterest_for_woocommerce_data' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.com/' );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE', 'pinterestv5' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://api.woocommerce.com/' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE', 'pinterest-v5' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE', 'pinterest' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE', 'wp_rest' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_VERSION', '1' );
@@ -857,7 +857,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return string
 		 */
 		public static function get_connection_proxy_url() {
-
 			/**
 			 * Filters the proxy URL.
 			 *
@@ -865,7 +864,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			 *
 			 * @param string $proxy_url the connection proxy URL
 			 */
-			return (string) trailingslashit( apply_filters( 'pinterest_for_woocommerce_connection_proxy_url', PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL ) );
+			return (string) trailingslashit(
+				apply_filters(
+					'pinterest_for_woocommerce_connection_proxy_url', PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL
+				)
+			);
 		}
 
 
@@ -904,7 +907,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
 			// nosemgrep: audit.php.wp.security.xss.query-arg
-			return self::get_connection_proxy_url() . 'connect/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
+			return self::get_connection_proxy_url() . 'integrations/connect/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
 		}
 
 

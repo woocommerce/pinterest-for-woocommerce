@@ -50,7 +50,7 @@ class RefreshTokenTest extends \WP_UnitTestCase {
 			'pre_http_request',
 			function ( $response, $parsed_args, $url ) {
 				$this->assertEquals(
-					Pinterest_For_Woocommerce::get_connection_proxy_url() . 'renew/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE,
+					Pinterest_For_Woocommerce::get_connection_proxy_url() . 'integrations/renew/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE,
 					$url
 				);
 				$this->assertEquals( 'pinr.refresh_token', $parsed_args['body']['refresh_token'] ?? '' );

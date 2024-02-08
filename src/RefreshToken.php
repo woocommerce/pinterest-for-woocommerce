@@ -56,16 +56,18 @@ class RefreshToken {
 			( $refresh_time + $expires_in - 2 * DAY_IN_SECONDS ) <= time()
 		);
 
-		if ( $maybe_refresh ) {
-			try {
-				$refreshed_token_data = self::refresh_token( $token_data );
-				Pinterest_For_Woocommerce::save_token_data( $refreshed_token_data );
-			} catch ( Exception $e ) {
-				self::log( $e->getMessage(), WC_Log_Levels::ERROR );
-				return false;
-			}
+		if ( ! $maybe_refresh ) {
+			return true;
 		}
-		return true;
+
+		try {
+			$refreshed_token_data = self::refresh_token( $token_data );
+			Pinterest_For_Woocommerce::save_token_data( $refreshed_token_data );
+			return true;
+		} catch ( Exception $e ) {
+			self::log( $e->getMessage(), WC_Log_Levels::ERROR );
+			return false;
+		}
 	}
 
 	/**
@@ -80,7 +82,7 @@ class RefreshToken {
 	 * @return array|false The refreshed token data or false if the request failed.
 	 */
 	private static function refresh_token( $token_data ) {
-		$endpoint = Pinterest_For_Woocommerce::get_connection_proxy_url() . 'renew/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE;
+		$endpoint = Pinterest_For_Woocommerce::get_connection_proxy_url() . 'integrations/renew/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE;
 		$options  = array(
 			'headers' => array(
 				'Content-Type' => 'application/x-www-form-urlencoded',
