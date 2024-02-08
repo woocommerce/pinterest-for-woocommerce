@@ -857,16 +857,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return string
 		 */
 		public static function get_connection_proxy_url() {
-			/**
-			 * Filters the proxy URL.
-			 *
-			 * @since 1.0.0
-			 *
-			 * @param string $proxy_url the connection proxy URL
-			 */
 			return (string) trailingslashit(
+				/**
+				 * Filters the proxy URL.
+				 *
+				 * @since 1.0.0
+				 *
+				 * @param string $proxy_url the connection proxy URL
+				 */
 				apply_filters(
-					'pinterest_for_woocommerce_connection_proxy_url', PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL
+					'pinterest_for_woocommerce_connection_proxy_url',
+					PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL
 				)
 			);
 		}
