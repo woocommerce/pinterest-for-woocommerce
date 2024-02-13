@@ -14,6 +14,7 @@ use Automattic\WooCommerce\Pinterest\AdsCreditCurrency;
 use Automattic\WooCommerce\Pinterest\Admin\Tasks\Onboarding;
 use Automattic\WooCommerce\Pinterest\API\UserInteraction;
 use Automattic\WooCommerce\Pinterest\Billing;
+use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
@@ -779,6 +780,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				// At this point we're disconnected.
 				return true;
 			}
+
+			FeedRegistration::maybe_disable_stale_feeds_for_merchant( '' );
 
 			try {
 				// Disconnect merchant from Pinterest.
