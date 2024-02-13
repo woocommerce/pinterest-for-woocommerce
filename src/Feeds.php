@@ -271,8 +271,8 @@ class Feeds {
 	 * @throws PinterestApiLocaleException No valid locale found to check for the registered feed.
 	 */
 	public static function match_local_feed_configuration_to_registered_feeds( array $feeds = array() ): string {
-		$local_country  = Pinterest_For_Woocommerce()::get_base_country();
-		$local_locale   = LocaleMapper::get_locale_for_api();
+		$local_country = Pinterest_For_Woocommerce()::get_base_country();
+		$local_locale  = LocaleMapper::get_locale_for_api();
 
 		if ( empty( $feeds ) ) {
 			$feeds = static::get_feeds();
