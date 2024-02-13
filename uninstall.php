@@ -16,8 +16,7 @@ require_once __DIR__ . '/pinterest-for-woocommerce.php';
 
 try {
 	Pinterest_For_Woocommerce::disconnect();
-} catch ( Throwable $th ) {
-	// phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+} catch ( Throwable $th ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 	// Do nothing - this is a cleanup routine.
 }
 
