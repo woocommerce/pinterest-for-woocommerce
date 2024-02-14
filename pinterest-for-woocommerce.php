@@ -51,7 +51,7 @@ define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', '1.4.0' ); // WRCS: DEFINED_VERSION
 // HPOS compatibility declaration.
 add_action(
 	'before_woocommerce_init',
-	function() {
+	function () {
 		if ( class_exists( FeaturesUtil::class ) ) {
 			FeaturesUtil::declare_compatibility( 'custom_order_tables', plugin_basename( __FILE__ ) );
 			FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', plugin_basename( __FILE__ ) );
