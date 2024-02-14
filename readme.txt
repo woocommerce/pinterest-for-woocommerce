@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.3.21 - 2024-02-14 =
+* Tweak - WC 8.6 compatibility.
+
 = 1.3.20 - 2024-01-12 =
 * Fix - Use proper redeem code format.
 
