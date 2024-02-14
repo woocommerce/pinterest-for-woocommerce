@@ -781,6 +781,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				return true;
 			}
 
+			// Pass empty string to the function to disable all feeds for the merchant.
 			FeedRegistration::maybe_disable_stale_feeds_for_merchant( '' );
 
 			try {
