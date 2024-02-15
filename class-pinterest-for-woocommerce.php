@@ -939,7 +939,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					$data['coupon_redeem_info'] = array( 'redeem_status' => false );
 
 					Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
-					return $data;
+					return Pinterest_For_Woocommerce()::add_currency_credits_info_to_account_data();
 				}
 
 				self::get_linked_businesses( true );
@@ -1051,13 +1051,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.3.9
 		 *
-		 * @return void
+		 * @return array The updated account data.
 		 */
 		public static function add_currency_credits_info_to_account_data() {
 			$account_data                         = self::get_setting( 'account_data' );
 			$currency_credit_info                 = AdsCreditCurrency::get_currency_credits();
 			$account_data['currency_credit_info'] = $currency_credit_info;
 			self::save_setting( 'account_data', $account_data );
+			return $account_data;
 		}
 
 		/**
