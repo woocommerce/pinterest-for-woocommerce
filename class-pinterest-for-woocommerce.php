@@ -304,7 +304,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Hook the setup task. The hook admin_init is not triggered when the WC fetches the tasks using the endpoint: wp-json/wc-admin/onboarding/tasks and hence hooking into init.
 			add_action( 'init', array( $this, 'add_onboarding_task' ), 20 );
-
 		}
 
 
@@ -935,8 +934,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					 * We will be able to check that only when the advertiser will be connected.
 					 * The billing is tied to advertiser.
 					 */
-					$data['is_billing_setup']   = false;
-					$data['coupon_redeem_info'] = array( 'redeem_status' => false );
+					$data['is_billing_setup']     = false;
+					$data['coupon_redeem_info']   = array( 'redeem_status' => false );
+					$data['currency_credit_info'] = AdsCreditCurrency::get_currency_credits();
 
 					Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
 					return $data;
@@ -1054,10 +1054,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return void
 		 */
 		public static function add_currency_credits_info_to_account_data() {
-			$account_data                         = self::get_setting( 'account_data' );
-			$currency_credit_info                 = AdsCreditCurrency::get_currency_credits();
-			$account_data['currency_credit_info'] = $currency_credit_info;
-			self::save_setting( 'account_data', $account_data );
+			$account_data = self::get_setting( 'account_data' );
+			if ( ! isset( $account_data['currency_credit_info'] ) ) {
+				$account_data['currency_credit_info'] = AdsCreditCurrency::get_currency_credits();
+				self::save_setting( 'account_data', $account_data );
+			}
 		}
 
 		/**
