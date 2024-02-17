@@ -129,24 +129,24 @@ class Conversions implements Tracker {
 			'event_id'    => $data->get_event_id(),
 			'custom_data' => array(
 				'currency'    => $data->get_currency(),
-				'value'       => $data->get_price(),
+				'value'       => (string) $data->get_price(),
 				'content_ids' => array_map(
 					function ( Product $product ) {
-						return $product->get_id();
+						return (string) $product->get_id();
 					},
 					$data->get_items()
 				),
 				'contents'    => array_map(
 					function ( Product $product ) {
 						return array(
-							'id'         => $product->get_id(),
-							'item_price' => $product->get_price(),
-							'quantity'   => $product->get_quantity(),
+							'id'         => (string) $product->get_id(),
+							'item_price' => (string) $product->get_price(),
+							'quantity'   => (int) $product->get_quantity(),
 						);
 					},
 					$data->get_items()
 				),
-				'num_items'   => $data->get_quantity(),
+				'num_items'   => (int) $data->get_quantity(),
 			),
 		);
 	}
@@ -166,16 +166,16 @@ class Conversions implements Tracker {
 			'event_id'    => $data->get_event_id(),
 			'custom_data' => array(
 				'currency'    => $data->get_currency(),
-				'value'       => $data->get_price() * $data->get_quantity(),
-				'content_ids' => array( $data->get_id() ),
+				'value'       => (string) ( $data->get_price() * $data->get_quantity() ),
+				'content_ids' => array( (string) $data->get_id() ),
 				'contents'    => array(
 					array(
-						'id'         => $data->get_id(),
-						'item_price' => $data->get_price(),
-						'quantity'   => $data->get_quantity(),
+						'id'         => (string) $data->get_id(),
+						'item_price' => (string) $data->get_price(),
+						'quantity'   => (int) $data->get_quantity(),
 					),
 				),
-				'num_items'   => $data->get_quantity(),
+				'num_items'   => (int) $data->get_quantity(),
 			),
 		);
 	}
@@ -220,16 +220,16 @@ class Conversions implements Tracker {
 			'event_id'    => $data->get_event_id(),
 			'custom_data' => array(
 				'currency'    => $data->get_currency(),
-				'value'       => $data->get_price() * $data->get_quantity(),
-				'content_ids' => array( $data->get_id() ),
+				'value'       => (string) ( $data->get_price() * $data->get_quantity() ),
+				'content_ids' => array( (string) $data->get_id() ),
 				'contents'    => array(
 					array(
-						'id'         => $data->get_id(),
-						'item_price' => $data->get_price(),
-						'quantity'   => $data->get_quantity(),
+						'id'         => (string) $data->get_id(),
+						'item_price' => (string) $data->get_price(),
+						'quantity'   => (int) $data->get_quantity(),
 					),
 				),
-				'num_items'   => $data->get_quantity(),
+				'num_items'   => (int) $data->get_quantity(),
 			),
 		);
 	}
