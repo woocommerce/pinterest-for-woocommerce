@@ -642,6 +642,7 @@ class APIV5 extends Base {
 			'POST',
 			array(
 				'offerCodeHash' => $offer_code,
+				'validateOnly'  => false,
 			)
 		);
 	}
