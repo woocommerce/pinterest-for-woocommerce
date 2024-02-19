@@ -284,7 +284,7 @@ class ProductsXmlFeed {
 
 		$id         = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
 		$taxonomies = array_map(
-			self::class . 'sanitize',
+			self::class . '::sanitize',
 			self::get_taxonomies( $id )
 		);
 
