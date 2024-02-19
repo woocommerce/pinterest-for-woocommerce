@@ -329,6 +329,129 @@ class APIV5 extends Base {
 	}
 
 	/**
+	 * Create commerce integration.
+	 *
+	 * @param array $integration_data {
+	 *      Commerce integration data.
+	 *
+	 *      @type string $external_business_id External business ID for the integration.
+	 *      @type string $external_business_id External business ID for the integration.
+	 *      @type string $connected_merchant_id Connected merchant ID for the integration.
+	 *      @type string $connected_user_id Connected user ID for the integration.
+	 *      @type string $connected_advertiser_id Connected advertiser ID for the integration.
+	 *      @type string $connected_lba_id Connected LBA ID for the integration.
+	 *      @type string $connected_tag_id Connected tag ID for the integration.
+	 *      @type int    $partner_access_token_expiry Partner access token expiry for the integration.
+	 *      @type int    $partner_refresh_token_expiry Partner refresh token expiry for the integration.
+	 *      @type string $scopes Scopes for the integration.
+	 *      @type int    $created_timestamp Created timestamp for the integration.
+	 *      @type int    $updated_timestamp Updated timestamp for the integration.
+	 *      @type string $additional_id_1 Additional ID 1 for the integration.
+	 * }
+	 *
+	 * @return array {
+	 *      Integration data returned by Pinterest.
+	 *
+	 *      @type string $id ID of the integration (string all digits).
+	 *      @type string $external_business_id External business ID for the integration.
+	 *      @type string $connected_merchant_id Connected merchant ID for the integration.
+	 *      @type string $connected_user_id Connected user ID for the integration.
+	 *      @type string $connected_advertiser_id Connected advertiser ID for the integration.
+	 *      @type string $connected_lba_id Connected LBA ID for the integration.
+	 *      @type string $connected_tag_id Connected tag ID for the integration.
+	 *      @type int    $partner_access_token_expiry Partner access token expiry for the integration.
+	 *      @type int    $partner_refresh_token_expiry Partner refresh token expiry for the integration.
+	 *      @type string $scopes Scopes for the integration.
+	 *      @type int    $created_timestamp Created timestamp for the integration.
+	 *      @type int    $updated_timestamp Updated timestamp for the integration.
+	 *      @type string $additional_id_1 Additional ID 1 for the integration.
+	 *      @type string $partner_metadata Partner metadata for the integration.
+	 * }
+	 * @throws PinterestApiException If the request fails with other than 200 status.
+	 * @link https://developers.pinterest.com/docs/api/v5/#operation/integrations_commerce/post
+	 * @since x.x.x
+	 */
+	public static function create_commerce_integration( array $integration_data ): array {
+		return self::make_request(
+			'integrations/commerce',
+			'POST',
+			$integration_data
+		);
+	}
+
+	/**
+	 * Updates WC integration parameters with Pinterest.
+	 *
+	 * @since x.x.x
+	 *
+	 * @link https://developers.pinterest.com/docs/api/v5/#operation/integrations_commerce/patch
+	 *
+	 * @param string $external_business_id External business ID for the integration.
+	 * @param array  $data {
+	 *      Integration data to update with Pinterest.
+	 *
+	 *      @type string    $external_business_id           External business ID for the integration.
+	 *      @type string    $connected_merchant_id          Connected merchant ID for the integration.
+	 *      @type string    $connected_advertiser_id        Connected advertiser ID for the integration.
+	 *      @type string    $connected_lba_id               Connected LBA ID for the integration.
+	 *      @type string    $connected_tag_id               Connected tag ID for the integration.
+	 *      @type string    $partner_access_token           Partner access token for the integration.
+	 *      @type string    $partner_refresh_token          Partner refresh token for the integration.
+	 *      @type string    $partner_primary_email          Partner primary email for the integration.
+	 *      @type int       $partner_access_token_expiry    Partner access token expiry for the integration.
+	 *      @type int       $partner_refresh_token_expiry   Partner refresh token expiry for the integration.
+	 *      @type string    $scopes                         Scopes for the integration.
+	 *      @type string    $additional_id_1                Additional ID 1 for the integration.
+	 *      @type string    $partner_metadata               Partner metadata for the integration.
+	 * }
+	 *
+	 * @return array {
+	 *      Integration data returned by Pinterest.
+	 *
+	 *      @type string    $id                             ID of the integration (string all digits).
+	 *      @type string    $external_business_id           External business ID for the integration.
+	 *      @type string    $connected_merchant_id          Connected merchant ID for the integration.
+	 *      @type string    $connected_user_id              Connected user ID for the integration.
+	 *      @type string    $connected_advertiser_id        Connected advertiser ID for the integration.
+	 *      @type string    $connected_lba_id               Connected LBA ID for the integration.
+	 *      @type string    $connected_tag_id               Connected tag ID for the integration.
+	 *      @type int       $partner_access_token_expiry    Partner access token expiry for the integration.
+	 *      @type int       $partner_refresh_token_expiry   Partner refresh token expiry for the integration.
+	 *      @type string    $scopes                         Scopes for the integration.
+	 *      @type int       $created_timestamp              Created timestamp for the integration.
+	 *      @type int       $updated_timestamp              Updated timestamp for the integration.
+	 *      @type string    $additional_id_1                Additional ID 1 for the integration.
+	 *      @type string    $partner_metadata               Partner metadata for the integration.
+	 * }
+	 * @throws PinterestApiException In case of 404, 409 and 500 errors from Pinterest.
+	 */
+	public static function update_commerce_integration( string $external_business_id , array $data ): array {
+		return self::make_request(
+			"integrations/commerce/{$external_business_id}",
+			'PATCH',
+			$data
+		);
+	}
+
+	/**
+	 * Delete commerce integration.
+	 *
+	 * @since x.x.x
+	 *
+	 * @link https://developers.pinterest.com/docs/api/v5/#operation/integrations_commerce/del
+	 *
+	 * @param string $external_business_id External Business ID.
+	 * @return array
+	 * @throws PinterestApiException If the request fails with other than 204 status.
+	 */
+	public static function delete_commerce_integration( string $external_business_id ) {
+		return self::make_request(
+			"integrations/commerce/{$external_business_id}",
+			'DELETE'
+		);
+	}
+
+	/**
 	 * Sends create feed request to Pinterest API.
 	 *
 	 * @since x.x.x
