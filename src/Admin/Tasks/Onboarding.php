@@ -83,7 +83,7 @@ class Onboarding extends Task {
 	 * @return string
 	 */
 	public function get_parent_id() {
-		if ( is_callable( 'parent::get_parent_id' ) ) {
+		if ( is_callable( parent::class . '::get_parent_id' ) ) {
 			return parent::get_parent_id();
 		}
 
