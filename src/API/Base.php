@@ -394,7 +394,7 @@ class Base {
 		$request_url = 'websites/verification/metatag/realtime/';
 
 		$parsed_website = wp_parse_url( get_home_url() );
-		$request_url    = add_query_arg( 'website', $parsed_website['host'] . $parsed_website['path'], $request_url );
+		$request_url    = add_query_arg( 'website', $parsed_website['host'] . ( $parsed_website['path'] ?? '' ), $request_url );
 
 		return self::make_request( $request_url, 'POST' );
 	}
