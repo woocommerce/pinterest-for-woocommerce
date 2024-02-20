@@ -425,7 +425,7 @@ class APIV5 extends Base {
 	 * }
 	 * @throws PinterestApiException In case of 404, 409 and 500 errors from Pinterest.
 	 */
-	public static function update_commerce_integration( string $external_business_id , array $data ): array {
+	public static function update_commerce_integration( string $external_business_id, array $data ): array {
 		return self::make_request(
 			"integrations/commerce/{$external_business_id}",
 			'PATCH',
