@@ -59,7 +59,8 @@ class Billing {
 		 * Check if we have verified a correct billing setup.
 		 */
 		$account_data       = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
-		$has_billing_setup  = is_array( $account_data ) && $account_data['is_billing_setup'] ?? false;
+
+		$has_billing_setup  = is_array( $account_data ) && ( $account_data['is_billing_setup'] ?? false );
 		$should_check_often = false !== get_transient( self::CHECK_BILLING_SETUP_OFTEN );
 		if ( $has_billing_setup && $should_check_often ) {
 			/*

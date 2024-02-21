@@ -577,7 +577,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function save_setting( $key, $data ) {
 
 			$settings = self::get_settings( true );
-
+			// Handle possible false value.
+			if ( ! is_array( $settings ) ) {
+				$settings = array();
+			}
 			$settings[ $key ] = $data;
 
 			return self::save_settings( $settings );
@@ -643,7 +646,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function save_data( $key, $data ) {
 
 			$settings = self::get_settings( true, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
-
+			// Handle possible false value.
+			if ( ! is_array( $settings ) ) {
+				$settings = array();
+			}
 			$settings[ $key ] = $data;
 
 			return self::save_settings( $settings, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
@@ -1133,7 +1139,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function maybe_check_billing_setup() {
 			$account_data          = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
-			$has_billing_setup_old = is_array( $account_data ) && $account_data['is_billing_setup'] ?? false;
+			$has_billing_setup_old = is_array( $account_data ) && ( $account_data['is_billing_setup'] ?? false );
 			if ( Billing::should_check_billing_setup_often() ) {
 				$has_billing_setup_new = self::add_billing_setup_info_to_account_data();
 				// Detect change in billing setup to true and try to redeem.
@@ -1210,6 +1216,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function add_currency_credits_info_to_account_data() {
 			$account_data = self::get_setting( 'account_data' );
 			if ( ! isset( $account_data['currency_credit_info'] ) ) {
+				// Handle possible false value.
+				if ( ! is_array( $account_data ) ) {
+					$account_data = array();
+				}
 				$account_data['currency_credit_info'] = AdsCreditCurrency::get_currency_credits();
 				self::save_setting( 'account_data', $account_data );
 			}
