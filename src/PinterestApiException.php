@@ -42,11 +42,8 @@ class PinterestApiException extends \Exception {
 	 * @param int          $response_code The response code of the API call.
 	 */
 	public function __construct( $error, $response_code ) {
-
-		if ( is_array( $error ) && isset( $error['message'] ) ) {
-			$message              = $error['message'];
-			$this->pinterest_code = isset( $error['response_body'], $error['response_body']['code'] ) ? $error['response_body']['code'] : null;
-		}
+		$message              = $error['message'] ?? $error;
+		$this->pinterest_code = $error['response_body']['code'] ?? null;
 
 		parent::__construct( $message ?? $error, $response_code );
 	}

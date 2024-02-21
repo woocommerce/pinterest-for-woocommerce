@@ -2,46 +2,80 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
+use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Pinterest_For_Woocommerce;
 
 class TrackingTest extends \WP_UnitTestCase {
 
 	function setUp(): void {
 		parent::setUp();
-		update_option( 'woocommerce_allow_tracking', 'yes' );
 	}
 
-	function test_ajax_tracking_snippet_action_added() {
-		// Deleting the option to make sure it does not affect tracking.
-		delete_option( 'woocommerce_enable_ajax_add_to_cart' );
-		update_option( 'woocommerce_cart_redirect_after_add', 'no' );
+	public function test_init_tracking_inits() {
+		Pinterest_For_Woocommerce::save_settings( array( 'track_conversions' => true ) );
+		add_filter( 'wp_doing_cron', '__return_false' );
 
-		Pinterest_For_Woocommerce::save_setting( 'track_conversions', true );
-		Pinterest_For_Woocommerce::save_setting( 'tracking_tag', 'some-tag-id' );
+		$tracking = Pinterest_For_Woocommerce::init_tracking();
 
-		Tracking::maybe_init();
-
-		$this->assertEquals(
-			20,
-			has_action( 'wp_enqueue_scripts', array( Tracking::class, 'ajax_tracking_snippet' ) )
-		);
-		$this->assertEquals(
-			10,
-			has_filter( 'woocommerce_loop_add_to_cart_args', array( Tracking::class, 'filter_add_to_cart_attributes' ) )
-		);
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_page_visit' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_view_category' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_add_to_cart', array( $tracking, 'handle_add_to_cart' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_before_thankyou', array( $tracking, 'handle_checkout' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_search' ) ) );
 	}
 
-	function test_ajax_tracking_snippet_action_is_not_added() {
-		// Deleting the option to make sure it does not affect tracking.
-		delete_option( 'woocommerce_enable_ajax_add_to_cart' );
-		update_option( 'woocommerce_cart_redirect_after_add', 'yes' );
+	function test_tracking_adds_actions_monitoring() {
+		$tracking = new Tracking();
 
-		Pinterest_For_Woocommerce::save_setting( 'track_conversions', true );
-		Pinterest_For_Woocommerce::save_setting( 'tracking_tag', 'some-tag-id' );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_page_visit' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_view_category' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_add_to_cart', array( $tracking, 'handle_add_to_cart' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_before_thankyou', array( $tracking, 'handle_checkout' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_search' ) ) );
+	}
 
-		Tracking::maybe_init();
+	public function test_trackers_are_empty_on_init() {
+		$tracking = new Tracking();
 
-		$this->assertFalse( has_action( 'wp_enqueue_scripts', array( Tracking::class, 'ajax_tracking_snippet' ) ) );
-		$this->assertFalse( has_filter( 'woocommerce_loop_add_to_cart_args', array( Tracking::class, 'filter_add_to_cart_attributes' ) ) );
+		$this->assertEquals( array(), $tracking->get_trackers() );
+	}
+
+	public function test_tracker_is_added() {
+		$tracking = new Tracking();
+
+		$pinterest_tag_tracker = new Tag();
+		$tracking->add_tracker( $pinterest_tag_tracker );
+
+		$this->assertEquals( array( Tag::class => $pinterest_tag_tracker ), $tracking->get_trackers() );
+	}
+
+	public function test_tracker_is_removed() {
+		$tracking = new Tracking();
+
+		$pinterest_tag_tracker = new Tag();
+		$tracking->add_tracker( $pinterest_tag_tracker );
+
+		$this->assertEquals( array( Tag::class => $pinterest_tag_tracker ), $tracking->get_trackers() );
+
+		$tracking->remove_tracker( Tag::class );
+
+		$this->assertEquals( array(), $tracking->get_trackers() );
+	}
+
+	public function test_tracking_calls_trackers() {
+		Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'WD7AFW51GS' ) );
+
+		$tracking = new Tracking();
+
+		$pinterest_tag_tracker = $this->createMock( Tag::class );
+		$tracking->add_tracker( $pinterest_tag_tracker );
+
+		$data = new None( 'event_id' );
+		$pinterest_tag_tracker->expects( $this->once() )
+			->method( 'track_event' )
+			->with( 'test', $data );
+
+		$tracking->track_event( 'test', $data );
 	}
 }

@@ -147,7 +147,7 @@ class Merchants {
 			'merchant_domains' => get_home_url(),
 			'feed_location'    => $feed_location,
 			'feed_format'      => 'XML',
-			'country'          => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
+			'country'          => Pinterest_For_Woocommerce()::get_base_country(),
 			'locale'           => LocaleMapper::get_locale_for_api(),
 			'currency'         => get_woocommerce_currency(),
 			'merchant_name'    => $merchant_name,
@@ -178,8 +178,6 @@ class Merchants {
 		}
 
 		$merchant_id = $response['data'];
-
-		Feeds::invalidate_get_merchant_feeds_cache( $merchant_id, true );
 
 		try {
 			$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( $response['data'] );

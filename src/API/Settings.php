@@ -8,18 +8,19 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
-use \WP_Error;
-use \WP_REST_Server;
-use \WP_REST_Request;
+use Pinterest_For_Woocommerce;
+use WP_Error;
+use WP_REST_Server;
+use WP_REST_Request;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 /**
- * Endpoint handling Options.
+ * Endpoint handling settings updates.
  */
-class Options extends VendorAPI {
+class Settings extends VendorAPI {
 
 	/**
 	 * Initialize class
@@ -44,8 +45,13 @@ class Options extends VendorAPI {
 	 */
 	public function get_settings() {
 		Pinterest_For_Woocommerce()::maybe_check_billing_setup();
+		$settings = Pinterest_For_Woocommerce()::get_settings( true );
+		if ( empty( $settings['account_data']['id'] ) ) {
+			$integration_data = Pinterest_For_Woocommerce::get_data( 'integration_data' );
+			$settings['account_data']['id'] = $integration_data['connected_user_id'] ?? '';
+		}
 		return array(
-			PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => Pinterest_For_Woocommerce()::get_settings( true ),
+			PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => $settings,
 		);
 	}
 

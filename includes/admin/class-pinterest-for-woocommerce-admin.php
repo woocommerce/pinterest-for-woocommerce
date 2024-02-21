@@ -359,7 +359,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		 * @return array
 		 */
 		private function get_component_settings() {
-			$store_country = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
+			$store_country = Pinterest_For_Woocommerce()::get_base_country();
 
 			return array(
 				'pluginVersion'            => PINTEREST_FOR_WOOCOMMERCE_VERSION,
@@ -403,7 +403,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					406 => 'domain verification',
 					409 => 'meta-tag',
 					),
-				'conflictingTagsWarning'   => Tracking::get_third_party_tags_warning_message(),
+				'conflictingTagsWarning'   => Tracking\Tag::get_third_party_tags_warning_message(),
 			);
 		}
 
