@@ -1027,22 +1027,24 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return string
 		 */
 		public static function generate_external_business_id(): string {
+			$name = (string) parse_url( esc_url( get_site_url() ), PHP_URL_HOST );
+			if ( empty( $name ) ) {
+				$name = sanitize_title( get_bloginfo( 'name' ) );
+			}
+			$id = uniqid( sprintf( 'woo-%s-', $name ), false );
+
 			/**
 			 * Filters the shop's external business id.
 			 *
 			 * This is passed to Pinterest when connecting.
 			 * Should be non-empty and without special characters,
-			 * otherwise the ID will be obtained from the site URL as fallback.
+			 * otherwise the ID will be obtained from the site's name as fallback.
 			 *
 			 * @since x.x.x
 			 *
 			 * @param string $id the shop's external business id.
 			 */
-			$id = sanitize_key( (string) apply_filters( 'wc_pinterest_external_business_id', get_bloginfo( 'name' ) ) );
-			if ( empty( $id ) ) {
-				$id = sanitize_key( str_replace( array( 'http', 'https', 'www' ), '', get_bloginfo( 'url' ) ) );
-			}
-			return uniqid( sprintf( '%s-', $id ), false );
+			return (string) apply_filters( 'wc_pinterest_external_business_id', $id );
 		}
 
 		/**
