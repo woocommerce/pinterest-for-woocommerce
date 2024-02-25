@@ -85,7 +85,7 @@ class Tracking {
 				$product->get_name(),
 				wc_get_product_category_list( $product->get_id() ),
 				'brand',
-				$product->get_price(),
+				wc_get_price_to_display( $product ),
 				get_woocommerce_currency(),
 				1
 			);
@@ -134,7 +134,7 @@ class Tracking {
 			$product->get_name(),
 			wc_get_product_category_list( $product->get_id() ),
 			'brand',
-			$product->get_price(),
+			wc_get_price_to_display( $product ),
 			get_woocommerce_currency(),
 			$quantity
 		);
@@ -163,8 +163,7 @@ class Tracking {
 				continue;
 			}
 
-			$product       = $order_item->get_product();
-			$product_price = $product->get_price();
+			$product = $order_item->get_product();
 
 			$items[] = new Product(
 				uniqid( 'product' ),
@@ -172,7 +171,7 @@ class Tracking {
 				$order_item->get_name(),
 				wc_get_product_category_list( $product->get_id() ),
 				'brand',
-				$product_price,
+				wc_get_price_to_display( $product ),
 				get_woocommerce_currency(),
 				$order_item->get_quantity()
 			);
