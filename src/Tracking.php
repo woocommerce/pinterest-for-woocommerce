@@ -53,13 +53,13 @@ class Tracking {
 		$this->trackers = $trackers;
 
 		// Tracks page visit events.
-		add_action( 'wp_footer', array( $this, 'handle_page_visit' ) );
+		add_action( 'wp_footer', array( $this, 'handle_page_visit' ), 0 );
 
 		// Tracks category visit events.
-		add_action( 'wp_footer', array( $this, 'handle_view_category' ) );
+		add_action( 'wp_footer', array( $this, 'handle_view_category' ), 0 );
 
 		// Tracks search events.
-		add_action( 'wp_footer', array( $this, 'handle_search' ) );
+		add_action( 'wp_footer', array( $this, 'handle_search' ), 0 );
 
 		// Tracks add to cart events.
 		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_add_to_cart' ), 10, 6 );

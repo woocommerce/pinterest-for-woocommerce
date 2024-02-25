@@ -71,8 +71,8 @@ class Tag implements Tracker {
 	 * @return void
 	 */
 	public function __construct() {
-		add_action( 'wp_head', array( $this, 'print_script' ) );
-		add_action( 'wp_body_open', array( $this, 'print_noscript' ), 0 );
+		add_action( 'wp_footer', array( $this, 'print_script' ) );
+		add_action( 'wp_footer', array( $this, 'print_noscript' ) );
 		add_action( 'shutdown', array( $this, 'save_deferred_events' ) );
 	}
 
