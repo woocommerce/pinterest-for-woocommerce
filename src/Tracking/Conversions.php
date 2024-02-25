@@ -266,6 +266,9 @@ class Conversions implements Tracker {
 	 */
 	private function send_request( string $event_name, array $data ) {
 		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+		if ( empty( $ad_account_id ) ) {
+			return;
+		}
 
 		/* translators: 1: Conversions API event name, 2: JSON encoded event data. */
 		$messages = sprintf(
