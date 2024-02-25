@@ -52,7 +52,14 @@ class Tag implements Tracker {
 	private static $noscript_base_tag = '<!-- Pinterest Pixel Base Code --><noscript><img height="1" width="1" style="display:none;" alt="" src="https://ct.pinterest.com/v3/?tid=' . self::TAG_ID_SLUG . '&noscript=1" /></noscript><!-- End Pinterest Pixel Base Code -->';
 
 	/**
-	 * A list of events that are to be stored or printed out depending on the circumstances.
+	 * A list of events that are to be printed out.
+	 *
+	 * @var array
+	 */
+	private static $events = array();
+
+	/**
+	 * A list of events that are to be stored.
 	 *
 	 * @var array
 	 */
@@ -78,19 +85,30 @@ class Tag implements Tracker {
 	 */
 	public function print_script() {
 		$active_tag = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
-		$email      = Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) ? static::maybe_get_hashed_customer_email() : '';
-		$script     = ! empty( $email ) ? self::$base_tag_em : self::$base_tag;
-		$script     = str_replace(
+		$email      = Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' )
+			? static::maybe_get_hashed_customer_email()
+			: '';
+
+		$script = ! empty( $email ) ? self::$base_tag_em : self::$base_tag;
+		$script = str_replace(
 			array( self::TAG_ID_SLUG, self::HASHED_EMAIL_SLUG ),
 			array( sanitize_key( $active_tag ), $email ),
 			$script
 		);
-		echo $script; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
-		$deferred_events = static::load_deferred_events();
-		if ( ! empty( $deferred_events ) ) {
-			echo '<script>' . implode( PHP_EOL, $deferred_events ) . '</script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
+		//phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $script;
+
+		$events = array_merge(
+			static::$events,
+			static::load_deferred_events()
+		);
+		if ( ! empty( $events ) ) {
+			//phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<script>' . implode( PHP_EOL, $events ) . '</script>';
 		}
-		echo '<script id="pinterest-tag-placeholder"></script>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped --- Printing hardcoded JS tracking code.
+
+		//phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '<script id="pinterest-tag-placeholder"></script>';
 	}
 
 	/**
@@ -151,7 +169,7 @@ class Tag implements Tracker {
 	}
 
 	/**
-	 * Adds event into the list of events to be saved/rendered.
+	 * Adds event into the list of events to be delayed.
 	 *
 	 * @since x.x.x
 	 *
@@ -166,7 +184,22 @@ class Tag implements Tracker {
 	}
 
 	/**
-	 * Saves deferred events into the storage.
+	 * Adds event into the list of events to be rendered.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $event_name Event name. e.g. Checkout, AddToCart, etc.
+	 * @param array  $data       Corresponding event data object.
+	 *
+	 * @return true
+	 */
+	public static function add_event( string $event_name, array $data ) {
+		static::$events[] = static::get_event_code( $event_name, $data );
+		return true;
+	}
+
+	/**
+	 * Saves events to be rendered the next page load.
 	 *
 	 * @since x.x.x
 	 *
@@ -198,10 +231,21 @@ class Tag implements Tracker {
 	 */
 	public function track_event( string $event_name, Data $data ) {
 		$data = $this->prepare_request_data( $event_name, $data );
-		if ( wp_doing_ajax() && wp_script_is( 'wc-cart-fragments' ) ) {
+		if ( wp_doing_ajax() ) {
 			return static::maybe_add_fragment( $event_name, $data );
 		}
-		return static::add_deferred_event( $event_name, $data );
+
+		/**
+		 * If the cart redirect is enabled, force add the event to the deferred events list
+		 * because if redirect is enabled, the cart page will be reloaded and the event will get lost.
+		 */
+		$is_redirect    = 'yes' === get_option( 'woocommerce_cart_redirect_after_add' );
+		$is_add_to_cart = Tracking::EVENT_ADD_TO_CART === $event_name;
+		if ( $is_redirect && $is_add_to_cart ) {
+			return static::add_deferred_event( $event_name, $data );
+		}
+
+		return static::add_event( $event_name, $data );
 	}
 
 	/**
