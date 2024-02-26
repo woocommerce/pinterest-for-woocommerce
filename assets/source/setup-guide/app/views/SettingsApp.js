@@ -28,7 +28,7 @@ const SettingsApp = () => {
 	useCreateNotice()( wcSettings.pinterest_for_woocommerce.error );
 
 	return (
-		<>
+		<div className="pinterest-for-woocommerce-settings">
 			<HealthCheck />
 			<NavigationClassic />
 
@@ -45,7 +45,7 @@ const SettingsApp = () => {
 			) : (
 				<Spinner />
 			) }
-		</>
+		</div>
 	);
 };
 

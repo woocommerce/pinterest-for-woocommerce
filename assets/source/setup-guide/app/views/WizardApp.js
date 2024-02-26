@@ -137,7 +137,7 @@ const WizardApp = ( { query } ) => {
 	const currentStep = getCurrentStep();
 
 	return (
-		<>
+		<div className="pinterest-for-woocommerce-setup-guide">
 			<OnboardingTopBar />
 			<div className="woocommerce-setup-guide__main">
 				{ appSettings ? (
@@ -146,7 +146,7 @@ const WizardApp = ( { query } ) => {
 					<Spinner />
 				) }
 			</div>
-		</>
+		</div>
 	);
 };
 
