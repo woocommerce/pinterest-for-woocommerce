@@ -268,6 +268,7 @@ class Tracking {
 	 * @return void
 	 */
 	public function add_tracker( Tracker $tracker ) {
+		$tracker->init_hooks();
 		$this->trackers[ get_class( $tracker ) ] = $tracker;
 	}
 
