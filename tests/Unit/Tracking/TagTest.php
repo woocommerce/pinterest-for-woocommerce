@@ -14,8 +14,8 @@ class TagTest extends \WP_UnitTestCase {
 		$tag = new Tag();
 		$tag->init_hooks();
 
-		$this->assertEquals( 10, has_action( 'wp_head', array( $tag, 'print_script' ) ) );
-		$this->assertEquals( 10, has_action( 'wp_body_open', array( $tag, 'print_noscript' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tag, 'print_script' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tag, 'print_noscript' ) ) );
 		$this->assertEquals( 10, has_action( 'shutdown', array( $tag, 'save_deferred_events' ) ) );
 	}
 
