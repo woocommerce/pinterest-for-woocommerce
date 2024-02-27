@@ -12,6 +12,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest\Crypto;
 use Automattic\WooCommerce\Pinterest\Logger;
 use Throwable;
+use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -32,15 +33,20 @@ class TokenExchangeV3ToV5 extends APIV5 {
 	 *
 	 * @since x.x.x
 	 *
-	 * @return array $data {
-	 *     Contains token details.
+	 * @return array {
+	 *     Contains the status and token details.
 	 *
-	 *     @type string $access_token                   The access token for authentication.
-	 *     @type string $refresh_token                  The refresh token for acquiring a new access token.
-	 *     @type string $token_type                     Type of the token, usually "bearer".
-	 *     @type int    $expires_in                     Time in seconds when the access token expires.
-	 *     @type int    $refresh_token_expires_in       Time in seconds when the refresh token expires.
-	 *     @type string $scope                          The scope for which the access token has permission.
+	 *     @type string $status                         The status of the token exchange.
+	 *     @type array  $data {
+	 *         Contains token details.
+	 *
+	 *         @type string $access_token                   The access token for authentication.
+	 *         @type string $refresh_token                  The refresh token for acquiring a new access token.
+	 *         @type string $token_type                     Type of the token, usually "bearer".
+	 *         @type int    $expires_in                     Time in seconds when the access token expires.
+	 *         @type int    $refresh_token_expires_in       Time in seconds when the refresh token expires.
+	 *         @type string $scope                          The scope for which the access token has permission.
+	 *     }
 	 * }
 	 */
 	public static function exchange_token() {
@@ -52,12 +58,39 @@ class TokenExchangeV3ToV5 extends APIV5 {
 	 *
 	 * @since x.x.x
 	 *
+	 * @throws Exception PHP Exception.
+	 *
 	 * @return bool $success Whether the token was updated successfully.
 	 */
 	public static function token_update() {
-		$respone = self::exchange_token();
 
-		if ( 'success' !== $respone['status'] ) {
+		// Try to exchange the token.
+		try {
+			$respone = self::exchange_token();
+			if ( 'success' !== $respone['status'] ) {
+				throw new Exception(
+					sprintf(
+						/* translators: %s connection status code. */
+						esc_html__(
+							'Connection status: %s',
+							'pinterest-for-woocommerce'
+						),
+						$respone['status']
+					)
+				);
+			}
+		} catch ( Throwable $th ) {
+			Logger::log(
+				sprintf(
+					/* translators: 1. Error message. */
+					esc_html__(
+						'Automatic token exchange failed. Try reconnecting to Pinterest manualy. [%1$s]',
+						'pinterest-for-woocommerce'
+					),
+					$th->getMessage()
+				),
+				'error'
+			);
 			return false;
 		}
 
