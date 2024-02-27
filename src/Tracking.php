@@ -38,7 +38,7 @@ class Tracking {
 	const EVENT_VIEW_CATEGORY = 'ViewCategory';
 
 	/**
-	 * @var array $trackers A list of available trackers.
+	 * @var Tracker[] $trackers A list of available trackers.
 	 */
 	private $trackers = array();
 
@@ -66,6 +66,11 @@ class Tracking {
 
 		// Tracks checkout events.
 		add_action( 'woocommerce_before_thankyou', array( $this, 'handle_checkout' ), 10, 2 );
+
+		array_walk(
+			$this->trackers,
+			fn ( $tracker ) => call_user_func( array( $tracker, 'init_hooks' ) )
+		);
 	}
 
 	/**
@@ -262,6 +267,7 @@ class Tracking {
 	 * @return void
 	 */
 	public function add_tracker( Tracker $tracker ) {
+		$tracker->init_hooks();
 		$this->trackers[ get_class( $tracker ) ] = $tracker;
 	}
 

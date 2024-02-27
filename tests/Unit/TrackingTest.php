@@ -48,6 +48,10 @@ class TrackingTest extends \WP_UnitTestCase {
 		$tracking->add_tracker( $pinterest_tag_tracker );
 
 		$this->assertEquals( array( Tag::class => $pinterest_tag_tracker ), $tracking->get_trackers() );
+
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $pinterest_tag_tracker, 'print_script' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $pinterest_tag_tracker, 'print_noscript' ) ) );
+		$this->assertEquals( 10, has_action( 'shutdown', array( $pinterest_tag_tracker, 'save_deferred_events' ) ) );
 	}
 
 	public function test_tracker_is_removed() {

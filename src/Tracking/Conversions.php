@@ -22,7 +22,7 @@ use Throwable;
 /**
  * Pinterest Conversions API support.
  */
-class Conversions implements Tracker {
+class Conversions extends Tracker {
 
 	/** @var User $user User data object. Data for Conversions API. */
 	private $user;
