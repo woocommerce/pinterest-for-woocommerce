@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class adds PinterestTag tracker support.
  */
-class Tag implements Tracker {
+class Tag extends Tracker {
 
 	private const TAG_ID_SLUG       = '%%TAG_ID%%';
 	private const HASHED_EMAIL_SLUG = '%%HASHED_EMAIL%%';
@@ -66,11 +66,11 @@ class Tag implements Tracker {
 	private static $deferred_events = array();
 
 	/**
-	 * Initialises Tag tracker and adds hooks trackers needs to operate.
+	 * Initialises hooks some trackers need to operate.
 	 *
 	 * @return void
 	 */
-	public function __construct() {
+	public function init_hooks() {
 		add_action( 'wp_footer', array( $this, 'print_script' ) );
 		add_action( 'wp_footer', array( $this, 'print_noscript' ) );
 		add_action( 'shutdown', array( $this, 'save_deferred_events' ) );

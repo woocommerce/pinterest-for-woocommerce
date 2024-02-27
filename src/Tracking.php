@@ -38,7 +38,7 @@ class Tracking {
 	const EVENT_VIEW_CATEGORY = 'ViewCategory';
 
 	/**
-	 * @var array $trackers A list of available trackers.
+	 * @var Tracker[] $trackers A list of available trackers.
 	 */
 	private $trackers = array();
 
@@ -53,19 +53,24 @@ class Tracking {
 		$this->trackers = $trackers;
 
 		// Tracks page visit events.
-		add_action( 'wp_footer', array( $this, 'handle_page_visit' ), 0 );
+		add_action( 'wp_footer', array( $this, 'handle_page_visit' ) );
 
 		// Tracks category visit events.
-		add_action( 'wp_footer', array( $this, 'handle_view_category' ), 0 );
+		add_action( 'wp_footer', array( $this, 'handle_view_category' ) );
 
 		// Tracks search events.
-		add_action( 'wp_footer', array( $this, 'handle_search' ), 0 );
+		add_action( 'wp_footer', array( $this, 'handle_search' ) );
 
 		// Tracks add to cart events.
 		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_add_to_cart' ), 10, 6 );
 
 		// Tracks checkout events.
 		add_action( 'woocommerce_before_thankyou', array( $this, 'handle_checkout' ), 10, 2 );
+
+		array_walk(
+			$this->trackers,
+			fn ( $tracker ) => call_user_func( array( $tracker, 'init_hooks' ) )
+		);
 	}
 
 	/**

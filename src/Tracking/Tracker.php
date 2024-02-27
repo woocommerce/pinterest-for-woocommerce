@@ -14,7 +14,7 @@ use Throwable;
 /**
  * Interface for Pinterest tracker implementations.
  */
-interface Tracker {
+abstract class Tracker {
 
 	/**
 	 * Maps tracking events to corresponding tracker methods and conversions API events names.
@@ -30,6 +30,14 @@ interface Tracker {
 	);
 
 	/**
+	 * Initialises hooks some trackers need to operate.
+	 *
+	 * @return void
+	 */
+	public function init_hooks() {
+	}
+
+	/**
 	 * Tracks the event.
 	 *
 	 * @since x.x.x
@@ -41,5 +49,5 @@ interface Tracker {
 	 *
 	 * @return true
 	 */
-	public function track_event( string $event_name, Data $data );
+	abstract public function track_event( string $event_name, Data $data );
 }
