@@ -284,7 +284,11 @@ class Tracking {
 		$this->trackers = array_filter(
 			$this->trackers,
 			function ( $item ) use ( $tracker ) {
-				return get_class( $item ) !== $tracker;
+				if ( get_class( $item ) === $tracker ) {
+					$item->disable_hooks();
+					return false;
+				}
+				return true;
 			}
 		);
 	}

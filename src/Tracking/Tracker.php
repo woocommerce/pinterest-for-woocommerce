@@ -30,11 +30,23 @@ abstract class Tracker {
 	);
 
 	/**
-	 * Initialises hooks some trackers need to operate.
+	 * Initialises hooks a tracker need to operate.
+	 *
+	 * @since x.x.x
 	 *
 	 * @return void
 	 */
 	public function init_hooks() {
+	}
+
+	/**
+	 * Disables hooks a tracker could set.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	public function disable_hooks() {
 	}
 
 	/**

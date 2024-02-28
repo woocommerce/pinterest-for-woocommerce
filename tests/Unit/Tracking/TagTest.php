@@ -19,6 +19,17 @@ class TagTest extends \WP_UnitTestCase {
 		$this->assertEquals( 10, has_action( 'shutdown', array( $tag, 'save_deferred_events' ) ) );
 	}
 
+	public function test_disables_hooks() {
+		$tag = new Tag();
+		$tag->init_hooks();
+
+		$tag->disable_hooks();
+
+		$this->assertFalse( has_action( 'wp_footer', array( $tag, 'print_script' ) ) );
+		$this->assertFalse( has_action( 'wp_footer', array( $tag, 'print_noscript' ) ) );
+		$this->assertFalse( has_action( 'shutdown', array( $tag, 'save_deferred_events' ) ) );
+	}
+
 	public function test_print_script_prints_tag() {
 		Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'YU9AOV86F', 'enhanced_match_support' => false ) );
 

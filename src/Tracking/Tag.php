@@ -66,7 +66,9 @@ class Tag extends Tracker {
 	private static $deferred_events = array();
 
 	/**
-	 * Initialises hooks some trackers need to operate.
+	 * Initialises hooks a tracker need to operate.
+	 *
+	 * @since x.x.x
 	 *
 	 * @return void
 	 */
@@ -74,6 +76,19 @@ class Tag extends Tracker {
 		add_action( 'wp_footer', array( $this, 'print_script' ) );
 		add_action( 'wp_footer', array( $this, 'print_noscript' ) );
 		add_action( 'shutdown', array( $this, 'save_deferred_events' ) );
+	}
+
+	/**
+	 * Disables hooks a tracker could set.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	public function disable_hooks() {
+		remove_action( 'wp_footer', array( $this, 'print_script' ) );
+		remove_action( 'wp_footer', array( $this, 'print_noscript' ) );
+		remove_action( 'shutdown', array( $this, 'save_deferred_events' ) );
 	}
 
 	/**
