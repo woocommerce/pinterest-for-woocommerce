@@ -27,7 +27,7 @@ class TokenExchangeFailure {
 	/**
 	 * Name of the note for use in the database.
 	 */
-	const NOTE_NAME = 'pinterest-for-woocommerce-v5-token-exchange-failure-email';
+	const NOTE_NAME = 'pinterest-for-woocommerce-v5-token-exchange-failure-email-t';
 
 	/**
 	 * Get the note.
@@ -41,6 +41,7 @@ class TokenExchangeFailure {
 			__( 'Pinterest is phasing out its V3 API, which our plugin previously utilized. The updated version 1.4.0 now supports Pinterest\'s new V5 API.<br/><br/>', 'pinterest-for-woocommerce' ),
 			__( 'To maintain the functionality of your Pinterest For WooCommerce integration, it is necessary to re-authorize the plugin with your Pinterest account. You can do this by navigating to the plugin settings in your WooCommerce dashboard and clicking on the "Get Started" button.<br/><br/> ', 'pinterest-for-woocommerce' ),
 			__( 'This step is essential to ensure uninterrupted service and access to the latest features offered by the Pinterest integration.<br/><br/>', 'pinterest-for-woocommerce' ),
+			__( 'You’re receiving this email because you signed up for Store Management Insights from your WooCommerce dashboard. <br/><br/>', 'pinterest-for-woocommerce' ),
 			__( 'Thank you for your immediate attention to this matter.<br/><br/>', 'pinterest-for-woocommerce' ),
 			__( 'Best regards,<br/>', 'pinterest-for-woocommerce' ),
 			__( 'The Pinterest For WooCommerce Team', 'pinterest-for-woocommerce' ),
@@ -76,17 +77,17 @@ class TokenExchangeFailure {
 
 		$note = self::get_note();
 		$note->save();
-		return $note;
+		return true;
 	}
 
 	/**
-	 * Send a note to the merchant tha they need to reconnect manually.
+	 * Send an email (Note) to the merchant tha they need to reconnect manually.
 	 *
 	 * @since x.x.x
 	 *
 	 * @return void
 	 */
-	public static function try_sending_note_to_merchant() {
+	public static function maybe_send_email_to_merchant() {
 
 		// Check if merchant emails are enabled.
 		$merchant_emails_enabled = get_option( 'woocommerce_merchant_email_notifications', 'no' ) === 'yes';
@@ -95,12 +96,12 @@ class TokenExchangeFailure {
 		}
 
 		// Try to add the note.
-		$note = self::possibly_add_note();
-		if ( ! $note instanceof Note ) {
+		$note_added = self::possibly_add_note();
+		if ( ! $note_added ) {
 			return;
 		}
 
-		// Send the note.
+		$note = self::get_note();
 		MerchantEmailNotifications::send_merchant_notification( $note );
 		$note->set_status( 'sent' );
 		$note->save();

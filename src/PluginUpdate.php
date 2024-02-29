@@ -321,7 +321,7 @@ class PluginUpdate {
 
 		if ( ! $updated ) {
 			// Update failed. Send an email to the user. Informing that they need to reconnect manually.
-			TokenExchangeFailure::try_sending_note_to_merchant();
+			TokenExchangeFailure::maybe_send_email_to_merchant();
 			return;
 		}
 
