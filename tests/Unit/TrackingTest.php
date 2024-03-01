@@ -65,6 +65,9 @@ class TrackingTest extends \WP_UnitTestCase {
 		$tracking->remove_tracker( Tag::class );
 
 		$this->assertEquals( array(), $tracking->get_trackers() );
+		$this->assertFalse( has_action( 'wp_footer', array( $pinterest_tag_tracker, 'print_script' ) ) );
+		$this->assertFalse( has_action( 'wp_footer', array( $pinterest_tag_tracker, 'print_noscript' ) ) );
+		$this->assertFalse( has_action( 'shutdown', array( $pinterest_tag_tracker, 'save_deferred_events' ) ) );
 	}
 
 	public function test_tracking_calls_trackers() {
