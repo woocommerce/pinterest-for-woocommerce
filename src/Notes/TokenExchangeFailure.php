@@ -101,6 +101,11 @@ class TokenExchangeFailure {
 			return;
 		}
 
+		// Make sure the class exists.
+		if ( ! class_exists( MerchantEmailNotifications::class ) ) {
+			return;
+		}
+
 		$note = self::get_note();
 		MerchantEmailNotifications::send_merchant_notification( $note );
 		$note->set_status( 'sent' );
