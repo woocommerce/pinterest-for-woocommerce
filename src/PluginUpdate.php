@@ -320,8 +320,8 @@ class PluginUpdate {
 		$updated = TokenExchangeV3ToV5::token_update();
 
 		if ( ! $updated ) {
-			// Update failed. Send an email to the user. Informing that they need to reconnect manually.
-			TokenExchangeFailure::maybe_send_email_to_merchant();
+			// Show a warning banner to the merchant informing that they need to reconnect manually.
+			TokenExchangeFailure::possibly_add_note();
 			return;
 		}
 
