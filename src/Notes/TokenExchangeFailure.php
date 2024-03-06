@@ -54,18 +54,11 @@ class TokenExchangeFailure {
 		$note->set_source( 'woocommerce-admin' );
 		$note->add_action(
 			'pinterest-for-woocommerce-v5-update-failure-go-to-settings',
-			__( 'Go to Pinterest Settings', 'pinterest-for-woocommerce' ),
-			admin_url( 'admin.php?page=wc-admin&path=/pinterest/landing' ),
+			__( 'Authenticate with Pinterest', 'pinterest-for-woocommerce' ),
+			admin_url( 'admin.php?page=wc-admin&path=/pinterest/onboarding' ),
 			Note::E_WC_ADMIN_NOTE_ACTIONED,
 			true,
 			'primary'
-		);
-		$note->add_action(
-			'pinterest-for-woocommerce-v5-update-failure-dismiss',
-			__( 'Dismiss', 'pinterest-for-woocommerce' ),
-			wc_admin_url(),
-			Note::E_WC_ADMIN_NOTE_ACTIONED,
-			false
 		);
 		return $note;
 	}
