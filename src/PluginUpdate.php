@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Automattic\WooCommerce\Pinterest\API\UserInteraction;
 use Automattic\WooCommerce\Pinterest\API\TokenExchangeV3ToV5;
+use Automattic\WooCommerce\Pinterest\Notes\TokenExchangeFailure;
 use Exception;
 use Throwable;
 /**
@@ -319,6 +320,8 @@ class PluginUpdate {
 		$updated = TokenExchangeV3ToV5::token_update();
 
 		if ( ! $updated ) {
+			// Show a warning banner to the merchant informing that they need to reconnect manually.
+			TokenExchangeFailure::possibly_add_note();
 			return;
 		}
 
