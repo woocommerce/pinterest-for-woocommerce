@@ -33,6 +33,18 @@ class PluginUpdate {
 	const PLUGIN_UPDATE_VERSION_OPTION = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-update-version';
 
 	/**
+	 * Option name used for token update retry hook.
+	 */
+	const TOKEN_UPDATE_RETRY_HOOK = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-token-update-retry';
+
+	/**
+	 * Constructor for the PluginUpdate class.
+	 */
+	public function __construct() {
+		add_action( self::TOKEN_UPDATE_RETRY_HOOK, array( $this, 'token_update' ) );
+	}
+
+	/**
 	 * Check if the plugin is up to date.
 	 *
 	 * @since 1.0.9
@@ -304,7 +316,7 @@ class PluginUpdate {
 	 *
 	 * @return void
 	 */
-	protected function token_update(): void {
+	protected function token_update( $args = array( 'retry_count' => 3 ) ): void {
 		// Update should only happen if the plugin is connected using the V3 token.
 		$token_data   = Pinterest_For_Woocommerce()::get_data( 'token', true );
 		$has_v3_token = $token_data && ! empty( $token_data['access_token'] );
@@ -322,6 +334,17 @@ class PluginUpdate {
 		if ( ! $updated ) {
 			// Show a warning banner to the merchant informing that they need to reconnect manually.
 			TokenExchangeFailure::possibly_add_note();
+
+			if ( args['retry_count'] > 0 ) {
+				as_schedule_single_action(
+					time() + MINUTE_IN_SECONDS * 5,
+					self::TOKEN_UPDATE_HOOK,
+					array(
+						'retry_count' => args['retry_count'] - 1,
+					),
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX
+				);
+
 			return;
 		}
 
