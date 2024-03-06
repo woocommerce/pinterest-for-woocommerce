@@ -35,10 +35,7 @@ class TokenExchangeFailure {
 	 */
 	public static function get_note() {
 		$content_lines = array(
-			__( 'There has been a critical update to the Pinterest For WooCommerce plugin (version 1.4.0) that has recently been applied to your system. <br/><br/>', 'pinterest-for-woocommerce' ),
-			__( 'Pinterest is phasing out its V3 API, which our plugin previously utilized. The updated version 1.4.0 now supports Pinterest\'s new V5 API.<br/><br/>', 'pinterest-for-woocommerce' ),
-			__( 'To maintain the functionality of your Pinterest For WooCommerce integration, it is necessary to re-authorize the plugin with your Pinterest account. You can do this by navigating to the plugin settings in your WooCommerce dashboard and clicking on the "Get Started" button.<br/><br/> ', 'pinterest-for-woocommerce' ),
-			__( 'This step is essential to ensure uninterrupted service and access to the latest features offered by the Pinterest integration.<br/><br/>', 'pinterest-for-woocommerce' ),
+			__( 'The Pinterest For WooCommerce plugin has been updated to version 1.4.0, which now supports Pinterest\'s new V5 API, replacing the outgoing V3 API.<br/>You need to re-authorize the plugin through your WooCommerce dashboard to maintain integration functionality and access new features.', 'pinterest-for-woocommerce' ),
 		);
 
 		$additional_data = array(
