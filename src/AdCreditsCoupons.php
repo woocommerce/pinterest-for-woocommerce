@@ -64,11 +64,7 @@ class AdCreditsCoupons {
 	 * @return string|false Coupon string or false if no coupon was found.
 	 */
 	public static function get_coupon_for_merchant() {
-		$switch_date       = new DateTime( '2023-12-31 23:59:59', new DateTimeZone( 'GMT' ) );
-		$switch_timestamp  = $switch_date->getTimestamp();
-		$current_timestamp = time();
-		$currency          = get_woocommerce_currency();
-
+		$currency = get_woocommerce_currency();
 		if ( ! in_array( $currency, self::$allowed_currencies, true ) ) {
 			return false;
 		}
