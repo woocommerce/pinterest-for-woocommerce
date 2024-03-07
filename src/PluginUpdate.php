@@ -332,23 +332,40 @@ class PluginUpdate {
 		$updated = TokenExchangeV3ToV5::token_update();
 
 		if ( ! $updated ) {
-			// Show a warning banner to the merchant informing that they need to reconnect manually.
-			TokenExchangeFailure::possibly_add_note();
-
-			if ( args['retry_count'] > 0 ) {
-				as_schedule_single_action(
-					time() + MINUTE_IN_SECONDS * 5,
-					self::TOKEN_UPDATE_HOOK,
-					array(
-						'retry_count' => args['retry_count'] - 1,
-					),
-					PINTEREST_FOR_WOOCOMMERCE_PREFIX
-				);
-
+			$this->update_failure( $args['retry_count'] );
 			return;
 		}
 
 		// Update completed successfully.
 		Pinterest_For_Woocommerce()::set_api_version( 'v5' );
+	}
+
+	/**
+	 * Schedule a retry for the token update procedure.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param int $retry_count Number of retries left.
+	 * @return void
+	 */
+	private function update_failure( $retry_count = 3 ) {
+		// Show a warning banner to the merchant informing that they need to reconnect manually.
+		TokenExchangeFailure::possibly_add_note();
+
+		if ( $retry_count = 0 ) {
+
+			// Retry count exceeded. Do not schedule another retry.
+			return;
+		}
+
+		as_schedule_single_action(
+			time() + MINUTE_IN_SECONDS * 5,
+			self::TOKEN_UPDATE_RETRY_HOOK,
+			array(
+				'retry_count' => $retry_count - 1,
+			),
+			PINTEREST_FOR_WOOCOMMERCE_PREFIX
+		);
+
 	}
 }
