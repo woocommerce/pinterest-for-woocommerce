@@ -49,18 +49,11 @@ class AdCreditsCoupons {
 	);
 
 	/**
-	 * 2023 copon code.
-	 *
-	 * @var string
-	 */
-	public static $coupon_for_2023 = 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT';
-
-	/**
 	 * 2024 copon code.
 	 *
 	 * @var string
 	 */
-	public static $coupon_for_2024 = 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA';
+	public static $coupon_for_2024 = '1b2c680bdf2b89eecb3384b10db2ca6a0b3824d82bbe63939b35e5720604cde4';
 
 	/**
 	 * Get a valid coupon for the merchant.
@@ -80,7 +73,7 @@ class AdCreditsCoupons {
 			return false;
 		}
 
-		return ( $current_timestamp >= $switch_timestamp ) ? self::$coupon_for_2024 : self::$coupon_for_2023;
+		return self::$coupon_for_2024;
 	}
 
 	/**
