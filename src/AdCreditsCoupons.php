@@ -60,7 +60,7 @@ class AdCreditsCoupons {
 	 *
 	 * @var string
 	 */
-	public static $coupon_for_2024 = 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA==';
+	public static $coupon_for_2024 = 'V09PQ09NTUVSQ0VfMTQ2ODQxNF9DUkVESVRfMjAyNA';
 
 	/**
 	 * Get a valid coupon for the merchant.
