@@ -314,6 +314,8 @@ class PluginUpdate {
 	 *
 	 * @since 1.4.0
 	 *
+	 * @param $args Parameteres passed via Action Scheduler call.
+	 *
 	 * @return void
 	 */
 	protected function token_update( $args = array( 'retry_count' => 3 ) ): void {
@@ -352,8 +354,7 @@ class PluginUpdate {
 		// Show a warning banner to the merchant informing that they need to reconnect manually.
 		TokenExchangeFailure::possibly_add_note();
 
-		if ( $retry_count = 0 ) {
-
+		if ( 0 == $retry_count ) {
 			// Retry count exceeded. Do not schedule another retry.
 			return;
 		}
@@ -366,6 +367,5 @@ class PluginUpdate {
 			),
 			PINTEREST_FOR_WOOCOMMERCE_PREFIX
 		);
-
 	}
 }
