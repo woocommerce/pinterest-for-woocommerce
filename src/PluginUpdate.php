@@ -314,7 +314,7 @@ class PluginUpdate {
 	 *
 	 * @since 1.4.0
 	 *
-	 * @param $args Parameteres passed via Action Scheduler call.
+	 * @param array $args Parameteres passed via Action Scheduler call.
 	 *
 	 * @return void
 	 */
