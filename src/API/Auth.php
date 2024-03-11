@@ -8,7 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
-use Automattic\WooCommerce\Pinterest\Logger as Logger;
+use Automattic\WooCommerce\Pinterest\Logger;
+use Automattic\WooCommerce\Pinterest\Notes\TokenExchangeFailure;
 use Throwable;
 use WP_HTTP_Response;
 use WP_REST_Request;
@@ -128,6 +129,7 @@ class Auth extends VendorAPI {
 			 * @since x.x.x
 			 */
 			do_action( 'pinterest_for_woocommerce_token_saved' );
+			TokenExchangeFailure::possibly_action_note();
 		} catch ( Throwable $th ) {
 			$error = esc_html__( 'There was an error getting the account data. Please try again later.', 'pinterest-for-woocommerce' );
 			$this->log_error_and_redirect( $request, $error );

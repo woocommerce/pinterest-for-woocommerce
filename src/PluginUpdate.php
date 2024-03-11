@@ -41,7 +41,7 @@ class PluginUpdate {
 	 * Constructor for the PluginUpdate class.
 	 */
 	public function __construct() {
-		add_action( self::TOKEN_UPDATE_RETRY_HOOK, array( $this, 'token_update' ) );
+		add_action( self::TOKEN_UPDATE_RETRY_HOOK, array( $this, 'token_update' ), 10, 1 );
 	}
 
 	/**
@@ -318,7 +318,7 @@ class PluginUpdate {
 	 *
 	 * @return void
 	 */
-	protected function token_update( $args = array( 'retry_count' => 3 ) ): void {
+	public function token_update( $retry_count = 3 ): void {
 		// Update should only happen if the plugin is connected using the V3 token.
 		$token_data   = Pinterest_For_Woocommerce()::get_data( 'token', true );
 		$has_v3_token = $token_data && ! empty( $token_data['access_token'] );
@@ -334,9 +334,12 @@ class PluginUpdate {
 		$updated = TokenExchangeV3ToV5::token_update();
 
 		if ( ! $updated ) {
-			$this->update_failure( $args['retry_count'] );
+			$this->update_failure( $retry_count );
 			return;
 		}
+
+		// Mark note as actioned so it will be removed from the UI in case it was added.
+		TokenExchangeFailure::possibly_action_note();
 
 		// Update completed successfully.
 		Pinterest_For_Woocommerce()::set_api_version( 'v5' );

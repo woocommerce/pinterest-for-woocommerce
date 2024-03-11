@@ -74,4 +74,20 @@ class TokenExchangeFailure {
 		$note->save();
 		return true;
 	}
+
+	/**
+	 * Set note to actioned.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	public static function possibly_action_note() {
+		if ( ! self::note_exists() ) {
+			return;
+		}
+		$note = self::get_note();
+		$note->set_status( Note::E_WC_ADMIN_NOTE_ACTIONED );
+		$note->save();
+	}
 }
