@@ -314,7 +314,7 @@ class PluginUpdate {
 	 *
 	 * @since 1.4.0
 	 *
-	 * @param array $args Parameteres passed via Action Scheduler call.
+	 * @param int $retry_count Parameteres passed via Action Scheduler call. Number of retries left.
 	 *
 	 * @return void
 	 */
@@ -363,7 +363,7 @@ class PluginUpdate {
 		}
 
 		as_schedule_single_action(
-			time() + MINUTE_IN_SECONDS * 5,
+			time() + MINUTE_IN_SECONDS * 5 * ( 4 - $retry_count ),
 			self::TOKEN_UPDATE_RETRY_HOOK,
 			array(
 				'retry_count' => $retry_count - 1,
