@@ -12,6 +12,7 @@ namespace Automattic\WooCommerce\Pinterest\Notes;
 defined( 'ABSPATH' ) || exit;
 
 use Automattic\WooCommerce\Admin\Notes\Note;
+use Automattic\WooCommerce\Admin\Notes\Notes;
 use Automattic\WooCommerce\Admin\Notes\NoteTraits;
 
 /**
@@ -86,8 +87,9 @@ class TokenExchangeFailure {
 		if ( ! self::note_exists() ) {
 			return;
 		}
-		$note = self::get_note();
+		$note = Notes::get_note_by_name( self::NOTE_NAME );
 		$note->set_status( Note::E_WC_ADMIN_NOTE_ACTIONED );
+		$note->set_is_read( true );
 		$note->save();
 	}
 }
