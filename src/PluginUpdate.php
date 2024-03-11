@@ -354,7 +354,7 @@ class PluginUpdate {
 		// Show a warning banner to the merchant informing that they need to reconnect manually.
 		TokenExchangeFailure::possibly_add_note();
 
-		if ( 0 == $retry_count ) {
+		if ( 0 === (int) $retry_count ) {
 			// Retry count exceeded. Do not schedule another retry.
 			return;
 		}
