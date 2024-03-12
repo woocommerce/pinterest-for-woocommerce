@@ -77,7 +77,7 @@ class TokenExchangeFailure {
 	}
 
 	/**
-	 * Set note to actioned.
+	 * Delete the note.
 	 *
 	 * @since x.x.x
 	 *
