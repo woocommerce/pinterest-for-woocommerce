@@ -91,6 +91,10 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.3.23 - 2024-03-12 =
+* Tweak - WC 8.7 compatibility.
+* Tweak - WP 6.5 compatibility.
+
 = 1.3.22 - 2024-02-20 =
 * Fix - Currency and credit information missing at domain verification step.
 * Fix - PHP notices and warnings in PHP 8.2 and PHP 8.3.
