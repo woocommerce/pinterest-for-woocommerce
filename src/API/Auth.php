@@ -106,14 +106,13 @@ class Auth extends VendorAPI {
 			$this->log_error_and_redirect( $request, $error );
 		}
 
-		$token_string = base64_decode( $token_data );
+		$token_string = base64_decode( $token_data ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 		$token_data   = (array) json_decode( urldecode( $token_string ) );
 
 		Pinterest_For_Woocommerce()::save_token_data( $token_data );
 
-		$info_string = base64_decode( $info );
+		$info_string = base64_decode( $info ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 		$info_data   = (array) json_decode( urldecode( $info_string ) );
-
 		$features    = (array) $info_data['feature_flags'] ?? array();
 
 		$this->apply_oauth_flow_features( $features );
@@ -129,7 +128,6 @@ class Auth extends VendorAPI {
 			 * @since x.x.x
 			 */
 			do_action( 'pinterest_for_woocommerce_token_saved' );
-			TokenExchangeFailure::possibly_action_note();
 		} catch ( Throwable $th ) {
 			$error = esc_html__( 'There was an error getting the account data. Please try again later.', 'pinterest-for-woocommerce' );
 			$this->log_error_and_redirect( $request, $error );

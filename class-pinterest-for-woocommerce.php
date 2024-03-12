@@ -18,6 +18,7 @@ use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
+use Automattic\WooCommerce\Pinterest\Notes\TokenExchangeFailure;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
@@ -299,6 +300,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'create_commerce_integration' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_linked_businesses' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'post_update_cleanup' ) );
 
 			// Handle the Pinterest verification URL.
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
@@ -613,6 +615,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function set_api_version( $version ) {
 			return update_option( PINTEREST_FOR_WOOCOMMERCE_PINTEREST_API_VERSION, $version );
+		}
+
+		/**
+		 * Get API version used by the plugin.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return string The API version.
+		 */
+		public static function get_api_version() {
+			return get_option( PINTEREST_FOR_WOOCOMMERCE_PINTEREST_API_VERSION, '' );
 		}
 
 		/**
@@ -1115,6 +1128,21 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function update_linked_businesses() {
 			self::get_linked_businesses( true );
+		}
+
+		/**
+		 * Cleanup after the token update.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public static function post_update_cleanup() {
+			// Mark note as actioned so it will be removed from the UI in case it was added.
+			TokenExchangeFailure::possibly_action_note();
+
+			// Update completed successfully.
+			Pinterest_For_Woocommerce()::set_api_version( 'v5' );
 		}
 
 		/**

@@ -328,6 +328,11 @@ class PluginUpdate {
 			return;
 		}
 
+		if ( 'v5' === Pinterest_For_Woocommerce()::get_api_version() ) {
+			// Plugin already updated.
+			return;
+		}
+
 		// Set API version to V3. We can use this value to detect failure in the token update procedure.
 		Pinterest_For_Woocommerce()::set_api_version( 'v3' );
 
@@ -337,12 +342,6 @@ class PluginUpdate {
 			$this->update_failure( $retry_count );
 			return;
 		}
-
-		// Mark note as actioned so it will be removed from the UI in case it was added.
-		TokenExchangeFailure::possibly_action_note();
-
-		// Update completed successfully.
-		Pinterest_For_Woocommerce()::set_api_version( 'v5' );
 	}
 
 	/**
