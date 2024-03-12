@@ -211,7 +211,6 @@ class ProductSync {
 		LocalFeedConfigs::deregister();
 		FeedRegistration::deregister();
 		ProductFeedStatus::deregister();
-		FeedIssues::deregister();
 
 		self::log( 'Product feed reset and files deleted.' );
 	}

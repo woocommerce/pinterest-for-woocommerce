@@ -6,18 +6,24 @@
  * @version  1.0.0
  */
 
-use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
+use Automattic\WooCommerce\Pinterest;
 use Automattic\WooCommerce\Pinterest\AdCredits;
 use Automattic\WooCommerce\Pinterest\AdCreditsCoupons;
 use Automattic\WooCommerce\Pinterest\AdsCreditCurrency;
+use Automattic\WooCommerce\Pinterest\Admin\Tasks\Onboarding;
+use Automattic\WooCommerce\Pinterest\API\UserInteraction;
 use Automattic\WooCommerce\Pinterest\Billing;
+use Automattic\WooCommerce\Pinterest\FeedRegistration;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
+use Automattic\WooCommerce\Pinterest\Tracking;
+use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
+use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
+use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Automattic\WooCommerce\Pinterest\Utilities\Tracks;
-use Automattic\WooCommerce\Pinterest\API\UserInteraction;
-use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
-use Automattic\WooCommerce\Pinterest\Admin\Tasks\Onboarding;
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -195,13 +201,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			define( 'PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME', 'pinterest_for_woocommerce' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_DATA_NAME', 'pinterest_for_woocommerce_data' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX', 'pinterest-for-woocommerce' );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://connect.woocommerce.com/' );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE', 'pinterestv3native' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL', 'https://api.woocommerce.com/' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE', 'pinterest-v5' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE', 'pinterest' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE', 'wp_rest' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_VERSION', '1' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT', 'oauth/callback' );
-			define( 'PINTEREST_FOR_WOOCOMMERCE_AUTH', PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_auth_key' );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX', 'pfw' );
+			define( 'PINTEREST_FOR_WOOCOMMERCE_PINTEREST_API_VERSION', PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_pinterest_api_version' );
 		}
 
 
@@ -267,11 +274,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// ActionScheduler is activated on init 1 so lets make sure we are updating after that.
 			add_action( 'init', array( $this, 'maybe_update_plugin' ), 5 );
-			add_action( 'init', array( Pinterest\Tracking::class, 'maybe_init' ) );
+			add_action( 'init', array( self::class, 'init_tracking' ) );
 			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\TrackerSnapshot::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\Billing::class, 'schedule_event' ) );
 			add_action( 'init', array( Pinterest\AdCredits::class, 'schedule_event' ) );
+			add_action( 'init', array( Pinterest\RefreshToken::class, 'schedule_event' ) );
 
 			// Register the marketing channel if the feature is included.
 			if ( defined( 'WC_MCM_EXISTS' ) ) {
@@ -288,24 +296,52 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'init', array( $this, 'add_currency_credits_info_to_account_data' ) );
 
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'create_commerce_integration' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_linked_businesses' ) );
 
 			// Handle the Pinterest verification URL.
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
 
 			// Disconnect advertiser if advertiser or tag change.
-			add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );
+			// add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );.
 
 			// Init marketing notifications.
 			add_action( Heartbeat::DAILY, array( $this, 'init_marketing_notifications' ) );
-
-			// Check available coupons and credits.
-			add_action( Heartbeat::HOURLY, array( $this, 'check_available_coupons_and_credits' ) );
 
 			// Hook the setup task. The hook admin_init is not triggered when the WC fetches the tasks using the endpoint: wp-json/wc-admin/onboarding/tasks and hence hooking into init.
 			add_action( 'init', array( $this, 'add_onboarding_task' ), 20 );
 		}
 
+		/**
+		 * Initialise Tracker and add trackers to it.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return Pinterest\Tracking|false
+		 */
+		public static function init_tracking() {
+			/**
+			 * Filters whether to disable tracking.
+			 *
+			 * @since x.x.x
+			 *
+			 * @param bool $disable_tracking Whether to disable tracking.
+			 */
+			$is_tracking_disabled             = apply_filters( 'woocommerce_pinterest_disable_tracking', false );
+			$is_tracking_conversions_disabled = ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
+			$is_not_a_site                    = wp_doing_cron() || is_admin();
+
+			if ( $is_tracking_disabled || $is_tracking_conversions_disabled || $is_not_a_site ) {
+				return false;
+			}
+
+			$tag_tracker         = new Tag();
+			$user                = new User( WC_Geolocation::get_ip_address(), wc_get_user_agent() );
+			$conversions_tracker = new Conversions( $user );
+
+			return new Tracking( array( $tag_tracker, $conversions_tracker ) );
+		}
 
 		/**
 		 * Init Pinterest_For_Woocommerce when WordPress Initialises.
@@ -566,6 +602,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			return update_option( $option, $settings );
 		}
 
+		/**
+		 * Set API version used by the plugin.
+		 *
+		 * @since x.x.x
+		 *
+		 * @param string $version The API version.
+		 *
+		 * @return boolean
+		 */
+		public static function set_api_version( $version ) {
+			return update_option( PINTEREST_FOR_WOOCOMMERCE_PINTEREST_API_VERSION, $version );
+		}
 
 		/**
 		 * Return APP Data based on its key
@@ -637,8 +685,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			new Pinterest\API\FeedState();
 			new Pinterest\API\FeedIssues();
 			new Pinterest\API\Tags();
-			new Pinterest\API\HealthCheck();
-			new Pinterest\API\Options();
+			new Pinterest\API\Health();
+			new Pinterest\API\Settings();
 			new Pinterest\API\SyncSettings();
 			new Pinterest\API\UserInteraction();
 		}
@@ -660,16 +708,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @return array
 		 */
-		public static function get_token() {
+		public static function get_access_token() {
 
-			$token = self::get_data( 'token', true );
+			$token_data = self::get_data( 'token_data', true );
+			$token      = array();
 
 			try {
-				$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::decrypt( $token['access_token'] );
+				$token['access_token'] = empty( $token_data['access_token'] ) ? '' : Pinterest\Crypto::decrypt( $token_data['access_token'] );
 			} catch ( \Exception $th ) {
 				/* Translators: The error description */
-				Pinterest\Logger::log( sprintf( esc_html__( 'Could not decrypt the Pinterest API access token. Try reconnecting to Pinterest. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() ), 'error' );
-				$token = array();
+				Logger::log( sprintf( esc_html__( 'Could not decrypt the Pinterest API access token. Try reconnecting to Pinterest. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() ), 'error' );
 			}
 
 			return $token;
@@ -680,88 +728,75 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Save encrypted token data. See the documentation of the get_token() method for the expected format of the related data variables.
 		 *
 		 * @since 1.0.0
+		 * @since x.x.x Added refresh token and tokens expiration.
 		 *
 		 * @param array $token The array containing the token values to save.
 		 *
 		 * @return boolean
 		 */
-		public static function save_token( $token ) {
+		public static function save_token_data( $token ) {
+			$token['access_token']             = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['access_token'] );
+			$token['expires_in']               = $token['expires_in'] ?? '';
+			$token['refresh_token']            = empty( $token['refresh_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['refresh_token'] );
+			$token['refresh_token_expires_in'] = $token['refresh_token_expires_in'] ?? '';
+			$token['scopes']                   = empty( $token['scopes'] ) ? '' : $token['scopes'];
+			$token['refresh_time']             = time();
 
-			$token['access_token'] = empty( $token['access_token'] ) ? '' : Pinterest\Crypto::encrypt( $token['access_token'] );
-			return self::save_data( 'token', $token );
+			return self::save_data( 'token_data', $token );
 		}
 
+		/**
+		 * Save connection info data.
+		 *
+		 * @since x.x.x
+		 *
+		 * @param array $connection_info_data The array containing the connection info data.
+		 * @return bool True if the data was saved successfully.
+		 */
+		public static function save_connection_info_data( array $connection_info_data ): bool {
+			return self::save_data( 'connection_info_data', $connection_info_data );
+		}
+
+		/**
+		 * Saves the integration data.
+		 *
+		 * @param array $integration_data The array containing the integration data.
+		 * @return bool True if the data was saved successfully.
+		 */
+		public static function save_integration_data( array $integration_data ): bool {
+			return self::save_data( 'integration_data', $integration_data );
+		}
 
 		/**
 		 * Disconnect by clearing the Token and any other data that we should gather from scratch.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @return boolean True if disconnection was successful.
+		 * @return bool True if disconnection was successful.
 		 *
-		 * @throws \Exception PHP Exception.
+		 * @throws Exception PHP Exception.
 		 */
-		public static function disconnect() {
+		public static function disconnect(): bool {
 			/*
 			 * If there is no business connected, disconnecting merchant will throw error.
 			 * Just need to clean account data in these cases.
 			 */
 			if ( ! self::is_business_connected() ) {
-
 				self::flush_options();
-
 				// At this point we're disconnected.
 				return true;
 			}
 
+			// Pass empty string to the function to disable all feeds for the merchant.
+			FeedRegistration::maybe_disable_stale_feeds_for_merchant( '' );
+
 			try {
 				// Disconnect merchant from Pinterest.
-				$result = Pinterest\API\Base::disconnect_merchant();
-
-				if ( 'success' !== $result['status'] ) {
-					throw new \Exception( esc_html__( 'Response error on disconnect merchant.', 'pinterest-for-woocommerce' ), 400 );
-				}
-
-				// Disconnect the advertiser from Pinterest.
-				$connected_advertiser = self::get_setting( 'tracking_advertiser', null );
-				$connected_tag        = self::get_setting( 'tracking_tag', null );
-
-				if ( $connected_advertiser && $connected_tag ) {
-
-					try {
-
-						Pinterest\API\AdvertiserConnect::disconnect_advertiser( $connected_advertiser, $connected_tag );
-
-					} catch ( \Exception $th ) {
-
-						Pinterest\Logger::log( esc_html__( 'There was an error disconnecting the Advertiser.', 'pinterest-for-woocommerce' ) );
-						self::flush_options();
-						throw new \Exception( esc_html__( 'There was an error disconnecting the Advertiser. Please try again.', 'pinterest-for-woocommerce' ), 400 );
-					}
-				}
-
+				self::delete_commerce_integration();
 				self::flush_options();
-
 				// At this point we're disconnected.
 				return true;
-			} catch ( PinterestApiException $e ) {
-				$code = $e->get_pinterest_code();
-
-				if ( PinterestApiException::MERCHANT_NOT_FOUND === $code ) {
-					Pinterest\Logger::log( esc_html__( 'Trying to disconnect while the merchant (id) was not found.', 'pinterest-for-woocommerce' ) );
-
-					/*
-					 * This is an abnormal state of the application. Caused probably by issues during the connection process.
-					 * It looks like the best course of actions is to flush the options and assume that we are disconnected.
-					 * This way we restore UI connect functionality and allow merchant to retry.
-					 */
-					self::flush_options();
-					return true;
-				}
-
-				return false;
-
-			} catch ( \Exception $th ) {
+			} catch ( Exception $th ) {
 				// There was an error disconnecting merchant.
 				return false;
 			}
@@ -812,14 +847,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Disconnect merchant if old values are different than new ones.
 			if ( $old_value['tracking_advertiser'] !== $new_value['tracking_advertiser'] || $old_value['tracking_tag'] !== $new_value['tracking_tag'] ) {
-
 				try {
-
 					Pinterest\API\AdvertiserConnect::disconnect_advertiser( $old_value['tracking_advertiser'], $old_value['tracking_tag'] );
-
-				} catch ( \Exception $th ) {
-
-					Pinterest\Logger::log( esc_html__( 'There was an error disconnecting the Advertiser. Please try again.', 'pinterest-for-woocommerce' ) );
+				} catch ( Exception $th ) {
+					Logger::log( esc_html__( 'There was an error disconnecting the Advertiser. Please try again.', 'pinterest-for-woocommerce' ) );
 				}
 			}
 		}
@@ -832,15 +863,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return string
 		 */
 		public static function get_connection_proxy_url() {
-
-			/**
-			 * Filters the proxy URL.
-			 *
-			 * @since 1.0.0
-			 *
-			 * @param string $proxy_url the connection proxy URL
-			 */
-			return (string) trailingslashit( apply_filters( 'pinterest_for_woocommerce_connection_proxy_url', PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL ) );
+			return (string) trailingslashit(
+				/**
+				 * Filters the proxy URL.
+				 *
+				 * @since 1.0.0
+				 *
+				 * @param string $proxy_url the connection proxy URL
+				 */
+				apply_filters(
+					'pinterest_for_woocommerce_connection_proxy_url',
+					PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL
+				)
+			);
 		}
 
 
@@ -856,18 +891,14 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_middleware_url( $context = 'login', $args = array() ) {
 
-			$control_key = uniqid();
-			$view        = is_null( $args['view'] ) ? 'settings' : $args['view'];
-			$rest_url    = get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT );
+			$nonce    = wp_create_nonce( PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE );
+			set_transient( PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE, $nonce, 10 * MINUTE_IN_SECONDS );
+
+			$rest_url = get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT );
 
 			$state_params = array(
-				'redirect' => add_query_arg(
-					array(
-						'control' => $control_key,
-						'view'    => $view,
-					),
-					$rest_url
-				),
+				'redirect' => $rest_url,
+				'nonce'    => $nonce,
 			);
 
 			switch ( $context ) {
@@ -881,11 +912,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$state = http_build_query( $state_params );
 
-			set_transient( PINTEREST_FOR_WOOCOMMERCE_AUTH, $control_key, MINUTE_IN_SECONDS * 5 );
-
 			// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
 			// nosemgrep: audit.php.wp.security.xss.query-arg
-			return self::get_connection_proxy_url() . 'login/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
+			return self::get_connection_proxy_url() . 'integrations/connect/' . PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE . '?' . $state;
 		}
 
 
@@ -903,6 +932,120 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 		}
 
+		/**
+		 * Connects WC to Pinterest.
+		 *
+		 * @since x.x.x
+		 *
+		 * @see Pinterest\API\APIV5::create_commerce_integration
+		 * @return array the result of APIV5::create_commerce_integration.
+		 * @throws PinterestApiException In case of 404, 409 and 500 errors from Pinterest.
+		 */
+		public static function create_commerce_integration(): array {
+			global $wp_version;
+
+			$external_business_id = self::generate_external_business_id();
+			$connection_data      = self::get_data( 'connection_info_data', true );
+
+			$integration_data     = array(
+				'external_business_id'    => $external_business_id,
+				'connected_merchant_id'   => $connection_data['merchant_id'] ?? '',
+				'connected_advertiser_id' => $connection_data['advertiser_id'] ?? '',
+				'partner_metadata'        => json_encode(
+					array(
+						'plugin_version' => PINTEREST_FOR_WOOCOMMERCE_VERSION,
+						'wc_version'     => defined( 'WC_VERSION' ) ? WC_VERSION : 'unknown',
+						'wp_version'     => $wp_version,
+						'locale'         => get_locale(),
+						'currency'       => get_woocommerce_currency(),
+					)
+				),
+			);
+
+			if ( ! empty( $connection_data['tag_id'] ) ) {
+				$integration_data['connected_tag_id'] = $connection_data['tag_id'];
+			}
+
+			$response = Pinterest\API\APIV5::create_commerce_integration( $integration_data );
+
+			/*
+			 * In case of successful response we save our integration data into a database.
+			 * Data we save includes but not limited to:
+			 *  external business id,
+			 *  id,
+			 *  connected_user_id,
+			 *  etc.
+			 */
+			self::save_integration_data( $response );
+
+			self::save_setting( 'tracking_advertiser', $response['connected_advertiser_id'] );
+			self::save_setting( 'tracking_tag', $response['connected_tag_id'] );
+
+			return $response;
+		}
+
+		/**
+		 * Updates WC integration parameters with Pinterest.
+		 *
+		 * @since x.x.x
+		 *
+		 * @param string $external_business_id External business ID for the integration.
+		 * @param array  $data Integration data to update with Pinterest.
+		 *
+		 * @see Pinterest\API\APIV5::update_commerce_integration
+		 * @return array the result of APIV5::update_commerce_integration.
+		 * @throws PinterestApiException In case of 404, 409 and 500 errors from Pinterest.
+		 */
+		public static function update_commerce_integration( string $external_business_id, array $data ): array {
+			return Pinterest\API\APIV5::update_commerce_integration( $external_business_id, $data );
+		}
+
+		/**
+		 * Disconnects WC from Pinterest.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return bool
+		 * @throws PinterestApiException In case of 500 unexpected error from Pinterest.
+		 */
+		public static function delete_commerce_integration(): bool {
+			try {
+				$external_business_id = self::get_data( 'integration_data' )['external_business_id'];
+				Pinterest\API\APIV5::delete_commerce_integration( $external_business_id );
+				return true;
+			} catch ( PinterestApiException $e ) {
+				Logger::log( $e->getMessage(), 'error' );
+				return false;
+			}
+		}
+
+		/**
+		 * Used to generate external business id to pass it Pinterest when creating a connection between WC and Pinterest.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return string
+		 */
+		public static function generate_external_business_id(): string {
+			$name = (string) parse_url( esc_url( get_site_url() ), PHP_URL_HOST );
+			if ( empty( $name ) ) {
+				$name = sanitize_title( get_bloginfo( 'name' ) );
+			}
+			$id = uniqid( sprintf( 'woo-%s-', $name ), false );
+
+			/**
+			 * Filters the shop's external business id.
+			 *
+			 * This is passed to Pinterest when connecting.
+			 * Should be non-empty and without special characters,
+			 * otherwise the ID will be obtained from the site's name as fallback.
+			 *
+			 * @since x.x.x
+			 *
+			 * @param string $id the shop's external business id.
+			 */
+			return (string) apply_filters( 'wc_pinterest_external_business_id', $id );
+		}
 
 		/**
 		 * Fetches the account_data parameters from Pinterest's API
@@ -915,25 +1058,36 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @throws Exception PHP Exception.
 		 */
 		public static function update_account_data() {
-
 			try {
+				$integration_data = self::get_data( 'integration_data' );
+				$account_data     = Pinterest\API\APIV5::get_account_info();
 
-				$account_data = Pinterest\API\Base::get_account_info();
+				$data = array(
+					'username'         => $account_data['username'] ?? '',
+					'full_name'        => '',
+					'id'               => $integration_data['id'] ?? '',
+					'image_medium_url' => $account_data['profile_image'] ?? '',
+					// Partner is a user who is a business account not a pinner ('BUSINESS', 'PINNER' account types).
+					'is_partner'       => 'BUSINESS' === ( $account_data['account_type'] ?? '' ),
+				);
 
-				if ( 'success' === $account_data['status'] ) {
+				$verified_websites = array_reduce(
+					Pinterest\API\APIV5::get_user_websites()['items'] ?? array(),
+					function ( $carry, $item ) {
+						if ( 'verified' === $item['status'] ) {
+							$carry[] = $item['website'];
+						}
+						return $carry;
+					},
+					array()
+				);
 
-					$data = array_intersect_key(
-						(array) $account_data['data'],
-						array(
-							'verified_user_websites'  => '',
-							'is_any_website_verified' => '',
-							'username'                => '',
-							'full_name'               => '',
-							'id'                      => '',
-							'image_medium_url'        => '',
-							'is_partner'              => '',
-						)
-					);
+				$data += array(
+					// Array of verified website domain names.
+					'verified_user_websites'  => $verified_websites,
+					// Indicates if any of the verified websites is verified true or false.
+					'is_any_website_verified' => 0 < count( $verified_websites ),
+				);
 
 					/*
 					 * For now we assume that the billing is not setup and credits are not redeemed.
@@ -944,21 +1098,23 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					$data['coupon_redeem_info']   = array( 'redeem_status' => false );
 					$data['currency_credit_info'] = AdsCreditCurrency::get_currency_credits();
 
-					Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
-					return $data;
-				}
-
-				self::get_linked_businesses( true );
-
+				Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
+				return $data;
 			} catch ( Throwable $th ) {
-
 				self::disconnect();
-
 				throw new Exception( esc_html__( 'There was an error getting the account data.', 'pinterest-for-woocommerce' ) );
 			}
+		}
 
-			return array();
-
+		/**
+		 * Updates linked businesses.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public static function update_linked_businesses() {
+			self::get_linked_businesses( true );
 		}
 
 		/**
@@ -1121,58 +1277,31 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Fetches a fresh copy (if needed or explicitly requested), of the authenticated user's linked business accounts.
 		 *
-		 * @param boolean $force_refresh Wether to refresh the data from the API.
+		 * @param bool $force_refresh Whether to refresh the data from the API.
 		 *
 		 * @return array
 		 */
-		public static function get_linked_businesses( $force_refresh = false ) {
-
+		public static function get_linked_businesses( bool $force_refresh = false ): array {
 			$linked_businesses = ! $force_refresh ? Pinterest_For_Woocommerce()::get_data( 'linked_businesses' ) : null;
-
 			if ( null === $linked_businesses ) {
-				$linked_businesses = self::update_linked_businesses();
+				$account_data            = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+				$fetch_linked_businesses = ! empty( $account_data ) && array_key_exists( 'is_partner', $account_data ) && ! $account_data['is_partner'];
+
+				try {
+					$fetched_businesses = $fetch_linked_businesses ? Pinterest\API\APIV5::get_linked_businesses() : array();
+
+					if ( ! empty( $fetched_businesses ) && 'success' === $fetched_businesses['status'] ) {
+						$linked_businesses = $fetched_businesses['data'];
+					}
+
+					$linked_businesses = $linked_businesses ?? array();
+
+					self::save_data( 'linked_businesses', $linked_businesses );
+				} catch ( PinterestApiException $e ) {
+					Logger::log( $e->getMessage(), 'error' );
+					$linked_businesses = array();
+				}
 			}
-
-			$linked_businesses = array_map(
-				function ( $business ) {
-					return array(
-						'value' => $business->id,
-						'label' => $business->full_name . ' [' . $business->id . ']',
-					);
-				},
-				$linked_businesses
-			);
-
-			return $linked_businesses;
-		}
-
-
-		/**
-		 * Grabs a fresh copy of businesses from the API saves & returns them.
-		 *
-		 * @return array
-		 */
-		public static function update_linked_businesses() {
-
-			$account_data            = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
-			$fetch_linked_businesses =
-				! empty( $account_data ) &&
-				array_key_exists( 'is_partner', $account_data ) &&
-				! $account_data['is_partner'];
-
-			try {
-				$fetched_businesses = $fetch_linked_businesses ? Pinterest\API\Base::get_linked_businesses() : array();
-			} catch ( Exception $e ) {
-				$fetched_businesses = array();
-			}
-
-			if ( ! empty( $fetched_businesses ) && 'success' === $fetched_businesses['status'] ) {
-				$linked_businesses = $fetched_businesses['data'];
-			}
-
-			$linked_businesses = $linked_businesses ?? array();
-
-			self::save_data( 'linked_businesses', $linked_businesses );
 
 			return $linked_businesses;
 		}
@@ -1184,7 +1313,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_account_id() {
 			$account_data = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
-			return isset( $account_data['id'] ) ? $account_data['id'] : false;
+			return $account_data['id'] ?? false;
 		}
 
 		/**
@@ -1233,17 +1362,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Trigger coupons check.
-		 *
-		 * @since 1.2.5
-		 *
-		 * @return void
-		 */
-		public function check_available_coupons_and_credits() {
-			Pinterest_For_Woocommerce()::add_available_credits_info_to_account_data();
-		}
-
-		/**
 		 * Checks if setup is completed and all requirements are set.
 		 *
 		 * @return boolean
@@ -1254,13 +1372,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Checks if connected by checking if we got a token in the db.
+		 * Checks if connected by checking if there is integration ID in the data store.
 		 *
 		 * @return boolean
 		 */
 		public static function is_connected() {
-			$token = self::get_token();
-			return $token && ! empty( $token['access_token'] );
+			$integration = self::get_data( 'integration_data' );
+			return ! empty( $integration['id'] ?? '' );
 		}
 
 
@@ -1282,14 +1400,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 
 		/**
-		 * Checks whether we have verified our domain, by checking account_data as
+		 * Checks whether we have verified our current domain, by checking account_data as
 		 * returned by Pinterest.
 		 *
-		 * @return boolean
+		 * @return bool
 		 */
-		public static function is_domain_verified() {
+		public static function is_domain_verified(): bool {
 			$account_data = self::get_setting( 'account_data' );
-			return isset( $account_data['is_any_website_verified'] ) ? (bool) $account_data['is_any_website_verified'] : false;
+			$verified_domains = $account_data['verified_user_websites'] ?? array();
+			return in_array( wp_parse_url( get_home_url() )['host'] ?? '', $verified_domains );
 		}
 
 		/**
@@ -1298,9 +1417,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function is_tracking_configured() {
-			return false !== Pinterest\Tracking::get_active_tag();
+			return false !== Pinterest\Tracking\Tag::get_active_tag();
 		}
-
 
 		/**
 		 * Returns the Terms object for the currently configured base country.
@@ -1309,7 +1427,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_applicable_tos() {
 
-			$base_country = self::get_base_country();
+			$base_country = self::get_base_country( null );
 
 			return $base_country && isset( self::TOS_PER_COUNTRY[ $base_country ] ) ? self::TOS_PER_COUNTRY[ $base_country ] : self::TOS_PER_COUNTRY['*'];
 		}
@@ -1317,16 +1435,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Helper function to return the country set in WC's settings using wc_get_base_location().
 		 *
-		 * @return string|null
+		 * @param string $default Default country code to return if no country is set.
+		 *
+		 * @return mixed|string|null
 		 */
-		public static function get_base_country() {
+		public static function get_base_country( $default = 'US' ) {
 			if ( ! function_exists( 'wc_get_base_location' ) ) {
 				return null;
 			}
 
 			$base_location = wc_get_base_location();
 
-			return ! empty( $base_location['country'] ) ? $base_location['country'] : null;
+			return ! empty( $base_location['country'] ) ? $base_location['country'] : $default;
 		}
 
 		/**

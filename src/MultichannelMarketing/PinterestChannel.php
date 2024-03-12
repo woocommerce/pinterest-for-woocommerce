@@ -16,6 +16,7 @@ use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\FeedStatusService;
 use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Automattic\WooCommerce\Pinterest\ProductSync;
+use Exception;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -137,12 +138,11 @@ class PinterestChannel implements MarketingChannelInterface {
 		$count = 0;
 
 		try {
-			$feed_id     = FeedRegistration::get_locally_stored_registered_feed_id();
-			$merchant_id = Pinterest_For_Woocommerce()::get_data( 'merchant_id' );
-			if ( $feed_id && $merchant_id ) {
-				$workflow = Feeds::get_feed_latest_workflow( (string) $merchant_id, (string) $feed_id );
-				if ( $workflow ) {
-					$count = FeedStatusService::get_workflow_overview_stats( $workflow )['errors'];
+			$feed_id = FeedRegistration::get_locally_stored_registered_feed_id();
+			if ( $feed_id ) {
+				$processing_results = Feeds::get_feed_recent_processing_results( $feed_id );
+				if ( $processing_results ) {
+					$count = FeedStatusService::get_processing_result_overview_stats( $processing_results )['errors'] ?? 0;
 				}
 			}
 		} catch ( \Exception $e ) {
@@ -204,29 +204,25 @@ class PinterestChannel implements MarketingChannelInterface {
 	 * @return string
 	 */
 	private function get_feed_registration_status(): string {
-		try {
-			$feed_registration_status = FeedStatusService::get_feed_registration_status();
-		} catch ( \Exception $e ) {
+		$feed_registration_status = FeedStatusService::get_feed_registration_status();
+
+		$failed = array(
+			FeedStatusService::FEED_STATUS_DISAPPROVED,
+			FeedStatusService::FEED_STATUS_FAILED,
+		);
+		if ( in_array( $feed_registration_status, $failed, true ) ) {
 			return self::PRODUCT_LISTINGS_SYNC_FAILED;
 		}
 
-		if ( in_array(
-			$feed_registration_status,
-			array(
-				'not_registered',
-				'pending',
-				'appeal_pending',
-			),
-			true
-		) ) {
-			$status = self::PRODUCT_LISTINGS_SYNC_IN_PROGRESS;
-		} elseif ( 'approved' === $feed_registration_status ) {
-			$status = self::PRODUCT_LISTINGS_SYNCED;
-		} else {
-			$status = self::PRODUCT_LISTINGS_SYNC_FAILED;
+		$succeeded = array(
+			FeedStatusService::FEED_STATUS_COMPLETED,
+			FeedStatusService::FEED_STATUS_COMPLETED_EARLY,
+		);
+		if ( in_array( $feed_registration_status, $succeeded, true ) ) {
+			return self::PRODUCT_LISTINGS_SYNCED;
 		}
 
-		return $status;
+		return self::PRODUCT_LISTINGS_SYNC_IN_PROGRESS;
 	}
 
 	/**

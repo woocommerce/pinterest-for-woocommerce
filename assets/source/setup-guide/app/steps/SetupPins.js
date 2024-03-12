@@ -137,13 +137,11 @@ const SetupPins = ( {} ) => {
 																className="pinterest-tooltip-link"
 																{ ...documentationLinkProps(
 																	{
-																		href:
-																			wcSettings
-																				.pinterest_for_woocommerce
-																				.pinterestLinks
-																				.enhancedMatch,
-																		linkId:
-																			'enhanced-match',
+																		href: wcSettings
+																			.pinterest_for_woocommerce
+																			.pinterestLinks
+																			.enhancedMatch,
+																		linkId: 'enhanced-match',
 																		context:
 																			'settings',
 																	}
@@ -160,7 +158,8 @@ const SetupPins = ( {} ) => {
 										className={ classnames(
 											'woocommerce-setup-guide__checkbox-group',
 											{
-												'pinterest-for-woocommerce-settings-checkbox-disabled': ! appSettings.track_conversions,
+												'pinterest-for-woocommerce-settings-checkbox-disabled':
+													! appSettings.track_conversions,
 											}
 										) }
 										disabled={
@@ -212,13 +211,11 @@ const SetupPins = ( {} ) => {
 													<ExternalLink
 														{ ...documentationLinkProps(
 															{
-																href:
-																	wcSettings
-																		.pinterest_for_woocommerce
-																		.pinterestLinks
-																		.tagManager,
-																linkId:
-																	'ads-manager',
+																href: wcSettings
+																	.pinterest_for_woocommerce
+																	.pinterestLinks
+																	.tagManager,
+																linkId: 'ads-manager',
 																context:
 																	'settings',
 															}

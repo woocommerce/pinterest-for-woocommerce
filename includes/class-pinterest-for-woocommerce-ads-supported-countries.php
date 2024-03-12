@@ -6,7 +6,7 @@
  * @since 1.0.5
  */
 
-use Automattic\WooCommerce\Pinterest\API\Base;
+use Automattic\WooCommerce\Pinterest\API\APIV5;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -40,16 +40,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 					throw new Exception( 'Pinterest user is not connected, using fallback list of supported countries.' );
 				}
 
-				$allowed_countries = Base::get_list_of_ads_supported_countries();
-				$get_country_code  = function( $country_object ) {
-					return $country_object->code;
-				};
+				$allowed_countries = APIV5::get_list_of_ads_supported_countries();
 
 				// Extract codes.
-				$allowed_countries_codes = array_map(
-					$get_country_code,
-					$allowed_countries['data'],
-				);
+				$allowed_countries_codes = array_column( $allowed_countries['items'], 'code' );
 
 				return $allowed_countries_codes;
 			} catch ( Exception $th ) {
@@ -105,7 +99,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 		 * @return bool Wether this is ads supported location.
 		 */
 		public static function is_ads_supported_country() {
-			$store_country = Pinterest_For_Woocommerce()::get_base_country() ?? 'US';
+			$store_country = Pinterest_For_Woocommerce()::get_base_country();
 			return in_array( $store_country, self::get_countries(), true );
 		}
 	}

@@ -8,6 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use WP_Error;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -86,8 +88,8 @@ class Logger {
 	/**
 	 *  Helper for Logging API responses.
 	 *
-	 * @param array|\WP_Error $response The body of the response.
-	 * @param string          $level    The default level/context of the message to be logged.
+	 * @param array|WP_Error $response The body of the response.
+	 * @param string         $level    The default level/context of the message to be logged.
 	 *
 	 * @return void
 	 */
@@ -96,7 +98,16 @@ class Logger {
 			$level = 'error';
 			$data  = $response->get_error_code() . ': ' . $response->get_error_message();
 		} else {
-			$data = $response['http_response']->get_response_object()->raw;
+			// Collecting response data.
+			$status  = wp_remote_retrieve_response_code( $response );
+			$message = wp_remote_retrieve_response_message( $response );
+			$body    = wp_remote_retrieve_body( $response );
+			$headers = wp_remote_retrieve_headers( $response );
+			if ( is_object( $headers ) ) {
+				$headers = $headers->getAll();
+			}
+
+			$data = 'Status: ' . $status . ' ' . $message . "\n\n" . 'Headers: ' . wp_json_encode( $headers ) . "\n\n" . 'Body: ' . $body;
 		}
 
 		self::log( 'Response: ' . "\n\n" . $data . "\n", $level );

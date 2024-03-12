@@ -85,7 +85,7 @@ class LocaleMapper {
 	 * @return string
 	 * @throws PinterestApiLocaleException If no matching locale code is found.
 	 */
-	public static function get_locale_for_api() {
+	public static function get_locale_for_api(): string {
 		$locale = self::get_wordpress_locale();
 
 		// If the locale is in the list of Pinterest locales, return it.
@@ -101,8 +101,13 @@ class LocaleMapper {
 		}
 
 		// If no match was found, throw an exception.
-		// translators: %s is the locale code.
-		throw new PinterestApiLocaleException( sprintf( __( 'No matching Pinterest API locale found for %s', 'pinterest-for-woocommerce' ), $locale ) );
+		throw new PinterestApiLocaleException(
+			sprintf(
+				// translators: %s is the locale code.
+				esc_html__( 'No matching Pinterest API locale found for %s', 'pinterest-for-woocommerce' ),
+				esc_html( $locale )
+			)
+		);
 	}
 
 	/**

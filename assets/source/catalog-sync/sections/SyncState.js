@@ -41,8 +41,9 @@ const SyncState = () => {
 		select( REPORTS_STORE_NAME ).getFeedState()
 	);
 
-	const hasAvailableCredits = useSettingsSelect()?.account_data
-		?.available_discounts?.marketing_offer?.remaining_discount;
+	const hasAvailableCredits =
+		useSettingsSelect()?.account_data?.available_discounts?.marketing_offer
+			?.remaining_discount;
 
 	const availableCredits = sprintf(
 		/* translators: %s credits value with currency formatted using wc_price */

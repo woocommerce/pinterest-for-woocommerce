@@ -11,6 +11,9 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest\AdCredits;
 use Automattic\WooCommerce\Pinterest\Billing;
 use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
+use Exception;
+use Pinterest_For_Woocommerce;
+use Throwable;
 use \WP_REST_Server;
 use \WP_REST_Request;
 use \WP_Error;
@@ -44,42 +47,30 @@ class AdvertiserConnect extends VendorAPI {
 	 *
 	 * @return array|WP_Error
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @throws Exception PHP Exception.
 	 */
 	public function connect_advertiser( WP_REST_Request $request ) {
-
 		try {
-
 			$advertiser_id = $request->has_param( 'advrtsr_id' ) ? $request->get_param( 'advrtsr_id' ) : false;
 			$tag_id        = $request->has_param( 'tag_id' ) ? $request->get_param( 'tag_id' ) : false;
-			$enable_aem    = $request->has_param( 'enable_aem' ) ? $request->get_param( 'enable_aem' ) : false;
 
 			if ( ! $advertiser_id || ! $tag_id ) {
-				throw new \Exception( esc_html__( 'Missing advertiser or tag parameters.', 'pinterest-for-woocommerce' ), 400 );
+				throw new Exception( esc_html__( 'Missing advertiser or tag parameters.', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			if ( $enable_aem ) {
-				self::enable_aem_tag( $tag_id );
-			}
-
-			$is_connected = Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' );
-
-			// Check if advertiser is already connected.
-			if ( $is_connected ) {
+			$integration_data = Pinterest_For_Woocommerce::get_data( 'integration_data' );
+			if ( $advertiser_id === $integration_data['connected_advertiser_id'] ?? '' ) {
 				return array(
 					'connected'   => $advertiser_id,
 					'reconnected' => false,
 				);
 			}
 
-			// Connect new advertiser and tag.
+			// Update integration with new advertiser and a tag.
 			return self::connect_advertiser_and_tag( $advertiser_id, $tag_id );
-
-		} catch ( \Throwable $th ) {
-
+		} catch ( Throwable $th ) {
 			/* Translators: The error description as returned from the API */
 			$error_message = sprintf( esc_html__( 'Could not connect advertiser with Pinterest. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() );
-
 			return new WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_advertiser_connect_error', $error_message, array( 'status' => $th->getCode() ) );
 		}
 	}
@@ -91,24 +82,39 @@ class AdvertiserConnect extends VendorAPI {
 	 * @param string $advertiser_id The ID of the advertiser.
 	 * @param string $tag_id        The ID of the tag.
 	 *
-	 * @throws \Exception PHP Exception.
+	 * @return array {
+	 *      Updates Pinterest integration with the new advertiser and tag.
+	 *
+	 *      @type string $connected   The ID of the connected advertiser.
+	 *      @type bool   $reconnected Whether the advertiser was reconnected.
+	 * }
+	 * @throws Exception PHP Exception.
 	 */
-	public static function connect_advertiser_and_tag( $advertiser_id, $tag_id ) {
+	public static function connect_advertiser_and_tag( string $advertiser_id, string $tag_id ): array {
 
-		$response = Base::connect_advertiser( $advertiser_id, $tag_id );
+		$integration_data     = Pinterest_For_Woocommerce::get_data( 'integration_data' );
+		$external_business_id = $integration_data['external_business_id'] ?? '';
 
-		if ( 'success' !== $response['status'] ) {
-			throw new \Exception( esc_html__( 'The advertiser could not be connected to Pinterest.', 'pinterest-for-woocommerce' ), 400 );
+		$data = array(
+			'connected_advertiser_id' => $advertiser_id,
+			'connected_tag_id'        => $tag_id,
+		);
+
+		try {
+			$response = Pinterest_For_Woocommerce::update_commerce_integration( $external_business_id, $data );
+		} catch ( Throwable $th ) {
+			throw new Exception(
+				sprintf(
+					/* translators: 1. Error message. */
+					esc_html__( 'Error: $1%s', 'pinterest-for-woocommerce' ),
+					esc_html( $th->getMessage() )
+				),
+				400
+			);
 		}
-
-		if ( $advertiser_id !== $response['data']->advertiser_id ) {
-			throw new \Exception( esc_html__( 'Incorrect advertiser ID.', 'pinterest-for-woocommerce' ), 400 );
-		}
-
-		Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', true );
 
 		// At this stage we can check if the connected advertiser has billing setup.
-		$has_billing = Pinterest_For_Woocommerce()::add_billing_setup_info_to_account_data();
+		$has_billing = Pinterest_For_Woocommerce::add_billing_setup_info_to_account_data();
 
 		/*
 		 * If the advertiser does not have a correct billing lets check for the setup frequently for the next hour.
@@ -130,7 +136,7 @@ class AdvertiserConnect extends VendorAPI {
 		UserInteraction::flush_options();
 
 		return array(
-			'connected'   => $response['data']->advertiser_id,
+			'connected'   => $response['connected_advertiser_id'],
 			'reconnected' => true,
 		);
 	}
@@ -153,8 +159,6 @@ class AdvertiserConnect extends VendorAPI {
 			if ( 'success' !== $response['status'] ) {
 				throw new \Exception( esc_html__( 'The advertiser could not be disconnected from Pinterest.', 'pinterest-for-woocommerce' ), 400 );
 			}
-
-			Pinterest_For_Woocommerce()::save_data( 'is_advertiser_connected', false );
 
 			// Advertiser disconnected, clear the billing status information in the account data.
 			$account_data                        = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
