@@ -83,13 +83,7 @@ class TokenExchangeFailure {
 	 *
 	 * @return void
 	 */
-	public static function possibly_action_note() {
-		if ( ! self::note_exists() ) {
-			return;
-		}
-		$note = Notes::get_note_by_name( self::NOTE_NAME );
-		$note->set_status( Note::E_WC_ADMIN_NOTE_ACTIONED );
-		$note->set_is_read( true );
-		$note->save();
+	public static function delete_failure_note() {
+		Notes::delete_notes_with_name( self::NOTE_NAME );
 	}
 }

@@ -1138,8 +1138,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return void
 		 */
 		public static function post_update_cleanup() {
-			// Mark note as actioned so it will be removed from the UI in case it was added.
-			TokenExchangeFailure::possibly_action_note();
+			TokenExchangeFailure::delete_failure_note();
 
 			// Update completed successfully.
 			Pinterest_For_Woocommerce()::set_api_version( 'v5' );
