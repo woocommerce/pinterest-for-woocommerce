@@ -1,6 +1,6 @@
 === Pinterest for WooCommerce ===
 Contributors: automattic, pinterest, woocommerce
-Tags: woocommerce, pinterest, advertise
+Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
 Tested up to: 6.4
 Requires PHP: 7.3
