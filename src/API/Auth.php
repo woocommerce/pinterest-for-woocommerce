@@ -9,7 +9,6 @@
 namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest\Logger;
-use Automattic\WooCommerce\Pinterest\Notes\TokenExchangeFailure;
 use Throwable;
 use WP_HTTP_Response;
 use WP_REST_Request;
