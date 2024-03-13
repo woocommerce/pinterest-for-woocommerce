@@ -33,6 +33,18 @@ class PluginUpdate {
 	const PLUGIN_UPDATE_VERSION_OPTION = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-update-version';
 
 	/**
+	 * Option name used for token update retry hook.
+	 */
+	const TOKEN_UPDATE_RETRY_HOOK = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-token-update-retry';
+
+	/**
+	 * Constructor for the PluginUpdate class.
+	 */
+	public function __construct() {
+		add_action( self::TOKEN_UPDATE_RETRY_HOOK, array( $this, 'token_update' ), 10, 1 );
+	}
+
+	/**
 	 * Check if the plugin is up to date.
 	 *
 	 * @since 1.0.9
@@ -302,9 +314,11 @@ class PluginUpdate {
 	 *
 	 * @since 1.4.0
 	 *
+	 * @param int $retry_count Parameteres passed via Action Scheduler call. Number of retries left.
+	 *
 	 * @return void
 	 */
-	protected function token_update(): void {
+	public function token_update( $retry_count = 3 ): void {
 		// Update should only happen if the plugin is connected using the V3 token.
 		$token_data   = Pinterest_For_Woocommerce()::get_data( 'token', true );
 		$has_v3_token = $token_data && ! empty( $token_data['access_token'] );
@@ -314,18 +328,46 @@ class PluginUpdate {
 			return;
 		}
 
+		if ( 'v5' === Pinterest_For_Woocommerce()::get_api_version() ) {
+			// Plugin already updated.
+			return;
+		}
+
 		// Set API version to V3. We can use this value to detect failure in the token update procedure.
 		Pinterest_For_Woocommerce()::set_api_version( 'v3' );
 
 		$updated = TokenExchangeV3ToV5::token_update();
 
 		if ( ! $updated ) {
-			// Show a warning banner to the merchant informing that they need to reconnect manually.
-			TokenExchangeFailure::possibly_add_note();
+			$this->update_failure( $retry_count );
+			return;
+		}
+	}
+
+	/**
+	 * Schedule a retry for the token update procedure.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param int $retry_count Number of retries left.
+	 * @return void
+	 */
+	private function update_failure( $retry_count = 3 ) {
+		// Show a warning banner to the merchant informing that they need to reconnect manually.
+		TokenExchangeFailure::possibly_add_note();
+
+		if ( 0 === (int) $retry_count ) {
+			// Retry count exceeded. Do not schedule another retry.
 			return;
 		}
 
-		// Update completed successfully.
-		Pinterest_For_Woocommerce()::set_api_version( 'v5' );
+		as_schedule_single_action(
+			time() + MINUTE_IN_SECONDS * 5 * ( 4 - $retry_count ),
+			self::TOKEN_UPDATE_RETRY_HOOK,
+			array(
+				'retry_count' => $retry_count - 1,
+			),
+			PINTEREST_FOR_WOOCOMMERCE_PREFIX
+		);
 	}
 }

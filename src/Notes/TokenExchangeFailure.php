@@ -12,6 +12,7 @@ namespace Automattic\WooCommerce\Pinterest\Notes;
 defined( 'ABSPATH' ) || exit;
 
 use Automattic\WooCommerce\Admin\Notes\Note;
+use Automattic\WooCommerce\Admin\Notes\Notes;
 use Automattic\WooCommerce\Admin\Notes\NoteTraits;
 
 /**
@@ -73,5 +74,16 @@ class TokenExchangeFailure {
 		$note = self::get_note();
 		$note->save();
 		return true;
+	}
+
+	/**
+	 * Delete the note.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	public static function delete_failure_note() {
+		Notes::delete_notes_with_name( self::NOTE_NAME );
 	}
 }

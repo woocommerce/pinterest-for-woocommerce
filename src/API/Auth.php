@@ -8,7 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
-use Automattic\WooCommerce\Pinterest\Logger as Logger;
+use Automattic\WooCommerce\Pinterest\Logger;
 use Throwable;
 use WP_HTTP_Response;
 use WP_REST_Request;
@@ -105,14 +105,13 @@ class Auth extends VendorAPI {
 			$this->log_error_and_redirect( $request, $error );
 		}
 
-		$token_string = base64_decode( $token_data );
+		$token_string = base64_decode( $token_data ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 		$token_data   = (array) json_decode( urldecode( $token_string ) );
 
 		Pinterest_For_Woocommerce()::save_token_data( $token_data );
 
-		$info_string = base64_decode( $info );
+		$info_string = base64_decode( $info ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 		$info_data   = (array) json_decode( urldecode( $info_string ) );
-
 		$features    = (array) $info_data['feature_flags'] ?? array();
 
 		$this->apply_oauth_flow_features( $features );
