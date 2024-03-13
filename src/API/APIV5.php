@@ -607,8 +607,8 @@ class APIV5 extends Base {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 * @param string $feed_id       The ID of the feed to be enabled.
+	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 *
 	 * @return mixed
 	 * @throws PinterestApiException If API request ends up other than 2xx status.
@@ -622,8 +622,8 @@ class APIV5 extends Base {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 * @param string $feed_id       The ID of the feed to be disabled.
+	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 *
 	 * @return mixed
 	 * @throws PinterestApiException If API request ends up other than 2xx status.
