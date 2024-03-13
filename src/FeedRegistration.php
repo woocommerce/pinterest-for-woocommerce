@@ -158,27 +158,6 @@ class FeedRegistration {
 	}
 
 	/**
-	 * Maintenance function for feed enable status.
-	 * Enable the registered feed if it is not enabled.
-	 * Disable all other feed configurations for the merchant.
-	 *
-	 * @param string $feed_id Feed ID.
-	 * @return void
-	 *
-	 * @throws PinterestApiException Feed could not be fetched.
-	 * @since 1.2.13
-	 */
-	private static function feed_enable_status_maintenance( string $feed_id ) {
-		// Check if the feed is enabled. If not, enable it.
-		if ( ! Feeds::is_local_feed_enabled( $feed_id ) ) {
-			Feeds::enabled_feed( $feed_id );
-		}
-
-		// Cleanup feeds that are registered but not in the local feed configurations.
-		self::maybe_delete_stale_feeds_for_merchant( $feed_id );
-	}
-
-	/**
 	 * Check if there are stale feeds that are registered but not in the local feed configurations.
 	 * Deregister them if they are registered as WooCommerce integration.
 	 *
