@@ -303,9 +303,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Handle the Pinterest verification URL.
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
 
-			// Disconnect advertiser if advertiser or tag change.
-			// add_action( 'update_option_pinterest_for_woocommerce', array( $this, 'maybe_disconnect_advertiser' ), 10, 2 );.
-
 			// Init marketing notifications.
 			add_action( Heartbeat::DAILY, array( $this, 'init_marketing_notifications' ) );
 
@@ -787,10 +784,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				return true;
 			}
 
-			// Pass empty string to the function to disable all feeds for the merchant.
-			FeedRegistration::maybe_disable_stale_feeds_for_merchant( '' );
-
 			try {
+				// Delete all the feeds for the merchant.
+				FeedRegistration::maybe_delete_stale_feeds_for_merchant( '' );
 				// Disconnect merchant from Pinterest.
 				self::delete_commerce_integration();
 				self::flush_options();
@@ -821,38 +817,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Cancel scheduled jobs.
 			Pinterest\ProductSync::cancel_jobs();
-		}
-
-
-		/**
-		 * Disconnect advertiser from the platform if advertiser or tag change.
-		 *
-		 * @param array $old_value The old value of the option.
-		 * @param array $new_value The new value of the option.
-		 */
-		public static function maybe_disconnect_advertiser( $old_value, $new_value ) {
-
-			if ( ! is_array( $old_value ) || ! is_array( $new_value ) ) {
-				return;
-			}
-
-			if (
-				! isset( $old_value['tracking_advertiser'] ) ||
-				! isset( $old_value['tracking_tag'] ) ||
-				! isset( $new_value['tracking_advertiser'] ) ||
-				! isset( $new_value['tracking_tag'] )
-			) {
-				return;
-			}
-
-			// Disconnect merchant if old values are different than new ones.
-			if ( $old_value['tracking_advertiser'] !== $new_value['tracking_advertiser'] || $old_value['tracking_tag'] !== $new_value['tracking_tag'] ) {
-				try {
-					Pinterest\API\AdvertiserConnect::disconnect_advertiser( $old_value['tracking_advertiser'], $old_value['tracking_tag'] );
-				} catch ( Exception $th ) {
-					Logger::log( esc_html__( 'There was an error disconnecting the Advertiser. Please try again.', 'pinterest-for-woocommerce' ) );
-				}
-			}
 		}
 
 		/**

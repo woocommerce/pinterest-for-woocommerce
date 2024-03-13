@@ -153,7 +153,7 @@ class FeedRegistration {
 			return false;
 		}
 
-		self::feed_enable_status_maintenance( $feed_id );
+		static::maybe_delete_stale_feeds_for_merchant( $feed_id );
 		return true;
 	}
 
@@ -175,7 +175,7 @@ class FeedRegistration {
 		}
 
 		// Cleanup feeds that are registered but not in the local feed configurations.
-		self::maybe_disable_stale_feeds_for_merchant( $feed_id );
+		self::maybe_delete_stale_feeds_for_merchant( $feed_id );
 	}
 
 	/**
@@ -187,7 +187,7 @@ class FeedRegistration {
 	 *
 	 * @since 1.2.13
 	 */
-	public static function maybe_disable_stale_feeds_for_merchant( string $feed_id ) {
+	public static function maybe_delete_stale_feeds_for_merchant( string $feed_id ) {
 		$feeds = Feeds::get_feeds();
 
 		if ( empty( $feeds ) ) {
@@ -197,16 +197,15 @@ class FeedRegistration {
 		$invalidate_cache = false;
 
 		foreach ( $feeds as $feed ) {
-			// Local feed should not be disabled.
+			// Local feed should not be deleted.
 			if ( $feed_id === $feed['id'] ) {
 				continue;
 			}
 
-			// Disable the feed if it is active and originated from the current website.
-			$is_active_feed      = Feeds::FEED_STATUS_ACTIVE === $feed['status'];
+			// Delete the feed if it belongs to the current website.
 			$is_woocommerce_feed = 0 === strpos( $feed['location'], get_site_url() );
-			if ( $is_active_feed && $is_woocommerce_feed ) {
-				Feeds::disable_feed( $feed['id'] );
+			if ( $is_woocommerce_feed ) {
+				Feeds::delete_feed( $feed['id'] );
 				$invalidate_cache = true;
 			}
 		}

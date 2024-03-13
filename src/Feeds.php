@@ -332,7 +332,7 @@ class Feeds {
 	public static function enabled_feed( string $feed_id ): bool {
 		try {
 			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
-			APIV5::enable_feed( $ad_account_id, $feed_id );
+			APIV5::enable_feed( $feed_id, $ad_account_id );
 			// We don't need to check the status, lets just invalidate the cache for extra safety.
 			self::invalidate_feeds_cache();
 			return true;
@@ -354,7 +354,27 @@ class Feeds {
 	public static function disable_feed( string $feed_id ): bool {
 		try {
 			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
-			APIV5::disable_feed( $ad_account_id, $feed_id );
+			APIV5::disable_feed( $feed_id, $ad_account_id );
+			return true;
+		} catch ( Throwable $th ) {
+			Logger::log( $th->getMessage(), 'error' );
+			return false;
+		}
+	}
+
+	/**
+	 * Delete the feed.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $feed_id The ID of the feed.
+	 *
+	 * @return bool
+	 */
+	public static function delete_feed( string $feed_id ) {
+		try {
+			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+			APIV5::delete_feed( $feed_id, $ad_account_id );
 			return true;
 		} catch ( Throwable $th ) {
 			Logger::log( $th->getMessage(), 'error' );

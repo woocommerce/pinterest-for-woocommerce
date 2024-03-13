@@ -613,7 +613,7 @@ class APIV5 extends Base {
 	 * @return mixed
 	 * @throws PinterestApiException If API request ends up other than 2xx status.
 	 */
-	public static function enable_feed( string $ad_account_id, string $feed_id ): array {
+	public static function enable_feed( string $feed_id, string $ad_account_id ): array {
 		return static::update_feed_status( $feed_id, Feeds::FEED_STATUS_ACTIVE, $ad_account_id );
 	}
 
@@ -628,7 +628,7 @@ class APIV5 extends Base {
 	 * @return mixed
 	 * @throws PinterestApiException If API request ends up other than 2xx status.
 	 */
-	public static function disable_feed( string $ad_account_id, string $feed_id ): array {
+	public static function disable_feed( string $feed_id, string $ad_account_id ): array {
 		return static::update_feed_status( $feed_id, Feeds::FEED_STATUS_INACTIVE, $ad_account_id );
 	}
 
