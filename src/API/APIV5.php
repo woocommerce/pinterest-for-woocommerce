@@ -603,58 +603,6 @@ class APIV5 extends Base {
 	}
 
 	/**
-	 * Enable a feed.
-	 *
-	 * @since x.x.x
-	 *
-	 * @param string $feed_id       The ID of the feed to be enabled.
-	 * @param string $ad_account_id Pinterest Ad Account ID.
-	 *
-	 * @return mixed
-	 * @throws PinterestApiException If API request ends up other than 2xx status.
-	 */
-	public static function enable_feed( string $feed_id, string $ad_account_id ): array {
-		return static::update_feed_status( $feed_id, Feeds::FEED_STATUS_ACTIVE, $ad_account_id );
-	}
-
-	/**
-	 * Disable a feed.
-	 *
-	 * @since x.x.x
-	 *
-	 * @param string $feed_id       The ID of the feed to be disabled.
-	 * @param string $ad_account_id Pinterest Ad Account ID.
-	 *
-	 * @return mixed
-	 * @throws PinterestApiException If API request ends up other than 2xx status.
-	 */
-	public static function disable_feed( string $feed_id, string $ad_account_id ): array {
-		return static::update_feed_status( $feed_id, Feeds::FEED_STATUS_INACTIVE, $ad_account_id );
-	}
-
-	/**
-	 * Update a feed status.
-	 *
-	 * @since x.x.x
-	 *
-	 * @param string $feed_id       The ID of the feed to be updated.
-	 * @param string $status        The status to be set.
-	 * @param string $ad_account_id Pinterest Ad Account ID.
-	 *
-	 * @return array
-	 * @throws PinterestApiException If API request ends up other than 2xx status.
-	 */
-	private static function update_feed_status( string $feed_id, string $status, string $ad_account_id ): array {
-		return self::make_request(
-			"catalogs/feeds/{$feed_id}?ad_account_id={$ad_account_id}",
-			'PATCH',
-			array(
-				'status' => $status,
-			),
-		);
-	}
-
-	/**
 	 * Get the latest workflow for the given feed.
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/feed_processing_results/list
