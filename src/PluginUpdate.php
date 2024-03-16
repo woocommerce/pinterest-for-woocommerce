@@ -130,6 +130,7 @@ class PluginUpdate {
 			),
 			'1.4.0'  => array(
 				'token_update',
+				'feed_status_migration_1_4_0',
 			),
 		);
 	}
@@ -369,5 +370,23 @@ class PluginUpdate {
 			),
 			PINTEREST_FOR_WOOCOMMERCE_PREFIX
 		);
+	}
+
+	/**
+	 * Feed status migration for 1.4.0.
+	 * Migrate from transients to options.
+	 *
+	 * @since 1.4.0
+	 * @return void
+	 */
+	private function feed_status_migration_1_4_0(): void {
+
+		foreach ( ProductFeedStatus::STATE_PROPS as $key => $default_value ) {
+			$name  = ProductFeedStatus::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key;
+			$value = get_transient( $name );
+			$value = ( false !== $value ) ? $value : $default_value;
+			update_option( $name, $value );
+			delete_transient( $name );
+		}
 	}
 }

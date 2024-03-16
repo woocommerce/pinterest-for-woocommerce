@@ -59,12 +59,10 @@ class ProductFeedStatus {
 		foreach ( self::STATE_PROPS as $key => $default_value ) {
 
 			if ( ! isset( self::$state[ $key ] ) || null === self::$state[ $key ] ) {
-				self::$state[ $key ] = get_transient( self::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key );
+				self::$state[ $key ] = get_option( self::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key, $default_value );
 			}
 
-			if ( false === self::$state[ $key ] ) {
-				self::$state[ $key ] = $default_value;
-			} elseif ( null === self::$state[ $key ] ) {
+			if ( null === self::$state[ $key ] ) {
 				self::$state[ $key ] = false;
 			}
 		}
@@ -85,7 +83,7 @@ class ProductFeedStatus {
 
 		foreach ( $state as $key => $value ) {
 			self::$state[ $key ] = $value;
-			set_transient( self::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key, ( false === $value ? null : $value ) ); // No expiration.
+			update_option( self::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key, ( false === $value ? null : $value ) ); // No expiration.
 		}
 
 		if ( ! empty( $state['status'] ) ) {
