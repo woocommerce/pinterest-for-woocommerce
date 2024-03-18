@@ -91,10 +91,7 @@ class Base {
 		$request = static::prepare_request( $endpoint, $method, $payload, $api );
 		try {
 			$response = static::handle_request( $request );
-			if ( ! empty( $cache_expiry ) ) {
-				$cache_key = self::get_cache_key( $endpoint, $method, $payload, $api );
-				set_transient( $cache_key, $response, $cache_expiry );
-			}
+			static::maybe_cache_api_response( $endpoint, $method, $payload, $api, $response, $cache_expiry );
 			return $response;
 		} catch ( PinterestApiException $e ) {
 			if ( ! empty( Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' ) ) ) {
