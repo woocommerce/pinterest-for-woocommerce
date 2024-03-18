@@ -130,7 +130,7 @@ class PluginUpdate {
 			),
 			'1.4.0'  => array(
 				'token_update',
-				'feed_status_migration_1_4_0',
+				'feed_status_migration',
 			),
 		);
 	}
@@ -379,7 +379,7 @@ class PluginUpdate {
 	 * @since 1.4.0
 	 * @return void
 	 */
-	private function feed_status_migration_1_4_0(): void {
+	private function feed_status_migration(): void {
 
 		foreach ( ProductFeedStatus::STATE_PROPS as $key => $default_value ) {
 			$name  = ProductFeedStatus::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key;
