@@ -269,11 +269,6 @@ class FeedState extends VendorAPI {
 			$status_label = esc_html__( 'Product feed failed.', 'pinterest-for-woocommerce' );
 		}
 
-		if ( FeedStatusService::FEED_STATUS_FAILED === $status ) {
-			$status       = 'error';
-			$status_label = esc_html__( 'Product feed disapproved by Pinterest', 'pinterest-for-woocommerce' );
-		}
-
 		$result['workflow'][] = array(
 			'label'        => esc_html__( 'Remote feed setup', 'pinterest-for-woocommerce' ),
 			'status'       => $status,
