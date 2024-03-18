@@ -40,7 +40,7 @@ class Logger {
 	 * @param string $message The message to be logged.
 	 * @param string $level   The level/context of the message.
 	 * @param string $feature Used to direct logs to a separate file.
-	 * @param string $force   Used to bypass system settings and force the logs.
+	 * @param bool   $force   Used to bypass system settings and force the logs.
 	 *
 	 * @return void
 	 */
