@@ -100,7 +100,7 @@ class Conversions extends Tracker {
 	private function get_default_data( string $event_name ) {
 		global $wp;
 
-		return array(
+		$data = array(
 			'event_name'       => $event_name,
 			'action_source'    => 'web',
 			'event_time'       => time(),
@@ -112,6 +112,15 @@ class Conversions extends Tracker {
 			),
 			'language'         => 'en',
 		);
+
+		$email = self::maybe_get_hashed_customer_email();
+		if ( false !== $email ) {
+			$data['user_data'] = array(
+				'em' => array( $email ),
+			);
+		}
+
+		return $data;
 	}
 
 	/**
@@ -149,6 +158,24 @@ class Conversions extends Tracker {
 				'num_items'   => (int) $data->get_quantity(),
 			),
 		);
+	}
+
+	/**
+	 * Returns the hashed email of the current user if any.
+	 *
+	 * @return string|false Hashed email or false if not available.
+	 */
+	private static function maybe_get_hashed_customer_email() {
+		$user_email = '';
+		if ( is_user_logged_in() ) {
+			$user       = wp_get_current_user();
+			$user_email = $user->user_email;
+		}
+		if ( empty( $user_email ) ) {
+			$session_customer = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session->get( 'customer' ) : false;
+			$user_email       = $session_customer ? $session_customer['email'] : '';
+		}
+		return $user_email ? hash( 'sha256', $user_email ) : false;
 	}
 
 	/**
