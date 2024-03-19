@@ -121,21 +121,17 @@ class Feeds {
 		);
 
 		$data = array(
-			'name'                          => $feed_name,
-			'format'                        => 'XML',
-			'location'                      => $config['feed_url'],
-			'catalog_type'                  => 'RETAIL',
-			'default_currency'              => $default_currency,
-			'default_locale'                => $default_locale,
-			'default_country'               => $default_country,
-			'default_availability'          => 'IN_STOCK',
-			'preferred_processing_schedule' => array(
-				'time'     => gmdate( 'H:i', time() + 5 * MINUTE_IN_SECONDS ),
-				'timezone' => 'Etc/UTC',
-			),
+			'name'                 => $feed_name,
+			'format'               => 'XML',
+			'location'             => $config['feed_url'],
+			'catalog_type'         => 'RETAIL',
+			'default_currency'     => $default_currency,
+			'default_locale'       => $default_locale,
+			'default_country'      => $default_country,
+			'default_availability' => 'IN_STOCK',
 		);
 
-		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( wp_json_encode( $data ) );
+		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( wp_json_encode( $data ) . (string) $ad_account_id );
 		$cache     = get_transient( $cache_key );
 
 		if ( false !== $cache ) {
@@ -144,6 +140,12 @@ class Feeds {
 				(int) $cache
 			);
 		}
+
+		// Add preferred_processing_schedule to the data after generating cache key because time() is used.
+		$data['preferred_processing_schedule'] = array(
+			'time'     => gmdate( 'H:i', time() + 5 * MINUTE_IN_SECONDS ),
+			'timezone' => 'Etc/UTC',
+		);
 
 		try {
 			$feed = APIV5::create_feed( $data, $ad_account_id );
