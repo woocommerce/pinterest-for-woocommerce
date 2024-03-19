@@ -166,7 +166,7 @@ class Conversions extends Tracker {
 			'event_id'    => $data->get_event_id(),
 			'custom_data' => array(
 				'currency'    => $data->get_currency(),
-				'value'       => (string) $data->get_price(),
+				'value'       => (string) ( $data->get_price() * $data->get_quantity() ),
 				'content_ids' => array( (string) $data->get_id() ),
 				'contents'    => array(
 					array(

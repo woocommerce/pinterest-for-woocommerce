@@ -394,7 +394,7 @@ class Tag extends Tracker {
 			'event_id'       => $data->get_event_id(),
 			'product_id'     => $data->get_id(),
 			'product_name'   => $data->get_name(),
-			'value'          => $data->get_price(),
+			'value'          => $data->get_price() * $data->get_quantity(),
 			'order_quantity' => $data->get_quantity(),
 			'currency'       => $data->get_currency(),
 		);
