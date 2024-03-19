@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
+use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 use Exception;
 use Throwable;
@@ -278,6 +279,9 @@ class Feeds {
 			$feeds = static::get_feeds();
 		}
 
+		$configs = LocalFeedConfigs::get_instance()->get_configurations();
+		$config  = reset( $configs );
+
 		foreach ( $feeds as $feed ) {
 			$old_name_match = is_null( $feed['name'] );
 			$new_name_match = 0 === strpos( $feed['name'] ?? '', 'Created by Pinterest for WooCommerce' );
@@ -294,6 +298,7 @@ class Feeds {
 			$does_match = $old_name_match || $new_name_match;
 			$does_match = $does_match && $local_country === $feed['default_country'] ?? '';
 			$does_match = $does_match && $local_locale === $feed['default_locale'] ?? '';
+			$does_match = $does_match && $config['feed_url'] === $feed['location'] ?? '';
 			if ( $does_match ) {
 				return $feed['id'];
 			}
