@@ -81,6 +81,11 @@ class Tracking {
 	 * @return void
 	 */
 	public function handle_page_visit() {
+		if ( is_404() ) {
+			// Do not track 404 pages.
+			return;
+		}
+
 		$data = new None( uniqid( 'page' ) );
 		if ( is_product() ) {
 			$product = wc_get_product();
