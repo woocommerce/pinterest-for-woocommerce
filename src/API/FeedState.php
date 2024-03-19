@@ -258,7 +258,7 @@ class FeedState extends VendorAPI {
 			FeedStatusService::FEED_STATUS_PROCESSING,
 		);
 		if ( in_array( $status, $pending, true ) ) {
-			$status       = 'pending';
+			$status       = 'success';
 			$status_label = esc_html__( 'Pinterest is processing the feed.', 'pinterest-for-woocommerce' );
 		}
 
