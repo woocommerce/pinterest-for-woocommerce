@@ -255,11 +255,18 @@ class FeedState extends VendorAPI {
 
 		$pending = array(
 			FeedStatusService::FEED_STATUS_QUEUED_FOR_PROCESSING,
-			FeedStatusService::FEED_STATUS_UNDER_APPEAL,
-			FeedStatusService::FEED_STATUS_UNDER_REVIEW,
 			FeedStatusService::FEED_STATUS_PROCESSING,
 		);
 		if ( in_array( $status, $pending, true ) ) {
+			$status       = 'success';
+			$status_label = esc_html__( 'Pinterest is processing the feed.', 'pinterest-for-woocommerce' );
+		}
+
+		$approval = array(
+			FeedStatusService::FEED_STATUS_UNDER_APPEAL,
+			FeedStatusService::FEED_STATUS_UNDER_REVIEW,
+		);
+		if ( in_array( $status, $approval, true ) ) {
 			$status       = 'pending';
 			$status_label = esc_html__( 'Product feed pending approval on Pinterest.', 'pinterest-for-woocommerce' );
 		}
