@@ -81,8 +81,8 @@ class Tracking {
 	 * @return void
 	 */
 	public function handle_page_visit() {
-		if ( ! ( is_page() || is_product() ) ) {
-			// We are not on a page or product page. Don't track the event.
+		if ( is_404() ) {
+			// Do not track 404 pages.
 			return;
 		}
 
