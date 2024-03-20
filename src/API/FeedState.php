@@ -460,7 +460,7 @@ class FeedState extends VendorAPI {
 				);
 				$global_error = Pinterest\FeedStatusService::get_processing_results_global_error( $processing_results );
 				return $info . ( $global_error ? ' - ' . $global_error : '' );
-			case 'POCESSING':
+			case 'PROCESSING':
 				return sprintf(
 					/* Translators: %1$s Time difference string, %2$s number of products */
 					esc_html__( 'overview numbers can be inaccurate untill processing finishes.', 'pinterest-for-woocommerce' ),
