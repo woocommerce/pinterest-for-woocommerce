@@ -48,6 +48,7 @@ class FeedState extends VendorAPI {
 	private function hooks() {
 		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_local_feed_status' ) );
 		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_feed_status' ) );
+		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_recent_feed_processing_status' ) );
 		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_third_party_tags_warning' ) );
 		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_rich_pins_conflict_warning' ) );
 	}
@@ -283,17 +284,6 @@ class FeedState extends VendorAPI {
 			'extra_info'   => $extra_info,
 		);
 
-		if ( 'success' === $status ) {
-			$result = $this->add_recent_feed_processing_status( $result );
-		} else {
-			$result['overview'] = array(
-				'total'      => 0,
-				'not_synced' => 0,
-				'warnings'   => 0,
-				'errors'     => 0,
-			);
-		}
-
 		return $result;
 	}
 
@@ -363,7 +353,7 @@ class FeedState extends VendorAPI {
 	 *
 	 * @since x.x.x
 	 */
-	private function add_recent_feed_processing_status( array $result ): array {
+	public function add_recent_feed_processing_status( array $result ): array {
 		$extra_info = '';
 
 		$feed_id = FeedRegistration::get_locally_stored_registered_feed_id();
