@@ -255,7 +255,7 @@ class Tag extends Tracker {
 		 * because if redirect is enabled, the cart page will be reloaded and the event will get lost.
 		 */
 		$is_redirect = 'yes' === get_option( 'woocommerce_cart_redirect_after_add' );
-		/**
+		/*
 		 * This check is made for Add to Cart when using Blocks. WP does not detect
 		 * the AJAX request in this case, so we must add the event to the deferred
 		 * list.
