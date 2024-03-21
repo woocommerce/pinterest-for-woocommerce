@@ -463,7 +463,7 @@ class FeedState extends VendorAPI {
 			case 'PROCESSING':
 				return sprintf(
 					/* Translators: %1$s Time difference string, %2$s number of products */
-					esc_html__( 'overview numbers can be inaccurate untill processing finishes.', 'pinterest-for-woocommerce' ),
+					esc_html__( 'Overview numbers may be inaccurate until processing finishes.', 'pinterest-for-woocommerce' ),
 				);
 			case 'DISAPPROVED':
 			case 'QUEUED_FOR_PROCESSING':
