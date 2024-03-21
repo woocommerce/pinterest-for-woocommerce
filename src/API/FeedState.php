@@ -235,11 +235,6 @@ class FeedState extends VendorAPI {
 			);
 		}
 
-		if ( FeedStatusService::FEED_STATUS_ERROR_FETCHING_FEED === $status ) {
-			$status       = 'error';
-			$status_label = esc_html__( 'Could not get feed info.', 'pinterest-for-woocommerce' );
-		}
-
 		if ( FeedStatusService::FEED_STATUS_DISAPPROVED === $status ) {
 			$status       = 'error';
 			$status_label = esc_html__( 'Product feed declined by Pinterest', 'pinterest-for-woocommerce' );
@@ -248,19 +243,13 @@ class FeedState extends VendorAPI {
 		$succeeded = array(
 			FeedStatusService::FEED_STATUS_COMPLETED,
 			FeedStatusService::FEED_STATUS_COMPLETED_EARLY,
+			FeedStatusService::FEED_STATUS_QUEUED_FOR_PROCESSING,
+			FeedStatusService::FEED_STATUS_PROCESSING,
+			FeedStatusService::FEED_STATUS_FAILED,
 		);
 		if ( in_array( $status, $succeeded, true ) ) {
 			$status       = 'success';
 			$status_label = esc_html__( 'Product feed configured for ingestion on Pinterest', 'pinterest-for-woocommerce' );
-		}
-
-		$pending = array(
-			FeedStatusService::FEED_STATUS_QUEUED_FOR_PROCESSING,
-			FeedStatusService::FEED_STATUS_PROCESSING,
-		);
-		if ( in_array( $status, $pending, true ) ) {
-			$status       = 'success';
-			$status_label = esc_html__( 'Pinterest is processing the feed.', 'pinterest-for-woocommerce' );
 		}
 
 		$approval = array(
@@ -270,11 +259,6 @@ class FeedState extends VendorAPI {
 		if ( in_array( $status, $approval, true ) ) {
 			$status       = 'pending';
 			$status_label = esc_html__( 'Product feed pending approval on Pinterest.', 'pinterest-for-woocommerce' );
-		}
-
-		if ( FeedStatusService::FEED_STATUS_FAILED === $status ) {
-			$status       = 'error';
-			$status_label = esc_html__( 'Product feed failed.', 'pinterest-for-woocommerce' );
 		}
 
 		$result['workflow'][] = array(
@@ -359,27 +343,24 @@ class FeedState extends VendorAPI {
 		$feed_id = FeedRegistration::get_locally_stored_registered_feed_id();
 
 		if ( empty( $feed_id ) ) {
+			// Without Feed ID, we can't get the processing results.
+			return $result;
+		}
+
+		$recent_feed_processing_results = Feeds::get_feed_recent_processing_results( $feed_id );
+		if ( empty( $recent_feed_processing_results ) ) {
 			$status       = 'error';
 			$status_label = esc_html__(
-				'Feed is not registered with Pinterest.',
+				'Feed report from Pinterest contains no information.',
 				'pinterest-for-woocommerce'
 			);
 		} else {
-			$recent_feed_processing_results = Feeds::get_feed_recent_processing_results( $feed_id );
-			if ( empty( $recent_feed_processing_results ) ) {
-				$status       = 'error';
-				$status_label = esc_html__(
-					'Feed report from Pinterest contains no information.',
-					'pinterest-for-woocommerce'
-				);
-			} else {
-				$processing_status = $recent_feed_processing_results['status'] ?? '';
-				$status            = static::map_status_into_status( $processing_status );
-				$status_label      = static::map_status_into_label( $processing_status );
-				$extra_info        = static::map_status_into_extra_info( $recent_feed_processing_results );
-			}
-			$result['overview'] = Pinterest\FeedStatusService::get_processing_result_overview_stats( $recent_feed_processing_results );
+			$processing_status = $recent_feed_processing_results['status'] ?? '';
+			$status            = static::map_status_into_status( $processing_status );
+			$status_label      = static::map_status_into_label( $processing_status );
+			$extra_info        = static::map_status_into_extra_info( $recent_feed_processing_results );
 		}
+		$result['overview'] = Pinterest\FeedStatusService::get_processing_result_overview_stats( $recent_feed_processing_results );
 
 		$result['workflow'][] = array(
 			'label'        => esc_html__( 'Remote sync status', 'pinterest-for-woocommerce' ),
@@ -404,12 +385,12 @@ class FeedState extends VendorAPI {
 			case 'COMPLETED':
 			case 'COMPLETED_EARLY':
 				return 'success';
-			case 'DISAPPROVED':
 			case 'PROCESSING':
 			case 'QUEUED_FOR_PROCESSING':
 			case 'UNDER_APPEAL':
 			case 'UNDER_REVIEW':
 				return 'pending';
+			case 'DISAPPROVED':
 			case 'FAILED':
 			default:
 				return 'error';
@@ -428,11 +409,11 @@ class FeedState extends VendorAPI {
 		switch ( $status ) {
 			case 'COMPLETED':
 			case 'COMPLETED_EARLY':
-				return esc_html__( 'Automatically pulled by Pinterest', 'pinterest-for-woocommerce' );
+				return esc_html__( 'Processing completed', 'pinterest-for-woocommerce' );
 			case 'DISAPPROVED':
 				return esc_html__( 'Feed is disapproved by Pinterest.', 'pinterest-for-woocommerce' );
 			case 'FAILED':
-				return esc_html__( 'Feed ingestion failed.', 'pinterest-for-woocommerce' );
+				return esc_html__( 'Processing failed', 'pinterest-for-woocommerce' );
 			case 'PROCESSING':
 				return esc_html__( 'Processing', 'pinterest-for-woocommerce' );
 			case 'QUEUED_FOR_PROCESSING':
@@ -465,21 +446,25 @@ class FeedState extends VendorAPI {
 		switch ( $status ) {
 			case 'COMPLETED':
 			case 'COMPLETED_EARLY':
-			case 'PROCESSING':
 				return sprintf(
 					/* Translators: %1$s Time difference string, %2$s number of products */
-					esc_html__( 'Last pulled: %1$s ago, containing %2$d products', 'pinterest-for-woocommerce' ),
+					esc_html__( '%1$s ago, containing %2$d products', 'pinterest-for-woocommerce' ),
 					human_time_diff( $processing_date->getTimestamp() ),
 					$original_products_count
 				);
 			case 'FAILED':
 				$info = sprintf(
 					/* Translators: %1$s Time difference string */
-					esc_html__( 'Last attempt: %1$s ago', 'pinterest-for-woocommerce' ),
+					esc_html__( '%1$s ago', 'pinterest-for-woocommerce' ),
 					human_time_diff( $processing_date->getTimestamp() )
 				);
 				$global_error = Pinterest\FeedStatusService::get_processing_results_global_error( $processing_results );
 				return $info . ( $global_error ? ' - ' . $global_error : '' );
+			case 'PROCESSING':
+				return sprintf(
+					/* Translators: %1$s Time difference string, %2$s number of products */
+					esc_html__( 'Overview numbers may be inaccurate until processing finishes.', 'pinterest-for-woocommerce' ),
+				);
 			case 'DISAPPROVED':
 			case 'QUEUED_FOR_PROCESSING':
 			case 'UNDER_APPEAL':
