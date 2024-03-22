@@ -227,10 +227,7 @@ class Conversions extends Tracker {
 	 */
 	private function get_view_category_data( Category $data ) {
 		return array(
-			'event_id'    => $data->get_event_id(),
-			'custom_data' => array(
-				'category_name' => $data->get_name(),
-			),
+			'event_id' => $data->get_event_id(),
 		);
 	}
 
