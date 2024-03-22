@@ -119,7 +119,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * The default settings that will be created
 		 * with the given values, if they don't exist.
 		 *
-		 * @var Pinterest_For_Woocommerce
+		 * @var array
 		 * @since 1.0.0
 		 */
 		protected static $default_settings = array(
@@ -162,12 +162,12 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Unserializing instances of this class is forbidden.
+		 * Deserializing instances of this class is forbidden.
 		 *
 		 * @since 1.0.0
 		 */
 		public function __wakeup() {
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'Unserializing instances of this class is forbidden.', 'pinterest-for-woocommerce' ), '1.0.0' );
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'Deserializing instances of this class is forbidden.', 'pinterest-for-woocommerce' ), '1.0.0' );
 		}
 
 		/**
@@ -229,6 +229,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					return defined( 'DOING_CRON' );
 				case 'frontend':
 					return ( ! is_admin() || defined( 'DOING_AJAX' ) ) && ! defined( 'DOING_CRON' );
+				default:
+					return false;
 			}
 		}
 
@@ -313,7 +315,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Initialise Tracker and add trackers to it.
+		 * Initialize Tracker and add trackers to it.
 		 *
 		 * @since x.x.x
 		 *
@@ -343,7 +345,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Init Pinterest_For_Woocommerce when WordPress Initialises.
+		 * Init Pinterest_For_Woocommerce when WordPress initializes.
 		 */
 		public function init() {
 			/**
@@ -352,7 +354,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			 */
 			do_action( 'before_pinterest_for_woocommerce_init' );
 
-			// Set up localisation.
+			// Set up localization.
 			$this->load_plugin_textdomain();
 
 			/**
@@ -433,7 +435,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			if ( $this->is_request( 'admin' ) ) {
 				add_action(
 					'admin_notices',
-					function() use ( $errors ) {
+					function () use ( $errors ) {
 						?>
 						<div class="notice notice-error">
 							<?php
@@ -445,7 +447,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 						<?php
 					}
 				);
-				return;
 			}
 
 			return false;
@@ -463,7 +464,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Load Localisation files.
+		 * Load localization files.
 		 *
 		 * Note: the first-loaded translation file overrides any following ones if the same translation is present.
 		 *
@@ -479,7 +480,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$locale = apply_filters( 'plugin_locale', get_locale(), 'pinterest-for-woocommerce' );
 
 			load_textdomain( 'pinterest-for-woocommerce', WP_LANG_DIR . '/pinterest-for-woocommerce/pinterest-for-woocommerce-' . $locale . '.mo' );
-			load_plugin_textdomain( 'pinterest-for-woocommerce', false, plugin_basename( dirname( __FILE__ ) ) . '/i18n/languages' );
+			load_plugin_textdomain( 'pinterest-for-woocommerce', false, plugin_basename( __DIR__ ) . '/i18n/languages' );
 		}
 
 		/**
@@ -1426,18 +1427,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Helper function to return the country set in WC's settings using wc_get_base_location().
 		 *
-		 * @param string $default Default country code to return if no country is set.
+		 * @param string $default_country Default country code to return if no country is set.
 		 *
 		 * @return mixed|string|null
 		 */
-		public static function get_base_country( $default = 'US' ) {
+		public static function get_base_country( $default_country = 'US' ) {
 			if ( ! function_exists( 'wc_get_base_location' ) ) {
 				return null;
 			}
 
 			$base_location = wc_get_base_location();
 
-			return ! empty( $base_location['country'] ) ? $base_location['country'] : $default;
+			return ! empty( $base_location['country'] ) ? $base_location['country'] : $default_country;
 		}
 
 		/**
