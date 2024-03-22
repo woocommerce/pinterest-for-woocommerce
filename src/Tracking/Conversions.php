@@ -51,12 +51,20 @@ class Conversions extends Tracker {
 
 		try {
 			$this->send_request( $event_name, $data );
+
+			/* translators: 1: Conversions API event name, 2: JSON encoded event data. */
+			$messages = sprintf(
+				'Sending Pinterest Conversions API event %1$s with a payload: %2$s',
+				$event_name,
+				wp_json_encode( $data )
+			);
+			Logger::log( $messages, 'debug', 'conversions' );
 		} catch ( Throwable $e ) {
 			/* translators: 1: Conversions API event name, 2: JSON encoded event data, 3: Error code, 4: Error message. */
 			$messages = sprintf(
 				'Sending Pinterest Conversions API event %1$s with a payload %2$s has failed with the error %3$d code and %4$s message',
 				$event_name,
-				json_encode( $data ),
+				wp_json_encode( $data ),
 				$e->getCode(),
 				$e->getMessage()
 			);
@@ -296,14 +304,6 @@ class Conversions extends Tracker {
 		if ( empty( $ad_account_id ) ) {
 			return;
 		}
-
-		/* translators: 1: Conversions API event name, 2: JSON encoded event data. */
-		$messages = sprintf(
-			'Sending Pinterest Conversions API event %1$s with a payload: %2$s',
-			$event_name,
-			json_encode( $data )
-		);
-		Logger::log( $messages, 'debug', 'conversions' );
 
 		$response = APIV5::make_request(
 			"ad_accounts/{$ad_account_id}/events",
