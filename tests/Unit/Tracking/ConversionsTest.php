@@ -191,9 +191,6 @@ class ConversionsTest extends WP_UnitTestCase {
 					'client_ip_address' => 'Some IP address.',
 					'client_user_agent' => 'Some user agent string.',
 				),
-				'custom_data'      => array(
-					'category_name'    => 'Category 1',
-				),
 				'language'         => 'en',
 			),
 			$data
