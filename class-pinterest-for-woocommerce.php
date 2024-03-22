@@ -464,7 +464,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Load Localization files.
+		 * Load localization files.
 		 *
 		 * Note: the first-loaded translation file overrides any following ones if the same translation is present.
 		 *
