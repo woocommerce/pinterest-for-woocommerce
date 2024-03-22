@@ -648,7 +648,10 @@ class APIV5 extends Base {
 	public static function get_feed_processing_results( $feed_id, $ad_account_id ): array {
 		return self::make_request(
 			"catalogs/feeds/{$feed_id}/processing_results?ad_account_id={$ad_account_id}&page_size=1",
-			'GET'
+			'GET',
+			array(),
+			'',
+			MINUTE_IN_SECONDS
 		);
 	}
 
