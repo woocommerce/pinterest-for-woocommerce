@@ -651,7 +651,7 @@ class APIV5 extends Base {
 			'GET',
 			array(),
 			'',
-			10
+			MINUTE_IN_SECONDS
 		);
 	}
 
