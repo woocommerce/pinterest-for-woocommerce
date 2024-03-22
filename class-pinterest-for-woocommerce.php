@@ -345,7 +345,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Init Pinterest_For_Woocommerce when WordPress Initializes.
+		 * Init Pinterest_For_Woocommerce when WordPress initializes.
 		 */
 		public function init() {
 			/**
