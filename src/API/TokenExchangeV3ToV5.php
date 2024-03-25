@@ -1,6 +1,6 @@
 <?php
 /**
- * Pinterest API Token exchnge class.
+ * Pinterest API Token exchange class.
  *
  * @class       TokenExchangeV3ToV5
  * @version     x.x.x
@@ -66,8 +66,8 @@ class TokenExchangeV3ToV5 extends APIV5 {
 
 		// Try to exchange the token.
 		try {
-			$respone = self::exchange_token();
-			if ( 'success' !== $respone['status'] ) {
+			$response = self::exchange_token();
+			if ( 'success' !== $response['status'] ) {
 				throw new Exception(
 					sprintf(
 						/* translators: %s connection status code. */
@@ -75,7 +75,7 @@ class TokenExchangeV3ToV5 extends APIV5 {
 							'Connection status: %s',
 							'pinterest-for-woocommerce'
 						),
-						$respone['status']
+						$response['status']
 					)
 				);
 			}
@@ -84,7 +84,7 @@ class TokenExchangeV3ToV5 extends APIV5 {
 				sprintf(
 					/* translators: 1. Error message. */
 					esc_html__(
-						'Automatic token exchange failed. Try reconnecting to Pinterest manualy. [%1$s]',
+						'Automatic token exchange failed. Try reconnecting to Pinterest manually. [%1$s]',
 						'pinterest-for-woocommerce'
 					),
 					$th->getMessage()
@@ -94,7 +94,7 @@ class TokenExchangeV3ToV5 extends APIV5 {
 			return false;
 		}
 
-		$token_data = $respone['data'];
+		$token_data = $response['data'];
 
 		Pinterest_For_Woocommerce()::save_token_data( $token_data );
 
@@ -147,7 +147,7 @@ class TokenExchangeV3ToV5 extends APIV5 {
 
 		try {
 			$token['access_token'] = empty( $token['access_token'] ) ? '' : Crypto::decrypt( $token['access_token'] );
-		} catch ( \Exception $th ) {
+		} catch ( Exception $th ) {
 			/* Translators: The error description */
 			Logger::log( sprintf( esc_html__( 'Could not decrypt the Pinterest API access token. Try reconnecting to Pinterest. [%s]', 'pinterest-for-woocommerce' ), $th->getMessage() ), 'error' );
 		}
