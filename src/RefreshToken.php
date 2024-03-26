@@ -107,8 +107,15 @@ class RefreshToken {
 		$body = trim( wp_remote_retrieve_body( $response ) );
 		$body = json_decode( $body, true );
 
-		$response['body'] = '**************';
-		self::log( $response );
+		$response['body'] = wp_json_encode(
+			array_merge(
+				$body, array(
+					'access_token' => '***** Sensitive data. *******',
+					'refresh_token' => '******* Sensitive data. *******',
+				)
+			)
+		);
+		self::log( wp_json_encode( $response ) );
 
 		if ( ! is_array( $body ) || ! isset( $body['access_token'], $body['expires_in'] ) ) {
 			return false;
