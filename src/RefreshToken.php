@@ -109,8 +109,9 @@ class RefreshToken {
 
 		$response['body'] = wp_json_encode(
 			array_merge(
-				$body, array(
-					'access_token' => '***** Sensitive data. *******',
+				$body,
+				array(
+					'access_token'  => '***** Sensitive data. *******',
 					'refresh_token' => '******* Sensitive data. *******',
 				)
 			)
