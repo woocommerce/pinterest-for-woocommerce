@@ -105,8 +105,8 @@ class AdvertiserConnect extends VendorAPI {
 		} catch ( Throwable $th ) {
 			throw new Exception(
 				sprintf(
-					/* translators: 1. Error message. */
-					esc_html__( 'Error: $1%s', 'pinterest-for-woocommerce' ),
+					/* translators: 1. the error message as returned by the Pinterest API */
+					esc_html__( 'Commerce integration update error: $1%s', 'pinterest-for-woocommerce' ),
 					esc_html( $th->getMessage() )
 				),
 				400

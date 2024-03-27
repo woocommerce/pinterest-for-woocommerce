@@ -273,7 +273,7 @@ class Base {
 			throw new PinterestApiException(
 				sprintf(
 					/* translators: Empty error body exception. */
-					esc_html__( 'Error: $1%s', 'pinterest-for-woocommerce' ),
+					esc_html__( 'Response body processing error: $1%s', 'pinterest-for-woocommerce' ),
 					esc_html( $e->getMessage() )
 				),
 				(int) $e->getCode()
