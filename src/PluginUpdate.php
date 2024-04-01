@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Automattic\WooCommerce\Pinterest\API\UserInteraction;
+use Automattic\WooCommerce\Pinterest\API\TokenExchangeV3ToV5;
+use Automattic\WooCommerce\Pinterest\Notes\TokenExchangeFailure;
 use Exception;
 use Throwable;
 /**
@@ -29,6 +31,18 @@ class PluginUpdate {
 	 * Option name used for storing version of the plugin before the update procedure.
 	 */
 	const PLUGIN_UPDATE_VERSION_OPTION = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-update-version';
+
+	/**
+	 * Option name used for token update retry hook.
+	 */
+	const TOKEN_UPDATE_RETRY_HOOK = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-token-update-retry';
+
+	/**
+	 * Constructor for the PluginUpdate class.
+	 */
+	public function __construct() {
+		add_action( self::TOKEN_UPDATE_RETRY_HOOK, array( $this, 'token_update' ), 10, 1 );
+	}
 
 	/**
 	 * Check if the plugin is up to date.
@@ -100,6 +114,7 @@ class PluginUpdate {
 	 *
 	 * @since 1.0.10
 	 * @since 1.2.7 Updates procedures organized in an array by plugin version.
+	 * @since 1.4.0 Added token_update procedure.
 	 * @return array List of update procedures names.
 	 */
 	private function update_procedures() {
@@ -112,6 +127,10 @@ class PluginUpdate {
 			),
 			'1.2.5'  => array(
 				'ads_credits_integration',
+			),
+			'1.4.0'  => array(
+				'token_update',
+				'feed_status_migration',
 			),
 		);
 	}
@@ -230,12 +249,12 @@ class PluginUpdate {
 		 * 2. Move feed file id to a new location.
 		 */
 		$feed_id = Pinterest_For_Woocommerce()::get_data( 'local_feed_id' );
-		if ( null !== $feed_id ) {
+		if ( $feed_id ) {
 			/*
 			 * 2-a. Move location id to array of ids.
 			 */
 			$feed_ids = array(
-				Pinterest_For_Woocommerce()::get_base_country() ?? 'US' => $feed_id,
+				Pinterest_For_Woocommerce()::get_base_country() => $feed_id,
 			);
 			Pinterest_For_Woocommerce()::save_data( 'local_feed_ids', $feed_ids );
 
@@ -289,5 +308,85 @@ class PluginUpdate {
 	protected function ads_credits_integration(): void {
 		// Set modals as dismissed and notice as not dismissed.
 		update_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . UserInteraction::ADS_MODAL_DISMISSED, true, false );
+	}
+
+	/**
+	 * Token update procedure. V3 to V5.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param int $retry_count Parameteres passed via Action Scheduler call. Number of retries left.
+	 *
+	 * @return void
+	 */
+	public function token_update( $retry_count = 3 ): void {
+		// Update should only happen if the plugin is connected using the V3 token.
+		$token_data   = Pinterest_For_Woocommerce()::get_data( 'token', true );
+		$has_v3_token = $token_data && ! empty( $token_data['access_token'] );
+
+		if ( ! $has_v3_token ) {
+			// Plugin not connected. Regular, manual connection flow will be used.
+			return;
+		}
+
+		if ( 'v5' === Pinterest_For_Woocommerce()::get_api_version() ) {
+			// Plugin already updated.
+			return;
+		}
+
+		// Set API version to V3. We can use this value to detect failure in the token update procedure.
+		Pinterest_For_Woocommerce()::set_api_version( 'v3' );
+
+		$updated = TokenExchangeV3ToV5::token_update();
+
+		if ( ! $updated ) {
+			$this->update_failure( $retry_count );
+			return;
+		}
+	}
+
+	/**
+	 * Schedule a retry for the token update procedure.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param int $retry_count Number of retries left.
+	 * @return void
+	 */
+	private function update_failure( $retry_count = 3 ) {
+		// Show a warning banner to the merchant informing that they need to reconnect manually.
+		TokenExchangeFailure::possibly_add_note();
+
+		if ( 0 === (int) $retry_count ) {
+			// Retry count exceeded. Do not schedule another retry.
+			return;
+		}
+
+		as_schedule_single_action(
+			time() + MINUTE_IN_SECONDS * 5 * ( 4 - $retry_count ),
+			self::TOKEN_UPDATE_RETRY_HOOK,
+			array(
+				'retry_count' => $retry_count - 1,
+			),
+			PINTEREST_FOR_WOOCOMMERCE_PREFIX
+		);
+	}
+
+	/**
+	 * Feed status migration for 1.4.0.
+	 * Migrate from transients to options.
+	 *
+	 * @since 1.4.0
+	 * @return void
+	 */
+	private function feed_status_migration(): void {
+
+		foreach ( ProductFeedStatus::STATE_PROPS as $key => $default_value ) {
+			$name  = ProductFeedStatus::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key;
+			$value = get_transient( $name );
+			$value = ( false !== $value ) ? $value : $default_value;
+			update_option( $name, $value );
+			delete_transient( $name );
+		}
 	}
 }

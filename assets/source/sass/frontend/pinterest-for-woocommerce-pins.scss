@@ -21,3 +21,16 @@
 		}
 	}
 }
+
+
+// Twenty Twenty-Four compatibility.
+.wp-block-post {
+
+	&.product {
+
+		.pinterest-for-woocommerce-image-wrapper {
+			top: unset;
+			left: unset;
+		}
+	}
+}
