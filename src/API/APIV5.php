@@ -51,7 +51,7 @@ class APIV5 extends Base {
 	/**
 	 * Returns basic user information.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return mixed|array {
 	 *      User account object.
@@ -76,7 +76,7 @@ class APIV5 extends Base {
 	/**
 	 * Pull ads supported countries information from the API.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return array {
 	 *      Ad Accounts countries
@@ -98,7 +98,7 @@ class APIV5 extends Base {
 	/**
 	 * Returns the list of the user's websites.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return array {
 	 *     User account websites.
@@ -119,7 +119,7 @@ class APIV5 extends Base {
 	/**
 	 * Returns the list of linked businesses.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return mixed|array[] {
 	 *      Linked businesses list.
@@ -139,7 +139,7 @@ class APIV5 extends Base {
 	/**
 	 * Get the advertiser object from the Pinterest API for the given User ID.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $pinterest_user The Pinterest User ID.
 	 *
@@ -194,7 +194,7 @@ class APIV5 extends Base {
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/conversion_tags/get
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $ad_account_id         Ad account ID.
 	 * @param string $conversion_tag_id     Conversion tag ID.
@@ -235,7 +235,7 @@ class APIV5 extends Base {
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/conversion_tags/create
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $ad_account_id the advertiser_id to create a tag for.
 	 *
@@ -285,7 +285,7 @@ class APIV5 extends Base {
 	/**
 	 * Returns Pinterest user verification code for website verification.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return array {
 	 *      Data needed to verify a website.
@@ -305,7 +305,7 @@ class APIV5 extends Base {
 	/**
 	 * Sends domain verification request to Pinterest.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $domain Domain to verify.
 	 * @return array {
@@ -369,7 +369,7 @@ class APIV5 extends Base {
 	 * }
 	 * @throws PinterestApiException If the request fails with other than 200 status.
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/integrations_commerce/post
-	 * @since x.x.x
+	 * @since 1.4.0
 	 */
 	public static function create_commerce_integration( array $integration_data ): array {
 		return self::make_request(
@@ -382,7 +382,7 @@ class APIV5 extends Base {
 	/**
 	 * Updates WC integration parameters with Pinterest.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/integrations_commerce/patch
 	 *
@@ -436,7 +436,7 @@ class APIV5 extends Base {
 	/**
 	 * Delete commerce integration.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/integrations_commerce/del
 	 *
@@ -454,7 +454,7 @@ class APIV5 extends Base {
 	/**
 	 * Sends create feed request to Pinterest API.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/feeds/create
 	 *
@@ -515,7 +515,7 @@ class APIV5 extends Base {
 	/**
 	 * Sends update feed request to Pinterest API.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/feeds/update
 	 *
@@ -537,7 +537,7 @@ class APIV5 extends Base {
 	/**
 	 * Get merchant's feeds.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 *
@@ -587,7 +587,7 @@ class APIV5 extends Base {
 	/**
 	 * Invalidate the ad account's feeds cache.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $ad_account_id Ad Account ID.
 	 *
@@ -643,7 +643,7 @@ class APIV5 extends Base {
 	 * }
 	 *
 	 * @throws PinterestApiException If the request fails with other than 2xx status.
-	 * @since x.x.x
+	 * @since 1.4.0
 	 */
 	public static function get_feed_processing_results( $feed_id, $ad_account_id ): array {
 		return self::make_request(
@@ -682,7 +682,7 @@ class APIV5 extends Base {
 	 * }
 	 *
 	 * @throws PinterestApiException If the request fails with other than 2xx status.
-	 * @since x.x.x
+	 * @since 1.4.0
 	 */
 	public static function get_feed_processing_result_items_issues( string $feed_processing_result_id, $limit = 25 ): array {
 		return self::make_request(
@@ -696,7 +696,7 @@ class APIV5 extends Base {
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/ads_credit/redeem
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 * @param string $offer_code    Offer code (hash).
@@ -726,7 +726,7 @@ class APIV5 extends Base {
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/billing_profiles/get
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 *
@@ -760,7 +760,7 @@ class APIV5 extends Base {
 	 *
 	 * @link https://developers.pinterest.com/docs/api/v5/#operation/ads_credits_discounts/get
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 *

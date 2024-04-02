@@ -68,7 +68,7 @@ class Tag extends Tracker {
 	/**
 	 * Initialises hooks a tracker need to operate.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return void
 	 */
@@ -81,7 +81,7 @@ class Tag extends Tracker {
 	/**
 	 * Disables hooks a tracker could set.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return void
 	 */
@@ -94,7 +94,7 @@ class Tag extends Tracker {
 	/**
 	 * Renders Pinterest Tag script part.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return void
 	 */
@@ -129,7 +129,7 @@ class Tag extends Tracker {
 	/**
 	 * Renders Pinterest Tag <noscript/> part.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return void
 	 */
@@ -145,7 +145,7 @@ class Tag extends Tracker {
 	/**
 	 * Generates Pinterest Tag event call.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $event_name Event name. e.g. Checkout, AddToCart, etc.
 	 * @param array  $data       Corresponding event data object.
@@ -164,7 +164,7 @@ class Tag extends Tracker {
 	/**
 	 * Loads deferred event from the storage.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return array
 	 */
@@ -186,7 +186,7 @@ class Tag extends Tracker {
 	/**
 	 * Adds event into the list of events to be delayed.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $event_name Event name. e.g. Checkout, AddToCart, etc.
 	 * @param array  $data       Corresponding event data object.
@@ -201,7 +201,7 @@ class Tag extends Tracker {
 	/**
 	 * Adds event into the list of events to be rendered.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $event_name Event name. e.g. Checkout, AddToCart, etc.
 	 * @param array  $data       Corresponding event data object.
@@ -216,7 +216,7 @@ class Tag extends Tracker {
 	/**
 	 * Saves events to be rendered the next page load.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return void
 	 */
@@ -237,7 +237,7 @@ class Tag extends Tracker {
 	/**
 	 * Tracks event.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $event_name Event name. e.g. Checkout, AddToCart, etc.
 	 * @param Data   $data       Corresponding event data object.
@@ -266,7 +266,7 @@ class Tag extends Tracker {
 	/**
 	 * Prepares event data for the request.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $event_name Event name. e.g. Checkout, AddToCart, etc.
 	 * @param Data   $data       Corresponding event data object.
@@ -290,7 +290,7 @@ class Tag extends Tracker {
 	 * Prepares data for search event.
 	 *
 	 * @see Tag::prepare_request_data()
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param Search $data Search tracking data.
 	 *
@@ -307,7 +307,7 @@ class Tag extends Tracker {
 	 * Prepares data for page visit event.
 	 *
 	 * @see Tag::prepare_request_data()
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param Product|None $data Product tracking data.
 	 *
@@ -333,7 +333,7 @@ class Tag extends Tracker {
 	 * Prepares data for view category event.
 	 *
 	 * @see Tag::prepare_request_data()
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param Category $data Category tracking data.
 	 *
@@ -351,7 +351,7 @@ class Tag extends Tracker {
 	 * Prepares data for checkout event.
 	 *
 	 * @see Tag::prepare_request_data()
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param Checkout $data Checkout tracking data.
 	 *
@@ -383,7 +383,7 @@ class Tag extends Tracker {
 	 * Prepares data for add to cart event.
 	 *
 	 * @see Tag::prepare_request_data()
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param Product $data Product tracking data.
 	 *
@@ -410,7 +410,7 @@ class Tag extends Tracker {
 	/**
 	 * Get the formatted warning message for the potential conflicting tags.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return string The warning message.
 	 */
@@ -435,7 +435,7 @@ class Tag extends Tracker {
 	/**
 	 * Detect if there are other tags installed on the site.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return array The list of installed tags.
 	 */
@@ -491,7 +491,7 @@ class Tag extends Tracker {
 	/**
 	 * Adds a fragment to trigger Pinterest Tag event on add to cart event.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $event_name Event name.
 	 * @param array  $data       Event data.

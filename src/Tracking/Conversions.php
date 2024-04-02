@@ -77,7 +77,7 @@ class Conversions extends Tracker {
 	/**
 	 * Prepares event data for the request.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $event_name Tracking event name.
 	 * @param Data   $data       Tracking event data.
@@ -135,7 +135,7 @@ class Conversions extends Tracker {
 	 * Prepares data for the checkout event.
 	 *
 	 * @see Conversions::prepare_request_data()
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param Checkout $data Checkout data.
 	 *
@@ -190,7 +190,7 @@ class Conversions extends Tracker {
 	 * Prepares data for add to cart event.
 	 *
 	 * @see Conversions::prepare_request_data()
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param Product $data Product data.
 	 *
@@ -219,7 +219,7 @@ class Conversions extends Tracker {
 	 * Prepares data for view category event.
 	 *
 	 * @see Conversions::prepare_request_data()
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param Category $data Category data.
 	 *
@@ -235,7 +235,7 @@ class Conversions extends Tracker {
 	 * Prepares data for page visit event.
 	 *
 	 * @see Conversions::prepare_request_data()
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param Product|None $data Product or None data.
 	 *
@@ -270,7 +270,7 @@ class Conversions extends Tracker {
 	 * Prepares data for the search event.
 	 *
 	 * @see Conversions::prepare_request_data()
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param Search $data Search data.
 	 *
@@ -288,7 +288,7 @@ class Conversions extends Tracker {
 	/**
 	 * Sends request to Pinterest Conversions API.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $event_name Event name.
 	 * @param array  $data       Event data.

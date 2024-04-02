@@ -49,7 +49,7 @@ class DomainVerification extends VendorAPI {
 	 * Handle domain verification by triggering the realtime verification process
 	 * using the Pinterest API.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return mixed
 	 *

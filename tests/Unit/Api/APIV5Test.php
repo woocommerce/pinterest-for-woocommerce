@@ -2,7 +2,7 @@
 /**
  * Pinterest for WooCommerce API v5 base class tests.
  *
- * @since x.x.x
+ * @since 1.4.0
  */
 declare(strict_types=1);
 

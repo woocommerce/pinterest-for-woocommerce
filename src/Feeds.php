@@ -88,7 +88,7 @@ class Feeds {
 	/**
 	 * Create a new feed for the given ad account.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return string The Feed ID or an empty string if failed.
 	 * @throws Exception PHP Exception if there is an error creating the feed, and we are throttling the requests.
@@ -106,7 +106,7 @@ class Feeds {
 		 * Filters the default feed name: pinterest_for_woocommerce_unique_feed_name.
 		 * This vale appears in the Catalogues - Data sources page at Pinterest.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.0
 		 *
 		 * @param string $feed_name The default feed name.
 		 */
@@ -179,7 +179,7 @@ class Feeds {
 	/**
 	 * Update a feed for the given ad account.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $feed_id The ID of the feed.
 	 * @param array  $data    The data to update the feed with.
@@ -255,7 +255,7 @@ class Feeds {
 	/**
 	 * Invalidate the merchant feeds cache.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return bool True if the cache was invalidated, false otherwise.
 	 */
@@ -330,7 +330,7 @@ class Feeds {
 	/**
 	 * Delete the feed.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $feed_id The ID of the feed.
 	 *
@@ -350,7 +350,7 @@ class Feeds {
 	/**
 	 * Get the latest report of the active feed related to the last attempt to process and ingest our feed.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $feed_id Pinterest feed ID.
 	 *
@@ -370,7 +370,7 @@ class Feeds {
 	/**
 	 * Get the feed report items issues.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $feed_processing_result_id The feed processing result ID.
 	 * @param int    $per_page                  The number of items to return per page. Default 25.

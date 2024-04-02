@@ -19,7 +19,7 @@ abstract class Tracker {
 	/**
 	 * Maps tracking events to corresponding tracker methods and conversions API events names.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 */
 	const EVENT_MAP = array(
 		Tracking::EVENT_PAGE_VISIT    => 'page_visit',
@@ -32,7 +32,7 @@ abstract class Tracker {
 	/**
 	 * Initialises hooks a tracker need to operate.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return void
 	 */
@@ -42,7 +42,7 @@ abstract class Tracker {
 	/**
 	 * Disables hooks a tracker could set.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return void
 	 */
@@ -52,7 +52,7 @@ abstract class Tracker {
 	/**
 	 * Tracks the event.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $event_name - A unique event id.
 	 * @param Data   $data       - Data class which holds corresponding even data.

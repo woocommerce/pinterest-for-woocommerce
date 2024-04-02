@@ -317,7 +317,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Initialize Tracker and add trackers to it.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.0
 		 *
 		 * @return Pinterest\Tracking|false
 		 */
@@ -325,7 +325,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			/**
 			 * Filters whether to disable tracking.
 			 *
-			 * @since x.x.x
+			 * @since 1.4.0
 			 *
 			 * @param bool $disable_tracking Whether to disable tracking.
 			 */
@@ -605,7 +605,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Set API version used by the plugin.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.0
 		 *
 		 * @param string $version The API version.
 		 *
@@ -618,7 +618,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Get API version used by the plugin.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.0
 		 *
 		 * @return string The API version.
 		 */
@@ -739,7 +739,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Save encrypted token data. See the documentation of the get_token() method for the expected format of the related data variables.
 		 *
 		 * @since 1.0.0
-		 * @since x.x.x Added refresh token and tokens expiration.
+		 * @since 1.4.0 Added refresh token and tokens expiration.
 		 *
 		 * @param array $token The array containing the token values to save.
 		 *
@@ -759,7 +759,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Save connection info data.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.0
 		 *
 		 * @param array $connection_info_data The array containing the connection info data.
 		 * @return bool True if the data was saved successfully.
@@ -913,7 +913,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Connects WC to Pinterest.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.0
 		 *
 		 * @see Pinterest\API\APIV5::create_commerce_integration
 		 * @return array the result of APIV5::create_commerce_integration.
@@ -965,7 +965,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Updates WC integration parameters with Pinterest.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.0
 		 *
 		 * @param string $external_business_id External business ID for the integration.
 		 * @param array  $data Integration data to update with Pinterest.
@@ -981,7 +981,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Disconnects WC from Pinterest.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.0
 		 *
 		 * @return bool
 		 * @throws PinterestApiException In case of 500 unexpected error from Pinterest.
@@ -1000,7 +1000,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Used to generate external business id to pass it Pinterest when creating a connection between WC and Pinterest.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.0
 		 *
 		 * @return string
 		 */
@@ -1018,7 +1018,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			 * Should be non-empty and without special characters,
 			 * otherwise the ID will be obtained from the site's name as fallback.
 			 *
-			 * @since x.x.x
+			 * @since 1.4.0
 			 *
 			 * @param string $id the shop's external business id.
 			 */
@@ -1087,7 +1087,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Updates linked businesses.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.0
 		 *
 		 * @return void
 		 */
@@ -1098,7 +1098,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Cleanup after the token update.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.0
 		 *
 		 * @return void
 		 */
