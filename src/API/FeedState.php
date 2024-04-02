@@ -335,7 +335,7 @@ class FeedState extends VendorAPI {
 	 * @param array $result The result array to add values to.
 	 * @return array
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 */
 	public function add_recent_feed_processing_status( array $result ): array {
 		$extra_info = '';
@@ -378,7 +378,7 @@ class FeedState extends VendorAPI {
 	 * @param string $status The feed's processing result status returned by the API.
 	 * @return string
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 */
 	private static function map_status_into_status( string $status ): string {
 		switch ( $status ) {
@@ -403,7 +403,7 @@ class FeedState extends VendorAPI {
 	 * @param string $status The feed's processing result status returned by the API.
 	 * @return string
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 */
 	private static function map_status_into_label( string $status ): string {
 		switch ( $status ) {
@@ -433,7 +433,7 @@ class FeedState extends VendorAPI {
 	 * @param array $processing_results The feed processing results array.
 	 * @return string
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 */
 	private static function map_status_into_extra_info( array $processing_results ): string {
 		$status                  = $processing_results['status'] ?? '';

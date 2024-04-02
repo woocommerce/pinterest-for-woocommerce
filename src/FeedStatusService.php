@@ -277,7 +277,7 @@ class FeedStatusService {
 	 *                  - warnings: The number of warnings.
 	 *                  - errors: The number of errors.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 */
 	public static function get_processing_result_overview_stats( array $processing_results ): array {
 		$sums = array(
@@ -308,7 +308,7 @@ class FeedStatusService {
 	 * @param array $processing_results Recent processing results array.
 	 * @return string
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 */
 	public static function get_processing_results_global_error( array $processing_results ): string {
 		$error_code = '';

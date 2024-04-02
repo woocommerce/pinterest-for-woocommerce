@@ -24,7 +24,7 @@ class RefreshToken {
 	/**
 	 * Initialize Refresh Token actions and Action Scheduler hooks.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 */
 	public static function schedule_event() {
 		if ( ! has_action( Heartbeat::DAILY, array( self::class, 'handle_refresh' ) ) ) {
@@ -35,7 +35,7 @@ class RefreshToken {
 	/**
 	 * Checks if it is time to refresh the token and refreshes it if needed.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return true
 	 */
@@ -47,7 +47,7 @@ class RefreshToken {
 		/**
 		 * Filters to determine if it is time to start refreshing the token.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.0
 		 *
 		 * @param bool $maybe_refresh - True if it is time to refresh the token.
 		 */
@@ -75,7 +75,7 @@ class RefreshToken {
 	 *
 	 * @param array $token_data The token data to be refreshed.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @throws Exception If the request fails.
 	 *
@@ -128,7 +128,7 @@ class RefreshToken {
 	/**
 	 * Logs a message to the log file.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $message The message to be logged.
 	 * @param string $level The level of the message.

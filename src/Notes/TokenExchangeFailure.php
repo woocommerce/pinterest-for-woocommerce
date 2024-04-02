@@ -79,7 +79,7 @@ class TokenExchangeFailure {
 	/**
 	 * Delete the note.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return void
 	 */
