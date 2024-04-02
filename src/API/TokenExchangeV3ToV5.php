@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * V3 to V5 token exchange class.
  * Contains the methods API methods and the update procedure.
  *
- * @since x.x.x
+ * @since 1.4.0
  */
 class TokenExchangeV3ToV5 extends APIV5 {
 
@@ -31,7 +31,7 @@ class TokenExchangeV3ToV5 extends APIV5 {
 	/**
 	 * Pull ads supported countries information from the API.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return array {
 	 *     Contains the status and token details.
@@ -56,7 +56,7 @@ class TokenExchangeV3ToV5 extends APIV5 {
 	/**
 	 * Update token from V3 to V5.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @throws Exception PHP Exception.
 	 *
@@ -114,7 +114,7 @@ class TokenExchangeV3ToV5 extends APIV5 {
 			/**
 			 * Actions to perform after getting the authorization token.
 			 *
-			 * @since x.x.x
+			 * @since 1.4.0
 			 */
 			do_action( 'pinterest_for_woocommerce_token_saved' );
 		} catch ( Throwable $th ) {
@@ -138,7 +138,7 @@ class TokenExchangeV3ToV5 extends APIV5 {
 	/**
 	 * Get the V3 token.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return string $token The V3 token.
 	 */

@@ -2,7 +2,7 @@
 /**
  * Class HealthTest
  *
- * @since x.x.x
+ * @since 1.4.0
  */
 declare( strict_types=1 );
 

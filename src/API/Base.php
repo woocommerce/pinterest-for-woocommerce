@@ -771,7 +771,7 @@ class Base {
 	/**
 	 * Generates a tag name.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return string The tag name.
 	 */

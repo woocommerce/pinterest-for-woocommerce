@@ -45,7 +45,7 @@ class Tracking {
 	/**
 	 * Attaches all the required tracking events to corresponding WP/WC hooks.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param array $trackers A list of trackers to track events with.
 	 */
@@ -76,7 +76,7 @@ class Tracking {
 	/**
 	 * Used as a callback for the wp_footer hook.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return void
 	 */
@@ -106,7 +106,7 @@ class Tracking {
 	/**
 	 * Used as a callback for the wp_footer hook.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return void
 	 */
@@ -126,7 +126,7 @@ class Tracking {
 	/**
 	 * Used as a callback for the woocommerce_add_to_cart hook.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $cart_item_key - WooCommerce cart item key.
 	 * @param string $product_id           - WooCommerce product id.
@@ -154,7 +154,7 @@ class Tracking {
 	/**
 	 * Used as a callback for the woocommerce_checkout_order_created hook.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $order_id - WooCommerce order id.
 	 *
@@ -203,7 +203,7 @@ class Tracking {
 	/**
 	 * Search event handler.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return void
 	 */
@@ -222,7 +222,7 @@ class Tracking {
 	/**
 	 * Method which iterates over all the attached trackers and delegates the event to them.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $event_name Tracking event name.
 	 * @param Data   $data       Event Data object.
@@ -254,7 +254,7 @@ class Tracking {
 	/**
 	 * Returns an array of registered trackers.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @return Tracker[]
 	 */
@@ -265,7 +265,7 @@ class Tracking {
 	/**
 	 * Adds a tracker to the array of trackers.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param Tracker $tracker - One of objects implementing Tracker interface.
 	 *
@@ -279,7 +279,7 @@ class Tracking {
 	/**
 	 * Removes a tracker.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param string $tracker Tracker class name to be removed. e.g. Tag::class, Conversions::class.
 	 *

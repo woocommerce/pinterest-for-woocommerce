@@ -348,7 +348,7 @@ class PluginUpdate {
 	/**
 	 * Schedule a retry for the token update procedure.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 *
 	 * @param int $retry_count Number of retries left.
 	 * @return void

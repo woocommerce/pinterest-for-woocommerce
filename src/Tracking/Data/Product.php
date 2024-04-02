@@ -13,7 +13,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
 /**
  * Product data class. Hold product related data for event.
  *
- * @since x.x.x
+ * @since 1.4.0
  */
 class Product extends Data {
 

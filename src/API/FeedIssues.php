@@ -80,7 +80,7 @@ class FeedIssues extends VendorAPI {
 	 * @param array $item The array containing each col value for the line.
 	 * @return array
 	 *
-	 * @since x.x.x
+	 * @since 1.4.0
 	 */
 	private static function prepare_issue_lines( array $acc, array $item ): array {
 
