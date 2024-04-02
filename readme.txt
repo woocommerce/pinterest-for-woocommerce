@@ -91,14 +91,16 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
-= 1.3.24 - 2024-04-01 =
-* Tweak - WC 8.8 compatibility.
-
-= 1.3.23 - 2024-03-12 =
-* Tweak - WC 8.7 compatibility.
-* Tweak - WP 6.5 compatibility.
-
-= 1.3.22 - 2024-02-20 =
-* Fix - Currency and credit information missing at domain verification step.
-* Fix - PHP notices and warnings in PHP 8.2 and PHP 8.3.
-
+= 1.4.0 - 2024-04-02 =
+* Add - CAPI: A new conversion system for reporting from the plugin to Pinterest.
+* Add - Support for platforms using persistent object caches like Memcached.
+* Add - Automatic token exchange and refresh token handling for improved OAuth management.
+* Add - Twenty Twenty-Four theme support.
+* Update - API update to V5.
+* Update - Tag implementation updated to work in conjunction with CAPI.
+* Update - Logging system enhanced for more granular debugging.
+* Update - Caching enabled on feed status endpoints for improved performance.
+* Update - Redirect to the cart page after successful addition WooCommerce setting support.
+* Update - Plugin deactivation and uninstall behavior now properly implemented.
+* Tweak - Multiple smaller adjustments for improved stability and performance.
+* Dev - Plugin now uses the new middleware for connection.
