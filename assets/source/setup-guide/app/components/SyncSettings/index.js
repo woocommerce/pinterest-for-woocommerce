@@ -100,8 +100,6 @@ const SyncSettings = () => {
 				'Sync to get latest settings from Pinterest Ads Manager',
 				'pinterest-for-woocommerce'
 			) }
-			showTooltip={ true }
-			tooltipPosition="top center"
 		>
 			{ __( 'Sync', 'pinterest-for-woocommerce' ) }
 		</Button>
