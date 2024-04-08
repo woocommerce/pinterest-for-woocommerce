@@ -279,6 +279,7 @@ $root: ".woocommerce-setup-guide";
 				}
 
 				&__setup-pins {
+
 					.components-tooltip {
 						background: unset;
 						padding: 0;
@@ -293,7 +294,6 @@ $root: ".woocommerce-setup-guide";
 							line-height: 1.4;
 							outline: none;
 							padding: 4px 8px;
-							text-align: center;
 
 							width: 180px;
 							white-space: normal;
