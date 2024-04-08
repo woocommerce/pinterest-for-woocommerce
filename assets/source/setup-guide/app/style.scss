@@ -283,7 +283,7 @@ $root: ".woocommerce-setup-guide";
 						background: unset;
 						padding: 0;
 
-					.components-popover__content {
+						.components-popover__content {
 							background: #000;
 							border-radius: 2px;
 							border-width: 0;
@@ -295,16 +295,16 @@ $root: ".woocommerce-setup-guide";
 							padding: 4px 8px;
 							text-align: center;
 
-						width: 180px;
-						white-space: normal;
-						text-align: left;
+							width: 180px;
+							white-space: normal;
+							text-align: left;
 
-						/*
-						`font-family` is overwritten when using
-						dashicon as the hovering anchor.
-						 */
-						font-family: $default-font;
-					}
+							/*
+							`font-family` is overwritten when using
+							dashicon as the hovering anchor.
+							*/
+							font-family: $default-font;
+						}
 					}
 				}
 
