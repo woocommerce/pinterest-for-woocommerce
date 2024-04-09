@@ -116,7 +116,7 @@ class Auth extends VendorAPI {
 
 		$this->apply_oauth_flow_features( $features );
 
-		unset( $info_data['feture_flags'] );
+		unset( $info_data['feature_flags'] );
 
 		Pinterest_For_Woocommerce()::save_connection_info_data( $info_data );
 
