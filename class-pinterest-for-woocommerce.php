@@ -1110,19 +1110,33 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Add billing setup information to the account data option.
+		 * Fetch billing setup information from API and update billing status in options.
 		 * Using this function makes sense only when we have a connected advertiser.
 		 *
 		 * @since 1.2.5
+		 * @since x.x.x Split storing billing setup status and updating billing setup status.
 		 *
 		 * @return bool Wether billing is set up or not.
 		 */
-		public static function add_billing_setup_info_to_account_data() {
+		public static function update_billing_information() {
+			$status = Billing::has_billing_set_up();
+			self::add_billing_setup_status_to_account_data( $status );
+			return $status;
+		}
+
+		/**
+		 * Add billing setup status to the account data option.
+		 *
+		 * @since x.x.x
+		 *
+		 * @param bool $status The billing setup status.
+		 *
+		 * @return void
+		 */
+		public static function add_billing_setup_status_to_account_data( $status ) {
 			$account_data                     = self::get_setting( 'account_data' );
-			$account_data['is_billing_setup'] = Billing::has_billing_set_up();
+			$account_data['is_billing_setup'] = $status;
 			self::save_setting( 'account_data', $account_data );
-			Billing::mark_billing_setup_checked();
-			return $account_data['is_billing_setup'];
 		}
 
 		/**
@@ -1135,7 +1149,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$account_data          = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
 			$has_billing_setup_old = is_array( $account_data ) && ( $account_data['is_billing_setup'] ?? false );
 			if ( Billing::should_check_billing_setup_often() ) {
-				$has_billing_setup_new = self::add_billing_setup_info_to_account_data();
+				$has_billing_setup_new = self::update_billing_information();
 				// Detect change in billing setup to true and try to redeem.
 				if ( $has_billing_setup_new && ! $has_billing_setup_old ) {
 					AdCredits::handle_redeem_credit();
@@ -1236,34 +1250,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			} catch ( Exception $e ) {
 				return;
 			}
-		}
-
-		/**
-		 * Check if coupon was redeemed. We can redeem only once.
-		 *
-		 * @since 1.2.5
-		 *
-		 * @return bool
-		 */
-		public static function check_if_coupon_was_redeemed() {
-			$account_data = self::get_setting( 'account_data' );
-
-			$redeem_status = is_array( $account_data['coupon_redeem_info'] ) ? $account_data['coupon_redeem_info']['redeem_status'] : false;
-			$error         = $account_data['coupon_redeem_info']['error_id'];
-			if ( 2322 === $error || 2318 === $error ) {
-				/*
-				 * Advertiser has already redeemed the coupon or
-				 * the coupon was redeemed by a different advertiser of the same user.
-				 * In both cases another redeem is not possible.
-				 */
-				return true;
-			}
-
-			if ( false === $redeem_status ) {
-				return false;
-			}
-
-			return true;
 		}
 
 		/**
