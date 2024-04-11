@@ -246,14 +246,13 @@ class AdCredits {
 			return false;
 		}
 
-		$advertiser_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
+		$advertiser_id      = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
+		$discounts          = APIV5::get_ads_credit_discounts( $advertiser_id )['items'] ?? array();
+		$coupon             = AdCreditsCoupons::get_coupon_for_merchant();
+		$remaining_discount = 0;
+		$found_discounts    = array();
 
-		$result = APIV5::get_ads_credit_discounts( $advertiser_id );
-
-		$coupon                   = AdCreditsCoupons::get_coupon_for_merchant();
-		$remaining_discount_value = 0;
-		$found_discounts          = array();
-		foreach ( $result as $discount ) {
+		foreach ( $discounts as $discount ) {
 			if ( ! $discount['active'] ) {
 				continue;
 			}
@@ -263,12 +262,12 @@ class AdCredits {
 					$found_discounts['future_discount'] = true;
 				}
 			} elseif ( static::MARKETING_OFFER_CREDIT === $discount['discount_type'] ) {
-				$remaining_discount_value += (float) $discount['remaining_discount_in_micro_currency'] / 1000000;
+				$remaining_discount += (float) $discount['remaining_discount_in_micro_currency'] / 1000000;
 			}
 		}
 
 		$found_discounts['marketing_offer'] = array(
-			'remaining_discount' => wc_price( $remaining_discount_value ),
+			'remaining_discount' => wc_price( $remaining_discount ),
 		);
 
 		return $found_discounts;
