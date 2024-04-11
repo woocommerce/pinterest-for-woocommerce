@@ -41,7 +41,7 @@ class Billing {
 	 */
 	public static function handle_billing_setup_check() {
 
-		Pinterest_For_Woocommerce()::add_billing_setup_info_to_account_data();
+		Pinterest_For_Woocommerce()::update_billing_information();
 
 		return true;
 	}
