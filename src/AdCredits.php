@@ -60,7 +60,7 @@ class AdCredits {
 			return true;
 		}
 
-		if ( Pinterest_For_Woocommerce()::check_if_coupon_was_redeemed() ) {
+		if ( self::check_if_coupon_was_redeemed() ) {
 			// Redeem credits only once.
 			return true;
 		}
@@ -70,6 +70,36 @@ class AdCredits {
 		}
 
 		Pinterest_For_Woocommerce()::add_redeem_credits_info_to_account_data();
+
+		return true;
+	}
+
+		/**
+		 * Check if coupon was redeemed. We can redeem only once.
+		 *
+		 * @since 1.2.5
+		 * @since x.x.x Update for API v5. and moved to AdCredits class.
+		 *
+		 * @return bool
+		 */
+	public static function check_if_coupon_was_redeemed() {
+		$account_data  = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+		$redeem_status = $account_data['coupon_redeem_info']['redeem_status'] ?? false;
+		$error_id      = $account_data['coupon_redeem_info']['error_id'] ?? false;
+
+		if ( PinterestApiException::OFFER_ALREADY_REDEEMED === $error_id ) {
+			// Advertiser has already redeemed the coupon.
+			return true;
+		}
+
+		if ( PinterestApiException::OFFER_ALREADY_REDEEMED_BY_ANOTHER_ADVERTISER === $error_id ) {
+			// Different advertiser id has already redeemed the coupon.
+			return true;
+		}
+
+		if ( false === $redeem_status ) {
+			return false;
+		}
 
 		return true;
 	}
@@ -102,10 +132,19 @@ class AdCredits {
 				return false;
 			}
 			return true;
+		} catch ( PinterestApiException $e ) {
+			$error_code    = $e->get_pinterest_code();
+			$error_message = $e->getMessage();
+
+			if ( PinterestApiException::NO_VALID_BILLING_SETUP === $error_code ) {
+				// Invalidate billing setup.
+				Pinterest_For_Woocommerce()::add_billing_setup_status_to_account_data( false );
+			}
 		} catch ( Throwable $th ) {
 			Logger::log( $th->getMessage(), 'error' );
-			return false;
 		}
+
+		return false;
 	}
 
 	/**
