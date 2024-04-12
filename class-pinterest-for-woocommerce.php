@@ -914,10 +914,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Connects WC to Pinterest.
 		 *
 		 * @return array the result of APIV5::create_commerce_integration.
-		 * @throws Exception In case of 404, 409 and 500 errors from Pinterest.*@throws Exception
+		 * @throws Exception In case of 404, 409 and 500 errors from Pinterest.
 		 * @see Pinterest\API\APIV5::create_commerce_integration
 		 * @since 1.4.0
-		 *
 		 */
 		public static function create_commerce_integration(): array {
 			global $wp_version;
