@@ -1345,7 +1345,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function is_setup_complete() {
-			return self::is_business_connected() && self::is_domain_verified() && self::is_tracking_configured();
+			return self::is_business_connected() && self::is_domain_verified();
 		}
 
 

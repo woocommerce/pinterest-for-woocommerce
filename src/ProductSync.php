@@ -11,9 +11,7 @@ namespace Automattic\WooCommerce\Pinterest;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-use \Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
-use Automattic\WooCommerce\Pinterest\FeedRegistration;
-use Automattic\WooCommerce\Pinterest\API\FeedIssues;
+use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
 
 /**
@@ -136,11 +134,9 @@ class ProductSync {
 	 * @return boolean
 	 */
 	public static function is_product_sync_enabled() {
-
 		$domain_verified  = Pinterest_For_Woocommerce()::is_domain_verified();
-		$tracking_enabled = $domain_verified && Pinterest_For_Woocommerce()::is_tracking_configured();
 
-		return (bool) $domain_verified && $tracking_enabled && Pinterest_For_Woocommerce()::get_setting( 'product_sync_enabled' );
+		return (bool) $domain_verified && Pinterest_For_Woocommerce()::get_setting( 'product_sync_enabled' );
 	}
 
 	/**
