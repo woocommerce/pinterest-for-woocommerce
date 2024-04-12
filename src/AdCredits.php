@@ -9,7 +9,7 @@
 namespace Automattic\WooCommerce\Pinterest;
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
-use Automattic\WooCommerce\Pinterest\API\Base;
+use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Exception;
 use Pinterest_For_Woocommerce;
 use Pinterest_For_Woocommerce_Ads_Supported_Countries;
@@ -60,7 +60,7 @@ class AdCredits {
 			return true;
 		}
 
-		if ( Pinterest_For_Woocommerce()::check_if_coupon_was_redeemed() ) {
+		if ( self::check_if_coupon_was_redeemed() ) {
 			// Redeem credits only once.
 			return true;
 		}
@@ -70,6 +70,36 @@ class AdCredits {
 		}
 
 		Pinterest_For_Woocommerce()::add_redeem_credits_info_to_account_data();
+
+		return true;
+	}
+
+		/**
+		 * Check if coupon was redeemed. We can redeem only once.
+		 *
+		 * @since 1.2.5
+		 * @since x.x.x Update for API v5. and moved to AdCredits class.
+		 *
+		 * @return bool
+		 */
+	public static function check_if_coupon_was_redeemed() {
+		$account_data  = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+		$redeem_status = $account_data['coupon_redeem_info']['redeem_status'] ?? false;
+		$error_id      = $account_data['coupon_redeem_info']['error_id'] ?? false;
+
+		if ( PinterestApiException::OFFER_ALREADY_REDEEMED === $error_id ) {
+			// Advertiser has already redeemed the coupon.
+			return true;
+		}
+
+		if ( PinterestApiException::OFFER_ALREADY_REDEEMED_BY_ANOTHER_ADVERTISER === $error_id ) {
+			// Different advertiser id has already redeemed the coupon.
+			return true;
+		}
+
+		if ( false === $redeem_status ) {
+			return false;
+		}
 
 		return true;
 	}
@@ -102,10 +132,19 @@ class AdCredits {
 				return false;
 			}
 			return true;
+		} catch ( PinterestApiException $e ) {
+			$error_code    = $e->get_pinterest_code();
+			$error_message = $e->getMessage();
+
+			if ( PinterestApiException::NO_VALID_BILLING_SETUP === $error_code ) {
+				// Invalidate billing setup.
+				Pinterest_For_Woocommerce()::add_billing_setup_status_to_account_data( false );
+			}
 		} catch ( Throwable $th ) {
 			Logger::log( $th->getMessage(), 'error' );
-			return false;
 		}
+
+		return false;
 	}
 
 	/**
@@ -198,7 +237,9 @@ class AdCredits {
 	 * Fetch data from the discount endpoint and get the necessary fields.
 	 *
 	 * @since 1.2.5
+	 * @since x.x.x
 	 *
+	 * @throws PinterestApiException Originating from get_coupon_for_merchant.
 	 * @return mixed False when no info is available, discounts object when discounts are available.
 	 */
 	public static function process_available_discounts() {
@@ -207,14 +248,13 @@ class AdCredits {
 			return false;
 		}
 
-		$advertiser_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
+		$advertiser_id      = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
+		$discounts          = APIV5::get_ads_credit_discounts( $advertiser_id )['items'] ?? array();
+		$coupon             = AdCreditsCoupons::get_coupon_for_merchant();
+		$remaining_discount = 0;
+		$found_discounts    = array();
 
-		$result = APIV5::get_ads_credit_discounts( $advertiser_id );
-
-		$coupon                   = AdCreditsCoupons::get_coupon_for_merchant();
-		$remaining_discount_value = 0;
-		$found_discounts          = array();
-		foreach ( $result as $discount ) {
+		foreach ( $discounts as $discount ) {
 			if ( ! $discount['active'] ) {
 				continue;
 			}
@@ -224,12 +264,12 @@ class AdCredits {
 					$found_discounts['future_discount'] = true;
 				}
 			} elseif ( static::MARKETING_OFFER_CREDIT === $discount['discount_type'] ) {
-				$remaining_discount_value += (float) $discount['remaining_discount_in_micro_currency'] / 1000000;
+				$remaining_discount += (float) $discount['remaining_discount_in_micro_currency'] / 1000000;
 			}
 		}
 
 		$found_discounts['marketing_offer'] = array(
-			'remaining_discount' => wc_price( $remaining_discount_value ),
+			'remaining_discount' => wc_price( $remaining_discount ),
 		);
 
 		return $found_discounts;
