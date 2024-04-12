@@ -9,7 +9,7 @@
 namespace Automattic\WooCommerce\Pinterest;
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
-use Automattic\WooCommerce\Pinterest\API\Base;
+use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Exception;
 use Pinterest_For_Woocommerce;
 use Pinterest_For_Woocommerce_Ads_Supported_Countries;
@@ -237,7 +237,9 @@ class AdCredits {
 	 * Fetch data from the discount endpoint and get the necessary fields.
 	 *
 	 * @since 1.2.5
+	 * @since x.x.x
 	 *
+	 * @throws PinterestApiException Originating from get_coupon_for_merchant.
 	 * @return mixed False when no info is available, discounts object when discounts are available.
 	 */
 	public static function process_available_discounts() {
