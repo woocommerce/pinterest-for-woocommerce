@@ -156,7 +156,7 @@ class Tracking {
 	 *
 	 * @since 1.4.0
 	 *
-	 * @param string $order_id - WooCommerce order id.
+	 * @param string $order_id WooCommerce order id.
 	 *
 	 * @return void
 	 */
@@ -191,7 +191,7 @@ class Tracking {
 
 		$data = new Checkout(
 			uniqid( 'checkout' ),
-			$order_id,
+			(string) $order->get_id(),
 			$order->get_total(),
 			$total_quantity,
 			$order->get_currency(),
