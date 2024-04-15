@@ -280,18 +280,32 @@ $root: ".woocommerce-setup-guide";
 
 				&__setup-pins {
 
-					.components-popover__content {
-						width: 180px;
-						white-space: normal;
-						text-align: left;
+					.components-tooltip {
+						background: unset;
+						padding: 0;
 
-						/*
-						`font-family` is overwritten when using
-						dashicon as the hovering anchor.
-						 */
-						font-family: $default-font;
+						.components-popover__content {
+							background: #000;
+							border-radius: 2px;
+							border-width: 0;
+							box-shadow: none;
+							color: #f0f0f0;
+							font-size: 12px;
+							line-height: 1.4;
+							outline: none;
+							padding: 4px 8px;
+
+							width: 180px;
+							white-space: normal;
+							text-align: left;
+
+							/*
+							`font-family` is overwritten when using
+							dashicon as the hovering anchor.
+							*/
+							font-family: $default-font;
+						}
 					}
-
 				}
 
 				&__setup-account {
