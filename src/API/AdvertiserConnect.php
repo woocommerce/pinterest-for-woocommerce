@@ -14,9 +14,9 @@ use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
 use Exception;
 use Pinterest_For_Woocommerce;
 use Throwable;
-use \WP_REST_Server;
-use \WP_REST_Request;
-use \WP_Error;
+use WP_REST_Server;
+use WP_REST_Request;
+use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
