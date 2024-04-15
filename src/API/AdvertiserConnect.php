@@ -114,7 +114,7 @@ class AdvertiserConnect extends VendorAPI {
 		}
 
 		// At this stage we can check if the connected advertiser has billing setup.
-		$has_billing = Pinterest_For_Woocommerce::update_billing_information();
+		$has_billing = Billing::update_billing_information();
 
 		/*
 		 * If the advertiser does not have a correct billing lets check for the setup frequently for the next hour.

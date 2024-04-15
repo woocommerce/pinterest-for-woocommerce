@@ -41,7 +41,7 @@ class Billing {
 	 */
 	public static function handle_billing_setup_check() {
 
-		Pinterest_For_Woocommerce()::update_billing_information();
+		self::update_billing_information();
 
 		return true;
 	}
@@ -147,5 +147,36 @@ class Billing {
 			Logger::log( $th->getMessage(), 'error' );
 			return false;
 		}
+	}
+
+	/**
+	 * Fetch billing setup information from API and update billing status in options.
+	 * Using this function makes sense only when we have a connected advertiser.
+	 *
+	 * @since 1.2.5
+	 * @since x.x.x Split storing billing setup status and updating billing setup status.
+	 * @since x.x.x Moved from class-pinterest-for-woocommerce.php
+	 *
+	 * @return bool Wether billing is set up or not.
+	 */
+	public static function update_billing_information() {
+		$status = self::has_billing_set_up();
+		self::add_billing_setup_status_to_account_data( $status );
+		return $status;
+	}
+
+	/**
+	 * Add billing setup status to the account data option.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param bool $status The billing setup status.
+	 *
+	 * @return void
+	 */
+	public static function add_billing_setup_status_to_account_data( $status ) {
+		$account_data                     = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+		$account_data['is_billing_setup'] = $status;
+		Pinterest_For_Woocommerce()::save_setting( 'account_data', $account_data );
 	}
 }

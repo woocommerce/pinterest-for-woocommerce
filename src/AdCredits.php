@@ -138,7 +138,7 @@ class AdCredits {
 
 			if ( PinterestApiException::NO_VALID_BILLING_SETUP === $error_code ) {
 				// Invalidate billing setup.
-				Pinterest_For_Woocommerce()::add_billing_setup_status_to_account_data( false );
+				Billing::add_billing_setup_status_to_account_data( false );
 			}
 		} catch ( Throwable $th ) {
 			Logger::log( $th->getMessage(), 'error' );
