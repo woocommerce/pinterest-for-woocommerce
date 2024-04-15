@@ -14,9 +14,9 @@ use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
 use Exception;
 use Pinterest_For_Woocommerce;
 use Throwable;
-use \WP_REST_Server;
-use \WP_REST_Request;
-use \WP_Error;
+use WP_REST_Server;
+use WP_REST_Request;
+use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -114,7 +114,7 @@ class AdvertiserConnect extends VendorAPI {
 		}
 
 		// At this stage we can check if the connected advertiser has billing setup.
-		$has_billing = Pinterest_For_Woocommerce::update_billing_information();
+		$has_billing = Billing::update_billing_information();
 
 		/*
 		 * If the advertiser does not have a correct billing lets check for the setup frequently for the next hour.

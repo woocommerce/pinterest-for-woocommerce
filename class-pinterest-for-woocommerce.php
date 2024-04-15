@@ -869,7 +869,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_middleware_url( $context = 'login', $args = array() ) {
 
-			$nonce    = wp_create_nonce( PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE );
+			$nonce = wp_create_nonce( PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE );
 			set_transient( PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE, $nonce, 10 * MINUTE_IN_SECONDS );
 
 			$rest_url = get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT );
@@ -1110,36 +1110,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Fetch billing setup information from API and update billing status in options.
-		 * Using this function makes sense only when we have a connected advertiser.
-		 *
-		 * @since 1.2.5
-		 * @since x.x.x Split storing billing setup status and updating billing setup status.
-		 *
-		 * @return bool Wether billing is set up or not.
-		 */
-		public static function update_billing_information() {
-			$status = Billing::has_billing_set_up();
-			self::add_billing_setup_status_to_account_data( $status );
-			return $status;
-		}
-
-		/**
-		 * Add billing setup status to the account data option.
-		 *
-		 * @since x.x.x
-		 *
-		 * @param bool $status The billing setup status.
-		 *
-		 * @return void
-		 */
-		public static function add_billing_setup_status_to_account_data( $status ) {
-			$account_data                     = self::get_setting( 'account_data' );
-			$account_data['is_billing_setup'] = $status;
-			self::save_setting( 'account_data', $account_data );
-		}
-
-		/**
 		 *
 		 * @since 1.2.5
 		 *
@@ -1149,7 +1119,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$account_data          = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
 			$has_billing_setup_old = is_array( $account_data ) && ( $account_data['is_billing_setup'] ?? false );
 			if ( Billing::should_check_billing_setup_often() ) {
-				$has_billing_setup_new = self::update_billing_information();
+				$has_billing_setup_new = Billing::update_billing_information();
 				// Detect change in billing setup to true and try to redeem.
 				if ( $has_billing_setup_new && ! $has_billing_setup_old ) {
 					AdCredits::handle_redeem_credit();
@@ -1306,7 +1276,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$settings = wp_parse_args( $settings, self::$default_settings );
 
 			return self::save_settings( $settings );
-
 		}
 
 		/**
@@ -1384,7 +1353,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return bool
 		 */
 		public static function is_domain_verified(): bool {
-			$account_data = self::get_setting( 'account_data' );
+			$account_data     = self::get_setting( 'account_data' );
 			$verified_domains = $account_data['verified_user_websites'] ?? array();
 			return in_array( wp_parse_url( get_home_url() )['host'] ?? '', $verified_domains );
 		}
