@@ -50,6 +50,8 @@ class Conversions extends Tracker {
 		$data = $this->prepare_request_data( $event_name, $data );
 
 		try {
+			$this->send_request( $event_name, $data );
+
 			/* translators: 1: Conversions API event name, 2: JSON encoded event data. */
 			$messages = sprintf(
 				'Sending Pinterest Conversions API event %1$s with a payload: %2$s',
@@ -57,8 +59,6 @@ class Conversions extends Tracker {
 				wp_json_encode( $data )
 			);
 			Logger::log( $messages, 'debug', 'conversions' );
-
-			$this->send_request( $event_name, $data );
 		} catch ( Throwable $e ) {
 			/* translators: 1: Conversions API event name, 2: JSON encoded event data, 3: Error code, 4: Error message. */
 			$messages = sprintf(
