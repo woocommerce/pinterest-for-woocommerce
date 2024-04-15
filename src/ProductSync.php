@@ -51,7 +51,7 @@ class ProductSync {
 	 */
 	public static function maybe_init() {
 
-		add_action( 'update_option_' . PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME, array( __class__, 'maybe_deregister' ), 10, 2 );
+		add_action( 'update_option_' . PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME, array( __CLASS__, 'maybe_deregister' ), 10, 2 );
 		if ( ! self::is_product_sync_enabled() ) {
 			return;
 		}
