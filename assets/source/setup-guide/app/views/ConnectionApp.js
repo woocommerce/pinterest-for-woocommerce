@@ -9,6 +9,7 @@ import { useState, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import SetupAccount from '../steps/SetupAccount';
+import BillingStatus from '../steps/BillingStatus';
 import ClaimWebsite from '../steps/ClaimWebsite';
 import SetupTracking from '../steps/SetupTracking';
 import SaveSettingsButton from '../components/SaveSettingsButton';
@@ -54,6 +55,11 @@ const SettingsApp = () => {
 				<div className="woocommerce-setup-guide__container">
 					<SetupAccount
 						view={ SETTINGS_VIEW }
+						setIsConnected={ setIsConnected }
+						isConnected={ isConnected }
+						isBusinessConnected={ isBusinessConnected }
+					/>
+					<BillingStatus
 						setIsConnected={ setIsConnected }
 						isConnected={ isConnected }
 						isBusinessConnected={ isBusinessConnected }
