@@ -1,11 +1,9 @@
 /**
  * External dependencies
  */
-import { useState } from '@wordpress/element';
+import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@woocommerce/components';
-import { getNewPath } from '@woocommerce/navigation';
 import { recordEvent } from '@woocommerce/tracks';
 import {
 	Button,
@@ -16,64 +14,43 @@ import {
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
 
 /**
- * Clicking on "Connect" Pinterest account button.
+ * Clicking on "Setup Billing" button.
  *
- * @event wcadmin_pfw_account_connect_button_click
- */
-/**
- * Clicking on "Disconnect" Pinterest account button.
- *
- * @event wcadmin_pfw_account_disconnect_button_click
- * @property {string} context `'settings' | 'wizard'` In which context it was used?
- */
-/**
- * Opening a modal.
- *
- * @event wcadmin_pfw_modal_open
- * @property {string} name Which modal is it?
- * @property {string} context `'settings' | 'wizard'` In which context it was used?
- */
-/**
- * Closing a modal.
- *
- * @event wcadmin_pfw_modal_closed
- * @property {string} name Which modal is it?
- * @property {string} context `'settings' | 'wizard'` In which context it was used?
- * @property {string} action
- * 				`confirm` - When the final "Yes, I'm sure" button is clicked.
- * 				`dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
+ * @event wcadmin_pfw_billing_setup_button_click
  */
 
 /**
- * Pinterest account connection component.
+ * Clicking on "Go to billing settings" button.
  *
- * This renders the body of `SetupAccount` card, to connect or disconnect Pinterest account.
- *
- * @fires wcadmin_pfw_account_connect_button_click
- * @fires wcadmin_pfw_account_disconnect_button_click with the given `{ context }`
- * @fires wcadmin_pfw_modal_open with `{ name: 'account-disconnection', … }`
- * @fires wcadmin_pfw_modal_closed with `{ name: 'account-disconnection', … }`
- * @param {Object} props React props.
- * @param {boolean} props.isConnected
- * @param {Function} props.setIsConnected
- * @param {Object} props.accountData
- * @param {string} props.context Context in which the component is used, to be forwarded to fired Track Events.
- * @return {JSX.Element} Rendered element.
+ * @event wcadmin_pfw_go_to_billing_button_click
  */
+
 const Billing = ( {
 	accountData,
 } ) => {
 
 	const isBillingSetup = accountData?.is_billing_setup;
+	const statusLabe = classnames(
+		'pfw-billing-info',
+		{
+			'pfw-billing-info--status-success': isBillingSetup === true,
+			'pfw-billing-info--status-error': isBillingSetup === false,
+		}
+	);
 
 	return (
 		<CardBody size="large">
-			<Flex direction="row" className="billing-info">
-				{ isBillingSetup === true ? ( // eslint-disable-line no-nested-ternary --- Code is reasonable readable
+			<Flex direction="row" className="pfw-billing-info">
+				{ isBillingSetup === true ? (
 					<>
-						<FlexBlock className="billing-label">
+						<FlexBlock className={statusLabe}>
 							<Text variant="body">
 								{ __(
 									'Billing Setup Correctly',
@@ -84,6 +61,7 @@ const Billing = ( {
 
 						<FlexItem>
 							<Button
+								variant='link'
 								href={
 									wcSettings.pinterest_for_woocommerce
 										.billingSettingsUrl
@@ -100,7 +78,7 @@ const Billing = ( {
 					</>
 				) : isBillingSetup === false ? (
 					<>
-						<FlexBlock>
+						<FlexBlock className={statusLabe}>
 							<Text variant="body">
 								{ __(
 									'No Valid Billing Setup Found',
@@ -111,6 +89,7 @@ const Billing = ( {
 
 						<FlexItem>
 							<Button
+								variant='primary'
 								href={
 									wcSettings.pinterest_for_woocommerce
 										.billingSettingsUrl
@@ -126,7 +105,7 @@ const Billing = ( {
 						</FlexItem>
 					</>
 				) : (
-					<Spinner className="connection-info__preloader" />
+					<Spinner className="billing-info__preloader" />
 				) }
 			</Flex>
 		</CardBody>
