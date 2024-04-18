@@ -91,7 +91,7 @@ const Billing = ( { accountData } ) => {
 
 				<FlexItem>
 					<Button
-						variant="primary"
+						isLink
 						href={
 							wcSettings.pinterest_for_woocommerce
 								.billingSettingsUrl
