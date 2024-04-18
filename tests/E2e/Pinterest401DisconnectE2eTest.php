@@ -58,6 +58,24 @@ class Pinterest401DisconnectE2eTest extends WP_UnitTestCase {
 		$this->assertTrue( TokenInvalidFailure::note_exists() );
 	}
 
+	/**
+	 * Tests .
+	 *
+	 * @return void
+	 */
+	public function test_401_disconnect_resets_integration_data_and_shows_notice_for_actions_scheduler() {
+		$this->expectException( Exception::class );
+		$this->expectExceptionCode( 401 );
+		$this->expectExceptionMessage( 'Authentication failed.' );
+
+		add_action( 'action_scheduler_failed_execution', array( Pinterest_For_Woocommerce::class, 'action_scheduler_reset_connection' ), 10, 2 );
+
+		do_action( 'action_scheduler_failed_execution', '987654', new Exception( 'Authentication failed.', 401 ) );
+
+		$this->assertEmpty( Pinterest_For_Woocommerce::get_data( 'integration_data' ) );
+		$this->assertTrue( TokenInvalidFailure::note_exists() );
+	}
+
 	private function create_commerce_integration_request_stub() {
 		add_filter(
 			'pre_http_request',

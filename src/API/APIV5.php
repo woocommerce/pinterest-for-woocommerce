@@ -819,7 +819,7 @@ class APIV5 extends Base {
 	 * @since 1.4.0
 	 *
 	 * @param string $ad_account_id Ad Account ID.
-	 * @param array $data
+	 * @param array  $data Event data.
 	 * @return array
 	 * @throws PinterestApiException If the request fails with other than 2xx status.
 	 */

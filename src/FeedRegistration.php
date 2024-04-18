@@ -80,6 +80,7 @@ class FeedRegistration {
 	 * @return bool
 	 *
 	 * @throws Exception PHP Exception.
+	 * @throws PinterestApiException Pinterest API Exception.
 	 */
 	public function handle_feed_registration(): bool {
 
@@ -98,11 +99,11 @@ class FeedRegistration {
 			}
 			throw new Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
 		} catch ( PinterestApiLocaleException $e ) {
-			Pinterest_For_Woocommerce()::save_data('merchant_locale_not_valid', true);
+			Pinterest_For_Woocommerce()::save_data( 'merchant_locale_not_valid', true );
 
 			// translators: %s: Error message.
 			$error_message = "Could not register feed. Error: {$e->getMessage()}";
-			self::log($error_message, 'error');
+			self::log( $error_message, 'error' );
 			return false;
 		} catch ( PinterestApiException $e ) {
 			throw $e;

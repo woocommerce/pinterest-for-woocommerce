@@ -92,6 +92,7 @@ class Feeds {
 	 *
 	 * @return string The Feed ID or an empty string if failed.
 	 * @throws Exception PHP Exception if there is an error creating the feed, and we are throttling the requests.
+	 * @throws PinterestApiException Pinterest API Exception if there is an error creating the feed.
 	 */
 	public static function create_feed(): string {
 		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );

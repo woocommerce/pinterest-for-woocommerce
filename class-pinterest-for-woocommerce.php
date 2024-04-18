@@ -839,16 +839,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.4.0
 		 *
-		 * @param $action_id
-		 * @param $e
-		 * @return mixed
+		 * @param string    $action_id The ID of the action.
+		 * @param Exception $e         The exception that was thrown.
+		 *
+		 * @return void
 		 * @throws NotesUnavailableException If the notes API is not available.
+		 * @throws Exception                 If the exception is a 401 error.
 		 */
 		public static function action_scheduler_reset_connection( $action_id, $e ) {
 			if ( 401 === $e->getCode() ) {
 				self::reset_connection();
+				throw $e;
 			}
-			throw $e;
 		}
 
 		/**
