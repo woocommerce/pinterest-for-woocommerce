@@ -79,9 +79,6 @@ class FeedRegistration {
 	 * @throws Exception PHP Exception.
 	 */
 	public function handle_feed_registration(): bool {
-		if ( ! Pinterest_For_Woocommerce::is_business_connected() ) {
-			return true;
-		}
 
 		// Clean merchants error code.
 		$this->clear_merchant_error_code();
