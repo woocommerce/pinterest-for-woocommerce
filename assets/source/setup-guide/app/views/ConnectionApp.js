@@ -60,9 +60,6 @@ const SettingsApp = () => {
 						isBusinessConnected={ isBusinessConnected }
 					/>
 					<BillingStatus
-						setIsConnected={ setIsConnected }
-						isConnected={ isConnected }
-						isBusinessConnected={ isBusinessConnected }
 					/>
 
 					{ isGroup1Visible && (
