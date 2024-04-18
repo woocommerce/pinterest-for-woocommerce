@@ -1,5 +1,7 @@
 <?php
 
+use Automattic\WooCommerce\Pinterest\Notes\TokenInvalidFailure;
+
 class PinterestConnectE2eTest extends WP_UnitTestCase {
 
 	/**
@@ -39,6 +41,7 @@ class PinterestConnectE2eTest extends WP_UnitTestCase {
 		add_action( 'pinterest_for_woocommerce_token_saved', array( Pinterest_For_Woocommerce::class, 'update_account_data' ) );
 		add_action( 'pinterest_for_woocommerce_token_saved', array( Pinterest_For_Woocommerce::class, 'update_linked_businesses' ) );
 		add_action( 'pinterest_for_woocommerce_token_saved', array( Pinterest_For_Woocommerce::class, 'post_update_cleanup' ) );
+		add_action( 'pinterest_for_woocommerce_token_saved', array( TokenInvalidFailure::class, 'possibly_delete_note' ) );
 
 		do_action( 'pinterest_for_woocommerce_token_saved' );
 
@@ -80,6 +83,7 @@ class PinterestConnectE2eTest extends WP_UnitTestCase {
 			),
 			$settings
 		);
+		$this->assertFalse( TokenInvalidFailure::note_exists() );
 	}
 
 	private function create_commerce_integration_request_stub() {

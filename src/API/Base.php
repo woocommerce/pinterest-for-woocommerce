@@ -111,7 +111,16 @@ class Base {
 				);
 			}
 
-			if ( 401 === $e->getCode() ) {
+			/**
+			 * Filter to disconnect the merchant from the Pinterest platform on authentication failure.
+			 *
+			 * @since 1.4.0
+			 */
+			$do_disconnect = apply_filters(
+				'pinterest_for_woocommerce_disconnect_on_authentication_failure',
+				'__return_true'
+			);
+			if ( 401 === $e->getCode() && $do_disconnect ) {
 				/**
 				 * Actions to perform disconnecting the merchant from the Pinterest platform.
 				 *

@@ -7,6 +7,7 @@
  */
 
 use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
+use Automattic\WooCommerce\Admin\Notes\NotesUnavailableException;
 use Automattic\WooCommerce\Pinterest;
 use Automattic\WooCommerce\Pinterest\AdCredits;
 use Automattic\WooCommerce\Pinterest\AdCreditsCoupons;
@@ -299,14 +300,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Append credits info to account data.
 			add_action( 'init', array( $this, 'add_currency_credits_info_to_account_data' ) );
 
-			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
-			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'create_commerce_integration' ) );
-			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
-			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_linked_businesses' ) );
-			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'post_update_cleanup' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( self::class, 'set_default_settings' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( self::class, 'create_commerce_integration' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( self::class, 'update_account_data' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( self::class, 'update_linked_businesses' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( self::class, 'post_update_cleanup' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( TokenInvalidFailure::class, 'possibly_delete_note' ) );
 
 			add_action( 'pinterest_for_woocommerce_disconnect', array( self::class, 'reset_connection' ) );
+
+			add_action( 'action_scheduler_failed_execution', array( self::class, 'action_scheduler_reset_connection' ), 10, 2 );
 
 			// Handle the Pinterest verification URL.
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
@@ -829,6 +832,23 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			self::disconnect();
 
 			TokenInvalidFailure::possibly_add_note();
+		}
+
+		/**
+		 * Resets the connection from action scheduler.
+		 *
+		 * @since 1.4.0
+		 *
+		 * @param $action_id
+		 * @param $e
+		 * @return mixed
+		 * @throws NotesUnavailableException If the notes API is not available.
+		 */
+		public static function action_scheduler_reset_connection( $action_id, $e ) {
+			if ( 401 === $e->getCode() ) {
+				self::reset_connection();
+			}
+			throw $e;
 		}
 
 		/**

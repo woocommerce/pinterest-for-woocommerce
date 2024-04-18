@@ -63,6 +63,9 @@ class FeedRegistration {
 		if ( false === as_has_scheduled_action( self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			as_schedule_recurring_action( time() + 10, 10 * MINUTE_IN_SECONDS, self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
+
+		// We do not want to disconnect the merchant if the authentication fails, since it running action can not be unscheduled.
+		add_filter( 'pinterest_for_woocommerce_disconnect_on_authentication_failure', '__return_false' );
 	}
 
 	/**
@@ -95,12 +98,14 @@ class FeedRegistration {
 			}
 			throw new Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
 		} catch ( PinterestApiLocaleException $e ) {
-			Pinterest_For_Woocommerce()::save_data( 'merchant_locale_not_valid', true );
+			Pinterest_For_Woocommerce()::save_data('merchant_locale_not_valid', true);
 
 			// translators: %s: Error message.
 			$error_message = "Could not register feed. Error: {$e->getMessage()}";
-			self::log( $error_message, 'error' );
+			self::log($error_message, 'error');
 			return false;
+		} catch ( PinterestApiException $e ) {
+			throw $e;
 		} catch ( Throwable $th ) {
 			if ( method_exists( $th, 'get_pinterest_code' ) && 4163 === $th->get_pinterest_code() ) {
 				Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', true );
