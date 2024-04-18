@@ -12,8 +12,6 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Exception;
-use Pinterest_For_Woocommerce;
-use function Automattic\WooCommerce\Pinterest\load_plugins;
 
 
 if ( ! defined( 'ABSPATH' ) ) {

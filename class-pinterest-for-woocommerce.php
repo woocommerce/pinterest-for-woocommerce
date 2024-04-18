@@ -306,7 +306,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'post_update_cleanup' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( TokenInvalidFailure::class, 'possibly_delete_note' ) );
 
-			add_action( 'pinterest_for_woocommerce_disconnect', array( Pinterest_For_Woocommerce::class, 'reset_connection' ) );
+			add_action( 'pinterest_for_woocommerce_disconnect', array( self::class, 'reset_connection' ) );
 
 			// Handle the Pinterest verification URL.
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
@@ -822,11 +822,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.4.0
 		 *
 		 * @return void
-		 * @throws \Automattic\WooCommerce\Admin\Notes\NotesUnavailableException
+		 * @throws \Automattic\WooCommerce\Admin\Notes\NotesUnavailableException If the notes API is not available.
 		 */
 		public static function reset_connection() {
-			Pinterest_For_Woocommerce::save_data( 'integration_data', array() );
-			Pinterest_For_Woocommerce::disconnect();
+			self::save_data( 'integration_data', array() );
+			self::disconnect();
 
 			TokenInvalidFailure::possibly_add_note();
 		}
