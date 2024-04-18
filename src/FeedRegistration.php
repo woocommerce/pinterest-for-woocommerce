@@ -9,6 +9,7 @@
 namespace Automattic\WooCommerce\Pinterest;
 
 use Exception;
+use Pinterest_For_Woocommerce;
 use Throwable;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
@@ -78,6 +79,9 @@ class FeedRegistration {
 	 * @throws Exception PHP Exception.
 	 */
 	public function handle_feed_registration(): bool {
+		if ( ! Pinterest_For_Woocommerce::is_business_connected() ) {
+			return true;
+		}
 
 		// Clean merchants error code.
 		$this->clear_merchant_error_code();
@@ -157,6 +161,8 @@ class FeedRegistration {
 	 * @return void
 	 *
 	 * @since 1.2.13
+	 *
+	 * @throws PinterestApiException Pinterest API Exception.
 	 */
 	public static function maybe_delete_stale_feeds_for_merchant( string $feed_id ) {
 		$feeds = Feeds::get_feeds();

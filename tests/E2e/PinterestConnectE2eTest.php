@@ -38,6 +38,7 @@ class PinterestConnectE2eTest extends WP_UnitTestCase {
 		add_action( 'pinterest_for_woocommerce_token_saved', array( Pinterest_For_Woocommerce::class, 'create_commerce_integration' ) );
 		add_action( 'pinterest_for_woocommerce_token_saved', array( Pinterest_For_Woocommerce::class, 'update_account_data' ) );
 		add_action( 'pinterest_for_woocommerce_token_saved', array( Pinterest_For_Woocommerce::class, 'update_linked_businesses' ) );
+		add_action( 'pinterest_for_woocommerce_token_saved', array( Pinterest_For_Woocommerce::class, 'post_update_cleanup' ) );
 
 		do_action( 'pinterest_for_woocommerce_token_saved' );
 
@@ -56,9 +57,13 @@ class PinterestConnectE2eTest extends WP_UnitTestCase {
 					'coupon_redeem_info'      => array(
 						'redeem_status' => false,
 					),
-					'verified_user_websites' => array(
+					'verified_user_websites'  => array(
 						'wordpress.dima.works',
 						'pinterest.dima.works'
+					),
+					'currency_credit_info'    => array(
+						'spendRequire' => '$15',
+						'creditsGiven' => '$125',
 					),
 				),
 				'track_conversions'                => true,

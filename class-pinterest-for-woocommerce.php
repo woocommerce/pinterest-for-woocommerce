@@ -19,6 +19,7 @@ use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 use Automattic\WooCommerce\Pinterest\Notes\TokenExchangeFailure;
+use Automattic\WooCommerce\Pinterest\Notes\TokenInvalidFailure;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
@@ -303,6 +304,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_linked_businesses' ) );
 			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'post_update_cleanup' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( TokenInvalidFailure::class, 'possibly_delete_note' ) );
+
+			add_action( 'pinterest_for_woocommerce_disconnect', array( Pinterest_For_Woocommerce::class, 'reset_connection' ) );
 
 			// Handle the Pinterest verification URL.
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
@@ -812,6 +816,20 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 		}
 
+		/**
+		 * Resets the connection by clearing the local connection data.
+		 *
+		 * @since 1.4.0
+		 *
+		 * @return void
+		 * @throws \Automattic\WooCommerce\Admin\Notes\NotesUnavailableException
+		 */
+		public static function reset_connection() {
+			Pinterest_For_Woocommerce::save_data( 'integration_data', array() );
+			Pinterest_For_Woocommerce::disconnect();
+
+			TokenInvalidFailure::possibly_add_note();
+		}
 
 		/**
 		 * Flush data option and remove settings.
@@ -825,6 +843,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			UserInteraction::flush_options();
 
 			// Remove settings that may cause issues if stale on disconnect.
+			self::save_setting( 'integration_data', array() );
 			self::save_setting( 'account_data', null );
 			self::save_setting( 'tracking_advertiser', null );
 			self::save_setting( 'tracking_tag', null );

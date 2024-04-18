@@ -12,6 +12,7 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Exception;
+use Pinterest_For_Woocommerce;
 use function Automattic\WooCommerce\Pinterest\load_plugins;
 
 
@@ -111,6 +112,16 @@ class Base {
 					'error'
 				);
 			}
+
+			if ( 401 === $e->getCode() ) {
+				/**
+				 * Actions to perform disconnecting the merchant from the Pinterest platform.
+				 *
+				 * @since 1.4.0
+				 */
+				do_action( 'pinterest_for_woocommerce_disconnect' );
+			}
+
 			throw $e;
 		}
 	}
