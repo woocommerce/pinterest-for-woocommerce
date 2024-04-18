@@ -13,7 +13,6 @@ import Billing from '../components/Billing/Billing';
 import StepOverview from '../components/StepOverview';
 
 const BillingStatus = () => {
-
 	return (
 		<div className="woocommerce-setup-guide__billing-status">
 			<div className="woocommerce-setup-guide__step-columns">

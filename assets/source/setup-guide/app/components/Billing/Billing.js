@@ -33,14 +33,13 @@ import { useSettingsSelect } from '../../helpers/effects';
  */
 
 const Billing = () => {
-
 	const isBillingSetup = useSettingsSelect()?.account_data?.is_billing_setup;
 	const statusLabe = classnames( 'pfw-billing-info', {
 		'pfw-billing-info--status-success': isBillingSetup === true,
 		'pfw-billing-info--status-error': isBillingSetup === false,
 	} );
 
-	const getElement = ( ) => {
+	const getElement = () => {
 		if ( isBillingSetup === undefined ) {
 			return <Spinner className="pfw-billing-info__preloader" />;
 		}
@@ -48,33 +47,33 @@ const Billing = () => {
 		if ( isBillingSetup === true ) {
 			return (
 				<>
-				<FlexBlock className={ statusLabe }>
-					<Text variant="body">
-						{ __(
-							'Billing Setup Correctly',
-							'pinterest-for-woocommerce'
-						) }
-					</Text>
-				</FlexBlock>
+					<FlexBlock className={ statusLabe }>
+						<Text variant="body">
+							{ __(
+								'Billing Setup Correctly',
+								'pinterest-for-woocommerce'
+							) }
+						</Text>
+					</FlexBlock>
 
-				<FlexItem>
-					<Button
-						isLink
-						href={
-							wcSettings.pinterest_for_woocommerce
-								.billingSettingsUrl
-						}
-						onClick={ () =>
-							recordEvent( 'pfw_go_to_billing_button_click' )
-						}
-					>
-						{ __(
-							'Go to billing settings',
-							'pinterest-for-woocommerce'
-						) }
-					</Button>
-				</FlexItem>
-			</>
+					<FlexItem>
+						<Button
+							isLink
+							href={
+								wcSettings.pinterest_for_woocommerce
+									.billingSettingsUrl
+							}
+							onClick={ () =>
+								recordEvent( 'pfw_go_to_billing_button_click' )
+							}
+						>
+							{ __(
+								'Go to billing settings',
+								'pinterest-for-woocommerce'
+							) }
+						</Button>
+					</FlexItem>
+				</>
 			);
 		}
 
