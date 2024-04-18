@@ -18,6 +18,7 @@ import {
  * Internal dependencies
  */
 import './style.scss';
+import { useSettingsSelect } from '../helpers/effects';
 
 /**
  * Clicking on "Setup Billing" button.
@@ -31,8 +32,9 @@ import './style.scss';
  * @event wcadmin_pfw_go_to_billing_button_click
  */
 
-const Billing = ( { accountData } ) => {
-	const isBillingSetup = accountData?.is_billing_setup;
+const Billing = () => {
+
+	const isBillingSetup = useSettingsSelect()?.account_data?.is_billing_setup;
 	const statusLabe = classnames( 'pfw-billing-info', {
 		'pfw-billing-info--status-success': isBillingSetup === true,
 		'pfw-billing-info--status-error': isBillingSetup === false,
@@ -41,7 +43,7 @@ const Billing = ( { accountData } ) => {
 	let element = null;
 
 	if ( isBillingSetup === undefined ) {
-		element = <Spinner className="billing-info__preloader" />;
+		element = <Spinner className="pfw-billing-info__preloader" />;
 	}
 
 	if ( isBillingSetup === true ) {

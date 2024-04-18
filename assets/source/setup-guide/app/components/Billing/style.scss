@@ -4,6 +4,10 @@
 	display: inline-flex;
 	align-items: center;
 
+	&__preloader {
+		flex: 1;
+	}
+
 	&--status-error {
 		color: $alert-red;
 	}

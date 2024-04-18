@@ -11,10 +11,8 @@ import { Card } from '@wordpress/components';
  */
 import Billing from '../components/Billing/Billing';
 import StepOverview from '../components/StepOverview';
-import { useSettingsSelect } from '../helpers/effects';
 
 const BillingStatus = () => {
-	const appSettings = useSettingsSelect();
 
 	return (
 		<div className="woocommerce-setup-guide__billing-status">
@@ -33,7 +31,7 @@ const BillingStatus = () => {
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
-						<Billing accountData={ appSettings.account_data } />
+						<Billing />
 					</Card>
 				</div>
 			</div>
