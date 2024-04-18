@@ -40,15 +40,14 @@ const Billing = () => {
 		'pfw-billing-info--status-error': isBillingSetup === false,
 	} );
 
-	let element = null;
+	getElement = ( ) => {
+		if ( isBillingSetup === undefined ) {
+			return <Spinner className="pfw-billing-info__preloader" />;
+		}
 
-	if ( isBillingSetup === undefined ) {
-		element = <Spinner className="pfw-billing-info__preloader" />;
-	}
-
-	if ( isBillingSetup === true ) {
-		element = (
-			<>
+		if ( isBillingSetup === true ) {
+			return (
+				<>
 				<FlexBlock className={ statusLabe }>
 					<Text variant="body">
 						{ __(
@@ -76,11 +75,10 @@ const Billing = () => {
 					</Button>
 				</FlexItem>
 			</>
-		);
-	}
+			);
+		}
 
-	if ( isBillingSetup === false ) {
-		element = (
+		return (
 			<>
 				<FlexBlock className={ statusLabe }>
 					<Text variant="body">
@@ -107,12 +105,12 @@ const Billing = () => {
 				</FlexItem>
 			</>
 		);
-	}
+	};
 
 	return (
 		<CardBody size="large">
 			<Flex direction="row" className="pfw-billing-info">
-				{ element }
+				{ getElement() }
 			</Flex>
 		</CardBody>
 	);
