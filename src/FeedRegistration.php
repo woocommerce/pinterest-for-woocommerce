@@ -161,8 +161,6 @@ class FeedRegistration {
 	 * @return void
 	 *
 	 * @since 1.2.13
-	 *
-	 * @throws PinterestApiException Pinterest API Exception.
 	 */
 	public static function maybe_delete_stale_feeds_for_merchant( string $feed_id ) {
 		$feeds = Feeds::get_feeds();

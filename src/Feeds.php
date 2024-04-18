@@ -240,12 +240,16 @@ class Feeds {
 	 * Get merchant's feeds.
 	 *
 	 * @return array The feed profile objects.
-	 * @throws PinterestApiException Pinterest API Exception.
 	 */
 	public static function get_feeds(): array {
-		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
-		$feeds         = APIV5::get_feeds( $ad_account_id );
-		return $feeds['items'] ?? array();
+		try {
+			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+			$feeds         = APIV5::get_feeds( $ad_account_id );
+			return $feeds['items'] ?? array();
+		} catch ( PinterestApiException $e ) {
+			Logger::log( $e->getMessage(), 'error' );
+			return array();
+		}
 	}
 
 	/**
@@ -268,7 +272,6 @@ class Feeds {
 	 * @return string Returns the ID of the feed if properly registered or an empty string otherwise.
 	 *
 	 * @throws PinterestApiLocaleException No valid locale found to check for the registered feed.
-	 * @throws PinterestApiException Pinterest API Exception.
 	 */
 	public static function match_local_feed_configuration_to_registered_feeds( array $feeds = array() ): string {
 		$local_country = Pinterest_For_Woocommerce()::get_base_country();
