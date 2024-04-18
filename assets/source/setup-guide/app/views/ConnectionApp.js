@@ -59,9 +59,7 @@ const SettingsApp = () => {
 						isConnected={ isConnected }
 						isBusinessConnected={ isBusinessConnected }
 					/>
-					<BillingStatus
-					/>
-
+					<BillingStatus />
 					{ isGroup1Visible && (
 						<ClaimWebsite view={ SETTINGS_VIEW } />
 					) }
