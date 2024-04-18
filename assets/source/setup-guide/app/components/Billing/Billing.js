@@ -18,7 +18,7 @@ import {
  * Internal dependencies
  */
 import './style.scss';
-import { useSettingsSelect } from '../helpers/effects';
+import { useSettingsSelect } from '../../helpers/effects';
 
 /**
  * Clicking on "Setup Billing" button.
@@ -40,7 +40,7 @@ const Billing = () => {
 		'pfw-billing-info--status-error': isBillingSetup === false,
 	} );
 
-	getElement = ( ) => {
+	const getElement = ( ) => {
 		if ( isBillingSetup === undefined ) {
 			return <Spinner className="pfw-billing-info__preloader" />;
 		}
