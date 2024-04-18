@@ -116,6 +116,7 @@ class ConversionsTest extends WP_UnitTestCase {
 					'client_user_agent' => 'Some user agent string.',
 				),
 				'custom_data'      => array(
+					'order_id'    => '1234567890',
 					'currency'    => 'USD',
 					'value'       => '29.97',
 					'content_ids' => array( 1, 2, 3 ),
