@@ -847,7 +847,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @throws Exception                 If the exception is a 401 error.
 		 */
 		public static function action_scheduler_reset_connection( $action_id, $e ) {
-			if ( 401 === $e->getCode() ) {
+			if ( in_array( $e->getCode(), array( 401, 403 ) ) ) {
 				self::reset_connection();
 				throw $e;
 			}
