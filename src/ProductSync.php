@@ -134,7 +134,7 @@ class ProductSync {
 	 * @return boolean
 	 */
 	public static function is_product_sync_enabled() {
-		$domain_verified  = Pinterest_For_Woocommerce()::is_domain_verified();
+		$domain_verified = Pinterest_For_Woocommerce()::is_domain_verified();
 
 		return (bool) $domain_verified && Pinterest_For_Woocommerce()::get_setting( 'product_sync_enabled' );
 	}
