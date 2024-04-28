@@ -29,6 +29,10 @@ class Billing {
 	 * @since 1.2.5
 	 */
 	public static function schedule_event() {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
+			return;
+		}
+
 		add_action( Heartbeat::DAILY, array( __CLASS__, 'handle_billing_setup_check' ) );
 	}
 

@@ -27,6 +27,10 @@ class RefreshToken {
 	 * @since 1.4.0
 	 */
 	public static function schedule_event() {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
+			return;
+		}
+
 		if ( ! has_action( Heartbeat::DAILY, array( self::class, 'handle_refresh' ) ) ) {
 			add_action( Heartbeat::DAILY, array( self::class, 'handle_refresh' ), 20 );
 		}
