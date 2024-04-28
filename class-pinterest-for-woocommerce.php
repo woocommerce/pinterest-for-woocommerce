@@ -831,6 +831,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Cancel scheduled jobs.
 			Pinterest\ProductSync::cancel_jobs();
+			Heartbeat::cancel_jobs();
 		}
 
 		/**
