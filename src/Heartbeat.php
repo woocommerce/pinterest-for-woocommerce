@@ -67,6 +67,13 @@ class Heartbeat {
 		}
 	}
 
+	/**
+	 * Cancels all the scheduled jobs.
+	 *
+	 * @sinxe 1.4.0
+	 *
+	 * @return void
+	 */
 	public static function cancel_jobs() {
 		as_unschedule_all_actions( self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		as_unschedule_all_actions( self::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
