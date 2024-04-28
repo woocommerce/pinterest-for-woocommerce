@@ -913,11 +913,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Connects WC to Pinterest.
 		 *
-		 * @since 1.4.0
-		 *
-		 * @see Pinterest\API\APIV5::create_commerce_integration
 		 * @return array the result of APIV5::create_commerce_integration.
-		 * @throws PinterestApiException In case of 404, 409 and 500 errors from Pinterest.
+		 * @throws Exception In case of 404, 409 and 500 errors from Pinterest.
+		 * @see Pinterest\API\APIV5::create_commerce_integration
+		 * @since 1.4.0
 		 */
 		public static function create_commerce_integration(): array {
 			global $wp_version;
@@ -925,7 +924,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$external_business_id = self::generate_external_business_id();
 			$connection_data      = self::get_data( 'connection_info_data', true );
 
-			$integration_data     = array(
+			// It does not make any sense to create integration without Advertiser ID.
+			if ( empty( $connection_data['advertiser_id'] ) ) {
+				throw new Exception(
+					sprintf(
+						esc_html__(
+							'Commerce Integration cannot be created: Advertiser ID is missing.',
+							'pinterest-for-woocommerce'
+						)
+					)
+				);
+			}
+
+			$integration_data = array(
 				'external_business_id'    => $external_business_id,
 				'connected_merchant_id'   => $connection_data['merchant_id'] ?? '',
 				'connected_advertiser_id' => $connection_data['advertiser_id'] ?? '',
