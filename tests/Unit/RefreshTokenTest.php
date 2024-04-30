@@ -22,6 +22,9 @@ class RefreshTokenTest extends \WP_UnitTestCase {
 	}
 
 	public function test_schedule_event_adds_daily_action() {
+		// Jobs will schedule only if Pinterest is connected (means integration data is set and has the ID).
+		Pinterest_For_Woocommerce::save_data( 'integration_data', array( 'id' => '567891567892' ) );
+
 		RefreshToken::schedule_event();
 		$this->assertEquals( 20, has_action( Heartbeat::DAILY, array( RefreshToken::class, 'handle_refresh' ) ) );
 	}

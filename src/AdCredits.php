@@ -37,6 +37,10 @@ class AdCredits {
 	 * @since 1.2.5
 	 */
 	public static function schedule_event() {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
+			return;
+		}
+
 		add_action( Heartbeat::HOURLY, array( static::class, 'handle_redeem_credit' ), 20 );
 	}
 
