@@ -91,16 +91,12 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
-= 1.4.0 - 2024-04-02 =
-* Add - CAPI: A new conversion system for reporting from the plugin to Pinterest.
-* Add - Support for platforms using persistent object caches like Memcached.
-* Add - Automatic token exchange and refresh token handling for improved OAuth management.
-* Add - Twenty Twenty-Four theme support.
-* Update - API update to V5.
-* Update - Tag implementation updated to work in conjunction with CAPI.
-* Update - Logging system enhanced for more granular debugging.
-* Update - Caching enabled on feed status endpoints for improved performance.
-* Update - Redirect to the cart page after successful addition WooCommerce setting support.
-* Update - Plugin deactivation and uninstall behavior now properly implemented.
-* Tweak - Multiple smaller adjustments for improved stability and performance.
-* Dev - Plugin now uses the new middleware for connection.
+= 1.4.1 - 2024-05-01 =
+* Add - Heartbeat actions cleanup
+* Update - Mandatory condition on tracking
+* Update - pinit.js script import to match with Pinterest documentation
+* Update - Error cases handling for discounts
+* Tweak - Advertiser ID missing exception
+* Fix - Missing Order ID into custom_data array for Checkout CAPI event.
+* Fix - Fix tooltip UI issue in Settings page
+* Fix - Correct coupons information
