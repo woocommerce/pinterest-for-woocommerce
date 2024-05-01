@@ -111,9 +111,9 @@ class PinterestSyncSettings {
 				throw new Exception( esc_html__( 'Tracking advertiser or tag missing', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$response = APIV5::get_advertiser_tag( $advertiser_id, $tag_id );
-			$automatic_enhanced_match_support = $response['configs']['aem_enabled'] ?? false;
-			Pinterest_For_Woocommerce()::save_setting( 'automatic_enhanced_match_support', $automatic_enhanced_match_support );
+			$response    = APIV5::get_advertiser_tag( $advertiser_id, $tag_id );
+			$aem_enabled = $response['configs']['aem_enabled'] ?? false;
+			Pinterest_For_Woocommerce()::save_setting( 'automatic_enhanced_match_support', $aem_enabled );
 		} catch ( Exception $th ) {
 			Logger::log( $th->getMessage(), 'error' );
 			throw new Exception( esc_html__( 'Response error', 'pinterest-for-woocommerce' ), 400 );
