@@ -95,6 +95,14 @@ class PinterestSyncSettings {
 	 * @throws Exception PHP Exception.
 	 */
 	private static function automatic_enhanced_match_support() {
+		/*
+		 * Tracking needs to be enabled in order to use automatic enhanced match support.
+		 */
+		$is_tracking_enabled = Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
+		if ( ! $is_tracking_enabled ) {
+			return false;
+		}
+
 		try {
 			$advertiser_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 			$tag_id        = Pinterest_For_WooCommerce()::get_setting( 'tracking_tag' );
