@@ -2,6 +2,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
+use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\RefreshToken;
 use Pinterest_For_Woocommerce;
@@ -268,5 +269,13 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 			'partner_metadata'             => 'partner-meta-data',
 		);
 		Pinterest_For_Woocommerce::update_commerce_integration( 'ebi-123456789', $data );
+	}
+
+	public function test_disconnect_removes_as_daily_and_hourly_actions() {
+		$heartbeat = new Heartbeat( WC()->queue() );
+		$heartbeat->schedule_events();
+		Pinterest_For_Woocommerce::disconnect();
+		$this->assertFalse( as_has_scheduled_action( Heartbeat::HOURLY, array(), 'pinterest-for-woocommerce' ) );
+		$this->assertFalse( as_has_scheduled_action( Heartbeat::DAILY, array(), 'pinterest-for-woocommerce' ) );
 	}
 }

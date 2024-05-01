@@ -263,10 +263,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$this->includes();
 
-			// Start the heartbeat.
-			$this->heartbeat = new Heartbeat( WC()->queue() );
-			$this->heartbeat->init();
-
 			add_action( 'admin_init', array( $this, 'admin_init' ), 0 );
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
@@ -278,6 +274,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// ActionScheduler is activated on init 1 so lets make sure we are updating after that.
 			add_action( 'init', array( $this, 'maybe_update_plugin' ), 5 );
 			add_action( 'init', array( self::class, 'init_tracking' ) );
+			add_action( 'init', array( Pinterest\Heartbeat::class, 'schedule_events' ) );
 			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\TrackerSnapshot::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\Billing::class, 'schedule_event' ) );
@@ -831,6 +828,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Cancel scheduled jobs.
 			Pinterest\ProductSync::cancel_jobs();
+			Heartbeat::cancel_jobs();
 		}
 
 		/**
@@ -869,7 +867,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_middleware_url( $context = 'login', $args = array() ) {
 
-			$nonce    = wp_create_nonce( PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE );
+			$nonce = wp_create_nonce( PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE );
 			set_transient( PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE, $nonce, 10 * MINUTE_IN_SECONDS );
 
 			$rest_url = get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT );
@@ -913,11 +911,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Connects WC to Pinterest.
 		 *
-		 * @since 1.4.0
-		 *
-		 * @see Pinterest\API\APIV5::create_commerce_integration
 		 * @return array the result of APIV5::create_commerce_integration.
-		 * @throws PinterestApiException In case of 404, 409 and 500 errors from Pinterest.
+		 * @throws Exception In case of 404, 409 and 500 errors from Pinterest.
+		 * @see Pinterest\API\APIV5::create_commerce_integration
+		 * @since 1.4.0
 		 */
 		public static function create_commerce_integration(): array {
 			global $wp_version;
@@ -925,7 +922,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$external_business_id = self::generate_external_business_id();
 			$connection_data      = self::get_data( 'connection_info_data', true );
 
-			$integration_data     = array(
+			// It does not make any sense to create integration without Advertiser ID.
+			if ( empty( $connection_data['advertiser_id'] ) ) {
+				throw new Exception(
+					sprintf(
+						esc_html__(
+							'Commerce Integration cannot be created: Advertiser ID is missing.',
+							'pinterest-for-woocommerce'
+						)
+					)
+				);
+			}
+
+			$integration_data = array(
 				'external_business_id'    => $external_business_id,
 				'connected_merchant_id'   => $connection_data['merchant_id'] ?? '',
 				'connected_advertiser_id' => $connection_data['advertiser_id'] ?? '',
@@ -1110,22 +1119,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Add billing setup information to the account data option.
-		 * Using this function makes sense only when we have a connected advertiser.
-		 *
-		 * @since 1.2.5
-		 *
-		 * @return bool Wether billing is set up or not.
-		 */
-		public static function add_billing_setup_info_to_account_data() {
-			$account_data                     = self::get_setting( 'account_data' );
-			$account_data['is_billing_setup'] = Billing::has_billing_set_up();
-			self::save_setting( 'account_data', $account_data );
-			Billing::mark_billing_setup_checked();
-			return $account_data['is_billing_setup'];
-		}
-
-		/**
 		 *
 		 * @since 1.2.5
 		 *
@@ -1135,7 +1128,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$account_data          = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
 			$has_billing_setup_old = is_array( $account_data ) && ( $account_data['is_billing_setup'] ?? false );
 			if ( Billing::should_check_billing_setup_often() ) {
-				$has_billing_setup_new = self::add_billing_setup_info_to_account_data();
+				$has_billing_setup_new = Billing::update_billing_information();
 				// Detect change in billing setup to true and try to redeem.
 				if ( $has_billing_setup_new && ! $has_billing_setup_old ) {
 					AdCredits::handle_redeem_credit();
@@ -1239,34 +1232,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Check if coupon was redeemed. We can redeem only once.
-		 *
-		 * @since 1.2.5
-		 *
-		 * @return bool
-		 */
-		public static function check_if_coupon_was_redeemed() {
-			$account_data = self::get_setting( 'account_data' );
-
-			$redeem_status = is_array( $account_data['coupon_redeem_info'] ) ? $account_data['coupon_redeem_info']['redeem_status'] : false;
-			$error         = $account_data['coupon_redeem_info']['error_id'];
-			if ( 2322 === $error || 2318 === $error ) {
-				/*
-				 * Advertiser has already redeemed the coupon or
-				 * the coupon was redeemed by a different advertiser of the same user.
-				 * In both cases another redeem is not possible.
-				 */
-				return true;
-			}
-
-			if ( false === $redeem_status ) {
-				return false;
-			}
-
-			return true;
-		}
-
-		/**
 		 * Fetches a fresh copy (if needed or explicitly requested), of the authenticated user's linked business accounts.
 		 *
 		 * @param bool $force_refresh Whether to refresh the data from the API.
@@ -1320,7 +1285,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$settings = wp_parse_args( $settings, self::$default_settings );
 
 			return self::save_settings( $settings );
-
 		}
 
 		/**
@@ -1359,7 +1323,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function is_setup_complete() {
-			return self::is_business_connected() && self::is_domain_verified() && self::is_tracking_configured();
+			return self::is_business_connected() && self::is_domain_verified();
 		}
 
 
@@ -1398,7 +1362,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return bool
 		 */
 		public static function is_domain_verified(): bool {
-			$account_data = self::get_setting( 'account_data' );
+			$account_data     = self::get_setting( 'account_data' );
 			$verified_domains = $account_data['verified_user_websites'] ?? array();
 			return in_array( wp_parse_url( get_home_url() )['host'] ?? '', $verified_domains );
 		}
