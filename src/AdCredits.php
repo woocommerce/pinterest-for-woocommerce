@@ -82,7 +82,7 @@ class AdCredits {
 		 * Check if coupon was redeemed. We can redeem only once.
 		 *
 		 * @since 1.2.5
-		 * @since x.x.x Update for API v5. and moved to AdCredits class.
+		 * @since 1.4.1 Update for API v5. and moved to AdCredits class.
 		 *
 		 * @return bool
 		 */
@@ -241,7 +241,7 @@ class AdCredits {
 	 * Fetch data from the discount endpoint and get the necessary fields.
 	 *
 	 * @since 1.2.5
-	 * @since x.x.x
+	 * @since 1.4.1
 	 *
 	 * @throws PinterestApiException Originating from get_coupon_for_merchant.
 	 * @return mixed False when no info is available, discounts object when discounts are available.
