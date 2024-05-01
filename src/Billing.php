@@ -158,8 +158,8 @@ class Billing {
 	 * Using this function makes sense only when we have a connected advertiser.
 	 *
 	 * @since 1.2.5
-	 * @since x.x.x Split storing billing setup status and updating billing setup status.
-	 * @since x.x.x Moved from class-pinterest-for-woocommerce.php
+	 * @since 1.4.1 Split storing billing setup status and updating billing setup status.
+	 * @since 1.4.1 Moved from class-pinterest-for-woocommerce.php
 	 *
 	 * @return bool Wether billing is set up or not.
 	 */
@@ -172,7 +172,7 @@ class Billing {
 	/**
 	 * Add billing setup status to the account data option.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.1
 	 *
 	 * @param bool $status The billing setup status.
 	 *
