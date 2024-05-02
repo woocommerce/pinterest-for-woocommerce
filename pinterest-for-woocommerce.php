@@ -20,6 +20,7 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       pinterest-for-woocommerce
  * Domain Path:       /i18n/languages
+ * Requires Plugins:  woocommerce
  *
  * Requires at least: 5.6
  * Tested up to: 6.5
