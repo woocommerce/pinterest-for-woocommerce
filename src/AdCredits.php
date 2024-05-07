@@ -201,7 +201,7 @@ class AdCredits {
 	}
 
 	/**
-	 * Check if campaign is enabled in the recommendations API from woo.com.
+	 * Check if campaign is enabled in the recommendations API from WooCommerce.com.
 	 *
 	 * @since 1.2.5
 	 *
@@ -210,7 +210,7 @@ class AdCredits {
 	 * @return bool Wether the campaign is active or not.
 	 */
 	private static function get_is_campaign_active_from_recommendations() {
-		$request         = wp_remote_get( 'https://woo.com/wp-json/wccom/marketing-tab/1.2/recommendations.json' );
+		$request         = wp_remote_get( 'https://woocommerce.com/wp-json/wccom/marketing-tab/1.2/recommendations.json' );
 		$recommendations = array();
 
 		if ( is_wp_error( $request ) ) {

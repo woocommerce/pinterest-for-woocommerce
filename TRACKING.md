@@ -1,6 +1,6 @@
 # Usage Tracking
 
-_Pinterest for WooCommerce_ implements usage tracking, based on the native [WooCommerce Usage Tracking](https://woo.com/usage-tracking/), and is only enabled when WooCommerce Tracking is enabled.
+_Pinterest for WooCommerce_ implements usage tracking, based on the native [WooCommerce Usage Tracking](https://woocommerce.com/usage-tracking/), and is only enabled when WooCommerce Tracking is enabled.
 
 When a store opts in to WooCommerce usage tracking and uses _Pinterest for WooCommerce_, they will also be opted in to the tracking added by _Pinterest for WooCommerce_.
 

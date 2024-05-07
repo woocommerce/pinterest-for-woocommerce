@@ -140,7 +140,3 @@ These flows can be used when testing PRs or releases, and as a basis for documen
 The Pinterest plugin will add these fields in an attributes tab on the product edit page. Pinterest does not require these fields, but if they are not filled in, a warning message will be displayed in the Catalog tab (alert message).
 
 ![Google Category and Condition fields](./images/google-category-condition.png)
-
-## Miscellaneous
-
-- Pinterest admin screens are visible and accessible in all supported WooCommerce Admin navigation variations (current WP sidebar and [forthcoming unified nav](https://developer.woo.com/2021/01/15/call-to-action-create-access-for-your-extension-in-the-new-woocommerce-navigation/)).
