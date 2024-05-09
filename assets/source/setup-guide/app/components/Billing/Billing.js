@@ -34,10 +34,6 @@ import { useSettingsSelect } from '../../helpers/effects';
 
 const Billing = () => {
 	const isBillingSetup = useSettingsSelect()?.account_data?.is_billing_setup;
-	const statusLabe = classnames( 'pfw-billing-info', {
-		'pfw-billing-info--status-success': isBillingSetup === true,
-		'pfw-billing-info--status-error': isBillingSetup === false,
-	} );
 
 	const getElement = () => {
 		if ( isBillingSetup === undefined ) {
@@ -47,7 +43,7 @@ const Billing = () => {
 		if ( isBillingSetup === true ) {
 			return (
 				<>
-					<FlexBlock className={ statusLabe }>
+					<FlexBlock className='pfw-billing-info--status-success'>
 						<Text variant="body">
 							{ __(
 								'Billing Setup Correctly',
@@ -79,7 +75,7 @@ const Billing = () => {
 
 		return (
 			<>
-				<FlexBlock className={ statusLabe }>
+				<FlexBlock className='pfw-billing-info--status-error'>
 					<Text variant="body">
 						{ __(
 							'No Valid Billing Setup Found',
