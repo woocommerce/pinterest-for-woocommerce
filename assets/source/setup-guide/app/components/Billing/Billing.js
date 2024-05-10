@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Spinner } from '@woocommerce/components';
 import { recordEvent } from '@woocommerce/tracks';
@@ -43,7 +42,7 @@ const Billing = () => {
 		if ( isBillingSetup === true ) {
 			return (
 				<>
-					<FlexBlock className='pfw-billing-info--status-success'>
+					<FlexBlock className="pfw-billing-info--status-success">
 						<Text variant="body">
 							{ __(
 								'Billing Setup Correctly',
@@ -75,7 +74,7 @@ const Billing = () => {
 
 		return (
 			<>
-				<FlexBlock className='pfw-billing-info--status-error'>
+				<FlexBlock className="pfw-billing-info--status-error">
 					<Text variant="body">
 						{ __(
 							'No Valid Billing Setup Found',
