@@ -6,6 +6,7 @@
  * @version  1.0.0
  */
 
+use Automattic\WooCommerce\Grow\Tools\CompatChecker\v0_0_1\Checker;
 use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
 use Automattic\WooCommerce\Pinterest;
 use Automattic\WooCommerce\Pinterest\AdCredits;
@@ -257,7 +258,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public function init_plugin() {
 
-			if ( ! $this->check_plugin_requirements() ) {
+			if ( ! Checker::instance()->is_compatible( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE, PINTEREST_FOR_WOOCOMMERCE_VERSION ) || ! $this->check_plugin_requirements() ) {
 				return;
 			}
 
