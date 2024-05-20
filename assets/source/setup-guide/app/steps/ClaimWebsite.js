@@ -9,7 +9,6 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { Spinner } from '@woocommerce/components';
 import {
 	Button,
 	Card,
@@ -28,12 +27,9 @@ import StepHeader from '../components/StepHeader';
 import StepOverview from '../components/StepOverview';
 import UrlInputControl from '../components/UrlInputControl';
 import StatusLabel from '../components/StatusLabel';
-import {
-	useSettingsSelect,
-	useSettingsDispatch,
-	useCreateNotice,
-} from '../helpers/effects';
+import { useSettingsSelect, useCreateNotice } from '../helpers/effects';
 import documentationLinkProps from '../helpers/documentation-link-props';
+import { getNewPath } from '@woocommerce/navigation'; // eslint-disable-line
 
 const StaticError = ( { reqError } ) => {
 	if ( reqError?.data?.pinterest_code === undefined ) {
@@ -92,38 +88,43 @@ const StaticError = ( { reqError } ) => {
  * @fires wcadmin_pfw_documentation_link_click with `{ link_id: 'claim-website', context: props.view }`
  * @param {Object} props React props.
  * @param {'wizard'|'settings'} props.view Indicate which view this component is rendered on.
- * @param {Function} [props.goToNextStep]
  *   When the website claim is complete, called when clicking the "Continue" button.
  *   The "Continue" button is only displayed when `props.view` is 'wizard'.
  * @return {JSX.Element} Rendered component.
  */
-const ClaimWebsite = ( { goToNextStep, view } ) => {
+const ClaimWebsite = ( { view } ) => {
 	const [ status, setStatus ] = useState( STATUS.IDLE );
 	const [ reqError, setReqError ] = useState();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
-	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
 	const pfwSettings = wcSettings.pinterest_for_woocommerce;
 
 	useEffect( () => {
+		// If domain is not verified and verification status is not pending, error nor success - start verification.
+		if (
+			! Object.values( {
+				...LABEL_STATUS,
+				ERROR: STATUS.ERROR,
+			} ).includes( status ) &&
+			! isDomainVerified
+		) {
+			handleClaimWebsite();
+		}
 		if ( status !== STATUS.PENDING && isDomainVerified ) {
 			setStatus( STATUS.SUCCESS );
 		}
-	}, [ status, isDomainVerified ] );
+	}, [ status, isDomainVerified ] ); // eslint-disable-line
 
 	const handleClaimWebsite = async () => {
 		setStatus( STATUS.PENDING );
 		setReqError();
 
 		try {
-			const results = await apiFetch( {
+			await apiFetch( {
 				path: pfwSettings.apiRoute + '/domain_verification',
 				method: 'POST',
 			} );
-			await setAppSettings( { account_data: results.account_data } );
-
 			recordEvent( 'pfw_domain_verify_success' );
-
 			setStatus( STATUS.SUCCESS );
 		} catch ( error ) {
 			setStatus( STATUS.ERROR );
@@ -160,13 +161,69 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 
 		const text = buttonLabels[ status ];
 
-		if ( Object.values( LABEL_STATUS ).includes( status ) ) {
+		if (
+			Object.values( {
+				...LABEL_STATUS,
+				IDLE: STATUS.IDLE,
+			} ).includes( status )
+		) {
 			return <StatusLabel status={ status } text={ text } />;
 		}
 
 		return (
 			<Button isSecondary text={ text } onClick={ handleClaimWebsite } />
 		);
+	};
+
+	const CompleteSetupButton = () => {
+		const buttonLabels = {
+			error: __( 'Try Again', 'pinterest-for-woocommerce' ),
+			success: __( 'Complete Setup', 'pinterest-for-woocommerce' ),
+		};
+
+		return (
+			<Button
+				isPrimary
+				disabled={
+					status !== STATUS.SUCCESS && status !== STATUS.ERROR
+				}
+				onClick={
+					status === STATUS.SUCCESS
+						? handleCompleteSetup
+						: handleClaimWebsite
+				}
+			>
+				{ buttonLabels[ status ] ??
+					__( 'Verifying…', 'pinterest-for-woocommerce' ) }
+			</Button>
+		);
+	};
+
+	const handleCompleteSetup = async () => {
+		try {
+			createNotice(
+				'success',
+				__( 'Connected successfully.', 'pinterest-for-woocommerce' )
+			);
+
+			recordEvent( 'pfw_setup', {
+				target: 'complete',
+				trigger: 'setup-complete',
+			} );
+
+			// Force reload WC admin page to initiate the relevant dependencies of the Dashboard page.
+			const path = getNewPath( {}, '/pinterest/settings', {} );
+
+			window.location = new URL( wcSettings.adminUrl + path );
+		} catch ( error ) {
+			createNotice(
+				'error',
+				__(
+					'There was a problem connecting the advertiser.',
+					'pinterest-for-woocommerce'
+				)
+			);
+		}
 	};
 
 	return (
@@ -208,49 +265,35 @@ const ClaimWebsite = ( { goToNextStep, view } ) => {
 				</div>
 				<div className="woocommerce-setup-guide__step-column">
 					<Card>
-						{ undefined !== isDomainVerified ? (
-							<CardBody size="large">
-								<Text variant="subtitle">
-									{ __(
-										'Verify your domain to claim your website',
-										'pinterest-for-woocommerce'
-									) }
-								</Text>
-								<Text variant="body">
-									{ __(
-										'This will allow access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site, and let people know where they can find more of your content.',
-										'pinterest-for-woocommerce'
-									) }
-								</Text>
+						<CardBody size="large">
+							<Text variant="subtitle">
+								{ __(
+									'Verify your domain to claim your website',
+									'pinterest-for-woocommerce'
+								) }
+							</Text>
+							<Text variant="body">
+								{ __(
+									'This will allow access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site, and let people know where they can find more of your content.',
+									'pinterest-for-woocommerce'
+								) }
+							</Text>
 
-								<Flex gap={ 6 }>
-									<UrlInputControl
-										disabled
-										value={ pfwSettings.homeUrlToVerify }
-									/>
-									<VerifyButton />
-								</Flex>
+							<Flex gap={ 6 }>
+								<UrlInputControl
+									disabled
+									value={ pfwSettings.homeUrlToVerify }
+								/>
+								<VerifyButton />
+							</Flex>
 
-								<StaticError reqError={ reqError } />
-							</CardBody>
-						) : (
-							<CardBody size="large">
-								<Spinner />
-							</CardBody>
-						) }
+							<StaticError reqError={ reqError } />
+						</CardBody>
 					</Card>
 
 					{ view === 'wizard' && (
 						<div className="woocommerce-setup-guide__footer-button">
-							<Button
-								isPrimary
-								disabled={ status !== STATUS.SUCCESS }
-								onClick={ goToNextStep }
-								text={ __(
-									'Continue',
-									'pinterest-for-woocommerce'
-								) }
-							/>
+							<CompleteSetupButton />
 						</div>
 					) }
 				</div>

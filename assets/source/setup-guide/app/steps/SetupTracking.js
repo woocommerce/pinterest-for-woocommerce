@@ -363,11 +363,10 @@ const SetupTracking = ( { view = 'settings' } ) => {
 											<Button
 												isLink
 												{ ...documentationLinkProps( {
-													href:
-														wcSettings
-															.pinterest_for_woocommerce
-															.pinterestLinks
-															.installTag,
+													href: wcSettings
+														.pinterest_for_woocommerce
+														.pinterestLinks
+														.installTag,
 													linkId: 'install-tag',
 													context: view,
 												} ) }
@@ -387,11 +386,10 @@ const SetupTracking = ( { view = 'settings' } ) => {
 											<Button
 												isLink
 												{ ...documentationLinkProps( {
-													href:
-														wcSettings
-															.pinterest_for_woocommerce
-															.pinterestLinks
-															.adGuidelines,
+													href: wcSettings
+														.pinterest_for_woocommerce
+														.pinterestLinks
+														.adGuidelines,
 													linkId: 'ad-guidelines',
 													context: view,
 												} ) }
@@ -401,11 +399,10 @@ const SetupTracking = ( { view = 'settings' } ) => {
 											<Button
 												isLink
 												{ ...documentationLinkProps( {
-													href:
-														wcSettings
-															.pinterest_for_woocommerce
-															.pinterestLinks
-															.adDataTerms,
+													href: wcSettings
+														.pinterest_for_woocommerce
+														.pinterestLinks
+														.adDataTerms,
 													linkId: 'ad-data-terms',
 													context: view,
 												} ) }
@@ -425,13 +422,11 @@ const SetupTracking = ( { view = 'settings' } ) => {
 											<Button
 												isLink
 												{ ...documentationLinkProps( {
-													href:
-														wcSettings
-															.pinterest_for_woocommerce
-															.pinterestLinks
-															.automaticEnhancedMatch,
-													linkId:
-														'automatic-enhanced-match',
+													href: wcSettings
+														.pinterest_for_woocommerce
+														.pinterestLinks
+														.automaticEnhancedMatch,
+													linkId: 'automatic-enhanced-match',
 													context: view,
 												} ) }
 											></Button>
@@ -515,8 +510,7 @@ const SetupTracking = ( { view = 'settings' } ) => {
 																		item.name,
 																		item.id
 																	),
-																	value:
-																		item.id,
+																	value: item.id,
 																} )
 															) }
 															help={ __(
@@ -554,14 +548,13 @@ const SetupTracking = ( { view = 'settings' } ) => {
 															isLink
 															{ ...documentationLinkProps(
 																{
-																	href:
-																		wcSettings
-																			.pinterest_for_woocommerce
-																			.countryTos
-																			.terms_url,
-																	linkId:
-																		'ad-terms-of-service',
-																	context: view,
+																	href: wcSettings
+																		.pinterest_for_woocommerce
+																		.countryTos
+																		.terms_url,
+																	linkId: 'ad-terms-of-service',
+																	context:
+																		view,
 																}
 															) }
 														></Button>

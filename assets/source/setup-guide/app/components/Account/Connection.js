@@ -88,9 +88,8 @@ const AccountConnection = ( {
 	const createNotice = useCreateNotice();
 	const modalName = 'account-disconnection';
 
-	const [ isConfirmationModalOpen, setIsConfirmationModalOpen ] = useState(
-		false
-	);
+	const [ isConfirmationModalOpen, setIsConfirmationModalOpen ] =
+		useState( false );
 
 	const openConfirmationModal = () => {
 		recordEvent( 'pfw_account_disconnect_button_click', { context } );

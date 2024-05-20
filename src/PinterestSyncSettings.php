@@ -8,9 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
-use \Exception;
-use Automattic\WooCommerce\Pinterest\API\Base;
-use Automattic\WooCommerce\Pinterest\Logger;
+use Automattic\WooCommerce\Pinterest\API\APIV5;
+use Exception;
 use DateTime;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -56,7 +55,6 @@ class PinterestSyncSettings {
 		}
 
 		$formatted_synced_time = new DateTime();
-
 		$formatted_synced_time = $formatted_synced_time->format( 'j M Y, h:i:s a' );
 
 		Pinterest_For_Woocommerce()::save_setting( 'last_synced_settings', $formatted_synced_time );
@@ -97,9 +95,15 @@ class PinterestSyncSettings {
 	 * @throws Exception PHP Exception.
 	 */
 	private static function automatic_enhanced_match_support() {
+		/*
+		 * Tracking needs to be enabled in order to use automatic enhanced match support.
+		 */
+		$is_tracking_enabled = Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
+		if ( ! $is_tracking_enabled ) {
+			return false;
+		}
 
 		try {
-
 			$advertiser_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 			$tag_id        = Pinterest_For_WooCommerce()::get_setting( 'tracking_tag' );
 
@@ -107,22 +111,14 @@ class PinterestSyncSettings {
 				throw new Exception( esc_html__( 'Tracking advertiser or tag missing', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$response = Base::get_advertiser_tag( $advertiser_id, $tag_id );
-
-			if ( 'success' !== $response['status'] ) {
-				throw new Exception( esc_html__( 'Response error', 'pinterest-for-woocommerce' ), 400 );
-			}
-
-			$automatic_enhanced_match_support = $response['data']->configs->aem_enabled;
-
-			Pinterest_For_Woocommerce()::save_setting( 'automatic_enhanced_match_support', $automatic_enhanced_match_support );
-
+			$response    = APIV5::get_advertiser_tag( $advertiser_id, $tag_id );
+			$aem_enabled = $response['configs']['aem_enabled'] ?? false;
+			Pinterest_For_Woocommerce()::save_setting( 'automatic_enhanced_match_support', $aem_enabled );
 		} catch ( Exception $th ) {
-
 			Logger::log( $th->getMessage(), 'error' );
+			throw new Exception( esc_html__( 'Response error', 'pinterest-for-woocommerce' ), 400 );
 		}
 
 		return Pinterest_For_Woocommerce()::get_setting( 'automatic_enhanced_match_support' );
 	}
-
 }

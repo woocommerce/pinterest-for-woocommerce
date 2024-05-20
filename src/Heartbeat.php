@@ -8,7 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
-use WC_Queue_Interface;
+use Pinterest_For_Woocommerce;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -29,35 +29,15 @@ class Heartbeat {
 	const HOURLY = 'pinterest_for_woocommerce_hourly_heartbeat';
 
 	/**
-	 * WooCommerce Queue Interface.
-	 *
-	 * @var WC_Queue_Interface
-	 */
-	protected $queue;
-
-	/**
-	 * Heartbeat constructor.
-	 *
-	 * @since 1.1.0
-	 * @param WC_Queue_Interface $queue WC Action Scheduler proxy.
-	 */
-	public function __construct( WC_Queue_Interface $queue ) {
-		$this->queue = $queue;
-	}
-
-	/**
-	 * Add hooks.
-	 */
-	public function init() {
-		add_action( 'admin_init', array( $this, 'schedule_events' ) );
-	}
-
-	/**
 	 * Schedule heartbeat events.
 	 *
 	 * @since 1.1.0
 	 */
-	public function schedule_events() {
+	public static function schedule_events() {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
+			return;
+		}
+
 		if ( ! as_has_scheduled_action( self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			as_schedule_recurring_action( time(), DAY_IN_SECONDS, self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
@@ -67,4 +47,15 @@ class Heartbeat {
 		}
 	}
 
+	/**
+	 * Cancels all the scheduled jobs.
+	 *
+	 * @sinxe 1.4.0
+	 *
+	 * @return void
+	 */
+	public static function cancel_jobs() {
+		as_unschedule_all_actions( self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_unschedule_all_actions( self::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+	}
 }

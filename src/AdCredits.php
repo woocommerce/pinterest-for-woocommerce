@@ -8,8 +8,10 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
-use Automattic\WooCommerce\Pinterest\API\Base;
+use Automattic\WooCommerce\Pinterest\API\APIV5;
+use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Exception;
+use Pinterest_For_Woocommerce;
 use Pinterest_For_Woocommerce_Ads_Supported_Countries;
 use Throwable;
 
@@ -25,8 +27,9 @@ class AdCredits {
 	const ADS_CREDIT_CAMPAIGN_TRANSIENT = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-ads-credit-campaign-transient';
 	const ADS_CREDIT_CAMPAIGN_OPTION    = 'ads_campaign_is_active';
 
-	const ADS_CREDIT_FUTURE_DISCOUNT = 16;
-	const ADS_CREDIT_MARKETING_OFFER = 5;
+	private const FUTURE_CREDIT = 'FUTURE_CREDIT';
+
+	private const MARKETING_OFFER_CREDIT = 'MARKETING_OFFER_CREDIT';
 
 	/**
 	 * Initialize Ad Credits actions and Action Scheduler hooks.
@@ -34,6 +37,10 @@ class AdCredits {
 	 * @since 1.2.5
 	 */
 	public static function schedule_event() {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
+			return;
+		}
+
 		add_action( Heartbeat::HOURLY, array( static::class, 'handle_redeem_credit' ), 20 );
 	}
 
@@ -45,8 +52,7 @@ class AdCredits {
 	 * @return mixed
 	 */
 	public static function handle_redeem_credit() {
-
-		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
 			// Advertiser not connected redeem operation makes no sense.
 			return true;
 		}
@@ -58,7 +64,7 @@ class AdCredits {
 			return true;
 		}
 
-		if ( Pinterest_For_Woocommerce()::check_if_coupon_was_redeemed() ) {
+		if ( self::check_if_coupon_was_redeemed() ) {
 			// Redeem credits only once.
 			return true;
 		}
@@ -68,6 +74,36 @@ class AdCredits {
 		}
 
 		Pinterest_For_Woocommerce()::add_redeem_credits_info_to_account_data();
+
+		return true;
+	}
+
+		/**
+		 * Check if coupon was redeemed. We can redeem only once.
+		 *
+		 * @since 1.2.5
+		 * @since 1.4.1 Update for API v5. and moved to AdCredits class.
+		 *
+		 * @return bool
+		 */
+	public static function check_if_coupon_was_redeemed() {
+		$account_data  = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+		$redeem_status = $account_data['coupon_redeem_info']['redeem_status'] ?? false;
+		$error_id      = $account_data['coupon_redeem_info']['error_id'] ?? false;
+
+		if ( PinterestApiException::OFFER_ALREADY_REDEEMED === $error_id ) {
+			// Advertiser has already redeemed the coupon.
+			return true;
+		}
+
+		if ( PinterestApiException::OFFER_ALREADY_REDEEMED_BY_ANOTHER_ADVERTISER === $error_id ) {
+			// Different advertiser id has already redeemed the coupon.
+			return true;
+		}
+
+		if ( false === $redeem_status ) {
+			return false;
+		}
 
 		return true;
 	}
@@ -85,50 +121,34 @@ class AdCredits {
 	 * @return bool Weather the coupon was successfully redeemed or not.
 	 */
 	public static function redeem_credits( $offer_code, &$error_code = null, &$error_message = null ) {
-
-		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
 			// Advertiser not connected, we can't check if credits were redeemed.
 			return false;
 		}
 
-		$advertiser_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
-
-		if ( false === $advertiser_id ) {
-			// No advertiser id stored. But we are connected. This is an abnormal state that should not happen.
-			Logger::log( __( 'Advertiser connected but the connection id is missing.', 'pinterest-for-woocommerce' ) );
-			return false;
-		}
-
+		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 		try {
-			$result = Base::redeem_ads_offer_code( $advertiser_id, $offer_code );
-			if ( 'success' !== $result['status'] ) {
+			$offer_code_credits_data = APIV5::redeem_ads_offer_code( $ad_account_id, $offer_code );
+			if ( ! $offer_code_credits_data['success'] ) {
+				$error_code    = $offer_code_credits_data['errorCode'];
+				$error_message = $offer_code_credits_data['errorMessage'];
+				Logger::log( "{$error_code}: {$error_message}", 'error' );
 				return false;
 			}
-
-			$redeem_credits_data     = (array) $result['data'];
-			$offer_code_credits_data = reset( $redeem_credits_data );
-			if ( false === $offer_code_credits_data ) {
-				// No data for the requested offer code.
-				Logger::log( __( 'There is no available data for the requested offer code.', 'pinterest-for-woocommerce' ) );
-				return false;
-			}
-
-			if ( ! $offer_code_credits_data->success ) {
-				Logger::log( $offer_code_credits_data->failure_reason, 'error' );
-				$error_code    = $offer_code_credits_data->error_code;
-				$error_message = $offer_code_credits_data->failure_reason;
-
-				return false;
-			}
-
 			return true;
+		} catch ( PinterestApiException $e ) {
+			$error_code    = $e->get_pinterest_code();
+			$error_message = $e->getMessage();
 
+			if ( PinterestApiException::NO_VALID_BILLING_SETUP === $error_code ) {
+				// Invalidate billing setup.
+				Billing::add_billing_setup_status_to_account_data( false );
+			}
 		} catch ( Throwable $th ) {
-
 			Logger::log( $th->getMessage(), 'error' );
-			return false;
-
 		}
+
+		return false;
 	}
 
 	/**
@@ -181,7 +201,7 @@ class AdCredits {
 	}
 
 	/**
-	 * Check if campaign is enabled in the recommendations API from woocommerce.com.
+	 * Check if campaign is enabled in the recommendations API from WooCommerce.com.
 	 *
 	 * @since 1.2.5
 	 *
@@ -221,54 +241,40 @@ class AdCredits {
 	 * Fetch data from the discount endpoint and get the necessary fields.
 	 *
 	 * @since 1.2.5
+	 * @since 1.4.1
 	 *
+	 * @throws PinterestApiException Originating from get_coupon_for_merchant.
 	 * @return mixed False when no info is available, discounts object when discounts are available.
 	 */
 	public static function process_available_discounts() {
-		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
 			// Advertiser not connected, we can't check if credits were redeemed.
 			return false;
 		}
 
-		$advertiser_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
+		$advertiser_id      = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
+		$discounts          = APIV5::get_ads_credit_discounts( $advertiser_id )['items'] ?? array();
+		$coupon             = AdCreditsCoupons::get_coupon_for_merchant();
+		$remaining_discount = 0;
+		$found_discounts    = array();
 
-		if ( false === $advertiser_id ) {
-			// No advertiser id stored. But we are connected. This is an abnormal state that should not happen.
-			Logger::log( __( 'Advertiser connected but the connection id is missing.', 'pinterest-for-woocommerce' ) );
-			return false;
-		}
-
-		$result = Base::get_available_discounts( $advertiser_id );
-		if ( 'success' !== $result['status'] ) {
-			return false;
-		}
-
-		$discounts = (array) $result['data'];
-
-		$coupon = AdCreditsCoupons::get_coupon_for_merchant();
-
-		$found_discounts = array();
-		if ( array_key_exists( self::ADS_CREDIT_FUTURE_DISCOUNT, $discounts ) ) {
-			foreach ( $discounts[ self::ADS_CREDIT_FUTURE_DISCOUNT ] as $future_discount ) {
-				$discount_information = (array) $future_discount;
-				if ( $discount_information['offer_code'] === $coupon ) {
+		foreach ( $discounts as $discount ) {
+			if ( ! $discount['active'] ) {
+				continue;
+			}
+			if ( static::FUTURE_CREDIT === $discount['discount_type'] ) {
+				$offer_code = $discount['discount_restrictions']['marketing_offer_code_hash'] ?? '';
+				if ( $offer_code === $coupon ) {
 					$found_discounts['future_discount'] = true;
 				}
+			} elseif ( static::MARKETING_OFFER_CREDIT === $discount['discount_type'] ) {
+				$remaining_discount += (float) $discount['remaining_discount_in_micro_currency'] / 1000000;
 			}
 		}
 
-		$remaining_discount_value = 0;
-		if ( array_key_exists( self::ADS_CREDIT_MARKETING_OFFER, $discounts ) ) {
-			// Sum all of the available coupons values.
-			foreach ( $discounts[ self::ADS_CREDIT_MARKETING_OFFER ] as $discount ) {
-				$discount_information      = (array) $discount;
-				$remaining_discount_value += ( (float) $discount_information['remaining_discount_in_micro_currency'] ) / 1000000;
-			}
-
-			$found_discounts['marketing_offer'] = array(
-				'remaining_discount' => wc_price( $remaining_discount_value ),
-			);
-		}
+		$found_discounts['marketing_offer'] = array(
+			'remaining_discount' => wc_price( $remaining_discount ),
+		);
 
 		return $found_discounts;
 	}

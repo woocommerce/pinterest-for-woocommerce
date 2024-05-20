@@ -139,11 +139,15 @@ class Merchants {
 		 */
 		$merchant_name = apply_filters( 'pinterest_for_woocommerce_default_merchant_name', esc_html__( 'Auto-created by Pinterest for WooCommerce', 'pinterest-for-woocommerce' ) );
 
+		// Check if the feed location is a full URL or a relative path and build the feed location accordingly.
+		$feed_location = parse_url( $config['feed_url'] );
+		$feed_location = ! empty( $feed_location['host'] ) ? $config['feed_url'] : get_home_url() . $feed_location['path'];
+
 		$args = array(
 			'merchant_domains' => get_home_url(),
-			'feed_location'    => $config['feed_url'],
+			'feed_location'    => $feed_location,
 			'feed_format'      => 'XML',
-			'country'          => Pinterest_For_Woocommerce()::get_base_country() ?? 'US',
+			'country'          => Pinterest_For_Woocommerce()::get_base_country(),
 			'locale'           => LocaleMapper::get_locale_for_api(),
 			'currency'         => get_woocommerce_currency(),
 			'merchant_name'    => $merchant_name,
@@ -174,8 +178,6 @@ class Merchants {
 		}
 
 		$merchant_id = $response['data'];
-
-		Feeds::invalidate_get_merchant_feeds_cache( $merchant_id, true );
 
 		try {
 			$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds( $response['data'] );

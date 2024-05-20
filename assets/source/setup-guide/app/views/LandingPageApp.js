@@ -138,10 +138,8 @@ const WelcomeSection = () => {
  * @return {JSX.Element} Rendered element.
  */
 const AdsCreditSection = () => {
-	const [
-		isTermsAndConditionsModalOpen,
-		setIsTermsAndConditionsModalOpen,
-	] = useState( false );
+	const [ isTermsAndConditionsModalOpen, setIsTermsAndConditionsModalOpen ] =
+		useState( false );
 
 	const openTermsAndConditionsModal = () => {
 		setIsTermsAndConditionsModalOpen( true );
@@ -383,11 +381,8 @@ const FaqQuestion = ( { questionId, question, answer } ) => {
 };
 
 const LandingPageApp = () => {
-	const {
-		pluginVersion,
-		isAdsSupportedCountry,
-		storeCountry,
-	} = wcSettings.pinterest_for_woocommerce;
+	const { pluginVersion, isAdsSupportedCountry, storeCountry } =
+		wcSettings.pinterest_for_woocommerce;
 
 	const adsCampaignIsActive = useSettingsSelect()?.ads_campaign_is_active;
 

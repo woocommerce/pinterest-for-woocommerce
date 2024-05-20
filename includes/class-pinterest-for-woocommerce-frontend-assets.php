@@ -45,9 +45,8 @@ class Pinterest_For_Woocommerce_Frontend_Assets {
 		$assets_path_url = str_replace( array( 'http:', 'https:' ), '', Pinterest_For_Woocommerce()->plugin_url() ) . '/assets/';
 		$ext             = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
-		wp_enqueue_script( 'pinterest-for-woocommerce-pinit', 'https://assets.pinterest.com/js/pinit.js', array(), PINTEREST_FOR_WOOCOMMERCE_VERSION, true );
+		wp_enqueue_script( 'pinterest-for-woocommerce-pinit', '//assets.pinterest.com/js/pinit.js', array(), PINTEREST_FOR_WOOCOMMERCE_VERSION, true );
 		wp_enqueue_style( 'pinterest-for-woocommerce-pins', $assets_path_url . 'css/frontend/pinterest-for-woocommerce-pins' . $ext . '.css', array(), PINTEREST_FOR_WOOCOMMERCE_VERSION );
-
 	}
 
 
@@ -92,7 +91,7 @@ class Pinterest_For_Woocommerce_Frontend_Assets {
 		);
 
 		if ( in_array( $handle, $defer, true ) ) {
-			return '<script src="' . $src . '" defer="defer"></script>' . "\n"; // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript --- Not enqueuing here.
+			return '<script type="text/javascript" async defer src="' . $src . '"></script>' . "\n"; // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript --- Not enqueuing here.
 		}
 
 		return $tag;

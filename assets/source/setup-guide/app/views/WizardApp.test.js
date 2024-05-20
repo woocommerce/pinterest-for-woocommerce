@@ -31,7 +31,6 @@ jest.mock( '../steps/SetupTracking', () => () => null );
 
 const stepOne = /Set up your business account/;
 const stepTwo = /Claim your website/;
-const stepThree = /Track conversions/;
 
 describe( 'WizardApp component', () => {
 	describe( 'First rendering', () => {
@@ -44,7 +43,6 @@ describe( 'WizardApp component', () => {
 		test( 'should show all options and first step should be clickable', () => {
 			expect( rendered.getByText( stepOne ) ).toBeInTheDocument();
 			expect( rendered.getByText( stepTwo ) ).toBeInTheDocument();
-			expect( rendered.getByText( stepThree ) ).toBeInTheDocument();
 
 			expect( rendered.queryAllByRole( 'button' ).length ).toBe( 1 );
 		} );
@@ -83,7 +81,7 @@ describe( 'WizardApp component', () => {
 		} );
 
 		test( 'should 3 steps button be clickable in the stepper', () => {
-			expect( rendered.queryAllByRole( 'button' ).length ).toBe( 3 );
+			expect( rendered.queryAllByRole( 'button' ).length ).toBe( 2 );
 
 			const setUpButton = rendered.getByRole( 'button', {
 				name: stepOne,
@@ -127,7 +125,7 @@ describe( 'WizardApp component', () => {
 		} );
 
 		test( 'should all three steps be clickable buttons', () => {
-			expect( rendered.queryAllByRole( 'button' ).length ).toBe( 3 );
+			expect( rendered.queryAllByRole( 'button' ).length ).toBe( 2 );
 
 			expect(
 				rendered.getByRole( 'button', {
@@ -138,12 +136,6 @@ describe( 'WizardApp component', () => {
 			expect(
 				rendered.getByRole( 'button', {
 					name: stepTwo,
-					exact: false,
-				} )
-			).toBeInTheDocument();
-			expect(
-				rendered.getByRole( 'button', {
-					name: stepThree,
 					exact: false,
 				} )
 			).toBeInTheDocument();
@@ -167,19 +159,6 @@ describe( 'WizardApp component', () => {
 				'step',
 				'claim-website'
 			);
-		} );
-
-		test( 'should event tracking be = setup-tracking after click', () => {
-			fireEvent.click(
-				rendered.getByRole( 'button', {
-					name: stepThree,
-				} )
-			);
-
-			expect( recordEvent ).toHaveBeenCalledWith( 'pfw_setup', {
-				target: 'setup-tracking',
-				trigger: 'wizard-stepper',
-			} );
 		} );
 	} );
 } );

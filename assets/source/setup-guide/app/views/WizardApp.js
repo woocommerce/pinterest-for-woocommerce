@@ -13,9 +13,7 @@ import { updateQueryString } from '@woocommerce/navigation';
  */
 import SetupAccount from '../steps/SetupAccount';
 import ClaimWebsite from '../steps/ClaimWebsite';
-import SetupTracking from '../steps/SetupTracking';
 import OnboardingTopBar from '../components/TopBar';
-import TransientNotices from '../components/TransientNotices';
 import {
 	useSettingsSelect,
 	useBodyClasses,
@@ -28,9 +26,8 @@ import {
  * @param {Object} props React props.
  * @param {Object} props.query The current query string, parsed into an object, from the page URL.
  *
- * @fires wcadmin_pfw_setup with `{ target: 'setup-account' | 'claim-website' | 'setup-tracking', trigger: 'wizard-stepper' }` when wizard's header step is clicked.
+ * @fires wcadmin_pfw_setup with `{ target: 'setup-account' | 'claim-website', trigger: 'wizard-stepper' }` when wizard's header step is clicked.
  * @fires wcadmin_pfw_setup with `{ target: 'claim-website' , trigger: 'setup-account-continue' }` when continue button is clicked.
- * @fires wcadmin_pfw_setup with `{ target: 'setup-tracking', trigger: 'claim-website-continue' }` when continue button is clicked.
  *
  * @return {JSX.Element} Rendered element.
  */
@@ -44,7 +41,6 @@ const WizardApp = ( { query } ) => {
 	);
 
 	const appSettings = useSettingsSelect();
-	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
 	const createNotice = useCreateNotice();
 
 	useEffect( () => {
@@ -77,15 +73,6 @@ const WizardApp = ( { query } ) => {
 			container: ClaimWebsite,
 			label: __( 'Claim your website', 'pinterest-for-woocommerce' ),
 			isClickable: isBusinessConnected,
-		},
-		{
-			key: 'setup-tracking',
-			container: SetupTracking,
-			label: __(
-				'Track conversions with the Pinterest tag',
-				'pinterest-for-woocommerce'
-			),
-			isClickable: isBusinessConnected && isDomainVerified,
 		},
 	];
 
@@ -150,17 +137,16 @@ const WizardApp = ( { query } ) => {
 	const currentStep = getCurrentStep();
 
 	return (
-		<>
+		<div className="pinterest-for-woocommerce-setup-guide">
 			<OnboardingTopBar />
 			<div className="woocommerce-setup-guide__main">
-				<TransientNotices />
 				{ appSettings ? (
 					<Stepper currentStep={ currentStep } steps={ getSteps() } />
 				) : (
 					<Spinner />
 				) }
 			</div>
-		</>
+		</div>
 	);
 };
 

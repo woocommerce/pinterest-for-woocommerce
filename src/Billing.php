@@ -7,7 +7,9 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\API\APIV5;
 use Automattic\WooCommerce\Pinterest\API\Base;
+use Pinterest_For_Woocommerce;
 use Throwable;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -27,6 +29,10 @@ class Billing {
 	 * @since 1.2.5
 	 */
 	public static function schedule_event() {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
+			return;
+		}
+
 		add_action( Heartbeat::DAILY, array( __CLASS__, 'handle_billing_setup_check' ) );
 	}
 
@@ -39,7 +45,7 @@ class Billing {
 	 */
 	public static function handle_billing_setup_check() {
 
-		Pinterest_For_Woocommerce()::add_billing_setup_info_to_account_data();
+		self::update_billing_information();
 
 		return true;
 	}
@@ -57,7 +63,8 @@ class Billing {
 		 * Check if we have verified a correct billing setup.
 		 */
 		$account_data       = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
-		$has_billing_setup  = is_array( $account_data ) && $account_data['is_billing_setup'] ?? false;
+
+		$has_billing_setup  = is_array( $account_data ) && ( $account_data['is_billing_setup'] ?? false );
 		$should_check_often = false !== get_transient( self::CHECK_BILLING_SETUP_OFTEN );
 		if ( $has_billing_setup && $should_check_often ) {
 			/*
@@ -121,35 +128,59 @@ class Billing {
 	 * @return bool
 	 */
 	public static function has_billing_set_up(): bool {
-
-		if ( ! Pinterest_For_Woocommerce()::get_data( 'is_advertiser_connected' ) ) {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
 			// Advertiser not connected, we can't establish if billing is set up.
 			return false;
 		}
 
-		$advertiser_id = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
-
-		if ( false === $advertiser_id ) {
-			// No advertiser id stored. But we are connected. This is an abnormal state that should not happen.
-			Logger::log( __( 'Advertiser connected but the connection id is missing.', 'pinterest-for-woocommerce' ) );
-			return false;
-		}
-
 		try {
-			$result = Base::get_advertiser_billing_profile( $advertiser_id );
-			if ( 'success' !== $result['status'] ) {
-				return false;
-			}
+			$ad_account_id   = Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' );
+			$active_profiles = APIV5::get_active_billing_profiles( $ad_account_id );
 
-			$billing_profile_data = (array) $result['data'];
-
-			return (bool) $billing_profile_data['is_billing_setup'];
-
+			return array_reduce(
+				$active_profiles['items'] ?? array(),
+				function ( $carry, $item ) {
+					if ( $carry ) {
+						return $carry;
+					}
+					return 'VALID' === $item['status'];
+				},
+				false
+			);
 		} catch ( Throwable $th ) {
-
 			Logger::log( $th->getMessage(), 'error' );
 			return false;
-
 		}
+	}
+
+	/**
+	 * Fetch billing setup information from API and update billing status in options.
+	 * Using this function makes sense only when we have a connected advertiser.
+	 *
+	 * @since 1.2.5
+	 * @since 1.4.1 Split storing billing setup status and updating billing setup status.
+	 * @since 1.4.1 Moved from class-pinterest-for-woocommerce.php
+	 *
+	 * @return bool Wether billing is set up or not.
+	 */
+	public static function update_billing_information() {
+		$status = self::has_billing_set_up();
+		self::add_billing_setup_status_to_account_data( $status );
+		return $status;
+	}
+
+	/**
+	 * Add billing setup status to the account data option.
+	 *
+	 * @since 1.4.1
+	 *
+	 * @param bool $status The billing setup status.
+	 *
+	 * @return void
+	 */
+	public static function add_billing_setup_status_to_account_data( $status ) {
+		$account_data                     = Pinterest_For_Woocommerce()::get_setting( 'account_data' );
+		$account_data['is_billing_setup'] = $status;
+		Pinterest_For_Woocommerce()::save_setting( 'account_data', $account_data );
 	}
 }

@@ -12,7 +12,6 @@ import { recordEvent } from '@woocommerce/tracks';
 import SyncState from './sections/SyncState';
 import AdCreditsNotice from './sections/AdCreditsNotice';
 import SyncIssues from './sections/SyncIssues';
-import TransientNotices from './components/TransientNotices';
 import HealthCheck from '../setup-guide/app/components/HealthCheck';
 import { useCreateNotice, useDismissAdsModalDispatch } from './helpers/effects';
 import NavigationClassic from '../components/navigation-classic';
@@ -46,16 +45,14 @@ import { useSettingsSelect } from '../setup-guide/app/helpers/effects';
 const CatalogSyncApp = () => {
 	const adsCampaignIsActive = useSettingsSelect()?.ads_campaign_is_active;
 
-	const couponRedeemErrorID = useSettingsSelect()?.account_data
-		?.coupon_redeem_info?.error_id;
+	const couponRedeemErrorID =
+		useSettingsSelect()?.account_data?.coupon_redeem_info?.error_id;
 
 	useCreateNotice( wcSettings.pinterest_for_woocommerce.error );
-	const [ isOnboardingModalOpen, setIsOnboardingModalOpen ] = useState(
-		false
-	);
-	const [ isAdCreditsNoticeOpen, setIsAdCreditsNoticeOpen ] = useState(
-		false
-	);
+	const [ isOnboardingModalOpen, setIsOnboardingModalOpen ] =
+		useState( false );
+	const [ isAdCreditsNoticeOpen, setIsAdCreditsNoticeOpen ] =
+		useState( false );
 
 	const userInteractions = useSelect( ( select ) =>
 		select( USER_INTERACTION_STORE_NAME ).getUserInteractions()
@@ -128,7 +125,6 @@ const CatalogSyncApp = () => {
 			<HealthCheck />
 			<NavigationClassic />
 
-			<TransientNotices />
 			<div className="pinterest-for-woocommerce-catalog-sync__container">
 				<SyncState />
 				{ isAdCreditsNoticeOpen && adsCampaignIsActive && (

@@ -11,9 +11,7 @@ namespace Automattic\WooCommerce\Pinterest;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-use \Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
-use Automattic\WooCommerce\Pinterest\FeedRegistration;
-use Automattic\WooCommerce\Pinterest\API\FeedIssues;
+use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
 
 /**
@@ -51,7 +49,7 @@ class ProductSync {
 	 */
 	public static function maybe_init() {
 
-		add_action( 'update_option_' . PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME, array( __class__, 'maybe_deregister' ), 10, 2 );
+		add_action( 'update_option_' . PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME, array( __CLASS__, 'maybe_deregister' ), 10, 2 );
 		if ( ! self::is_product_sync_enabled() ) {
 			return;
 		}
@@ -136,11 +134,9 @@ class ProductSync {
 	 * @return boolean
 	 */
 	public static function is_product_sync_enabled() {
+		$domain_verified = Pinterest_For_Woocommerce()::is_domain_verified();
 
-		$domain_verified  = Pinterest_For_Woocommerce()::is_domain_verified();
-		$tracking_enabled = $domain_verified && Pinterest_For_Woocommerce()::is_tracking_configured();
-
-		return (bool) $domain_verified && $tracking_enabled && Pinterest_For_Woocommerce()::get_setting( 'product_sync_enabled' );
+		return (bool) $domain_verified && Pinterest_For_Woocommerce()::get_setting( 'product_sync_enabled' );
 	}
 
 	/**
@@ -211,7 +207,6 @@ class ProductSync {
 		LocalFeedConfigs::deregister();
 		FeedRegistration::deregister();
 		ProductFeedStatus::deregister();
-		FeedIssues::deregister();
 
 		self::log( 'Product feed reset and files deleted.' );
 	}

@@ -8,6 +8,9 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use DateTime;
+use DateTimeZone;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -18,39 +21,55 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AdCreditsCoupons {
 
 	/**
-	 * @var array $currency_coupons_map Mapping of coupons to currency available for that currency.
+	 * List of Ads Credits allowed currencies.
+	 *
+	 * @since 1.3.17
+	 *
+	 * @var array
 	 */
-	public static $currency_coupons_map = array(
-		'USD' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'GBP' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'EUR' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'BRL' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'AUD' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'CAD' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'MXN' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'PLN' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'CHF' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'DKK' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'RON' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'SEK' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'NZD' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'HUF' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'NOK' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'JPY' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'CZK' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
-		'ARS' => 'Q09JTl9DTElFTlRfSURfMTQ2ODQxNF9DUkVESVRT',
+	public static $allowed_currencies = array(
+		'USD',
+		'GBP',
+		'EUR',
+		'BRL',
+		'AUD',
+		'CAD',
+		'MXN',
+		'PLN',
+		'CHF',
+		'DKK',
+		'RON',
+		'SEK',
+		'NZD',
+		'HUF',
+		'NOK',
+		'JPY',
+		'CZK',
+		'ARS',
 	);
 
 	/**
-	 * Get a valid coupon for merchant.
+	 * 2024 copon code.
+	 *
+	 * @var string
+	 */
+	public static $coupon_for_2024 = '1b2c680bdf2b89eecb3384b10db2ca6a0b3824d82bbe63939b35e5720604cde4';
+
+	/**
+	 * Get a valid coupon for the merchant.
 	 *
 	 * @since 1.2.5
+	 * @since 1.3.17 update logic for new data format.
 	 *
-	 * @return string|false Coupon string of false if no coupon was found.
+	 * @return string|false Coupon string or false if no coupon was found.
 	 */
 	public static function get_coupon_for_merchant() {
 		$currency = get_woocommerce_currency();
-		return self::$currency_coupons_map[ $currency ] ?? false;
+		if ( ! in_array( $currency, self::$allowed_currencies, true ) ) {
+			return false;
+		}
+
+		return self::$coupon_for_2024;
 	}
 
 	/**

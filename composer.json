@@ -30,9 +30,8 @@
 	},
 	"require-dev": {
 		"composer/installers": "^1.7.0",
-		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
-		"woocommerce/woocommerce-sniffs": "^0.1.3",
-		"wp-coding-standards/wpcs": "^2.3",
+		"woocommerce/woocommerce-sniffs": "1.0.0",
+		"sirbrillig/phpcs-changed": "^2.11.1",
 		"phpunit/phpunit": "^9.6",
 		"yoast/phpunit-polyfills": "^1.0",
 		"wp-cli/i18n-command": "^2.3"
@@ -53,15 +52,12 @@
 		}
 	},
 	"scripts": {
-		"phpcs": [
-			"phpcs --extensions=php -s -p"
-		],
-		"phpcbf": [
-			"phpcbf -p"
-		],
-	  	"test-unit": [
-		  "./vendor/bin/phpunit"
-		]
+		"phpcs": "phpcs --extensions=php -s -p",
+		"lint": "chg=$(git diff --relative --name-only -- '*.php'); [[ -z $chg ]] || phpcs-changed -s --git --git-unstaged $chg",
+		"lint-staged": "chg=$(git diff HEAD --relative --name-only -- '*.php'); [[ -z $chg ]] || phpcs-changed -s --git $chg",
+		"lint-branch": "sh ./bin/lint-branch.sh",
+		"phpcbf": "phpcbf -p",
+		"test-unit": "./vendor/bin/phpunit"
 	},
 	"extra": {
 		"scripts-description": {

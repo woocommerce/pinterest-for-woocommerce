@@ -2,7 +2,7 @@
 
 [![PHP Unit Tests](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-unit-tests.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-unit-tests.yml)
 [![JavaScript Unit Tests](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-unit-tests.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-unit-tests.yml)
-[![PHP Coding Standards](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-coding-standards.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-coding-standards.yml)
+[![PHP Coding Standards - PR Changed Files](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-cs-on-changes.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-cs-on-changes.yml)
 [![JavaScript and CSS Linting](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-css-linting.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-css-linting.yml)
 
 A native integration which allows you to market your store on Pinterest, including:
@@ -44,7 +44,7 @@ As per [WordPress Core Handbook](https://make.wordpress.org/core/handbook/best-p
 
 ## Development
 
-After cloning the repo. Remember to use the appropiate node version
+After cloning the repo. Remember to use the appropriate node version
 
 - `nvm use` to autoselect the node version based on `.nvmrc` file.
 
@@ -61,7 +61,7 @@ Now you can build the plugin using one of these commands:
 
 ### Branches
 
--   `develop` branch is the most up to date code.
+-   `develop` branch is the most up-to-date code.
 
 ### Development tools
 
@@ -121,7 +121,7 @@ Change to the plugin root directory and type:
 $ vendor/bin/phpunit
 ```
 
-The tests will execute and you'll be presented with a summary.
+The tests will execute, and you'll be presented with a summary.
 
 <p align="center">
 	<br/><br/>

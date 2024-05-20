@@ -29,8 +29,8 @@ const OnboardingErrorModal = ( { onCloseModal } ) => {
 	const NOT_AVAILABLE_IN_COUNTRY_OR_CURRENCY_ERROR = 2327;
 	const WRONG_BILLING_PROFILE_ERROR = 2006;
 
-	const couponRedeemInfo = useSettingsSelect()?.account_data
-		?.coupon_redeem_info;
+	const couponRedeemInfo =
+		useSettingsSelect()?.account_data?.coupon_redeem_info;
 
 	let errorMessageText = '';
 	switch ( couponRedeemInfo?.error_id ) {
