@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Refresh Token.
  *
  * @package Pinterest_For_WooCommerce/Classes/
- * @version x.x.x
+ * @version 1.4.2
  */
 
 namespace Automattic\WooCommerce\Pinterest;
