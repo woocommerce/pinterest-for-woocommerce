@@ -6,7 +6,6 @@
 * Fix - Undefined array key "path" warning thrown by DomainVerification.php.
 * Tweak - Adds WooCommerce as a dependency to the plugin header.
 * Tweak - Revert to WooCommerce.com domain.
-* Tweak - WC 9.0 compatibility.
 
 = 1.4.1 - 2024-05-01 =
 * Add - Heartbeat actions cleanup
