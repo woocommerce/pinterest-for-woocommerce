@@ -63,7 +63,7 @@ class DomainVerification extends VendorAPI {
 				$domain_verification_data = APIV5::domain_verification_data();
 				Pinterest_For_Woocommerce()::save_data( 'verification_data', $domain_verification_data );
 				$parsed_website = wp_parse_url( get_home_url() );
-				$result         = APIV5::domain_metatag_verification_request( $parsed_website['host'] . $parsed_website['path'] );
+				$result         = APIV5::domain_metatag_verification_request( $parsed_website['host'] . ( $parsed_website['path'] ?? '' ) );
 				if ( in_array( $result['status'], array( 'success', 'already_verified_by_user' ) ) ) {
 					$account_data['verified_user_websites'][] = $result['website'];
 					$account_data['is_any_website_verified']  = 0 < count( $account_data['verified_user_websites'] );
