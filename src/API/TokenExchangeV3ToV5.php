@@ -3,7 +3,7 @@
  * Pinterest API Token exchange class.
  *
  * @class       TokenExchangeV3ToV5
- * @version     x.x.x
+ * @version     1.4.2
  * @package     Pinterest_For_WordPress/Classes/
  */
 

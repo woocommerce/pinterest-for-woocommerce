@@ -4,7 +4,7 @@ Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
 Tested up to: 6.5
 Requires PHP: 7.3
-Stable tag: 1.3.24
+Stable tag: 1.4.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,13 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.4.2 - 2024-06-13 =
+* Add - Versioning and compatibility checks to implement support policy.
+* Fix - Release v1.4.1.
+* Fix - Undefined array key "path" warning thrown by DomainVerification.php.
+* Tweak - Adds WooCommerce as a dependency to the plugin header.
+* Tweak - Revert to WooCommerce.com domain.
 
 = 1.4.1 - 2024-05-01 =
 * Add - Heartbeat actions cleanup

@@ -1,5 +1,12 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.4.2 - 2024-06-13 =
+* Add - Versioning and compatibility checks to implement support policy.
+* Fix - Release v1.4.1.
+* Fix - Undefined array key "path" warning thrown by DomainVerification.php.
+* Tweak - Adds WooCommerce as a dependency to the plugin header.
+* Tweak - Revert to WooCommerce.com domain.
+
 = 1.4.1 - 2024-05-01 =
 * Add - Heartbeat actions cleanup
 * Update - Mandatory condition on tracking
