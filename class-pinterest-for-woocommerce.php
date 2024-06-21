@@ -335,11 +335,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				return false;
 			}
 
-			$tag_tracker         = new Tag();
-			$user                = new User( WC_Geolocation::get_ip_address(), wc_get_user_agent() );
-			$conversions_tracker = new Conversions( $user );
+			$tag_tracker = new Tag();
 
-			return new Tracking( array( $tag_tracker, $conversions_tracker ) );
+			return new Tracking( array( $tag_tracker ) );
 		}
 
 		/**
