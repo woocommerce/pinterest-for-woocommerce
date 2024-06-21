@@ -2,6 +2,7 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Pinterest_For_Woocommerce;
@@ -80,6 +81,51 @@ class TrackingTest extends \WP_UnitTestCase {
 
 		$data = new None( 'event_id' );
 		$pinterest_tag_tracker->expects( $this->once() )
+			->method( 'track_event' )
+			->with( 'test', $data );
+
+		$tracking->track_event( 'test', $data );
+	}
+
+	public function test_tracking_calls_multiple_trackers() {
+		Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'WD7AFW51GS' ) );
+
+		$tracking = new Tracking();
+
+		$pinterest_tag_tracker = $this->createMock( Tag::class );
+		$pinterest_capi_tracker = $this->createMock( Conversions::class );
+
+		$tracking->add_tracker( $pinterest_tag_tracker );
+		$tracking->add_tracker( $pinterest_capi_tracker );
+
+		$data = new None( 'event_id' );
+		$pinterest_tag_tracker->expects( $this->once() )
+			->method( 'track_event' )
+			->with( 'test', $data );
+		$pinterest_capi_tracker->expects( $this->once() )
+			->method( 'track_event' )
+			->with( 'test', $data );
+
+		$tracking->track_event( 'test', $data );
+	}
+
+	public function test_tracking_calls_no_detached_trackers() {
+		Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'WD7AFW51GS' ) );
+
+		$tracking = new Tracking();
+
+		$pinterest_tag_tracker = $this->createMock( Tag::class );
+		$pinterest_capi_tracker = $this->createMock( Conversions::class );
+
+		$tracking->add_tracker( $pinterest_tag_tracker );
+		$tracking->add_tracker( $pinterest_capi_tracker );
+		$tracking->remove_tracker( get_class( $pinterest_capi_tracker ) );
+
+		$data = new None( 'event_id' );
+		$pinterest_tag_tracker->expects( $this->once() )
+			->method( 'track_event' )
+			->with( 'test', $data );
+		$pinterest_capi_tracker->expects( $this->never() )
 			->method( 'track_event' )
 			->with( 'test', $data );
 
