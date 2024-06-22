@@ -8,13 +8,13 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
-use Automattic\WooCommerce\Pinterest as Pinterest;
+use Automattic\WooCommerce\Pinterest;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
 
 use Automattic\WooCommerce\Pinterest\FeedStatusService;
-use \WP_REST_Server;
-use \WP_REST_Request;
-use \WP_REST_Response;
+use WP_REST_Server;
+use WP_REST_Request;
+use WP_REST_Response;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -55,14 +55,18 @@ class FeedIssues extends VendorAPI {
 			return array( 'lines' => array() );
 		}
 
-		$per_page          = $request->has_param( 'per_page' ) ? (int) $request->get_param( 'per_page' ) : 25;
+		$paged    = $request->has_param( 'paged' ) ? (int) $request->get_param( 'paged' ) : 1;
+		$per_page = $request->has_param( 'per_page' ) ? (int) $request->get_param( 'per_page' ) : 25;
+
+		// Retrieve up to 250 feed item issues to ensure we can sort them by status before applying pagination.
 		$feed_item_details = Pinterest\Feeds::get_feed_processing_result_items_issues( $results['id'], 250 );
 
 		$lines = array_reduce( $feed_item_details, array( __CLASS__, 'prepare_issue_lines' ), array() );
 		array_multisort( $lines, SORT_ASC, array_column( $lines, 'status' ) );
-		$response = new WP_REST_Response(
+		$current_page_lines = array_slice( $lines, ( $paged - 1 ) * $per_page, $per_page );
+		$response           = new WP_REST_Response(
 			array(
-				'lines'      => $lines,
+				'lines'      => $current_page_lines,
 				'total_rows' => count( $lines ),
 			)
 		);
