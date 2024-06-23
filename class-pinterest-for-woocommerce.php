@@ -328,18 +328,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			 *
 			 * @param bool $disable_tracking Whether to disable tracking.
 			 */
-			$is_tracking_disabled = apply_filters( 'woocommerce_pinterest_disable_tracking', false );
-			$is_not_a_site        = wp_doing_cron() || is_admin();
-			if ( $is_tracking_disabled || $is_not_a_site ) {
+			$is_tracking_disabled             = apply_filters( 'woocommerce_pinterest_disable_tracking', false );
+			$is_tracking_conversions_disabled = ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
+			$is_not_a_site                    = wp_doing_cron() || is_admin();
+
+			if ( $is_tracking_disabled || $is_tracking_conversions_disabled || $is_not_a_site ) {
 				return false;
 			}
 
-			$is_tracking_conversions_enabled      = Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
 			$is_tracking_conversions_capi_enabled = Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' );
-
-			if ( ! $is_tracking_conversions_enabled ) {
-				return false;
-			}
 
 			$tracking = new Tracking( array( new Tag() ) );
 
