@@ -125,6 +125,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		protected static $default_settings = array(
 			'track_conversions'                => true,
+			'track_conversions_capi'           => false,
 			'enhanced_match_support'           => true,
 			'automatic_enhanced_match_support' => true,
 			'save_to_pinterest'                => true,
@@ -327,17 +328,28 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			 *
 			 * @param bool $disable_tracking Whether to disable tracking.
 			 */
-			$is_tracking_disabled             = apply_filters( 'woocommerce_pinterest_disable_tracking', false );
-			$is_tracking_conversions_disabled = ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
-			$is_not_a_site                    = wp_doing_cron() || is_admin();
-
-			if ( $is_tracking_disabled || $is_tracking_conversions_disabled || $is_not_a_site ) {
+			$is_tracking_disabled = apply_filters( 'woocommerce_pinterest_disable_tracking', false );
+			$is_not_a_site        = wp_doing_cron() || is_admin();
+			if ( $is_tracking_disabled || $is_not_a_site ) {
 				return false;
 			}
 
-			$tag_tracker = new Tag();
+			$is_tracking_conversions_enabled      = Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
+			$is_tracking_conversions_capi_enabled = Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' );
 
-			return new Tracking( array( $tag_tracker ) );
+			if ( ! $is_tracking_conversions_enabled ) {
+				return false;
+			}
+
+			$tracking = new Tracking( array( new Tag() ) );
+
+			if ( $is_tracking_conversions_capi_enabled ) {
+				$user                = new User( WC_Geolocation::get_ip_address(), wc_get_user_agent() );
+				$conversions_tracker = new Conversions( $user );
+				$tracking->add_tracker( $conversions_tracker );
+			}
+
+			return $tracking;
 		}
 
 		/**
