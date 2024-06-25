@@ -139,10 +139,17 @@ class Auth extends VendorAPI {
 	/**
 	 * Applies the features from the OAuth flow to the plugin settings.
 	 *
-	 * @param array $features The features selected by the merchant during the OAuth flow.
+	 * @param array $features {
+	 *      The features selected by the merchant during the OAuth flow.
+	 *
+	 *      @type bool $tags    Whether Pinterest Tag was enabled.
+	 *      @type bool $CAPI    Whether Conversions API was enabled.
+	 *      @type bool $catalog Whether Catalog synchronisation was enabled.
+	 * }
 	 */
-	private function apply_oauth_flow_features( $features ) {
+	private function apply_oauth_flow_features( array $features ): void {
 		Pinterest_For_Woocommerce()::save_setting( 'track_conversions', $features['tags'] ?? false );
+		Pinterest_For_Woocommerce()::save_setting( 'track_conversions_capi', false );
 		Pinterest_For_Woocommerce()::save_setting( 'product_sync_enabled', $features['catalog'] ?? false );
 	}
 

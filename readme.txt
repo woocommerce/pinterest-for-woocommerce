@@ -4,7 +4,7 @@ Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
 Tested up to: 6.5
 Requires PHP: 7.3
-Stable tag: 1.3.24
+Stable tag: 1.4.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -67,7 +67,7 @@ Pinterest is a visual discovery engine people use to find inspiration for their 
 * PHP version 7.3 or greater (PHP 7.4 or greater is recommended)
 * MySQL version 5.6 or greater
 
-Visit the [WooCommerce server requirements documentation](https://woo.com/document/server-requirements/) for a detailed list of server requirements.
+Visit the [WooCommerce server requirements documentation](https://woocommerce.com/document/server-requirements/) for a detailed list of server requirements.
 
 = Automatic installation =
 
@@ -87,9 +87,20 @@ Bugs should be reported in the [Pinterest for WooCommerce repository](https://gi
 
 Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/pinterest-for-woocommerce/) :)
 
-Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woo.com/)
+Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.4.3 - 2024-06-25 =
+* Tweak - Remove `feature_flag` connection info data key.
+* Update - Disabling CAPI tracker.
+
+= 1.4.2 - 2024-06-13 =
+* Add - Versioning and compatibility checks to implement support policy.
+* Fix - Release v1.4.1.
+* Fix - Undefined array key "path" warning thrown by DomainVerification.php.
+* Tweak - Adds WooCommerce as a dependency to the plugin header.
+* Tweak - Revert to WooCommerce.com domain.
 
 = 1.4.1 - 2024-05-01 =
 * Add - Heartbeat actions cleanup

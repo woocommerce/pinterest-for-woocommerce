@@ -1,7 +1,7 @@
 {
 	"name": "woocommerce/pinterest-for-woocommerce",
 	"description": "",
-	"homepage": "https://woo.com/",
+	"homepage": "https://woocommerce.com/",
 	"type": "wordpress-plugin",
 	"keywords": [
 		"pinterest",
@@ -14,14 +14,19 @@
 		{
 		  "type": "vcs",
 		  "url": "https://github.com/woocommerce/action-scheduler-job-framework"
-		}
+		},
+		{
+            "type": "vcs",
+            "url": "https://github.com/woocommerce/grow"
+        }
 	  ],
 	"require": {
 		"php": ">=7.4",
 		"ext-json": "*",
 		"automattic/jetpack-autoloader": "^2.10.1",
 		"defuse/php-encryption": "^2.2",
-		"woocommerce/action-scheduler-job-framework": "^2.0.0"
+		"woocommerce/action-scheduler-job-framework": "^2.0.0",
+		"woocommerce/grow": "dev-compat-checker"
 	},
 	"require-dev": {
 		"composer/installers": "^1.7.0",

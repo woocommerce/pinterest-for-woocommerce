@@ -55,6 +55,7 @@ class SyncSettingsTest extends WP_Test_REST_TestCase {
 		$user = $this->factory->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $user );
 
+		Pinterest_For_WooCommerce::save_setting( 'track_conversions', true );
 		Pinterest_For_Woocommerce::save_setting( 'automatic_enhanced_match_support', false );
 		Pinterest_For_WooCommerce::save_setting( 'tracking_advertiser', 'ai-123456789' );
 		Pinterest_For_WooCommerce::save_setting( 'tracking_tag', 'ti-123456789' );
@@ -105,4 +106,32 @@ class SyncSettingsTest extends WP_Test_REST_TestCase {
 			Pinterest_For_WooCommerce::get_setting( 'last_synced_settings' )
 		);
 	}
+
+	/**
+	 * Tests endpoint returns settings synced with Pinterest side.
+	 *
+	 * @return void
+	 */
+	public function test_sync_settings_when_tracking_disabled() {
+		$user = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $user );
+
+		Pinterest_For_WooCommerce::save_setting( 'track_conversions', false );
+		Pinterest_For_Woocommerce::save_setting( 'automatic_enhanced_match_support', true );
+		Pinterest_For_WooCommerce::save_setting( 'tracking_advertiser', 'ai-123456789' );
+		Pinterest_For_WooCommerce::save_setting( 'tracking_tag', 'ti-123456789' );
+
+		$request  = new WP_REST_Request( 'GET', '/pinterest/v1/sync_settings' );
+		$response = rest_get_server()->dispatch( $request );
+
+		[
+			'success'         => $success,
+			'synced_settings' => $synced_settings,
+		] = $response->get_data();
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertTrue( $success );
+		$this->assertFalse( $synced_settings['automatic_enhanced_match_support'] );
+	}
+
 }

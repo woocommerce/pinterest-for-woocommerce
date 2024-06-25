@@ -5,28 +5,29 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              https://woo.com
+ * @link              https://woocommerce.com
  * @since             1.0.0
  * @package           woocommerce/pinterest-for-woocommerce
  *
  * @wordpress-plugin
  * Plugin Name:       Pinterest for WooCommerce
- * Plugin URI:        https://woo.com/products/pinterest-for-woocommerce/
+ * Plugin URI:        https://woocommerce.com/products/pinterest-for-woocommerce/
  * Description:       Grow your business on Pinterest! Use this official plugin to allow shoppers to Pin products while browsing your store, track conversions, and advertise on Pinterest.
- * Version:           1.4.1
+ * Version:           1.4.2
  * Author:            WooCommerce
- * Author URI:        https://woo.com
+ * Author URI:        https://woocommerce.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       pinterest-for-woocommerce
  * Domain Path:       /i18n/languages
+ * Requires Plugins:  woocommerce
  *
  * Requires at least: 5.6
  * Tested up to: 6.5
  * Requires PHP: 7.4
  *
  * WC requires at least: 6.3
- * WC tested up to: 8.8
+ * WC tested up to: 9.0
  */
 
 /**
@@ -46,7 +47,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE', __FILE__ );
-define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', '1.4.1' ); // WRCS: DEFINED_VERSION.
+define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', '1.4.2' ); // WRCS: DEFINED_VERSION.
 
 // HPOS compatibility declaration.
 add_action(
@@ -88,7 +89,7 @@ if ( is_readable( $autoloader ) ) {
 	 */
 	add_action(
 		'admin_notices',
-		function() {
+		function () {
 			?>
 			<div class="notice notice-error">
 				<p>

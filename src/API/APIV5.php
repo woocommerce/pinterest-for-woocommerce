@@ -3,7 +3,7 @@
  * Pinterest API V5 class
  *
  * @class       Pinterest_For_Woocommerce_API
- * @version     x.x.x
+ * @version     1.4.2
  * @package     Pinterest_For_WordPress/Classes/
  */
 
