@@ -80,7 +80,6 @@ class TokenInvalidFailure {
 	/**
 	 * Delete the note.
 	 *
-	 *
 	 * @return void
 	 */
 	public static function delete_failure_note() {
