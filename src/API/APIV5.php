@@ -789,7 +789,7 @@ class APIV5 extends Base {
 	/**
 	 * Pull ads supported countries information from the API.
 	 *
-	 * @since 1.4.0
+	 * @since x.x.x
 	 *
 	 * @return array {
 	 *     Contains the status and token details.
@@ -816,7 +816,7 @@ class APIV5 extends Base {
 	/**
 	 * Sends Conversions API event data to Pinterest.
 	 *
-	 * @since 1.4.0
+	 * @since x.x.x
 	 *
 	 * @param string $ad_account_id Ad Account ID.
 	 * @param array  $data Event data.

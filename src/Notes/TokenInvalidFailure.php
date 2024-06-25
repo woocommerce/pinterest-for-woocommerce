@@ -80,7 +80,6 @@ class TokenInvalidFailure {
 	/**
 	 * Delete the note.
 	 *
-	 * @since 1.4.0
 	 *
 	 * @return void
 	 */

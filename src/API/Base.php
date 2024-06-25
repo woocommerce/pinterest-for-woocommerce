@@ -114,7 +114,7 @@ class Base {
 			/**
 			 * Filter to disconnect the merchant from the Pinterest platform on authentication failure.
 			 *
-			 * @since 1.4.0
+			 * @since x.x.x
 			 */
 			$do_disconnect = apply_filters(
 				'pinterest_for_woocommerce_disconnect_on_authentication_failure',
