@@ -91,6 +91,10 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.3 - 2024-06-25 =
+* Tweak - Remove `feature_flag` connection info data key.
+* Update - Disabling CAPI tracker.
+
 = 1.4.2 - 2024-06-13 =
 * Add - Versioning and compatibility checks to implement support policy.
 * Fix - Release v1.4.1.
