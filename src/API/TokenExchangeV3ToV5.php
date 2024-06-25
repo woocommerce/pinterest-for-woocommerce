@@ -102,11 +102,6 @@ class TokenExchangeV3ToV5 extends APIV5 {
 			'advertiser_id' => Pinterest_For_Woocommerce()::get_setting( 'tracking_advertiser' ),
 			'tag_id'        => Pinterest_For_WooCommerce()::get_setting( 'tracking_tag' ),
 			'merchant_id'   => Pinterest_For_Woocommerce()::get_data( 'merchant_id' ),
-			'feature_flags' => array(
-				'tags'    => true,
-				'CAPI'    => true,
-				'catalog' => true,
-			),
 		);
 		Pinterest_For_Woocommerce()::save_connection_info_data( $info_data );
 
