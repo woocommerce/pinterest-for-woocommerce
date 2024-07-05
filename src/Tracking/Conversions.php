@@ -303,11 +303,7 @@ class Conversions extends Tracker {
 			return;
 		}
 
-		$response = APIV5::make_request(
-			"ad_accounts/{$ad_account_id}/events",
-			'POST',
-			array( 'data' => array( $data ) )
-		);
+		$response = APIV5::send_conversions_api_event( $ad_account_id, $data );
 
 		// Processing the call results.
 		$is_error = isset( $response['code'] );

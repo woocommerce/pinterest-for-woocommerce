@@ -785,4 +785,49 @@ class APIV5 extends Base {
 			'GET'
 		);
 	}
+
+	/**
+	 * Pull ads supported countries information from the API.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array {
+	 *     Contains the status and token details.
+	 *
+	 *     @type string $status                         The status of the token exchange.
+	 *     @type array  $data {
+	 *         Contains token details.
+	 *
+	 *         @type string $access_token                   The access token for authentication.
+	 *         @type string $refresh_token                  The refresh token for acquiring a new access token.
+	 *         @type string $token_type                     Type of the token, usually "bearer".
+	 *         @type int    $expires_in                     Time in seconds when the access token expires.
+	 *         @type int    $refresh_token_expires_in       Time in seconds when the refresh token expires.
+	 *         @type string $scope                          The scope for which the access token has permission.
+	 *     }
+	 * }
+	 * @throws PinterestApiException If the request fails with other than 2xx status.
+	 */
+	public static function exchange_token() {
+		$request_url = 'oauth/commerce_integrations/token/exchange/';
+		return self::make_request( $request_url );
+	}
+
+	/**
+	 * Sends Conversions API event data to Pinterest.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $ad_account_id Ad Account ID.
+	 * @param array  $data Event data.
+	 * @return array
+	 * @throws PinterestApiException If the request fails with other than 2xx status.
+	 */
+	public static function send_conversions_api_event( string $ad_account_id, array $data ) {
+		return self::make_request(
+			"ad_accounts/{$ad_account_id}/events",
+			'POST',
+			array( 'data' => array( $data ) )
+		);
+	}
 }
