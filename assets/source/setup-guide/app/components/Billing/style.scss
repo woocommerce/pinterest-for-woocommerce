@@ -1,0 +1,18 @@
+@import "~@wordpress/base-styles/_variables";
+
+.pfw-billing-info {
+	display: inline-flex;
+	align-items: center;
+
+	&__preloader {
+		flex: 1;
+	}
+
+	&--status-error {
+		color: $alert-red;
+	}
+
+	&--status-success {
+		color: $alert-green;
+	}
+}
