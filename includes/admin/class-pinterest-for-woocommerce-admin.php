@@ -507,7 +507,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 			wp_safe_redirect( Pinterest_For_Woocommerce()::get_middleware_url( $context, $args ) );
 			exit;
-			
+
 		}
 
 		/**
