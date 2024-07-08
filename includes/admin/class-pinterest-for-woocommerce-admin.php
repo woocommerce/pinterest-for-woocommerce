@@ -276,6 +276,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'version'      => PINTEREST_FOR_WOOCOMMERCE_VERSION,
 				);
 
+			// This is a quick fix for a breaking change in WP 6.6.
+			// We may not need this in the future when we update `@wordpress/*` packages to newer versions.
+			$script_info['dependencies'][] = 'regenerator-runtime';
+
 			$script_info['dependencies'][] = 'wc-settings';
 
 			wp_register_script(
