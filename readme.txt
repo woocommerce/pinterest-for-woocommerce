@@ -91,6 +91,13 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.4 - 2024-07-10 =
+* Add - Billing status info in the Settings UI
+* Fix - Token invalid reset procedure
+* Fix - Checkbox control UI with WordPress 6.6
+* Tweak - WC 9.1 compatibility.
+* Tweak - WP 6.6 compatibility.
+
 = 1.4.3 - 2024-06-25 =
 * Tweak - Remove `feature_flag` connection info data key.
 * Update - Disabling CAPI tracker.
