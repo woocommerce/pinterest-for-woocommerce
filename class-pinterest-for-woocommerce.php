@@ -827,7 +827,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Resets the connection by clearing the local connection data.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.4
 		 *
 		 * @return void
 		 * @throws \Automattic\WooCommerce\Admin\Notes\NotesUnavailableException If the notes API is not available.
@@ -842,7 +842,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Resets the connection from action scheduler.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.4
 		 *
 		 * @param string    $action_id The ID of the action.
 		 * @param Exception $e         The exception that was thrown.
