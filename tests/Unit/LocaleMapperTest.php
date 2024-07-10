@@ -24,7 +24,7 @@ class PinterestTestLocaleMapper extends TestCase {
 	 */
     protected function setUp(): void
     {
-		add_filter( 'pre_determine_locale', array( $this, 'locale_filter' ) );
+		add_filter( 'locale', array( $this, 'locale_filter' ) );
     }
 
 	/**
