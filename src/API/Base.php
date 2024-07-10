@@ -12,7 +12,6 @@ namespace Automattic\WooCommerce\Pinterest\API;
 use Automattic\WooCommerce\Pinterest\Logger as Logger;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Exception;
-use function Automattic\WooCommerce\Pinterest\load_plugins;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -111,6 +110,25 @@ class Base {
 					'error'
 				);
 			}
+
+			/**
+			 * Filter to disconnect the merchant from the Pinterest platform on authentication failure.
+			 *
+			 * @since 1.4.4
+			 */
+			$do_disconnect = apply_filters(
+				'pinterest_for_woocommerce_disconnect_on_authentication_failure',
+				'__return_true'
+			);
+			if ( in_array( $e->getCode(), array( 401, 403 ) ) && $do_disconnect ) {
+				/**
+				 * Actions to perform disconnecting the merchant from the Pinterest platform.
+				 *
+				 * @since 1.4.0
+				 */
+				do_action( 'pinterest_for_woocommerce_disconnect' );
+			}
+
 			throw $e;
 		}
 	}

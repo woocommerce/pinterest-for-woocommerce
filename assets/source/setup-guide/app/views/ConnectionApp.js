@@ -9,6 +9,7 @@ import { useState, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import SetupAccount from '../steps/SetupAccount';
+import BillingStatus from '../steps/BillingStatus';
 import ClaimWebsite from '../steps/ClaimWebsite';
 import SetupTracking from '../steps/SetupTracking';
 import SaveSettingsButton from '../components/SaveSettingsButton';
@@ -58,7 +59,7 @@ const SettingsApp = () => {
 						isConnected={ isConnected }
 						isBusinessConnected={ isBusinessConnected }
 					/>
-
+					<BillingStatus />
 					{ isGroup1Visible && (
 						<ClaimWebsite view={ SETTINGS_VIEW } />
 					) }

@@ -42,6 +42,29 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test of the plugin has disconnect action initialised.
+	 *
+	 * @return void
+	 */
+	public function test_disconnect_events_added_with_plugin() {
+		Pinterest_For_Woocommerce();
+		$this->assertEquals(
+			10,
+			has_action(
+				'pinterest_for_woocommerce_disconnect',
+				[ Pinterest_For_Woocommerce::class, 'reset_connection' ]
+			)
+		);
+		$this->assertEquals(
+			10,
+			has_action(
+				'action_scheduler_failed_execution',
+				[ Pinterest_For_Woocommerce::class, 'action_scheduler_reset_connection' ]
+			)
+		);
+	}
+
+	/**
 	 * Test of the plugin has refresh token action initialised.
 	 *
 	 * @return void

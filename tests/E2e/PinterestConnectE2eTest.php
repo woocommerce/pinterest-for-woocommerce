@@ -1,5 +1,7 @@
 <?php
 
+use Automattic\WooCommerce\Pinterest\Notes\TokenInvalidFailure;
+
 class PinterestConnectE2eTest extends WP_UnitTestCase {
 
 	/**
@@ -38,6 +40,8 @@ class PinterestConnectE2eTest extends WP_UnitTestCase {
 		add_action( 'pinterest_for_woocommerce_token_saved', array( Pinterest_For_Woocommerce::class, 'create_commerce_integration' ) );
 		add_action( 'pinterest_for_woocommerce_token_saved', array( Pinterest_For_Woocommerce::class, 'update_account_data' ) );
 		add_action( 'pinterest_for_woocommerce_token_saved', array( Pinterest_For_Woocommerce::class, 'update_linked_businesses' ) );
+		add_action( 'pinterest_for_woocommerce_token_saved', array( Pinterest_For_Woocommerce::class, 'post_update_cleanup' ) );
+		add_action( 'pinterest_for_woocommerce_token_saved', array( TokenInvalidFailure::class, 'possibly_delete_note' ) );
 
 		do_action( 'pinterest_for_woocommerce_token_saved' );
 
@@ -56,9 +60,13 @@ class PinterestConnectE2eTest extends WP_UnitTestCase {
 					'coupon_redeem_info'      => array(
 						'redeem_status' => false,
 					),
-					'verified_user_websites' => array(
+					'verified_user_websites'  => array(
 						'wordpress.dima.works',
 						'pinterest.dima.works'
+					),
+					'currency_credit_info'    => array(
+						'spendRequire' => '$15',
+						'creditsGiven' => '$125',
 					),
 				),
 				'track_conversions'                => true,
@@ -75,6 +83,7 @@ class PinterestConnectE2eTest extends WP_UnitTestCase {
 			),
 			$settings
 		);
+		$this->assertFalse( TokenInvalidFailure::note_exists() );
 	}
 
 	private function create_commerce_integration_request_stub() {

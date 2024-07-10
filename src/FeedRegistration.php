@@ -9,6 +9,7 @@
 namespace Automattic\WooCommerce\Pinterest;
 
 use Exception;
+use Pinterest_For_Woocommerce;
 use Throwable;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
@@ -62,6 +63,9 @@ class FeedRegistration {
 		if ( false === as_has_scheduled_action( self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			as_schedule_recurring_action( time() + 10, 10 * MINUTE_IN_SECONDS, self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
+
+		// We do not want to disconnect the merchant if the authentication fails, since it running action can not be unscheduled.
+		add_filter( 'pinterest_for_woocommerce_disconnect_on_authentication_failure', '__return_false' );
 	}
 
 	/**
@@ -76,6 +80,7 @@ class FeedRegistration {
 	 * @return bool
 	 *
 	 * @throws Exception PHP Exception.
+	 * @throws PinterestApiException Pinterest API Exception.
 	 */
 	public function handle_feed_registration(): bool {
 
@@ -100,6 +105,8 @@ class FeedRegistration {
 			$error_message = "Could not register feed. Error: {$e->getMessage()}";
 			self::log( $error_message, 'error' );
 			return false;
+		} catch ( PinterestApiException $e ) {
+			throw $e;
 		} catch ( Throwable $th ) {
 			if ( method_exists( $th, 'get_pinterest_code' ) && 4163 === $th->get_pinterest_code() ) {
 				Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', true );
