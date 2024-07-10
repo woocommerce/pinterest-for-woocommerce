@@ -22,10 +22,10 @@ class PinterestTestLocaleMapper extends TestCase {
 	/**
 	 * Set up the filter for the locale.
 	 */
-    protected function setUp(): void
-    {
+	protected function setUp(): void
+	{
 		add_filter( 'locale', array( $this, 'locale_filter' ) );
-    }
+	}
 
 	/**
 	 * Remove the filter for the locale.
