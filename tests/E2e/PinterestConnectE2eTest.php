@@ -1,8 +1,17 @@
-<?php
+<?php declare( strict_types=1 );
+
+namespace Automattic\WooCommerce\Pinterest\Tests\E2e;
 
 use Automattic\WooCommerce\Pinterest\Notes\TokenInvalidFailure;
+use Pinterest_For_Woocommerce;
 
-class PinterestConnectE2eTest extends WP_UnitTestCase {
+class PinterestConnectE2eTest extends \WP_UnitTestCase {
+
+	protected function setUp(): void {
+		parent::setUp();
+
+		Pinterest_For_Woocommerce::save_settings( [] );
+	}
 
 	/**
 	 * Tests successful Pinterest auth produces proper settings after all pinterest_for_woocommerce_token_saved hooks are fired.
@@ -80,6 +89,7 @@ class PinterestConnectE2eTest extends WP_UnitTestCase {
 				'erase_plugin_data'                => false,
 				'tracking_advertiser'              => '549765662491',
 				'tracking_tag'                     => '2613286171854',
+				'track_conversions_capi'           => false,
 			),
 			$settings
 		);
