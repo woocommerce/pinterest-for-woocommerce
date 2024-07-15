@@ -32,7 +32,7 @@ class PinterestTestLocaleMapper extends TestCase {
 	 */
 	protected function tearDown(): void
 	{
-		remove_filter( 'pre_determine_locale', array( $this, 'locale_filter' ) );
+		remove_filter( 'locale', array( $this, 'locale_filter' ) );
 	}
 
 	/**
