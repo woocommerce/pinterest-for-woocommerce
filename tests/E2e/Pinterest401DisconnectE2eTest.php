@@ -1,10 +1,13 @@
-<?php
+<?php declare( strict_types=1 );
 
-use Automattic\WooCommerce\Pinterest\API\APIV5;
+namespace Automattic\WooCommerce\Pinterest\Tests\E2e;
+
 use Automattic\WooCommerce\Pinterest\Notes\TokenInvalidFailure;
+use Exception;
+use Pinterest_For_Woocommerce;
 
-class Pinterest401DisconnectE2eTest extends WP_UnitTestCase {
-
+class Pinterest401DisconnectE2eTest extends \WP_UnitTestCase
+{
 	protected function setUp(): void {
 		parent::setUp();
 

@@ -117,7 +117,7 @@ class LocaleMapper {
 	 * @return string
 	 */
 	private static function get_wordpress_locale() {
-		$wordpress_locale = determine_locale();
+		$wordpress_locale = get_locale();
 		return str_replace( '_', '-', $wordpress_locale );
 	}
 }
