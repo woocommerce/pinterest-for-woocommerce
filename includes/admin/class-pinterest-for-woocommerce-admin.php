@@ -469,7 +469,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 		/**
 		 * Return the advertiser billing settings URL.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.5
 		 * @return string
 		 */
 		private function get_advertiser_billing_settings_url() {
