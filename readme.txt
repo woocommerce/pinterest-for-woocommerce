@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.5 - 2024-07-19 =
+* Tweak - replace locale source function.
+
 = 1.4.4 - 2024-07-10 =
 * Add - Billing status info in the Settings UI
 * Fix - Token invalid reset procedure
