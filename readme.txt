@@ -91,6 +91,12 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.3.25 - 2024-07-23 =
+* Fix - Add regenerator-runtime as script dependency for WP 6.6.
+* Fix - Checkbox control UI issue for WP 6.6.
+* Tweak - WC 9.1 compatibility.
+* Tweak - WP 6.6 compatibility.
+
 = 1.3.24 - 2024-04-01 =
 * Tweak - WC 8.8 compatibility.
 
