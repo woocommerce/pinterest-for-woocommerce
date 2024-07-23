@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
-Tested up to: 6.5
+Tested up to: 6.6
 Requires PHP: 7.3
-Stable tag: 1.3.24
+Stable tag: 1.3.25
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,12 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woo.com/)
 
 == Changelog ==
+
+= 1.3.25 - 2024-07-23 =
+* Fix - Add regenerator-runtime as script dependency for WP 6.6.
+* Fix - Checkbox control UI issue for WP 6.6.
+* Tweak - WC 9.1 compatibility.
+* Tweak - WP 6.6 compatibility.
 
 = 1.3.24 - 2024-04-01 =
 * Tweak - WC 8.8 compatibility.
