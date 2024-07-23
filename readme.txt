@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: woocommerce, pinterest, advertise
 Requires at least: 5.6
-Tested up to: 6.5
+Tested up to: 6.6
 Requires PHP: 7.3
-Stable tag: 1.3.24
+Stable tag: 1.3.25
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
