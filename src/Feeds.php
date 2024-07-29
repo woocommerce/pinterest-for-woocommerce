@@ -15,7 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Automattic\WooCommerce\Pinterest\API\APIV5;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
+use Automattic\WooCommerce\Pinterest\Notes\FeedNameExistsFailure;
 use Exception;
+use Pinterest_For_Woocommerce;
 use Throwable;
 
 /**
@@ -152,6 +154,10 @@ class Feeds {
 		try {
 			$feed = APIV5::create_feed( $data, $ad_account_id );
 		} catch ( PinterestApiException $e ) {
+			if ( 422 === $e->getCode() ) {
+				FeedNameExistsFailure::possibly_add_note();
+			}
+
 			$delay = Pinterest_For_Woocommerce()::get_data( 'create_feed_delay' ) ?? MINUTE_IN_SECONDS;
 			set_transient( $cache_key, $e->getCode(), $delay );
 			// Double the delay.

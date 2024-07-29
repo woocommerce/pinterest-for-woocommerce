@@ -1,8 +1,8 @@
 <?php
 /**
- * WooCommerce Admin: Add First Product.
+ * WooCommerce Admin: Feed with the same name already exists at Pinterest notice.
  *
- * Adds a note (type `email`) to bring the client back to the store setup flow.
+ * Adds a note to inform clients there is a feed from another website already at Pinterest.
  *
  * @package Automattic\WooCommerce\Pinterest\Notes
  */
@@ -17,9 +17,9 @@ use Automattic\WooCommerce\Admin\Notes\NotesUnavailableException;
 use Automattic\WooCommerce\Admin\Notes\NoteTraits;
 
 /**
- * Add_First_Product.
+ * Feed name already exists at Pinterest admin notice.
  */
-class TokenInvalidFailure {
+class FeedNameExistsFailure {
 	/**
 	 * Note traits.
 	 */
@@ -28,16 +28,18 @@ class TokenInvalidFailure {
 	/**
 	 * Name of the note for use in the database.
 	 */
-	const NOTE_NAME = 'pinterest-for-woocommerce-token-invalid-failure';
+	const NOTE_NAME = 'pinterest-for-woocommerce-feed-name-exists-failure';
 
 	/**
 	 * Get the note.
+	 *
+	 * @since x.x.x
 	 *
 	 * @return Note
 	 */
 	public static function get_note() {
 		$content_lines = array(
-			__( 'The Pinterest For WooCommerce plugin has detected an issue with your access token.<br/>No operations are possible until you reconnect to Pinterest.', 'pinterest-for-woocommerce' ),
+			__( 'The Pinterest For WooCommerce plugin has detected an issue with your feed.<br/>The feed with the same name already exists at Pinterest.<br/>This can be due to another website already connected to the same Pinterest account.', 'pinterest-for-woocommerce' ),
 		);
 
 		$additional_data = array(
@@ -52,8 +54,8 @@ class TokenInvalidFailure {
 		$note->set_name( self::NOTE_NAME );
 		$note->set_source( 'woocommerce-admin' );
 		$note->add_action(
-			'pinterest-for-woocommerce-token-invalid-failure-go-to-settings',
-			__( 'Re-authenticate with Pinterest', 'pinterest-for-woocommerce' ),
+			'pinterest-for-woocommerce-feed-name-exists-failure-disconnect',
+			__( 'Disconnect Pinterest', 'pinterest-for-woocommerce' ),
 			admin_url( 'admin.php?page=wc-admin&path=/pinterest/onboarding' ),
 			Note::E_WC_ADMIN_NOTE_ACTIONED,
 			true,
@@ -64,6 +66,8 @@ class TokenInvalidFailure {
 
 	/**
 	 * Add the note if it passes predefined conditions.
+	 *
+	 * @since x.x.x
 	 *
 	 * @return void
 	 * @throws NotesUnavailableException Throws exception when notes are unavailable.
