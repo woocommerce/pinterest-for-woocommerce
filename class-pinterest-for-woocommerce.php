@@ -796,8 +796,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.0.0
 		 *
 		 * @return bool True if disconnection was successful.
-		 *
-		 * @throws Exception PHP Exception.
 		 */
 		public static function disconnect(): bool {
 			/*

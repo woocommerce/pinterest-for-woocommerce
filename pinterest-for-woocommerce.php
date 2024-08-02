@@ -140,6 +140,7 @@ register_deactivation_hook(
 	function () {
 		Automattic\WooCommerce\Pinterest\ProductSync::cancel_jobs();
 		Automattic\WooCommerce\Pinterest\Heartbeat::cancel_jobs();
+		Pinterest_For_Woocommerce::disconnect();
 	}
 );
 
@@ -150,6 +151,7 @@ if ( defined( 'WC_PLUGIN_FILE' ) ) {
 		function () {
 			Automattic\WooCommerce\Pinterest\ProductSync::cancel_jobs();
 			Automattic\WooCommerce\Pinterest\Heartbeat::cancel_jobs();
+			Pinterest_For_Woocommerce::disconnect();
 		}
 	);
 }
