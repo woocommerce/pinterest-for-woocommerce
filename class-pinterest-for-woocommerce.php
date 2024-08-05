@@ -23,6 +23,7 @@ use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 use Automattic\WooCommerce\Pinterest\Notes\TokenExchangeFailure;
 use Automattic\WooCommerce\Pinterest\Notes\TokenInvalidFailure;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
+use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
@@ -800,6 +801,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @throws Exception PHP Exception.
 		 */
 		public static function disconnect(): bool {
+			// Reset Feed file generation telemetry.
+			ProductFeedStatus::deregister();
 			/*
 			 * If there is no business connected, disconnecting merchant will throw error.
 			 * Just need to clean account data in these cases.
