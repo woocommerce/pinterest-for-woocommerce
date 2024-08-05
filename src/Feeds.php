@@ -99,6 +99,7 @@ class Feeds {
 		$configs       = LocalFeedConfigs::get_instance()->get_configurations();
 		$config        = reset( $configs );
 
+		$name             = (string) parse_url( esc_url( get_site_url() ), PHP_URL_HOST );
 		$default_country  = Pinterest_For_Woocommerce()::get_base_country();
 		$default_currency = get_woocommerce_currency();
 		$default_locale   = LocaleMapper::get_locale_for_api();
@@ -115,7 +116,8 @@ class Feeds {
 			'pinterest_for_woocommerce_unique_feed_name',
 			sprintf(
 				// translators: %1$s is a country ISO 2 code, %2$s is a currency ISO 3 code.
-				esc_html__( 'Created by Pinterest for WooCommerce %1$s|%2$s|%3$s', 'pinterest-for-woocommerce' ),
+				esc_html__( 'Created by Pinterest for WooCommerce at %1$s %2$s|%3$s|%4$s', 'pinterest-for-woocommerce' ),
+				esc_html( $name ),
 				esc_html( $default_country ),
 				esc_html( $default_locale ),
 				esc_html( $default_currency )
