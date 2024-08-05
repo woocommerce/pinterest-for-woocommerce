@@ -276,6 +276,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 					'version'      => PINTEREST_FOR_WOOCOMMERCE_VERSION,
 				);
 
+			// This is a quick fix for a breaking change in WP 6.6.
+			// We may not need this in the future when we update `@wordpress/*` packages to newer versions.
+			$script_info['dependencies'][] = 'regenerator-runtime';
+
 			$script_info['dependencies'][] = 'wc-settings';
 
 			wp_register_script(
@@ -367,6 +371,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				'serviceLoginUrl'          => $this->get_service_login_url(),
 				'createBusinessAccountUrl' => $this->get_create_business_account_url(),
 				'switchBusinessAccountUrl' => $this->get_switch_business_account_url(),
+				'billingSettingsUrl'       => $this->get_advertiser_billing_settings_url(),
 				'homeUrlToVerify'          => get_home_url(),
 				'storeCountry'             => $store_country,
 				'isAdsSupportedCountry'    => Pinterest_For_Woocommerce_Ads_Supported_Countries::is_ads_supported_country(),
@@ -459,6 +464,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 				),
 				admin_url( 'admin.php' )
 			);
+		}
+
+		/**
+		 * Return the advertiser billing settings URL.
+		 *
+		 * @since 1.4.5
+		 * @return string
+		 */
+		private function get_advertiser_billing_settings_url() {
+			$advertiser_id = Pinterest_For_Woocommerce()->get_setting( 'tracking_advertiser' );
+			return "https://ads.pinterest.com/advertiser/{$advertiser_id}/billing";
 		}
 
 

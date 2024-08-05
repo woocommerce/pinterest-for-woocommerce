@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
-Tested up to: 6.5
+Tested up to: 6.6
 Requires PHP: 7.3
-Stable tag: 1.4.2
+Stable tag: 1.4.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,20 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.4.5 - 2024-07-19 =
+* Tweak - replace locale source function.
+
+= 1.4.4 - 2024-07-10 =
+* Add - Billing status info in the Settings UI
+* Fix - Token invalid reset procedure
+* Fix - Checkbox control UI with WordPress 6.6
+* Tweak - WC 9.1 compatibility.
+* Tweak - WP 6.6 compatibility.
+
+= 1.4.3 - 2024-06-25 =
+* Tweak - Remove `feature_flag` connection info data key.
+* Update - Disabling CAPI tracker.
 
 = 1.4.2 - 2024-06-13 =
 * Add - Versioning and compatibility checks to implement support policy.

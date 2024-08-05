@@ -92,6 +92,7 @@ class Feeds {
 	 *
 	 * @return string The Feed ID or an empty string if failed.
 	 * @throws Exception PHP Exception if there is an error creating the feed, and we are throttling the requests.
+	 * @throws PinterestApiException Pinterest API Exception if there is an error creating the feed.
 	 */
 	public static function create_feed(): string {
 		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
@@ -150,16 +151,15 @@ class Feeds {
 
 		try {
 			$feed = APIV5::create_feed( $data, $ad_account_id );
-		} catch ( Throwable $th ) {
+		} catch ( PinterestApiException $e ) {
 			$delay = Pinterest_For_Woocommerce()::get_data( 'create_feed_delay' ) ?? MINUTE_IN_SECONDS;
-			set_transient( $cache_key, $th->getCode(), $delay );
+			set_transient( $cache_key, $e->getCode(), $delay );
 			// Double the delay.
 			Pinterest_For_Woocommerce()::save_data(
 				'create_feed_delay',
 				min( $delay * 2, 6 * HOUR_IN_SECONDS )
 			);
-			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
-			throw new Exception( $th->getMessage(), $th->getCode() );
+			throw $e;
 		}
 
 		static::invalidate_feeds_cache();

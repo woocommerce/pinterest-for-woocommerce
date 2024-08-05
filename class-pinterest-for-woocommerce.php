@@ -8,6 +8,7 @@
 
 use Automattic\WooCommerce\Grow\Tools\CompatChecker\v0_0_1\Checker;
 use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
+use Automattic\WooCommerce\Admin\Notes\NotesUnavailableException;
 use Automattic\WooCommerce\Pinterest;
 use Automattic\WooCommerce\Pinterest\AdCredits;
 use Automattic\WooCommerce\Pinterest\AdCreditsCoupons;
@@ -20,6 +21,7 @@ use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Notes\MarketingNotifications;
 use Automattic\WooCommerce\Pinterest\Notes\TokenExchangeFailure;
+use Automattic\WooCommerce\Pinterest\Notes\TokenInvalidFailure;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
@@ -125,6 +127,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		protected static $default_settings = array(
 			'track_conversions'                => true,
+			'track_conversions_capi'           => false,
 			'enhanced_match_support'           => true,
 			'automatic_enhanced_match_support' => true,
 			'save_to_pinterest'                => true,
@@ -296,11 +299,16 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Append credits info to account data.
 			add_action( 'init', array( $this, 'add_currency_credits_info_to_account_data' ) );
 
-			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'set_default_settings' ) );
-			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'create_commerce_integration' ) );
-			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_account_data' ) );
-			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'update_linked_businesses' ) );
-			add_action( 'pinterest_for_woocommerce_token_saved', array( $this, 'post_update_cleanup' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( self::class, 'set_default_settings' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( self::class, 'create_commerce_integration' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( self::class, 'update_account_data' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( self::class, 'update_linked_businesses' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( self::class, 'post_update_cleanup' ) );
+			add_action( 'pinterest_for_woocommerce_token_saved', array( TokenInvalidFailure::class, 'possibly_delete_note' ) );
+
+			add_action( 'pinterest_for_woocommerce_disconnect', array( self::class, 'reset_connection' ) );
+
+			add_action( 'action_scheduler_failed_execution', array( self::class, 'action_scheduler_reset_connection' ), 10, 2 );
 
 			// Handle the Pinterest verification URL.
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
@@ -335,11 +343,17 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				return false;
 			}
 
-			$tag_tracker         = new Tag();
-			$user                = new User( WC_Geolocation::get_ip_address(), wc_get_user_agent() );
-			$conversions_tracker = new Conversions( $user );
+			$is_tracking_conversions_capi_enabled = Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' );
 
-			return new Tracking( array( $tag_tracker, $conversions_tracker ) );
+			$tracking = new Tracking( array( new Tag() ) );
+
+			if ( $is_tracking_conversions_capi_enabled ) {
+				$user                = new User( WC_Geolocation::get_ip_address(), wc_get_user_agent() );
+				$conversions_tracker = new Conversions( $user );
+				$tracking->add_tracker( $conversions_tracker );
+			}
+
+			return $tracking;
 		}
 
 		/**
@@ -810,6 +824,39 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			}
 		}
 
+		/**
+		 * Resets the connection by clearing the local connection data.
+		 *
+		 * @since 1.4.4
+		 *
+		 * @return void
+		 * @throws \Automattic\WooCommerce\Admin\Notes\NotesUnavailableException If the notes API is not available.
+		 */
+		public static function reset_connection() {
+			self::save_data( 'integration_data', array() );
+			self::disconnect();
+
+			TokenInvalidFailure::possibly_add_note();
+		}
+
+		/**
+		 * Resets the connection from action scheduler.
+		 *
+		 * @since 1.4.4
+		 *
+		 * @param string    $action_id The ID of the action.
+		 * @param Exception $e         The exception that was thrown.
+		 *
+		 * @return void
+		 * @throws NotesUnavailableException If the notes API is not available.
+		 * @throws Exception                 If the exception is a 401 error.
+		 */
+		public static function action_scheduler_reset_connection( $action_id, $e ) {
+			if ( in_array( $e->getCode(), array( 401, 403 ) ) ) {
+				self::reset_connection();
+				throw $e;
+			}
+		}
 
 		/**
 		 * Flush data option and remove settings.
@@ -823,6 +870,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			UserInteraction::flush_options();
 
 			// Remove settings that may cause issues if stale on disconnect.
+			self::save_setting( 'integration_data', array() );
 			self::save_setting( 'account_data', null );
 			self::save_setting( 'tracking_advertiser', null );
 			self::save_setting( 'tracking_tag', null );

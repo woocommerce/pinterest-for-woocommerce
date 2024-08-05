@@ -10,6 +10,7 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
+use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
 
 class APIV5Test extends WP_UnitTestCase {
@@ -113,5 +114,40 @@ class APIV5Test extends WP_UnitTestCase {
 		);
 
 		APIV5::create_tag( 'aai-1234567890' );
+	}
+
+	public function test_any_api_call_401_response_calls_disconnect_action() {
+		$this->expectException( PinterestApiException::class );
+		$this->expectExceptionCode( 401 );
+		$this->expectExceptionMessage( 'Authentication failed.' );
+
+		add_filter(
+			'pre_http_request',
+			function ( $response, $parsed_args, $url ) {
+				return array(
+					'headers'  => array(
+						'content-type' => 'application/json',
+					),
+					'body'     => json_encode(
+						array(
+							'code'    => 2,
+							'message' => 'Authentication failed.',
+						)
+					),
+					'response' => array(
+						'code'    => 401,
+						'message' => 'Unexpected error',
+					),
+					'cookies'  => array(),
+					'filename' => '',
+				);
+			},
+			10,
+			3
+		);
+
+		APIV5::create_tag( 'aai-1234567890' );
+
+		$this->assertEquals( 1, did_action( 'pinterest_for_woocommerce_disconnect' ) );
 	}
 }

@@ -79,11 +79,11 @@ class TrackerSnapshot {
 	 * @return array
 	 */
 	protected static function parse_settings(): array {
-
-		$settings = (array) Pinterest_For_Woocommerce()::get_settings( true );
+		$settings = Pinterest_For_Woocommerce()::get_settings( true );
 
 		$tracked_settings = array(
 			'track_conversions',
+			'track_conversions_capi',
 			'enhanced_match_support',
 			'automatic_enhanced_match_support',
 			'save_to_pinterest',

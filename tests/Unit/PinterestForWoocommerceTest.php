@@ -5,6 +5,8 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Automattic\WooCommerce\Pinterest\RefreshToken;
+use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
+use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
 
@@ -25,6 +27,7 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 		$this->assertEquals(
 			array(
 				'track_conversions'                => true,
+				'track_conversions_capi'           => false,
 				'enhanced_match_support'           => true,
 				'automatic_enhanced_match_support' => true,
 				'save_to_pinterest'                => true,
@@ -35,6 +38,29 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 				'erase_plugin_data'                => false,
 			),
 			$settings
+		);
+	}
+
+	/**
+	 * Test of the plugin has disconnect action initialised.
+	 *
+	 * @return void
+	 */
+	public function test_disconnect_events_added_with_plugin() {
+		Pinterest_For_Woocommerce();
+		$this->assertEquals(
+			10,
+			has_action(
+				'pinterest_for_woocommerce_disconnect',
+				[ Pinterest_For_Woocommerce::class, 'reset_connection' ]
+			)
+		);
+		$this->assertEquals(
+			10,
+			has_action(
+				'action_scheduler_failed_execution',
+				[ Pinterest_For_Woocommerce::class, 'action_scheduler_reset_connection' ]
+			)
 		);
 	}
 
@@ -277,5 +303,69 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 		Pinterest_For_Woocommerce::disconnect();
 		$this->assertFalse( as_has_scheduled_action( Heartbeat::HOURLY, array(), 'pinterest-for-woocommerce' ) );
 		$this->assertFalse( as_has_scheduled_action( Heartbeat::DAILY, array(), 'pinterest-for-woocommerce' ) );
+	}
+
+	public function test_init_tracking_inits_if_at_least_one_tracker() {
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions', true );
+
+		$tracking = Pinterest_For_Woocommerce::init_tracking();
+
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_page_visit' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_view_category' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_add_to_cart', array( $tracking, 'handle_add_to_cart' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_before_thankyou', array( $tracking, 'handle_checkout' ) ) );
+		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_search' ) ) );
+	}
+
+	public function test_init_tracking_does_not_init_if_no_trackers() {
+		$tracking = Pinterest_For_Woocommerce::init_tracking();
+
+		$this->assertFalse( has_action( 'wp_footer', array( $tracking, 'handle_page_visit' ) ) );
+		$this->assertFalse( has_action( 'wp_footer', array( $tracking, 'handle_view_category' ) ) );
+		$this->assertFalse( has_action( 'woocommerce_add_to_cart', array( $tracking, 'handle_add_to_cart' ) ) );
+		$this->assertFalse( has_action( 'woocommerce_before_thankyou', array( $tracking, 'handle_checkout' ) ) );
+		$this->assertFalse( has_action( 'wp_footer', array( $tracking, 'handle_search' ) ) );
+	}
+
+	public function test_init_tracking_inits_tag_tracker() {
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions', true );
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions_capi', false );
+
+		$tracking = Pinterest_For_Woocommerce::init_tracking();
+
+		$trackers = $tracking->get_trackers();
+
+		$this->assertCount( 1, $trackers );
+		$this->assertInstanceOf( Tag::class, current( $trackers ) );
+	}
+
+	public function test_init_tracking_does_not_init_capi_tracker_if_tag_tracker_disabled() {
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions', false );
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions_capi', true );
+
+		$tracking = Pinterest_For_Woocommerce::init_tracking();
+		$this->assertFalse( $tracking );
+	}
+
+	public function test_init_tracking_inits_no_trackers() {
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions', false );
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions_capi', false );
+
+		$tracking = Pinterest_For_Woocommerce::init_tracking();
+
+		$this->assertFalse( $tracking );
+	}
+
+	public function test_init_tracking_inits_both_trackers() {
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions', true );
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions_capi', true );
+
+		$tracking = Pinterest_For_Woocommerce::init_tracking();
+
+		$trackers = $tracking->get_trackers();
+
+		$this->assertCount( 2, $trackers );
+		$this->assertInstanceOf( Tag::class, array_shift( $trackers ) );
+		$this->assertInstanceOf( Conversions::class, array_shift( $trackers ) );
 	}
 }
