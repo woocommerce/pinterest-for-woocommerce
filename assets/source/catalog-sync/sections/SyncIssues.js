@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement, useState } from '@wordpress/element';
 import { getHistory, getQuery, onQueryChange } from '@woocommerce/navigation';
@@ -8,7 +9,7 @@ import {
 	ExternalLink,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
