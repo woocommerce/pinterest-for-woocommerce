@@ -2,12 +2,10 @@
  * External dependencies
  */
 import { useSelect } from '@wordpress/data';
-import {createInterpolateElement, useState} from '@wordpress/element';
+import { createInterpolateElement, useState } from '@wordpress/element';
 import { getHistory, getQuery, onQueryChange } from '@woocommerce/navigation';
 import {
 	ExternalLink,
-	Icon,
-	Notice,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 /**
@@ -33,6 +31,11 @@ const SyncIssues = () => {
 
 	const total = feedIssues?.total_rows ?? 0
 
+	const messageStyles = {
+		marginTop: "40px",
+		textAlign: "right"
+	}
+
 	if ( ! feedIssues?.lines?.length ) {
 		return null;
 	}
@@ -53,10 +56,10 @@ const SyncIssues = () => {
 		<>
 			{
 				itemsLimit === total && (
-					<Text style={{ marginTop: "40px", textAlign: "right" }}>
+					<Text style={ messageStyles }>
 						{ createInterpolateElement(
 								sprintf(
-									// translators: %1$s: Amount of money required to spend to claim ad credits with currency. %2$s: Amount of ad credits given with currency.
+									// translators: %1$s: Total number of issues in the table.
 									__(
 										'Only the first %1$s Errors and Warnings are displayed below. To see more, please, visit <feedDiagnostics>Pinterest Feed Diagnostics</feedDiagnostics> page.',
 										'pinterest-for-woocommerce'
@@ -64,9 +67,11 @@ const SyncIssues = () => {
 									total
 								),
 								{
-									feedDiagnostics: <ExternalLink
-										href={ `https://pinterest.com/business/catalogs/diagnosticsv2/?advertiserId=${trackingAdvertiser}` }
-									/>
+									feedDiagnostics: (
+										<ExternalLink
+											href={ `https://pinterest.com/business/catalogs/diagnosticsv2/?advertiserId=${trackingAdvertiser}` }
+										/>
+									)
 								}
 							)
 						}
@@ -74,11 +79,11 @@ const SyncIssues = () => {
 				)
 			}
 			<SyncIssuesTable
-				issues={feedIssues?.lines}
-				query={query}
-				totalRows={total}
-				isRequesting={isRequesting}
-				onQueryChange={onQueryChange}
+				issues={ feedIssues?.lines }
+				query={ query }
+				totalRows={ total }
+				isRequesting={ isRequesting }
+				onQueryChange={ onQueryChange }
 			/>
 		</>
 	);
