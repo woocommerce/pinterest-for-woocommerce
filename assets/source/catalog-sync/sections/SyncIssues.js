@@ -13,11 +13,11 @@ import {
  */
 import { REPORTS_STORE_NAME } from '../data';
 import SyncIssuesTable from './SyncIssuesTable';
-import {__, sprintf} from "@wordpress/i18n";
-import {useSettingsSelect} from "../../setup-guide/app/helpers/effects";
+import { __, sprintf } from '@wordpress/i18n';
+import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
 
 const SyncIssues = () => {
-	const itemsLimit = 250
+	const itemsLimit = 250;
 	const [ query, setQuery ] = useState( getQuery() );
 	const feedIssues = useSelect( ( select ) =>
 		select( REPORTS_STORE_NAME ).getFeedIssues( query )
@@ -29,11 +29,11 @@ const SyncIssues = () => {
 	const appSettings = useSettingsSelect();
 	const trackingAdvertiser = appSettings?.tracking_advertiser;
 
-	const total = feedIssues?.total_rows ?? 0
+	const total = feedIssues?.total_rows ?? 0;
 
 	const messageStyles = {
 		marginTop: '40px',
-		textAlign: 'right'
+		textAlign: 'right',
 	};
 
 	if ( ! feedIssues?.lines?.length ) {
@@ -70,13 +70,11 @@ const SyncIssues = () => {
 								<ExternalLink
 									href={ `https://pinterest.com/business/catalogs/diagnosticsv2/?advertiserId=${ trackingAdvertiser }` }
 								/>
-							)
+							),
 						}
-						)
-					}
+					) }
 				</Text>
-				)
-			}
+			) }
 			<SyncIssuesTable
 				issues={ feedIssues?.lines }
 				query={ query }
