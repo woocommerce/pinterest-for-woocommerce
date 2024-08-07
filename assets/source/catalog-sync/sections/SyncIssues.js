@@ -8,12 +8,12 @@ import {
 	ExternalLink,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
 import { REPORTS_STORE_NAME } from '../data';
 import SyncIssuesTable from './SyncIssuesTable';
-import { __, sprintf } from '@wordpress/i18n';
 import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
 
 const SyncIssues = () => {
