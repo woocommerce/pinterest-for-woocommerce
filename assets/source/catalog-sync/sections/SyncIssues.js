@@ -32,9 +32,9 @@ const SyncIssues = () => {
 	const total = feedIssues?.total_rows ?? 0
 
 	const messageStyles = {
-		marginTop: "40px",
-		textAlign: "right"
-	}
+		marginTop: '40px',
+		textAlign: 'right'
+	};
 
 	if ( ! feedIssues?.lines?.length ) {
 		return null;
@@ -54,28 +54,27 @@ const SyncIssues = () => {
 
 	return (
 		<>
-			{
-				itemsLimit === total && (
-					<Text style={ messageStyles }>
-						{ createInterpolateElement(
-								sprintf(
-									// translators: %1$s: Total number of issues in the table.
-									__(
-										'Only the first %1$s Errors and Warnings are displayed below. To see more, please, visit <feedDiagnostics>Pinterest Feed Diagnostics</feedDiagnostics> page.',
-										'pinterest-for-woocommerce'
-									),
-									total
-								),
-								{
-									feedDiagnostics: (
-										<ExternalLink
-											href={ `https://pinterest.com/business/catalogs/diagnosticsv2/?advertiserId=${trackingAdvertiser}` }
-										/>
-									)
-								}
+			{ itemsLimit === total && (
+				<Text style={ messageStyles }>
+					{ createInterpolateElement(
+						sprintf(
+							// translators: %1$s: Total number of issues in the table.
+							__(
+								'Only the first %1$s Errors and Warnings are displayed below. To see more, please, visit <feedDiagnostics>Pinterest Feed Diagnostics</feedDiagnostics> page.',
+								'pinterest-for-woocommerce'
+							),
+							total
+						),
+						{
+							feedDiagnostics: (
+								<ExternalLink
+									href={ `https://pinterest.com/business/catalogs/diagnosticsv2/?advertiserId=${ trackingAdvertiser }` }
+								/>
 							)
 						}
-					</Text>
+						)
+					}
+				</Text>
 				)
 			}
 			<SyncIssuesTable
