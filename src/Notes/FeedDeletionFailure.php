@@ -46,7 +46,7 @@ class FeedDeletionFailure {
 					'pinterest-for-woocommerce'
 				),
 				$message
-			)
+			),
 		);
 
 		$additional_data = array(
