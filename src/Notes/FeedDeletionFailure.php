@@ -39,7 +39,14 @@ class FeedDeletionFailure {
 	 */
 	public static function get_note( string $message = '' ) {
 		$content_lines = array(
-			__( "The Pinterest For WooCommerce plugin has failed to delete the feed.<br/>{$message}", 'pinterest-for-woocommerce' ),
+			sprintf(
+				// translators: %1$s: Pinterest API message (reason of the failure).
+				__(
+					'The Pinterest For WooCommerce plugin has failed to delete the feed.<br/>%1$s',
+					'pinterest-for-woocommerce'
+				),
+				$message
+			)
 		);
 
 		$additional_data = array(
@@ -62,15 +69,18 @@ class FeedDeletionFailure {
 	 * @param string $message - Pinterest API Exception message.
 	 *
 	 * @return void
-	 * @throws NotesUnavailableException Throws exception when notes are unavailable.
 	 */
 	public static function possibly_add_note( string $message ) {
-		if ( self::note_exists() ) {
+		try {
+			if ( self::note_exists() ) {
+				return;
+			}
+
+			$note = self::get_note( $message );
+			$note->save();
+		} catch ( NotesUnavailableException $e ) {
 			return;
 		}
-
-		$note = self::get_note( $message );
-		$note->save();
 	}
 
 	/**

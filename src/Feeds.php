@@ -349,18 +349,14 @@ class Feeds {
 			Logger::log( $e->getMessage(), 'error' );
 			if ( in_array(
 				(int) $e->get_pinterest_code(),
-				[
+				array(
 					PinterestApiException::MERCHANT_DISAPPROVED,
 					PinterestApiException::MERCHANT_UNDER_REVIEW,
-					PinterestApiException::CATALOGS_FEED_HAS_ACTIVE_PROMOTIONS
-				]
+					PinterestApiException::CATALOGS_FEED_HAS_ACTIVE_PROMOTIONS,
+				)
 			) ) {
 				// Show Admin Notice.
-				try {
-					FeedDeletionFailure::possibly_add_note(  $e->getMessage() );
-				} catch ( NotesUnavailableException $e ) {
-					// Do nothing.
-				}
+				FeedDeletionFailure::possibly_add_note( $e->getMessage() );
 			}
 			return false;
 		}
