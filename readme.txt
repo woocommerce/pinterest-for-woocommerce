@@ -91,6 +91,11 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.6 - 2024-08-13 =
+* Dev - Update dependency.
+* Tweak - Add the website's domain to the Pinterest feed name.
+* Tweak - WC 9.2 compatibility.
+
 = 1.4.5 - 2024-07-19 =
 * Tweak - replace locale source function.
 
