@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Pinterest for WooCommerce 1.4.2\n"
+"Project-Id-Version: Pinterest for WooCommerce 1.4.6\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/pinterest-for-woocommerce\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-06-13T11:54:10+00:00\n"
+"POT-Creation-Date: 2024-08-13T16:10:19+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: pinterest-for-woocommerce\n"
@@ -41,57 +41,57 @@ msgstr ""
 msgid "https://woocommerce.com"
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:162
+#: class-pinterest-for-woocommerce.php:165
 msgid "Cloning this class is forbidden."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:171
+#: class-pinterest-for-woocommerce.php:174
 msgid "Deserializing instances of this class is forbidden."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:179
+#: class-pinterest-for-woocommerce.php:182
 msgid "Only a single instance of this class is allowed. Use singleton."
 msgstr ""
 
 #. Translators: The minimum PHP version
-#: class-pinterest-for-woocommerce.php:403
+#: class-pinterest-for-woocommerce.php:417
 msgid "Pinterest for WooCommerce requires a minimum PHP version of %s."
 msgstr ""
 
 #. Translators: The minimum WP version
-#: class-pinterest-for-woocommerce.php:408
+#: class-pinterest-for-woocommerce.php:422
 msgid "Pinterest for WooCommerce requires a minimum WordPress version of %s."
 msgstr ""
 
 #. Translators: The minimum WC version
-#: class-pinterest-for-woocommerce.php:413
+#: class-pinterest-for-woocommerce.php:427
 msgid "Pinterest for WooCommerce requires a minimum WooCommerce version of %s."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:421
+#: class-pinterest-for-woocommerce.php:435
 msgid "Pinterest for WooCommerce requires WooCommerce Admin to be enabled."
 msgstr ""
 
 #. Translators: The minimum Action Scheduler version
-#: class-pinterest-for-woocommerce.php:426
+#: class-pinterest-for-woocommerce.php:440
 msgid "Pinterest for WooCommerce requires a minimum Action Scheduler package of %s. It can be caused by old version of the WooCommerce extensions."
 msgstr ""
 
 #. Translators: The error description
-#: class-pinterest-for-woocommerce.php:729
-#: src/API/TokenExchangeV3ToV5.php:152
+#: class-pinterest-for-woocommerce.php:743
+#: src/API/TokenExchangeV3ToV5.php:122
 msgid "Could not decrypt the Pinterest API access token. Try reconnecting to Pinterest. [%s]"
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:930
+#: class-pinterest-for-woocommerce.php:978
 msgid "Commerce Integration cannot be created: Advertiser ID is missing."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:1093
+#: class-pinterest-for-woocommerce.php:1141
 msgid "There was an error getting the account data."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:1314
+#: class-pinterest-for-woocommerce.php:1362
 msgid "Pinterest for WooCommerce verification page"
 msgstr ""
 
@@ -132,7 +132,7 @@ msgstr ""
 msgid "Landing page"
 msgstr ""
 
-#: includes/admin/class-pinterest-for-woocommerce-admin.php:488
+#: includes/admin/class-pinterest-for-woocommerce-admin.php:504
 msgid "Cheatin' huh?"
 msgstr ""
 
@@ -224,7 +224,7 @@ msgid "There was an error getting the account data. Please try again later."
 msgstr ""
 
 #. Translators: 1: Request method 2: Request endpoint 3: Response status code 4: Response message 5: Pinterest code
-#: src/API/Base.php:104
+#: src/API/Base.php:103
 msgid ""
 "%1$s Request: %2$s\n"
 "Status Code: %3$s\n"
@@ -233,16 +233,16 @@ msgid ""
 msgstr ""
 
 #. translators: Empty error body exception.
-#: src/API/Base.php:276
+#: src/API/Base.php:294
 msgid "Response body processing error: $1%s"
 msgstr ""
 
-#: src/API/Base.php:328
+#: src/API/Base.php:346
 msgid "Empty body"
 msgstr ""
 
-#: src/API/Base.php:403
-#: src/API/Base.php:788
+#: src/API/Base.php:421
+#: src/API/Base.php:806
 #: src/Merchants.php:140
 msgid "Auto-created by Pinterest for WooCommerce"
 msgstr ""
@@ -434,17 +434,17 @@ msgid "No tracking tag available. [%s]"
 msgstr ""
 
 #. translators: %s connection status code.
-#: src/API/TokenExchangeV3ToV5.php:74
+#: src/API/TokenExchangeV3ToV5.php:49
 msgid "Connection status: %s"
 msgstr ""
 
 #. translators: 1. Error message.
-#: src/API/TokenExchangeV3ToV5.php:86
+#: src/API/TokenExchangeV3ToV5.php:61
 msgid "Automatic token exchange failed. Try reconnecting to Pinterest manually. [%1$s]"
 msgstr ""
 
 #. translators: 1. Error message.
-#: src/API/TokenExchangeV3ToV5.php:124
+#: src/API/TokenExchangeV3ToV5.php:94
 msgid "Could not finish the Pinterest API connection flow. Try reconnecting to Pinterest. [%1$s]"
 msgstr ""
 
@@ -518,16 +518,16 @@ msgstr ""
 msgid "Feed Generator `%1$s` Action failed to execute due to an error thrown `%2$s.`. A complete feed generation retry has been scheduled."
 msgstr ""
 
-#: src/FeedRegistration.php:95
+#: src/FeedRegistration.php:100
 msgid "Could not register feed."
 msgstr ""
 
 #. translators: %1$s is a country ISO 2 code, %2$s is a currency ISO 3 code.
-#: src/Feeds.php:117
-msgid "Created by Pinterest for WooCommerce %1$s|%2$s|%3$s"
+#: src/Feeds.php:119
+msgid "Created by Pinterest for WooCommerce at %1$s %2$s|%3$s|%4$s"
 msgstr ""
 
-#: src/Feeds.php:140
+#: src/Feeds.php:143
 msgid "There was a previous error trying to create a feed."
 msgstr ""
 
@@ -620,11 +620,20 @@ msgid "The Pinterest For WooCommerce plugin has been updated to version 1.4.0, w
 msgstr ""
 
 #: src/Notes/TokenExchangeFailure.php:47
+#: src/Notes/TokenInvalidFailure.php:48
 msgid "Pinterest For WooCommerce action required."
 msgstr ""
 
 #: src/Notes/TokenExchangeFailure.php:55
 msgid "Authenticate with Pinterest"
+msgstr ""
+
+#: src/Notes/TokenInvalidFailure.php:40
+msgid "The Pinterest For WooCommerce plugin has detected an issue with your access token.<br/>No operations are possible until you reconnect to Pinterest."
+msgstr ""
+
+#: src/Notes/TokenInvalidFailure.php:56
+msgid "Re-authenticate with Pinterest"
 msgstr ""
 
 #: src/PinterestSyncSettings.php:83
@@ -695,8 +704,8 @@ msgid ""
 msgstr ""
 
 #. translators: 1. the error message as returned by the Pinterest API
-#: src/Tracking/Conversions.php:319
-#: src/Tracking/Conversions.php:332
+#: src/Tracking/Conversions.php:315
+#: src/Tracking/Conversions.php:328
 msgid "Error: $1%s"
 msgstr ""
 
@@ -924,6 +933,22 @@ msgstr ""
 
 #: assets/source/setup-guide/app/components/Account/Connection.js:224
 msgid "Connect your Pinterest Account"
+msgstr ""
+
+#: assets/source/setup-guide/app/components/Billing/Billing.js:47
+msgid "Billing Setup Correctly"
+msgstr ""
+
+#: assets/source/setup-guide/app/components/Billing/Billing.js:65
+msgid "Go to billing settings"
+msgstr ""
+
+#: assets/source/setup-guide/app/components/Billing/Billing.js:79
+msgid "No Valid Billing Setup Found"
+msgstr ""
+
+#: assets/source/setup-guide/app/components/Billing/Billing.js:97
+msgid "Setup Billing"
 msgstr ""
 
 #: assets/source/setup-guide/app/components/HealthCheck/index.js:66
@@ -1247,6 +1272,14 @@ msgstr ""
 
 #: assets/source/setup-guide/app/steps/AdvancedSettings.js:96
 msgid "Erase Plugin Data"
+msgstr ""
+
+#: assets/source/setup-guide/app/steps/BillingStatus.js:21
+msgid "Billing status"
+msgstr ""
+
+#: assets/source/setup-guide/app/steps/BillingStatus.js:25
+msgid "A valid billing setup is necessary if you wish to advertise your products on Pinterest. You can set up and manage your billing through your account settings on Pinterest."
 msgstr ""
 
 #. translators: %s: error reason returned by Pinterest when verifying website claim fail.
