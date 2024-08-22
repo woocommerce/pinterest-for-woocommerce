@@ -57,9 +57,13 @@ class FeedDeletionFailure {
 		$note->set_title( __( 'Pinterest For WooCommerce Feed Deletion Failed.', 'pinterest-for-woocommerce' ) );
 		$note->set_content( implode( '', $content_lines ) );
 		$note->set_content_data( (object) $additional_data );
-		$note->set_type( Note::E_WC_ADMIN_NOTE_INFORMATIONAL );
+		$note->set_type( Note::E_WC_ADMIN_NOTE_ERROR );
 		$note->set_name( self::NOTE_NAME );
-		$note->set_source( 'woocommerce-admin' );
+		$note->set_source( 'pinterest-for-woocommerce' );
+		$note->add_action(
+			'dismiss',
+			__( 'Dismiss', 'pinterest-for-woocommerce' )
+		);
 		return $note;
 	}
 
