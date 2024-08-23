@@ -24,9 +24,11 @@
 
 
 // Twenty Twenty-Four compatibility.
-.wp-block-post {
+.wp-block-product {
 
 	&.product {
+
+		position: relative;
 
 		.pinterest-for-woocommerce-image-wrapper {
 			top: unset;
