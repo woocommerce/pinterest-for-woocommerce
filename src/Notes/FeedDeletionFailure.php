@@ -58,6 +58,7 @@ class FeedDeletionFailure {
 		$note->set_content( implode( '', $content_lines ) );
 		$note->set_content_data( (object) $additional_data );
 		$note->set_type( Note::E_WC_ADMIN_NOTE_ERROR );
+		$note->set_status( Note::E_WC_ADMIN_NOTE_UNACTIONED );
 		$note->set_name( self::NOTE_NAME );
 		$note->set_source( 'pinterest-for-woocommerce' );
 		$note->add_action(
@@ -76,7 +77,7 @@ class FeedDeletionFailure {
 	 */
 	public static function possibly_add_note( string $message ) {
 		try {
-			if ( self::note_exists() ) {
+			if ( self::note_exists() && !self::has_note_been_actioned() ) {
 				return;
 			}
 
