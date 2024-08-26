@@ -4,7 +4,7 @@ Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
 Tested up to: 6.6
 Requires PHP: 7.3
-Stable tag: 1.4.6
+Stable tag: 1.4.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,15 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.4.7 - 2024-08-26 =
+* Add - Adding admin notice in case of feed deletion error.
+* Add - Call to disconnect from Pinterest on deactivation.
+* Dev - Fixing SKU Unit tests.
+* Fix - Pagination on Feed Issues table.
+* Fix - Pinterest Save button positioning.
+* Fix - Reset internal feed status on disconnect.
+* Tweak - New .pot file.
 
 = 1.4.6 - 2024-08-13 =
 * Dev - Update dependency.
