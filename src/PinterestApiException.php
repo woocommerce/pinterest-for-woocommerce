@@ -59,22 +59,40 @@ class PinterestApiException extends \Exception {
 	public const OFFER_ALREADY_REDEEMED_BY_ANOTHER_ADVERTISER = 2318;
 
 	/**
+	 * Merchant has been disapproved.
+	 * Some feeds, when deleting, may fail to delete due to the merchant has been disapproved.
+	 */
+	public const MERCHANT_DISAPPROVED = 2625;
+
+	/**
+	 * Merchant is under review.
+	 * Some feeds, when deleting, may fail to delete due to the merchant is under review.
+	 */
+	public const MERCHANT_UNDER_REVIEW = 2626;
+
+	/**
+	 * Feed has active promotions.
+	 * Some feeds, when deleting, may fail to delete due to active promotions on the feed items.
+	 */
+	public const CATALOGS_FEED_HAS_ACTIVE_PROMOTIONS = 4162;
+
+	/**
 	 * Holds the specific Pinterest error code, which is useful in addition to the response code.
 	 *
 	 * @var int
 	 * @since 1.0.0
 	 */
-	private $pinterest_code = null;
+	private int $pinterest_code = 0;
 
 	/**
 	 * Pinterest_API_Exception constructor.
 	 *
 	 * @param string|array $error The error message or an array containing the error message + additional data.
-	 * @param int          $response_code The response code of the API call.
+	 * @param int          $response_code The HTTP response code of the API call. e.g. 200, 401, 403, 404, etc.
 	 */
 	public function __construct( $error, $response_code ) {
 		$message              = $error['message'] ?? $error;
-		$this->pinterest_code = $error['response_body']['code'] ?? null;
+		$this->pinterest_code = (int) $error['response_body']['code'] ?? 0;
 
 		parent::__construct( $message ?? $error, $response_code );
 	}
@@ -84,7 +102,7 @@ class PinterestApiException extends \Exception {
 	 *
 	 * @return int
 	 */
-	public function get_pinterest_code() {
+	public function get_pinterest_code(): int {
 		return $this->pinterest_code;
 	}
 }

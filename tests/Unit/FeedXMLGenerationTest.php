@@ -56,7 +56,12 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 * @group feed
 	 */
 	public function testSimpleProductXmlItem() {
-		$product  = WC_Helper_Product::create_simple_product();
+		$product  = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'sku' => 'DUMMY SKU',
+			)
+		);
 
 		// We need header and footer so we can process XML directly.
 		$xml      = ProductsXmlFeed::get_xml_header();
@@ -614,7 +619,12 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyMpnXML() {
 		$mpn_method = $this->getProductsXmlFeedAttributeMethod( 'g:mpn' );
-		$product    = WC_Helper_Product::create_simple_product();
+		$product    = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'sku' => 'DUMMY SKU',
+			)
+		);
 		$xml        = $mpn_method( $product );
 		$this->assertEquals( '<g:mpn>DUMMY SKU</g:mpn>', $xml );
 	}

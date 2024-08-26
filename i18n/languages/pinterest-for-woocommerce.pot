@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-08-13T16:10:19+00:00\n"
+"POT-Creation-Date: 2024-08-26T09:32:11+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: pinterest-for-woocommerce\n"
@@ -41,57 +41,57 @@ msgstr ""
 msgid "https://woocommerce.com"
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:165
+#: class-pinterest-for-woocommerce.php:166
 msgid "Cloning this class is forbidden."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:174
+#: class-pinterest-for-woocommerce.php:175
 msgid "Deserializing instances of this class is forbidden."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:182
+#: class-pinterest-for-woocommerce.php:183
 msgid "Only a single instance of this class is allowed. Use singleton."
 msgstr ""
 
 #. Translators: The minimum PHP version
-#: class-pinterest-for-woocommerce.php:417
+#: class-pinterest-for-woocommerce.php:418
 msgid "Pinterest for WooCommerce requires a minimum PHP version of %s."
 msgstr ""
 
 #. Translators: The minimum WP version
-#: class-pinterest-for-woocommerce.php:422
+#: class-pinterest-for-woocommerce.php:423
 msgid "Pinterest for WooCommerce requires a minimum WordPress version of %s."
 msgstr ""
 
 #. Translators: The minimum WC version
-#: class-pinterest-for-woocommerce.php:427
+#: class-pinterest-for-woocommerce.php:428
 msgid "Pinterest for WooCommerce requires a minimum WooCommerce version of %s."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:435
+#: class-pinterest-for-woocommerce.php:436
 msgid "Pinterest for WooCommerce requires WooCommerce Admin to be enabled."
 msgstr ""
 
 #. Translators: The minimum Action Scheduler version
-#: class-pinterest-for-woocommerce.php:440
+#: class-pinterest-for-woocommerce.php:441
 msgid "Pinterest for WooCommerce requires a minimum Action Scheduler package of %s. It can be caused by old version of the WooCommerce extensions."
 msgstr ""
 
 #. Translators: The error description
-#: class-pinterest-for-woocommerce.php:743
+#: class-pinterest-for-woocommerce.php:744
 #: src/API/TokenExchangeV3ToV5.php:122
 msgid "Could not decrypt the Pinterest API access token. Try reconnecting to Pinterest. [%s]"
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:978
+#: class-pinterest-for-woocommerce.php:980
 msgid "Commerce Integration cannot be created: Advertiser ID is missing."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:1141
+#: class-pinterest-for-woocommerce.php:1143
 msgid "There was an error getting the account data."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:1362
+#: class-pinterest-for-woocommerce.php:1364
 msgid "Pinterest for WooCommerce verification page"
 msgstr ""
 
@@ -252,11 +252,11 @@ msgstr ""
 msgid "Could not fetch linked business accounts for Pinterest account ID. [%s]"
 msgstr ""
 
-#: src/API/FeedIssues.php:89
+#: src/API/FeedIssues.php:93
 msgid "Invalid product"
 msgstr ""
 
-#: src/API/FeedIssues.php:96
+#: src/API/FeedIssues.php:100
 msgid "(Variation)"
 msgstr ""
 
@@ -615,6 +615,19 @@ msgstr ""
 msgid "Enable Sync"
 msgstr ""
 
+#. translators: %1$s: Pinterest API message (reason of the failure).
+#: src/Notes/FeedDeletionFailure.php:63
+msgid "The Pinterest For WooCommerce plugin has failed to delete the feed.<br/>%1$s<br/>Please, contact support to resolve the issue."
+msgstr ""
+
+#: src/Notes/FeedDeletionFailure.php:75
+msgid "Pinterest For WooCommerce Feed Deletion Failed."
+msgstr ""
+
+#: src/Notes/FeedDeletionFailure.php:84
+msgid "Dismiss"
+msgstr ""
+
 #: src/Notes/TokenExchangeFailure.php:39
 msgid "The Pinterest For WooCommerce plugin has been updated to version 1.4.0, which now supports Pinterest's new V5 API, replacing the outgoing V3 API.<br/>You need to re-authorize the plugin through your WooCommerce dashboard to maintain integration functionality and access new features."
 msgstr ""
@@ -803,6 +816,11 @@ msgstr ""
 #. translators: %1$s: Amount of money required to spend to claim ad credits with currency. %2$s: Amount of ad credits given with currency.
 #: assets/source/catalog-sync/sections/AdCreditsNotice.js:98
 msgid "Spend %1$s to claim %2$s in Pinterest ad credits. To claim the credits, <adsBillingDetails>add your billing details.</adsBillingDetails>"
+msgstr ""
+
+#. translators: %1$s: Total number of issues in the table.
+#: assets/source/catalog-sync/sections/SyncIssues.js:63
+msgid "Only the first %1$s Errors and Warnings are displayed below. To see more, please, visit <feedDiagnostics>Pinterest Feed Diagnostics</feedDiagnostics> page."
 msgstr ""
 
 #: assets/source/catalog-sync/sections/SyncIssuesTable.js:23

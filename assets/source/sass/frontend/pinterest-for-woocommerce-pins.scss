@@ -24,13 +24,10 @@
 
 
 // Twenty Twenty-Four compatibility.
-.wp-block-post {
+.wp-block-post,
+.wc-block-product {
 
 	&.product {
-
-		.pinterest-for-woocommerce-image-wrapper {
-			top: unset;
-			left: unset;
-		}
+		position: relative;
 	}
 }
