@@ -13,8 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
-use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
+use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
 use Exception;
 use Throwable;
 
@@ -343,8 +343,19 @@ class Feeds {
 			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 			APIV5::delete_feed( $feed_id, $ad_account_id );
 			return true;
-		} catch ( Throwable $th ) {
-			Logger::log( $th->getMessage(), 'error' );
+		} catch ( PinterestApiException $e ) {
+			Logger::log( $e->getMessage(), 'error' );
+			if ( in_array(
+				(int) $e->get_pinterest_code(),
+				array(
+					PinterestApiException::MERCHANT_DISAPPROVED,
+					PinterestApiException::MERCHANT_UNDER_REVIEW,
+					PinterestApiException::CATALOGS_FEED_HAS_ACTIVE_PROMOTIONS,
+				)
+			) ) {
+				// Show Admin Notice.
+				FeedDeletionFailure::possibly_add_note( $e->get_pinterest_code() );
+			}
 			return false;
 		}
 	}
