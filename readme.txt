@@ -91,6 +91,15 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.7 - 2024-08-26 =
+* Add - Adding admin notice in case of feed deletion error.
+* Add - Call to disconnect from Pinterest on deactivation.
+* Dev - Fixing SKU Unit tests.
+* Fix - Pagination on Feed Issues table.
+* Fix - Pinterest Save button positioning.
+* Fix - Reset internal feed status on disconnect.
+* Tweak - New .pot file.
+
 = 1.4.6 - 2024-08-13 =
 * Dev - Update dependency.
 * Tweak - Add the website's domain to the Pinterest feed name.
