@@ -12,9 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Automattic\WooCommerce\Admin\Notes\NotesUnavailableException;
 use Automattic\WooCommerce\Pinterest\API\APIV5;
-use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
 use Exception;
