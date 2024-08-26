@@ -354,7 +354,7 @@ class Feeds {
 				)
 			) ) {
 				// Show Admin Notice.
-				FeedDeletionFailure::possibly_add_note( $e->getMessage() );
+				FeedDeletionFailure::possibly_add_note( $e->get_pinterest_code() );
 			}
 			return false;
 		}

@@ -1,8 +1,9 @@
 <?php
 /**
- * WooCommerce Admin: Add First Product.
+ * WooCommerce Admin: Pinterest Feed Deletion Failed.
  *
- * Adds a note (type `email`) to bring the client back to the store setup flow.
+ * Adds a note to tell the user that Pinterest Feed deletion failed when
+ * disconnecting/deactivating/uninstalling the extension.
  *
  * @package Automattic\WooCommerce\Pinterest\Notes
  */
@@ -15,20 +16,39 @@ use Automattic\WooCommerce\Admin\Notes\Note;
 use Automattic\WooCommerce\Admin\Notes\Notes;
 use Automattic\WooCommerce\Admin\Notes\NotesUnavailableException;
 use Automattic\WooCommerce\Admin\Notes\NoteTraits;
+use Automattic\WooCommerce\Pinterest\PinterestApiException;
 
 /**
- * Add_First_Product.
+ * Pinterest Feed Deletion Error Admin Note Class
  */
 class FeedDeletionFailure {
-	/**
-	 * Note traits.
-	 */
+
 	use NoteTraits;
 
 	/**
-	 * Name of the note for use in the database.
+	 * @var string Name of the note for use in the database.
 	 */
 	const NOTE_NAME = 'pinterest-for-woocommerce-feed-deletion-failure';
+
+	/**
+	 * @var string Message in case feed could not be deleted due to a disapproved merchant reason.
+	 */
+	const MESSAGE_MERCHANT_DISAPPROVED = 'The merchant is disapproved.';
+
+	/**
+	 * @var string Message in case feed could not be deleted due to active promotions still present on it.
+	 */
+	const MESSAGE_FEED_HAS_PROMOTIONS = 'You feed has active promotions.';
+
+	/**
+	 * @var string Message in case feed could not be deleted due to a merchant is still under review reason.
+	 */
+	const MESSAGE_MERCHANT_UNDER_REVIEW = 'The merchant is under review.';
+
+	/**
+	 * @var string A default message in case of an error code mismatch.
+	 */
+	const MESSAGE_DEFAULT = 'Unexpected error. Please, see the log for more details.';
 
 	/**
 	 * Get the note.
@@ -38,15 +58,13 @@ class FeedDeletionFailure {
 	 * @return Note
 	 */
 	public static function get_note( string $message = '' ) {
-		$content_lines = array(
-			sprintf(
-				// translators: %1$s: Pinterest API message (reason of the failure).
-				__(
-					'The Pinterest For WooCommerce plugin has failed to delete the feed.<br/>%1$s',
-					'pinterest-for-woocommerce'
-				),
-				$message
+		$content = sprintf(
+			// translators: %1$s: Pinterest API message (reason of the failure).
+			__(
+				'The Pinterest For WooCommerce plugin has failed to delete the feed.<br/>%1$s<br/>Please, contact support to resolve the issue.',
+				'pinterest-for-woocommerce'
 			),
+			$message
 		);
 
 		$additional_data = array(
@@ -55,7 +73,7 @@ class FeedDeletionFailure {
 
 		$note = new Note();
 		$note->set_title( __( 'Pinterest For WooCommerce Feed Deletion Failed.', 'pinterest-for-woocommerce' ) );
-		$note->set_content( implode( '', $content_lines ) );
+		$note->set_content( $content );
 		$note->set_content_data( (object) $additional_data );
 		$note->set_type( Note::E_WC_ADMIN_NOTE_ERROR );
 		$note->set_status( Note::E_WC_ADMIN_NOTE_UNACTIONED );
@@ -71,15 +89,17 @@ class FeedDeletionFailure {
 	/**
 	 * Add the note if it passes predefined conditions.
 	 *
-	 * @param string $message - Pinterest API Exception message.
+	 * @param int $code - Pinterest API Error Code.
 	 *
 	 * @return void
 	 */
-	public static function possibly_add_note( string $message ) {
+	public static function possibly_add_note( int $code ) {
 		try {
 			if ( self::note_exists() && ! self::has_note_been_actioned() ) {
 				return;
 			}
+
+			$message = self::code_to_message( $code );
 
 			$note = self::get_note( $message );
 			$note->save();
@@ -89,11 +109,25 @@ class FeedDeletionFailure {
 	}
 
 	/**
-	 * Delete the note.
+	 * Maps code to message.
 	 *
-	 * @return void
+	 * @param int $code - Pinterest error code.
+	 * @return string - Predefined error message.
 	 */
-	public static function delete_note() {
-		Notes::delete_notes_with_name( self::NOTE_NAME );
+	private static function code_to_message( int $code ): string
+	{
+		if ( $code === PinterestApiException::MERCHANT_DISAPPROVED ) {
+			return self::MESSAGE_MERCHANT_DISAPPROVED;
+		}
+
+		if ( $code === PinterestApiException::MERCHANT_UNDER_REVIEW ) {
+			return self::MESSAGE_MERCHANT_UNDER_REVIEW;
+		}
+
+		if ( $code === PinterestApiException::CATALOGS_FEED_HAS_ACTIVE_PROMOTIONS ) {
+			return self::MESSAGE_FEED_HAS_PROMOTIONS;
+		}
+
+		return self::MESSAGE_DEFAULT;
 	}
 }
