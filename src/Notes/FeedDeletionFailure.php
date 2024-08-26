@@ -114,17 +114,16 @@ class FeedDeletionFailure {
 	 * @param int $code - Pinterest error code.
 	 * @return string - Predefined error message.
 	 */
-	private static function code_to_message( int $code ): string
-	{
-		if ( $code === PinterestApiException::MERCHANT_DISAPPROVED ) {
+	private static function code_to_message( int $code ): string {
+		if ( PinterestApiException::MERCHANT_DISAPPROVED === $code ) {
 			return self::MESSAGE_MERCHANT_DISAPPROVED;
 		}
 
-		if ( $code === PinterestApiException::MERCHANT_UNDER_REVIEW ) {
+		if ( PinterestApiException::MERCHANT_UNDER_REVIEW === $code ) {
 			return self::MESSAGE_MERCHANT_UNDER_REVIEW;
 		}
 
-		if ( $code === PinterestApiException::CATALOGS_FEED_HAS_ACTIVE_PROMOTIONS ) {
+		if ( PinterestApiException::CATALOGS_FEED_HAS_ACTIVE_PROMOTIONS === $code ) {
 			return self::MESSAGE_FEED_HAS_PROMOTIONS;
 		}
 
