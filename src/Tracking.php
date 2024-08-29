@@ -77,6 +77,7 @@ class Tracking {
 	 * Used as a callback for the wp_footer hook.
 	 *
 	 * @since 1.4.0
+	 * @since x.x.x Added checkf for product page.
 	 *
 	 * @return void
 	 */
@@ -86,20 +87,31 @@ class Tracking {
 			return;
 		}
 
+		// Dumy data for when we can't get product data.
 		$data = new None( uniqid( 'page' ) );
-		if ( is_product() ) {
-			$product = wc_get_product();
-			$data    = new Product(
-				uniqid( 'page' ),
-				$product->get_id(),
-				$product->get_name(),
-				wc_get_product_category_list( $product->get_id() ),
-				'brand',
-				wc_get_price_to_display( $product ),
-				get_woocommerce_currency(),
-				1
-			);
+
+		// Not a product page.
+		if ( ! is_product() ) {
+			$this->track_event( static::EVENT_PAGE_VISIT, $data );
+			return;
 		}
+
+		$product = wc_get_product();
+		if ( ! $product instanceof \WC_Product ) {
+			$this->track_event( static::EVENT_PAGE_VISIT, $data );
+			return;
+		}
+
+		$data = new Product(
+			uniqid( 'page' ),
+			$product->get_id(),
+			$product->get_name(),
+			wc_get_product_category_list( $product->get_id() ),
+			'brand',
+			wc_get_price_to_display( $product ),
+			get_woocommerce_currency(),
+			1
+		);
 		$this->track_event( static::EVENT_PAGE_VISIT, $data );
 	}
 
