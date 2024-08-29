@@ -91,6 +91,10 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.8 - 2024-08-29 =
+* Fix - Detect no product error in the page_visit tracking.
+* Release/1.4.7.
+
 = 1.4.7 - 2024-08-26 =
 * Add - Adding admin notice in case of feed deletion error.
 * Add - Call to disconnect from Pinterest on deactivation.
