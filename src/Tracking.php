@@ -77,7 +77,7 @@ class Tracking {
 	 * Used as a callback for the wp_footer hook.
 	 *
 	 * @since 1.4.0
-	 * @since x.x.x Added checkf for product page.
+	 * @since x.x.x Added check for product page.
 	 *
 	 * @return void
 	 */
