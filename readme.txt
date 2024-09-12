@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.9 - 2024-09-12 =
+* Tweak - WC 9.3 compatibility.
+
 = 1.4.8 - 2024-08-29 =
 * Fix - Detect no product error in the page_visit tracking.
 * Release/1.4.7.
