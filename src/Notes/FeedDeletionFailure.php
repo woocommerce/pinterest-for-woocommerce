@@ -61,7 +61,7 @@ class FeedDeletionFailure {
 		$content = sprintf(
 			// translators: %1$s: Pinterest API message (reason of the failure).
 			__(
-				'The Pinterest For WooCommerce plugin has failed to delete the feed.<br/>%1$s<br/>Please, contact support to resolve the issue.',
+				'The Pinterest For WooCommerce plugin has failed to delete the feed.<br/>%1$s<br/>Please, contact Pinterest support to resolve the issue.',
 				'pinterest-for-woocommerce'
 			),
 			$message

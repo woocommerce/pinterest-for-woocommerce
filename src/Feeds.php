@@ -276,9 +276,6 @@ class Feeds {
 	 * @throws PinterestApiLocaleException No valid locale found to check for the registered feed.
 	 */
 	public static function match_local_feed_configuration_to_registered_feeds( array $feeds = array() ): string {
-		$local_country = Pinterest_For_Woocommerce()::get_base_country();
-		$local_locale  = LocaleMapper::get_locale_for_api();
-
 		if ( empty( $feeds ) ) {
 			$feeds = static::get_feeds();
 		}
@@ -287,9 +284,6 @@ class Feeds {
 		$config  = reset( $configs );
 
 		foreach ( $feeds as $feed ) {
-			$old_name_match = is_null( $feed['name'] );
-			$new_name_match = 0 === strpos( $feed['name'] ?? '', 'Created by Pinterest for WooCommerce' );
-
 			/**
 			 * Match feeds created by Pinterest for WooCommerce extension in both API v3 and v5 versions.
 			 *
@@ -299,15 +293,38 @@ class Feeds {
 			 * When trying to match remote feed to a local configuration, we need to check both cases
 			 * not to create a new feed if the feed was created by the extension in the past.
 			 */
-			$does_match = $old_name_match || $new_name_match;
-			$does_match = $does_match && $local_country === $feed['default_country'] ?? '';
-			$does_match = $does_match && $local_locale === $feed['default_locale'] ?? '';
-			$does_match = $does_match && $config['feed_url'] === $feed['location'] ?? '';
+			$does_match = self::does_feed_match( $feed ) && $config['feed_url'] === $feed['location'] ?? '';
 			if ( $does_match ) {
 				return $feed['id'];
 			}
 		}
 
+		return '';
+	}
+
+	private static function does_feed_match( $feed ): bool {
+		$local_country = Pinterest_For_Woocommerce()::get_base_country();
+		$local_locale  = LocaleMapper::get_locale_for_api();
+		$does_match = $local_country === $feed['default_country'] ?? '';
+		$does_match = $does_match && $local_locale === $feed['default_locale'] ?? '';
+		return $does_match && 0 === strpos( $feed['location'] ?? '', get_site_url() );
+	}
+
+	/**
+	 * Tries to match remote feeds against local website configuration to find an existing feed, if any.
+	 *
+	 * @return string - Remote feed ID that matches.
+	 */
+	public static function maybe_remote_feed(): string {
+		$feeds = self::get_feeds();
+		foreach ( $feeds as $feed ) {
+			if ( self::does_feed_match( $feed ) ) {
+				$last_dash_position = strrpos( $feed['location'], '-' ) + 1;
+				$last_dot_position  = strrpos( $feed['location'], '.' );
+				$length_of_the_id   = $last_dot_position - $last_dash_position;
+				return substr( $feed['location'], $last_dash_position, $length_of_the_id );
+			}
+		}
 		return '';
 	}
 
@@ -319,6 +336,7 @@ class Feeds {
 	 *
 	 * @throws PinterestApiException Pinterest API Exception.
 	 * @since 1.2.13
+	 * @deprecated
 	 */
 	public static function is_local_feed_enabled( string $feed_id ): bool {
 		if ( empty( $feed_id ) ) {
