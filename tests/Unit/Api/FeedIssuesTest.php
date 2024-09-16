@@ -156,7 +156,7 @@ class FeedIssuesTest extends WP_Test_REST_TestCase {
 												),
 										)
 								)
-								)
+							)
 						),
 						'response' => array(
 							'code'    => 200,

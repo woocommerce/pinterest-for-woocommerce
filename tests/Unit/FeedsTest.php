@@ -9,7 +9,7 @@ use WC_Helper_Product;
 
 class FeedsTest extends \WP_UnitTestCase {
 
-	protected function setUp(): void {
+	public function setUp(): void {
 		parent::setUp();
 
 		// Cleanup API call stub before each test.
@@ -86,7 +86,7 @@ class FeedsTest extends \WP_UnitTestCase {
 							"password" => "string",
 							"username" => "string",
 						),
-						"location"                      => "",
+						"location"                      => "https://pinterest.dima.works/pinterest-for-woocommerce-fIOasjj.xml",
 						"preferred_processing_schedule" => array(
 							"time"     => "02:59",
 							"timezone" => "Africa/Abidjan",
@@ -118,16 +118,16 @@ class FeedsTest extends \WP_UnitTestCase {
 		$this->assertEquals( '', $feed );
 	}
 
-	private static function get_feeds_request_stub( array $response ) {
+	private static function get_feeds_request_stub( array $body ) {
 		add_filter(
 			'pre_http_request',
-			function ( $response, $parsed_args, $url ) use ( $response ) {
+			function ( $response, $parsed_args, $url ) use ( $body ) {
 				if ( 'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=8901267167247612734708' === $url ) {
 					$response = array(
 						'headers' => array(
 							'content-type' => 'application/json',
 						),
-						'body' => json_encode( $response ),
+						'body' => json_encode( $body ),
 						'response' => array(
 							'code'    => 200,
 							'message' => 'OK',

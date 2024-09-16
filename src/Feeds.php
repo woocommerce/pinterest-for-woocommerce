@@ -302,6 +302,15 @@ class Feeds {
 		return '';
 	}
 
+	/**
+	 * Tests if the feed is a match.
+	 *
+	 * @param $feed
+	 *
+	 * @since x.x.x
+	 * @return bool
+	 * @throws PinterestApiLocaleException
+	 */
 	private static function does_feed_match( $feed ): bool {
 		$local_country = Pinterest_For_Woocommerce()::get_base_country();
 		$local_locale  = LocaleMapper::get_locale_for_api();
@@ -313,6 +322,7 @@ class Feeds {
 	/**
 	 * Tries to match remote feeds against local website configuration to find an existing feed, if any.
 	 *
+	 * @since x.x.x
 	 * @return string - Remote feed ID that matches.
 	 */
 	public static function maybe_remote_feed(): string {
