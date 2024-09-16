@@ -16,6 +16,7 @@ use Automattic\WooCommerce\Pinterest\API\APIV5;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
 use Exception;
+use Pinterest_For_Woocommerce;
 use Throwable;
 
 /**
@@ -312,7 +313,7 @@ class Feeds {
 	 * @throws PinterestApiLocaleException
 	 */
 	private static function does_feed_match( $feed ): bool {
-		$local_country = Pinterest_For_Woocommerce()::get_base_country();
+		$local_country = Pinterest_For_Woocommerce::get_base_country();
 		$local_locale  = LocaleMapper::get_locale_for_api();
 		$does_match = $local_country === $feed['default_country'] ?? '';
 		$does_match = $does_match && $local_locale === $feed['default_locale'] ?? '';
