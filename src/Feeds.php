@@ -326,16 +326,20 @@ class Feeds {
 	 * @return string - Remote feed ID that matches.
 	 */
 	public static function maybe_remote_feed(): string {
-		$feeds = self::get_feeds();
-		foreach ( $feeds as $feed ) {
-			if ( self::does_feed_match( $feed ) ) {
-				$last_dash_position = strrpos( $feed['location'], '-' ) + 1;
-				$last_dot_position  = strrpos( $feed['location'], '.' );
-				$length_of_the_id   = $last_dot_position - $last_dash_position;
-				return substr( $feed['location'], $last_dash_position, $length_of_the_id );
+		try {
+			$feeds = self::get_feeds();
+			foreach ( $feeds as $feed ) {
+				if ( self::does_feed_match( $feed ) ) {
+					$last_dash_position = strrpos( $feed['location'], '-' ) + 1;
+					$last_dot_position  = strrpos( $feed['location'], '.' );
+					$length_of_the_id   = $last_dot_position - $last_dash_position;
+					return substr( $feed['location'], $last_dash_position, $length_of_the_id );
+				}
 			}
+			return '';
+		} catch ( PinterestApiLocaleException $e ) {
+			return '';
 		}
-		return '';
 	}
 
 	/**
