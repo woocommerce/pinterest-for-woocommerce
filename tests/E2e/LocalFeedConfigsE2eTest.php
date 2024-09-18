@@ -21,7 +21,6 @@ class LocalFeedConfigsE2eTest extends \WP_UnitTestCase {
 		add_filter( 'locale', fn() => 'en_US' );
 		add_filter( 'site_url', fn( $url ) => 'https://example-2.com' );
 		add_filter( 'upload_dir', fn( $data ) => array_merge( $data, array( 'baseurl' => 'https://example-2.com/wp-content/uploads' ) ) );
-		add_filter( 'pre_http_request', array( self::class, 'get_feeds' ), 10, 3 );
 	}
 
 	public function tearDown(): void {
@@ -41,6 +40,8 @@ class LocalFeedConfigsE2eTest extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_when_local_feed_config_is_empty_we_attempt_to_get_active_feed_from_pinterest() {
+		add_filter( 'pre_http_request', array( self::class, 'get_feeds' ), 10, 3 );
+
 		$local_feed_configs = LocalFeedConfigs::get_instance();
 
 		$configurations = $local_feed_configs->get_configurations();
@@ -58,6 +59,28 @@ class LocalFeedConfigsE2eTest extends \WP_UnitTestCase {
 		);
 	}
 
+	public function test_when_local_feed_config_is_empty_and_no_matching_feeds_at_pinterest() {
+		add_filter( 'pre_http_request', array( self::class, 'get_feeds_no_match' ), 10, 3 );
+
+		$local_feed_configs = LocalFeedConfigs::get_instance();
+
+		$configurations = $local_feed_configs->get_configurations();
+
+		$this->assertNotEmpty( $configurations['US']['feed_id'] );
+		$this->assertNotEquals( 'taLlmN', $configurations['US']['feed_id'] );
+	}
+
+	public function test_when_local_feed_config_is_empty_and_no_feeds_at_pinterest() {
+		add_filter( 'pre_http_request', array( self::class, 'get_no_feeds' ), 10, 3 );
+
+		$local_feed_configs = LocalFeedConfigs::get_instance();
+
+		$configurations = $local_feed_configs->get_configurations();
+
+		$this->assertNotEmpty( $configurations['US']['feed_id'] );
+		$this->assertNotEquals( 'taLlmN', $configurations['US']['feed_id'] );
+	}
+
 	public static function get_feeds( $response, $parsed_args, $url ) {
 		if ( 'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=475245723456346' === $url ) {
 			return array(
@@ -69,10 +92,24 @@ class LocalFeedConfigsE2eTest extends \WP_UnitTestCase {
 						'items' => array(
 							array(
 								"created_at"           => "2022-03-14T15:15:22Z",
+								"id"                   => "7689378468829304869",
+								"updated_at"           => "2022-03-14T15:16:34Z",
+								"name"                 => "string",
+								"format"               => "XML",
+								"catalog_type"         => "RETAIL",
+								"location"             => "https://example-3.com/wp-content/uploads/pinterest-for-woocommerce-KJhJas.xml",
+								"status"               => "ACTIVE",
+								"default_currency"     => "USD",
+								"default_locale"       => "en-US",
+								"default_country"      => "US",
+								"default_availability" => "IN_STOCK",
+							),
+							array(
+								"created_at"           => "2022-03-14T15:15:22Z",
 								"id"                   => "547381235776346598",
 								"updated_at"           => "2022-03-14T15:16:34Z",
 								"name"                 => "string",
-								"format"               => "TSV",
+								"format"               => "CSV",
 								"catalog_type"         => "RETAIL",
 								"location"             => "https://example-2.com/wp-content/uploads/pinterest-for-woocommerce-taLlmN.xml",
 								"status"               => "ACTIVE",
@@ -80,8 +117,95 @@ class LocalFeedConfigsE2eTest extends \WP_UnitTestCase {
 								"default_locale"       => "en-US",
 								"default_country"      => "US",
 								"default_availability" => "IN_STOCK",
-							)
+							),
 						),
+					)
+				),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'cookies'  => array(),
+				'filename' => '',
+			);
+		}
+		return $response;
+	}
+
+	public static function get_feeds_no_match( $response, $parsed_args, $url ) {
+		if ( 'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=475245723456346' === $url ) {
+			return array(
+				'headers' => array(
+					'content-type' => 'application/json',
+				),
+				'body' => json_encode(
+					array (
+						'items' => array(
+							array(
+								"created_at"           => "2022-03-14T15:15:22Z",
+								"id"                   => "7689378468829304869",
+								"updated_at"           => "2022-03-14T15:16:34Z",
+								"name"                 => "string",
+								"format"               => "XML",
+								"catalog_type"         => "RETAIL",
+								"location"             => "https://example-3.com/wp-content/uploads/pinterest-for-woocommerce-KJhJas.xml",
+								"status"               => "ACTIVE",
+								"default_currency"     => "USD",
+								"default_locale"       => "en-US",
+								"default_country"      => "US",
+								"default_availability" => "IN_STOCK",
+							),
+							array(
+								"created_at"           => "2022-03-14T15:15:22Z",
+								"id"                   => "1345136789312412469",
+								"updated_at"           => "2022-03-14T15:16:34Z",
+								"name"                 => "string",
+								"format"               => "XML",
+								"catalog_type"         => "RETAIL",
+								"location"             => "https://example-5.com/wp-content/uploads/pinterest-for-woocommerce-hhRJgh.xml",
+								"status"               => "ACTIVE",
+								"default_currency"     => "USD",
+								"default_locale"       => "en-US",
+								"default_country"      => "US",
+								"default_availability" => "IN_STOCK",
+							),
+							array(
+								"created_at"           => "2022-03-14T15:15:22Z",
+								"id"                   => "123123510511560562",
+								"updated_at"           => "2022-03-14T15:16:34Z",
+								"name"                 => "string",
+								"format"               => "CSV",
+								"catalog_type"         => "RETAIL",
+								"location"             => "https://example-4.com/wp-content/uploads/pinterest-for-woocommerce-jkAadD.xml",
+								"status"               => "ACTIVE",
+								"default_currency"     => "USD",
+								"default_locale"       => "en-US",
+								"default_country"      => "US",
+								"default_availability" => "IN_STOCK",
+							),
+						),
+					)
+				),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'cookies'  => array(),
+				'filename' => '',
+			);
+		}
+		return $response;
+	}
+
+	public static function get_no_feeds( $response, $parsed_args, $url ) {
+		if ( 'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=475245723456346' === $url ) {
+			return array(
+				'headers' => array(
+					'content-type' => 'application/json',
+				),
+				'body' => json_encode(
+					array (
+						'items' => array(),
 					)
 				),
 				'response' => array(
