@@ -3,28 +3,35 @@
 namespace Automattic\WooCommerce\Pinterest\Tests\E2e;
 
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
-use Automattic\WooCommerce\Pinterest\Notes\TokenInvalidFailure;
 use Pinterest_For_Woocommerce;
 
 class LocalFeedConfigsE2eTest extends \WP_UnitTestCase {
 
-	protected function setUp(): void {
+	public function setUp(): void {
 		parent::setUp();
 
-		self::get_feeds_request_stub();
+		Pinterest_For_Woocommerce::set_default_settings();
+		Pinterest_For_Woocommerce::save_setting( 'tracking_advertiser', '475245723456346' );
+		Pinterest_For_Woocommerce::save_setting( 'product_sync_enabled', true );
 
-		Pinterest_For_Woocommerce::save_data('local_feed_ids', array());
-		Pinterest_For_Woocommerce::save_setting('tracking_advertiser', '8901267167247612734708');
-		add_filter('woocommerce_get_base_location', 'US:CA');
-		add_filter('locale', 'en_US');
-		add_filter(
-			'site_url',
-			function ($url) {
-				return 'https://pinterest.dima.works';
-			},
-			10,
-			1
-		);
+		// LocalFeedConfigs is a singleton object, resetting its state before each test.
+		LocalFeedConfigs::deregister();
+
+		add_filter( 'woocommerce_get_base_location', fn() => 'US:CA' );
+		add_filter( 'locale', fn() => 'en_US' );
+		add_filter( 'site_url', fn( $url ) => 'https://example-2.com' );
+		add_filter( 'upload_dir', fn( $data ) => array_merge( $data, array( 'baseurl' => 'https://example-2.com/wp-content/uploads' ) ) );
+		add_filter( 'pre_http_request', array( self::class, 'get_feeds' ), 10, 3 );
+	}
+
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+		remove_all_filters( 'site_url' );
+		remove_all_filters( 'woocommerce_get_base_location' );
+		remove_all_filters( 'upload_dir' );
+		remove_all_filters( 'locale' );
 	}
 
 	/**
@@ -40,65 +47,51 @@ class LocalFeedConfigsE2eTest extends \WP_UnitTestCase {
 
 		$this->assertEquals(
 			array(
-				array(
+				'US' => array(
 					'feed_id'   => 'taLlmN',
-					'feed_file' => '/taLlmN.xml',
-					'tmp_file'  => '/taLlmN-tmp.xml',
-					'feed_url'  => 'https://pinterest.dima.works/wp-content/uploads/pinterest-for-woocommerce-taLlmN.xml',
+					'feed_file' => '/var/folders/2h/88p1y74545vd1bb3_vc684n80000gn/T/wordpress/wp-content/uploads/pinterest-for-woocommerce-taLlmN.xml',
+					'tmp_file'  => '/var/folders/2h/88p1y74545vd1bb3_vc684n80000gn/T/wordpress/wp-content/uploads/pinterest-for-woocommerce-taLlmN-tmp.xml',
+					'feed_url'  => 'https://example-2.com/wp-content/uploads/pinterest-for-woocommerce-taLlmN.xml',
 				),
 			),
 			$configurations
 		);
 	}
 
-	private static function get_feeds_request_stub() {
-		add_filter(
-			'pre_http_request',
-			function ( $response, $parsed_args, $url ) {
-				if ( 'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=8901267167247612734708' === $url ) {
-					$response = array(
-						'headers' => array(
-							'content-type' => 'application/json',
-						),
-						'body' => json_encode(
-							array (
-								'items' => array(
-									"created_at"                    => "2022-03-14T15:15:22Z",
-									"id"                            => "547381235776346598",
-									"updated_at"                    => "2022-03-14T15:16:34Z",
-									"name"                          => "string",
-									"format"                        => "TSV",
-									"catalog_type"                  => "RETAIL",
-									"credentials"                   => array(
-										"password" => "string",
-										"username" => "string",
-									),
-									"location"                      => "https://pinterest.dima.works/wp-content/uploads/pinterest-for-woocommerce-taLlmN.xml",
-									"preferred_processing_schedule" => array(
-										"time"     => "02:59",
-										"timezone" => "Africa/Abidjan",
-									),
-									"status"                        => "ACTIVE",
-									"default_currency"              => "USD",
-									"default_locale"                => "en-US",
-									"default_country"               => "US",
-									"default_availability"          => "IN_STOCK",
-								),
+	public static function get_feeds( $response, $parsed_args, $url ) {
+		if ( 'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=475245723456346' === $url ) {
+			return array(
+				'headers' => array(
+					'content-type' => 'application/json',
+				),
+				'body' => json_encode(
+					array (
+						'items' => array(
+							array(
+								"created_at"           => "2022-03-14T15:15:22Z",
+								"id"                   => "547381235776346598",
+								"updated_at"           => "2022-03-14T15:16:34Z",
+								"name"                 => "string",
+								"format"               => "TSV",
+								"catalog_type"         => "RETAIL",
+								"location"             => "https://example-2.com/wp-content/uploads/pinterest-for-woocommerce-taLlmN.xml",
+								"status"               => "ACTIVE",
+								"default_currency"     => "USD",
+								"default_locale"       => "en-US",
+								"default_country"      => "US",
+								"default_availability" => "IN_STOCK",
 							)
 						),
-						'response' => array(
-							'code'    => 200,
-							'message' => 'OK',
-						),
-						'cookies'  => array(),
-						'filename' => '',
-					);
-				}
-
-				return $response;
-			},
-			10,
-			3
-		);
+					)
+				),
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'cookies'  => array(),
+				'filename' => '',
+			);
+		}
+		return $response;
 	}
 }

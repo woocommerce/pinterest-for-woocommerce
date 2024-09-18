@@ -47,6 +47,12 @@ class Pinterest401DisconnectE2eTest extends \WP_UnitTestCase
 		do_action( 'pinterest_for_woocommerce_token_saved' );
 	}
 
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
 	/**
 	 * Tests .
 	 *

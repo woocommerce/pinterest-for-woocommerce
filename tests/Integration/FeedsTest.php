@@ -8,6 +8,12 @@ use Pinterest_For_Woocommerce;
 
 class FeedsTest extends \WP_UnitTestCase {
 
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
 	/**
 	 * Tests emulates Pinterest create feed endpoint response when a feed with the same name already exists.
 	 *

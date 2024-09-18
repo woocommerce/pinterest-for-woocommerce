@@ -13,6 +13,12 @@ use Exception;
 
 class AdvertiserConnectTest extends \WP_UnitTestCase {
 
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
 	public function test_connect_advertiser_and_tag_successfully_connects() {
 		add_filter(
 			'pre_http_request',

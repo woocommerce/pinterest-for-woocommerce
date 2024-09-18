@@ -13,6 +13,12 @@ use WP_Test_REST_TestCase;
 
 class TagsTest extends WP_Test_REST_TestCase {
 
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
 	/**
 	 * Tests if the tags route is registered.
 	 *

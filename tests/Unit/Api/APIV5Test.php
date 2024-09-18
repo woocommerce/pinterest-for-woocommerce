@@ -15,6 +15,12 @@ use WP_UnitTestCase;
 
 class APIV5Test extends WP_UnitTestCase {
 
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
 	public function test_create_tag_returns_successful_response() {
 		add_filter(
 			'pinterest_for_woocommerce_default_tag_name',

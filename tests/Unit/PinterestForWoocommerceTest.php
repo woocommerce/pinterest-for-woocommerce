@@ -12,6 +12,12 @@ use WP_UnitTestCase;
 
 class PinterestForWoocommerceTest extends WP_UnitTestCase {
 
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
 	/**
 	 * Tests default settings are set.
 	 *

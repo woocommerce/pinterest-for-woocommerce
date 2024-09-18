@@ -13,6 +13,12 @@ class PinterestConnectE2eTest extends \WP_UnitTestCase {
 		Pinterest_For_Woocommerce::save_settings( [] );
 	}
 
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
 	/**
 	 * Tests successful Pinterest auth produces proper settings after all pinterest_for_woocommerce_token_saved hooks are fired.
 	 *
