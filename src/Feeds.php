@@ -306,11 +306,11 @@ class Feeds {
 	/**
 	 * Tests if the feed is a match.
 	 *
-	 * @param $feed
+	 * @param array $feed A feed information array from Pinterest API response.
 	 *
 	 * @since x.x.x
 	 * @return bool
-	 * @throws PinterestApiLocaleException
+	 * @throws PinterestApiLocaleException If we could not match any of WP locales to Pinterest locales list.
 	 */
 	private static function does_feed_match( $feed ): bool {
 		$local_country = Pinterest_For_Woocommerce::get_base_country();
