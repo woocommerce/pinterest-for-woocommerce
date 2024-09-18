@@ -315,8 +315,8 @@ class Feeds {
 	private static function does_feed_match( $feed ): bool {
 		$local_country = Pinterest_For_Woocommerce::get_base_country();
 		$local_locale  = LocaleMapper::get_locale_for_api();
-		$does_match = $local_country === $feed['default_country'] ?? '';
-		$does_match = $does_match && $local_locale === $feed['default_locale'] ?? '';
+		$does_match    = $local_country === $feed['default_country'] ?? '';
+		$does_match    = $does_match && $local_locale === $feed['default_locale'] ?? '';
 		return $does_match && 0 === strpos( $feed['location'] ?? '', get_site_url() );
 	}
 
