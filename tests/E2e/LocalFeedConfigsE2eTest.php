@@ -49,9 +49,9 @@ class LocalFeedConfigsE2eTest extends \WP_UnitTestCase {
 			array(
 				'US' => array(
 					'feed_id'   => 'taLlmN',
-					'feed_file' => '/var/folders/2h/88p1y74545vd1bb3_vc684n80000gn/T/wordpress/wp-content/uploads/pinterest-for-woocommerce-taLlmN.xml',
-					'tmp_file'  => '/var/folders/2h/88p1y74545vd1bb3_vc684n80000gn/T/wordpress/wp-content/uploads/pinterest-for-woocommerce-taLlmN-tmp.xml',
-					'feed_url'  => 'https://example-2.com/wp-content/uploads/pinterest-for-woocommerce-taLlmN.xml',
+					'feed_file' => wp_upload_dir()['basedir'] . '/pinterest-for-woocommerce-taLlmN.xml',
+					'tmp_file'  => wp_upload_dir()['basedir'] . '/pinterest-for-woocommerce-taLlmN-tmp.xml',
+					'feed_url'  => wp_upload_dir()['baseurl'] . '/pinterest-for-woocommerce-taLlmN.xml',
 				),
 			),
 			$configurations
