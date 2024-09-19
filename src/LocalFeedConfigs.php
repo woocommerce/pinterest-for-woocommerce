@@ -7,6 +7,8 @@
  */
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Exception\FeedNotFoundException;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -68,12 +70,12 @@ class LocalFeedConfigs {
 	private function initialize_local_feeds_config( $locations ) {
 		$feed_ids = Pinterest_For_Woocommerce()::get_data( 'local_feed_ids' );
 		if ( empty( $feed_ids ) ) {
-			$remote_feed_id = Feeds::maybe_remote_feed();
-			if ( $remote_feed_id ) {
-				$feed_ids = array(
+			try {
+				$remote_feed_id = Feeds::maybe_remote_feed();
+				$feed_ids       = array(
 					Pinterest_For_Woocommerce()::get_base_country() => $remote_feed_id,
 				);
-			} else {
+			} catch ( FeedNotFoundException $e ) {
 				$feed_ids = array();
 			}
 		}

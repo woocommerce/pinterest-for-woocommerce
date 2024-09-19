@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
+use Automattic\WooCommerce\Pinterest\Exception\FeedNotFoundException;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
 use Exception;
@@ -103,7 +104,11 @@ class Feeds {
 		$name             = (string) parse_url( esc_url( get_site_url() ), PHP_URL_HOST );
 		$default_country  = Pinterest_For_Woocommerce()::get_base_country();
 		$default_currency = get_woocommerce_currency();
-		$default_locale   = LocaleMapper::get_locale_for_api();
+		try {
+			$default_locale = LocaleMapper::get_locale_for_api();
+		} catch ( PinterestApiLocaleException $e ) {
+			$default_locale = LocaleMapper::PINTEREST_DEFAULT_LOCALE;
+		}
 
 		/**
 		 * Filters the default feed name: pinterest_for_woocommerce_unique_feed_name.
@@ -310,11 +315,14 @@ class Feeds {
 	 *
 	 * @since x.x.x
 	 * @return bool
-	 * @throws PinterestApiLocaleException If we could not match any of WP locales to Pinterest locales list.
 	 */
 	private static function does_feed_match( $feed ): bool {
 		$local_country = Pinterest_For_Woocommerce::get_base_country();
-		$local_locale  = LocaleMapper::get_locale_for_api();
+		try {
+			$local_locale = LocaleMapper::get_locale_for_api();
+		} catch ( PinterestApiLocaleException $e ) {
+			$local_locale = LocaleMapper::PINTEREST_DEFAULT_LOCALE;
+		}
 		$does_match    = $local_country === $feed['default_country'] ?? '';
 		$does_match    = $does_match && $local_locale === $feed['default_locale'] ?? '';
 		return $does_match && 0 === strpos( $feed['location'] ?? '', get_site_url() );
@@ -325,22 +333,19 @@ class Feeds {
 	 *
 	 * @since x.x.x
 	 * @return string - Remote feed ID that matches.
+	 * @throws FeedNotFoundException When there is no matching feed at Pinterest.
 	 */
 	public static function maybe_remote_feed(): string {
-		try {
-			$feeds = self::get_feeds();
-			foreach ( $feeds as $feed ) {
-				if ( self::does_feed_match( $feed ) ) {
-					$last_dash_position = strrpos( $feed['location'], '-' ) + 1;
-					$last_dot_position  = strrpos( $feed['location'], '.' );
-					$length_of_the_id   = $last_dot_position - $last_dash_position;
-					return substr( $feed['location'], $last_dash_position, $length_of_the_id );
-				}
+		$feeds = self::get_feeds();
+		foreach ( $feeds as $feed ) {
+			if ( self::does_feed_match( $feed ) ) {
+				$last_dash_position = strrpos( $feed['location'], '-' ) + 1;
+				$last_dot_position  = strrpos( $feed['location'], '.' );
+				$length_of_the_id   = $last_dot_position - $last_dash_position;
+				return substr( $feed['location'], $last_dash_position, $length_of_the_id );
 			}
-			return '';
-		} catch ( PinterestApiLocaleException $e ) {
-			return '';
 		}
+		throw new FeedNotFoundException();
 	}
 
 	/**
