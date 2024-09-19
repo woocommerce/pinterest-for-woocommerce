@@ -403,7 +403,7 @@ class PluginUpdate {
 	 */
 	private function feed_deletion_notice_cleanup(): void {
 		try {
-			FeedDeletionFailure::possibly_update_note();
+			FeedDeletionFailure::possibly_delete_note();
 		} catch ( NotesUnavailableException $e ) {
 			return;
 		}
