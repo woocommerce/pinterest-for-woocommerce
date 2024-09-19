@@ -95,7 +95,7 @@ class FeedDeletionFailure {
 	 */
 	public static function possibly_add_note( int $code ) {
 		try {
-			if ( self::note_exists() && ! self::has_note_been_actioned() ) {
+			if ( self::note_exists() ) {
 				return;
 			}
 
