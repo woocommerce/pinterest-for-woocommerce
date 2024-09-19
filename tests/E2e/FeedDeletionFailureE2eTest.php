@@ -35,7 +35,21 @@ class FeedDeletionFailureE2eTest extends \WP_UnitTestCase {
 
 	public function test_deletes_multiple_notes() {
 		for ( $i = 0; $i < 10; $i ++ ) {
-			$note = FeedDeletionFailure::get_note( 'Some message' );
+			$additional_data = array(
+				'role' => 'administrator',
+			);
+			$note = new Note();
+			$note->set_title( __( 'Pinterest For WooCommerce Feed Deletion Failed.', 'pinterest-for-woocommerce' ) );
+			$note->set_content( 'Notice text.' );
+			$note->set_content_data( (object) $additional_data );
+			$note->set_type( Note::E_WC_ADMIN_NOTE_ERROR );
+			$note->set_status( Note::E_WC_ADMIN_NOTE_UNACTIONED );
+			$note->set_name( FeedDeletionFailure::NOTE_NAME );
+			$note->set_source( 'pinterest-for-woocommerce' );
+			$note->add_action(
+				'dismiss',
+				__( 'Dismiss', 'pinterest-for-woocommerce' )
+			);
 			$note->save();
 		}
 
