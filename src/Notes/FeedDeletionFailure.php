@@ -67,22 +67,29 @@ class FeedDeletionFailure {
 			$message
 		);
 
-		$additional_data = array(
-			'role' => 'administrator',
-		);
+		if ( self::note_exists() ) {
+			$data_store = Notes::load_data_store();
+			$note_ids   = $data_store->get_notes_with_name( self::NOTE_NAME );
+			$note       = Notes::get_note( current( $note_ids ) );
+		} else {
+			$additional_data = array(
+				'role' => 'administrator',
+			);
 
-		$note = new Note();
-		$note->set_title( __( 'Pinterest For WooCommerce Feed Deletion Failed.', 'pinterest-for-woocommerce' ) );
-		$note->set_content( $content );
-		$note->set_content_data( (object) $additional_data );
-		$note->set_type( Note::E_WC_ADMIN_NOTE_ERROR );
-		$note->set_status( Note::E_WC_ADMIN_NOTE_UNACTIONED );
-		$note->set_name( self::NOTE_NAME );
-		$note->set_source( 'pinterest-for-woocommerce' );
-		$note->add_action(
-			'dismiss',
-			__( 'Dismiss', 'pinterest-for-woocommerce' )
-		);
+			$note = new Note();
+			$note->set_title( __( 'Pinterest For WooCommerce Feed Deletion Failed.', 'pinterest-for-woocommerce' ) );
+			$note->set_content( $content );
+			$note->set_content_data( (object) $additional_data );
+			$note->set_type( Note::E_WC_ADMIN_NOTE_ERROR );
+			$note->set_status( Note::E_WC_ADMIN_NOTE_UNACTIONED );
+			$note->set_name( self::NOTE_NAME );
+			$note->set_source( 'pinterest-for-woocommerce' );
+			$note->add_action(
+				'dismiss',
+				__( 'Dismiss', 'pinterest-for-woocommerce' )
+			);
+		}
+
 		return $note;
 	}
 

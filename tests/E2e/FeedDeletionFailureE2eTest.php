@@ -2,6 +2,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tests\E2e;
 
+use Automattic\WooCommerce\Admin\Notes\Note;
 use Automattic\WooCommerce\Admin\Notes\Notes;
 use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
@@ -49,5 +50,24 @@ class FeedDeletionFailureE2eTest extends \WP_UnitTestCase {
 		$note_ids   = $data_store->get_notes_with_name( FeedDeletionFailure::NOTE_NAME );
 
 		$this->assertCount( 0, $note_ids );
+	}
+
+	public function test_no_notice_duplicates() {
+		FeedDeletionFailure::possibly_add_note( PinterestApiException::CATALOGS_FEED_HAS_ACTIVE_PROMOTIONS );
+
+		$data_store = Notes::load_data_store();
+		$note_ids   = $data_store->get_notes_with_name( FeedDeletionFailure::NOTE_NAME );
+		$note       = Notes::get_note( current( $note_ids ) );
+		$note->set_status( Note::E_WC_ADMIN_NOTE_ACTIONED );
+		$note->save();
+
+		FeedDeletionFailure::possibly_add_note( PinterestApiException::CATALOGS_FEED_HAS_ACTIVE_PROMOTIONS );
+
+		$data_store = Notes::load_data_store();
+		$note_ids   = $data_store->get_notes_with_name( FeedDeletionFailure::NOTE_NAME );
+		$note       = Notes::get_note( current( $note_ids ) );
+
+		$this->assertCount( 1, $note_ids );
+		$this->assertEquals( Note::E_WC_ADMIN_NOTE_ACTIONED, $note->get_status() );
 	}
 }
