@@ -2,16 +2,16 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Pinterest for WooCommerce 1.4.6\n"
+"Project-Id-Version: Pinterest for WooCommerce 1.4.10\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/pinterest-for-woocommerce\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-08-26T09:32:11+00:00\n"
+"POT-Creation-Date: 2024-09-19T14:58:29+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.10.0\n"
+"X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: pinterest-for-woocommerce\n"
 
 #. Plugin Name of the plugin
@@ -243,7 +243,7 @@ msgstr ""
 
 #: src/API/Base.php:421
 #: src/API/Base.php:806
-#: src/Merchants.php:140
+#: src/Merchants.php:141
 msgid "Auto-created by Pinterest for WooCommerce"
 msgstr ""
 
@@ -523,11 +523,11 @@ msgid "Could not register feed."
 msgstr ""
 
 #. translators: %1$s is a country ISO 2 code, %2$s is a currency ISO 3 code.
-#: src/Feeds.php:119
+#: src/Feeds.php:125
 msgid "Created by Pinterest for WooCommerce at %1$s %2$s|%3$s|%4$s"
 msgstr ""
 
-#: src/Feeds.php:143
+#: src/Feeds.php:149
 msgid "There was a previous error trying to create a feed."
 msgstr ""
 
@@ -538,32 +538,32 @@ msgid "Pinterest says: %1$s"
 msgstr ""
 
 #. translators: %s is the locale code.
-#: src/LocaleMapper.php:107
+#: src/LocaleMapper.php:109
 msgid "No matching Pinterest API locale found for %s"
 msgstr ""
 
-#: src/Merchants.php:71
+#: src/Merchants.php:72
 msgid "Wrong response when trying to create or update merchant."
 msgstr ""
 
-#: src/Merchants.php:79
+#: src/Merchants.php:80
 msgid "There was an error trying to get the merchant object."
 msgstr ""
 
-#: src/Merchants.php:84
-#: src/Merchants.php:177
+#: src/Merchants.php:85
+#: src/Merchants.php:183
 msgid "Response error when trying to create a merchant or update the existing one."
 msgstr ""
 
-#: src/Merchants.php:107
+#: src/Merchants.php:108
 msgid "Response error when trying to get advertisers."
 msgstr ""
 
-#: src/Merchants.php:113
+#: src/Merchants.php:114
 msgid "No merchant returned in the advertiser's response."
 msgstr ""
 
-#: src/Merchants.php:160
+#: src/Merchants.php:166
 msgid "There was a previous error trying to create or update merchant."
 msgstr ""
 
@@ -617,14 +617,14 @@ msgstr ""
 
 #. translators: %1$s: Pinterest API message (reason of the failure).
 #: src/Notes/FeedDeletionFailure.php:63
-msgid "The Pinterest For WooCommerce plugin has failed to delete the feed.<br/>%1$s<br/>Please, contact support to resolve the issue."
+msgid "The Pinterest For WooCommerce plugin has failed to delete the feed.<br/>%1$s<br/>Please, contact Pinterest support to resolve the issue."
 msgstr ""
 
-#: src/Notes/FeedDeletionFailure.php:75
+#: src/Notes/FeedDeletionFailure.php:80
 msgid "Pinterest For WooCommerce Feed Deletion Failed."
 msgstr ""
 
-#: src/Notes/FeedDeletionFailure.php:84
+#: src/Notes/FeedDeletionFailure.php:89
 msgid "Dismiss"
 msgstr ""
 
@@ -658,12 +658,12 @@ msgid "Tracking advertiser or tag missing"
 msgstr ""
 
 #. translators: plugin version.
-#: src/PluginUpdate.php:176
+#: src/PluginUpdate.php:181
 msgid "Plugin updated to version: %s."
 msgstr ""
 
 #. translators: 1: plugin version, 2: failed procedure, 3: error message.
-#: src/PluginUpdate.php:199
+#: src/PluginUpdate.php:204
 msgid "Plugin update to version %1$s. Procedure: %2$s. Error: %3$s"
 msgstr ""
 
@@ -685,17 +685,17 @@ msgid "The product [%s] has a description longer than the allowed limit."
 msgstr ""
 
 #. translators: 1: The URL of the connection page
-#: src/ProductSync.php:156
+#: src/ProductSync.php:157
 msgid "The domain is not verified, visit the <a href=\"%1$s\">connection</a> page to verify it."
 msgstr ""
 
 #. translators: 1: The URL of the connection page
-#: src/ProductSync.php:172
+#: src/ProductSync.php:173
 msgid "The tracking tag is not configured, visit the <a href=\"%1$s\">connection</a> page to configure it."
 msgstr ""
 
 #. translators: 1: The URL of the settings page
-#: src/ProductSync.php:187
+#: src/ProductSync.php:188
 msgid "Visit the <a href=\"%1$s\">settings</a> page to enable it."
 msgstr ""
 
