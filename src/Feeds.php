@@ -329,7 +329,7 @@ class Feeds {
 	}
 
 	/**
-	 * Tries to match remote feeds against local website configuration to find an existing feed, if any.
+	 * Compare remote feeds to local configuration to find a matching feed.
 	 *
 	 * @since x.x.x
 	 * @return string - Remote feed ID that matches.
