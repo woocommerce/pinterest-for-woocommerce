@@ -77,6 +77,8 @@ class LocaleMapper {
 		'pt-BR'  => 1,
 	);
 
+	const PINTEREST_DEFAULT_LOCALE = 'en-US';
+
 	/**
 	 * Get Pinterest locale code for API.
 	 * Pinterest API uses hyphens instead of underscores in locale codes so we need to replace them.
@@ -112,6 +114,7 @@ class LocaleMapper {
 
 	/**
 	 * Get WordPress locale code.
+	 * WordPress defaults to en_US locale if nothing is found.
 	 *
 	 * @since 1.2.13
 	 * @return string

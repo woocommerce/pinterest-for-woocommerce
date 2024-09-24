@@ -10,6 +10,12 @@ use WP_Test_REST_TestCase;
 
 class FeedIssuesTest extends WP_Test_REST_TestCase {
 
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
 	/**
 	 * Tests if the feed issues route is registered.
 	 *
@@ -58,9 +64,9 @@ class FeedIssuesTest extends WP_Test_REST_TestCase {
 		);
 		$mock_feed_id      = uniqid();
 
+		Pinterest_For_Woocommerce::set_default_settings();
 		Pinterest_For_WooCommerce::save_setting( 'tracking_advertiser', 'ai-123456789' );
 		Pinterest_For_WooCommerce::save_setting( 'account_data', $mock_account_data );
-		Pinterest_For_Woocommerce::save_setting( 'product_sync_enabled', true );
 		Pinterest_For_Woocommerce::save_data( 'feed_registered', $mock_feed_id  );
 
 		add_filter(
@@ -156,7 +162,7 @@ class FeedIssuesTest extends WP_Test_REST_TestCase {
 												),
 										)
 								)
-								)
+							)
 						),
 						'response' => array(
 							'code'    => 200,

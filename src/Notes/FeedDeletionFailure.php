@@ -61,28 +61,35 @@ class FeedDeletionFailure {
 		$content = sprintf(
 			// translators: %1$s: Pinterest API message (reason of the failure).
 			__(
-				'The Pinterest For WooCommerce plugin has failed to delete the feed.<br/>%1$s<br/>Please, contact support to resolve the issue.',
+				'The Pinterest For WooCommerce plugin has failed to delete the feed.<br/>%1$s<br/>Please, contact Pinterest support to resolve the issue.',
 				'pinterest-for-woocommerce'
 			),
 			$message
 		);
 
-		$additional_data = array(
-			'role' => 'administrator',
-		);
+		if ( self::note_exists() ) {
+			$data_store = Notes::load_data_store();
+			$note_ids   = $data_store->get_notes_with_name( self::NOTE_NAME );
+			$note       = Notes::get_note( current( $note_ids ) );
+		} else {
+			$additional_data = array(
+				'role' => 'administrator',
+			);
 
-		$note = new Note();
-		$note->set_title( __( 'Pinterest For WooCommerce Feed Deletion Failed.', 'pinterest-for-woocommerce' ) );
-		$note->set_content( $content );
-		$note->set_content_data( (object) $additional_data );
-		$note->set_type( Note::E_WC_ADMIN_NOTE_ERROR );
-		$note->set_status( Note::E_WC_ADMIN_NOTE_UNACTIONED );
-		$note->set_name( self::NOTE_NAME );
-		$note->set_source( 'pinterest-for-woocommerce' );
-		$note->add_action(
-			'dismiss',
-			__( 'Dismiss', 'pinterest-for-woocommerce' )
-		);
+			$note = new Note();
+			$note->set_title( __( 'Pinterest For WooCommerce Feed Deletion Failed.', 'pinterest-for-woocommerce' ) );
+			$note->set_content( $content );
+			$note->set_content_data( (object) $additional_data );
+			$note->set_type( Note::E_WC_ADMIN_NOTE_ERROR );
+			$note->set_status( Note::E_WC_ADMIN_NOTE_UNACTIONED );
+			$note->set_name( self::NOTE_NAME );
+			$note->set_source( 'pinterest-for-woocommerce' );
+			$note->add_action(
+				'dismiss',
+				__( 'Dismiss', 'pinterest-for-woocommerce' )
+			);
+		}
+
 		return $note;
 	}
 
@@ -95,7 +102,7 @@ class FeedDeletionFailure {
 	 */
 	public static function possibly_add_note( int $code ) {
 		try {
-			if ( self::note_exists() && ! self::has_note_been_actioned() ) {
+			if ( self::note_exists() ) {
 				return;
 			}
 

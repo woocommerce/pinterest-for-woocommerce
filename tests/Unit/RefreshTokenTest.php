@@ -6,8 +6,15 @@ use Automattic\WooCommerce\Pinterest\Crypto;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Automattic\WooCommerce\Pinterest\RefreshToken;
 use Pinterest_For_Woocommerce;
+use WP_UnitTestCase;
 
-class RefreshTokenTest extends \WP_UnitTestCase {
+class RefreshTokenTest extends WP_UnitTestCase {
+
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+	}
 
 	/**
 	 * Test daily refresh token action is added.

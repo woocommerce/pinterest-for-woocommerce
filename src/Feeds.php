@@ -13,9 +13,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
+use Automattic\WooCommerce\Pinterest\Exception\FeedNotFoundException;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
 use Exception;
+use Pinterest_For_Woocommerce;
 use Throwable;
 
 /**
@@ -102,7 +104,11 @@ class Feeds {
 		$name             = (string) parse_url( esc_url( get_site_url() ), PHP_URL_HOST );
 		$default_country  = Pinterest_For_Woocommerce()::get_base_country();
 		$default_currency = get_woocommerce_currency();
-		$default_locale   = LocaleMapper::get_locale_for_api();
+		try {
+			$default_locale = LocaleMapper::get_locale_for_api();
+		} catch ( PinterestApiLocaleException $e ) {
+			$default_locale = LocaleMapper::PINTEREST_DEFAULT_LOCALE;
+		}
 
 		/**
 		 * Filters the default feed name: pinterest_for_woocommerce_unique_feed_name.
@@ -276,9 +282,6 @@ class Feeds {
 	 * @throws PinterestApiLocaleException No valid locale found to check for the registered feed.
 	 */
 	public static function match_local_feed_configuration_to_registered_feeds( array $feeds = array() ): string {
-		$local_country = Pinterest_For_Woocommerce()::get_base_country();
-		$local_locale  = LocaleMapper::get_locale_for_api();
-
 		if ( empty( $feeds ) ) {
 			$feeds = static::get_feeds();
 		}
@@ -287,9 +290,6 @@ class Feeds {
 		$config  = reset( $configs );
 
 		foreach ( $feeds as $feed ) {
-			$old_name_match = is_null( $feed['name'] );
-			$new_name_match = 0 === strpos( $feed['name'] ?? '', 'Created by Pinterest for WooCommerce' );
-
 			/**
 			 * Match feeds created by Pinterest for WooCommerce extension in both API v3 and v5 versions.
 			 *
@@ -299,16 +299,62 @@ class Feeds {
 			 * When trying to match remote feed to a local configuration, we need to check both cases
 			 * not to create a new feed if the feed was created by the extension in the past.
 			 */
-			$does_match = $old_name_match || $new_name_match;
-			$does_match = $does_match && $local_country === $feed['default_country'] ?? '';
-			$does_match = $does_match && $local_locale === $feed['default_locale'] ?? '';
-			$does_match = $does_match && $config['feed_url'] === $feed['location'] ?? '';
+			$does_match = self::does_feed_match( $feed ) && ( $feed['location'] ?? '' ) === $config['feed_url'];
 			if ( $does_match ) {
 				return $feed['id'];
 			}
 		}
 
 		return '';
+	}
+
+	/**
+	 * Tests if the feed is a match.
+	 *
+	 * @param array $feed A feed information array from Pinterest API response.
+	 *
+	 * @since 1.4.10
+	 * @return bool
+	 */
+	private static function does_feed_match( array $feed ): bool {
+		$local_country = Pinterest_For_Woocommerce::get_base_country();
+		try {
+			$local_locale = LocaleMapper::get_locale_for_api();
+		} catch ( PinterestApiLocaleException $e ) {
+			$local_locale = LocaleMapper::PINTEREST_DEFAULT_LOCALE;
+		}
+
+		$does_match = ( $feed['default_country'] ?? '' ) === $local_country;
+		if ( ! $does_match ) {
+			return false;
+		}
+
+		$does_match = ( $feed['default_locale'] ?? '' ) === $local_locale;
+		if ( ! $does_match ) {
+			return false;
+		}
+
+		return 0 === strpos( $feed['location'] ?? '', get_site_url() );
+	}
+
+	/**
+	 * Compare remote feeds to local configuration to find a matching feed.
+	 *
+	 * @since 1.4.10
+	 * @return string - Remote feed ID that matches.
+	 * @throws FeedNotFoundException When there is no matching feed at Pinterest.
+	 */
+	public static function maybe_remote_feed(): string {
+		$feeds = self::get_feeds();
+		foreach ( $feeds as $feed ) {
+			if ( self::does_feed_match( $feed ) ) {
+				$last_dash_position = strrpos( $feed['location'], '-' ) + 1;
+				$last_dot_position  = strrpos( $feed['location'], '.' );
+				$length_of_the_id   = $last_dot_position - $last_dash_position;
+				return substr( $feed['location'], $last_dash_position, $length_of_the_id );
+			}
+		}
+		throw new FeedNotFoundException();
 	}
 
 	/**
@@ -319,6 +365,7 @@ class Feeds {
 	 *
 	 * @throws PinterestApiException Pinterest API Exception.
 	 * @since 1.2.13
+	 * @deprecated
 	 */
 	public static function is_local_feed_enabled( string $feed_id ): bool {
 		if ( empty( $feed_id ) ) {

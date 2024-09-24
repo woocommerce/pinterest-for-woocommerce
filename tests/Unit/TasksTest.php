@@ -64,6 +64,7 @@ class TasksTest extends WP_UnitTestCase {
 		$this->assertFalse( $is_complete, 'Cannot assert task not completed.' );
 
 		// Setup complete data.
+		Pinterest_For_Woocommerce::set_default_settings();
 		$account_data = array(
 			'is_any_website_verified' => true,
 			'verified_user_websites'  => array( 'somedomain.com' ),

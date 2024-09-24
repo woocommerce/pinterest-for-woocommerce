@@ -4,7 +4,7 @@ Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
 Tested up to: 6.6
 Requires PHP: 7.3
-Stable tag: 1.4.9
+Stable tag: 1.4.10
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,12 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.4.10 - 2024-09-24 =
+* Dev - Tests suits update.
+* Fix - 403 Pinterest API error response is not the reason to auto-disconnect.
+* Fix - Feed Deletion Failure notice duplicates removal.
+* Fix - Reuse existing feed, if any.
 
 = 1.4.9 - 2024-09-12 =
 * Tweak - WC 9.3 compatibility.

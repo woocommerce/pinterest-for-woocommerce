@@ -8,10 +8,24 @@ declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
 
+use Automattic\WooCommerce\Pinterest\Tests\Unit\PinterestForWoocommerceTest;
+use Pinterest_For_Woocommerce;
 use WP_REST_Request;
 use WP_Test_REST_TestCase;
 
 class DomainVerificationTest extends WP_Test_REST_TestCase {
+
+	public function setUp(): void {
+		parent::setUp();
+
+		Pinterest_For_Woocommerce::set_default_settings();
+	}
+
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+	}
 
 	/**
 	 * Tests if the domain verification route is registered.
