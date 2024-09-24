@@ -299,7 +299,7 @@ class Feeds {
 			 * When trying to match remote feed to a local configuration, we need to check both cases
 			 * not to create a new feed if the feed was created by the extension in the past.
 			 */
-			$does_match = self::does_feed_match( $feed ) && $config['feed_url'] === ( $feed['location'] ?? '' );
+			$does_match = self::does_feed_match( $feed ) && ( $feed['location'] ?? '' ) === $config['feed_url'];
 			if ( $does_match ) {
 				return $feed['id'];
 			}
@@ -324,12 +324,12 @@ class Feeds {
 			$local_locale = LocaleMapper::PINTEREST_DEFAULT_LOCALE;
 		}
 
-		$does_match = $local_country === ( $feed['default_country'] ?? '' );
+		$does_match = ( $feed['default_country'] ?? '' ) === $local_country;
 		if ( ! $does_match ) {
 			return false;
 		}
 
-		$does_match = $local_locale === ( $feed['default_locale'] ?? '' );
+		$does_match = ( $feed['default_locale'] ?? '' ) === $local_locale;
 		if ( ! $does_match ) {
 			return false;
 		}
