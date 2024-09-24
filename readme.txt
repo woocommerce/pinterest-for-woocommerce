@@ -91,6 +91,12 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.10 - 2024-09-24 =
+* Dev - Tests suits update.
+* Fix - 403 Pinterest API error response is not the reason to auto-disconnect.
+* Fix - Feed Deletion Failure notice duplicates removal.
+* Fix - Reuse existing feed, if any.
+
 = 1.4.9 - 2024-09-12 =
 * Tweak - WC 9.3 compatibility.
 
