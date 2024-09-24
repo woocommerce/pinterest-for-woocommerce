@@ -299,7 +299,7 @@ class Feeds {
 			 * When trying to match remote feed to a local configuration, we need to check both cases
 			 * not to create a new feed if the feed was created by the extension in the past.
 			 */
-			$does_match = self::does_feed_match( $feed ) && $config['feed_url'] === $feed['location'] ?? '';
+			$does_match = self::does_feed_match( $feed ) && $config['feed_url'] === ( $feed['location'] ?? '' );
 			if ( $does_match ) {
 				return $feed['id'];
 			}
@@ -316,16 +316,25 @@ class Feeds {
 	 * @since x.x.x
 	 * @return bool
 	 */
-	private static function does_feed_match( $feed ): bool {
+	private static function does_feed_match( array $feed ): bool {
 		$local_country = Pinterest_For_Woocommerce::get_base_country();
 		try {
 			$local_locale = LocaleMapper::get_locale_for_api();
 		} catch ( PinterestApiLocaleException $e ) {
 			$local_locale = LocaleMapper::PINTEREST_DEFAULT_LOCALE;
 		}
-		$does_match    = $local_country === $feed['default_country'] ?? '';
-		$does_match    = $does_match && $local_locale === $feed['default_locale'] ?? '';
-		return $does_match && 0 === strpos( $feed['location'] ?? '', get_site_url() );
+
+		$does_match = $local_country === ( $feed['default_country'] ?? '' );
+		if ( ! $does_match ) {
+			return false;
+		}
+
+		$does_match = $local_locale === ( $feed['default_locale'] ?? '' );
+		if ( ! $does_match ) {
+			return false;
+		}
+
+		return 0 === strpos( $feed['location'] ?? '', get_site_url() );
 	}
 
 	/**
