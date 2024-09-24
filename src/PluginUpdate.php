@@ -398,7 +398,7 @@ class PluginUpdate {
 	/**
 	 * Clears all Feed Deletion Failure admin notices created by mistake.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.10
 	 * @return void
 	 */
 	private function feed_deletion_notice_cleanup(): void {
