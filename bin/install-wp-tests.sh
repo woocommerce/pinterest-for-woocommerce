@@ -188,17 +188,20 @@ install_wc() {
     # Grab the necessary plugins.
     if [ $WC_VERSION == 'trunk' ]; then
       rm -rf "$TMPDIR"/woocommerce-trunk
-      git clone --quiet --depth=1 --branch="$LATEST_WC_VERSION" https://github.com/woocommerce/woocommerce.git "${TMPDIR}/woocommerce-trunk"
+      git clone --quiet --depth=1 --branch="$LATEST_WC_VERSION" https://github.com/woocommerce/woocommerce.git "$TMPDIR"/woocommerce-trunk
+
+      # Install composer for WooCommerce
+      cd "$TMPDIR"/woocommerce-trunk/plugins/woocommerce
+      composer install --ignore-platform-reqs --no-interaction --no-dev
+
+      # Symlink woocommerce plugin
       mv "$TMPDIR"/woocommerce-trunk/plugins/woocommerce/* "$WC_DIR"
     else
       echo "Test with specified WooCommerce version ${WC_VERSION} is not yet supported."
       exit 1
     fi
 
-    # Install composer for WooCommerce
-    cd "${WC_DIR}"
-    composer install --ignore-platform-reqs --no-interaction --no-dev
-
+    cd "$WC_DIR"
 	# Generate feature config for WooCommerce
 	GENERATE_FEATURE_CONFIG=bin/generate-feature-config.php
 	if [ -f $GENERATE_FEATURE_CONFIG ]; then

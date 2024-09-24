@@ -14,6 +14,12 @@ use WP_Test_REST_TestCase;
 
 class AdvertisersTest extends WP_Test_REST_TestCase {
 
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
 	/**
 	 * Tests if the advertisers route is registered.
 	 *

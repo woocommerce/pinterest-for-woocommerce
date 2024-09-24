@@ -6,10 +6,6 @@ use Pinterest_For_Woocommerce;
 
 class TagTest extends \WP_UnitTestCase {
 
-	function setUp(): void {
-		parent::setUp();
-	}
-
 	public function test_adds_hooks() {
 		$tag = new Tag();
 		$tag->init_hooks();

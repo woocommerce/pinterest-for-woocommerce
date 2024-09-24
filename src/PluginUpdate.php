@@ -13,8 +13,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Automattic\WooCommerce\Admin\Notes\NotesUnavailableException;
 use Automattic\WooCommerce\Pinterest\API\UserInteraction;
 use Automattic\WooCommerce\Pinterest\API\TokenExchangeV3ToV5;
+use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
 use Automattic\WooCommerce\Pinterest\Notes\TokenExchangeFailure;
 use Exception;
 use Throwable;
@@ -131,6 +133,9 @@ class PluginUpdate {
 			'1.4.0'  => array(
 				'token_update',
 				'feed_status_migration',
+			),
+			'1.4.10' => array(
+				'feed_deletion_notice_cleanup',
 			),
 		);
 	}
@@ -387,6 +392,20 @@ class PluginUpdate {
 			$value = ( false !== $value ) ? $value : $default_value;
 			update_option( $name, $value );
 			delete_transient( $name );
+		}
+	}
+
+	/**
+	 * Clears all Feed Deletion Failure admin notices created by mistake.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	private function feed_deletion_notice_cleanup(): void {
+		try {
+			FeedDeletionFailure::possibly_delete_note();
+		} catch ( NotesUnavailableException $e ) {
+			return;
 		}
 	}
 }

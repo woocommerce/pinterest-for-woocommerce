@@ -9,6 +9,12 @@ use WP_UnitTestCase;
 
 class ConversionsTest extends WP_UnitTestCase {
 
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
 	public function test_conversions_track_page_visit_event() {
 		Pinterest_For_Woocommerce::save_settings(
 			array(

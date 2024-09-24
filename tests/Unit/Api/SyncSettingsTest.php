@@ -14,6 +14,12 @@ use WP_Test_REST_TestCase;
 
 class SyncSettingsTest extends WP_Test_REST_TestCase {
 
+	public function tearDown(): void {
+		parent::tearDown();
+
+		remove_all_filters( 'pre_http_request' );
+	}
+
 	/**
 	 * Tests if the sync settings route is registered.
 	 *

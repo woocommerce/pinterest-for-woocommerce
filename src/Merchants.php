@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Automattic\WooCommerce\Pinterest\API\Base;
+use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 use \Exception;
 use \Throwable;
 
@@ -143,12 +144,17 @@ class Merchants {
 		$feed_location = parse_url( $config['feed_url'] );
 		$feed_location = ! empty( $feed_location['host'] ) ? $config['feed_url'] : get_home_url() . $feed_location['path'];
 
+		try {
+			$locale = LocaleMapper::get_locale_for_api();
+		} catch ( PinterestApiLocaleException $e ) {
+			$locale = LocaleMapper::PINTEREST_DEFAULT_LOCALE;
+		}
 		$args = array(
 			'merchant_domains' => get_home_url(),
 			'feed_location'    => $feed_location,
 			'feed_format'      => 'XML',
 			'country'          => Pinterest_For_Woocommerce()::get_base_country(),
-			'locale'           => LocaleMapper::get_locale_for_api(),
+			'locale'           => $locale,
 			'currency'         => get_woocommerce_currency(),
 			'merchant_name'    => $merchant_name,
 		);

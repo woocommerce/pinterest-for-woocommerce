@@ -120,7 +120,7 @@ class Base {
 				'pinterest_for_woocommerce_disconnect_on_authentication_failure',
 				'__return_true'
 			);
-			if ( in_array( $e->getCode(), array( 401, 403 ) ) && $do_disconnect ) {
+			if ( $do_disconnect && 401 === $e->getCode() ) {
 				/**
 				 * Actions to perform disconnecting the merchant from the Pinterest platform.
 				 *

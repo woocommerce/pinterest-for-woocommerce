@@ -105,9 +105,10 @@ class ProductSync {
 			return;
 		}
 
-		$product_sync_enabled = $value['product_sync_enabled'] ?? false;
-
-		if ( ! $product_sync_enabled ) {
+		$isset             = isset( $value['product_sync_enabled'] );
+		$has_changed       = $isset && ( $old_value['product_sync_enabled'] ?? '' ) !== $value['product_sync_enabled'];
+		$should_deregister = $has_changed && false === $value['product_sync_enabled'];
+		if ( $should_deregister ) {
 			self::deregister();
 		}
 	}

@@ -1,5 +1,6 @@
 <?php
 
+use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 use Automattic\WooCommerce\Pinterest\LocaleMapper;
 
@@ -59,7 +60,7 @@ class PinterestTestLocaleMapper extends TestCase {
 	 */
 	public function test_locale_with_no_match() {
 		$this->locale = 'me_ME';
-		$this->expectException( Exception::class );
+		$this->expectException( PinterestApiLocaleException::class );
 		LocaleMapper::get_locale_for_api();
 	}
 }
