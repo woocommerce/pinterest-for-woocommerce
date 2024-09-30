@@ -313,7 +313,7 @@ class Feeds {
 	 *
 	 * @param array $feed A feed information array from Pinterest API response.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.10
 	 * @return bool
 	 */
 	private static function does_feed_match( array $feed ): bool {
@@ -340,7 +340,7 @@ class Feeds {
 	/**
 	 * Compare remote feeds to local configuration to find a matching feed.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.10
 	 * @return string - Remote feed ID that matches.
 	 * @throws FeedNotFoundException When there is no matching feed at Pinterest.
 	 */
