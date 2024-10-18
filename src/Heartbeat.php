@@ -28,6 +28,8 @@ class Heartbeat {
 	const DAILY  = 'pinterest_for_woocommerce_daily_heartbeat';
 	const HOURLY = 'pinterest_for_woocommerce_hourly_heartbeat';
 
+	const WEEKLY = 'pinterest_for_woocommerce_weekly_heartbeat';
+
 	/**
 	 * Schedule heartbeat events.
 	 *
@@ -45,6 +47,10 @@ class Heartbeat {
 		if ( ! as_has_scheduled_action( self::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
 			as_schedule_recurring_action( time(), HOUR_IN_SECONDS, self::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		}
+
+		if ( ! as_has_scheduled_action( self::WEEKLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+			as_schedule_recurring_action( time(), WEEK_IN_SECONDS, self::WEEKLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		}
 	}
 
 	/**
@@ -57,5 +63,6 @@ class Heartbeat {
 	public static function cancel_jobs() {
 		as_unschedule_all_actions( self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		as_unschedule_all_actions( self::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_unschedule_all_actions( self::WEEKLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 	}
 }
