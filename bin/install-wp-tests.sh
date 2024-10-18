@@ -22,6 +22,20 @@ PLUGINS_DIR="${WP_CORE_DIR}/wp-content/plugins"
 WC_DIR="${PLUGINS_DIR}/woocommerce"
 WC_VERSION=trunk
 
+# Check if svn is installed
+if ! command -v svn &> /dev/null; then
+  echo "svn could not be found, installing..."
+  if [ $(which apt-get) ]; then
+    sudo apt-get update
+    sudo apt-get install -y subversion
+  elif [ $(which yum) ]; then
+    sudo yum install -y subversion
+  else
+    echo "Package manager not supported. Please install svn manually."
+    exit 1
+  fi
+fi
+
 download() {
   if [ $(which curl) ]; then
     curl -s "$1" >"$2"
