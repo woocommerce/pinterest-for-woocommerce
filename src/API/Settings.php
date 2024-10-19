@@ -48,7 +48,7 @@ class Settings extends VendorAPI {
 		$settings = Pinterest_For_Woocommerce()::get_settings( true );
 		if ( empty( $settings['account_data']['id'] ) ) {
 			$integration_data = Pinterest_For_Woocommerce::get_data( 'integration_data' );
-			$settings['account_data']['id'] = $integration_data['connected_user_id'] ?? '';
+			$settings['account_data']['id'] = $integration_data['connected_user_id'] ?? 'unknown';
 		}
 		return array(
 			PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => $settings,

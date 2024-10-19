@@ -285,6 +285,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'init', array( Pinterest\Billing::class, 'schedule_event' ) );
 			add_action( 'init', array( Pinterest\AdCredits::class, 'schedule_event' ) );
 			add_action( 'init', array( Pinterest\RefreshToken::class, 'schedule_event' ) );
+			add_action( 'init', array( Pinterest\CommerceIntegrationSync::class, 'schedule_event' ) );
 
 			// Register the marketing channel if the feature is included.
 			if ( defined( 'WC_MCM_EXISTS' ) ) {
@@ -310,6 +311,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'pinterest_for_woocommerce_disconnect', array( self::class, 'reset_connection' ) );
 
 			add_action( 'action_scheduler_failed_execution', array( self::class, 'action_scheduler_reset_connection' ), 10, 2 );
+
+			add_action( 'pinterest_for_woocommerce_retry_commerce_integration', array( self::class, 'create_commerce_integration' ), 10, 1 );
 
 			// Handle the Pinterest verification URL.
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
@@ -880,6 +883,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Cancel scheduled jobs.
 			Pinterest\ProductSync::cancel_jobs();
 			Heartbeat::cancel_jobs();
+
+			// Cancel Create Commerce Integration scheduled actions if any.
+			as_unschedule_all_actions( 'pinterest_for_woocommerce_retry_commerce_integration' );
 		}
 
 		/**
@@ -960,66 +966,61 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
-		 * Connects WC to Pinterest.
+		 * Creates Commerce Integration with Pinterest.
 		 *
-		 * @return array the result of APIV5::create_commerce_integration.
-		 * @throws Exception In case of 404, 409 and 500 errors from Pinterest.
+		 * @param int $attempt Create Commerce Integration attempt number.
+		 *
+		 * @return void
+		 * @throws Exception In case of Advertiser ID is missing while preparing commerce integration data.
+		 * @see Pinterest\CommerceIntegrationSync::prepare_commerce_integration_data.
 		 * @see Pinterest\API\APIV5::create_commerce_integration
 		 * @since 1.4.0
 		 */
-		public static function create_commerce_integration(): array {
-			global $wp_version;
+		public static function create_commerce_integration( $attempt = 1 ): void {
+			if ( empty( $attempt ) || ! is_numeric( $attempt ) ) {
+				$attempt = 1;
+			}
 
-			$external_business_id = self::generate_external_business_id();
-			$connection_data      = self::get_data( 'connection_info_data', true );
+			$integration_data = Pinterest\CommerceIntegrationSync::prepare_commerce_integration_data();
 
-			// It does not make any sense to create integration without Advertiser ID.
-			if ( empty( $connection_data['advertiser_id'] ) ) {
-				throw new Exception(
-					sprintf(
-						esc_html__(
-							'Commerce Integration cannot be created: Advertiser ID is missing.',
-							'pinterest-for-woocommerce'
-						)
-					)
+			try {
+				$response = Pinterest\API\APIV5::create_commerce_integration( $integration_data );
+
+				/*
+				 * In case of successful response we save our integration data into a database.
+				 * Data we save includes but not limited to:
+				 *  external business id,
+				 *  id,
+				 *  connected_user_id,
+				 *  etc.
+				 */
+				self::save_integration_data( $response );
+			} catch ( PinterestApiException $e ) {
+				/**
+				 * Number of retries has exceeded.
+				 * Other retries are going to be handled weekly by Commerce Integration Sync action.
+				 *
+				 * @see Pinterest\CommerceIntegrationSync
+				 */
+				if ( 3 === $attempt ) {
+					return;
+				}
+
+				as_unschedule_all_actions( 'pinterest_for_woocommerce_retry_commerce_integration' );
+
+				// Schedule a retry.
+				as_schedule_single_action(
+					time() + 10 * $attempt * MINUTE_IN_SECONDS,
+					'pinterest_for_woocommerce_retry_commerce_integration',
+					array(
+						'attempt' => $attempt + 1,
+					),
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX
 				);
 			}
 
-			$integration_data = array(
-				'external_business_id'    => $external_business_id,
-				'connected_merchant_id'   => $connection_data['merchant_id'] ?? '',
-				'connected_advertiser_id' => $connection_data['advertiser_id'] ?? '',
-				'partner_metadata'        => json_encode(
-					array(
-						'plugin_version' => PINTEREST_FOR_WOOCOMMERCE_VERSION,
-						'wc_version'     => defined( 'WC_VERSION' ) ? WC_VERSION : 'unknown',
-						'wp_version'     => $wp_version,
-						'locale'         => get_locale(),
-						'currency'       => get_woocommerce_currency(),
-					)
-				),
-			);
-
-			if ( ! empty( $connection_data['tag_id'] ) ) {
-				$integration_data['connected_tag_id'] = $connection_data['tag_id'];
-			}
-
-			$response = Pinterest\API\APIV5::create_commerce_integration( $integration_data );
-
-			/*
-			 * In case of successful response we save our integration data into a database.
-			 * Data we save includes but not limited to:
-			 *  external business id,
-			 *  id,
-			 *  connected_user_id,
-			 *  etc.
-			 */
-			self::save_integration_data( $response );
-
-			self::save_setting( 'tracking_advertiser', $response['connected_advertiser_id'] );
-			self::save_setting( 'tracking_tag', $response['connected_tag_id'] );
-
-			return $response;
+			self::save_setting( 'tracking_advertiser', $integration_data['connected_advertiser_id'] );
+			self::save_setting( 'tracking_tag', $integration_data['connected_tag_id'] ?? '' );
 		}
 
 		/**
@@ -1048,7 +1049,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function delete_commerce_integration(): bool {
 			try {
-				$external_business_id = self::get_data( 'integration_data' )['external_business_id'];
+				$external_business_id = self::get_data( 'integration_data' )['external_business_id'] ?? '';
+				if ( empty( $external_business_id ) ) {
+					return false;
+				}
 				Pinterest\API\APIV5::delete_commerce_integration( $external_business_id );
 				return true;
 			} catch ( PinterestApiException $e ) {
@@ -1060,6 +1064,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Used to generate external business id to pass it Pinterest when creating a connection between WC and Pinterest.
 		 *
+		 * @deprecated since 1.4.10
 		 * @since 1.4.0
 		 *
 		 * @return string
@@ -1384,8 +1389,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function is_connected() {
-			$integration = self::get_data( 'integration_data' );
-			return ! empty( $integration['id'] ?? '' );
+			$token_data = self::get_data( 'token_data', true );
+			return ! empty( $token_data['access_token'] ?? '' );
 		}
 
 
