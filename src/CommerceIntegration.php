@@ -34,6 +34,10 @@ class CommerceIntegration {
 			10,
 			1
 		);
+
+		if ( ! has_action( Heartbeat::WEEKLY, array( self::class, 'handle_sync' ) ) ) {
+			add_action( Heartbeat::WEEKLY, array( self::class, 'handle_sync' ) );
+		}
 	}
 
 	/**
@@ -44,6 +48,7 @@ class CommerceIntegration {
 	 */
 	public static function maybe_unregister_retries() {
 		as_unschedule_all_actions( 'pinterest-for-woocommerce-create-commerce-integration-retry' );
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-sync-commerce-integration' );
 	}
 
 	/**
@@ -120,16 +125,69 @@ class CommerceIntegration {
 	}
 
 	/**
+	 * Handles Commerce Integration partner_metadata updates.
+	 *
+	 * @since x.x.x
+	 * @return void
+	 */
+	public static function handle_sync() {
+		if ( ! Pinterest_For_Woocommerce::is_connected() ) {
+			return;
+		}
+
+		/*
+		 * If there is a commerce integration retry action, we know not to run the sync yet,
+		 * since it will also try to create the commerce integration as well.
+		 */
+		if ( as_has_scheduled_action( 'pinterest-for-woocommerce-create-commerce-integration-retry' ) ) {
+			return;
+		}
+
+		try {
+			$integration_data     = Pinterest_For_Woocommerce::get_data( 'integration_data' );
+			$external_business_id = $integration_data['external_business_id'] ?? '';
+
+			if ( ! $external_business_id ) {
+				self::handle_create();
+				return;
+			}
+
+			$new_integration_data = self::get_integration_data( $external_business_id );
+
+			if ( $integration_data['partner_metadata'] !== $new_integration_data['partner_metadata'] ) {
+				$response = APIV5::update_commerce_integration( $external_business_id, $new_integration_data );
+				Pinterest_For_Woocommerce::save_integration_data( $response );
+			}
+		} catch ( PinterestApiException $e ) {
+			Logger::log(
+				sprintf(
+					/* translators: 1: Pinterest internal code, 2: Pinterest response message. */
+					__(
+						'Commerce Integration Sync has failed with Pinterest code %1$s and the message %2$s. Next attempt in a week.',
+						'pinterest-for-woocommerce'
+					),
+					esc_html( $e->get_pinterest_code() ),
+					esc_html( $e->getMessage() )
+				),
+				'error'
+			);
+		}
+	}
+
+	/**
 	 * Prepares Commerce Integration data.
 	 *
 	 * @since x.x.x
 	 * @return array
 	 */
-	public static function get_integration_data(): array {
+	public static function get_integration_data( $external_business_id = '' ): array {
 		global $wp_version;
 
-		$external_business_id = self::generate_external_business_id();
-		$connection_data      = Pinterest_For_Woocommerce::get_data( 'connection_info_data', true );
+		if ( empty( $external_business_id ) ) {
+			$external_business_id = self::generate_external_business_id();
+		}
+
+		$connection_data = Pinterest_For_Woocommerce::get_data( 'connection_info_data', true );
 
 		$integration_data = array(
 			'external_business_id'    => $external_business_id,
