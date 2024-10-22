@@ -20,7 +20,7 @@ class Pinterest401DisconnectE2eTest extends \WP_UnitTestCase
 			'expires_in' => 2592000,
 			'refresh_token_expires_in' => 31536000,
 			'scope' => 'ads:read ads:write catalogs:read catalogs:write pins:read pins:write user_accounts:read user_accounts:write',
-			'refresh_date' => 1685694065,
+			'refresh_time' => 1685694065,
 		);
 		Pinterest_For_Woocommerce()::save_token_data( $token_data );
 		$info_data = array(
@@ -96,7 +96,7 @@ class Pinterest401DisconnectE2eTest extends \WP_UnitTestCase
 						),
 						'body' => json_encode(
 							array(
-								'id' => '6491114367052267731',
+								'id' => '58468345645685645',
 								'external_business_id' => 'wordpresspinterest-6479a6713160b',
 								'connected_merchant_id' => '1479839719476',
 								'connected_user_id' => '1144266355231574943',
