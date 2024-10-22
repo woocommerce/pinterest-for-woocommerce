@@ -70,7 +70,7 @@ class CommerceIntegration {
 
 			return $response;
 		} catch ( PinterestApiException $e ) {
-			if ( self::MAX_RETRIES < $attempt ) {
+			if ( self::MAX_RETRIES === $attempt ) {
 				Logger::log(
 					sprintf(
 						/* translators: 1: Pinterest internal code, 2: Pinterest response message. */
