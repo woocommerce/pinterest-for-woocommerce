@@ -44,6 +44,8 @@ class PinterestConnectE2eTest extends \WP_UnitTestCase {
 			'clientHash'    => 'MTQ4NjE3MzpkNWJjNTM4ZmVhMTZhYzIwMmZiNDZhMTFjMGNkZGVmNzFhOWU1YWY0',
 		);
 		Pinterest_For_Woocommerce()::save_connection_info_data( $info_data );
+		Pinterest_For_Woocommerce::save_setting( 'tracking_advertiser', '549765662491' );
+		Pinterest_For_Woocommerce::save_setting( 'tracking_tag', '2613286171854' );
 
 		// API Request filters to stub Pinterest API requests.
 		$this->create_commerce_integration_request_stub();
