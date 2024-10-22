@@ -178,6 +178,7 @@ class CommerceIntegration {
 	 * Prepares Commerce Integration data.
 	 *
 	 * @since x.x.x
+	 * @param string $external_business_id External Business ID.
 	 * @return array
 	 */
 	public static function get_integration_data( $external_business_id = '' ): array {
