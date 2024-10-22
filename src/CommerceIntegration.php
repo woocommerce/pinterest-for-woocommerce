@@ -73,8 +73,8 @@ class CommerceIntegration {
 			if ( self::MAX_RETRIES < $attempt ) {
 				Logger::log(
 					sprintf(
+						/* translators: 1: Pinterest internal code, 2: Pinterest response message. */
 						__(
-							/* translators: 1: Pinterest internal code, 2: Pinterest response message. */
 							'Create Pinterest Commerce Integration retries has stopped. No further attempts to be scheduled.',
 							'pinterest-for-woocommerce'
 						),
@@ -94,8 +94,8 @@ class CommerceIntegration {
 			if ( false === $has_retry_scheduled ) {
 				Logger::log(
 					sprintf(
+						/* translators: 1: Pinterest internal code, 2: Pinterest response message. */
 						__(
-							/* translators: 1: Pinterest internal code, 2: Pinterest response message. */
 							'Create Pinterest Commerce Integration has failed due to Pinterest API code %1$s with message %2$s. Scheduling a retry attempt.',
 							'pinterest-for-woocommerce'
 						),
