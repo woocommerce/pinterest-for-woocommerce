@@ -31,6 +31,7 @@ class RefreshTokenTest extends WP_UnitTestCase {
 	public function test_schedule_event_adds_daily_action() {
 		// Jobs will schedule only if Pinterest is connected (means integration data is set and has the ID).
 		Pinterest_For_Woocommerce::save_data( 'integration_data', array( 'id' => '567891567892' ) );
+		Pinterest_For_Woocommerce::save_token_data( array( 'access_token' => 'def5020011e6faae77c53f97dc7d36875a55ae0402fbc99e28e3b2a43580562947330a5d31fa766cca66a0a1accfb72ffcc8106e1d57b2ee68a07b34d9158a4e70e164d035c80e63a77be40fd9d0955c6aa36ff96ffcce80a4dfc2963d3511e1c71ee76b766d8f26f53a713ab3b28b3e17053e9afd0e5dd1ccedecace7514e471641ea298631edcf0310294488da09a8ae0a1a3f9fdfd5fe1d3f215be42108e064cd5baea7d6f4eb970551aaf480cc986a1b0c7bfa83df5580' ) );
 
 		RefreshToken::schedule_event();
 		$this->assertEquals( 20, has_action( Heartbeat::DAILY, array( RefreshToken::class, 'handle_refresh' ) ) );
@@ -51,7 +52,7 @@ class RefreshTokenTest extends WP_UnitTestCase {
 				'token_data' => array(
 					'refresh_token' => Crypto::encrypt( 'pinr.refresh_token' ),
 					'expires_in'    => $expires_in, // Access Token expires in 30 days.
-					'refresh_date'  => $refresh_date, // Token was refreshed more than 28 days ago. Refresh.
+					'refresh_time'  => $refresh_date, // Token was refreshed more than 28 days ago. Refresh.
 				),
 			)
 		);
@@ -99,7 +100,7 @@ class RefreshTokenTest extends WP_UnitTestCase {
 				'token_data' => array(
 					'refresh_token' => Crypto::encrypt( 'pinr.refresh_token' ),
 					'expires_in'    => $expires_in, // Access Token expires in 30 days.
-					'refresh_date'  => $refresh_date, // Token was refreshed more than 28 days ago. Refresh.
+					'refresh_time'  => $refresh_date, // Token was refreshed more than 28 days ago. Refresh.
 				),
 			)
 		);

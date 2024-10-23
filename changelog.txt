@@ -1,5 +1,12 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.4.11 - 2024-10-23 =
+* Add - API method to get commerce integration.
+* Add - Commerce Integration `partner_metadata` weekly sync.
+* Add - Failed Create Commerce Integration API call retries procedure.
+* Add - Weakly heartbeat action.
+* Update - Make `integration_data` optional for the extension.
+
 = 1.4.10 - 2024-09-24 =
 * Dev - Tests suits update.
 * Fix - 403 Pinterest API error response is not the reason to auto-disconnect.

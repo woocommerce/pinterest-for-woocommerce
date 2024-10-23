@@ -9,6 +9,7 @@
 namespace Automattic\WooCommerce\Pinterest\API;
 
 use Automattic\WooCommerce\Pinterest\Logger;
+use Pinterest_For_Woocommerce;
 use Throwable;
 use WP_HTTP_Response;
 use WP_REST_Request;
@@ -119,6 +120,9 @@ class Auth extends VendorAPI {
 		unset( $info_data['feature_flags'] );
 
 		Pinterest_For_Woocommerce()::save_connection_info_data( $info_data );
+
+		Pinterest_For_Woocommerce::save_setting( 'tracking_advertiser', $info_data['advertiser_id'] );
+		Pinterest_For_Woocommerce::save_setting( 'tracking_tag', $info_data['tag_id'] ?? '' );
 
 		try {
 			/**

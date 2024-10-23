@@ -34,7 +34,7 @@ class PinterestConnectE2eTest extends \WP_UnitTestCase {
 			'expires_in'               => 2592000,
 			'refresh_token_expires_in' => 31536000,
 			'scope'                    => 'ads:read ads:write catalogs:read catalogs:write pins:read pins:write user_accounts:read user_accounts:write',
-			'refresh_date'             => 1685694065,
+			'refresh_time'             => 1685694065,
 		);
 		Pinterest_For_Woocommerce()::save_token_data( $token_data );
 		$info_data = array (
@@ -44,6 +44,8 @@ class PinterestConnectE2eTest extends \WP_UnitTestCase {
 			'clientHash'    => 'MTQ4NjE3MzpkNWJjNTM4ZmVhMTZhYzIwMmZiNDZhMTFjMGNkZGVmNzFhOWU1YWY0',
 		);
 		Pinterest_For_Woocommerce()::save_connection_info_data( $info_data );
+		Pinterest_For_Woocommerce::save_setting( 'tracking_advertiser', '549765662491' );
+		Pinterest_For_Woocommerce::save_setting( 'tracking_tag', '2613286171854' );
 
 		// API Request filters to stub Pinterest API requests.
 		$this->create_commerce_integration_request_stub();
@@ -156,6 +158,7 @@ class PinterestConnectE2eTest extends \WP_UnitTestCase {
 						),
 						'body' => json_encode(
 							array(
+								'id'            => '6491114367052267731',
 								'username'      => 'dmytromaksiuta1',
 								'profile_image' => 'https://i.pinimg.com/600x600_R/42/f5/36/42f5364f737aff4749a8e9046510828f.jpg',
 								'account_type'  => 'BUSINESS',
