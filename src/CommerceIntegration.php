@@ -111,7 +111,7 @@ class CommerceIntegration {
 				);
 				$frames = array( MINUTE_IN_SECONDS, HOUR_IN_SECONDS, DAY_IN_SECONDS );
 				as_schedule_single_action(
-					time() + $frames[ $attempt ],
+					time() + ( $frames[ $attempt ] ?? DAY_IN_SECONDS ),
 					'pinterest-for-woocommerce-create-commerce-integration-retry',
 					array(
 						'attempt' => $attempt + 1,
