@@ -352,7 +352,7 @@ class APIV5 extends Base {
 	 *  }
 	 * @throws PinterestApiException If the request fails with other than 200 status.
 	 * @link https://developers.pinterest.com/docs/api/v5/integrations_commerce-get
-	 * @since x.x.x
+	 * @since 1.4.11
 	 */
 	public static function get_commerce_integration( string $external_business_id ): array {
 		return self::make_request(

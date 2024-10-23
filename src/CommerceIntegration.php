@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce Commerce Integration controller class.
  *
  * @package     Pinterest_For_WooCommerce/Classes/
- * @since       x.x.x
+ * @since       1.4.11
  */
 
 namespace Automattic\WooCommerce\Pinterest;
@@ -127,7 +127,7 @@ class CommerceIntegration {
 	/**
 	 * Handles Commerce Integration partner_metadata updates.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.11
 	 * @return void
 	 */
 	public static function handle_sync() {
@@ -177,7 +177,7 @@ class CommerceIntegration {
 	/**
 	 * Prepares Commerce Integration data.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.11
 	 * @param string $external_business_id External Business ID.
 	 * @return array
 	 */
@@ -217,7 +217,7 @@ class CommerceIntegration {
 	 *
 	 * @NOTE: ID generation logic is as requested by Pinterest.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.11
 	 * @return string
 	 */
 	private static function generate_external_business_id(): string {
