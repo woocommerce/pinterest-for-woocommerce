@@ -143,15 +143,15 @@ class CommerceIntegration {
 			return;
 		}
 
+		$integration_data     = Pinterest_For_Woocommerce::get_data( 'integration_data' );
+		$external_business_id = $integration_data['external_business_id'] ?? '';
+
+		if ( ! $external_business_id ) {
+			self::handle_create();
+			return;
+		}
+
 		try {
-			$integration_data     = Pinterest_For_Woocommerce::get_data( 'integration_data' );
-			$external_business_id = $integration_data['external_business_id'] ?? '';
-
-			if ( ! $external_business_id ) {
-				self::handle_create();
-				return;
-			}
-
 			$new_integration_data = self::get_integration_data( $external_business_id );
 
 			if ( $integration_data['partner_metadata'] !== $new_integration_data['partner_metadata'] ) {
