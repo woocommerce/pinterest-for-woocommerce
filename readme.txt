@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 7.3
-Stable tag: 1.4.11
+Stable tag: 1.4.12
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
