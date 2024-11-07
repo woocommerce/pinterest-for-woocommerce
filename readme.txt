@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 7.3
-Stable tag: 1.4.11
+Stable tag: 1.4.12
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,10 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.4.12 - 2024-11-07 =
+* Tweak - WC 9.4 compatibility.
+* Tweak - WP 6.7 compatibility.
 
 = 1.4.11 - 2024-10-23 =
 * Add - API method to get commerce integration.

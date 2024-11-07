@@ -1,5 +1,9 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.4.12 - 2024-11-07 =
+* Tweak - WC 9.4 compatibility.
+* Tweak - WP 6.7 compatibility.
+
 = 1.4.11 - 2024-10-23 =
 * Add - API method to get commerce integration.
 * Add - Commerce Integration `partner_metadata` weekly sync.
