@@ -9,7 +9,7 @@
     "url": "git@github.com:woocommerce/pinterest-for-woocommerce.git"
   },
   "dependencies": {
-    "@woocommerce/components": "^5.1.2",
+    "@woocommerce/components": "^6.2.0",
     "@woocommerce/data": "^1.1.1",
     "@woocommerce/navigation": "^5.2.0",
     "@woocommerce/tracks": "^1.1.0",
