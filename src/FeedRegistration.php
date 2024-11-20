@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Notes\AccountDisapproved;
 use Exception;
 use Throwable;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
@@ -237,14 +238,15 @@ class FeedRegistration {
 	 *
 	 * @since x.x.x
 	 *
-	 * @param $http_code
-	 * @param $pinterest_api_code
-	 * @param $pinterest_api_message
+	 * @param int    $http_code             Pinterest API HTTP response code.
+	 * @param int    $pinterest_api_code    Pinterest API error code.
+	 * @param string $pinterest_api_message Pinterest API error message.
+	 *
 	 * @return void
 	 */
-	public static function maybe_account_disapproved_notice( $http_code, $pinterest_api_code, $pinterest_api_message ) {
+	public static function maybe_account_disapproved_notice( int $http_code, int $pinterest_api_code, string $pinterest_api_message ): void {
 		if ( 2625 === $pinterest_api_code ) {
-
+			AccountDisapproved::possibly_add_note();
 		}
 	}
 }
