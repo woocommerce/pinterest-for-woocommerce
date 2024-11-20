@@ -148,11 +148,11 @@ class Feeds {
 			throw new PinterestApiException(
 				sprintf(
 					/* translators: Pinterest API error code and message. 1: Cached error string. */
-					esc_html__(
+					__(
 						'Previous request for the same action failed due to: %1$s. Delaying the next call to prevent repeating errors.',
 						'pinterest-for-woocommerce'
 					),
-					$cached_error
+					esc_html( $cached_error )
 				),
 				425
 			);
@@ -167,8 +167,9 @@ class Feeds {
 		try {
 			$feed = APIV5::create_feed( $data, $ad_account_id );
 		} catch ( PinterestApiException $e ) {
-			$delay = Pinterest_For_Woocommerce()::get_data( 'create_feed_delay' ) ?? MINUTE_IN_SECONDS;
-			set_transient( $cache_key, esc_html__( "{$e->get_pinterest_code()} - {$e->getMessage()}" ), $delay );
+			$delay   = Pinterest_For_Woocommerce()::get_data( 'create_feed_delay' ) ?? MINUTE_IN_SECONDS;
+			$message = sprintf( '%1$s - %2$s', esc_html( $e->get_pinterest_code() ), esc_html( $e->getMessage() ) );
+			set_transient( $cache_key, $message, $delay );
 			// Double the delay.
 			Pinterest_For_Woocommerce()::save_data(
 				'create_feed_delay',
