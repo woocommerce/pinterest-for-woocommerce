@@ -9,7 +9,6 @@
 namespace Automattic\WooCommerce\Pinterest;
 
 use Exception;
-use Pinterest_For_Woocommerce;
 use Throwable;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
@@ -136,7 +135,7 @@ class FeedRegistration {
 	 *
 	 * @return boolean
 	 *
-	 * @throws Exception PHP Exception.
+	 * @throws PinterestApiException PHP Exception.
 	 */
 	private static function register_feed(): bool {
 		$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds();
