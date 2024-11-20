@@ -148,7 +148,7 @@ class Feeds {
 			throw new PinterestApiException(
 				sprintf(
 					/* translators: Pinterest API error code and message. 1: Cached error string. */
-					__(
+					esc_html__(
 						'Previous request for the same action failed due to: %1$s. Delaying the next call to prevent repeating errors.',
 						'pinterest-for-woocommerce'
 					),
