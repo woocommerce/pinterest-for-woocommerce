@@ -65,6 +65,8 @@ class FeedRegistration {
 
 		// We do not want to disconnect the merchant if the authentication fails, since it running action can not be unscheduled.
 		add_filter( 'pinterest_for_woocommerce_disconnect_on_authentication_failure', '__return_false' );
+
+		add_action( 'pinterest_for_woocommerce_show_admin_notice_for_api_exception', array( self::class, 'maybe_account_disapproved_notice' ) );
 	}
 
 	/**
@@ -228,5 +230,21 @@ class FeedRegistration {
 	public static function deregister() {
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
 		self::cancel_jobs();
+	}
+
+	/**
+	 * Maybe show admin notice about account being disapproved.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param $http_code
+	 * @param $pinterest_api_code
+	 * @param $pinterest_api_message
+	 * @return void
+	 */
+	public static function maybe_account_disapproved_notice( $http_code, $pinterest_api_code, $pinterest_api_message ) {
+		if ( 2625 === $pinterest_api_code ) {
+
+		}
 	}
 }
