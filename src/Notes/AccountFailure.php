@@ -56,7 +56,7 @@ class AccountFailure {
 	 *
 	 * @param string $message Pinterest API error message.
 	 * @return void
-	 * @throws NotesUnavailableException
+	 * @throws NotesUnavailableException An exception when notes are unavailable.
 	 */
 	public static function maybe_add_note( string $message ): void {
 		if ( self::note_exists() ) {
