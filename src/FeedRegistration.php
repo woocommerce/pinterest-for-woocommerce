@@ -78,8 +78,9 @@ class FeedRegistration {
 	 *
 	 * @return bool
 	 *
-	 * @throws Exception PHP Exception.
-	 * @throws PinterestApiException Pinterest API Exception.
+	 * @throws PinterestApiLocaleException Pinterest API does not support the locale.
+	 * @throws PinterestApiException       Pinterest API exception.
+	 * @throws Throwable                   Any other exception.
 	 */
 	public function handle_feed_registration(): bool {
 
@@ -101,18 +102,14 @@ class FeedRegistration {
 			Pinterest_For_Woocommerce()::save_data( 'merchant_locale_not_valid', true );
 
 			// translators: %s: Error message.
-			$error_message = "Could not register feed. Error: {$e->getMessage()}";
+			$error_message = "Could not register the feed. Error: {$e->getMessage()}";
 			self::log( $error_message, 'error' );
-			return false;
+			throw $e;
 		} catch ( PinterestApiException $e ) {
 			throw $e;
 		} catch ( Throwable $th ) {
-			if ( method_exists( $th, 'get_pinterest_code' ) && 4163 === $th->get_pinterest_code() ) {
-				Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', true );
-			}
-
 			self::log( $th->getMessage(), 'error' );
-			return false;
+			throw $th;
 		}
 	}
 
