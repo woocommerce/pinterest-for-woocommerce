@@ -1,9 +1,8 @@
 <?php
 /**
- * WooCommerce Admin: Add First Product.
+ * Adds an error note to display Pinterest API account status failure responses.
  *
- * Adds a note (type `email`) to bring the client back to the store setup flow.
- *
+ * @since x.x.x
  * @package Automattic\WooCommerce\Pinterest\Notes
  */
 
@@ -17,7 +16,9 @@ use Automattic\WooCommerce\Admin\Notes\NotesUnavailableException;
 use Automattic\WooCommerce\Admin\Notes\NoteTraits;
 
 /**
- * Add_First_Product.
+ * Account Failure admin notice.
+ *
+ * @since x.x.x
  */
 class AccountFailure {
 	/**
@@ -33,6 +34,7 @@ class AccountFailure {
 	/**
 	 * Get the note.
 	 *
+	 * @since x.x.x
 	 * @param string $message Pinterest API error message.
 	 * @return Note
 	 */
@@ -54,6 +56,7 @@ class AccountFailure {
 	/**
 	 * Used to add an account failure note if the one does not exist.
 	 *
+	 * @since x.x.x
 	 * @param string $message Pinterest API error message.
 	 * @return void
 	 * @throws NotesUnavailableException An exception when notes are unavailable.
@@ -70,6 +73,7 @@ class AccountFailure {
 	/**
 	 * Delete the note.
 	 *
+	 * @since x.x.x
 	 * @return void
 	 */
 	public static function delete_note() {
