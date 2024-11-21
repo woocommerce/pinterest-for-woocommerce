@@ -94,10 +94,7 @@ class FeedRegistration {
 		}
 
 		try {
-			if ( self::register_feed() ) {
-				return true;
-			}
-			throw new Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
+			return self::register_feed();
 		} catch ( PinterestApiLocaleException $e ) {
 			Pinterest_For_Woocommerce()::save_data( 'merchant_locale_not_valid', true );
 
