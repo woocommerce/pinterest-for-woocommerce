@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Notes\AccountFailure;
 use Exception;
 use Throwable;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
@@ -65,6 +66,9 @@ class FeedRegistration {
 
 		// We do not want to disconnect the merchant if the authentication fails, since it running action can not be unscheduled.
 		add_filter( 'pinterest_for_woocommerce_disconnect_on_authentication_failure', '__return_false' );
+
+		add_action( 'pinterest_for_woocommerce_show_admin_notice_for_api_exception', array( self::class, 'maybe_account_failure_notice' ), 10, 3 );
+		add_action( 'pinterest_for_woocommerce_disconnect', array( AccountFailure::class, 'delete_note' ) );
 	}
 
 	/**
@@ -222,5 +226,22 @@ class FeedRegistration {
 	public static function deregister() {
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
 		self::cancel_jobs();
+	}
+
+	/**
+	 * Maybe show admin notice about account being disapproved.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param int    $http_code             Pinterest API HTTP response code.
+	 * @param int    $pinterest_api_code    Pinterest API error code.
+	 * @param string $pinterest_api_message Pinterest API error message.
+	 *
+	 * @return void
+	 */
+	public static function maybe_account_failure_notice( int $http_code, int $pinterest_api_code, string $pinterest_api_message ): void {
+		if ( 403 === $http_code ) {
+			AccountFailure::maybe_add_note( $pinterest_api_message );
+		}
 	}
 }
