@@ -9,7 +9,6 @@
 
 namespace Automattic\WooCommerce\Pinterest\API;
 
-use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Exception;
 

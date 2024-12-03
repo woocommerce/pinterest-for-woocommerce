@@ -88,13 +88,13 @@ class PinterestApiException extends \Exception {
 	 * Pinterest_API_Exception constructor.
 	 *
 	 * @param string|array $error The error message or an array containing the error message + additional data.
-	 * @param int          $response_code The HTTP response code of the API call. e.g. 200, 401, 403, 404, etc.
+	 * @param int|array    $response_code The error code of the API response body or the whole response body as array.
 	 */
 	public function __construct( $error, $response_code ) {
 		$message              = $error['message'] ?? $error;
-		$this->pinterest_code = (int) $error['response_body']['code'] ?? 0;
+		$this->pinterest_code = (int) ( $error['response_body']['code'] ?? $response_code ) ?? 0;
 
-		parent::__construct( $message ?? $error, $response_code );
+		parent::__construct( $message, $response_code );
 	}
 
 	/**
