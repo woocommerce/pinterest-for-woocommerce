@@ -310,8 +310,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			add_action( 'pinterest_for_woocommerce_disconnect', array( self::class, 'reset_connection' ) );
 
-			add_action( 'action_scheduler_failed_execution', array( self::class, 'action_scheduler_reset_connection' ), 10, 2 );
-
 			// Handle the Pinterest verification URL.
 			add_action( 'parse_request', array( $this, 'verification_request' ) );
 
@@ -845,25 +843,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			self::disconnect();
 
 			TokenInvalidFailure::possibly_add_note();
-		}
-
-		/**
-		 * Resets the connection from action scheduler.
-		 *
-		 * @since 1.4.4
-		 *
-		 * @param string    $action_id The ID of the action.
-		 * @param Exception $e         The exception that was thrown.
-		 *
-		 * @return void
-		 * @throws NotesUnavailableException If the notes API is not available.
-		 * @throws Exception                 If the exception is a 401 error.
-		 */
-		public static function action_scheduler_reset_connection( $action_id, $e ) {
-			if ( in_array( $e->getCode(), array( 401, 403 ) ) ) {
-				self::reset_connection();
-				throw $e;
-			}
 		}
 
 		/**

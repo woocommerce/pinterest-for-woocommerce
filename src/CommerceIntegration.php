@@ -128,6 +128,7 @@ class CommerceIntegration {
 	 * Handles Commerce Integration partner_metadata updates.
 	 *
 	 * @since 1.4.11
+	 * @throws PinterestApiException Pinterest API exception.
 	 * @return void
 	 */
 	public static function handle_sync() {
@@ -171,6 +172,7 @@ class CommerceIntegration {
 				),
 				'error'
 			);
+			throw $e;
 		}
 	}
 

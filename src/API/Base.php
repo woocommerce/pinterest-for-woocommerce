@@ -129,6 +129,18 @@ class Base {
 				do_action( 'pinterest_for_woocommerce_disconnect' );
 			}
 
+			/**
+			 * Action used to intercept the Pinterest API exception with code and a message and decide whether or not
+			 * to show an admin notice for the exception.
+			 *
+			 * @since 1.4.13
+			 *
+			 * @param int    $http_code             Pinterest API HTTP response code.
+			 * @param int    $pinterest_api_code    Pinterest API error code.
+			 * @param string $pinterest_api_message Pinterest API error message.
+			 */
+			do_action( 'pinterest_for_woocommerce_show_admin_notice_for_api_exception', $e->getCode(), $e->get_pinterest_code(), $e->getMessage() );
+
 			throw $e;
 		}
 	}

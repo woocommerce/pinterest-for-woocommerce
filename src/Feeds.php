@@ -93,7 +93,6 @@ class Feeds {
 	 * @since 1.4.0
 	 *
 	 * @return string The Feed ID or an empty string if failed.
-	 * @throws Exception PHP Exception if there is an error creating the feed, and we are throttling the requests.
 	 * @throws PinterestApiException Pinterest API Exception if there is an error creating the feed.
 	 */
 	public static function create_feed(): string {
@@ -141,13 +140,21 @@ class Feeds {
 			'default_availability' => 'IN_STOCK',
 		);
 
-		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( wp_json_encode( $data ) . (string) $ad_account_id );
-		$cache     = get_transient( $cache_key );
+		$cache_key    = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( wp_json_encode( $data ) . (string) $ad_account_id );
+		$cached_error = get_transient( $cache_key );
 
-		if ( false !== $cache ) {
-			throw new Exception(
-				esc_html__( 'There was a previous error trying to create a feed.', 'pinterest-for-woocommerce' ),
-				(int) $cache
+		if ( false !== $cached_error ) {
+			// Faking Pinterest API response to 425 Too early.
+			throw new PinterestApiException(
+				sprintf(
+					/* translators: Pinterest API error code and message. 1: Cached error string. */
+					esc_html__(
+						'Previous request for the same action failed due to: %1$s. Delaying the next call to prevent repeating errors.',
+						'pinterest-for-woocommerce'
+					),
+					esc_html( $cached_error )
+				),
+				425
 			);
 		}
 
@@ -160,8 +167,9 @@ class Feeds {
 		try {
 			$feed = APIV5::create_feed( $data, $ad_account_id );
 		} catch ( PinterestApiException $e ) {
-			$delay = Pinterest_For_Woocommerce()::get_data( 'create_feed_delay' ) ?? MINUTE_IN_SECONDS;
-			set_transient( $cache_key, $e->getCode(), $delay );
+			$delay   = Pinterest_For_Woocommerce()::get_data( 'create_feed_delay' ) ?? MINUTE_IN_SECONDS;
+			$message = sprintf( '%1$s - %2$s', esc_html( $e->get_pinterest_code() ), esc_html( $e->getMessage() ) );
+			set_transient( $cache_key, $message, $delay );
 			// Double the delay.
 			Pinterest_For_Woocommerce()::save_data(
 				'create_feed_delay',
@@ -172,11 +180,7 @@ class Feeds {
 
 		static::invalidate_feeds_cache();
 
-		try {
-			$feed_id = static::match_local_feed_configuration_to_registered_feeds( array( $feed ) );
-		} catch ( Throwable $th ) {
-			$feed_id = '';
-		}
+		$feed_id = static::match_local_feed_configuration_to_registered_feeds( array( $feed ) );
 
 		// Clean the cached delay.
 		Pinterest_For_Woocommerce()::save_data( 'create_feed_delay', false );
@@ -278,8 +282,6 @@ class Feeds {
 	 *
 	 * @param array $feeds The list of feeds to check against. If not set, the list will be fetched from the API.
 	 * @return string Returns the ID of the feed if properly registered or an empty string otherwise.
-	 *
-	 * @throws PinterestApiLocaleException No valid locale found to check for the registered feed.
 	 */
 	public static function match_local_feed_configuration_to_registered_feeds( array $feeds = array() ): string {
 		if ( empty( $feeds ) ) {

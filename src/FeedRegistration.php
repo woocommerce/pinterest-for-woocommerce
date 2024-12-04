@@ -8,8 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Notes\AccountFailure;
 use Exception;
-use Pinterest_For_Woocommerce;
 use Throwable;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
@@ -66,6 +66,9 @@ class FeedRegistration {
 
 		// We do not want to disconnect the merchant if the authentication fails, since it running action can not be unscheduled.
 		add_filter( 'pinterest_for_woocommerce_disconnect_on_authentication_failure', '__return_false' );
+
+		add_action( 'pinterest_for_woocommerce_show_admin_notice_for_api_exception', array( self::class, 'maybe_account_failure_notice' ), 10, 3 );
+		add_action( 'pinterest_for_woocommerce_disconnect', array( AccountFailure::class, 'delete_note' ) );
 	}
 
 	/**
@@ -79,8 +82,9 @@ class FeedRegistration {
 	 *
 	 * @return bool
 	 *
-	 * @throws Exception PHP Exception.
-	 * @throws PinterestApiException Pinterest API Exception.
+	 * @throws PinterestApiLocaleException Pinterest API does not support the locale.
+	 * @throws PinterestApiException       Pinterest API exception.
+	 * @throws Throwable                   Any other exception.
 	 */
 	public function handle_feed_registration(): bool {
 
@@ -94,26 +98,19 @@ class FeedRegistration {
 		}
 
 		try {
-			if ( self::register_feed() ) {
-				return true;
-			}
-			throw new Exception( esc_html__( 'Could not register feed.', 'pinterest-for-woocommerce' ) );
+			return self::register_feed();
 		} catch ( PinterestApiLocaleException $e ) {
 			Pinterest_For_Woocommerce()::save_data( 'merchant_locale_not_valid', true );
 
 			// translators: %s: Error message.
-			$error_message = "Could not register feed. Error: {$e->getMessage()}";
+			$error_message = "Could not register the feed. Error: {$e->getMessage()}";
 			self::log( $error_message, 'error' );
-			return false;
+			throw $e;
 		} catch ( PinterestApiException $e ) {
 			throw $e;
 		} catch ( Throwable $th ) {
-			if ( method_exists( $th, 'get_pinterest_code' ) && 4163 === $th->get_pinterest_code() ) {
-				Pinterest_For_Woocommerce()::save_data( 'merchant_connected_diff_platform', true );
-			}
-
 			self::log( $th->getMessage(), 'error' );
-			return false;
+			throw $th;
 		}
 	}
 
@@ -136,7 +133,7 @@ class FeedRegistration {
 	 *
 	 * @return boolean
 	 *
-	 * @throws Exception PHP Exception.
+	 * @throws PinterestApiException PHP Exception.
 	 */
 	private static function register_feed(): bool {
 		$feed_id = Feeds::match_local_feed_configuration_to_registered_feeds();
@@ -229,5 +226,22 @@ class FeedRegistration {
 	public static function deregister() {
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );
 		self::cancel_jobs();
+	}
+
+	/**
+	 * Maybe show admin notice about account being disapproved.
+	 *
+	 * @since 1.4.13
+	 *
+	 * @param int    $http_code             Pinterest API HTTP response code.
+	 * @param int    $pinterest_api_code    Pinterest API error code.
+	 * @param string $pinterest_api_message Pinterest API error message.
+	 *
+	 * @return void
+	 */
+	public static function maybe_account_failure_notice( int $http_code, int $pinterest_api_code, string $pinterest_api_message ): void {
+		if ( 403 === $http_code ) {
+			AccountFailure::maybe_add_note( $pinterest_api_message );
+		}
 	}
 }

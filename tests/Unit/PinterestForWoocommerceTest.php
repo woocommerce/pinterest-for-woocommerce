@@ -61,13 +61,6 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 				[ Pinterest_For_Woocommerce::class, 'reset_connection' ]
 			)
 		);
-		$this->assertEquals(
-			10,
-			has_action(
-				'action_scheduler_failed_execution',
-				[ Pinterest_For_Woocommerce::class, 'action_scheduler_reset_connection' ]
-			)
-		);
 	}
 
 	/**
