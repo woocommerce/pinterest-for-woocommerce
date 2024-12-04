@@ -2,7 +2,7 @@
 /**
  * Adds an error note to display Pinterest API account status failure responses.
  *
- * @since x.x.x
+ * @since 1.4.13
  * @package Automattic\WooCommerce\Pinterest\Notes
  */
 
@@ -18,7 +18,7 @@ use Automattic\WooCommerce\Admin\Notes\NoteTraits;
 /**
  * Account Failure admin notice.
  *
- * @since x.x.x
+ * @since 1.4.13
  */
 class AccountFailure {
 	/**
@@ -34,7 +34,7 @@ class AccountFailure {
 	/**
 	 * Get the note.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.13
 	 * @param string $message Pinterest API error message.
 	 * @return Note
 	 */
@@ -56,7 +56,7 @@ class AccountFailure {
 	/**
 	 * Used to add an account failure note if the one does not exist.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.13
 	 * @param string $message Pinterest API error message.
 	 * @return void
 	 * @throws NotesUnavailableException An exception when notes are unavailable.
@@ -73,7 +73,7 @@ class AccountFailure {
 	/**
 	 * Delete the note.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.13
 	 * @return void
 	 */
 	public static function delete_note() {
