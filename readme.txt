@@ -91,6 +91,11 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.13 - 2024-12-04 =
+* Add - Admin notice of a failed Pinterest account status.
+* Update - Do not disconnect on the Action Scheduler action failure.
+* Update - Failed actions to log the errors.
+
 = 1.4.12 - 2024-11-07 =
 * Tweak - WC 9.4 compatibility.
 * Tweak - WP 6.7 compatibility.
