@@ -4,7 +4,7 @@ Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
 Tested up to: 6.7
 Requires PHP: 7.3
-Stable tag: 1.4.12
+Stable tag: 1.4.13
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.4.13 - 2024-12-04 =
+* Add - Admin notice of a failed Pinterest account status.
+* Update - Do not disconnect on the Action Scheduler action failure.
+* Update - Failed actions to log the errors.
 
 = 1.4.12 - 2024-11-07 =
 * Tweak - WC 9.4 compatibility.

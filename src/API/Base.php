@@ -133,7 +133,7 @@ class Base {
 			 * Action used to intercept the Pinterest API exception with code and a message and decide whether or not
 			 * to show an admin notice for the exception.
 			 *
-			 * @since x.x.x
+			 * @since 1.4.13
 			 *
 			 * @param int    $http_code             Pinterest API HTTP response code.
 			 * @param int    $pinterest_api_code    Pinterest API error code.

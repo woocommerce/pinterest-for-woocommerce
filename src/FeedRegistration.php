@@ -231,7 +231,7 @@ class FeedRegistration {
 	/**
 	 * Maybe show admin notice about account being disapproved.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.13
 	 *
 	 * @param int    $http_code             Pinterest API HTTP response code.
 	 * @param int    $pinterest_api_code    Pinterest API error code.
