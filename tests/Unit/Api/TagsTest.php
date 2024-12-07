@@ -4,6 +4,7 @@
  *
  * @since 1.4.0
  */
+
 declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
@@ -11,8 +12,16 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
 use WP_REST_Request;
 use WP_Test_REST_TestCase;
 
+/**
+ * Pinterest Tags tests.
+ */
 class TagsTest extends WP_Test_REST_TestCase {
 
+	/**
+	 * Clears http request filters after tests.
+	 *
+	 * @return void
+	 */
 	public function tearDown(): void {
 		parent::tearDown();
 
