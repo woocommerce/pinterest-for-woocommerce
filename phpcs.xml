@@ -25,11 +25,9 @@
 	<config name="testVersion" value="7.4-" />
 
 	<!-- Rules -->
-	<rule ref="WooCommerce-Core" />
-
 	<rule ref="WooCommerce.Commenting">
 		<!-- It wants @since to contain defined version and does not allow just x.x.x -->
-		<exclude name="WooCommerce.Commenting.CommentHooks.MissingSinceVersionComment"/>
+		<exclude name="WooCommerce.Commenting.CommentHooks.MissingSinceVersionComment" />
 	</rule>
 
 	<rule ref="WordPress.WP.I18n">
