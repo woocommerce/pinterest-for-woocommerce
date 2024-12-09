@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Class TagsTest
+ *
+ * @since 1.4.0
+ */
 declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
