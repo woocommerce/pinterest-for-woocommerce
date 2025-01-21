@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.15 - 2025-01-21 =
+* Tweak - WC 9.6 compatibility.
+
 = 1.4.14 - 2024-12-18 =
 * Tweak - WC 9.5 compatibility.
 
