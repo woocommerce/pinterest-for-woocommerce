@@ -8,6 +8,7 @@ node_modules
 .vscode
 coverage
 phplint.cache
+.phpunit.result.cache
 
 # Ignore assets except source files
 assets/*
