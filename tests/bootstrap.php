@@ -97,6 +97,9 @@ function load_plugins() {
 
 	require_once( $wc_dir . '/woocommerce.php' );
 	update_option( 'woocommerce_db_version', WC()->version );
+	
+	// Be sure the WooCommerce features are loaded on the test environment
+	add_filter( 'woocommerce_admin_should_load_features', '__return_true' );
 
 	require $plugin_dir . '/pinterest-for-woocommerce.php';
 }
