@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="WooCommerce Coding Standards">
-	<description>Pinterest for WooCommerce ruleset.</description>
+	<description>Pinterest for WooCommerce dev PHP_CodeSniffer ruleset.</description>
 
 	<!-- Οnly files with a php extension -->
 	<arg name="extensions" value="php" />
@@ -10,31 +10,24 @@
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/*.asset.php</exclude-pattern>
-	<exclude-pattern>./tests/*</exclude-pattern>
+
+	<!-- Show progress, show the error codes for each message (source). -->
+	<arg value="ps" />
+
+	<!-- Strip the filepaths in reports down to the relevant bit. -->
+	<arg name="basepath" value="./" />
+
+	<!-- Check up to 8 files simultaneously. -->
+	<arg name="parallel" value="8" />
 
 	<!-- Configs -->
-	<config name="minimum_supported_wp_version" value="5.6" />
+	<config name="minimum_supported_wp_version" value="6.5" />
 	<config name="testVersion" value="7.4-" />
 
 	<!-- Rules -->
-	<rule ref="WooCommerce-Core">
-		<exclude name="Generic.Files.LineEndings.InvalidEOLChar"/>
-		<exclude name="Generic.Commenting.DocComment.MissingShort"/>
-		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
-	</rule>
-
 	<rule ref="WooCommerce.Commenting">
 		<!-- It wants @since to contain defined version and does not allow just x.x.x -->
-		<exclude name="WooCommerce.Commenting.CommentHooks.MissingSinceVersionComment"/>
-	</rule>
-
-	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
-		<exclude-pattern>src/*</exclude-pattern>
-		<exclude-pattern>bin/*</exclude-pattern>
-	</rule>
-
-	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
-		<exclude-pattern>src/*</exclude-pattern>
+		<exclude name="WooCommerce.Commenting.CommentHooks.MissingSinceVersionComment" />
 	</rule>
 
 	<rule ref="WordPress.WP.I18n">
@@ -45,7 +38,48 @@
 
 	<rule ref="PHPCompatibility" />
 
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>bin/</exclude-pattern>
+		<exclude-pattern>src/</exclude-pattern>
+		<exclude-pattern>tests/</exclude-pattern>
+	</rule>
+
+	<rule ref="Squiz.Classes.ClassFileName">
+		<include-pattern>src/</include-pattern>
+		<include-pattern>tests/php/src/</include-pattern>
+	</rule>
+
+	<rule ref="Squiz.Classes.ValidClassName">
+		<include-pattern>src/</include-pattern>
+		<include-pattern>tests/php/src/</include-pattern>
+	</rule>
+
+	<rule ref="Generic.Commenting">
+		<exclude-pattern>tests/</exclude-pattern>
+	</rule>
+
+	<rule ref="PEAR.Functions.FunctionCallSignature.EmptyLine" />
+
+	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>src/</exclude-pattern>
+		<exclude-pattern>tests/</exclude-pattern>
+	</rule>
+
+	<rule ref="Squiz.Commenting.FileComment.MissingPackageTag">
+		<exclude-pattern>src/</exclude-pattern>
+		<exclude-pattern>tests/</exclude-pattern>
+	</rule>
+
 	<rule ref="Squiz.Commenting.FileComment.Missing">
 		<exclude-pattern>index.asset.php</exclude-pattern>
+		<exclude-pattern>tests/</exclude-pattern>
+	</rule>
+
+	<rule ref="Squiz.Commenting.FunctionCommentThrowTag.Missing">
+		<exclude-pattern>tests/</exclude-pattern>
+	</rule>
+
+	<rule ref="Squiz.Commenting.FileComment.Missing">
+		<exclude-pattern>tests/</exclude-pattern>
 	</rule>
 </ruleset>
