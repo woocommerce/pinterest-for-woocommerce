@@ -29,6 +29,9 @@ class PluginActivate {
 		// Init the update class.
 		$this->init_plugin_update();
 
+		// do nothing
+		$a = 1;
+
 		// Maybe update the redirect option.
 		( new ActivationRedirect() )->maybe_update_redirect_option();
 	}
