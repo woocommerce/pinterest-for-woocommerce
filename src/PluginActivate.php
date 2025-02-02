@@ -31,6 +31,7 @@ class PluginActivate {
 
 		// do nothing
 		$a = 1;
+		$b= 2;
 
 		// Maybe update the redirect option.
 		( new ActivationRedirect() )->maybe_update_redirect_option();
