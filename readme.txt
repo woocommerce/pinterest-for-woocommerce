@@ -4,7 +4,7 @@ Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
 Tested up to: 6.7
 Requires PHP: 7.3
-Stable tag: 1.4.15
+Stable tag: 1.4.16
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.4.16 - 2025-02-11 =
+* Add - UTM parameters to the products URLs used in the product feed.
+* Dev - Updating code styling rules.
+* Tweak - WC 9.7 compatibility.
 
 = 1.4.15 - 2025-01-21 =
 * Tweak - WC 9.6 compatibility.

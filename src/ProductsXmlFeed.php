@@ -299,7 +299,7 @@ class ProductsXmlFeed {
 	/**
 	 * Returns the permalink.
 	 *
-	 * @since x.x.x Url has UTM parameters used for tracking.
+	 * @since 1.4.16 Url has UTM parameters used for tracking.
 	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
@@ -320,7 +320,7 @@ class ProductsXmlFeed {
 	 * - utm_source: pinterest
 	 * - utm_medium: social
 	 *
-	 * @since x.x.x
+	 * @since 1.4.16
 	 *
 	 * @param string $product_url The product URL.
 	 * @return string
