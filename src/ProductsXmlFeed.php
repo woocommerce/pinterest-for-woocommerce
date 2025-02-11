@@ -299,13 +299,39 @@ class ProductsXmlFeed {
 	/**
 	 * Returns the permalink.
 	 *
+	 * @since 1.4.16 Url has UTM parameters used for tracking.
+	 *
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
 	 *
 	 * @return string
 	 */
 	private static function get_property_link( $product, $property ) {
-		return '<' . $property . '><![CDATA[' . $product->get_permalink() . ']]></' . $property . '>';
+		$product_url          = $product->get_permalink();
+		$product_url_with_utm = self::add_utm_parameters( $product_url );
+
+		return '<' . $property . '><![CDATA[' . $product_url_with_utm . ']]></' . $property . '>';
+	}
+
+	/**
+	 * Add UTM parameters to the product URL.
+	 * This is used to track the performance of the product pins.
+	 * The parameters are:
+	 * - utm_source: pinterest
+	 * - utm_medium: social
+	 *
+	 * @since 1.4.16
+	 *
+	 * @param string $product_url The product URL.
+	 * @return string
+	 */
+	private static function add_utm_parameters( $product_url ) {
+		$utm_params = array(
+			'utm_source'   => 'pinterest',
+			'utm_medium'   => 'social',
+		);
+
+		return add_query_arg( $utm_params, $product_url );
 	}
 
 	/**
