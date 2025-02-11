@@ -91,6 +91,11 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.16 - 2025-02-11 =
+* Add - UTM parameters to the products URLs used in the product feed.
+* Dev - Updating code styling rules.
+* Tweak - WC 9.7 compatibility.
+
 = 1.4.15 - 2025-01-21 =
 * Tweak - WC 9.6 compatibility.
 
