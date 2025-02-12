@@ -4,6 +4,9 @@ namespace Automattic\WooCommerce\Pinterest;
 
 use WP_UnitTestCase;
 
+/**
+ * Class WPConsentAPITest.
+ */
 class WPConsentAPITest extends WP_UnitTestCase {
 
 	/**
@@ -31,6 +34,10 @@ class WPConsentAPITest extends WP_UnitTestCase {
 		remove_all_filters( 'wp_consent_api_registered_' . PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME );
 	}
 
+	/**
+	 * Test that WP Consent API is not available.
+	 * @return void
+	 */
 	public function test_wp_consent_api_not_available(): void {
 		$this->wp_consent_api->expects( $this->once() )
 			->method( 'is_wp_consent_api_active' )
@@ -38,11 +45,15 @@ class WPConsentAPITest extends WP_UnitTestCase {
 
 		$this->wp_consent_api->__construct();
 
-		// When API is not available, no filters should be registered
+		// When API is not available, no filters should be registered.
 		$this->assertFalse( has_filter( 'wp_consent_api_registered_' . PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME ) );
 		$this->assertFalse( has_filter( 'woocommerce_pinterest_disable_tracking' ) );
 	}
 
+	/**
+	 * Test that WP Consent API is available.
+	 * @return void
+	 */
 	public function test_wp_consent_api_available_with_marketing_consent(): void {
 		$this->wp_consent_api->expects( $this->once() )
 			->method( 'is_wp_consent_api_active' )
@@ -54,17 +65,20 @@ class WPConsentAPITest extends WP_UnitTestCase {
 
 		$this->wp_consent_api->__construct();
 
-		// When API is available, both filters should be registered
+		// When API is available, both filters should be registered.
 		$this->assertTrue( has_filter( 'wp_consent_api_registered_' . PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME ) );
 		$this->assertTrue( has_filter( 'woocommerce_pinterest_disable_tracking' ) );
-
-		// Plugin registration filter should return true
+		// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment
 		$this->assertTrue( apply_filters( 'wp_consent_api_registered_' . PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME, false ) );
 
-		// When marketing consent is granted, tracking should be enabled
+		// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment
 		$this->assertFalse( apply_filters( 'woocommerce_pinterest_disable_tracking', false ) );
 	}
 
+	/**
+	 * Test that WP Consent API is available but marketing consent is not granted.
+	 * @return void
+	 */
 	public function test_wp_consent_api_available_without_marketing_consent(): void {
 		$this->wp_consent_api->expects( $this->once() )
 			->method( 'is_wp_consent_api_active' )
@@ -76,11 +90,11 @@ class WPConsentAPITest extends WP_UnitTestCase {
 
 		$this->wp_consent_api->__construct();
 
-		// When API is available, both filters should be registered
+		// When API is available, both filters should be registered.
 		$this->assertTrue( has_filter( 'wp_consent_api_registered_' . PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME ) );
 		$this->assertTrue( has_filter( 'woocommerce_pinterest_disable_tracking' ) );
 
-		// When marketing consent is not granted, tracking should be disabled
+		// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment
 		$this->assertTrue( apply_filters( 'woocommerce_pinterest_disable_tracking', false ) );
 	}
 }
