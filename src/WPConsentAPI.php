@@ -34,17 +34,26 @@ class WPConsentAPI {
 		add_filter(
 			'woocommerce_pinterest_disable_tracking',
 			function () {
-				return ! wp_has_consent( 'marketing' );
+				return $this->disable_tracking();
 			}
 		);
 	}
 
 	/**
-	 * Check if WP Cookie Consent API is active
+	 * Check if WP Consent API is active
 	 *
 	 * @return bool
 	 */
 	protected function is_wp_consent_api_active() {
 		return function_exists( 'wp_has_consent' );
+	}
+
+	/**
+	 * Disable tracking if marketing consent is not granted
+	 *
+	 * @return bool
+	 */
+	public function disable_tracking() {
+		return ! wp_has_consent( 'marketing' );
 	}
 }
