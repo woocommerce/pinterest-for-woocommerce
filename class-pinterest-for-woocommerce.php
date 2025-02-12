@@ -328,6 +328,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return Pinterest\Tracking|false
 		 */
 		public static function init_tracking() {
+
+			// Init WP Consent API integration.
+			new Pinterest\WPConsentAPI();
+
 			/**
 			 * Filters whether to disable tracking.
 			 *
@@ -1019,7 +1023,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function update_account_data() {
 			try {
-				$account_data     = Pinterest\API\APIV5::get_account_info();
+				$account_data = Pinterest\API\APIV5::get_account_info();
 
 				$data = array(
 					'username'         => $account_data['username'] ?? '',
@@ -1091,6 +1095,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		}
 
 		/**
+		 * Maybe check billing setup.
 		 *
 		 * @since 1.2.5
 		 *
@@ -1252,7 +1257,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return boolean
 		 */
 		public static function set_default_settings() {
-
 			$settings = self::get_settings( true );
 			$settings = wp_parse_args( $settings, self::$default_settings );
 
@@ -1335,7 +1339,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function is_domain_verified(): bool {
 			$account_data     = self::get_setting( 'account_data' );
 			$verified_domains = $account_data['verified_user_websites'] ?? array();
-			return in_array( wp_parse_url( get_home_url() )['host'] ?? '', $verified_domains );
+			return in_array( wp_parse_url( get_home_url() )['host'] ?? '', $verified_domains ); // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 		}
 
 		/**
