@@ -34,7 +34,7 @@ class WPConsentAPI {
 		add_filter(
 			'woocommerce_pinterest_disable_tracking',
 			function () {
-				return $this->disable_tracking();
+				return $this->should_disable_tracking();
 			}
 		);
 	}
@@ -49,11 +49,11 @@ class WPConsentAPI {
 	}
 
 	/**
-	 * Disable tracking if marketing consent is not granted
+	 * Check if we should disable tracking if marketing consent is not granted
 	 *
 	 * @return bool
 	 */
-	public function disable_tracking() {
+	public function should_disable_tracking() {
 		return ! wp_has_consent( 'marketing' );
 	}
 }

@@ -17,7 +17,7 @@ class WPConsentAPITest extends WP_UnitTestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->wp_consent_api = $this->getMockBuilder( WPConsentAPI::class )
-			->onlyMethods( array( 'is_wp_consent_api_active', 'disable_tracking' ) )
+			->onlyMethods( array( 'is_wp_consent_api_active', 'should_disable_tracking' ) )
 			->getMock();
 	}
 
@@ -49,7 +49,7 @@ class WPConsentAPITest extends WP_UnitTestCase {
 			->willReturn( true );
 
 		$this->wp_consent_api->expects( $this->once() )
-			->method( 'disable_tracking' )
+			->method( 'should_disable_tracking' )
 			->willReturn( false );
 
 		$this->wp_consent_api->__construct();
@@ -71,7 +71,7 @@ class WPConsentAPITest extends WP_UnitTestCase {
 			->willReturn( true );
 
 		$this->wp_consent_api->expects( $this->once() )
-			->method( 'disable_tracking' )
+			->method( 'should_disable_tracking' )
 			->willReturn( true );
 
 		$this->wp_consent_api->__construct();
