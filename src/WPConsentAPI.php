@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class WPConsentAPI
+ * Class handling WP Consent API integration.
  *
  * @since x.x.x
  */
@@ -21,8 +21,6 @@ class WPConsentAPI {
 
 	/**
 	 * Constructor.
-	 *
-	 * @return void
 	 */
 	public function __construct() {
 		if ( ! $this->is_wp_consent_api_active() ) {
@@ -30,30 +28,24 @@ class WPConsentAPI {
 		}
 
 		add_filter( 'wp_consent_api_registered_' . PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME, '__return_true' );
-
-		add_filter(
-			'woocommerce_pinterest_disable_tracking',
-			function () {
-				return $this->should_disable_tracking();
-			}
-		);
+		add_filter( 'woocommerce_pinterest_disable_conversions_capi_tracking', array( $this, 'should_disable_tracking' ) );
 	}
 
 	/**
-	 * Check if WP Consent API is active
+	 * Check if WP Consent API is active.
 	 *
 	 * @return bool
 	 */
-	protected function is_wp_consent_api_active() {
+	protected function is_wp_consent_api_active(): bool {
 		return function_exists( 'wp_has_consent' );
 	}
 
 	/**
-	 * Check if we should disable tracking if marketing consent is not granted
+	 * Check if tracking should be disabled based on marketing consent.
 	 *
 	 * @return bool
 	 */
-	public function should_disable_tracking() {
+	public function should_disable_tracking(): bool {
 		return ! wp_has_consent( 'marketing' );
 	}
 }
