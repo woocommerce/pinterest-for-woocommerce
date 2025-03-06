@@ -1,5 +1,7 @@
 <?php
 
+namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
+
 use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 use Automattic\WooCommerce\Pinterest\LocaleMapper;
@@ -7,7 +9,7 @@ use Automattic\WooCommerce\Pinterest\LocaleMapper;
 /**
  * Class for testing locale mapper.
  */
-class PinterestTestLocaleMapper extends TestCase {
+class LocaleMapperTest extends TestCase {
 
 	private $locale;
 
@@ -17,23 +19,21 @@ class PinterestTestLocaleMapper extends TestCase {
 	 * the determine_locale() function in WordPress.
 	 */
 	public function locale_filter() {
-		return $this->locale;
+		return $this->locale ?: 'en_US';
 	}
 
 	/**
 	 * Set up the filter for the locale.
 	 */
-	protected function setUp(): void
-	{
-		add_filter( 'locale', array( $this, 'locale_filter' ) );
+	protected function setUp(): void {
+		add_filter( 'pre_option_WPLANG', array( $this, 'locale_filter' ) );
 	}
 
 	/**
 	 * Remove the filter for the locale.
 	 */
-	protected function tearDown(): void
-	{
-		remove_filter( 'locale', array( $this, 'locale_filter' ) );
+	protected function tearDown(): void {
+		remove_filter( 'pre_option_WPLANG', array( $this, 'locale_filter' ) );
 	}
 
 	/**
@@ -41,7 +41,6 @@ class PinterestTestLocaleMapper extends TestCase {
 	 * @group locale_mapper
 	 */
 	public function test_locale_with_full_match() {
-		$this->locale = 'en_US';
 		$this->assertEquals( 'en-US', LocaleMapper::get_locale_for_api() );
 	}
 
@@ -51,6 +50,7 @@ class PinterestTestLocaleMapper extends TestCase {
 	 */
 	public function test_locale_with_partial_match() {
 		$this->locale = 'de_DE';
+
 		$this->assertEquals( 'de', LocaleMapper::get_locale_for_api() );
 	}
 
@@ -60,8 +60,9 @@ class PinterestTestLocaleMapper extends TestCase {
 	 */
 	public function test_locale_with_no_match() {
 		$this->locale = 'me_ME';
+
 		$this->expectException( PinterestApiLocaleException::class );
+
 		LocaleMapper::get_locale_for_api();
 	}
 }
-
