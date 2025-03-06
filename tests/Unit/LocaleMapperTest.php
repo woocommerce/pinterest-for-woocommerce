@@ -18,8 +18,11 @@ class LocaleMapperTest extends TestCase {
 	 * Using this allows us to modify the value that is used by
 	 * the determine_locale() function in WordPress.
 	 */
-	public function locale_filter() {
-		return $this->locale ?: 'en_US';
+	public function locale_filter(): string {
+		if ( ! $this->locale ) {
+			return 'en_US';
+		}
+		return $this->locale;
 	}
 
 	/**
