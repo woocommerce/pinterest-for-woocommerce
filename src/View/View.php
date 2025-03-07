@@ -41,7 +41,7 @@ interface View extends Renderable {
 	 *
 	 * @throws ViewException If the view could not be loaded or provided path was not valid.
 	 */
-	public function render_partial( string $path, array $context = null ): string;
+	public function render_partial( string $path, ?array $context = null ): string;
 
 	/**
 	 * Return the raw value of a context property.
