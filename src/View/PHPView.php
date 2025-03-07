@@ -124,7 +124,7 @@ class PHPView implements View {
 	 *
 	 * @throws ViewException If the view could not be loaded or the provided path was not valid.
 	 */
-	public function render_partial( string $path, array $context = null ): string {
+	public function render_partial( string $path, ?array $context = null ): string {
 		if ( ! $context ) {
 			$context = $this->context;
 		}
