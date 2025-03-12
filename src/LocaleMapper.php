@@ -120,6 +120,7 @@ class LocaleMapper {
 	 * @return string
 	 */
 	private static function get_wordpress_locale() {
+		// Using `WPLANG` instead `get_locale()` since the last may return inconsistent results depending on the user session language.
 		$wordpress_locale = get_option( 'WPLANG', self::PINTEREST_DEFAULT_LOCALE );
 		return str_replace( '_', '-', $wordpress_locale );
 	}
