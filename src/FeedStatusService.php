@@ -285,11 +285,11 @@ class FeedStatusService {
 			'warnings' => 0,
 		);
 
-		$sums['errors'] += array_sum( $processing_results['ingestion_details']['errors'] );
-		$sums['errors'] += array_sum( $processing_results['validation_details']['errors'] );
+		$sums['errors'] += array_sum( $processing_results['ingestion_details']['errors'] ?? array() );
+		$sums['errors'] += array_sum( $processing_results['validation_details']['errors'] ?? array() );
 
-		$sums['warnings'] += array_sum( $processing_results['ingestion_details']['warnings'] );
-		$sums['warnings'] += array_sum( $processing_results['validation_details']['warnings'] );
+		$sums['warnings'] += array_sum( $processing_results['ingestion_details']['warnings'] ?? array() );
+		$sums['warnings'] += array_sum( $processing_results['validation_details']['warnings'] ?? array() );
 
 		$original = $processing_results['product_counts']['original'] ?? 0;
 		$ingested = $processing_results['product_counts']['ingested'] ?? 0;
