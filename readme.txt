@@ -91,6 +91,12 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.17 - 2025-03-18 =
+* Add - PHP 8.4 compatibility.
+* Fix - Add feed status data fallback to empty data sets.
+* Fix - Site locale is obtained from settings.
+* Tweak - WC 9.8 compatibility.
+
 = 1.4.16 - 2025-02-11 =
 * Add - UTM parameters to the products URLs used in the product feed.
 * Dev - Updating code styling rules.
