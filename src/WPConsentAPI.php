@@ -3,7 +3,7 @@
  * Implement WP Consent API for Pinterest for WooCommerce.
  *
  * @package Pinterest_For_WooCommerce/Classes/
- * @version x.x.x
+ * @version 1.4.17
  */
 
 namespace Automattic\WooCommerce\Pinterest;
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class handling WP Consent API integration.
  *
- * @since x.x.x
+ * @since 1.4.17
  */
 class WPConsentAPI {
 
