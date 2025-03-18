@@ -347,7 +347,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			/**
 			 * Filters whether to disable CAPI tracking.
 			 *
-			 * @since x.x.x
+			 * @since 1.4.17
 			 *
 			 * @param bool $disable_capi_tracking Whether to disable CAPI tracking.
 			 */
