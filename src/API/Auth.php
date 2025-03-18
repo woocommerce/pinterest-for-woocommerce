@@ -153,7 +153,7 @@ class Auth extends VendorAPI {
 	 */
 	private function apply_oauth_flow_features( array $features ): void {
 		Pinterest_For_Woocommerce()::save_setting( 'track_conversions', $features['tags'] ?? false );
-		Pinterest_For_Woocommerce()::save_setting( 'track_conversions_capi', $features['CAPI'] ?? false );
+		Pinterest_For_Woocommerce()::save_setting( 'track_conversions_capi', false );
 		Pinterest_For_Woocommerce()::save_setting( 'product_sync_enabled', $features['catalog'] ?? false );
 	}
 
