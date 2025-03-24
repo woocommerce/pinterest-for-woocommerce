@@ -91,7 +91,8 @@ class LocalFeedConfigs {
 		Pinterest_For_Woocommerce()::save_data( 'local_feed_ids', $feed_ids );
 
 		$file_name_base = trailingslashit( wp_get_upload_dir()['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
-		$url_base       = trailingslashit( wp_get_upload_dir()['baseurl'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
+		$force_https    = str_replace( 'http:', 'https:', wp_get_upload_dir()['baseurl'] );
+		$url_base       = trailingslashit( $force_https ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
 		array_walk(
 			$feed_ids,
 			function ( &$id ) use ( $file_name_base, $url_base ) {
