@@ -336,6 +336,7 @@ class Feeds {
 			return false;
 		}
 
+		// Some sites may be misconfigured and return HTTP schema for the feed location URL. We force it to become HTTPS.
 		$force_https   = str_replace( 'http:', 'https:', wp_get_upload_dir()['baseurl'] );
 		$feed_location = trailingslashit( $force_https ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
 
