@@ -41,7 +41,7 @@ class FeedsTest extends WP_UnitTestCase {
 	public function test_maybe_remote_feed_returns_feed_id() {
 		add_filter(
 			'upload_dir',
-			function( $uploads ) {
+			function ( $uploads ) {
 				$uploads['baseurl'] = 'https://example-1.com';
 				return $uploads;
 			}
@@ -56,7 +56,7 @@ class FeedsTest extends WP_UnitTestCase {
 	public function test_maybe_remote_feed_returns_empty_feed_id() {
 		add_filter(
 			'upload_dir',
-			function( $uploads ) {
+			function ( $uploads ) {
 				$uploads['baseurl'] = 'https://example-11.com';
 				return $uploads;
 			}
