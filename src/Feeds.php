@@ -336,7 +336,8 @@ class Feeds {
 			return false;
 		}
 
-		return 0 === strpos( $feed['location'] ?? '', get_site_url() );
+		$feed_location = trailingslashit( wp_get_upload_dir()['baseurl'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
+		return 0 === strpos( $feed['location'] ?? '', $feed_location );
 	}
 
 	/**
