@@ -39,10 +39,13 @@ class FeedsTest extends WP_UnitTestCase {
 	}
 
 	public function test_maybe_remote_feed_returns_feed_id() {
-		add_filter( 'upload_dir', function( $uploads ) {
-			$uploads['baseurl'] = 'https://example-1.com';
-			return $uploads;
-		});
+		add_filter(
+			'upload_dir',
+			function( $uploads ) {
+				$uploads['baseurl'] = 'https://example-1.com';
+				return $uploads;
+			}
+		);
 		add_filter( 'pre_http_request', array( self::class, 'get_feeds' ), 10, 3 );
 
 		$feed = Feeds::maybe_remote_feed();
@@ -51,10 +54,13 @@ class FeedsTest extends WP_UnitTestCase {
 	}
 
 	public function test_maybe_remote_feed_returns_empty_feed_id() {
-		add_filter( 'upload_dir', function( $uploads ) {
-			$uploads['baseurl'] = 'https://example-11.com';
-			return $uploads;
-		});
+		add_filter(
+			'upload_dir',
+			function( $uploads ) {
+				$uploads['baseurl'] = 'https://example-11.com';
+				return $uploads;
+			}
+		);
 		add_filter( 'pre_http_request', array( self::class, 'get_feeds_with_empty_tail_for_the_feed_location' ), 10, 3 );
 
 		$feed = Feeds::maybe_remote_feed();
