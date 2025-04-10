@@ -38,7 +38,7 @@ jobs:
             - name: Build
               run: |
                   export PATH=$PATH:${PWD}/tools
-                  npm run build
+                  npm run build:zip
 
             - name: Upload zip
               uses: actions/upload-artifact@v4
