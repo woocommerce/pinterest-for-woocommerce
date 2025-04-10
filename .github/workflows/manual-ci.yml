@@ -108,45 +108,45 @@ jobs:
       test_mode: '[ "legacy", "blocks" ]'
     secrets: inherit
 
-  # handle-success:
-  #   if: |
-  #     always() &&
-  #     (needs.qit-tests.result == 'success' || needs.qit-tests.result == 'skipped') &&
-  #     (needs.e2e-tests.result == 'success' || needs.e2e-tests.result == 'skipped') &&
-  #     (needs.php-tests.result == 'success' || needs.php-tests.result == 'skipped')
-  #   needs: [qit-tests, e2e-tests, php-tests]
-  #   name: Handle success
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  #   steps:
-  #     - uses: act10ns/slack@v2
-  #       with:
-  #         status: success
-  #         message: "Test Runner Workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> passed."
+  handle-success:
+    if: |
+      always() &&
+      (needs.qit-tests.result == 'success' || needs.qit-tests.result == 'skipped') &&
+      (needs.e2e-tests.result == 'success' || needs.e2e-tests.result == 'skipped') &&
+      (needs.php-tests.result == 'success' || needs.php-tests.result == 'skipped')
+    needs: [qit-tests, e2e-tests, php-tests]
+    name: Handle success
+    runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - uses: act10ns/slack@v2
+        with:
+          status: success
+          message: "Test Runner Workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> passed."
 
-  # handle-cancelled:
-  #   if: cancelled()
-  #   needs: [qit-tests, e2e-tests, php-tests]
-  #   name: Handle cancellation
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  #   steps:
-  #     - uses: act10ns/slack@v2
-  #       with:
-  #         status: cancelled
-  #         message: "Test Runner Workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> cancelled."
+  handle-cancelled:
+    if: cancelled()
+    needs: [qit-tests, e2e-tests, php-tests]
+    name: Handle cancellation
+    runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - uses: act10ns/slack@v2
+        with:
+          status: cancelled
+          message: "Test Runner Workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> cancelled."
 
-  # handle-error:
-  #   if: failure()
-  #   needs: [qit-tests, e2e-tests, php-tests]
-  #   name: Handle failure
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  #   steps:
-  #     - uses: act10ns/slack@v2
-  #       with:
-  #         status: failure
-  #         message: "Test Runner Workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> failed."
+  handle-error:
+    if: failure()
+    needs: [qit-tests, e2e-tests, php-tests]
+    name: Handle failure
+    runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - uses: act10ns/slack@v2
+        with:
+          status: failure
+          message: "Test Runner Workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> failed."
