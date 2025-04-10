@@ -32,10 +32,13 @@ jobs:
                   wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -P ${PWD}/tools/
                   chmod +x tools/wp-cli.phar && mv tools/wp-cli.phar tools/wp
 
+            - name: Rebuild node-sass
+              run: npm rebuild node-sass
+
             - name: Build
               run: |
                   export PATH=$PATH:${PWD}/tools
-                  npm run build
+                  npm run build:zip
 
             - name: Upload zip
               uses: actions/upload-artifact@v4
