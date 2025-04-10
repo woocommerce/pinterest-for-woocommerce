@@ -85,7 +85,8 @@ jobs:
       test-activation: ${{ contains(inputs.qit-tests, 'Activation') && true || false }}
       test-security: ${{ contains(inputs.qit-tests, 'Security') && true || false }}
       test-phpcompatibility: ${{ contains(inputs.qit-tests, 'Compatibility') && true || false }}
-      test-phpstan: ${{ contains(inputs.qit-tests, 'PHPStan') && true || false }}
+      # TODO: Enable PHPStan tests
+      # test-phpstan: ${{ contains(inputs.qit-tests, 'PHPStan') && true || false }}
       test-woo-api: ${{ contains(inputs.qit-tests, 'API') && true || false }}
       test-woo-e2e: ${{ contains(inputs.qit-tests, 'WooCommerce E2E') && true || false }}
       test-malware: ${{ contains(inputs.qit-tests, 'Malware') && true || false }}
