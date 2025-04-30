@@ -137,7 +137,7 @@ class PluginUpdate {
 			'1.4.10' => array(
 				'feed_deletion_notice_cleanup',
 			),
-			'1.4.17' => array(
+			'1.4.18' => array(
 				'disable_capi_for_all_merchants',
 			),
 		);
