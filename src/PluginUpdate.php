@@ -421,10 +421,5 @@ class PluginUpdate {
 	protected function disable_capi_for_all_merchants(): void {
 		// Set track_conversions_capi to false for all merchants
 		Pinterest_For_Woocommerce()::save_setting( 'track_conversions_capi', false );
-		
-		Logger::log(
-			'Disabled Conversions API for all merchants as part of the update to 1.4.17',
-			'info'
-		);
 	}
 }
