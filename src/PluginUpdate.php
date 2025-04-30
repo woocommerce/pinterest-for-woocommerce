@@ -413,13 +413,13 @@ class PluginUpdate {
 	}
 
 	/**
-	 * Disable CAPI for all merchants
-	 * 
-	 * @since 1.4.17
+	 * Disable CAPI for all merchants.
+	 *
+	 * @since x.x.x
 	 * @return void
 	 */
 	protected function disable_capi_for_all_merchants(): void {
-		// Set track_conversions_capi to false for all merchants
+		// Set track_conversions_capi to false for all merchants.
 		Pinterest_For_Woocommerce()::save_setting( 'track_conversions_capi', false );
 	}
 }
