@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 1.4.17
+Stable tag: 1.4.18
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,10 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.4.18 - 2025-05-20 =
+* Tweak - WC 9.9 compatibility.
+* Tweak - WP 6.8 compatibility.
 
 = 1.4.17 - 2025-03-18 =
 * Add - PHP 8.4 compatibility.
