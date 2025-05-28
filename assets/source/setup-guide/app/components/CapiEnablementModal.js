@@ -14,6 +14,7 @@ import {
  * Internal dependencies
  */
 import { useSettingsDispatch, useCreateNotice } from '../helpers/effects';
+import landingConnectImage from '../../../../images/landing_connect.svg';
 
 /**
  * Modal to encourage merchants to enable Conversions API for better tracking.
@@ -74,23 +75,22 @@ const CapiEnablementModal = ( { onCloseModal, onDismiss } ) => {
 			) }
 			onRequestClose={ onCloseModal }
 			className="pinterest-for-woocommerce-capi-enablement-modal"
+			style={ { maxWidth: '600px' } }
 		>
+			<div style={ { textAlign: 'center', marginBottom: '20px' } }>
+				<img
+					src={ landingConnectImage }
+					alt={ __(
+						'Pinterest connection illustration',
+						'pinterest-for-woocommerce'
+					) }
+					style={ { maxWidth: '200px', height: 'auto' } }
+				/>
+			</div>
+
 			<Text variant="body.large">
 				{ __(
-					'Enable Pinterest Conversions API for more reliable and accurate conversion tracking. This server-side tracking works alongside your Pinterest Tag to capture conversions that might be missed due to browser restrictions or ad blockers.',
-					'pinterest-for-woocommerce'
-				) }
-			</Text>
-
-			<Text
-				variant="body"
-				style={ {
-					marginTop: '16px',
-					marginBottom: '8px',
-				} }
-			>
-				{ __(
-					'Benefits of enabling Conversions API:',
+					'Enable Pinterest Conversions API for more reliable conversion tracking. This helps you better measure ad campaign success, optimize your marketing strategies, and understand customer behavior. Benefits:',
 					'pinterest-for-woocommerce'
 				) }
 			</Text>
@@ -98,7 +98,9 @@ const CapiEnablementModal = ( { onCloseModal, onDismiss } ) => {
 			<ul
 				style={ {
 					marginLeft: '20px',
+					marginTop: '16px',
 					marginBottom: '24px',
+					listStyleType: 'disc',
 				} }
 			>
 				<li>
