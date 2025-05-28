@@ -77,14 +77,22 @@ const CapiEnablementModal = ( { onCloseModal, onDismiss } ) => {
 			className="pinterest-for-woocommerce-capi-enablement-modal"
 			style={ { maxWidth: '600px' } }
 		>
-			<div style={ { textAlign: 'center', marginBottom: '20px' } }>
+			<div
+				style={ {
+					textAlign: 'center',
+					marginBottom: '20px',
+				} }
+			>
 				<img
 					src={ landingConnectImage }
 					alt={ __(
 						'Pinterest connection illustration',
 						'pinterest-for-woocommerce'
 					) }
-					style={ { maxWidth: '200px', height: 'auto' } }
+					style={ {
+						maxWidth: '200px',
+						height: 'auto',
+					} }
 				/>
 			</div>
 
