@@ -13,20 +13,18 @@ import {
 /**
  * Internal dependencies
  */
-import {
-	useSettingsDispatch,
-	useCreateNotice,
-} from '../helpers/effects';
+import { useSettingsDispatch, useCreateNotice } from '../helpers/effects';
 
 /**
  * Modal to encourage merchants to enable Conversions API for better tracking.
  *
  * @param {Object} options
  * @param {Function} options.onCloseModal Action to call when the modal gets closed.
+ * @param {Function} options.onDismiss Action to call when the modal is dismissed (optional).
  *
  * @return {JSX.Element} rendered component
  */
-const CapiEnablementModal = ( { onCloseModal } ) => {
+const CapiEnablementModal = ( { onCloseModal, onDismiss } ) => {
 	const [ isEnabling, setIsEnabling ] = useState( false );
 	const setAppSettings = useSettingsDispatch( true );
 	const createNotice = useCreateNotice();
@@ -37,7 +35,7 @@ const CapiEnablementModal = ( { onCloseModal } ) => {
 			await setAppSettings( {
 				track_conversions_capi: true,
 			} );
-			
+
 			createNotice(
 				'success',
 				__(
@@ -45,6 +43,7 @@ const CapiEnablementModal = ( { onCloseModal } ) => {
 					'pinterest-for-woocommerce'
 				)
 			);
+
 			onCloseModal();
 		} catch ( error ) {
 			createNotice(
@@ -57,6 +56,14 @@ const CapiEnablementModal = ( { onCloseModal } ) => {
 		} finally {
 			setIsEnabling( false );
 		}
+	};
+
+	const handleNotNow = () => {
+		// Call the dismiss callback to mark modal as dismissed
+		if ( onDismiss ) {
+			onDismiss();
+		}
+		onCloseModal();
 	};
 
 	return (
@@ -74,25 +81,56 @@ const CapiEnablementModal = ( { onCloseModal } ) => {
 					'pinterest-for-woocommerce'
 				) }
 			</Text>
-			
-			<Text variant="body" style={{ marginTop: '16px', marginBottom: '8px' }}>
+
+			<Text
+				variant="body"
+				style={ {
+					marginTop: '16px',
+					marginBottom: '8px',
+				} }
+			>
 				{ __(
 					'Benefits of enabling Conversions API:',
 					'pinterest-for-woocommerce'
 				) }
 			</Text>
-			
-			<ul style={{ marginLeft: '20px', marginBottom: '24px' }}>
-				<li>{ __( 'More complete conversion data', 'pinterest-for-woocommerce' ) }</li>
-				<li>{ __( 'Better campaign optimization', 'pinterest-for-woocommerce' ) }</li>
-				<li>{ __( 'Improved audience targeting', 'pinterest-for-woocommerce' ) }</li>
-				<li>{ __( 'Reduced impact from browser limitations', 'pinterest-for-woocommerce' ) }</li>
+
+			<ul
+				style={ {
+					marginLeft: '20px',
+					marginBottom: '24px',
+				} }
+			>
+				<li>
+					{ __(
+						'More complete conversion data',
+						'pinterest-for-woocommerce'
+					) }
+				</li>
+				<li>
+					{ __(
+						'Better campaign optimization',
+						'pinterest-for-woocommerce'
+					) }
+				</li>
+				<li>
+					{ __(
+						'Improved audience targeting',
+						'pinterest-for-woocommerce'
+					) }
+				</li>
+				<li>
+					{ __(
+						'Reduced impact from browser limitations',
+						'pinterest-for-woocommerce'
+					) }
+				</li>
 			</ul>
 
 			<Flex direction="row" justify="flex-end" gap={ 2 }>
 				<Button
 					variant="tertiary"
-					onClick={ onCloseModal }
+					onClick={ handleNotNow }
 					disabled={ isEnabling }
 				>
 					{ __( 'Not now', 'pinterest-for-woocommerce' ) }
@@ -104,9 +142,11 @@ const CapiEnablementModal = ( { onCloseModal } ) => {
 					disabled={ isEnabling }
 				>
 					{ isEnabling
-						? __( 'Enabling...', 'pinterest-for-woocommerce' )
-						: __( 'Enable Conversions API', 'pinterest-for-woocommerce' )
-					}
+						? __( 'Enabling…', 'pinterest-for-woocommerce' )
+						: __(
+								'Enable Conversions API',
+								'pinterest-for-woocommerce'
+						  ) }
 				</Button>
 			</Flex>
 		</Modal>

@@ -8,6 +8,7 @@ const userInteractionsReducer = (
 		userInteractions: {
 			ads_modal_dismissed: false,
 			ads_notice_dismissed: false,
+			capi_modal_dismissed: false,
 			billingSetupFlowEntered: false,
 		},
 		isRequesting: false,
@@ -45,6 +46,15 @@ const userInteractionsReducer = (
 				userInteractions: {
 					...state.userInteractions,
 					ads_notice_dismissed: action.noticeDismissed,
+				},
+			};
+			break;
+		case TYPES.SET_CAPI_MODAL_DISMISSED:
+			state = {
+				...state,
+				userInteractions: {
+					...state.userInteractions,
+					capi_modal_dismissed: action.modalDismissed,
 				},
 			};
 			break;

@@ -14,7 +14,11 @@ import AdCreditsNotice from './sections/AdCreditsNotice';
 import SyncIssues from './sections/SyncIssues';
 import HealthCheck from '../setup-guide/app/components/HealthCheck';
 import CapiEnablementModal from '../setup-guide/app/components/CapiEnablementModal';
-import { useCreateNotice, useDismissAdsModalDispatch } from './helpers/effects';
+import {
+	useCreateNotice,
+	useDismissAdsModalDispatch,
+	useDismissCapiModalDispatch,
+} from './helpers/effects';
 import NavigationClassic from '../components/navigation-classic';
 import OnboardingModals from './components/OnboardingModals';
 import { USER_INTERACTION_STORE_NAME } from './data';
@@ -55,8 +59,7 @@ const CatalogSyncApp = () => {
 		useState( false );
 	const [ isAdCreditsNoticeOpen, setIsAdCreditsNoticeOpen ] =
 		useState( false );
-	const [ isCapiModalOpen, setIsCapiModalOpen ] =
-		useState( false );
+	const [ isCapiModalOpen, setIsCapiModalOpen ] = useState( false );
 
 	const userInteractions = useSelect( ( select ) =>
 		select( USER_INTERACTION_STORE_NAME ).getUserInteractions()
@@ -104,6 +107,13 @@ const CatalogSyncApp = () => {
 	] );
 
 	const openCapiModal = useCallback( () => {
+		if (
+			userInteractionsLoaded === false ||
+			userInteractions?.capi_modal_dismissed
+		) {
+			return;
+		}
+
 		const trackConversions = appSettings?.track_conversions;
 		const trackConversionsCapi = appSettings?.track_conversions_capi;
 
@@ -113,7 +123,12 @@ const CatalogSyncApp = () => {
 		}
 
 		setIsCapiModalOpen( true );
-	}, [ appSettings?.track_conversions, appSettings?.track_conversions_capi ] );
+	}, [
+		userInteractionsLoaded,
+		userInteractions?.capi_modal_dismissed,
+		appSettings?.track_conversions,
+		appSettings?.track_conversions_capi,
+	] );
 
 	const closeOnboardingModal = () => {
 		setIsOnboardingModalOpen( false );
@@ -124,9 +139,12 @@ const CatalogSyncApp = () => {
 		} );
 	};
 
-	const closeCapiModal = () => {
-		setIsCapiModalOpen( false );
-	};
+	const setDismissCapiModal = useDismissCapiModalDispatch();
+	const handleSetDismissCapiModal = useCallback( async () => {
+		try {
+			await setDismissCapiModal();
+		} catch ( error ) {}
+	}, [ setDismissCapiModal ] );
 
 	const setDismissAdsModal = useDismissAdsModalDispatch();
 	const handleSetDismissAdsModal = useCallback( async () => {
@@ -157,7 +175,10 @@ const CatalogSyncApp = () => {
 				<OnboardingModals onCloseModal={ closeOnboardingModal } />
 			) }
 			{ isCapiModalOpen && (
-				<CapiEnablementModal onCloseModal={ closeCapiModal } />
+				<CapiEnablementModal
+					onCloseModal={ () => setIsCapiModalOpen( false ) }
+					onDismiss={ handleSetDismissCapiModal }
+				/>
 			) }
 		</div>
 	);
