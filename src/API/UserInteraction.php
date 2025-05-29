@@ -23,11 +23,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class UserInteraction extends VendorAPI {
 
-	const USER_INTERACTION      = 'user_interaction';
-	const ADS_MODAL_DISMISSED   = 'ads_modal_dismissed';
-	const ADS_NOTICE_DISMISSED  = 'ads_notice_dismissed';
-	const BILLING_FLOW_ENTERED  = 'billing_setup_flow_entered';
-	const CAPI_MODAL_DISMISSED  = 'capi_modal_dismissed';
+	const USER_INTERACTION     = 'user_interaction';
+	const ADS_MODAL_DISMISSED  = 'ads_modal_dismissed';
+	const ADS_NOTICE_DISMISSED = 'ads_notice_dismissed';
+	const BILLING_FLOW_ENTERED = 'billing_setup_flow_entered';
+	const CAPI_MODAL_DISMISSED = 'capi_modal_dismissed';
 
 	/**
 	 * Initialize class
