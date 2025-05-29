@@ -77,6 +77,29 @@ export function* adsNoticeDismissed() {
 	} catch ( error ) {}
 }
 
+export function setCapiModalDismissed( modalDismissed ) {
+	return {
+		type: TYPES.SET_CAPI_MODAL_DISMISSED,
+		modalDismissed,
+	};
+}
+
+export function* capiModalDismissed() {
+	yield setCapiModalDismissed( true );
+
+	try {
+		const results = yield apiFetch( {
+			path: API_ROUTE,
+			method: 'POST',
+			data: {
+				capi_modal_dismissed: true,
+			},
+		} );
+
+		return { success: results.capi_modal_dismissed };
+	} catch ( error ) {}
+}
+
 export function setBillingSetupFlowEntered() {
 	return {
 		type: TYPES.SET_BILLING_SETUP_FLOW_ENTERED,

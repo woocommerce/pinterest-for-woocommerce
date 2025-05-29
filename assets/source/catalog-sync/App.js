@@ -13,7 +13,12 @@ import SyncState from './sections/SyncState';
 import AdCreditsNotice from './sections/AdCreditsNotice';
 import SyncIssues from './sections/SyncIssues';
 import HealthCheck from '../setup-guide/app/components/HealthCheck';
-import { useCreateNotice, useDismissAdsModalDispatch } from './helpers/effects';
+import CapiEnablementModal from '../setup-guide/app/components/CapiEnablementModal';
+import {
+	useCreateNotice,
+	useDismissAdsModalDispatch,
+	useDismissCapiModalDispatch,
+} from './helpers/effects';
 import NavigationClassic from '../components/navigation-classic';
 import OnboardingModals from './components/OnboardingModals';
 import { USER_INTERACTION_STORE_NAME } from './data';
@@ -43,16 +48,18 @@ import { useSettingsSelect } from '../setup-guide/app/helpers/effects';
  * @return {JSX.Element} rendered component
  */
 const CatalogSyncApp = () => {
-	const adsCampaignIsActive = useSettingsSelect()?.ads_campaign_is_active;
+	const appSettings = useSettingsSelect();
+	const adsCampaignIsActive = appSettings?.ads_campaign_is_active;
 
 	const couponRedeemErrorID =
-		useSettingsSelect()?.account_data?.coupon_redeem_info?.error_id;
+		appSettings?.account_data?.coupon_redeem_info?.error_id;
 
 	useCreateNotice( wcSettings.pinterest_for_woocommerce.error );
 	const [ isOnboardingModalOpen, setIsOnboardingModalOpen ] =
 		useState( false );
 	const [ isAdCreditsNoticeOpen, setIsAdCreditsNoticeOpen ] =
 		useState( false );
+	const [ isCapiModalOpen, setIsCapiModalOpen ] = useState( false );
 
 	const userInteractions = useSelect( ( select ) =>
 		select( USER_INTERACTION_STORE_NAME ).getUserInteractions()
@@ -99,6 +106,30 @@ const CatalogSyncApp = () => {
 		couponRedeemErrorID,
 	] );
 
+	const openCapiModal = useCallback( () => {
+		if (
+			userInteractionsLoaded === false ||
+			userInteractions?.capi_modal_dismissed
+		) {
+			return;
+		}
+
+		const trackConversions = appSettings?.track_conversions;
+		const trackConversionsCapi = appSettings?.track_conversions_capi;
+
+		// Only show if track_conversions is enabled but CAPI is not enabled
+		if ( ! trackConversions || trackConversionsCapi ) {
+			return;
+		}
+
+		setIsCapiModalOpen( true );
+	}, [
+		userInteractionsLoaded,
+		userInteractions?.capi_modal_dismissed,
+		appSettings?.track_conversions,
+		appSettings?.track_conversions_capi,
+	] );
+
 	const closeOnboardingModal = () => {
 		setIsOnboardingModalOpen( false );
 		handleSetDismissAdsModal();
@@ -107,6 +138,13 @@ const CatalogSyncApp = () => {
 			name: 'ads-credits-onboarding',
 		} );
 	};
+
+	const setDismissCapiModal = useDismissCapiModalDispatch();
+	const handleSetDismissCapiModal = useCallback( async () => {
+		try {
+			await setDismissCapiModal();
+		} catch ( error ) {}
+	}, [ setDismissCapiModal ] );
 
 	const setDismissAdsModal = useDismissAdsModalDispatch();
 	const handleSetDismissAdsModal = useCallback( async () => {
@@ -118,7 +156,8 @@ const CatalogSyncApp = () => {
 	useEffect( () => {
 		openOnboardingModal();
 		openAdsCreditsNotice();
-	}, [ openOnboardingModal, openAdsCreditsNotice ] );
+		openCapiModal();
+	}, [ openOnboardingModal, openAdsCreditsNotice, openCapiModal ] );
 
 	return (
 		<div className="pinterest-for-woocommerce-catalog-sync">
@@ -134,6 +173,12 @@ const CatalogSyncApp = () => {
 			</div>
 			{ isOnboardingModalOpen && (
 				<OnboardingModals onCloseModal={ closeOnboardingModal } />
+			) }
+			{ isCapiModalOpen && (
+				<CapiEnablementModal
+					onCloseModal={ () => setIsCapiModalOpen( false ) }
+					onDismiss={ handleSetDismissCapiModal }
+				/>
 			) }
 		</div>
 	);

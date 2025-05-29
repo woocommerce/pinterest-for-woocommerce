@@ -27,6 +27,7 @@ class UserInteraction extends VendorAPI {
 	const ADS_MODAL_DISMISSED  = 'ads_modal_dismissed';
 	const ADS_NOTICE_DISMISSED = 'ads_notice_dismissed';
 	const BILLING_FLOW_ENTERED = 'billing_setup_flow_entered';
+	const CAPI_MODAL_DISMISSED = 'capi_modal_dismissed';
 
 	/**
 	 * Initialize class
@@ -52,6 +53,7 @@ class UserInteraction extends VendorAPI {
 		return array(
 			self::ADS_MODAL_DISMISSED  => (bool) get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::ADS_MODAL_DISMISSED ),
 			self::ADS_NOTICE_DISMISSED => (bool) get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::ADS_NOTICE_DISMISSED ),
+			self::CAPI_MODAL_DISMISSED => (bool) get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::CAPI_MODAL_DISMISSED ),
 		);
 	}
 
@@ -89,6 +91,14 @@ class UserInteraction extends VendorAPI {
 			);
 		}
 
+		if ( $request->has_param( self::CAPI_MODAL_DISMISSED ) ) {
+			update_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::CAPI_MODAL_DISMISSED, true, false );
+			// Confirm dismissal.
+			return array(
+				self::CAPI_MODAL_DISMISSED => true,
+			);
+		}
+
 		return new WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_' . self::USER_INTERACTION, esc_html__( 'Unrecognized interaction parameter', 'pinterest-for-woocommerce' ), array( 'status' => 400 ) );
 	}
 
@@ -98,6 +108,7 @@ class UserInteraction extends VendorAPI {
 	public static function flush_options() {
 		delete_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::ADS_MODAL_DISMISSED );
 		delete_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::ADS_NOTICE_DISMISSED );
+		delete_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::CAPI_MODAL_DISMISSED );
 		Billing::do_not_check_billing_setup_often();
 	}
 }
