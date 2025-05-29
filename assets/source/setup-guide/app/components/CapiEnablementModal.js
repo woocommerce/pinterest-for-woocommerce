@@ -139,14 +139,14 @@ const CapiEnablementModal = ( { onCloseModal, onDismiss } ) => {
 
 			<Flex direction="row" justify="flex-end" gap={ 2 }>
 				<Button
-					variant="tertiary"
+					isTertiary
 					onClick={ handleNotNow }
 					disabled={ isEnabling }
 				>
 					{ __( 'Not now', 'pinterest-for-woocommerce' ) }
 				</Button>
 				<Button
-					variant="primary"
+					isPrimary
 					onClick={ handleEnableCapi }
 					isBusy={ isEnabling }
 					disabled={ isEnabling }
