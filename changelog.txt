@@ -1,5 +1,9 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.4.19 - 2025-05-29 =
+* Add CAPI enablement modal to encourage merchants to enable Conversions API.
+* Enable Conversions API in OAuth flow and settings UI.
+
 = 1.4.18 - 2025-05-20 =
 * Tweak - WC 9.9 compatibility.
 * Tweak - WP 6.8 compatibility.

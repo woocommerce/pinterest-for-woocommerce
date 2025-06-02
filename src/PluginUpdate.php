@@ -137,6 +137,9 @@ class PluginUpdate {
 			'1.4.10' => array(
 				'feed_deletion_notice_cleanup',
 			),
+			'1.4.19' => array(
+				'disable_capi_for_all_merchants',
+			),
 		);
 	}
 
@@ -407,5 +410,16 @@ class PluginUpdate {
 		} catch ( NotesUnavailableException $e ) {
 			return;
 		}
+	}
+
+	/**
+	 * Disable CAPI for all merchants.
+	 *
+	 * @since 1.4.19
+	 * @return void
+	 */
+	protected function disable_capi_for_all_merchants(): void {
+		// Set track_conversions_capi to false for all merchants.
+		Pinterest_For_Woocommerce()::save_setting( 'track_conversions_capi', false );
 	}
 }

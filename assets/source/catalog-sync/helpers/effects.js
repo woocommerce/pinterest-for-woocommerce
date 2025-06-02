@@ -29,6 +29,11 @@ export const useDismissAdsNoticeDispatch = () => {
 	return () => adsNoticeDismissed();
 };
 
+export const useDismissCapiModalDispatch = () => {
+	const { capiModalDismissed } = useDispatch( USER_INTERACTION_STORE_NAME );
+	return () => capiModalDismissed();
+};
+
 export const useBillingSetupFlowEntered = () => {
 	const { billingSetupFlowEntered } = useDispatch(
 		USER_INTERACTION_STORE_NAME
