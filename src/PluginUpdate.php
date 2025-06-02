@@ -415,7 +415,7 @@ class PluginUpdate {
 	/**
 	 * Disable CAPI for all merchants.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.19
 	 * @return void
 	 */
 	protected function disable_capi_for_all_merchants(): void {
