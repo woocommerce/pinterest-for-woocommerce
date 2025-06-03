@@ -329,6 +329,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function init_tracking() {
 
+			// Init WP Consent API integration.
+			new Pinterest\WPConsentAPI();
+
 			/**
 			 * Filters whether to disable tracking.
 			 *
