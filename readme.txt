@@ -4,7 +4,7 @@ Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.3
-Stable tag: 1.4.19
+Stable tag: 1.4.20
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.4.20 - 2025-06-03 =
+* Tweak - Reenable WP Consent API tracking integration.
 
 = 1.4.19 - 2025-05-29 =
 * Add CAPI enablement modal to encourage merchants to enable Conversions API.
