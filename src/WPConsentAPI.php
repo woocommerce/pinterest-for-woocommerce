@@ -43,7 +43,8 @@ class WPConsentAPI {
 	/**
 	 * Check if tracking should be disabled based on user marketing consent.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.17
+	 * @since x.x.x Renamed from should_disable_tracking() for clarity.
 	 *
 	 * @return bool
 	 */
