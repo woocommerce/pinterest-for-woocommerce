@@ -91,6 +91,10 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.21 - 2025-06-16 =
+* Update WP Consent API to affect all tracking with improved architecture.
+* [dev] Pin Github actions to immutable references of commits instead of tags.
+
 = 1.4.20 - 2025-06-03 =
 * Tweak - Reenable WP Consent API tracking integration.
 
