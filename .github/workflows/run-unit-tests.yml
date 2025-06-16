@@ -22,7 +22,7 @@ jobs:
         php: [7.4, 8.3]
         wp-version: [latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Prepare PHP
         uses: woocommerce/grow/prepare-php@actions-v1
