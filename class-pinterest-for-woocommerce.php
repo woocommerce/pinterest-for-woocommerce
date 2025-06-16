@@ -335,7 +335,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			/**
 			 * Filters whether to disable tracking based on user consent.
 			 *
-			 * @since x.x.x Added to provide granular user consent control for tracking.
+			 * @since 1.4.21 Added to provide granular user consent control for tracking.
 			 *
 			 * @param bool $disable_tracking Whether to disable tracking due to user consent.
 			 */
