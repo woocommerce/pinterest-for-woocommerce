@@ -342,9 +342,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			$is_tracking_disabled_user_consent = apply_filters( 'woocommerce_pinterest_disable_tracking_user_consent', false );
 			$is_tracking_conversions_disabled  = ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
 			$is_not_a_site                     = wp_doing_cron() || is_admin();
-
-			// Combine all consent conditions
-			$should_disable_tracking = $is_tracking_disabled_user_consent || $is_tracking_conversions_disabled || $is_not_a_site;
+			$should_disable_tracking           = $is_tracking_disabled_user_consent || $is_tracking_conversions_disabled || $is_not_a_site;
 
 			/**
 			 * Filters whether to disable tracking.
