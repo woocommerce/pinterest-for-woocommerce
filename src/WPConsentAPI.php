@@ -28,7 +28,7 @@ class WPConsentAPI {
 		}
 
 		add_filter( 'wp_consent_api_registered_' . PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME, '__return_true' );
-		add_filter( 'woocommerce_pinterest_disable_conversions_capi_tracking', array( $this, 'should_disable_tracking' ) );
+		add_filter( 'woocommerce_pinterest_disable_tracking_user_consent', array( $this, 'should_disable_tracking_for_user_consent' ) );
 	}
 
 	/**
@@ -41,11 +41,14 @@ class WPConsentAPI {
 	}
 
 	/**
-	 * Check if tracking should be disabled based on marketing consent.
+	 * Check if tracking should be disabled based on user marketing consent.
+	 *
+	 * @since 1.4.17
+	 * @since 1.4.21 Renamed from should_disable_tracking() for clarity.
 	 *
 	 * @return bool
 	 */
-	public function should_disable_tracking(): bool {
+	public function should_disable_tracking_for_user_consent(): bool {
 		return ! wp_has_consent( 'marketing' );
 	}
 }

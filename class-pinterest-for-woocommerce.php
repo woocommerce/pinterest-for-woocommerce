@@ -333,32 +333,31 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			new Pinterest\WPConsentAPI();
 
 			/**
+			 * Filters whether to disable tracking based on user consent.
+			 *
+			 * @since 1.4.21 Added to provide granular user consent control for tracking.
+			 *
+			 * @param bool $disable_tracking Whether to disable tracking due to user consent.
+			 */
+			$is_tracking_disabled_user_consent = apply_filters( 'woocommerce_pinterest_disable_tracking_user_consent', false );
+			$is_tracking_conversions_disabled  = ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
+			$is_not_a_site                     = wp_doing_cron() || is_admin();
+			$should_disable_tracking           = $is_tracking_disabled_user_consent || $is_tracking_conversions_disabled || $is_not_a_site;
+
+			/**
 			 * Filters whether to disable tracking.
 			 *
 			 * @since 1.4.0
 			 *
-			 * @param bool $disable_tracking Whether to disable tracking.
+			 * @param bool $disable_tracking Whether to disable tracking based on consent conditions.
 			 */
-			$is_tracking_disabled             = apply_filters( 'woocommerce_pinterest_disable_tracking', false );
-			$is_tracking_conversions_disabled = ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' );
-			$is_not_a_site                    = wp_doing_cron() || is_admin();
-
-			if ( $is_tracking_disabled || $is_tracking_conversions_disabled || $is_not_a_site ) {
+			if ( apply_filters( 'woocommerce_pinterest_disable_tracking', $should_disable_tracking ) ) {
 				return false;
 			}
 
-			/**
-			 * Filters whether to disable CAPI tracking.
-			 *
-			 * @since 1.4.17
-			 *
-			 * @param bool $disable_capi_tracking Whether to disable CAPI tracking.
-			 */
-			$is_tracking_conversions_capi_enabled = ! apply_filters( 'woocommerce_pinterest_disable_conversions_capi_tracking', false )
-													&& Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' );
-			$tracking                             = new Tracking( array( new Tag() ) );
+			$tracking = new Tracking( array( new Tag() ) );
 
-			if ( $is_tracking_conversions_capi_enabled ) {
+			if ( Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' ) ) {
 				$user                = new User( WC_Geolocation::get_ip_address(), wc_get_user_agent() );
 				$conversions_tracker = new Conversions( $user );
 				$tracking->add_tracker( $conversions_tracker );
