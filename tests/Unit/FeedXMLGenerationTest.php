@@ -350,7 +350,12 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		 */
 		$mock_logger = new class() {
 
-			static $message = '';
+			/**
+			 * The message to log.
+			 *
+			 * @var string
+			 */
+			public static $message = '';
 			/**
 			 * Log the message.
 			 *
@@ -808,7 +813,12 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		 */
 		$mock_logger = new class() {
 
-			static $message = '';
+			/**
+			 * The message to log.
+			 *
+			 * @var string
+			 */
+			public static $message = '';
 			/**
 			 * Log the message.
 			 *
@@ -853,7 +863,12 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		 */
 		$mock_logger = new class() {
 
-			static $message = '';
+			/**
+			 * The message to log.
+			 *
+			 * @var string
+			 */
+			public static $message = '';
 			/**
 			 * Log the message.
 			 *
@@ -908,7 +923,12 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		 */
 		$mock_logger = new class() {
 
-			static $message = '';
+			/**
+			 * The message to log.
+			 *
+			 * @var string
+			 */
+			public static $message = '';
 			/**
 			 * Log the message.
 			 *
@@ -958,7 +978,12 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		 */
 		$mock_logger = new class() {
 
-			static $message = '';
+			/**
+			 * The message to log.
+			 *
+			 * @var string
+			 */
+			public static $message = '';
 			/**
 			 * Log the message.
 			 *
