@@ -69,6 +69,20 @@ class ProductsXmlFeed {
 	 */
 	const ADDITIONAL_IMAGES_LIMIT = 10;
 
+	/**
+	 * Limit of categories allowed by Pinterest in the product_type.
+	 *
+	 * @var int
+	 */
+	const PRODUCT_TYPE_CATEGORIES_LIMIT = 5;
+
+	/**
+	 * Limit of characters allowed by Pinterest in the product_type.
+	 *
+	 * @var int
+	 */
+	const PRODUCT_TYPE_CHARS_LIMIT = 1000;
+
 
 	/**
 	 * Returns the XML header to be printed.
@@ -292,7 +306,36 @@ class ProductsXmlFeed {
 			return;
 		}
 
-		return '<' . $property . '>' . implode( ' &gt; ', $taxonomies ) . '</' . $property . '>';
+		// Limit to first 5 categories as per Pinterest requirements.
+		$original_count = count( $taxonomies );
+		if ( $original_count > self::PRODUCT_TYPE_CATEGORIES_LIMIT ) {
+			$taxonomies = array_slice( $taxonomies, 0, self::PRODUCT_TYPE_CATEGORIES_LIMIT );
+			/* translators: 1: product id, 2: original category count, 3: limit */
+			Logger::log( sprintf( esc_html__( 'Product [%1$s] has %2$d categories, limiting to first %3$d as per Pinterest requirements.', 'pinterest-for-woocommerce' ), $id, $original_count, self::PRODUCT_TYPE_CATEGORIES_LIMIT ) );
+		}
+
+		// Build product_type string.
+		$product_type = implode( ' &gt; ', $taxonomies );
+
+		// Ensure product_type doesn't exceed 1000 character limit.
+		if ( strlen( $product_type ) > self::PRODUCT_TYPE_CHARS_LIMIT ) {
+			/* translators: 1: product id, 2: original length, 3: limit */
+			Logger::log( sprintf( esc_html__( 'Product [%1$s] product_type length is %2$d characters, truncating to %3$d characters as per Pinterest requirements.', 'pinterest-for-woocommerce' ), $id, strlen( $product_type ), self::PRODUCT_TYPE_CHARS_LIMIT ) );
+			
+			// Build product_type by adding taxonomies until we hit the character limit, we always include the first taxonomy.
+			$product_type = '';
+			foreach ( $taxonomies as $index => $taxonomy ) {
+				$separator = $index > 0 ? ' &gt; ' : '';
+				$new_product_type = $product_type . $separator . $taxonomy;
+				
+				if ( strlen( $new_product_type ) > self::PRODUCT_TYPE_CHARS_LIMIT && $index > 0 ) {
+					break;
+				}
+				$product_type = $new_product_type;
+			}
+		}
+
+		return '<' . $property . '>' . $product_type . '</' . $property . '>';
 	}
 
 

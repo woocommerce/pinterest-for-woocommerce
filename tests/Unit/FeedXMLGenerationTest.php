@@ -792,6 +792,181 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Test that product_type is limited to 5 categories
+	 *
+	 * @group feed
+	 */
+	public function testProductTypeLimitToFiveCategories() {
+		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
+		$product             = WC_Helper_Product::create_simple_product();
+
+		/**
+		 * Mock logger object that will catch any logged messages.
+		 */
+		$mock_logger = new class {
+
+			static $message = '';
+			public function log( $level, $msg )
+			{
+				self::$message = $msg;
+			}
+		};
+
+		Logger::$logger = $mock_logger;
+
+		// Create 7 categories and assign them to the product.
+		$category_ids = array();
+		for ( $i = 1; $i <= 7; $i++ ) {
+			$category = wp_insert_term( "Category {$i}", 'product_cat' );
+			$category_ids[] = $category['term_id'];
+		}
+		wp_set_object_terms( $product->get_id(), $category_ids, 'product_cat' );
+
+		$xml = $product_type_method( $product );
+
+		// Should only have first 5 categories.
+		$this->assertEquals( '<g:product_type>Category 1 &gt; Category 2 &gt; Category 3 &gt; Category 4 &gt; Category 5</g:product_type>', $xml );
+
+		// Check that a warning was logged.
+		$this->assertStringContainsString( 'has 7 categories, limiting to first 5', $mock_logger::$message );
+	}
+
+	/**
+	 * Test that product_type is limited to 1000 characters
+	 *
+	 * @group feed
+	 */
+	public function testProductTypeCharacterLimit() {
+		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
+		$product             = WC_Helper_Product::create_simple_product();
+
+		/**
+		 * Mock logger object that will catch any logged messages.
+		 */
+		$mock_logger = new class {
+
+			static $message = '';
+			public function log( $level, $msg )
+			{
+				self::$message = $msg;
+			}
+		};
+
+		Logger::$logger = $mock_logger;
+
+		// Create categories with long names to exceed 1000 character limit.
+		// Each category name is 300 chars, so 4 categories = 1200 chars + separators.
+		$category_ids = array();
+		for ( $i = 1; $i <= 4; $i++ ) {
+			$long_name = str_repeat( "LongCategoryName{$i}_", 15 ); // ~300 chars each.
+			$category = wp_insert_term( $long_name, 'product_cat' );
+			$category_ids[] = $category['term_id'];
+		}
+		wp_set_object_terms( $product->get_id(), $category_ids, 'product_cat' );
+
+		$xml = $product_type_method( $product );
+
+		// Extract the product_type value from the XML.
+		preg_match( '/<g:product_type>(.*?)<\/g:product_type>/', $xml, $matches );
+		$product_type = $matches[1] ?? '';
+
+		// Decode HTML entities to get the actual length.
+		$product_type_decoded = html_entity_decode( $product_type );
+
+		// Should be under 1000 characters.
+		$this->assertLessThanOrEqual( 1000, strlen( $product_type_decoded ) );
+
+		// Check that a warning was logged.
+		$this->assertStringContainsString( 'product_type length is', $mock_logger::$message );
+		$this->assertStringContainsString( 'truncating to 1000 characters', $mock_logger::$message );
+	}
+
+	/**
+	 * Test that first category is always included even if it exceeds 1000 characters
+	 *
+	 * @group feed
+	 */
+	public function testProductTypeIncludesFirstCategoryEvenIfTooLong() {
+		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
+		$product             = WC_Helper_Product::create_simple_product();
+
+		/**
+		 * Mock logger object that will catch any logged messages.
+		 */
+		$mock_logger = new class {
+
+			static $message = '';
+			public function log( $level, $msg )
+			{
+				self::$message = $msg;
+			}
+		};
+
+		Logger::$logger = $mock_logger;
+
+		// Create a first category that is over 1000 characters
+		$very_long_name = str_repeat( "VeryLongFirstCategoryName_", 50 ); // Over 1000 chars
+		$category = wp_insert_term( $very_long_name, 'product_cat' );
+		wp_set_object_terms( $product->get_id(), array( $category['term_id'] ), 'product_cat' );
+
+		$xml = $product_type_method( $product );
+
+		// Extract the product_type value from the XML.
+		preg_match( '/<g:product_type>(.*?)<\/g:product_type>/', $xml, $matches );
+		$product_type = $matches[1] ?? '';
+
+		// Decode HTML entities to get the actual length.
+		$product_type_decoded = html_entity_decode( $product_type );
+
+		// Should contain the very long first category name
+		$this->assertStringContainsString( $very_long_name, $product_type_decoded );
+
+		// Check that a warning was logged about length
+		$this->assertStringContainsString( 'product_type length is', $mock_logger::$message );
+		$this->assertStringContainsString( 'truncating to 1000 characters', $mock_logger::$message );
+	}
+
+	/**
+	 * Test that product_type with exactly 5 categories doesn't trigger warning
+	 *
+	 * @group feed
+	 */
+	public function testProductTypeWithFiveCategoriesNoWarning() {
+		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
+		$product             = WC_Helper_Product::create_simple_product();
+
+		/**
+		 * Mock logger object that will catch any logged messages.
+		 */
+		$mock_logger = new class {
+
+			static $message = '';
+			public function log( $level, $msg )
+			{
+				self::$message = $msg;
+			}
+		};
+
+		Logger::$logger = $mock_logger;
+
+		// Create exactly 5 categories.
+		$category_ids = array();
+		for ( $i = 1; $i <= 5; $i++ ) {
+			$category = wp_insert_term( "Category {$i}", 'product_cat' );
+			$category_ids[] = $category['term_id'];
+		}
+		wp_set_object_terms( $product->get_id(), $category_ids, 'product_cat' );
+
+		$xml = $product_type_method( $product );
+
+		// Should have all 5 categories.
+		$this->assertEquals( '<g:product_type>Category 1 &gt; Category 2 &gt; Category 3 &gt; Category 4 &gt; Category 5</g:product_type>', $xml );
+
+		// No warning should be logged for exactly 5 categories.
+		$this->assertEquals( '', $mock_logger::$message );
+	}
+
+	/**
 	 * Mimic the method on FeedGenerator.
 	 *
 	 * @param array $taxable_location The taxable location to filter.
