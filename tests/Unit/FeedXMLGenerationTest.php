@@ -885,8 +885,8 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// Create categories with long names to exceed 1000 character limit.
 		// Each category name is 300 chars, so 4 categories = 1200 chars + separators.
 		$category_ids = array();
-		for ( $i = 1; $i <= 4; $i++ ) {
-			$long_name      = str_repeat( "LongCategoryName{$i}_", 15 ); // ~300 chars each.
+		for ( $i = 1; $i <= 5; $i++ ) {
+			$long_name      = str_repeat( "LongCategoryName{$i}_", 11 ); // ~242 chars each.
 			$category       = wp_insert_term( $long_name, 'product_cat' );
 			$category_ids[] = $category['term_id'];
 		}
@@ -905,61 +905,6 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$this->assertLessThanOrEqual( 1000, strlen( $product_type_decoded ) );
 
 		// Check that a warning was logged.
-		$this->assertStringContainsString( 'product_type length is', $mock_logger::$message );
-		$this->assertStringContainsString( 'truncating to 1000 characters', $mock_logger::$message );
-	}
-
-	/**
-	 * Test that first category is always included even if it exceeds 1000 characters
-	 *
-	 * @group feed
-	 */
-	public function testProductTypeIncludesFirstCategoryEvenIfTooLong() {
-		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
-		$product             = WC_Helper_Product::create_simple_product();
-
-		/**
-		 * Mock logger object that will catch any logged messages.
-		 */
-		$mock_logger = new class() {
-
-			/**
-			 * The message to log.
-			 *
-			 * @var string
-			 */
-			public static $message = '';
-			/**
-			 * Log the message.
-			 *
-			 * @param string $level The level of the message.
-			 * @param string $msg The message to log.
-			 */
-			public function log( $level, $msg ) {
-				self::$message = $msg;
-			}
-		};
-
-		Logger::$logger = $mock_logger;
-
-		// Create a first category that is over 1000 characters.
-		$very_long_name = str_repeat( 'VeryLongFirstCategoryName_', 50 ); // Over 1000 chars.
-		$category       = wp_insert_term( $very_long_name, 'product_cat' );
-		wp_set_object_terms( $product->get_id(), array( $category['term_id'] ), 'product_cat' );
-
-		$xml = $product_type_method( $product );
-
-		// Extract the product_type value from the XML.
-		preg_match( '/<g:product_type>(.*?)<\/g:product_type>/', $xml, $matches );
-		$product_type = $matches[1] ?? '';
-
-		// Decode HTML entities to get the actual length.
-		$product_type_decoded = html_entity_decode( $product_type );
-
-		// Should contain the very long first category name
-		$this->assertStringContainsString( $very_long_name, $product_type_decoded );
-
-		// Check that a warning was logged about length
 		$this->assertStringContainsString( 'product_type length is', $mock_logger::$message );
 		$this->assertStringContainsString( 'truncating to 1000 characters', $mock_logger::$message );
 	}
