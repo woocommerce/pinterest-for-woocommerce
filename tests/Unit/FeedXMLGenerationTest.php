@@ -348,24 +348,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		/**
 		 * Mock logger object that will catch any logged messages.
 		 */
-		$mock_logger = new class() {
-
-			/**
-			 * The message to log.
-			 *
-			 * @var string
-			 */
-			public static $message = '';
-			/**
-			 * Log the message.
-			 *
-			 * @param string $level The level of the message.
-			 * @param string $msg The message to log.
-			 */
-			public function log( $level, $msg ) {
-				self::$message = $msg;
-			}
-		};
+		$mock_logger = $this->getMockLogger();
 
 		Logger::$logger = $mock_logger;
 
@@ -784,19 +767,36 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
-	 * Remove filters and shortcodes.
+	 * Gets a mock logger for testing.
+	 *
+	 * @return object Mock logger instance
 	 */
-	public function tearDown(): void {
-		parent::tearDown();
+	private function getMockLogger() {
+		return new class() {
+			/**
+			 * The message to log.
+			 *
+			 * @var string
+			 */
+			public static $message = '';
 
-		// Remove any added filter.
-		remove_all_filters( 'pinterest_for_woocommerce_product_description_apply_shortcodes' );
+			/**
+			 * Constructor.
+			 */
+			public function __construct() {
+				self::$message = '';
+			}
 
-		// Remove added shortcodes.
-		remove_shortcode( 'pinterest_for_woocommerce_sample_test_shortcode' );
-
-		// Reset logger.
-		Logger::$logger = null;
+			/**
+			 * Log the message.
+			 *
+			 * @param string $level The level of the message.
+			 * @param string $msg The message to log.
+			 */
+			public function log( $level, $msg ) {
+				self::$message = $msg;
+			}
+		};
 	}
 
 	/**
@@ -811,24 +811,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		/**
 		 * Mock logger object that will catch any logged messages.
 		 */
-		$mock_logger = new class() {
-
-			/**
-			 * The message to log.
-			 *
-			 * @var string
-			 */
-			public static $message = '';
-			/**
-			 * Log the message.
-			 *
-			 * @param string $level The level of the message.
-			 * @param string $msg The message to log.
-			 */
-			public function log( $level, $msg ) {
-				self::$message = $msg;
-			}
-		};
+		$mock_logger = $this->getMockLogger();
 
 		Logger::$logger = $mock_logger;
 
@@ -861,24 +844,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		/**
 		 * Mock logger object that will catch any logged messages.
 		 */
-		$mock_logger = new class() {
-
-			/**
-			 * The message to log.
-			 *
-			 * @var string
-			 */
-			public static $message = '';
-			/**
-			 * Log the message.
-			 *
-			 * @param string $level The level of the message.
-			 * @param string $msg The message to log.
-			 */
-			public function log( $level, $msg ) {
-				self::$message = $msg;
-			}
-		};
+		$mock_logger = $this->getMockLogger();
 
 		Logger::$logger = $mock_logger;
 
@@ -921,24 +887,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		/**
 		 * Mock logger object that will catch any logged messages.
 		 */
-		$mock_logger = new class() {
-
-			/**
-			 * The message to log.
-			 *
-			 * @var string
-			 */
-			public static $message = '';
-			/**
-			 * Log the message.
-			 *
-			 * @param string $level The level of the message.
-			 * @param string $msg The message to log.
-			 */
-			public function log( $level, $msg ) {
-				self::$message = $msg;
-			}
-		};
+		$mock_logger = $this->getMockLogger();
 
 		Logger::$logger = $mock_logger;
 
@@ -971,5 +920,21 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		}
 
 		return $taxable_location;
+	}
+
+	/**
+	 * Remove filters and shortcodes.
+	 */
+	public function tearDown(): void {
+		parent::tearDown();
+
+		// Remove any added filter.
+		remove_all_filters( 'pinterest_for_woocommerce_product_description_apply_shortcodes' );
+
+		// Remove added shortcodes.
+		remove_shortcode( 'pinterest_for_woocommerce_sample_test_shortcode' );
+
+		// Reset logger.
+		Logger::$logger = null;
 	}
 }
