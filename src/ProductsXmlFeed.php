@@ -311,8 +311,7 @@ class ProductsXmlFeed {
 		$original_count = count( $taxonomies );
 		if ( $original_count > self::PRODUCT_TYPE_CATEGORIES_LIMIT ) {
 			$taxonomies = array_slice( $taxonomies, 0, self::PRODUCT_TYPE_CATEGORIES_LIMIT );
-			/* translators: 1: product id, 2: original category count, 3: limit */
-			Logger::log( sprintf( esc_html__( 'Product [%1$s] has %2$d categories, limiting to first %3$d as per Pinterest requirements.', 'pinterest-for-woocommerce' ), $id, $original_count, self::PRODUCT_TYPE_CATEGORIES_LIMIT ) );
+			Logger::log( sprintf( 'Product [%1$s] has %2$d categories, limiting to first %3$d as per Pinterest requirements.', $id, $original_count, self::PRODUCT_TYPE_CATEGORIES_LIMIT ) );
 		}
 
 		// Build product_type string.
@@ -320,8 +319,7 @@ class ProductsXmlFeed {
 
 		// Ensure product_type doesn't exceed 1000 character limit.
 		if ( strlen( $product_type ) > self::PRODUCT_TYPE_CHARS_LIMIT ) {
-			/* translators: 1: product id, 2: original length, 3: limit */
-			Logger::log( sprintf( esc_html__( 'Product [%1$s] product_type length is %2$d characters, truncating to %3$d characters as per Pinterest requirements.', 'pinterest-for-woocommerce' ), $id, strlen( $product_type ), self::PRODUCT_TYPE_CHARS_LIMIT ) );
+			Logger::log( sprintf( 'Product [%1$s] product_type length is %2$d characters, truncating to %3$d characters as per Pinterest requirements.', $id, strlen( $product_type ), self::PRODUCT_TYPE_CHARS_LIMIT ) );
 
 			// Build product_type by adding taxonomies until we hit the character limit, we always include the first taxonomy.
 			$product_type = '';
