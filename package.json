@@ -116,6 +116,7 @@
     "lint:js": "wp-scripts lint-js ./assets/source",
     "lint:js:fix": "wp-scripts lint-js ./assets/source --fix",
     "lint:php": "composer run-script phpcs ./",
+    "lint:php:fix": "composer run-script phpcbf",
     "start": "wp-scripts start",
     "test:js": "wp-scripts test-unit-js --coverage",
     "test:js:watch": "npm run test:js -- --watch",
