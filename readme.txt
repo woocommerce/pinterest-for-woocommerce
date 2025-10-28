@@ -110,7 +110,6 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 = 1.4.18 - 2025-05-20 =
 * Tweak - WC 9.9 compatibility.
-* Tweak - WP 6.8 compatibility.
 
 = 1.4.17 - 2025-03-18 =
 * Add - PHP 8.4 compatibility.
