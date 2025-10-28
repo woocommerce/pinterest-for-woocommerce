@@ -28,11 +28,11 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	public function testHeader() {
 		$actual_header = ProductsXmlFeed::get_xml_header();
 		$this->assertEquals(
-		"<?xml version=\"1.0\"?>
-<rss version=\"2.0\" xmlns:g=\"http://base.google.com/ns/1.0\">
+			'<?xml version="1.0"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
 	<channel>
-",
-		$actual_header
+',
+			$actual_header
 		);
 	}
 
@@ -42,9 +42,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	public function testFooter() {
 		$actual_footer = ProductsXmlFeed::get_xml_footer();
 		$this->assertEquals(
-		"	</channel>
-</rss>",
-		$actual_footer
+			'	</channel>
+</rss>',
+			$actual_footer
 		);
 	}
 
@@ -56,7 +56,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 * @group feed
 	 */
 	public function testSimpleProductXmlItem() {
-		$product  = WC_Helper_Product::create_simple_product(
+		$product = WC_Helper_Product::create_simple_product(
 			true,
 			array(
 				'sku' => 'DUMMY SKU',
@@ -64,16 +64,16 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		);
 
 		// We need header and footer so we can process XML directly.
-		$xml      = ProductsXmlFeed::get_xml_header();
-		$xml     .= ProductsXmlFeed::get_xml_item( $product, 'US' );
-		$xml     .= ProductsXmlFeed::get_xml_footer();
+		$xml  = ProductsXmlFeed::get_xml_header();
+		$xml .= ProductsXmlFeed::get_xml_item( $product, 'US' );
+		$xml .= ProductsXmlFeed::get_xml_footer();
 
-		$simplex_object = simplexml_load_string( $xml, "SimpleXMLElement", LIBXML_NOCDATA );
+		$simplex_object = simplexml_load_string( $xml, 'SimpleXMLElement', LIBXML_NOCDATA );
 		$children       = (array) $simplex_object->channel->item->children();
-		$g_children     = (array) $simplex_object->channel->item->children( "g", true ); // Child nodes that are prefixed.
+		$g_children     = (array) $simplex_object->channel->item->children( 'g', true ); // Child nodes that are prefixed.
 
 		// Id value 0 comes from WC_Helper_Product.
-		$this->assertEquals( $product->get_id(), $g_children['id']);
+		$this->assertEquals( $product->get_id(), $g_children['id'] );
 
 		// Not a variation so no item group id.
 		$this->assertArrayNotHasKey( 'item_group_id', $children, 'Simple products should not have the item_group_id set.' );
@@ -100,10 +100,10 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$this->assertEquals( '10.00USD', $g_children['price'] );
 
 		// No description set.
-		$this->assertArrayNotHasKey( 'image_link', $g_children, "By default product does not have an image link." );
+		$this->assertArrayNotHasKey( 'image_link', $g_children, 'By default product does not have an image link.' );
 
 		// No sale price set.
-		$this->assertArrayNotHasKey( 'sale_price', $children, "By default product does not have a sale price." );
+		$this->assertArrayNotHasKey( 'sale_price', $children, 'By default product does not have a sale price.' );
 
 		// Dummy SKU from WC_Helper_Product
 		$this->assertEquals( 'DUMMY SKU', $g_children['mpn'] );
@@ -146,8 +146,8 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
 
 		// No description set.
-		$product  = WC_Helper_Product::create_simple_product();
-		$xml      = $description_method( $product );
+		$product = WC_Helper_Product::create_simple_product();
+		$xml     = $description_method( $product );
 		$this->assertEquals( '', $xml );
 
 		$desc = 'Test description.';
@@ -155,10 +155,10 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product_with_description = WC_Helper_Product::create_simple_product(
 			true,
 			array(
-				'short_description' => $desc
+				'short_description' => $desc,
 			)
 		);
-		$xml = $description_method( $product_with_description );
+		$xml                      = $description_method( $product_with_description );
 		$this->assertEquals( "<description><![CDATA[{$desc}]]></description>", $xml );
 	}
 
@@ -169,12 +169,12 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
 
 		// By passing manually created Variable Product the create_variation_product will add children to it.
-		$product            = new WC_Product_Variable();
-		$variation_product  = WC_Helper_Product::create_variation_product( $product );
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
 		// create_variation_product creates multiple children, picking up the first one
-		$child_id           = $variation_product->get_children()[0];
-		$child_product      = wc_get_product( $child_id );
-		$xml                = $description_method( $child_product );
+		$child_id      = $variation_product->get_children()[0];
+		$child_product = wc_get_product( $child_id );
+		$xml           = $description_method( $child_product );
 
 		/*
 		 * With no description set the code will use the excerpt.
@@ -186,7 +186,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// Get the next variable product for tests with description set.
 		$child_id      = $variation_product->get_children()[1];
 		$child_product = wc_get_product( $child_id );
-		$desc = 'Test description.';
+		$desc          = 'Test description.';
 		$child_product->set_description( $desc );
 		$child_product->save();
 		$xml = $description_method( $child_product );
@@ -318,7 +318,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// Add filter to apply shortcodes on description.
 		add_filter(
 			'pinterest_for_woocommerce_product_description_apply_shortcodes',
-			function() {
+			function () {
 				return true;
 			}
 		);
@@ -348,14 +348,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		/**
 		 * Mock logger object that will catch any logged messages.
 		 */
-		$mock_logger = new class {
-
-			static $message = '';
-			public function log( $level, $msg )
-			{
-				self::$message = $msg;
-			}
-		};
+		$mock_logger = $this->getMockLogger();
 
 		Logger::$logger = $mock_logger;
 
@@ -429,7 +422,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$this->assertEquals( '', $xml );
 
 		// Add dummy image entry.
-		$attachment = array(
+		$attachment    = array(
 			'post_mime_type' => 'image/png',
 			'post_title'     => 'product image',
 		);
@@ -471,10 +464,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyPriceXML() {
 		$price_method = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
-		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
+		$product      = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => 15 ) );
 		$xml          = $price_method( $product );
 		$this->assertEquals( '<g:price>15.00USD</g:price>', $xml );
-
 
 		// Test if the price excludes taxes.
 		$old_tax_display_option = get_option( 'woocommerce_tax_display_shop' );
@@ -484,7 +476,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$price_decimals_method->setAccessible( true );
 		$price_decimals = $price_decimals_method->invoke( null );
 
-		$product_price = wc_get_price_excluding_tax(
+		$product_price   = wc_get_price_excluding_tax(
 			$product,
 			array(
 				'price' => $product->get_regular_price(),
@@ -499,7 +491,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$old_currency = get_woocommerce_currency();
 		update_option( 'woocommerce_currency', 'JPY' );
 		$price_method = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
-		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
+		$product      = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => 15 ) );
 		$xml          = $price_method( $product );
 		$this->assertEquals( '<g:price>15JPY</g:price>', $xml );
 
@@ -514,7 +506,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$sale_price_method = $this->getProductsXmlFeedAttributeMethod( 'sale_price' );
 
 		// No sale price is set.
-		$product = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
+		$product = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => 15 ) );
 		$xml     = $sale_price_method( $product );
 		$this->assertEquals( '', $xml );
 
@@ -529,7 +521,6 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$xml     = $sale_price_method( $product );
 		$this->assertEquals( '<sale_price>5.00USD</sale_price>', $xml );
 
-
 		// Test if the price excludes taxes.
 		$old_tax_display_option = get_option( 'woocommerce_tax_display_shop' );
 		update_option( 'woocommerce_tax_display_shop', 'excl' );
@@ -538,7 +529,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$price_decimals_method->setAccessible( true );
 		$price_decimals = $price_decimals_method->invoke( null );
 
-		$product_price = wc_get_price_excluding_tax(
+		$product_price   = wc_get_price_excluding_tax(
 			$product,
 			array(
 				'price' => $product->get_sale_price(),
@@ -574,7 +565,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 */
 	public function testPropertyPriceWithTaxesXML() {
 		$price_method = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
-		$product      = WC_Helper_Product::create_simple_product( true, array( "regular_price" => 15 ) );
+		$product      = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => 15 ) );
 
 		// Setup shipping.
 		$zone = ShippingHelpers::createZoneWithLocations(
@@ -638,9 +629,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product    = WC_Helper_Product::create_simple_product(
 			true,
 			array(
-				'sku' => "invalid&sku"
+				'sku' => 'invalid&sku',
 			)
-		 );
+		);
 		$xml        = $mpn_method( $product );
 		$this->assertEquals( '<g:mpn>invalid&amp;sku</g:mpn>', $xml );
 	}
@@ -657,7 +648,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$this->assertEquals( '', $xml );
 
 		// Add dummy image entry.
-		$attachment = array(
+		$attachment      = array(
 			'post_mime_type' => 'image/png',
 			'post_title'     => 'product image 1',
 		);
@@ -673,7 +664,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$attachment_id_2 = wp_insert_attachment( $attachment, 'product_image_2.png', $product->get_id() );
 
 		// Add attachment id as product image id.
-		$product->set_gallery_image_ids( [ $attachment_id_1, $attachment_id_2 ] );
+		$product->set_gallery_image_ids( array( $attachment_id_1, $attachment_id_2 ) );
 		$product->save();
 
 		$xml = $additional_image_link_method( $product );
@@ -688,7 +679,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$method->setAccessible( true );
 
 		$product = WC_Helper_Product::create_simple_product();
-		$xml = $method->invoke( null, $product, '' );
+		$xml     = $method->invoke( null, $product, '' );
 		// No attributes set, output should be empty.
 		$this->assertEquals( '', $xml );
 
@@ -712,16 +703,16 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$method->setAccessible( true );
 
 		$product = WC_Helper_Product::create_simple_product();
-		$xml = $method->invoke( null, $product, '' );
+		$xml     = $method->invoke( null, $product, '' );
 		// No attributes set, output should be empty.
 		$this->assertEquals( '', $xml );
 
 		$full_category_name_method = new ReflectionMethod( GoogleCategorySearch::class, 'full_category_name' );
 		$full_category_name_method->setAccessible( true );
-		$taxonomy                  = GoogleProductTaxonomy::TAXONOMY[502979]; // Randomly selected category - i just made sure that it has parent.
-		$full_taxonomy_name        = $full_category_name_method->invoke( new GoogleCategorySearch(), $taxonomy );
-		$condition                 = new GoogleCategory( $full_taxonomy_name );
-		$attribute_manager         = AttributeManager::instance();
+		$taxonomy           = GoogleProductTaxonomy::TAXONOMY[502979]; // Randomly selected category - i just made sure that it has parent.
+		$full_taxonomy_name = $full_category_name_method->invoke( new GoogleCategorySearch(), $taxonomy );
+		$condition          = new GoogleCategory( $full_taxonomy_name );
+		$attribute_manager  = AttributeManager::instance();
 		$attribute_manager->update( $product, $condition );
 
 		$xml = $method->invoke( null, $product, '' );
@@ -751,7 +742,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 				$xml
 			);
 
-			$this->assertTrue( ( bool ) $bytes_written );
+			$this->assertTrue( (bool) $bytes_written );
 
 			break;
 		}
@@ -770,9 +761,165 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$method      = $class->getMethod( $method_name );
 		$method->setAccessible( true );
 
-		return function( $product ) use ( $method, $attribute ) {
+		return function ( $product ) use ( $method, $attribute ) {
 			return $method->invoke( null, $product, $attribute );
 		};
+	}
+
+	/**
+	 * Gets a mock logger for testing.
+	 *
+	 * @return object Mock logger instance
+	 */
+	private function getMockLogger() {
+		return new class() {
+			/**
+			 * The message to log.
+			 *
+			 * @var string
+			 */
+			public static $message = '';
+
+			/**
+			 * Constructor.
+			 */
+			public function __construct() {
+				self::$message = '';
+			}
+
+			/**
+			 * Log the message.
+			 *
+			 * @param string $level The level of the message.
+			 * @param string $msg The message to log.
+			 */
+			public function log( $level, $msg ) {
+				self::$message = $msg;
+			}
+		};
+	}
+
+	/**
+	 * Test that product_type is limited to 5 categories
+	 *
+	 * @group feed
+	 */
+	public function testProductTypeLimitToFiveCategories() {
+		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
+		$product             = WC_Helper_Product::create_simple_product();
+
+		/**
+		 * Mock logger object that will catch any logged messages.
+		 */
+		$mock_logger = $this->getMockLogger();
+
+		Logger::$logger = $mock_logger;
+
+		// Create 7 categories and assign them to the product.
+		$category_ids = array();
+		for ( $i = 1; $i <= 7; $i++ ) {
+			$category       = wp_insert_term( "Category {$i}", 'product_cat' );
+			$category_ids[] = $category['term_id'];
+		}
+		wp_set_object_terms( $product->get_id(), $category_ids, 'product_cat' );
+
+		$xml = $product_type_method( $product );
+
+		// Should only have first 5 categories.
+		$this->assertEquals( '<g:product_type>Category 1 &gt; Category 2 &gt; Category 3 &gt; Category 4 &gt; Category 5</g:product_type>', $xml );
+
+		// Check that a warning was logged.
+		$this->assertStringContainsString( 'has 7 categories, limiting to first 5', $mock_logger::$message );
+	}
+
+	/**
+	 * Test that product_type is limited to 1000 characters
+	 *
+	 * @group feed
+	 */
+	public function testProductTypeCharacterLimit() {
+		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
+		$product             = WC_Helper_Product::create_simple_product();
+
+		/**
+		 * Mock logger object that will catch any logged messages.
+		 */
+		$mock_logger = $this->getMockLogger();
+
+		Logger::$logger = $mock_logger;
+
+		// Create categories with long names to exceed 1000 character limit.
+		// Each category name is 300 chars, so 4 categories = 1200 chars + separators.
+		$category_ids = array();
+		for ( $i = 1; $i <= 5; $i++ ) {
+			$long_name      = str_repeat( "LongCategoryName{$i}_", 11 ); // ~242 chars each.
+			$category       = wp_insert_term( $long_name, 'product_cat' );
+			$category_ids[] = $category['term_id'];
+		}
+		wp_set_object_terms( $product->get_id(), $category_ids, 'product_cat' );
+
+		$xml = $product_type_method( $product );
+
+		// Extract the product_type value from the XML.
+		preg_match( '/<g:product_type>(.*?)<\/g:product_type>/', $xml, $matches );
+		$product_type = $matches[1] ?? '';
+
+		// Decode HTML entities to get the actual length.
+		$product_type_decoded = html_entity_decode( $product_type );
+
+		// Should be under 1000 characters.
+		$this->assertLessThanOrEqual( 1000, strlen( $product_type_decoded ) );
+
+		// Check that a warning was logged.
+		$this->assertStringContainsString( 'product_type length is', $mock_logger::$message );
+		$this->assertStringContainsString( 'truncating to 1000 characters', $mock_logger::$message );
+	}
+
+	/**
+	 * Test that product_type with exactly 5 categories doesn't trigger warning
+	 *
+	 * @group feed
+	 */
+	public function testProductTypeWithFiveCategoriesNoWarning() {
+		$product_type_method = $this->getProductsXmlFeedAttributeMethod( 'g:product_type' );
+		$product             = WC_Helper_Product::create_simple_product();
+
+		/**
+		 * Mock logger object that will catch any logged messages.
+		 */
+		$mock_logger = $this->getMockLogger();
+
+		Logger::$logger = $mock_logger;
+
+		// Create exactly 5 categories.
+		$category_ids = array();
+		for ( $i = 1; $i <= 5; $i++ ) {
+			$category       = wp_insert_term( "Category {$i}", 'product_cat' );
+			$category_ids[] = $category['term_id'];
+		}
+		wp_set_object_terms( $product->get_id(), $category_ids, 'product_cat' );
+
+		$xml = $product_type_method( $product );
+
+		// Should have all 5 categories.
+		$this->assertEquals( '<g:product_type>Category 1 &gt; Category 2 &gt; Category 3 &gt; Category 4 &gt; Category 5</g:product_type>', $xml );
+
+		// No warning should be logged for exactly 5 categories.
+		$this->assertEquals( '', $mock_logger::$message );
+	}
+
+	/**
+	 * Mimic the method on FeedGenerator.
+	 *
+	 * @param array $taxable_location The taxable location to filter.
+	 */
+	public function filter_taxable_location( array $taxable_location ) {
+
+		if ( isset( $taxable_location[0] ) ) {
+			$taxable_location[0] = Pinterest_For_Woocommerce()::get_base_country( null );
+		}
+
+		return $taxable_location;
 	}
 
 	/**
@@ -790,20 +937,4 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// Reset logger.
 		Logger::$logger = null;
 	}
-
-	/**
-	 * Mimic the method on FeedGenerator.
-	 *
-	 * @param array $taxable_location The taxable location to filter.
-	 */
-	public function filter_taxable_location( array $taxable_location ) {
-
-		if ( isset( $taxable_location[0] ) ) {
-			$taxable_location[0] = Pinterest_For_Woocommerce()::get_base_country( null );
-		}
-
-		return $taxable_location;
-	}
-
 }
-
