@@ -134,26 +134,26 @@ register_activation_hook(
 	}
 );
 
-// Register deactivation hook.
+/**
+ * Handle plugin deregistration.
+ */
+function pinterest_for_woocommerce_deregister() {
+	Automattic\WooCommerce\Pinterest\ProductSync::deregister();
+	Automattic\WooCommerce\Pinterest\Heartbeat::cancel_jobs();
+	Automattic\WooCommerce\Pinterest\ProductFeedStatus::deregister();
+	Pinterest_For_Woocommerce::disconnect();
+}
+
+// Register deactivation hook for this plugin.
 register_deactivation_hook(
 	PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE,
-	function () {
-		Automattic\WooCommerce\Pinterest\ProductSync::cancel_jobs();
-		Automattic\WooCommerce\Pinterest\Heartbeat::cancel_jobs();
-		Automattic\WooCommerce\Pinterest\FeedGenerator::deregister();
-		Pinterest_For_Woocommerce::disconnect();
-	}
+	'pinterest_for_woocommerce_deregister'
 );
 
 // Register deactivation hook for WooCommerce.
 if ( defined( 'WC_PLUGIN_FILE' ) ) {
 	register_deactivation_hook(
 		WC_PLUGIN_FILE,
-		function () {
-			Automattic\WooCommerce\Pinterest\ProductSync::cancel_jobs();
-			Automattic\WooCommerce\Pinterest\Heartbeat::cancel_jobs();
-			Automattic\WooCommerce\Pinterest\FeedGenerator::deregister();
-			Pinterest_For_Woocommerce::disconnect();
-		}
+		'pinterest_for_woocommerce_deregister'
 	);
 }
