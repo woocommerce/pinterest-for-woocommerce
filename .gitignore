@@ -25,6 +25,3 @@ assets/source/_maps
 
 # build products
 pinterest-for-woocommerce.zip
-
-# languages
-i18n/languages/*.pot
