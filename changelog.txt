@@ -1,5 +1,10 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.4.23 - 2025-11-24 =
+* Fix - Remove feed file on deactivation.
+* Tweak - WC 10.4 compatibility.
+* Tweak - WP 6.9 compatibility.
+
 = 1.4.22 - 2025-10-28 =
 * Fix - Issue where `product_type` include more then 5 categories if a product included more.
 * Tweak - Update use of `wp_json_encode` to avoid potential browser parsing issues.
