@@ -203,7 +203,7 @@ class ProductSync {
 	 *
 	 * @return void
 	 */
-	private static function deregister() {
+	public static function deregister() {
 		FeedGenerator::deregister();
 		LocalFeedConfigs::deregister();
 		FeedRegistration::deregister();

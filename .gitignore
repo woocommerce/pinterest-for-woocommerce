@@ -9,6 +9,7 @@ node_modules
 coverage
 phplint.cache
 .phpunit.result.cache
+.wp-env.override.json
 
 # Ignore assets except source files
 assets/*

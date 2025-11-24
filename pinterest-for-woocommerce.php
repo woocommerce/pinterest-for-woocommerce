@@ -13,7 +13,7 @@
  * Plugin Name:       Pinterest for WooCommerce
  * Plugin URI:        https://woocommerce.com/products/pinterest-for-woocommerce/
  * Description:       Grow your business on Pinterest! Use this official plugin to allow shoppers to Pin products while browsing your store, track conversions, and advertise on Pinterest.
- * Version:           1.4.22
+ * Version:           1.4.23
  * Author:            WooCommerce
  * Author URI:        https://woocommerce.com
  * License:           GPL-2.0+
@@ -23,11 +23,11 @@
  * Requires Plugins:  woocommerce
  *
  * Requires at least: 5.6
- * Tested up to: 6.8
+ * Tested up to: 6.9
  * Requires PHP: 7.4
  *
  * WC requires at least: 6.3
- * WC tested up to: 10.3
+ * WC tested up to: 10.4
  */
 
 /**
@@ -47,7 +47,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE', __FILE__ );
-define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', '1.4.22' ); // WRCS: DEFINED_VERSION.
+define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', '1.4.23' ); // WRCS: DEFINED_VERSION.
 
 // HPOS compatibility declaration.
 add_action(
@@ -134,24 +134,26 @@ register_activation_hook(
 	}
 );
 
-// Register deactivation hook.
+/**
+ * Handle plugin deregistration.
+ */
+function pinterest_for_woocommerce_deregister() {
+	Automattic\WooCommerce\Pinterest\ProductSync::deregister();
+	Automattic\WooCommerce\Pinterest\Heartbeat::cancel_jobs();
+	Automattic\WooCommerce\Pinterest\ProductFeedStatus::deregister();
+	Pinterest_For_Woocommerce::disconnect();
+}
+
+// Register deactivation hook for this plugin.
 register_deactivation_hook(
 	PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE,
-	function () {
-		Automattic\WooCommerce\Pinterest\ProductSync::cancel_jobs();
-		Automattic\WooCommerce\Pinterest\Heartbeat::cancel_jobs();
-		Pinterest_For_Woocommerce::disconnect();
-	}
+	'pinterest_for_woocommerce_deregister'
 );
 
 // Register deactivation hook for WooCommerce.
 if ( defined( 'WC_PLUGIN_FILE' ) ) {
 	register_deactivation_hook(
 		WC_PLUGIN_FILE,
-		function () {
-			Automattic\WooCommerce\Pinterest\ProductSync::cancel_jobs();
-			Automattic\WooCommerce\Pinterest\Heartbeat::cancel_jobs();
-			Pinterest_For_Woocommerce::disconnect();
-		}
+		'pinterest_for_woocommerce_deregister'
 	);
 }
