@@ -1,6 +1,6 @@
 *** Pinterest for WooCommerce Changelog ***
 
-= 1.4.23 - 2025-11-24 =
+= 1.4.24 - 2026-01-27 =
 * Fix - Remove feed file on deactivation.
 * Tweak - WC 10.4 compatibility.
 * Tweak - WP 6.9 compatibility.
