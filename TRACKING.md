@@ -19,15 +19,15 @@ Clicking on "Connect" Pinterest account button.
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82)
 
-### [`wcadmin_pfw_account_convert_button_click`](assets/source/setup-guide/app/steps/SetupAccount.js#L32)
+### [`wcadmin_pfw_account_convert_button_click`](assets/source/setup-guide/app/steps/SetupAccount.js#L33)
 Clicking on "… convert your personal account" button.
 #### Emitters
-- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L54)
+- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L57)
 
-### [`wcadmin_pfw_account_create_button_click`](assets/source/setup-guide/app/steps/SetupAccount.js#L27)
+### [`wcadmin_pfw_account_create_button_click`](assets/source/setup-guide/app/steps/SetupAccount.js#L28)
 Clicking on "… create a new Pinterest account" button.
 #### Emitters
-- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L54)
+- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L57)
 
 ### [`wcadmin_pfw_account_disconnect_button_click`](assets/source/setup-guide/app/components/Account/Connection.js#L42)
 Clicking on "Disconnect" Pinterest account button.
@@ -38,20 +38,23 @@ Clicking on "Disconnect" Pinterest account button.
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with the given `{ context }`
 
-### [`wcadmin_pfw_ads_manager_link_click`](assets/source/catalog-sync/sections/SyncState.js#L25)
+### [`wcadmin_pfw_ads_billing_details_link_click`](assets/source/catalog-sync/sections/AdCreditsNotice.js#L33)
+Clicking the "Add billing details" link.
+#### Emitters
+- [`AdCreditsNotice`](assets/source/catalog-sync/sections/AdCreditsNotice.js#L46)
+
+### [`wcadmin_pfw_ads_credits_success_notice`](assets/source/catalog-sync/sections/AdCreditsNotice.js#L28)
+Closing the Ad Credits notice.
+#### Emitters
+- [`AdCreditsNotice`](assets/source/catalog-sync/sections/AdCreditsNotice.js#L46)
+
+### [`wcadmin_pfw_ads_manager_link_click`](assets/source/catalog-sync/sections/SyncState.js#L27)
 Clicking on the "Pinterest ads manager" link.
 #### Emitters
-- [`SyncState`](assets/source/catalog-sync/sections/SyncState.js#L41)
+- [`SyncState`](assets/source/catalog-sync/sections/SyncState.js#L39)
 
-### [`wcadmin_pfw_ads_credits_success_notice`](assets/source/catalog-sync/sections/AdCreditsNotice.js#L20)
-Closing the Ads Credits notice on Catalog Page.
-#### Emitters
-- [`AdCreditsNotice`](assets/source/catalog-sync/sections/AdCreditsNotice.js#L38)
-
-### [`wcadmin_pfw_ads_billing_details_link_click`](assets/source/catalog-sync/sections/AdCreditsNotice.js#L25)
-Clicking on the "add your billing details" link.
-#### Emitters
-- [`AdCreditsNotice`](assets/source/catalog-sync/sections/AdCreditsNotice.js#L38)
+### [`wcadmin_pfw_billing_setup_button_click`](assets/source/setup-guide/app/components/Billing/Billing.js#L22)
+Clicking on "Setup Billing" button.
 
 ### [`wcadmin_pfw_business_account_connect_button_click`](assets/source/setup-guide/app/components/Account/BusinessAccountSelection.js#L24)
 Clicking on "Connect" business account button.
@@ -69,45 +72,45 @@ Clicking on an external documentation link.
 | name | type | description |
 | ---- | ---- | ----------- |
 `link_id` | `string` | Identifier of the link.
-`context` | `string` | `'settings' \| 'welcome-section' \| 'wizard' \| 'ads-credits-terms-and-conditions'` In which context the link was placed?
+`context` | `string` | `'settings' \| 'welcome-section' \| 'wizard'` In which context the link was placed?
 `href` | `string` | Href to which the user was navigated to.
 #### Emitters
+- [`FormattedReasons`](assets/source/setup-guide/app/components/HealthCheck/index.js#L29) with `{ link_id: 'merchant-guidelines', context: 'merchant-disapproval-reasons' }`
+- [`AdsCreditsTermsAndConditionsModal`](assets/source/setup-guide/app/components/TermsAndConditionsModal.js#L33)
+	- with `{ link_id: 'terms-of-service', context: 'ads-credits-terms-and-conditions' }`
+	- with `{ link_id: 'privacy-policy', context: 'ads-credits-terms-and-conditions' }`
+	- with `{ link_id: 'advertising-services-agreement', context: 'ads-credits-terms-and-conditions' }`
 - [`documentationLinkProps`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L49) on click, with given `linkId` and `context`.
-- [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L99) with `{ link_id: 'claim-website', context: props.view }`
-- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L56)
+- [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L95) with `{ link_id: 'claim-website', context: props.view }`
+- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L57)
 	- with `{ link_id: 'ad-guidelines', context: props.view }`
 	- with `{ link_id: 'merchant-guidelines', context: props.view }`
+- [`SetupPins`](assets/source/setup-guide/app/steps/SetupPins.js#L47)
+	- with `{ link_id: 'ads-manager', context: 'settings' }`
+	- with `{ link_id: 'enhanced-match', context: 'settings' }`
 - [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L57)
 	- with `{ link_id: 'ad-guidelines', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-data-terms', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'ad-terms-of-service', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'install-tag', context: 'wizard'|'settings' }`
 	- with `{ link_id: 'automatic-enhanced-match', context: 'wizard'|'settings' }`
-- [`SetupPins`](assets/source/setup-guide/app/steps/SetupPins.js#L48)
-	- with `{ link_id: 'ads-manager', context: 'settings' }`
-	- with `{ link_id: 'enhanced-match', context: 'settings' }`
-- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L48) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
-- [TermsAndConditionsModal]( assets/source/setup-guide/app/components/TermsAndConditionsModal.js#L24)
-  - with `{ link_id: 'terms-of-service', context: 'ads-credits-terms-and-conditions' }`
-	- with `{ link_id: 'privacy-policy', context: 'ads-credits-terms-and-conditions' }`
-	- with `{ link_id: 'advertising-services-agreement', context: 'ads-credits-terms-and-conditions' }`
-- [FormattedReasons]( assets/source/setup-guide/app/components/HealthCheck/index.js#L29)
-    - with `{ link_id: 'merchant-guidelines', context: 'merchant-disapproval-reasons' }`
-### [`wcadmin_pfw_domain_verify_failure`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L69)
+- [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L53) with `{ link_id: 'terms-of-service', context: 'welcome-section' }`
+
+### [`wcadmin_pfw_domain_verify_failure`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L66)
 Triggered when domain verification fails.
 #### Properties
 | name | type | description |
 | ---- | ---- | ----------- |
 `step` | `string` | Identifier of the step when verification failed.
 #### Emitters
-- [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L99)
+- [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L95)
 
-### [`wcadmin_pfw_domain_verify_success`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L77)
+### [`wcadmin_pfw_domain_verify_success`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L74)
 Triggered when a site is successfully verified.
 #### Emitters
-- [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L99)
+- [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L95)
 
-### [`wcadmin_pfw_get_started_faq`](assets/source/setup-guide/app/views/LandingPageApp.js#L310)
+### [`wcadmin_pfw_get_started_faq`](assets/source/setup-guide/app/views/LandingPageApp.js#L342)
 Clicking on getting started page faq item to collapse or expand it.
 #### Properties
 | name | type | description |
@@ -115,7 +118,7 @@ Clicking on getting started page faq item to collapse or expand it.
 `action` | `string` | `'expand' \| 'collapse'` What action was initiated.
 `question_id` | `string` | Identifier of the clicked question.
 #### Emitters
-- [`FaqQuestion`](assets/source/setup-guide/app/views/LandingPageApp.js#326) whenever the FAQ is toggled.
+- [`FaqQuestion`](assets/source/setup-guide/app/views/LandingPageApp.js#L361) whenever the FAQ is toggled.
 
 ### [`wcadmin_pfw_get_started_notice_link_click`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L16)
 Clicking on the link inside the notice.
@@ -129,34 +132,61 @@ Clicking on the link inside the notice.
 - [`PrelaunchNotice`](assets/source/components/prelaunch-notice/index.js#L18) `{ context: 'pinterest-landing', link_id: 'prelaunch-notice' }`
 - [`UnsupportedCountryNotice`](assets/source/setup-guide/app/components/UnsupportedCountryNotice/index.js#L31) with `{ context: 'pinterest-landing', linkId: 'ads-availability' | 'unsupported-country-link' }`
 
+### [`wcadmin_pfw_go_to_billing_button_click`](assets/source/setup-guide/app/components/Billing/Billing.js#L28)
+Clicking on "Go to billing settings" button.
+
+### [`wcadmin_pfw_modal_closed`](assets/source/catalog-sync/App.js#L34)
+Closing a modal.
+#### Properties
+| name | type | description |
+| ---- | ---- | ----------- |
+`name` | `string` | Ads Onboarding Modal.
+`context` | `string` | catalog-sync
+#### Emitters
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
+- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L57) with `{ name: 'ads-credits-terms-and-conditions'', … }`
+- [`AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L140) with `{ name: 'ads-credits-terms-and-conditions'', … }`
+
 ### [`wcadmin_pfw_modal_closed`](assets/source/setup-guide/app/components/Account/Connection.js#L55)
 Closing a modal.
 #### Properties
 | name | type | description |
 | ---- | ---- | ----------- |
 `name` | `string` | Which modal is it?
-`context` | `string` | `'settings' \| 'wizard' \| 'landing-page' \| 'catalog-sync'` In which context it was used?
+`context` | `string` | `'settings' \| 'wizard'` In which context it was used?
 `action` | `string` | `confirm` - When the final "Yes, I'm sure" button is clicked. <br> `dismiss` -  When the modal is dismissed by clicking on "x", "cancel", overlay, or by pressing a keystroke.
 #### Emitters
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
-- [`LandingPageApp.AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L140) with `{ name: 'ads-credits-terms-and-conditions', … } `
-- [`CatalogSync`](assets/source/catalog-sync/App.js#L37) with `{ name: 'ads-credits-onboarding', … } `
-- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L60 ) with `{ name: 'ads-credits-terms-and-conditions', … } `
+- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L57) with `{ name: 'ads-credits-terms-and-conditions'', … }`
+- [`AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L140) with `{ name: 'ads-credits-terms-and-conditions'', … }`
 
-### [`wcadmin_pfw_modal_open`](assets/source/setup-guide/app/components/Account/Connection.js#L39)
+### [`wcadmin_pfw_modal_open`](assets/source/catalog-sync/App.js#L27)
+Opening a modal.
+#### Properties
+| name | type | description |
+| ---- | ---- | ----------- |
+`name` | `string` | Ads Onboarding Modal.
+`context` | `string` | catalog-sync
+#### Emitters
+- [`CatalogSyncApp`](assets/source/catalog-sync/App.js#L50) with `{ name: 'ads-credits-onboarding' }`
+- [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
+- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L57) with `{ name: 'ads-credits-terms-and-conditions', … }`
+- [`AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L140) with `{ name: 'ads-credits-terms-and-conditions', … }`
+
+### [`wcadmin_pfw_modal_open`](assets/source/setup-guide/app/components/Account/Connection.js#L48)
 Opening a modal.
 #### Properties
 | name | type | description |
 | ---- | ---- | ----------- |
 `name` | `string` | Which modal is it?
-`context` | `string` | `'settings' \| 'wizard' \| 'landing-page' \| 'catalog-sync'` In which context it was used?
+`context` | `string` | `'settings' \| 'wizard'` In which context it was used?
 #### Emitters
+- [`CatalogSyncApp`](assets/source/catalog-sync/App.js#L50) with `{ name: 'ads-credits-onboarding' }`
 - [`AccountConnection`](assets/source/setup-guide/app/components/Account/Connection.js#L82) with `{ name: 'account-disconnection', … }`
-- [`LandingPageApp.AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L140) with `{ name: 'ads-credits-terms-and-conditions', … } `
-- [`CatalogSync`](assets/source/catalog-sync/App.js#L38) with `{ name: 'ads-credits-onboarding', … } `
-- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L59 ) with `{ name: 'ads-credits-terms-and-conditions', … } `
+- [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L57) with `{ name: 'ads-credits-terms-and-conditions', … }`
+- [`AdsCreditSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L140) with `{ name: 'ads-credits-terms-and-conditions', … }`
 
-### [`wcadmin_pfw_save_changes_button_click`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L19)
+### [`wcadmin_pfw_save_changes_button_click`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L21)
 Clicking on "… Save changes" button.
 #### Properties
 | name | type | description |
@@ -172,9 +202,9 @@ Clicking on "… Save changes" button.
 `track_conversions` | `boolean` | Indicates if Track Conversion option is checked
 `context` | `string` | The context in which the event is recorded
 #### Emitters
-- [`SaveSettingsButton`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L42) with `{ context: view, … }`
+- [`SaveSettingsButton`](assets/source/setup-guide/app/components/SaveSettingsButton.js#L45) with `{ context: view, … }`
 
-### [`wcadmin_pfw_setup`](assets/source/setup-guide/app/views/LandingPageApp.js#L38)
+### [`wcadmin_pfw_setup`](assets/source/setup-guide/app/views/LandingPageApp.js#L34)
 Triggered on events during setup,
 like starting, ending, or navigating between steps.
 #### Properties
@@ -183,14 +213,13 @@ like starting, ending, or navigating between steps.
 `target` | `string` | Setup phase that the user navigates to.
 `trigger` | `string` | UI element that triggered the action, e.g. `wizard-stepper` or `get-started` button.
 #### Emitters
-- [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L54)
+- [`SetupTracking`](assets/source/setup-guide/app/steps/SetupTracking.js#L57)
 	- with `{ target: 'complete', trigger: 'setup-tracking-complete' }` when "Complete setup" button is clicked.
 	- with `{ target: 'fetch-tags' | 'fetch-advertisers', trigger: 'setup-tracking-try-again' }` when "Try again" button is clicked.
 - [`WelcomeSection`](assets/source/setup-guide/app/views/LandingPageApp.js#L53) with `{ target: 'onboarding', trigger: 'get-started' }` when "Get started" button is clicked for incomplete setup.
-- [`WizardApp`](assets/source/setup-guide/app/views/WizardApp.js#L37)
-	- with `{ target: 'setup-account' | 'claim-website' | 'setup-tracking', trigger: 'wizard-stepper' }` when wizard's header step is clicked.
+- [`WizardApp`](assets/source/setup-guide/app/views/WizardApp.js#L34)
+	- with `{ target: 'setup-account' | 'claim-website', trigger: 'wizard-stepper' }` when wizard's header step is clicked.
 	- with `{ target: 'claim-website' , trigger: 'setup-account-continue' }` when continue button is clicked.
-	- with `{ target: 'setup-tracking', trigger: 'claim-website-continue' }` when continue button is clicked.
 
 <!---
 End of `woocommerce-grow-tracking-jsdoc`-generated content.
