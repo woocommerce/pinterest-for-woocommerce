@@ -69,13 +69,13 @@
     "jsdoc-plugin-typescript": "^2.0.6",
     "md5": "^2.3.0",
     "merge-stream": "^1.0.1",
-    "node-sass": "^4.14.1",
+    "sass": "^1.77.0",
     "path": "^0.12.7",
     "prettier": "npm:wp-prettier@^2.2.1-beta-1",
     "semver": "^6.0.0",
     "stylelint": "^13.13.1",
     "underscore": "^1.9.1",
-    "woocommerce-grow-jsdoc": "git+https://github.com/woocommerce/grow#9eb10353728dc915bf5f7bdd4b8e218c625355a9"
+    "woocommerce-grow-jsdoc": "git+https://github.com/woocommerce/grow#jsdoc-v1"
   },
   "eslintConfig": {
     "extends": [
@@ -145,8 +145,12 @@
   "author": "WooCommerce",
   "license": "GPL-3.0-or-later",
   "engines": {
-    "node": ">=12.20.1 <15",
-    "npm": ">=6.14.10 <7"
+    "node": "^16.20.0 || ^18.12.0 || ^20.9.0 || ^22.0.0",
+    "npm": ">=8.3.0"
+  },
+  "overrides": {
+    "eslint-plugin-jsdoc": "^54.0.0",
+    "node-sass": "npm:sass@^1.77.0"
   },
   "config": {
     "build_step": "npm install && npm run build:zip",
