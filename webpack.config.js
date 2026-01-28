@@ -49,13 +49,12 @@ const webpackConfig = {
 	},
 	optimization: {
 		...defaultConfig.optimization,
-		// Disable optimizations that can cause "Cannot access variable before initialization"
-		// errors due to temporal dead zone issues in complex module dependency graphs.
+		// Disable optimizations that cause TDZ errors in complex module graphs.
 		concatenateModules: false,
-		// Disable inner graph analysis which can incorrectly reorder variable declarations
 		innerGraph: false,
-		// Disable used exports optimization which can cause issues with circular dependencies
 		usedExports: false,
+		// Disable minification to prevent Terser from causing TDZ issues.
+		minimize: false,
 	},
 };
 
