@@ -188,6 +188,8 @@ gulp.task(
 					[
 						`${folder}/{assets,i18n,includes,src,vendor,views}/**/*`,
 						`${folder}/*.{php,txt,md}`,
+						`!${folder}/README.md`,
+						`!${folder}/i18n/languages/README.md`,
 						'LICENSE'
 					],
 					{
