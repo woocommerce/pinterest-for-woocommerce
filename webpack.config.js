@@ -49,12 +49,8 @@ const webpackConfig = {
 	},
 	optimization: {
 		...defaultConfig.optimization,
-		// Disable optimizations that cause TDZ errors in complex module graphs.
+		// Disable module concatenation to avoid potential TDZ issues.
 		concatenateModules: false,
-		innerGraph: false,
-		usedExports: false,
-		// Disable minification to prevent Terser from causing TDZ issues.
-		minimize: false,
 	},
 };
 
