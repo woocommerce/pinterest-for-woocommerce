@@ -31,10 +31,10 @@
 	"require-dev": {
 		"composer/installers": "^1.7.0",
 		"woocommerce/woocommerce-sniffs": "1.0.0",
-		"sirbrillig/phpcs-changed": "^2.11.1",
+		"sirbrillig/phpcs-changed": "^2.12.0",
 		"phpunit/phpunit": "^9.6",
 		"yoast/phpunit-polyfills": "^1.0",
-		"wp-cli/i18n-command": "^2.3"
+		"wp-cli/i18n-command": "^2.6"
 	},
 	"autoload": {
 		"psr-4": {
