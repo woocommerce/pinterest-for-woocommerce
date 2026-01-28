@@ -6,7 +6,7 @@ fs     = require( 'fs' );
 path   = require( 'path' );
 semver = require( 'semver' );
 _      = require( 'underscore' );
-$      = require( 'gulp-load-plugins' )( {pattern: '*'} );
+$      = require( 'gulp-load-plugins' )( {pattern: 'gulp-*', excludeDependencies: ['sass']} );
 
 if( path.sep !== '/' ) {
 	var oldJoin = path.join;

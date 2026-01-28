@@ -25,6 +25,7 @@ const ourPlugins = [
 
 const webpackConfig = {
 	...defaultConfig,
+	target: 'web',
 	plugins: ourPlugins,
 	entry: {
 		'setup-guide': __dirname + '/assets/source/setup-guide/index.js',
@@ -34,6 +35,7 @@ const webpackConfig = {
 	output: {
 		filename: '[name].js',
 		path: __dirname + '/assets/build',
+		chunkFormat: 'array-push',
 	},
 };
 
