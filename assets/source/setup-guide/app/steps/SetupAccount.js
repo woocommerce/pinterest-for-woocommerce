@@ -68,16 +68,6 @@ const SetupAccount = ( {
 		wcSettings.pinterest_for_woocommerce.businessAccounts
 	);
 
-	useEffect( () => {
-		if ( undefined !== businessAccounts && businessAccounts.length > 0 ) {
-			window.removeEventListener( 'focus', fetchBusinesses );
-		} else {
-			window.addEventListener( 'focus', fetchBusinesses );
-		}
-
-		return () => window.removeEventListener( 'focus', fetchBusinesses );
-	}, [ fetchBusinesses, businessAccounts ] );
-
 	const fetchBusinesses = useCallback( async () => {
 		try {
 			setBusinessAccounts();
@@ -95,12 +85,22 @@ const SetupAccount = ( {
 				'error',
 				error.message ||
 					__(
-						'Couldn’t retrieve your linked business accounts.',
+						"Couldn't retrieve your linked business accounts.",
 						'pinterest-for-woocommerce'
 					)
 			);
 		}
 	}, [ createNotice ] );
+
+	useEffect( () => {
+		if ( undefined !== businessAccounts && businessAccounts.length > 0 ) {
+			window.removeEventListener( 'focus', fetchBusinesses );
+		} else {
+			window.addEventListener( 'focus', fetchBusinesses );
+		}
+
+		return () => window.removeEventListener( 'focus', fetchBusinesses );
+	}, [ fetchBusinesses, businessAccounts ] );
 
 	return (
 		<div className="woocommerce-setup-guide__setup-account pinterest-for-woocommerce-account-setup">
