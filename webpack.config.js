@@ -1,5 +1,6 @@
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 const WooCommerceDependencyExtractionWebpackPlugin = require( '@woocommerce/dependency-extraction-webpack-plugin' );
+const webpack = require( 'webpack' );
 
 const requestToExternal = ( request ) => {
 	// Bundle these packages & components so we can use the latest, independent of WordPress version.
@@ -21,6 +22,9 @@ const ourPlugins = [
 		injectPolyfill: true, // TBD Confirm this is needed for Pinterest.
 		requestToExternal,
 	} ),
+	new webpack.ProvidePlugin( {
+		process: 'process/browser',
+	} ),
 ];
 
 const webpackConfig = {
@@ -36,6 +40,18 @@ const webpackConfig = {
 		filename: '[name].js',
 		path: __dirname + '/assets/build',
 		chunkFormat: 'array-push',
+	},
+	resolve: {
+		...defaultConfig.resolve,
+		fallback: {
+			process: require.resolve( 'process/browser' ),
+		},
+	},
+	optimization: {
+		...defaultConfig.optimization,
+		// Disable module concatenation to prevent "Cannot access variable before initialization"
+		// errors caused by temporal dead zone issues in complex module dependency graphs.
+		concatenateModules: false,
 	},
 };
 
