@@ -29,7 +29,7 @@
 		"woocommerce/grow": "dev-compat-checker"
 	},
 	"require-dev": {
-		"composer/installers": "^1.7.0",
+		"composer/installers": "^2.0",
 		"woocommerce/woocommerce-sniffs": "1.0.0",
 		"sirbrillig/phpcs-changed": "^2.12.0",
 		"phpunit/phpunit": "^9.6",
