@@ -150,7 +150,7 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 * Add - API method to get commerce integration.
 * Add - Commerce Integration `partner_metadata` weekly sync.
 * Add - Failed Create Commerce Integration API call retries procedure.
-* Add - Weakly heartbeat action.
+* Add - Weekly heartbeat action.
 * Update - Make `integration_data` optional for the extension.
 
 = 1.4.10 - 2024-09-24 =
