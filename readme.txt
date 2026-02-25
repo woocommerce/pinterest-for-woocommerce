@@ -64,7 +64,7 @@ Pinterest is a visual discovery engine people use to find inspiration for their 
 
 * WordPress 5.6 or greater
 * WooCommerce 7.0 or greater
-* PHP version 7.3 or greater (PHP 7.4 or greater is recommended)
+* PHP version 7.4 or greater
 * MySQL version 5.6 or greater
 
 Visit the [WooCommerce server requirements documentation](https://woocommerce.com/document/server-requirements/) for a detailed list of server requirements.
