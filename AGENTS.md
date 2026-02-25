@@ -35,8 +35,6 @@ Pinterest for WooCommerce is an official WordPress plugin that integrates WooCom
 - **npm:** 6.14.10 to <7
 
 ### Development Environment
-- **DDEV:** Recommended for local development and testing
-- **Docker:** Used via DDEV for containerized environments
 - **Build Tools:** Gulp (legacy), webpack (modern)
 
 ## Directory Structure
@@ -146,7 +144,6 @@ npm run lint:css:fix
 
 #### PHPUnit Tests
 
-**Standard Setup (without DDEV):**
 ```bash
 # Install WordPress test environment
 ./bin/install-wp-tests.sh wordpress_test root root localhost
@@ -155,18 +152,6 @@ npm run lint:css:fix
 vendor/bin/phpunit
 # OR
 composer test-unit
-```
-
-**DDEV Setup (REQUIRED for this project):**
-
-Most WooCommerce extension development uses DDEV. Setting up tests INSIDE the container is critical.
-
-```bash
-# Install test dependencies (run once)
-ddev exec "curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb && sudo dpkg -i /tmp/debsuryorg-archive-keyring.deb && sudo apt-get update ; echo Y | sudo apt-get install subversion ; mysql -u root -proot -e 'DROP DATABASE IF EXISTS woocommerce_test' ;rm -rf /tmp/wordpress*"
-
-# Run tests inside DDEV container
-TSTPLGN=$(basename "$PWD"); ddev exec "cd /var/www/html/wp-content/plugins/$TSTPLGN && ([ -f vendor/bin/phpunit ] || composer install) && echo Y | ./bin/install-wp-tests.sh woocommerce_test root root db && vendor/bin/phpunit"
 ```
 
 #### JavaScript Tests
@@ -278,7 +263,6 @@ When creating PRs:
 
 ### CRITICAL - ALWAYS Do These Things
 
-✅ **ALWAYS use DDEV commands for unit tests** (see Testing section)
 ✅ **ALWAYS follow WooCommerce coding standards** (enforced by phpcs)
 ✅ **ALWAYS use text domain `pinterest-for-woocommerce`** for translations
 ✅ **ALWAYS branch from `develop`**, not main/master
@@ -310,16 +294,7 @@ __( 'Hello', 'pinterest' )
 __( 'Hello', 'pinterest-for-woocommerce' )
 ```
 
-**3. Running PHPUnit without DDEV:**
-```bash
-# ❌ WRONG - tests will fail or not run correctly
-vendor/bin/phpunit
-
-# ✅ CORRECT - use DDEV
-TSTPLGN=$(basename "$PWD"); ddev exec "cd /var/www/html/wp-content/plugins/$TSTPLGN && ([ -f vendor/bin/phpunit ] || composer install) && echo Y | ./bin/install-wp-tests.sh woocommerce_test root root db && vendor/bin/phpunit"
-```
-
-**4. Wrong file naming in `src/`:**
+**3. Wrong file naming in `src/`:**
 ```php
 // ❌ WRONG - WordPress style in PSR-4 directory
 // File: class-product-sync.php
@@ -330,7 +305,7 @@ class Product_Sync {}
 class ProductSync {}
 ```
 
-**5. Editing compiled files:**
+**4. Editing compiled files:**
 ```bash
 # ❌ WRONG - editing compiled output
 vim assets/build/index.js
