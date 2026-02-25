@@ -92,7 +92,7 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 == Changelog ==
 
 = 1.4.24 - 2026-01-27 =
-* Tweak - PHP 8.5 compatibiliy.
+* Tweak - PHP 8.5 compatibility.
 * Tweak - WC 10.5 compatibility.
 
 = 1.4.23 - 2025-11-24 =
