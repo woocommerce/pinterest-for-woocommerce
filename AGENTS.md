@@ -203,6 +203,66 @@ This project follows **WooCommerce-Core** coding standards, which extend WordPre
 - BEM-like naming conventions preferred
 - Mobile-first responsive design
 
+## Code Style
+
+**MUST** follow WordPress coding standards in all code.
+
+### Spacing Rules
+
+- **Spaces inside parentheses:** `if ( condition )`, `function_name( $arg )`
+- **Spaces inside brackets:** `array( 'key' => 'value' )`, `[ 1, 2, 3 ]` (PHP 5.4+ syntax)
+- **Spaces inside braces:** `{ 'key': 'value' }` (JavaScript)
+- **Function calls:** `__( 'text', 'pinterest-for-woocommerce' )`
+- **Control structures:** `if ( condition ) {` (space before opening brace)
+- **Indentation:** Tabs (4-space width), not spaces (per `.editorconfig`)
+- **Line length:** 120 columns max (WordPress standard)
+
+### Example
+
+```php
+<?php
+/**
+ * Example function demonstrating WordPress code style
+ *
+ * @param string $merchant_id The merchant identifier.
+ * @param array  $args        Configuration arguments.
+ * @return array
+ *
+ * @throws Exception When merchant creation fails.
+ */
+public static function update_or_create_merchant( $merchant_id, $args ) {
+
+	$config = array(
+		'merchant_domains' => get_home_url(),
+		'feed_location'    => $args['feed_url'],
+		'feed_format'      => 'XML',
+	);
+
+	if ( empty( $merchant_id ) ) {
+		throw new Exception(
+			__( 'Merchant ID is required.', 'pinterest-for-woocommerce' ),
+			400
+		);
+	}
+
+	try {
+		$response = Base::update_or_create_merchant( $config );
+	} catch ( Throwable $th ) {
+		throw new Exception( $th->getMessage(), $th->getCode() );
+	}
+
+	return $response;
+}
+```
+
+**Key style elements shown:**
+- Spaces inside parentheses and array brackets
+- Tab indentation (shown as spaces in this example, but use actual tabs)
+- Array alignment for readability
+- Proper docblock with `@param`, `@return`, and `@throws`
+- Text domain in translation function
+- Exception handling pattern
+
 ## Git Workflow
 
 ### Branching
@@ -219,6 +279,41 @@ git checkout -b fix/bug-description
 ```
 
 **NEVER** branch from or merge directly to `main` or `master`. The main development branch is `develop`.
+
+#### Branch Naming Format
+
+**Format:** `<prefix>/<short-description>`
+
+**Allowed prefixes:**
+- `feature/` - New functionality or enhancements
+- `fix/` - Bug fixes
+- `update/` - Dependency updates or version bumps
+- `refactor/` - Code refactoring without changing functionality
+- `chore/` - Maintenance tasks, build config changes
+
+**Naming conventions:**
+- Use imperative mood (e.g., `add`, `fix`, `update`, not `adding`, `fixed`, `updated`)
+- Use lowercase
+- Use hyphens (not underscores or spaces)
+- Keep descriptions short and descriptive
+- Do NOT include issue/ticket numbers in branch names
+
+**Good examples:**
+```
+feature/add-catalog-retry-logic
+fix/product-attribute-mapping
+update/bump-min-woocommerce-version
+refactor/simplify-merchant-creation
+chore/update-phpcs-config
+```
+
+**Bad examples:**
+```
+Feature/AddRetryLogic          # Wrong: capitalized
+fix_bug                        # Wrong: too vague, uses underscore
+feature/PINT-123-add-feature   # Wrong: includes ticket number
+updateDependencies             # Wrong: missing prefix, camelCase
+```
 
 ### Commit Practices
 
@@ -251,28 +346,32 @@ When creating PRs:
 
 ### CRITICAL - NEVER Do These Things
 
-❌ **NEVER edit WordPress core files** - Only modify plugin code
-❌ **NEVER edit WooCommerce plugin files** - Only modify this plugin's code
-❌ **NEVER commit without running `vendor/bin/phpcs` first** - CI will fail
-❌ **NEVER modify `changelog.txt`** unless explicitly requested
-❌ **NEVER commit `node_modules/` or `vendor/` directories** - These are gitignored
-❌ **NEVER commit `.env` files or credentials** - Security risk
-❌ **NEVER use `--no-verify` or `--no-gpg-sign`** unless explicitly required
-❌ **NEVER skip running tests** before pushing to remote
-❌ **NEVER use Node versions outside 12.20.1 to <15** - Check with `nvm use`
+| Pitfall | Why |
+|---------|-----|
+| Edit WordPress core files | Only modify plugin code |
+| Edit WooCommerce plugin files | Only modify this plugin's code |
+| Commit without running `vendor/bin/phpcs` first | CI will fail |
+| Modify `changelog.txt` | Unless explicitly requested |
+| Commit `node_modules/` or `vendor/` directories | These are gitignored |
+| Commit `.env` files or credentials | Security risk |
+| Use `--no-verify` or `--no-gpg-sign` | Unless explicitly required |
+| Skip running tests before pushing to remote | May break production |
+| Use Node versions outside 12.20.1 to <15 | Check with `nvm use` |
 
 ### CRITICAL - ALWAYS Do These Things
 
-✅ **ALWAYS follow WooCommerce coding standards** (enforced by phpcs)
-✅ **ALWAYS use text domain `pinterest-for-woocommerce`** for translations
-✅ **ALWAYS branch from `develop`**, not main/master
-✅ **ALWAYS run linting before commits:** `vendor/bin/phpcs`, `npm run lint:js`, `npm run lint:css`
-✅ **ALWAYS write PHPUnit tests** for new PHP functionality
-✅ **ALWAYS use PSR-4 naming** in `src/` directory
-✅ **ALWAYS use WordPress naming conventions** in `includes/` directory
-✅ **ALWAYS check minimum version requirements** when using WordPress/WooCommerce APIs
-✅ **ALWAYS use `composer install`** after pulling - autoloader must be regenerated
-✅ **ALWAYS use `npm install`** after pulling if package.json changed
+| Best Practice | Why |
+|--------------|-----|
+| Follow WooCommerce coding standards | Enforced by phpcs |
+| Use text domain `pinterest-for-woocommerce` | Required for translations |
+| Branch from `develop`, not main/master | Main development branch |
+| Run linting before commits | `vendor/bin/phpcs`, `npm run lint:js`, `npm run lint:css` |
+| Write PHPUnit tests for new PHP functionality | Ensure code quality and prevent regressions |
+| Use PSR-4 naming in `src/` directory | Modern PHP autoloading standard |
+| Use WordPress naming conventions in `includes/` | Legacy code compatibility |
+| Check minimum version requirements | When using WordPress/WooCommerce APIs |
+| Run `composer install` after pulling | Autoloader must be regenerated |
+| Run `npm install` after pulling if package.json changed | Ensure dependency consistency |
 
 ### Common Mistakes
 
@@ -319,23 +418,30 @@ npm start  # recompile
 
 ### Why PSR-4 in `src/` but WordPress style in `includes/`?
 
-The plugin is transitioning from WordPress conventions to modern PHP standards. New code goes in `src/` with PSR-4 autoloading. Legacy code remains in `includes/` for backward compatibility.
+**Reason:** The plugin is transitioning from WordPress conventions to modern PHP standards. New code goes in `src/` with PSR-4 autoloading for better maintainability and IDE support. Legacy code remains in `includes/` for backward compatibility.
 
 ### Why Jetpack Autoloader?
 
-When multiple plugins bundle the same dependencies (e.g., Guzzle), version conflicts can occur. Jetpack Autoloader resolves these conflicts by loading the latest compatible version.
+**Reason:** When multiple plugins bundle the same dependencies (e.g., Guzzle), version conflicts can occur. Jetpack Autoloader resolves these conflicts by loading the latest compatible version across all installed plugins.
 
 ### Why Action Scheduler Job Framework?
 
-WordPress cron is unreliable for critical tasks. Action Scheduler provides robust background job processing with retries, error handling, and admin UI for monitoring.
+**Reason:** WordPress cron is unreliable for critical tasks (depends on site traffic). Action Scheduler provides robust background job processing with retries, error handling, failure logging, and admin UI for monitoring scheduled actions.
 
 ### Why separate WordPress/WooCommerce minimum versions?
 
-WordPress and WooCommerce release independently. We support recent versions of each:
-- **WordPress:** Last 2 major versions (currently 5.6+)
-- **WooCommerce:** Last several major versions (currently 7.0+)
+**Reason:** WordPress and WooCommerce release independently. We support recent versions of each to balance feature availability with user adoption:
+
+| Platform | Support Policy | Current Minimum |
+|----------|---------------|-----------------|
+| WordPress | Last 2 major versions | 5.6+ |
+| WooCommerce | Last several major versions | 7.0+ |
 
 Always check the plugin header in `pinterest-for-woocommerce.php` for current requirements.
+
+### Why is Node pinned to v14.16?
+
+**Reason:** The build toolchain and dependencies have proven difficult to update without breaking changes. Updating Node and related packages (webpack, @wordpress/scripts, etc.) requires significant testing and potential code changes. The current pinned version (v14.16, specified in `.nvmrc`) works reliably, so we maintain it until a coordinated update effort can be planned. Always use `nvm use` to ensure you're on the correct version.
 
 ## Testing Strategy
 
