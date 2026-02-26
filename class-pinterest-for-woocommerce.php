@@ -75,7 +75,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		const PLUGIN_REQUIREMENTS = array(
 			'php_version'      => '7.4',
 			'wp_version'       => '5.6',
-			'wc_version'       => '5.3',
+			'wc_version'       => '7.0',
 			'action_scheduler' => '3.3.0',
 		);
 
@@ -1392,7 +1392,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.2.11
 		 */
 		public function add_onboarding_task() {
-			if ( class_exists( TaskLists::class ) ) { // compatibility-code "< WC 5.9". This is added for backward compatibility.
+			if ( class_exists( TaskLists::class ) ) {
 				TaskLists::add_task(
 					'extended',
 					new Onboarding(
