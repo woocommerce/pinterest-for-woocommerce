@@ -18,7 +18,7 @@ Pinterest for WooCommerce is an official WordPress plugin that integrates WooCom
 ### Backend
 - **PHP:** 7.4+ (minimum supported version)
 - **WordPress:** 5.6+ (minimum), tested up to 6.9
-- **WooCommerce:** 6.3+ (minimum), tested up to 10.5
+- **WooCommerce:** 7.0+ (minimum), tested up to 10.5
 - **Architecture:** PSR-4 autoloading for modern code, WordPress conventions for legacy code
 - **Dependencies:**
   - `automattic/jetpack-autoloader` - Version resolution for shared dependencies
@@ -333,7 +333,7 @@ WordPress cron is unreliable for critical tasks. Action Scheduler provides robus
 
 WordPress and WooCommerce release independently. We support recent versions of each:
 - **WordPress:** Last 2 major versions (currently 5.6+)
-- **WooCommerce:** Last several major versions (currently 6.3+)
+- **WooCommerce:** Last several major versions (currently 7.0+)
 
 Always check the plugin header in `pinterest-for-woocommerce.php` for current requirements.
 
