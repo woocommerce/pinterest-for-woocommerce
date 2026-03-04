@@ -31,7 +31,7 @@ Pinterest for WooCommerce is an official WordPress plugin that integrates WooCom
 - **Build System:** @wordpress/scripts with webpack
 - **UI Framework:** @woocommerce/components, @wordpress/components
 - **State Management:** @wordpress/data
-- **Node:** 12.20.1 to <15
+- **Node:** 14.16 (pinned via `.nvmrc`)
 - **npm:** 6.14.10 to <7
 
 ### Development Environment
@@ -180,7 +180,7 @@ This project follows **WooCommerce-Core** coding standards, which extend WordPre
 - PSR-4 naming in `src/` directory (e.g., `class ProductSync` in file `ProductSync.php`)
 - WordPress naming conventions in `includes/` directory (e.g., `class-pinterest-for-woocommerce-admin.php`)
 - Text domain MUST be `pinterest-for-woocommerce`
-- Minimum WordPress version: 6.5
+- Minimum WordPress version: 5.6
 - Minimum PHP version: 7.4
 - PHPCompatibility checks enabled
 - File comments required (except in `src/` and `tests/`)
