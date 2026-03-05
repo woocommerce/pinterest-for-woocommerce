@@ -106,7 +106,7 @@
     "prebuild": "composer install",
     "build": "wp-scripts build && gulp build && npm run i18n",
     "build:zip": "npm run build && composer install --no-dev -n && gulp zip",
-    "postbuild:zip": "composer install && zip -d pinterest-for-woocommerce.zip 'pinterest-for-woocommerce/*.md'",
+    "postbuild:zip": "composer install && (zipinfo -1 pinterest-for-woocommerce.zip | grep -E '^pinterest-for-woocommerce/[^/]+\\.md$' | xargs zip -d pinterest-for-woocommerce.zip || true)",
     "dev": "wp-scripts build && gulp build",
     "doc:tracking": "woocommerce-grow-jsdoc ./assets/source/",
     "format:js": "wp-scripts format ./assets/source",
