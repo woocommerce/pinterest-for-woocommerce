@@ -107,6 +107,7 @@
     "build": "wp-scripts build && gulp build && npm run i18n",
     "build:zip": "npm run build && composer install --no-dev -n && gulp zip",
     "postbuild:zip": "composer install",
+    "postarchive": "zip -d pinterest-for-woocommerce.zip 'pinterest-for-woocommerce/*.md'",
     "dev": "wp-scripts build && gulp build",
     "doc:tracking": "woocommerce-grow-jsdoc ./assets/source/",
     "format:js": "wp-scripts format ./assets/source",
