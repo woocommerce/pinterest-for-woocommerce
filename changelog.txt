@@ -1,6 +1,6 @@
 *** Pinterest for WooCommerce Changelog ***
 
-= 1.4.24 - 2026-01-27 =
+= 1.4.25 - 2026-03-06 =
 * Tweak - PHP 8.5 compatibiliy.
 * Tweak - WC 10.5 compatibility.
 
