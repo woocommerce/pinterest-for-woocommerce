@@ -91,6 +91,10 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.25 - 2026-03-06 =
+* Tweak - WC 10.6 compatibility.
+* Update - Minimum required WooCommerce version bumped to 7.0.
+
 = 1.4.24 - 2026-01-27 =
 * Tweak - PHP 8.5 compatibility.
 * Tweak - WC 10.5 compatibility.
