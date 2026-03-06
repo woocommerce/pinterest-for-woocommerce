@@ -11,7 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use Automattic\WooCommerce\Admin\Features\Onboarding;
 use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
 
 /**
@@ -26,10 +25,6 @@ class Compat {
 	 * @return bool
 	 */
 	public static function should_show_tasks(): bool {
-		if ( version_compare( WC_VERSION, '5.9', '<' ) ) {
-			return Onboarding::should_show_tasks();
-		}
-
 		$setup_list    = TaskLists::get_list( 'setup' );
 		$extended_list = TaskLists::get_list( 'extended' );
 

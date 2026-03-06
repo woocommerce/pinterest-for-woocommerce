@@ -3,8 +3,8 @@ Contributors: automattic, pinterest, woocommerce
 Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
 Tested up to: 6.9
-Requires PHP: 7.3
-Stable tag: 1.4.24
+Requires PHP: 7.4
+Stable tag: 1.4.25
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -63,8 +63,8 @@ Pinterest is a visual discovery engine people use to find inspiration for their 
 = Minimum Requirements =
 
 * WordPress 5.6 or greater
-* WooCommerce 5.3 or greater
-* PHP version 7.3 or greater (PHP 7.4 or greater is recommended)
+* WooCommerce 7.0 or greater
+* PHP version 7.4 or greater
 * MySQL version 5.6 or greater
 
 Visit the [WooCommerce server requirements documentation](https://woocommerce.com/document/server-requirements/) for a detailed list of server requirements.
@@ -91,8 +91,12 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.25 - 2026-03-06 =
+* Tweak - WC 10.6 compatibility.
+* Update - Minimum required WooCommerce version bumped to 7.0.
+
 = 1.4.24 - 2026-01-27 =
-* Tweak - PHP 8.5 compatibiliy.
+* Tweak - PHP 8.5 compatibility.
 * Tweak - WC 10.5 compatibility.
 
 = 1.4.23 - 2025-11-24 =
@@ -108,7 +112,7 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 = 1.4.21 - 2025-06-16 =
 * Update WP Consent API to affect all tracking with improved architecture.
-* [dev] Pin Github actions to immutable references of commits instead of tags.
+* [dev] Pin GitHub actions to immutable references of commits instead of tags.
 
 = 1.4.20 - 2025-06-03 =
 * Tweak - Reenable WP Consent API tracking integration.
@@ -150,7 +154,7 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 * Add - API method to get commerce integration.
 * Add - Commerce Integration `partner_metadata` weekly sync.
 * Add - Failed Create Commerce Integration API call retries procedure.
-* Add - Weakly heartbeat action.
+* Add - Weekly heartbeat action.
 * Update - Make `integration_data` optional for the extension.
 
 = 1.4.10 - 2024-09-24 =

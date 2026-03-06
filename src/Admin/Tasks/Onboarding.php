@@ -75,18 +75,4 @@ class Onboarding extends Task {
 	public function is_complete() {
 		return Pinterest_For_Woocommerce()::is_setup_complete();
 	}
-
-	/**
-	 * Parent ID. This method is abstract in WooCommerce 6.1.x, 6.2.x and 6.3.x. This implementation is for backward compatibility for these versions.
-	 * compatibility-code "WC 6.1.x, WC 6.2.x, WC 6.3.x"
-	 *
-	 * @return string
-	 */
-	public function get_parent_id() {
-		if ( is_callable( parent::class . '::get_parent_id' ) ) {
-			return parent::get_parent_id();
-		}
-
-		return 'extended'; // The parent task list id.
-	}
 }
