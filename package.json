@@ -2,7 +2,7 @@
   "name": "pinterest-for-woocommerce",
   "title": "Pinterest for WooCommerce",
   "description": "Pinterest for WooCommerce",
-  "version": "1.4.24",
+  "version": "1.4.25",
   "main": "gulpfile.js",
   "repository": {
     "type": "git",
@@ -106,7 +106,8 @@
     "prebuild": "composer install",
     "build": "wp-scripts build && gulp build && npm run i18n",
     "build:zip": "npm run build && composer install --no-dev -n && gulp zip",
-    "postbuild:zip": "composer install",
+    "postbuild:zip": "composer install && npm run _remove-root-md",
+    "_remove-root-md": "zipinfo -1 pinterest-for-woocommerce.zip | grep -E '^pinterest-for-woocommerce/[^/]+\\.md$' | xargs zip -d pinterest-for-woocommerce.zip || true",
     "dev": "wp-scripts build && gulp build",
     "doc:tracking": "woocommerce-grow-jsdoc ./assets/source/",
     "format:js": "wp-scripts format ./assets/source",
