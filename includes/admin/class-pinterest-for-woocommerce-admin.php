@@ -38,6 +38,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			add_filter( 'woocommerce_marketing_menu_items', array( $this, 'add_menu_items' ) );
 			add_action( 'admin_menu', array( $this, 'fix_menu_paths' ) );
 			add_action( 'admin_menu', array( $this, 'register_wc_admin_pages' ) );
+			add_filter( 'plugin_action_links_' . PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
 		}
 
 
@@ -227,6 +228,23 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 			}
 
 			return $items;
+		}
+
+
+		/**
+		 * Add a Settings link to the plugin's action links in the Plugins list table.
+		 *
+		 * @param array $links Existing plugin action links.
+		 * @return array
+		 */
+		public function plugin_action_links( $links ) {
+			$url = admin_url( 'admin.php?page=wc-admin&path=/pinterest/landing' );
+
+			$settings_link = '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Settings', 'pinterest-for-woocommerce' ) . '</a>';
+
+			array_unshift( $links, $settings_link );
+
+			return $links;
 		}
 
 
