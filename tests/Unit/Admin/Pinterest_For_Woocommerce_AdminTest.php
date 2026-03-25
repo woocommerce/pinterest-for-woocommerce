@@ -2,6 +2,8 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Admin;
 
+require_once dirname( __DIR__, 3 ) . '/includes/admin/class-pinterest-for-woocommerce-admin.php';
+
 use Pinterest_For_Woocommerce_Admin;
 use WP_UnitTestCase;
 
