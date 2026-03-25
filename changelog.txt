@@ -1,8 +1,5 @@
 *** Pinterest for WooCommerce Changelog ***
 
-= 1.4.26 - 2026-03-25 =
-* Add - Settings link in the WordPress Installed Plugins list, pointing to the Pinterest landing page.
-
 = 1.4.25 - 2026-03-06 =
 * Tweak - WC 10.6 compatibility.
 * Update - Minimum required WooCommerce version bumped to 7.0.
