@@ -30,7 +30,7 @@ class Pinterest_For_Woocommerce_AdminTest extends WP_UnitTestCase {
 	 */
 	protected function tearDown(): void {
 		parent::tearDown();
-		remove_all_filters( 'plugin_action_links_' . PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME );
+		remove_filter( 'plugin_action_links_' . PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME, array( $this->admin, 'plugin_action_links' ) );
 		unset( $this->admin );
 	}
 
