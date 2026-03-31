@@ -37,9 +37,10 @@ class TestActionSchedulerProxy implements ActionSchedulerInterface {
 	 *
 	 * @param mixed  $args          Search arguments.
 	 * @param string $return_format Return format.
+	 * @param string $group         Action group.
 	 * @return array Empty array for testing.
 	 */
-	public function search( $args = array(), $return_format = OBJECT ) {
+	public function search( $args = array(), $return_format = OBJECT, string $group = '' ) {
 		return array();
 	}
 
