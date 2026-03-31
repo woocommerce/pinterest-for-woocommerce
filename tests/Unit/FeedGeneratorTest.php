@@ -16,6 +16,23 @@ use ReflectionMethod;
 use WC_Helper_Product;
 use WC_Product_Variable;
 
+/**
+ * Test helper class that wraps real Action Scheduler functions.
+ */
+class TestActionSchedulerProxy implements ActionSchedulerInterface {
+	public function schedule_immediate( string $hook, array $args = array(), string $group = '' ): int {
+		return as_schedule_single_action( time(), $hook, $args, $group );
+	}
+
+	public function search( array $args = array(), string $return_format = OBJECT ): array {
+		return array();
+	}
+
+	public function cancel( int $action_id ): void {}
+
+	public function cancel_all( string $hook, array $args = array(), string $group = '' ): void {}
+}
+
 class FeedGeneratorTest extends \WP_UnitTestCase {
 
 	/** @var ActionSchedulerInterface */
@@ -130,9 +147,9 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_handle_unexpected_shutdown_does_throttle_product_number_when_rescheduling_the_action() {
-		// Use real FeedGenerator without mocks for this integration test.
+		// Use real FeedGenerator that schedules actual actions.
 		$real_feed_generator = new FeedGenerator(
-			$this->createMock( ActionSchedulerInterface::class ),
+			new TestActionSchedulerProxy(),
 			$this->feed_file_operations,
 			$this->local_feed_configs
 		);
@@ -147,22 +164,6 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$error = array(
 			'type'    => E_ERROR,
 			'message' => 'Maximum execution time',
-		);
-
-		// Mock search to return empty array (no failure threshold met).
-		$real_feed_generator = new FeedGenerator(
-			new class() implements ActionSchedulerInterface {
-				public function schedule_immediate( string $hook, array $args = array(), string $group = '' ): int {
-					return as_schedule_single_action( time(), $hook, $args, $group );
-				}
-				public function search( array $args = array(), string $return_format = OBJECT ): array {
-					return array();
-				}
-				public function cancel( int $action_id ): void {}
-				public function cancel_all( string $hook, array $args = array(), string $group = '' ): void {}
-			},
-			$this->feed_file_operations,
-			$this->local_feed_configs
 		);
 
 		// First call: should reschedule and throttle.
@@ -186,16 +187,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	public function test_handle_unexpected_shutdown_skips_rescheduling_if_action_already_scheduled() {
 		// Use real FeedGenerator that actually schedules actions.
 		$real_feed_generator = new FeedGenerator(
-			new class() implements ActionSchedulerInterface {
-				public function schedule_immediate( string $hook, array $args = array(), string $group = '' ): int {
-					return as_schedule_single_action( time(), $hook, $args, $group );
-				}
-				public function search( array $args = array(), string $return_format = OBJECT ): array {
-					return array();
-				}
-				public function cancel( int $action_id ): void {}
-				public function cancel_all( string $hook, array $args = array(), string $group = '' ): void {}
-			},
+			new TestActionSchedulerProxy(),
 			$this->feed_file_operations,
 			$this->local_feed_configs
 		);
