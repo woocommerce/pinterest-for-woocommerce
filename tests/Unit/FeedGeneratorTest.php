@@ -159,8 +159,9 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		// Schedule a duplicate action to simulate what the first call would have done.
 		// This allows the deduplication logic to find it on the second call.
+		// Schedule it in the future to keep it in "pending" status.
 		as_schedule_single_action(
-			time(),
+			time() + 10,
 			'pinterest/jobs/generate_feed/chain_batch',
 			array( 1, array() ),
 			'pinterest-for-woocommerce'
@@ -211,8 +212,9 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		// Schedule a duplicate action to simulate what the first call would have done.
 		// This allows the deduplication logic to find it on the second call.
+		// Schedule it in the future to keep it in "pending" status.
 		as_schedule_single_action(
-			time(),
+			time() + 10,
 			'pinterest/jobs/generate_feed/chain_batch',
 			array( 1, array() ),
 			'pinterest-for-woocommerce'
