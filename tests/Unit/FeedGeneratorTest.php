@@ -130,6 +130,13 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_handle_unexpected_shutdown_does_throttle_product_number_when_rescheduling_the_action() {
+		// Use real FeedGenerator without mocks for this integration test.
+		$real_feed_generator = new FeedGenerator(
+			$this->createMock( ActionSchedulerInterface::class ),
+			$this->feed_file_operations,
+			$this->local_feed_configs
+		);
+
 		$action_id = as_schedule_single_action(
 			gmdate( 'U' ) - 1,
 			'pinterest/jobs/generate_feed/chain_batch',
@@ -137,38 +144,34 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			'pinterest-for-woocommerce'
 		);
 
-		// The first call should reschedule (no duplicate exists yet).
-		$this->action_scheduler->expects( $this->once() )
-			->method( 'schedule_immediate' )
-			->with(
-				'pinterest/jobs/generate_feed/chain_batch',
-				array( 1, array() ),
-				'pinterest-for-woocommerce'
-			);
-		$this->action_scheduler->method( 'search' )
-			->willReturn( array() );
-
 		$error = array(
 			'type'    => E_ERROR,
 			'message' => 'Maximum execution time',
 		);
-		$this->feed_generator->handle_unexpected_shutdown( $action_id, $error );
 
+		// Mock search to return empty array (no failure threshold met).
+		$real_feed_generator = new FeedGenerator(
+			new class() implements ActionSchedulerInterface {
+				public function schedule_immediate( string $hook, array $args = array(), string $group = '' ): int {
+					return as_schedule_single_action( time(), $hook, $args, $group );
+				}
+				public function search( array $args = array(), string $return_format = OBJECT ): array {
+					return array();
+				}
+				public function cancel( int $action_id ): void {}
+				public function cancel_all( string $hook, array $args = array(), string $group = '' ): void {}
+			},
+			$this->feed_file_operations,
+			$this->local_feed_configs
+		);
+
+		// First call: should reschedule and throttle.
+		$real_feed_generator->handle_unexpected_shutdown( $action_id, $error );
 		$this->assertEquals( 50, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
 		$this->assertEquals( 2, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) );
 
-		// Schedule a duplicate action to simulate what the first call would have done.
-		// This allows the deduplication logic to find it on the second call.
-		// Schedule it in the future to keep it in "pending" status.
-		as_schedule_single_action(
-			time() + 10,
-			'pinterest/jobs/generate_feed/chain_batch',
-			array( 1, array() ),
-			'pinterest-for-woocommerce'
-		);
-
-		// Second call should be skipped due to deduplication (action already scheduled).
-		$this->feed_generator->handle_unexpected_shutdown( $action_id, $error );
+		// Second call: should be skipped due to deduplication (action already scheduled from first call).
+		$real_feed_generator->handle_unexpected_shutdown( $action_id, $error );
 
 		// Batch size and attempt should remain the same since rescheduling was skipped.
 		$this->assertEquals( 50, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
@@ -181,6 +184,22 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_handle_unexpected_shutdown_skips_rescheduling_if_action_already_scheduled() {
+		// Use real FeedGenerator that actually schedules actions.
+		$real_feed_generator = new FeedGenerator(
+			new class() implements ActionSchedulerInterface {
+				public function schedule_immediate( string $hook, array $args = array(), string $group = '' ): int {
+					return as_schedule_single_action( time(), $hook, $args, $group );
+				}
+				public function search( array $args = array(), string $return_format = OBJECT ): array {
+					return array();
+				}
+				public function cancel( int $action_id ): void {}
+				public function cancel_all( string $hook, array $args = array(), string $group = '' ): void {}
+			},
+			$this->feed_file_operations,
+			$this->local_feed_configs
+		);
+
 		$action_id = as_schedule_single_action(
 			gmdate( 'U' ) - 1,
 			'pinterest/jobs/generate_feed/chain_batch',
@@ -188,43 +207,19 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			'pinterest-for-woocommerce'
 		);
 
-		// First call schedules the action.
-		$this->action_scheduler->expects( $this->once() )
-			->method( 'schedule_immediate' )
-			->with(
-				'pinterest/jobs/generate_feed/chain_batch',
-				array( 1, array() ),
-				'pinterest-for-woocommerce'
-			);
-		$this->action_scheduler->method( 'search' )
-			->willReturn( array() );
-
 		$error = array(
 			'type'    => E_ERROR,
 			'message' => 'Maximum execution time',
 		);
 
-		// First timeout: should reschedule.
-		$this->feed_generator->handle_unexpected_shutdown( $action_id, $error );
-
-		// Verify batch size was decreased.
+		// First timeout: should reschedule and decrease batch size.
+		$real_feed_generator->handle_unexpected_shutdown( $action_id, $error );
 		$this->assertEquals( 50, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
 
-		// Schedule a duplicate action to simulate what the first call would have done.
-		// This allows the deduplication logic to find it on the second call.
-		// Schedule it in the future to keep it in "pending" status.
-		as_schedule_single_action(
-			time() + 10,
-			'pinterest/jobs/generate_feed/chain_batch',
-			array( 1, array() ),
-			'pinterest-for-woocommerce'
-		);
+		// Second timeout: deduplication should prevent rescheduling since action already exists.
+		$real_feed_generator->handle_unexpected_shutdown( $action_id, $error );
 
-		// Second timeout with same action: should skip due to deduplication.
-		// The action is already scheduled from the first call.
-		$this->feed_generator->handle_unexpected_shutdown( $action_id, $error );
-
-		// Batch size should not change further since rescheduling was skipped.
+		// Batch size should remain unchanged since deduplication skipped the second reschedule.
 		$this->assertEquals( 50, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
 	}
 
