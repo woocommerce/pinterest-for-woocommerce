@@ -20,17 +20,17 @@ use WC_Product_Variable;
  * Test helper class that wraps real Action Scheduler functions.
  */
 class TestActionSchedulerProxy implements ActionSchedulerInterface {
-	public function schedule_immediate( string $hook, array $args = array(), string $group = '' ): int {
+	public function schedule_immediate( string $hook, $args = array(), string $group = '' ) {
 		return as_schedule_single_action( time(), $hook, $args, $group );
 	}
 
-	public function search( array $args = array(), string $return_format = OBJECT ): array {
+	public function search( $args = array(), $return_format = OBJECT ) {
 		return array();
 	}
 
-	public function cancel( int $action_id ): void {}
+	public function cancel( $action_id ) {}
 
-	public function cancel_all( string $hook, array $args = array(), string $group = '' ): void {}
+	public function cancel_all( string $hook, $args = array(), string $group = '' ) {}
 }
 
 class FeedGeneratorTest extends \WP_UnitTestCase {
