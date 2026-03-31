@@ -20,16 +20,45 @@ use WC_Product_Variable;
  * Test helper class that wraps real Action Scheduler functions.
  */
 class TestActionSchedulerProxy implements ActionSchedulerInterface {
+	/**
+	 * Schedule an action to run immediately.
+	 *
+	 * @param string $hook  Action hook.
+	 * @param mixed  $args  Action arguments.
+	 * @param string $group Action group.
+	 * @return int Action ID.
+	 */
 	public function schedule_immediate( string $hook, $args = array(), string $group = '' ) {
 		return as_schedule_single_action( time(), $hook, $args, $group );
 	}
 
+	/**
+	 * Search for scheduled actions.
+	 *
+	 * @param mixed  $args          Search arguments.
+	 * @param string $return_format Return format.
+	 * @return array Empty array for testing.
+	 */
 	public function search( $args = array(), $return_format = OBJECT ) {
 		return array();
 	}
 
+	/**
+	 * Cancel an action.
+	 *
+	 * @param mixed $action_id Action ID.
+	 * @return void
+	 */
 	public function cancel( $action_id ) {}
 
+	/**
+	 * Cancel all actions matching criteria.
+	 *
+	 * @param string $hook  Action hook.
+	 * @param mixed  $args  Action arguments.
+	 * @param string $group Action group.
+	 * @return void
+	 */
 	public function cancel_all( string $hook, $args = array(), string $group = '' ) {}
 }
 
