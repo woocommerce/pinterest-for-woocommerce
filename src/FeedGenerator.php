@@ -43,6 +43,12 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	const MAX_RETRIES_PER_BATCH = 2;
 
+	/**
+	 * The max number of batches to process in a single generation cycle.
+	 * Circuit breaker to prevent runaway scheduling and database bloat.
+	 */
+	const MAX_BATCHES_PER_CYCLE = 1000;
+
 	public const DEFAULT_PRODUCT_BATCH_SIZE = 100;
 
 	/**
@@ -66,6 +72,14 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @var array $buffers Array of feed buffers.
 	 */
 	private $buffers = array();
+
+	/**
+	 * Pending last batch ID to be committed after successful processing.
+	 * Prevents cursor advancement before batch processing completes.
+	 *
+	 * @var int|null $pending_last_batch_id
+	 */
+	private $pending_last_batch_id = null;
 
 	/**
 	 * FeedGenerator initialization.
@@ -188,6 +202,21 @@ class FeedGenerator extends AbstractChainedJob {
 			)
 		);
 
+		// Check if an action with the same hook and args is already scheduled to prevent duplicate retries.
+		if ( as_has_scheduled_action( $hook, $args, PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+			self::log(
+				sprintf(
+					// Translators: Action Scheduler hook name.
+					__(
+						'Feed Generator `%s` Action retry already scheduled. Skipping duplicate.',
+						'pinterest-for-woocommerce'
+					),
+					$hook
+				)
+			);
+			return;
+		}
+
 		// Register retry attempt.
 		$this->action_scheduler->schedule_immediate( $hook, $args, PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 	}
@@ -267,6 +296,9 @@ class FeedGenerator extends AbstractChainedJob {
 				)
 			);
 			$this->feed_file_operations->prepare_temporary_files();
+
+			// Reset circuit breaker batch counter.
+			Pinterest_For_Woocommerce::save_data( 'feed_batch_count', 0 );
 		} catch ( Throwable $th ) {
 			$this->handle_error( $th, $this->get_action_full_name( self::CHAIN_START ) );
 			throw $th;
@@ -288,9 +320,15 @@ class FeedGenerator extends AbstractChainedJob {
 
 		/*
 		 * Action has finished successfully.
+		 *   - Commit the cursor position (only after successful processing).
 		 *   - Reset number of products per batch.
 		 *   - Reset action retries counter.
 		 */
+		if ( null !== $this->pending_last_batch_id ) {
+			$this->set_last_batch_id( $this->pending_last_batch_id );
+			$this->pending_last_batch_id = null;
+		}
+
 		Pinterest_For_Woocommerce::remove_data( 'feed_product_batch_size' );
 		Pinterest_For_Woocommerce::remove_data( 'feed_product_batch_attempt' );
 	}
@@ -321,6 +359,9 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 		self::log( __( 'Feed generated successfully.', 'pinterest-for-woocommerce' ) );
 
+		// Clean up circuit breaker counter.
+		Pinterest_For_Woocommerce::remove_data( 'feed_batch_count' );
+
 		// Check if feed is dirty and reschedule in necessary.
 		if ( $this->feed_is_dirty() ) {
 			$this->mark_feed_clean();
@@ -342,6 +383,26 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
 	 */
 	protected function get_items_for_batch( int $batch_number, array $args ): array {
+		// Circuit breaker: Check if max batches per cycle has been reached.
+		$batch_count = Pinterest_For_Woocommerce::get_data( 'feed_batch_count' ) ?? 0;
+		if ( $batch_count >= self::MAX_BATCHES_PER_CYCLE ) {
+			self::log(
+				sprintf(
+					// Translators: Maximum number of batches allowed.
+					__(
+						'Feed Generator circuit breaker triggered. Maximum batch limit of %d reached. Completing generation.',
+						'pinterest-for-woocommerce'
+					),
+					self::MAX_BATCHES_PER_CYCLE
+				),
+				\WC_Log_Levels::WARNING
+			);
+			return array();
+		}
+
+		// Increment batch counter.
+		Pinterest_For_Woocommerce::save_data( 'feed_batch_count', $batch_count + 1 );
+
 		global $wpdb;
 
 		$variable_type_like = $wpdb->esc_like( 'variable' ) . '%';
@@ -375,8 +436,10 @@ class FeedGenerator extends AbstractChainedJob {
 		);
 
 		$product_ids = array_map( 'intval', $product_ids );
-		// We save the last product's id from the current batch to start from it next time when fetching the next batch.
-		$this->set_last_batch_id( $product_ids[ count( $product_ids ) - 1 ] ?? 0 );
+		// Store the last product ID temporarily. It will be committed to persistent storage
+		// only after the batch is successfully processed (in handle_batch_action).
+		// This prevents timeouts from causing cursor advancement before processing completes.
+		$this->pending_last_batch_id = $product_ids[ count( $product_ids ) - 1 ] ?? 0;
 		return $product_ids;
 	}
 
@@ -450,7 +513,7 @@ class FeedGenerator extends AbstractChainedJob {
 
 		// Do not sync out of stock products which do not support backorders if woocommerce_hide_out_of_stock_items is set.
 		if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) ) {
-			$products_query_args['stock_status'] = [ 'instock', 'onbackorder' ];
+			$products_query_args['stock_status'] = array( 'instock', 'onbackorder' );
 		}
 
 		return wc_get_products( $products_query_args );
@@ -512,6 +575,8 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
+	 * Handle feed generation error by updating status and scheduling retry.
+	 *
 	 * @param Throwable $th - An exception that was thrown.
 	 * @param string    $hook_name - The name of the hook that was being executed when the exception was thrown.
 	 *
@@ -770,20 +835,20 @@ class FeedGenerator extends AbstractChainedJob {
 		 * Threshold of failed actions.
 		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 		 */
-		$threshold   = apply_filters( 'pinterest_for_woocommerce_action_failure_threshold', 3 );
+		$threshold = apply_filters( 'pinterest_for_woocommerce_action_failure_threshold', 3 );
 		/**
 		 * Time period of failed actions.
 		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 		 */
-		$time_period = apply_filters( 'pinterest_for_woocommerce_action_failure_time_period', 30 * MINUTE_IN_SECONDS );
+		$time_period    = apply_filters( 'pinterest_for_woocommerce_action_failure_time_period', 30 * MINUTE_IN_SECONDS );
 		$failed_actions = $this->action_scheduler->search(
-			[
+			array(
 				'hook'         => $hook,
 				'args'         => $args,
 				'status'       => ActionSchedulerInterface::STATUS_FAILED,
 				'date'         => gmdate( 'U' ) - $time_period,
 				'date_compare' => '>',
-			],
+			),
 			'ids'
 		);
 
