@@ -543,6 +543,52 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests circuit breaker stops batch processing after reaching MAX_BATCHES_PER_CYCLE.
+	 *
+	 * @return void
+	 */
+	public function test_circuit_breaker_stops_processing_at_max_batches() {
+		// Set batch counter to just below the limit.
+		Pinterest_For_Woocommerce::save_data( 'feed_batch_count', FeedGenerator::MAX_BATCHES_PER_CYCLE - 1 );
+
+		// This should process normally (last allowed batch).
+		$items = $this->feed_generator->get_items_for_batch( 1, array() );
+		$this->assertIsArray( $items );
+
+		// Next call should return empty array due to circuit breaker.
+		$items = $this->feed_generator->get_items_for_batch( 2, array() );
+		$this->assertEmpty( $items, 'Circuit breaker should return empty array after max batches reached' );
+	}
+
+	/**
+	 * Tests that cursor is only advanced after successful batch processing.
+	 *
+	 * @return void
+	 */
+	public function test_cursor_deferred_until_successful_batch_completion() {
+		// Create a product to fetch.
+		WC_Helper_Product::create_simple_product();
+
+		// Set initial cursor.
+		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
+
+		// Fetch items - this should store pending cursor but not commit it yet.
+		$items = $this->feed_generator->get_items_for_batch( 1, array() );
+		$this->assertNotEmpty( $items );
+
+		// Cursor should still be at initial value (not advanced yet).
+		$cursor_before = Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		$this->assertEquals( 0, $cursor_before, 'Cursor should not advance before handle_batch_action completes' );
+
+		// Complete batch processing.
+		$this->feed_generator->handle_batch_action( 1, array() );
+
+		// Now cursor should be advanced.
+		$cursor_after = Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		$this->assertGreaterThan( $cursor_before, $cursor_after, 'Cursor should advance after successful batch completion' );
+	}
+
+	/**
 	 * Tests get feed products method returns products in stock including products on backorder.
 	 *
 	 * @return void

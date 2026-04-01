@@ -184,6 +184,22 @@ class FeedGenerator extends AbstractChainedJob {
 			)
 		);
 
+		// Check if an action with the same hook and args is already scheduled to prevent duplicate retries.
+		// Important: Check this BEFORE throttling to avoid unnecessary batch size adjustments.
+		if ( as_has_scheduled_action( $hook, $args, PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+			self::log(
+				sprintf(
+					// Translators: Action Scheduler hook name.
+					__(
+						'Feed Generator `%s` Action retry already scheduled. Skipping duplicate.',
+						'pinterest-for-woocommerce'
+					),
+					$hook
+				)
+			);
+			return;
+		}
+
 		// Decrease the number of products to retry.
 		$attempt = ( Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) ?? 1 ) + 1;
 		$limit   = (int) ceil( $this->get_batch_size() / $attempt );
@@ -201,21 +217,6 @@ class FeedGenerator extends AbstractChainedJob {
 				$limit
 			)
 		);
-
-		// Check if an action with the same hook and args is already scheduled to prevent duplicate retries.
-		if ( as_has_scheduled_action( $hook, $args, PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			self::log(
-				sprintf(
-					// Translators: Action Scheduler hook name.
-					__(
-						'Feed Generator `%s` Action retry already scheduled. Skipping duplicate.',
-						'pinterest-for-woocommerce'
-					),
-					$hook
-				)
-			);
-			return;
-		}
 
 		// Register retry attempt.
 		$this->action_scheduler->schedule_immediate( $hook, $args, PINTEREST_FOR_WOOCOMMERCE_PREFIX );
@@ -316,6 +317,9 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Throwable Related to issue possible when creating an empty feed temp file and populating the header.
 	 */
 	public function handle_batch_action( int $batch_number, array $args ) {
+		// Reset pending cursor to prevent stale values from previous failed batches.
+		$this->pending_last_batch_id = null;
+
 		parent::handle_batch_action( $batch_number, $args );
 
 		/*
