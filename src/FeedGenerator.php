@@ -173,17 +173,6 @@ class FeedGenerator extends AbstractChainedJob {
 			return;
 		}
 
-		self::log(
-			sprintf(
-				// Translators: Action Scheduler hook name.
-				__(
-					'Feed Generator `%s` Action timed out due to an unexpected shutdown. Rescheduling it.',
-					'pinterest-for-woocommerce'
-				),
-				$hook
-			)
-		);
-
 		// Check if an action with the same hook and args is already scheduled to prevent duplicate retries.
 		// Important: Check this BEFORE throttling to avoid unnecessary batch size adjustments.
 		if ( as_has_scheduled_action( $hook, $args, PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
@@ -199,6 +188,17 @@ class FeedGenerator extends AbstractChainedJob {
 			);
 			return;
 		}
+
+		self::log(
+			sprintf(
+				// Translators: Action Scheduler hook name.
+				__(
+					'Feed Generator `%s` Action timed out due to an unexpected shutdown. Rescheduling it.',
+					'pinterest-for-woocommerce'
+				),
+				$hook
+			)
+		);
 
 		// Decrease the number of products to retry.
 		$attempt = ( Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) ?? 1 ) + 1;

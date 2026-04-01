@@ -92,6 +92,31 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Clean up Action Scheduler entries after each test to prevent cross-test interference
+	 * when the deduplication guard checks for pending scheduled actions.
+	 *
+	 * @return void
+	 */
+	public function tearDown(): void {
+		as_unschedule_all_actions( 'pinterest/jobs/generate_feed/chain_batch', null, 'pinterest-for-woocommerce' );
+		parent::tearDown();
+	}
+
+	/**
+	 * Helper to invoke a protected method on FeedGenerator via reflection.
+	 *
+	 * @param FeedGenerator $generator    The FeedGenerator instance.
+	 * @param string        $method_name  Name of the protected method.
+	 * @param array         $args         Arguments to pass to the method.
+	 * @return mixed Return value of the method.
+	 */
+	private function invoke_protected( FeedGenerator $generator, string $method_name, array $args = array() ) {
+		$reflection = new \ReflectionMethod( FeedGenerator::class, $method_name );
+		$reflection->setAccessible( true );
+		return $reflection->invokeArgs( $generator, $args );
+	}
+
+	/**
 	 * Tests feed generator registers the action scheduler failed execution hook.
 	 *
 	 * @return void
@@ -552,11 +577,11 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		Pinterest_For_Woocommerce::save_data( 'feed_batch_count', FeedGenerator::MAX_BATCHES_PER_CYCLE - 1 );
 
 		// This should process normally (last allowed batch).
-		$items = $this->feed_generator->get_items_for_batch( 1, array() );
+		$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( 1, array() ) );
 		$this->assertIsArray( $items );
 
 		// Next call should return empty array due to circuit breaker.
-		$items = $this->feed_generator->get_items_for_batch( 2, array() );
+		$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( 2, array() ) );
 		$this->assertEmpty( $items, 'Circuit breaker should return empty array after max batches reached' );
 	}
 
@@ -573,7 +598,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
 
 		// Fetch items - this should store pending cursor but not commit it yet.
-		$items = $this->feed_generator->get_items_for_batch( 1, array() );
+		$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( 1, array() ) );
 		$this->assertNotEmpty( $items );
 
 		// Cursor should still be at initial value (not advanced yet).
