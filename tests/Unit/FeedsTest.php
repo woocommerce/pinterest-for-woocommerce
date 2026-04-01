@@ -22,6 +22,7 @@ class FeedsTest extends WP_UnitTestCase {
 
 		remove_all_filters( 'pre_http_request' );
 		remove_all_filters( 'site_url' );
+		remove_all_filters( 'upload_dir' );
 	}
 
 	/**
