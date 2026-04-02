@@ -349,12 +349,17 @@ class FeedGenerator extends AbstractChainedJob {
 				"SELECT post.ID
 				FROM {$wpdb->posts} as post
 				LEFT JOIN {$wpdb->posts} as parent ON post.post_parent = parent.ID
-				LEFT JOIN {$wpdb->term_relationships} as parent_tr ON parent.ID = parent_tr.object_id
-				LEFT JOIN {$wpdb->term_taxonomy} as parent_tt ON parent_tr.term_taxonomy_id = parent_tt.term_taxonomy_id AND parent_tt.taxonomy = 'product_type'
-				LEFT JOIN {$wpdb->terms} as parent_term ON parent_tt.term_id = parent_term.term_id
 				WHERE
 					(
-						( post.post_type = 'product_variation' AND parent.post_status = 'publish' AND parent_term.slug = 'variable' )
+						( post.post_type = 'product_variation' AND parent.post_status = 'publish'
+							AND EXISTS (
+								SELECT 1
+								FROM {$wpdb->term_relationships} tr
+								INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+								INNER JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
+								WHERE tr.object_id = parent.ID AND tt.taxonomy = 'product_type' AND t.slug = 'variable'
+							)
+						)
 					OR
 						( post.post_type = 'product' AND post.post_status = 'publish' )
 					)
