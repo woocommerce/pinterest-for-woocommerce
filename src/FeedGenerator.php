@@ -357,7 +357,7 @@ class FeedGenerator extends AbstractChainedJob {
 								FROM {$wpdb->term_relationships} tr
 								INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
 								INNER JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
-								WHERE tr.object_id = parent.ID AND tt.taxonomy = 'product_type' AND t.slug = 'variable'
+								WHERE tr.object_id = parent.ID AND tt.taxonomy = 'product_type' AND t.slug LIKE 'variable%%'
 							)
 						)
 					OR
