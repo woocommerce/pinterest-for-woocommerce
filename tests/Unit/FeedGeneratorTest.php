@@ -458,6 +458,72 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that orphaned variations are excluded from the feed batch when
+	 * the parent product type changes from variable to simple.
+	 *
+	 * @return void
+	 */
+	public function test_get_items_for_batch_excludes_orphaned_variations_when_parent_is_no_longer_variable() {
+		// Create a variable product with a variation.
+		$variable_product = WC_Helper_Product::create_variation_product();
+		$variation_ids    = $variable_product->get_children();
+
+		// Verify the variation is included in the batch initially.
+		$items = $this->feed_generator->handle_batch_action( 1, array() );
+
+		global $wpdb;
+		$batch_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT post.ID
+				FROM {$wpdb->posts} as post
+				LEFT JOIN {$wpdb->posts} as parent ON post.post_parent = parent.ID
+				LEFT JOIN {$wpdb->postmeta} as parent_meta ON parent.ID = parent_meta.post_id AND parent_meta.meta_key = '_product_type'
+				WHERE
+					(
+						( post.post_type = 'product_variation' AND parent.post_status = 'publish' AND parent_meta.meta_value = 'variable' )
+					OR
+						( post.post_type = 'product' AND post.post_status = 'publish' )
+					)
+				AND
+					post.ID > %d
+				ORDER BY post.ID ASC
+				LIMIT %d",
+				0,
+				100
+			)
+		);
+
+		$this->assertNotEmpty( array_intersect( $variation_ids, $batch_ids ), 'Variations of a variable product should be in the feed.' );
+
+		// Simulate the parent product type changing to simple without deleting variations.
+		update_post_meta( $variable_product->get_id(), '_product_type', 'simple' );
+		clean_post_cache( $variable_product->get_id() );
+
+		$batch_ids_after = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT post.ID
+				FROM {$wpdb->posts} as post
+				LEFT JOIN {$wpdb->posts} as parent ON post.post_parent = parent.ID
+				LEFT JOIN {$wpdb->postmeta} as parent_meta ON parent.ID = parent_meta.post_id AND parent_meta.meta_key = '_product_type'
+				WHERE
+					(
+						( post.post_type = 'product_variation' AND parent.post_status = 'publish' AND parent_meta.meta_value = 'variable' )
+					OR
+						( post.post_type = 'product' AND post.post_status = 'publish' )
+					)
+				AND
+					post.ID > %d
+				ORDER BY post.ID ASC
+				LIMIT %d",
+				0,
+				100
+			)
+		);
+
+		$this->assertEmpty( array_intersect( $variation_ids, $batch_ids_after ), 'Orphaned variations should be excluded when parent is no longer a variable product.' );
+	}
+
+	/**
 	 * Tests get feed products method returns products in stock including products on backorder.
 	 *
 	 * @return void
