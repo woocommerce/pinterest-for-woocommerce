@@ -14,7 +14,6 @@ use Exception;
 use Pinterest_For_Woocommerce;
 use ReflectionMethod;
 use WC_Helper_Product;
-use WC_Product_Simple;
 use WC_Product_Variable;
 
 class FeedGeneratorTest extends \WP_UnitTestCase {
@@ -510,6 +509,10 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * @return array Product IDs.
 	 */
 	private function call_get_items_for_batch( int $batch_number = 1, array $args = array() ): array {
+		// Use a large batch size to ensure all test products are included regardless of
+		// any products created by the test bootstrap or other setup routines.
+		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', 10000 );
+
 		$method = new ReflectionMethod( FeedGenerator::class, 'get_items_for_batch' );
 		$method->setAccessible( true );
 		return $method->invoke( $this->feed_generator, $batch_number, $args );
