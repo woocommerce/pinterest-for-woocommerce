@@ -344,7 +344,8 @@ class FeedGenerator extends AbstractChainedJob {
 	protected function get_items_for_batch( int $batch_number, array $args ): array {
 		global $wpdb;
 
-		$product_ids = $wpdb->get_col(
+		$variable_type_like = $wpdb->esc_like( 'variable' ) . '%';
+		$product_ids        = $wpdb->get_col(
 			$wpdb->prepare(
 				"SELECT post.ID
 				FROM {$wpdb->posts} as post
@@ -357,7 +358,7 @@ class FeedGenerator extends AbstractChainedJob {
 								FROM {$wpdb->term_relationships} tr
 								INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
 								INNER JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
-								WHERE tr.object_id = parent.ID AND tt.taxonomy = 'product_type' AND t.slug LIKE 'variable%%'
+								WHERE tr.object_id = parent.ID AND tt.taxonomy = 'product_type' AND t.slug LIKE %s
 							)
 						)
 					OR
@@ -367,6 +368,7 @@ class FeedGenerator extends AbstractChainedJob {
 					post.ID > %d
 				ORDER BY post.ID ASC
 				LIMIT %d",
+				$variable_type_like,
 				$this->get_last_batch_id( $batch_number ),
 				$this->get_batch_size()
 			)
