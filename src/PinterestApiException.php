@@ -62,10 +62,10 @@ class PinterestApiException extends \Exception {
 	 * Offer already redeemed — additional Pinterest error code observed for
 	 * the same condition.
 	 *
-	 * Observed in customer ticket #11013264 (PIN4WOO-74). Pinterest returns
-	 * this code alongside 2324 / 2318 for offer-redemption conflicts; the
-	 * exact distinction is not documented in the public API, but it has the
-	 * same terminal semantics as the other already-redeemed codes.
+	 * Observed during investigation for PIN4WOO-74. Pinterest returns this
+	 * code alongside 2324 / 2318 for offer-redemption conflicts; the exact
+	 * distinction is not documented in the public API, but it has the same
+	 * terminal semantics as the other already-redeemed codes.
 	 */
 	public const OFFER_ALREADY_REDEEMED_VARIANT = 2322;
 
