@@ -91,13 +91,9 @@ class AdCredits {
 		$redeem_status = $account_data['coupon_redeem_info']['redeem_status'] ?? false;
 		$error_id      = $account_data['coupon_redeem_info']['error_id'] ?? false;
 
-		if ( PinterestApiException::OFFER_ALREADY_REDEEMED === $error_id ) {
-			// Advertiser has already redeemed the coupon.
-			return true;
-		}
-
-		if ( PinterestApiException::OFFER_ALREADY_REDEEMED_BY_ANOTHER_ADVERTISER === $error_id ) {
-			// Different advertiser id has already redeemed the coupon.
+		if ( in_array( $error_id, PinterestApiException::TERMINAL_REDEEM_ERRORS, true ) ) {
+			// A prior attempt hit a terminal error from Pinterest (e.g., the
+			// offer has already been redeemed). Do not retry.
 			return true;
 		}
 
