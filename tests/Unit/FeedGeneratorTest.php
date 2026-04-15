@@ -12,7 +12,9 @@ use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Exception;
 use Pinterest_For_Woocommerce;
+use ReflectionMethod;
 use WC_Helper_Product;
+use WC_Product_Variable;
 
 class FeedGeneratorTest extends \WP_UnitTestCase {
 
@@ -496,5 +498,117 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->assertEquals( $product_b->get_id(), $products[1]->get_id() );
 		$this->assertEquals( 'Product on backorder', $products[1]->get_name() );
 		$this->assertEquals( 'onbackorder', $products[1]->get_stock_status() );
+	}
+
+	/**
+	 * Helper to call the protected get_items_for_batch method via reflection.
+	 *
+	 * @param int   $batch_number The batch number.
+	 * @param array $args        The args for the job.
+	 *
+	 * @return array Product IDs.
+	 */
+	private function call_get_items_for_batch( int $batch_number = 1, array $args = array() ): array {
+		// Use a large batch size to ensure all test products are included regardless of
+		// any products created by the test bootstrap or other setup routines.
+		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', 10000 );
+
+		$method = new ReflectionMethod( FeedGenerator::class, 'get_items_for_batch' );
+		$method->setAccessible( true );
+		return $method->invoke( $this->feed_generator, $batch_number, $args );
+	}
+
+	/**
+	 * Tests that variations of a variable product are included in the feed.
+	 *
+	 * @return void
+	 */
+	public function test_get_items_for_batch_includes_variations_of_variable_products() {
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+		$variation_ids     = $variation_product->get_children();
+
+		$batch_ids = $this->call_get_items_for_batch();
+
+		foreach ( $variation_ids as $variation_id ) {
+			$this->assertContains( $variation_id, $batch_ids );
+		}
+	}
+
+	/**
+	 * Tests that variations whose parent is not a variable product are excluded from the feed.
+	 * This covers the case where a variable product is converted to a simple product,
+	 * leaving behind orphaned variations in the database.
+	 *
+	 * @return void
+	 */
+	public function test_get_items_for_batch_excludes_orphaned_variations() {
+		// Create a variable product with variations.
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+		$variation_ids     = $variation_product->get_children();
+		$parent_id         = $variation_product->get_id();
+
+		// Convert the parent from variable to simple, orphaning the variations.
+		wp_set_object_terms( $parent_id, 'simple', 'product_type' );
+
+		$batch_ids = $this->call_get_items_for_batch();
+
+		// The parent (now simple) should be included.
+		$this->assertContains( $parent_id, $batch_ids );
+
+		// The orphaned variations should be excluded.
+		foreach ( $variation_ids as $variation_id ) {
+			$this->assertNotContains( $variation_id, $batch_ids );
+		}
+	}
+
+	/**
+	 * Tests that simple products are included in the feed batch.
+	 *
+	 * @return void
+	 */
+	public function test_get_items_for_batch_includes_simple_products() {
+		$product = WC_Helper_Product::create_simple_product();
+
+		$batch_ids = $this->call_get_items_for_batch();
+
+		$this->assertContains( $product->get_id(), $batch_ids );
+	}
+
+	/**
+	 * Tests that draft products are excluded from the feed batch.
+	 *
+	 * @return void
+	 */
+	public function test_get_items_for_batch_excludes_draft_products() {
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'status' => 'draft',
+			)
+		);
+
+		$batch_ids = $this->call_get_items_for_batch();
+
+		$this->assertNotContains( $product->get_id(), $batch_ids );
+	}
+
+	/**
+	 * Tests that variations with an unpublished parent are excluded from the feed.
+	 *
+	 * @return void
+	 */
+	public function test_get_items_for_batch_excludes_variations_with_draft_parent() {
+		$product = new WC_Product_Variable();
+		$product->set_status( 'draft' );
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+		$variation_ids     = $variation_product->get_children();
+
+		$batch_ids = $this->call_get_items_for_batch();
+
+		foreach ( $variation_ids as $variation_id ) {
+			$this->assertNotContains( $variation_id, $batch_ids );
+		}
 	}
 }
