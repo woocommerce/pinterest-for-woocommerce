@@ -1,5 +1,12 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.4.26 - 2026-04-20 =
+* Add - Settings link to plugin action links.
+* Fix - Exclude orphaned variations from Pinterest feed.
+* Fix - Resolve console error in Pinterest Save button script.
+* Tweak - WC 10.7 compatibility.
+* Tweak - WP 7.0 compatibility.
+
 = 1.4.25 - 2026-03-06 =
 * Tweak - WC 10.6 compatibility.
 * Update - Minimum required WooCommerce version bumped to 7.0.
