@@ -1,7 +1,5 @@
-/*global fetch*/
-
 /**
- * Disable the Save to Pinterest button if the Chrome extension is detected.
+ * Disable the Save to Pinterest button if the Pinterest browser extension is detected.
  */
 // eslint-disable-next-line @wordpress/no-global-event-listener
 window.addEventListener( 'load', function () {
@@ -13,13 +11,14 @@ window.addEventListener( 'load', function () {
 			} );
 	};
 
-	const isChromeExtensionDetected = () => {
-		fetch(
-			`chrome-extension://gpdjojdkbbmdfjfahjcgigfpmkopogic/html/save.html`
-		)
-			.then( () => disableSaveButton() )
-			.catch( () => false );
+	const checkForPinterestExtension = () => {
+		const pinterestElement = document.querySelector(
+			'[data-pinterest-extension]'
+		);
+		if ( pinterestElement ) {
+			disableSaveButton();
+		}
 	};
 
-	isChromeExtensionDetected();
+	checkForPinterestExtension();
 } );

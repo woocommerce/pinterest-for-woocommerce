@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.4.25
+Stable tag: 1.4.26
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,13 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.4.26 - 2026-04-20 =
+* Add - Settings link to plugin action links.
+* Fix - Exclude orphaned variations from Pinterest feed.
+* Fix - Resolve console error in Pinterest Save button script.
+* Tweak - WC 10.7 compatibility.
+* Tweak - WP 7.0 compatibility.
 
 = 1.4.25 - 2026-03-06 =
 * Tweak - WC 10.6 compatibility.

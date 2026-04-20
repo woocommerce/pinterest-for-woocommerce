@@ -2,7 +2,7 @@
   "name": "pinterest-for-woocommerce",
   "title": "Pinterest for WooCommerce",
   "description": "Pinterest for WooCommerce",
-  "version": "1.4.25",
+  "version": "1.4.26",
   "main": "gulpfile.js",
   "repository": {
     "type": "git",
@@ -74,8 +74,7 @@
     "prettier": "npm:wp-prettier@^2.2.1-beta-1",
     "semver": "^6.0.0",
     "stylelint": "^13.13.1",
-    "underscore": "^1.9.1",
-    "woocommerce-grow-jsdoc": "https://gitpkg.now.sh/woocommerce/grow/packages/js/jsdoc?9eb10353728dc915bf5f7bdd4b8e218c625355a9"
+    "underscore": "^1.9.1"
   },
   "eslintConfig": {
     "extends": [
@@ -109,7 +108,6 @@
     "postbuild:zip": "composer install && npm run _remove-root-md",
     "_remove-root-md": "zipinfo -1 pinterest-for-woocommerce.zip | grep -E '^pinterest-for-woocommerce/[^/]+\\.md$' | xargs zip -d pinterest-for-woocommerce.zip || true",
     "dev": "wp-scripts build && gulp build",
-    "doc:tracking": "woocommerce-grow-jsdoc ./assets/source/",
     "format:js": "wp-scripts format ./assets/source",
     "i18n": "WP_CLI_PHP_ARGS='-d memory_limit=2048M' ./vendor/bin/wp i18n make-pot ./ i18n/languages/$npm_package_name.pot --slug=$npm_package_name --domain=$npm_package_name --exclude='bin,*.asset.php,assets/source/_maps,assets/setup-*,assets/catalog-sync,assets/build,tests,woo-tracking-jsdoc,index.php,gulpfile.js,jest.config.js'",
     "lint:css": "wp-scripts lint-style ./assets/source",
