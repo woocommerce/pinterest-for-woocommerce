@@ -14,6 +14,8 @@ import AdCreditsNotice from './sections/AdCreditsNotice';
 import SyncIssues from './sections/SyncIssues';
 import HealthCheck from '../setup-guide/app/components/HealthCheck';
 import CapiEnablementModal from '../setup-guide/app/components/CapiEnablementModal';
+import RatingsNotice from '../components/ratings-notice';
+import '../components/ratings-notice/data';
 import {
 	useCreateNotice,
 	useDismissAdsModalDispatch,
@@ -165,6 +167,7 @@ const CatalogSyncApp = () => {
 			<NavigationClassic />
 
 			<div className="pinterest-for-woocommerce-catalog-sync__container">
+				<RatingsNotice />
 				<SyncState />
 				{ isAdCreditsNoticeOpen && adsCampaignIsActive && (
 					<AdCreditsNotice />
