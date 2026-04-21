@@ -1,0 +1,19 @@
+.pinterest-for-woocommerce-ratings-notice {
+	&__headline {
+		display: block;
+		font-weight: 600;
+		margin-bottom: 4px;
+	}
+
+	&__actions {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: 12px;
+	}
+
+	&__dismiss-forever {
+		margin-left: auto;
+	}
+}
