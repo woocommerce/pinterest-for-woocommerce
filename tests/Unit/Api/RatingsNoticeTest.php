@@ -168,6 +168,18 @@ class RatingsNoticeTest extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * The refresh handler is attached to the daily heartbeat.
+	 */
+	public function test_refresh_cache_is_hooked_to_daily_heartbeat() {
+		$this->assertNotFalse(
+			has_action(
+				\Automattic\WooCommerce\Pinterest\Heartbeat::DAILY,
+				array( RatingsNoticeApi::class, 'refresh_cache' )
+			)
+		);
+	}
+
+	/**
 	 * Refreshing the cache stamps first_eligible_at on a positive compute.
 	 */
 	public function test_refresh_cache_stamps_first_eligible_when_eligible() {
