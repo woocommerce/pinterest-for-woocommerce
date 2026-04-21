@@ -722,6 +722,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			new Pinterest\API\Settings();
 			new Pinterest\API\SyncSettings();
 			new Pinterest\API\UserInteraction();
+			new Pinterest\API\RatingsNotice();
 		}
 
 		/**
@@ -864,6 +865,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			// Flush the whole data option.
 			delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 			UserInteraction::flush_options();
+			Pinterest\RatingsNotice\State::reset();
+			Pinterest\API\RatingsNotice::flush_cache();
 
 			// Remove settings that may cause issues if stale on disconnect.
 			self::save_setting( 'account_data', null );
