@@ -43,6 +43,7 @@ class ProductsXmlFeed {
 		'g:price',
 		'sale_price',
 		'g:mpn',
+		'g:brand',
 		'g:tax',
 		'g:shipping',
 		'g:additional_image_link',
@@ -496,6 +497,38 @@ class ProductsXmlFeed {
 		return '<' . $property . '>' . self::sanitize( $product->get_sku() ) . '</' . $property . '>';
 	}
 
+
+	/**
+	 * Returns the brand of the product from the core WooCommerce product_brand taxonomy.
+	 *
+	 * @param WC_Product $product The product.
+	 * @param string     $property The name of the property.
+	 *
+	 * @return string
+	 */
+	private static function get_property_g_brand( $product, $property ) {
+		$id    = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
+		$terms = wc_get_object_terms( $id, 'product_brand' );
+
+		if ( empty( $terms ) || is_wp_error( $terms ) ) {
+			return '';
+		}
+
+		/**
+		 * Filters the brand value included in the Pinterest feed.
+		 *
+		 * @since 1.4.27
+		 * @param string     $brand   The brand name.
+		 * @param WC_Product $product The product.
+		 */
+		$brand = apply_filters( 'pinterest_for_woocommerce_product_brand', $terms[0]->name, $product );
+
+		if ( empty( $brand ) ) {
+			return '';
+		}
+
+		return '<' . $property . '>' . self::sanitize( $brand ) . '</' . $property . '>';
+	}
 
 	/**
 	 * Returns the gallery images for the product.

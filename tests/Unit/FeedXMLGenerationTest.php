@@ -939,6 +939,42 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * @group feed
+	 */
+	public function testPropertyBrandXML() {
+		$brand_method = $this->getProductsXmlFeedAttributeMethod( 'g:brand' );
+		$product      = WC_Helper_Product::create_simple_product();
+
+		// No brand set.
+		$xml = $brand_method( $product );
+		$this->assertEquals( '', $xml );
+
+		// Assign a brand via the product_brand taxonomy.
+		$term = wp_insert_term( 'Nike', 'product_brand' );
+		wp_set_object_terms( $product->get_id(), $term['term_id'], 'product_brand' );
+
+		$xml = $brand_method( $product );
+		$this->assertEquals( '<g:brand>Nike</g:brand>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testPropertyBrandVariationUsesParentXML() {
+		$brand_method      = $this->getProductsXmlFeedAttributeMethod( 'g:brand' );
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+		$child_product     = wc_get_product( $variation_product->get_children()[0] );
+
+		// Assign brand to the parent product.
+		$term = wp_insert_term( 'Adidas', 'product_brand' );
+		wp_set_object_terms( $variation_product->get_id(), $term['term_id'], 'product_brand' );
+
+		$xml = $brand_method( $child_product );
+		$this->assertEquals( '<g:brand>Adidas</g:brand>', $xml );
+	}
+
+	/**
 	 * Mimic the method on FeedGenerator.
 	 *
 	 * @param array $taxable_location The taxable location to filter.
