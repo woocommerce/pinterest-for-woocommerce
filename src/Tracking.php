@@ -164,7 +164,7 @@ class Tracking {
 	}
 
 	/**
-	 * Used as a callback for the woocommerce_checkout_order_created hook.
+	 * Used as a callback for the woocommerce_before_thankyou hook.
 	 *
 	 * @since 1.4.0
 	 *
@@ -201,6 +201,8 @@ class Tracking {
 			$total_quantity += $order_item->get_quantity();
 		}
 
+		// Deterministic event id so Pinterest can deduplicate Tag/CAPI Checkout events when
+		// the thank-you page is re-rendered (woocommerce_before_thankyou fires on every render).
 		$data = new Checkout(
 			'checkout_' . $order->get_id(),
 			(string) $order->get_id(),

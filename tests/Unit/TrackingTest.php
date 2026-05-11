@@ -184,6 +184,14 @@ class TrackingTest extends \WP_UnitTestCase {
 		$this->assertSame( $expected_event_id, $tracked_events[0]['data']->get_event_id() );
 		$this->assertSame( $expected_event_id, $tracked_events[1]['data']->get_event_id() );
 
+		// Per-product line item event ids stay non-deterministic (uniqid) by design.
+		$first_call_items  = $tracked_events[0]['data']->get_items();
+		$second_call_items = $tracked_events[1]['data']->get_items();
+		$this->assertNotSame(
+			$first_call_items[0]->get_event_id(),
+			$second_call_items[0]->get_event_id()
+		);
+
 		$tag_data         = ( new Tag() )->prepare_request_data(
 			Tracking::EVENT_CHECKOUT,
 			$tracked_events[0]['data']
