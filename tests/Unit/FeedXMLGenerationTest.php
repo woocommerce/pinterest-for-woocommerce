@@ -88,7 +88,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$this->assertEquals( 'Uncategorized', $g_children['product_type'] );
 
 		// This should be the permalink.
-		$this->assertEquals( $this->get_product_permalink_with_utm( $product ), $children['link'] );
+		$this->assertEquals( $this->getProductPermalinkWithUtm( $product ), $children['link'] );
 
 		// No description set.
 		$this->assertArrayNotHasKey( 'image_link', $g_children, 'By default product does not have an image link.' );
@@ -408,7 +408,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$xml         = $link_method( $product );
 		// create_simple_product gives the product 'Uncategorized' type.
 		$this->assertEquals(
-			'<link><![CDATA[' . $this->get_product_permalink_with_utm( $product ) . ']]></link>',
+			'<link><![CDATA[' . $this->getProductPermalinkWithUtm( $product ) . ']]></link>',
 			$xml
 		);
 	}
@@ -784,7 +784,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	 * @param WC_Product $product Product object.
 	 * @return string
 	 */
-	private function get_product_permalink_with_utm( $product ) {
+	private function getProductPermalinkWithUtm( $product ) {
 		return add_query_arg(
 			array(
 				'utm_source' => 'pinterest',
