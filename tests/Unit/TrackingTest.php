@@ -83,7 +83,7 @@ class TrackingTest extends \WP_UnitTestCase {
 
 		$tracking = new Tracking();
 
-		$pinterest_tag_tracker = $this->createMock( Tag::class );
+		$pinterest_tag_tracker  = $this->createMock( Tag::class );
 		$pinterest_capi_tracker = $this->createMock( Conversions::class );
 
 		$tracking->add_tracker( $pinterest_tag_tracker );
@@ -105,7 +105,7 @@ class TrackingTest extends \WP_UnitTestCase {
 
 		$tracking = new Tracking();
 
-		$pinterest_tag_tracker = $this->createMock( Tag::class );
+		$pinterest_tag_tracker  = $this->createMock( Tag::class );
 		$pinterest_capi_tracker = $this->createMock( Conversions::class );
 
 		$tracking->add_tracker( $pinterest_tag_tracker );
@@ -187,6 +187,8 @@ class TrackingTest extends \WP_UnitTestCase {
 		// Per-product line item event ids stay non-deterministic (uniqid) by design.
 		$first_call_items  = $tracked_events[0]['data']->get_items();
 		$second_call_items = $tracked_events[1]['data']->get_items();
+		$this->assertCount( 1, $first_call_items );
+		$this->assertCount( 1, $second_call_items );
 		$this->assertNotSame(
 			$first_call_items[0]->get_event_id(),
 			$second_call_items[0]->get_event_id()
