@@ -87,8 +87,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// Product type not set.
 		$this->assertEquals( 'Uncategorized', $g_children['product_type'] );
 
-		// This should be the permalink.
-		$this->assertEquals( 'http://example.org/?product=dummy-product&utm_source=pinterest&utm_medium=social', $children['link'] );
+		// This should be the permalink, with the Pinterest UTM contract appended.
+		$this->assertEquals( $this->getProductPermalinkWithUtm( $product ), $children['link'] );
+		$this->assertStringContainsString( 'utm_source=pinterest&utm_medium=social', $children['link'] );
 
 		// No description set.
 		$this->assertArrayNotHasKey( 'image_link', $g_children, 'By default product does not have an image link.' );
@@ -407,7 +408,11 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product     = WC_Helper_Product::create_simple_product();
 		$xml         = $link_method( $product );
 		// create_simple_product gives the product 'Uncategorized' type.
-		$this->assertEquals( '<link><![CDATA[http://example.org/?product=dummy-product&utm_source=pinterest&utm_medium=social]]></link>', $xml );
+		$this->assertEquals(
+			'<link><![CDATA[' . $this->getProductPermalinkWithUtm( $product ) . ']]></link>',
+			$xml
+		);
+		$this->assertStringContainsString( 'utm_source=pinterest&utm_medium=social', $xml );
 	}
 
 	/**
@@ -433,7 +438,10 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product->save();
 
 		$xml = $image_link_method( $product );
-		$this->assertEquals( '<g:image_link><![CDATA[http://example.org/wp-content/uploads/product_image.png]]></g:image_link>', $xml );
+		$this->assertEquals(
+			'<g:image_link><![CDATA[' . wp_get_attachment_url( $attachment_id ) . ']]></g:image_link>',
+			$xml
+		);
 	}
 
 	/**
@@ -667,8 +675,14 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product->set_gallery_image_ids( array( $attachment_id_1, $attachment_id_2 ) );
 		$product->save();
 
-		$xml = $additional_image_link_method( $product );
-		$this->assertEquals( '<g:additional_image_link><![CDATA[http://example.org/wp-content/uploads/product_image_1.png,http://example.org/wp-content/uploads/product_image_2.png]]></g:additional_image_link>', $xml );
+		$xml      = $additional_image_link_method( $product );
+		$expected = sprintf(
+			'<g:additional_image_link><![CDATA[%s,%s]]></g:additional_image_link>',
+			wp_get_attachment_url( $attachment_id_1 ),
+			wp_get_attachment_url( $attachment_id_2 )
+		);
+
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -764,6 +778,22 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		return function ( $product ) use ( $method, $attribute ) {
 			return $method->invoke( null, $product, $attribute );
 		};
+	}
+
+	/**
+	 * Gets the product permalink with Pinterest UTM parameters.
+	 *
+	 * @param WC_Product $product Product object.
+	 * @return string
+	 */
+	private function getProductPermalinkWithUtm( $product ) {
+		return add_query_arg(
+			array(
+				'utm_source' => 'pinterest',
+				'utm_medium' => 'social',
+			),
+			$product->get_permalink()
+		);
 	}
 
 	/**
