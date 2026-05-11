@@ -46,7 +46,7 @@ As per [WordPress Core Handbook](https://make.wordpress.org/core/handbook/best-p
 
 After cloning the repo. Remember to use the appropriate node version
 
--   `nvm use` to autoselect the node version based on `.nvmrc` file.
+- `nvm use` to autoselect the node version based on `.nvmrc` file.
 
 Then, install dependencies:
 
@@ -75,6 +75,7 @@ Please use these tools to ensure your code changes are consistent with the rest 
 
 This repository includes an [`EditorConfig`](https://editorconfig.org/) to automate basic code formatting. Please install the appropriate plugin for your editor.
 
+
 ## PHPUnit
 
 ### Prerequisites
@@ -86,6 +87,7 @@ Change to the plugin root directory and type:
 ```bash
 $ composer install
 ```
+
 
 ### Install Test Dependencies
 
@@ -158,3 +160,4 @@ The tests will execute, and you'll be presented with a summary.
 	Made with 💜 by <a href="https://woocommerce.com/">WooCommerce</a>.<br/>
 	<a href="https://woocommerce.com/careers/">We're hiring</a>! Come work with us!
 </p>
+
