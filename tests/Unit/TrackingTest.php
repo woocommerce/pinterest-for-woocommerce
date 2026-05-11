@@ -3,8 +3,12 @@
 namespace Automattic\WooCommerce\Pinterest;
 
 use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
+use Automattic\WooCommerce\Pinterest\Tracking\Data;
+use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
+use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
 use Automattic\WooCommerce\Pinterest\Tracking\Tag;
+use Automattic\WooCommerce\Pinterest\Tracking\Tracker;
 use Pinterest_For_Woocommerce;
 
 class TrackingTest extends \WP_UnitTestCase {
@@ -117,5 +121,79 @@ class TrackingTest extends \WP_UnitTestCase {
 			->with( 'test', $data );
 
 		$tracking->track_event( 'test', $data );
+	}
+
+	/**
+	 * Test that checkout event ids remain stable for a given order.
+	 */
+	public function test_checkout_event_id_is_deterministic_for_order() {
+		$product = \WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'regular_price' => 15,
+			)
+		);
+		$order   = wc_create_order();
+		$order->add_product( $product, 2 );
+		$order->set_currency( 'USD' );
+		$order->calculate_totals();
+		$order->save();
+
+		$tracker  = new class() extends Tracker {
+			/**
+			 * @var array Tracked event calls.
+			 */
+			private $tracked_events = array();
+
+			/**
+			 * Records a tracked event call.
+			 *
+			 * @param string $event_name Event name.
+			 * @param Data   $data       Event data.
+			 * @return true
+			 */
+			public function track_event( string $event_name, Data $data ) {
+				$this->tracked_events[] = array(
+					'event_name' => $event_name,
+					'data'       => $data,
+				);
+				return true;
+			}
+
+			/**
+			 * Gets recorded tracked event calls.
+			 *
+			 * @return array
+			 */
+			public function get_tracked_events() {
+				return $this->tracked_events;
+			}
+		};
+		$tracking = new Tracking( array( $tracker ) );
+
+		$tracking->handle_checkout( $order->get_id() );
+		$tracking->handle_checkout( $order->get_id() );
+
+		$expected_event_id = 'checkout_' . $order->get_id();
+		$tracked_events    = $tracker->get_tracked_events();
+
+		$this->assertCount( 2, $tracked_events );
+		$this->assertSame( Tracking::EVENT_CHECKOUT, $tracked_events[0]['event_name'] );
+		$this->assertSame( Tracking::EVENT_CHECKOUT, $tracked_events[1]['event_name'] );
+		$this->assertInstanceOf( Checkout::class, $tracked_events[0]['data'] );
+		$this->assertSame( $expected_event_id, $tracked_events[0]['data']->get_event_id() );
+		$this->assertSame( $expected_event_id, $tracked_events[1]['data']->get_event_id() );
+
+		$tag_data         = ( new Tag() )->prepare_request_data(
+			Tracking::EVENT_CHECKOUT,
+			$tracked_events[0]['data']
+		);
+		$conversions_data = ( new Conversions( new User( '127.0.0.1', 'test-agent' ) ) )->prepare_request_data(
+			Tracking::EVENT_CHECKOUT,
+			$tracked_events[0]['data']
+		);
+
+		$this->assertSame( $expected_event_id, $tag_data['event_id'] );
+		$this->assertSame( $expected_event_id, $conversions_data['event_id'] );
 	}
 }

@@ -202,7 +202,7 @@ class Tracking {
 		}
 
 		$data = new Checkout(
-			uniqid( 'checkout' ),
+			'checkout_' . $order->get_id(),
 			(string) $order->get_id(),
 			$order->get_total(),
 			$total_quantity,
