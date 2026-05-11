@@ -42,7 +42,7 @@ class ConversionsTest extends WP_UnitTestCase {
 								'event_id'         => 'event-id-123',
 								'event_name'       => 'page_visit',
 								'action_source'    => 'web',
-								'event_source_url' => 'http://example.org',
+								'event_source_url' => $this->get_event_source_url(),
 								'partner_name'     => 'ss-woocommerce',
 								'user_data'        => array(
 									'client_ip_address' => 'Some IP address.',
@@ -115,7 +115,7 @@ class ConversionsTest extends WP_UnitTestCase {
 				'event_id'         => 'event-id-123',
 				'event_name'       => 'checkout',
 				'action_source'    => 'web',
-				'event_source_url' => 'http://example.org',
+				'event_source_url' => $this->get_event_source_url(),
 				'partner_name'     => 'ss-woocommerce',
 				'user_data'        => array(
 					'client_ip_address' => 'Some IP address.',
@@ -155,7 +155,7 @@ class ConversionsTest extends WP_UnitTestCase {
 				'event_id'         => 'event-id-321',
 				'event_name'       => 'add_to_cart',
 				'action_source'    => 'web',
-				'event_source_url' => 'http://example.org',
+				'event_source_url' => $this->get_event_source_url(),
 				'partner_name'     => 'ss-woocommerce',
 				'user_data'        => array(
 					'client_ip_address' => 'Some IP address.',
@@ -192,7 +192,7 @@ class ConversionsTest extends WP_UnitTestCase {
 				'event_id'         => 'event-id-312',
 				'event_name'       => 'view_category',
 				'action_source'    => 'web',
-				'event_source_url' => 'http://example.org',
+				'event_source_url' => $this->get_event_source_url(),
 				'partner_name'     => 'ss-woocommerce',
 				'user_data'        => array(
 					'client_ip_address' => 'Some IP address.',
@@ -220,7 +220,7 @@ class ConversionsTest extends WP_UnitTestCase {
 				'event_id'         => 'event-id-132',
 				'event_name'       => 'page_visit',
 				'action_source'    => 'web',
-				'event_source_url' => 'http://example.org',
+				'event_source_url' => $this->get_event_source_url(),
 				'partner_name'     => 'ss-woocommerce',
 				'user_data'        => array(
 					'client_ip_address' => 'Some IP address.',
@@ -257,7 +257,7 @@ class ConversionsTest extends WP_UnitTestCase {
 				'event_id'         => 'event-id-111',
 				'event_name'       => 'search',
 				'action_source'    => 'web',
-				'event_source_url' => 'http://example.org',
+				'event_source_url' => $this->get_event_source_url(),
 				'partner_name'     => 'ss-woocommerce',
 				'user_data'        => array(
 					'client_ip_address' => 'Some IP address.',
@@ -270,5 +270,16 @@ class ConversionsTest extends WP_UnitTestCase {
 			),
 			$data
 		);
+	}
+
+	/**
+	 * Gets the expected event source URL for the active test site.
+	 *
+	 * @return string
+	 */
+	private function get_event_source_url() {
+		global $wp;
+
+		return home_url( $wp->request );
 	}
 }
