@@ -46,7 +46,7 @@ As per [WordPress Core Handbook](https://make.wordpress.org/core/handbook/best-p
 
 After cloning the repo. Remember to use the appropriate node version
 
-- `nvm use` to autoselect the node version based on `.nvmrc` file.
+-   `nvm use` to autoselect the node version based on `.nvmrc` file.
 
 Then, install dependencies:
 
@@ -75,7 +75,6 @@ Please use these tools to ensure your code changes are consistent with the rest 
 
 This repository includes an [`EditorConfig`](https://editorconfig.org/) to automate basic code formatting. Please install the appropriate plugin for your editor.
 
-
 ## PHPUnit
 
 ### Prerequisites
@@ -87,7 +86,6 @@ Change to the plugin root directory and type:
 ```bash
 $ composer install
 ```
-
 
 ### Install Test Dependencies
 
@@ -113,6 +111,38 @@ You can also specify the path to their directories by setting the following envi
 -   `WP_CORE_DIR`: WordPress core directory
 -   `WC_DIR`: WooCommerce directory
 
+### PHP Tests in wp-env
+
+`npm run test:php:wp-env` runs the PHPUnit suite inside [`@wordpress/env`](https://www.npmjs.com/package/@wordpress/env)'s `tests-cli` container. Compared to `./bin/install-wp-tests.sh`, this path needs no host MySQL or `svn`, and wp-env scopes its containers by working-directory hash so concurrent runs from separate worktrees stay isolated.
+
+#### Prerequisites
+
+-   Docker (Docker Desktop on macOS/Windows is enough).
+-   A local development checkout of WooCommerce. The plugin's `tests/bootstrap.php` requires WooCommerce's `tests/legacy/bootstrap.php`, which ships only in the WooCommerce source repo — not in the WordPress.org zip the base `.wp-env.json` downloads.
+
+#### One-time setup
+
+Create `.wp-env.override.json` alongside `.wp-env.json` to swap the base WooCommerce zip for your local checkout (adjust the path to wherever you cloned WooCommerce):
+
+```json
+{
+	"plugins": ["../woocommerce/plugins/woocommerce", "."]
+}
+```
+
+`plugins` in the override file _replaces_ the base list, so include both WooCommerce and `.` (this plugin). If `vendor/` is missing inside your WooCommerce checkout, run `composer install` in that directory before starting wp-env.
+
+#### Running tests
+
+```bash
+npx wp-env start                         # ~30–90s first run, faster afterwards
+npm run test:php:wp-env                  # run the full PHPUnit suite
+npm run test:php:wp-env -- --filter ProductSyncTest --testsuite=unit
+npx wp-env stop                          # tear down when finished
+```
+
+Anything after `--` is forwarded to `phpunit`, so PHPUnit flags such as `--filter`, `--testsuite`, and `--group` work as usual.
+
 ### Running Tests
 
 Change to the plugin root directory and type:
@@ -128,4 +158,3 @@ The tests will execute, and you'll be presented with a summary.
 	Made with 💜 by <a href="https://woocommerce.com/">WooCommerce</a>.<br/>
 	<a href="https://woocommerce.com/careers/">We're hiring</a>! Come work with us!
 </p>
-
