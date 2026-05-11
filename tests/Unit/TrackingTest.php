@@ -3,9 +3,12 @@
 namespace Automattic\WooCommerce\Pinterest;
 
 use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
+use Automattic\WooCommerce\Pinterest\Tracking\Data;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Tag;
+use Automattic\WooCommerce\Pinterest\Tracking\Tracker;
 use Pinterest_For_Woocommerce;
+use WC_Helper_Product;
 
 class TrackingTest extends \WP_UnitTestCase {
 
@@ -117,5 +120,48 @@ class TrackingTest extends \WP_UnitTestCase {
 			->with( 'test', $data );
 
 		$tracking->track_event( 'test', $data );
+	}
+
+	/**
+	 * Tests that checkout tracking uses the paid order line unit price.
+	 */
+	public function test_checkout_uses_paid_order_item_unit_price() {
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'regular_price' => 20,
+				'price'         => 20,
+			)
+		);
+
+		$order = wc_create_order();
+		$item  = new \WC_Order_Item_Product();
+		$item->set_product( $product );
+		$item->set_quantity( 2 );
+		$item->set_subtotal( 40 );
+		$item->set_total( 0 );
+		$order->add_item( $item );
+		$order->set_total( 0 );
+		$order->save();
+
+		$tracker = $this->createMock( Tracker::class );
+		$tracker->expects( $this->once() )
+			->method( 'track_event' )
+			->with(
+				Tracking::EVENT_CHECKOUT,
+				$this->callback(
+					function ( Data\Checkout $checkout ) {
+						$items = $checkout->get_items();
+
+						return 1 === count( $items )
+							&& 0 === (int) $items[0]->get_price()
+							&& 2 === (int) $items[0]->get_quantity()
+							&& 0 === (int) ( $items[0]->get_price() * $items[0]->get_quantity() );
+					}
+				)
+			);
+
+		$tracking = new Tracking( array( $tracker ) );
+		$tracking->handle_checkout( $order->get_id() );
 	}
 }

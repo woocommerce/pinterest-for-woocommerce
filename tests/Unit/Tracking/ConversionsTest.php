@@ -13,6 +13,7 @@ class ConversionsTest extends WP_UnitTestCase {
 		parent::tearDown();
 
 		remove_all_filters( 'pre_http_request' );
+		wp_set_current_user( 0 );
 	}
 
 	public function test_conversions_track_page_visit_event() {
@@ -86,6 +87,32 @@ class ConversionsTest extends WP_UnitTestCase {
 		$user        = new User( 'Some IP address.', 'Some user agent string.' );
 		$conversions = new Conversions( $user );
 		$conversions->track_event( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+	}
+
+	/**
+	 * Tests that hashed email is merged into default user data.
+	 */
+	public function test_default_data_keeps_ip_user_agent_with_logged_in_email() {
+		$user_id = self::factory()->user->create(
+			array(
+				'user_email' => 'customer@example.com',
+			)
+		);
+		wp_set_current_user( $user_id );
+
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user );
+
+		$data = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertEquals(
+			array(
+				'client_ip_address' => 'Some IP address.',
+				'client_user_agent' => 'Some user agent string.',
+				'em'                => array( hash( 'sha256', 'customer@example.com' ) ),
+			),
+			$data['user_data']
+		);
 	}
 
 	public function test_get_checkout_data() {
