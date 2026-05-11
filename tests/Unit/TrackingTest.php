@@ -213,4 +213,50 @@ class TrackingTest extends \WP_UnitTestCase {
 		$this->assertSame( 2, $items[0]->get_quantity() );
 		$this->assertEqualsWithDelta( 10.0, (float) $items[0]->get_price(), 0.0001 );
 	}
+
+	/**
+	 * Tests that checkout tracking excludes tax from the paid line unit price.
+	 */
+	public function test_checkout_uses_paid_order_item_unit_price_excluding_tax() {
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'regular_price' => 20,
+				'price'         => 20,
+			)
+		);
+
+		$order = wc_create_order();
+		$item  = new \WC_Order_Item_Product();
+		$item->set_product( $product );
+		$item->set_quantity( 2 );
+		$item->set_subtotal( 40 );
+		$item->set_total( 20 );
+		$item->set_total_tax( 4 );
+		$order->add_item( $item );
+		$order->set_total( 24 );
+		$order->save();
+
+		$captured = null;
+		$tracker  = $this->createMock( Tracker::class );
+		$tracker->expects( $this->once() )
+			->method( 'track_event' )
+			->with(
+				Tracking::EVENT_CHECKOUT,
+				$this->callback(
+					function ( Checkout $checkout ) use ( &$captured ) {
+						$captured = $checkout;
+						return true;
+					}
+				)
+			);
+
+		$tracking = new Tracking( array( $tracker ) );
+		$tracking->handle_checkout( $order->get_id() );
+
+		$items = $captured->get_items();
+		$this->assertCount( 1, $items );
+		$this->assertSame( 2, $items[0]->get_quantity() );
+		$this->assertEqualsWithDelta( 10.0, (float) $items[0]->get_price(), 0.0001 );
+	}
 }

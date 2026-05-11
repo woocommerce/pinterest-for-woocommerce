@@ -193,7 +193,7 @@ class Tracking {
 				$order_item->get_name(),
 				wc_get_product_category_list( $product->get_id() ),
 				'brand',
-				$order->get_item_total( $order_item, true, true ),
+				$order->get_item_total( $order_item, false, true ),
 				get_woocommerce_currency(),
 				$order_item->get_quantity()
 			);
