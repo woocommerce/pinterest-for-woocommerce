@@ -141,6 +141,55 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a non-FAILED processing result is ignored even if a result ID is present.
+	 *
+	 * @return void
+	 */
+	public function test_log_failed_processing_result_skips_when_status_is_not_failed() {
+		$processing_results           = $this->get_failed_processing_results();
+		$processing_results['status'] = 'COMPLETED';
+
+		FeedStatusService::log_failed_processing_result( 'feed-123', $processing_results );
+
+		$this->assertCount( 0, $this->mock_logger->entries );
+		$this->assertEmpty( Pinterest_For_Woocommerce::get_data( 'last_logged_processing_result_id' ) );
+	}
+
+	/**
+	 * Tests that an empty processing result payload (e.g. empty API response) is ignored.
+	 *
+	 * @return void
+	 */
+	public function test_log_failed_processing_result_skips_when_processing_result_id_missing() {
+		FeedStatusService::log_failed_processing_result( 'feed-123', array( 'status' => 'FAILED' ) );
+
+		$this->assertCount( 0, $this->mock_logger->entries );
+		$this->assertEmpty( Pinterest_For_Woocommerce::get_data( 'last_logged_processing_result_id' ) );
+	}
+
+	/**
+	 * Tests that a new failed processing result ID is logged even after a previous one was recorded.
+	 *
+	 * @return void
+	 */
+	public function test_log_failed_processing_result_logs_new_processing_result_id_after_previous() {
+		$first  = $this->get_failed_processing_results();
+		$second = $this->get_failed_processing_results();
+
+		$second['id']         = 'processing-result-2';
+		$second['created_at'] = '2026-05-12T07:00:00';
+
+		FeedStatusService::log_failed_processing_result( 'feed-123', $first );
+		FeedStatusService::log_failed_processing_result( 'feed-123', $second );
+
+		$this->assertCount( 2, $this->mock_logger->entries );
+		$this->assertEquals(
+			'processing-result-2',
+			Pinterest_For_Woocommerce::get_data( 'last_logged_processing_result_id' )
+		);
+	}
+
+	/**
 	 * Get a failed processing result fixture.
 	 *
 	 * @return array

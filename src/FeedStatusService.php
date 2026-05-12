@@ -60,42 +60,41 @@ class FeedStatusService {
 		'ACCOUNT_FLAGGED',
 	);
 
-	// phpcs:disable WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned -- Keep legacy message map readable.
 	public const ERROR_MESSAGES = array(
 		// Validation errors.
-		'FETCH_ERROR'                       => 'Pinterest couldn\'t download your feed.',
-		'FETCH_INACTIVE_FEED_ERROR'         => 'Your feed wasn\'t ingested because it hasn\'t changed in the previous 90 days.',
-		'ENCODING_ERROR'                    => 'Your feed includes data with an unsupported encoding format.',
-		'DELIMITER_ERROR'                   => 'Your feed includes data with formatting errors.',
-		'REQUIRED_COLUMNS_MISSING'          => 'Your feed is missing some required column headers.',
-		'DUPLICATE_PRODUCTS'                => 'Some products are duplicated.',
-		'IMAGE_LINK_INVALID'                => 'Some image links are formatted incorrectly.',
-		'ITEMID_MISSING'                    => 'Some items are missing an item id in their product metadata, those items will not be published.',
-		'TITLE_MISSING'                     => 'Some items are missing a title in their product metadata, those items will not be published.',
-		'DESCRIPTION_MISSING'               => 'Some items are missing a description in their product metadata, those items will not be published.',
-		'PRODUCT_LINK_MISSING'              => 'Some items are missing a link URL in their product metadata, those items will not be published.',
-		'IMAGE_LINK_MISSING'                => 'Some items are missing an image link URL in their product metadata, those items will not be published.',
-		'AVAILABILITY_INVALID'              => 'Some items are missing an availability value in their product metadata, those items will not be published.',
-		'PRODUCT_PRICE_INVALID'             => 'Some items have price formatting errors in their product metadata, those items will not be published.',
-		'LINK_FORMAT_INVALID'               => 'Some link values are formatted incorrectly.',
-		'PARSE_LINE_ERROR'                  => 'Your feed contains formatting errors for some items.',
-		'ADWORDS_FORMAT_INVALID'            => 'Some adwords links contain too many characters.',
-		'INTERNAL_SERVICE_ERROR'            => 'We experienced a technical difficulty and were unable to ingest your feed. The next ingestion will happen in 24 hours.',
-		'NO_VERIFIED_DOMAIN'                => 'Your merchant domain needs to be claimed.',
-		'ADULT_INVALID'                     => 'Some items have invalid adult values.',
-		'IMAGE_LINK_LENGTH_TOO_LONG'        => 'Some items have image_link URLs that contain too many characters, so those items will not be published.',
-		'INVALID_DOMAIN'                    => 'Some of your product link values don\'t match the verified domain associated with this account.',
-		'FEED_LENGTH_TOO_LONG'              => 'Your feed contains too many items, some items will not be published.',
-		'LINK_LENGTH_TOO_LONG'              => 'Some product links contain too many characters, those items will not be published.',
-		'MALFORMED_XML'                     => 'Your feed couldn\'t be validated because the xml file is formatted incorrectly.',
-		'PRICE_MISSING'                     => 'Some products are missing a price, those items will not be published.',
-		'FEED_TOO_SMALL'                    => 'Your feed couldn\'t be validated because the file doesn\'t contain the minimum number of lines required.',
-		'MAX_ITEMS_PER_ITEM_GROUP_EXCEEDED' => 'Some items exceed the maximum number of items per item group, those items will not be published.',
-		'ITEM_MAIN_IMAGE_DOWNLOAD_FAILURE'  => 'Some items\' main images can\'t be found.',
-		'PINJOIN_CONTENT_UNSAFE'            => 'Some items were not published because they don\'t meet Pinterest\'s Merchant Guidelines.',
-		'BLOCKLISTED_IMAGE_SIGNATURE'       => 'Some items were not published because they don\'t meet Pinterest\'s Merchant Guidelines.',
-		'LIST_PRICE_INVALID'                => 'Some items have list price formatting errors in their product metadata, those items will not be published.',
-		'PRICE_CANNOT_BE_DETERMINED'        => 'Some items were not published because price cannot be determined. The price, list price, and sale price are all different, so those items will not be published.',
+		'FETCH_ERROR'                            => 'Pinterest couldn\'t download your feed.',
+		'FETCH_INACTIVE_FEED_ERROR'              => 'Your feed wasn\'t ingested because it hasn\'t changed in the previous 90 days.',
+		'ENCODING_ERROR'                         => 'Your feed includes data with an unsupported encoding format.',
+		'DELIMITER_ERROR'                        => 'Your feed includes data with formatting errors.',
+		'REQUIRED_COLUMNS_MISSING'               => 'Your feed is missing some required column headers.',
+		'DUPLICATE_PRODUCTS'                     => 'Some products are duplicated.',
+		'IMAGE_LINK_INVALID'                     => 'Some image links are formatted incorrectly.',
+		'ITEMID_MISSING'                         => 'Some items are missing an item id in their product metadata, those items will not be published.',
+		'TITLE_MISSING'                          => 'Some items are missing a title in their product metadata, those items will not be published.',
+		'DESCRIPTION_MISSING'                    => 'Some items are missing a description in their product metadata, those items will not be published.',
+		'PRODUCT_LINK_MISSING'                   => 'Some items are missing a link URL in their product metadata, those items will not be published.',
+		'IMAGE_LINK_MISSING'                     => 'Some items are missing an image link URL in their product metadata, those items will not be published.',
+		'AVAILABILITY_INVALID'                   => 'Some items are missing an availability value in their product metadata, those items will not be published.',
+		'PRODUCT_PRICE_INVALID'                  => 'Some items have price formatting errors in their product metadata, those items will not be published.',
+		'LINK_FORMAT_INVALID'                    => 'Some link values are formatted incorrectly.',
+		'PARSE_LINE_ERROR'                       => 'Your feed contains formatting errors for some items.',
+		'ADWORDS_FORMAT_INVALID'                 => 'Some adwords links contain too many characters.',
+		'INTERNAL_SERVICE_ERROR'                 => 'We experienced a technical difficulty and were unable to ingest your feed. The next ingestion will happen in 24 hours.',
+		'NO_VERIFIED_DOMAIN'                     => 'Your merchant domain needs to be claimed.',
+		'ADULT_INVALID'                          => 'Some items have invalid adult values.',
+		'IMAGE_LINK_LENGTH_TOO_LONG'             => 'Some items have image_link URLs that contain too many characters, so those items will not be published.',
+		'INVALID_DOMAIN'                         => 'Some of your product link values don\'t match the verified domain associated with this account.',
+		'FEED_LENGTH_TOO_LONG'                   => 'Your feed contains too many items, some items will not be published.',
+		'LINK_LENGTH_TOO_LONG'                   => 'Some product links contain too many characters, those items will not be published.',
+		'MALFORMED_XML'                          => 'Your feed couldn\'t be validated because the xml file is formatted incorrectly.',
+		'PRICE_MISSING'                          => 'Some products are missing a price, those items will not be published.',
+		'FEED_TOO_SMALL'                         => 'Your feed couldn\'t be validated because the file doesn\'t contain the minimum number of lines required.',
+		'MAX_ITEMS_PER_ITEM_GROUP_EXCEEDED'      => 'Some items exceed the maximum number of items per item group, those items will not be published.',
+		'ITEM_MAIN_IMAGE_DOWNLOAD_FAILURE'       => 'Some items\' main images can\'t be found.',
+		'PINJOIN_CONTENT_UNSAFE'                 => 'Some items were not published because they don\'t meet Pinterest\'s Merchant Guidelines.',
+		'BLOCKLISTED_IMAGE_SIGNATURE'            => 'Some items were not published because they don\'t meet Pinterest\'s Merchant Guidelines.',
+		'LIST_PRICE_INVALID'                     => 'Some items have list price formatting errors in their product metadata, those items will not be published.',
+		'PRICE_CANNOT_BE_DETERMINED'             => 'Some items were not published because price cannot be determined. The price, list price, and sale price are all different, so those items will not be published.',
 
 		// Validation warnings.
 		'AD_LINK_FORMAT_WARNING'                 => 'Some items have ad links that are formatted incorrectly.',
@@ -149,29 +148,28 @@ class FeedStatusService {
 		'MPN_INVALID'                            => 'Some items include incorrectly formatted MPNs.',
 
 		// Ingestion errors.
-		'LINE_LEVEL_INTERNAL_ERROR'    => 'We experienced a technical difficulty and were unable to ingest this some items. The next ingestion will happen in 24 hours.',
-		'LARGE_PRODUCT_COUNT_DECREASE' => 'The product count has decreased by more than 99% compared to the last successful ingestion.',
-		'ACCOUNT_FLAGGED'              => 'We detected an issue with your account and are not currently ingesting your items. Please review our policies at policy.pinterest.com/community-guidelines#section-spam or contact us at help.pinterest.com/contact for more information.',
-		'IMAGE_LEVEL_INTERNAL_ERROR'   => 'We experienced a technical difficulty and were unable to download some images. The next download attempt will happen in 24 hours.',
-		'IMAGE_FILE_NOT_ACCESSIBLE'    => 'Image files are unreadable. Please upload new files to continue.',
-		'IMAGE_MALFORMED_URL'          => 'Image files are unreadable. Please check your link and upload new files to continue.',
-		'IMAGE_FILE_NOT_FOUND'         => 'Image files are unreadable. Please upload new files to continue.',
-		'IMAGE_INVALID_FILE'           => 'Image files are unreadable. Please upload new files to continue.',
+		'LINE_LEVEL_INTERNAL_ERROR'              => 'We experienced a technical difficulty and were unable to ingest this some items. The next ingestion will happen in 24 hours.',
+		'LARGE_PRODUCT_COUNT_DECREASE'           => 'The product count has decreased by more than 99% compared to the last successful ingestion.',
+		'ACCOUNT_FLAGGED'                        => 'We detected an issue with your account and are not currently ingesting your items. Please review our policies at policy.pinterest.com/community-guidelines#section-spam or contact us at help.pinterest.com/contact for more information.',
+		'IMAGE_LEVEL_INTERNAL_ERROR'             => 'We experienced a technical difficulty and were unable to download some images. The next download attempt will happen in 24 hours.',
+		'IMAGE_FILE_NOT_ACCESSIBLE'              => 'Image files are unreadable. Please upload new files to continue.',
+		'IMAGE_MALFORMED_URL'                    => 'Image files are unreadable. Please check your link and upload new files to continue.',
+		'IMAGE_FILE_NOT_FOUND'                   => 'Image files are unreadable. Please upload new files to continue.',
+		'IMAGE_INVALID_FILE'                     => 'Image files are unreadable. Please upload new files to continue.',
 
 		// Ingestion warnings.
-		'ADDITIONAL_IMAGE_LEVEL_INTERNAL_ERROR' => 'We experienced a technical difficulty and were unable to download some additional images. The next download attempt will happen in 24 hours.',
-		'ADDITIONAL_IMAGE_FILE_NOT_ACCESSIBLE'  => 'Additional image files are unreadable. Please upload new files to continue.',
-		'ADDITIONAL_IMAGE_MALFORMED_URL'        => 'Additional image files are unreadable. Please check your link and upload new files to continue.',
-		'ADDITIONAL_IMAGE_FILE_NOT_FOUND'       => 'Additional image files are unreadable. Please upload new files to continue.',
-		'ADDITIONAL_IMAGE_INVALID_FILE'         => 'Additional image files are unreadable. Please upload new files to continue.',
-		'HOTEL_PRICE_HEADER_IS_PRESENT'         => 'Price is not a supported column. Use base_price and sale_price instead.',
+		'ADDITIONAL_IMAGE_LEVEL_INTERNAL_ERROR'  => 'We experienced a technical difficulty and were unable to download some additional images. The next download attempt will happen in 24 hours.',
+		'ADDITIONAL_IMAGE_FILE_NOT_ACCESSIBLE'   => 'Additional image files are unreadable. Please upload new files to continue.',
+		'ADDITIONAL_IMAGE_MALFORMED_URL'         => 'Additional image files are unreadable. Please check your link and upload new files to continue.',
+		'ADDITIONAL_IMAGE_FILE_NOT_FOUND'        => 'Additional image files are unreadable. Please upload new files to continue.',
+		'ADDITIONAL_IMAGE_INVALID_FILE'          => 'Additional image files are unreadable. Please upload new files to continue.',
+		'HOTEL_PRICE_HEADER_IS_PRESENT'          => 'Price is not a supported column. Use base_price and sale_price instead.',
 
 		// Ingestion info.
-		'IN_STOCK'     => 'The number of ingested products that are in stock.',
-		'OUT_OF_STOCK' => 'The number of ingested products that are in out of stock.',
-		'PREORDER'     => 'The number of ingested products that are in preorder.',
+		'IN_STOCK'                               => 'The number of ingested products that are in stock.',
+		'OUT_OF_STOCK'                           => 'The number of ingested products that are in out of stock.',
+		'PREORDER'                               => 'The number of ingested products that are in preorder.',
 	);
-	// phpcs:enable WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned
 
 	const FEED_STATUS_NOT_REGISTERED = 'not_registered';
 
@@ -348,6 +346,10 @@ class FeedStatusService {
 	 * @return void
 	 */
 	public static function log_failed_processing_result( string $feed_id, array $processing_results ): void {
+		if ( Feeds::FEED_PROCESSING_STATUS_FAILED !== ( $processing_results['status'] ?? '' ) ) {
+			return;
+		}
+
 		$processing_result_id = $processing_results['id'] ?? '';
 
 		if ( empty( $processing_result_id ) ) {

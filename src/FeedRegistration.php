@@ -163,17 +163,19 @@ class FeedRegistration {
 	/**
 	 * Log the latest failed feed processing result context if Pinterest reported a failed ingestion.
 	 *
+	 * Failures inside this helper must never propagate back to the registration action — a
+	 * diagnostic-only side path should not be able to mark the parent scheduled action as failed.
+	 *
 	 * @param string $feed_id Feed ID.
 	 * @return void
 	 */
 	private static function maybe_log_failed_processing_result( string $feed_id ): void {
-		$processing_results = Feeds::get_feed_recent_processing_results( $feed_id );
-
-		if ( Feeds::FEED_PROCESSING_STATUS_FAILED !== ( $processing_results['status'] ?? '' ) ) {
-			return;
+		try {
+			$processing_results = Feeds::get_feed_recent_processing_results( $feed_id );
+			FeedStatusService::log_failed_processing_result( $feed_id, $processing_results );
+		} catch ( Throwable $th ) {
+			Logger::log( $th->getMessage(), 'error', 'feed-ingestion-failure' );
 		}
-
-		FeedStatusService::log_failed_processing_result( $feed_id, $processing_results );
 	}
 
 	/**
