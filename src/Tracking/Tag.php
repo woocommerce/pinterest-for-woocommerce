@@ -26,6 +26,7 @@ class Tag extends Tracker {
 
 	private const TAG_ID_SLUG       = '%%TAG_ID%%';
 	private const HASHED_EMAIL_SLUG = '%%HASHED_EMAIL%%';
+	private const PAGE_VISIT_SLUG   = '%%PAGE_VISIT%%';
 
 	/**
 	 * The base tracking snippet.
@@ -33,7 +34,7 @@ class Tag extends Tracker {
 	 *
 	 * @var string
 	 */
-	private static $base_tag = "<!-- Pinterest Pixel Base Code -->\n<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "', { np: \"woocommerce\" } );\n</script>\n<!-- End Pinterest Pixel Base Code -->\n";
+	private static $base_tag = "<!-- Pinterest Pixel Base Code -->\n<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "', { np: \"woocommerce\" } );\n" . self::PAGE_VISIT_SLUG . "</script>\n<!-- End Pinterest Pixel Base Code -->\n";
 
 	/**
 	 * The base tracking snippet with Enchanced match support.
@@ -41,7 +42,7 @@ class Tag extends Tracker {
 	 *
 	 * @var string
 	 */
-	private static $base_tag_em = "<!-- Pinterest Pixel Base Code -->\n<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n pintrk('load', '" . self::TAG_ID_SLUG . "', { em: '" . self::HASHED_EMAIL_SLUG . "', np: \"woocommerce\" });\n</script>\n<!-- End Pinterest Pixel Base Code -->\n";
+	private static $base_tag_em = "<!-- Pinterest Pixel Base Code -->\n<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n pintrk('load', '" . self::TAG_ID_SLUG . "', { em: '" . self::HASHED_EMAIL_SLUG . "', np: \"woocommerce\" });\n" . self::PAGE_VISIT_SLUG . "</script>\n<!-- End Pinterest Pixel Base Code -->\n";
 
 	/**
 	 * The noscript base tracking snippet.
@@ -64,6 +65,13 @@ class Tag extends Tracker {
 	 * @var array
 	 */
 	private static $deferred_events = array();
+
+	/**
+	 * Page visit event data to be passed to the native Pinterest page signal.
+	 *
+	 * @var array
+	 */
+	private static $page_visit_data = array();
 
 	/**
 	 * Initialises hooks a tracker need to operate.
@@ -106,8 +114,8 @@ class Tag extends Tracker {
 
 		$script = ! empty( $email ) ? self::$base_tag_em : self::$base_tag;
 		$script = str_replace(
-			array( self::TAG_ID_SLUG, self::HASHED_EMAIL_SLUG ),
-			array( sanitize_key( $active_tag ), $email ),
+			array( self::TAG_ID_SLUG, self::HASHED_EMAIL_SLUG, self::PAGE_VISIT_SLUG ),
+			array( sanitize_key( $active_tag ), $email, static::get_page_visit_code() ),
 			$script
 		);
 		//phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -159,6 +167,22 @@ class Tag extends Tracker {
 			$event_name,
 			empty( $data_string ) ? '' : ', ' . $data_string
 		);
+	}
+
+	/**
+	 * Generates the native Pinterest Tag page call.
+	 *
+	 * @since 1.4.27
+	 *
+	 * @return string A generated page call.
+	 */
+	private static function get_page_visit_code() {
+		if ( empty( static::$page_visit_data ) ) {
+			return '';
+		}
+
+		$data_string = wp_json_encode( static::$page_visit_data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES );
+		return sprintf( "  pintrk('page', %s);\n", $data_string );
 	}
 
 	/**
@@ -246,6 +270,11 @@ class Tag extends Tracker {
 	 */
 	public function track_event( string $event_name, Data $data ) {
 		$data = $this->prepare_request_data( $event_name, $data );
+		if ( Tracking::EVENT_PAGE_VISIT === $event_name ) {
+			static::$page_visit_data = $data;
+			return true;
+		}
+
 		if ( wp_doing_ajax() ) {
 			return static::maybe_add_fragment( $event_name, $data );
 		}
