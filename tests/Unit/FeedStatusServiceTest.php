@@ -235,7 +235,7 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 			'processing-result-1',
 			Pinterest_For_Woocommerce::get_data( 'last_retried_processing_result_id' )
 		);
-		$this->assert_log_entry_contains( 'FETCH_ERROR retry triggered for processing_result_id=processing-result-1' );
+		$this->assert_log_entry_contains( 'FETCH_ERROR retry triggered for processing_result_id=processing-result-1', 'info' );
 	}
 
 	/**
@@ -286,7 +286,7 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 
 		$this->assertCount( 1, $this->update_feed_requests );
 		$this->assertNull( Pinterest_For_Woocommerce::get_data( 'last_retried_processing_result_id' ) );
-		$this->assert_log_entry_contains( 'FETCH_ERROR retry failed:' );
+		$this->assert_log_entry_contains( 'FETCH_ERROR retry failed for processing_result_id=processing-result-1' );
 	}
 
 	/**
@@ -371,12 +371,13 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	 * Assert a log entry contains a given message fragment.
 	 *
 	 * @param string $message_fragment Message fragment.
+	 * @param string $expected_level   Expected log level.
 	 * @return void
 	 */
-	private function assert_log_entry_contains( string $message_fragment ): void {
+	private function assert_log_entry_contains( string $message_fragment, string $expected_level = 'error' ): void {
 		foreach ( $this->mock_logger->entries as $entry ) {
 			if ( false !== strpos( $entry['message'], $message_fragment ) ) {
-				$this->assertEquals( 'error', $entry['level'] );
+				$this->assertEquals( $expected_level, $entry['level'] );
 				$this->assertEquals(
 					array(
 						'source' => PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-feed-ingestion-failure',

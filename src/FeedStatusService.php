@@ -431,14 +431,14 @@ class FeedStatusService {
 			Pinterest_For_WooCommerce()::save_data( self::LAST_RETRIED_PROCESSING_RESULT_ID_KEY, $processing_result_id );
 			Logger::log(
 				"FETCH_ERROR retry triggered for processing_result_id={$processing_result_id}",
-				'error',
+				'info',
 				'feed-ingestion-failure'
 			);
 
 			return true;
 		} catch ( Throwable $th ) {
 			Logger::log(
-				"FETCH_ERROR retry failed: {$th->getMessage()}",
+				"FETCH_ERROR retry failed for processing_result_id={$processing_result_id}",
 				'error',
 				'feed-ingestion-failure'
 			);
