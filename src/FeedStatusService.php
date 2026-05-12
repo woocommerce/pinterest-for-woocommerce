@@ -19,6 +19,13 @@ defined( 'ABSPATH' ) || exit;
 class FeedStatusService {
 
 	/**
+	 * Plugin data key used to avoid logging the same failed processing result repeatedly.
+	 *
+	 * @var string
+	 */
+	private const LAST_LOGGED_PROCESSING_RESULT_ID_KEY = 'last_logged_processing_result_id';
+
+	/**
 	 * The error contexts to search for in the workflow responses.
 	 *
 	 * @var array
@@ -53,6 +60,7 @@ class FeedStatusService {
 		'ACCOUNT_FLAGGED',
 	);
 
+	// phpcs:disable WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned -- Keep legacy message map readable.
 	public const ERROR_MESSAGES = array(
 		// Validation errors.
 		'FETCH_ERROR'                       => 'Pinterest couldn\'t download your feed.',
@@ -163,6 +171,7 @@ class FeedStatusService {
 		'OUT_OF_STOCK' => 'The number of ingested products that are in out of stock.',
 		'PREORDER'     => 'The number of ingested products that are in preorder.',
 	);
+	// phpcs:enable WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned
 
 	const FEED_STATUS_NOT_REGISTERED = 'not_registered';
 
@@ -328,5 +337,49 @@ class FeedStatusService {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Log the full failed feed processing result context once per processing result ID.
+	 *
+	 * @param string $feed_id            Pinterest feed ID.
+	 * @param array  $processing_results Recent processing results array.
+	 *
+	 * @return void
+	 */
+	public static function log_failed_processing_result( string $feed_id, array $processing_results ): void {
+		$processing_result_id = $processing_results['id'] ?? '';
+
+		if ( empty( $processing_result_id ) ) {
+			return;
+		}
+
+		$last_logged_processing_result_id = Pinterest_For_WooCommerce()::get_data( self::LAST_LOGGED_PROCESSING_RESULT_ID_KEY );
+		if ( $processing_result_id === $last_logged_processing_result_id ) {
+			return;
+		}
+
+		$feed_url = '';
+		$configs  = LocalFeedConfigs::get_instance()->get_configurations();
+		if ( ! empty( $configs ) ) {
+			$config   = reset( $configs );
+			$feed_url = $config['feed_url'] ?? '';
+		}
+
+		Logger::log(
+			sprintf(
+				"Feed ingestion FAILED\nfeed_id: %s\nprocessing_result_id: %s\ncreated_at: %s\nfeed_url: %s\nvalidation_details: %s\nproduct_counts: %s",
+				$feed_id,
+				$processing_result_id,
+				$processing_results['created_at'] ?? '',
+				$feed_url,
+				wp_json_encode( $processing_results['validation_details'] ?? array() ),
+				wp_json_encode( $processing_results['product_counts'] ?? array() )
+			),
+			'error',
+			'feed-ingestion-failure'
+		);
+
+		Pinterest_For_WooCommerce()::save_data( self::LAST_LOGGED_PROCESSING_RESULT_ID_KEY, $processing_result_id );
 	}
 }
