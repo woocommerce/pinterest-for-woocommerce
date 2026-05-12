@@ -361,6 +361,10 @@ class FeedStatusService {
 			return;
 		}
 
+		if ( ! function_exists( 'wc_get_logger' ) ) {
+			return;
+		}
+
 		$feed_url = '';
 		$configs  = LocalFeedConfigs::get_instance()->get_configurations();
 		if ( ! empty( $configs ) ) {
