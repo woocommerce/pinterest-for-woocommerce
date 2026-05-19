@@ -59,6 +59,37 @@ class LocalFeedConfigsE2eTest extends \WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Tests feed URLs are generated with HTTPS when the upload base URL is HTTP.
+	 *
+	 * @return void
+	 */
+	public function test_feed_url_uses_https_when_upload_dir_baseurl_is_http() {
+		Pinterest_For_Woocommerce::save_data(
+			'local_feed_ids',
+			array(
+				'US' => 'taLlmN',
+			)
+		);
+		add_filter(
+			'upload_dir',
+			function ( $data ) {
+				$data['baseurl'] = 'http://example-2.com/wp-content/uploads';
+				return $data;
+			},
+			20
+		);
+
+		$local_feed_configs = LocalFeedConfigs::get_instance();
+
+		$configurations = $local_feed_configs->get_configurations();
+
+		$this->assertEquals(
+			'https://example-2.com/wp-content/uploads/pinterest-for-woocommerce-taLlmN.xml',
+			$configurations['US']['feed_url']
+		);
+	}
+
 	public function test_when_local_feed_config_is_empty_and_no_matching_feeds_at_pinterest() {
 		add_filter( 'pre_http_request', array( self::class, 'get_feeds_no_match' ), 10, 3 );
 
