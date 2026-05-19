@@ -4,6 +4,7 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
 use Automattic\WooCommerce\Pinterest\Exception\FeedNotFoundException;
 use Automattic\WooCommerce\Pinterest\Feeds;
+use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
 use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
@@ -15,6 +16,7 @@ class FeedsTest extends WP_UnitTestCase {
 
 		Pinterest_For_Woocommerce::set_default_settings();
 		Pinterest_For_Woocommerce::save_setting( 'tracking_advertiser', '114141241212' );
+		LocalFeedConfigs::deregister();
 	}
 
 	public function tearDown(): void {
@@ -23,6 +25,7 @@ class FeedsTest extends WP_UnitTestCase {
 		remove_all_filters( 'pre_http_request' );
 		remove_all_filters( 'site_url' );
 		remove_all_filters( 'upload_dir' );
+		LocalFeedConfigs::deregister();
 	}
 
 	/**
@@ -52,6 +55,60 @@ class FeedsTest extends WP_UnitTestCase {
 		$feed = Feeds::maybe_remote_feed();
 
 		$this->assertEquals( 'fIOasjj', $feed );
+	}
+
+	/**
+	 * Tests matching an HTTPS remote feed when the local upload URL is HTTP.
+	 *
+	 * @return void
+	 */
+	public function test_maybe_remote_feed_matches_when_upload_dir_is_http() {
+		add_filter(
+			'upload_dir',
+			function ( $uploads ) {
+				$uploads['baseurl'] = 'http://example-1.com';
+				return $uploads;
+			}
+		);
+		add_filter( 'pre_http_request', array( self::class, 'get_feeds' ), 10, 3 );
+
+		$feed = Feeds::maybe_remote_feed();
+
+		$this->assertEquals( 'fIOasjj', $feed );
+	}
+
+	/**
+	 * Tests registered feed matching normalizes the remote feed URL scheme.
+	 *
+	 * @return void
+	 */
+	public function test_registered_feed_match_normalizes_remote_location_scheme() {
+		Pinterest_For_Woocommerce::save_data(
+			'local_feed_ids',
+			array(
+				'US' => 'fIOasjj',
+			)
+		);
+		add_filter(
+			'upload_dir',
+			function ( $uploads ) {
+				$uploads['baseurl'] = 'https://example-1.com';
+				return $uploads;
+			}
+		);
+
+		$feed = Feeds::match_local_feed_configuration_to_registered_feeds(
+			array(
+				array(
+					'id'              => '278913891236895123895',
+					'location'        => 'http://example-1.com/pinterest-for-woocommerce-fIOasjj.xml',
+					'default_locale'  => 'en-US',
+					'default_country' => 'US',
+				),
+			)
+		);
+
+		$this->assertEquals( '278913891236895123895', $feed );
 	}
 
 	public function test_maybe_remote_feed_returns_empty_feed_id() {
