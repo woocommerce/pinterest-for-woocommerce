@@ -352,7 +352,7 @@ class Feeds {
 	 * @return string
 	 */
 	private static function normalize_feed_location_url( string $url ): string {
-		return str_replace( 'http:', 'https:', $url );
+		return set_url_scheme( $url, 'https' );
 	}
 
 	/**

@@ -93,7 +93,7 @@ class LocalFeedConfigs {
 		$upload_dir     = wp_get_upload_dir();
 		$file_name_base = trailingslashit( $upload_dir['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
 		// Some sites may be misconfigured and return an HTTP scheme for the feed location URL. We force it to become HTTPS.
-		$force_https = str_replace( 'http:', 'https:', $upload_dir['baseurl'] );
+		$force_https = set_url_scheme( $upload_dir['baseurl'], 'https' );
 		$url_base    = trailingslashit( $force_https ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
 		array_walk(
 			$feed_ids,
