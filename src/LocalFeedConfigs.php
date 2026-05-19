@@ -90,11 +90,11 @@ class LocalFeedConfigs {
 		// Store generated ids for each location.
 		Pinterest_For_Woocommerce()::save_data( 'local_feed_ids', $feed_ids );
 
-		$upload_dir     = wp_get_upload_dir();
-		$file_name_base = trailingslashit( $upload_dir['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
+		$upload_dir          = wp_get_upload_dir();
+		$file_name_base      = trailingslashit( $upload_dir['basedir'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
 		// Some sites may be misconfigured and return an HTTP scheme for the feed location URL. We force it to become HTTPS.
-		$force_https = set_url_scheme( $upload_dir['baseurl'], 'https' );
-		$url_base    = trailingslashit( $force_https ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
+		$upload_baseurl_https = set_url_scheme( $upload_dir['baseurl'], 'https' );
+		$url_base            = trailingslashit( $upload_baseurl_https ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
 		array_walk(
 			$feed_ids,
 			function ( &$id ) use ( $file_name_base, $url_base ) {
