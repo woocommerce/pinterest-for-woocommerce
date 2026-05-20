@@ -6,6 +6,7 @@ use ActionScheduler_Action;
 use ActionScheduler_QueueRunner;
 use ActionScheduler;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
+use Automattic\WooCommerce\Pinterest\Exception\FeedCircuitBreakerException;
 use Automattic\WooCommerce\Pinterest\FeedFileOperations;
 use Automattic\WooCommerce\Pinterest\FeedGenerator;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
@@ -573,16 +574,13 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_circuit_breaker_stops_processing_at_max_batches() {
-		// Set batch counter to just below the limit.
-		Pinterest_For_Woocommerce::save_data( 'feed_batch_count', FeedGenerator::MAX_BATCHES_PER_CYCLE - 1 );
-
-		// This should process normally (last allowed batch).
-		$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( 1, array() ) );
+		// The last allowed batch (batch_number = MAX_BATCHES_PER_CYCLE) should process normally.
+		$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( FeedGenerator::MAX_BATCHES_PER_CYCLE, array() ) );
 		$this->assertIsArray( $items );
 
-		// Next call should return empty array due to circuit breaker.
-		$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( 2, array() ) );
-		$this->assertEmpty( $items, 'Circuit breaker should return empty array after max batches reached' );
+		// The next batch exceeds the limit and must throw so the feed is never silently truncated.
+		$this->expectException( Exception::class );
+		$this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( FeedGenerator::MAX_BATCHES_PER_CYCLE + 1, array() ) );
 	}
 
 	/**
@@ -764,5 +762,15 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		foreach ( $variation_ids as $variation_id ) {
 			$this->assertNotContains( $variation_id, $batch_ids );
 		}
+	}
+
+	/**
+	 * Verifies FeedCircuitBreakerException is throwable and is-a Exception.
+	 *
+	 * @return void
+	 */
+	public function test_feed_circuit_breaker_exception_is_an_exception() {
+		$this->expectException( FeedCircuitBreakerException::class );
+		throw new FeedCircuitBreakerException( 'limit reached' );
 	}
 }
