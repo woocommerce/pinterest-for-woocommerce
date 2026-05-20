@@ -846,6 +846,6 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->invoke_protected( $this->feed_generator, 'handle_error', array( $exception, 'chain_batch' ) );
 
 		$note_ids = Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
-		$this->assertEmpty( $note_ids, 'No inbox note should be created for non-circuit-breaker errors' );
+		$this->assertCount( 0, $note_ids, 'No inbox note should be created for non-circuit-breaker errors' );
 	}
 }

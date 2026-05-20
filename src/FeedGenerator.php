@@ -581,6 +581,8 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	private function handle_error( Throwable $th, string $hook_name = '' ) {
 		if ( $th instanceof FeedCircuitBreakerException ) {
+			// Use a live product count rather than the batch-run status cache — the batch
+			// may have been interrupted mid-update, so the cached count could be stale.
 			$recommended = $this->calculate_recommended_batch_limit( $this->count_published_products() );
 			FeedCircuitBreakerNote::add_note( $recommended );
 		}
