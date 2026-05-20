@@ -773,4 +773,49 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->expectException( FeedCircuitBreakerException::class );
 		throw new FeedCircuitBreakerException( 'limit reached' );
 	}
+
+	/**
+	 * @return void
+	 */
+	public function test_count_published_products_counts_only_published() {
+		$before = $this->invoke_protected( $this->feed_generator, 'count_published_products', array() );
+
+		// Published product — should be counted.
+		WC_Helper_Product::create_simple_product();
+
+		// Draft product — should NOT be counted.
+		$draft = WC_Helper_Product::create_simple_product();
+		wp_update_post( array( 'ID' => $draft->get_id(), 'post_status' => 'draft' ) );
+
+		$after = $this->invoke_protected( $this->feed_generator, 'count_published_products', array() );
+
+		$this->assertEquals( $before + 1, $after, 'Only published products should be counted' );
+	}
+
+	/**
+	 * @dataProvider provide_product_count_to_recommended_limit
+	 * @param int $total    Total product count.
+	 * @param int $expected Expected recommended limit.
+	 * @return void
+	 */
+	public function test_calculate_recommended_batch_limit( int $total, int $expected ) {
+		$result = $this->invoke_protected(
+			$this->feed_generator,
+			'calculate_recommended_batch_limit',
+			array( $total )
+		);
+		$this->assertEquals( $expected, $result );
+	}
+
+	/**
+	 * @return array<string, array{int, int}>
+	 */
+	public function provide_product_count_to_recommended_limit(): array {
+		return array(
+			'50k products'  => array( 50000,  1000 ),
+			'120k products' => array( 120000, 1500 ),
+			'200k products' => array( 200000, 2500 ),
+			'500k products' => array( 500000, 6500 ),
+		);
+	}
 }

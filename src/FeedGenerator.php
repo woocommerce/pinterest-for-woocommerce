@@ -297,9 +297,6 @@ class FeedGenerator extends AbstractChainedJob {
 				)
 			);
 			$this->feed_file_operations->prepare_temporary_files();
-
-			// Reset circuit breaker batch counter.
-			Pinterest_For_Woocommerce::save_data( 'feed_batch_count', 0 );
 		} catch ( Throwable $th ) {
 			$this->handle_error( $th, $this->get_action_full_name( self::CHAIN_START ) );
 			throw $th;
@@ -322,17 +319,7 @@ class FeedGenerator extends AbstractChainedJob {
 
 		parent::handle_batch_action( $batch_number, $args );
 
-		/*
-		 * Action has finished successfully.
-		 *   - Commit the cursor position (only after successful processing).
-		 *   - Reset number of products per batch.
-		 *   - Reset action retries counter.
-		 */
-		if ( null !== $this->pending_last_batch_id ) {
-			$this->set_last_batch_id( $this->pending_last_batch_id );
-			$this->pending_last_batch_id = null;
-		}
-
+		// Reset number of products per batch and action retries counter on success.
 		Pinterest_For_Woocommerce::remove_data( 'feed_product_batch_size' );
 		Pinterest_For_Woocommerce::remove_data( 'feed_product_batch_attempt' );
 	}
@@ -363,9 +350,6 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 		self::log( __( 'Feed generated successfully.', 'pinterest-for-woocommerce' ) );
 
-		// Clean up circuit breaker counter.
-		Pinterest_For_Woocommerce::remove_data( 'feed_batch_count' );
-
 		// Check if feed is dirty and reschedule in necessary.
 		if ( $this->feed_is_dirty() ) {
 			$this->mark_feed_clean();
@@ -387,25 +371,25 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
 	 */
 	protected function get_items_for_batch( int $batch_number, array $args ): array {
-		// Circuit breaker: Check if max batches per cycle has been reached.
-		$batch_count = Pinterest_For_Woocommerce::get_data( 'feed_batch_count' ) ?? 0;
-		if ( $batch_count >= self::MAX_BATCHES_PER_CYCLE ) {
-			self::log(
-				sprintf(
-					// Translators: Maximum number of batches allowed.
-					__(
-						'Feed Generator circuit breaker triggered. Maximum batch limit of %d reached. Completing generation.',
-						'pinterest-for-woocommerce'
-					),
-					self::MAX_BATCHES_PER_CYCLE
-				),
-				\WC_Log_Levels::WARNING
-			);
-			return array();
-		}
+		/**
+		 * Maximum number of batches allowed per generation cycle.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
+		$max_batches = (int) apply_filters( 'pinterest_for_woocommerce_max_feed_batches_per_cycle', self::MAX_BATCHES_PER_CYCLE );
 
-		// Increment batch counter.
-		Pinterest_For_Woocommerce::save_data( 'feed_batch_count', $batch_count + 1 );
+		// Circuit breaker: abort with an error so the truncated feed is never silently published.
+		if ( $batch_number > $max_batches ) {
+			$message = sprintf(
+				// Translators: 1: batch limit, 2: filter name.
+				__(
+					'Feed generation truncated: maximum batch limit of %1$d reached. Use the `%2$s` filter to increase the limit.',
+					'pinterest-for-woocommerce'
+				),
+				$max_batches,
+				'pinterest_for_woocommerce_max_feed_batches_per_cycle'
+			);
+			throw new Exception( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+		}
 
 		global $wpdb;
 
@@ -439,10 +423,7 @@ class FeedGenerator extends AbstractChainedJob {
 			)
 		);
 
-		$product_ids = array_map( 'intval', $product_ids );
-		// Store the last product ID temporarily. It will be committed to persistent storage
-		// only after the batch is successfully processed (in handle_batch_action).
-		// This prevents timeouts from causing cursor advancement before processing completes.
+		$product_ids                 = array_map( 'intval', $product_ids );
 		$this->pending_last_batch_id = $product_ids[ count( $product_ids ) - 1 ] ?? 0;
 		return $product_ids;
 	}
@@ -477,6 +458,14 @@ class FeedGenerator extends AbstractChainedJob {
 
 		// May throw write to file exception.
 		$this->feed_file_operations->write_buffers_to_temp_files( $this->buffers );
+
+		// Commit cursor immediately after the successful write to minimise the duplicate-append
+		// window: if a timeout lands after write_buffers_to_temp_files() but before the commit the
+		// retry would re-fetch the same IDs and append them a second time.
+		if ( null !== $this->pending_last_batch_id ) {
+			$this->set_last_batch_id( $this->pending_last_batch_id );
+			$this->pending_last_batch_id = null;
+		}
 
 		$count = ProductFeedStatus::get()['product_count'] ?? 0;
 		ProductFeedStatus::set(
@@ -691,6 +680,45 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	protected function set_last_batch_id( int $id ): void {
 		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', $id );
+	}
+
+	/**
+	 * Count all published products and published product variations.
+	 *
+	 * Uses the same product/variation filter as get_items_for_batch() so the
+	 * result accurately reflects what the feed would include.
+	 *
+	 * @return int
+	 */
+	private function count_published_products(): int {
+		global $wpdb;
+
+		return (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			"SELECT COUNT( post.ID )
+			FROM {$wpdb->posts} AS post
+			LEFT JOIN {$wpdb->posts} AS parent ON post.post_parent = parent.ID
+			WHERE
+				(
+					( post.post_type = 'product_variation' AND parent.post_status = 'publish' )
+				OR
+					( post.post_type = 'product' AND post.post_status = 'publish' )
+				)" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		);
+	}
+
+	/**
+	 * Calculate the recommended max-batches-per-cycle filter value for the given product count.
+	 *
+	 * Formula: ceil(total / DEFAULT_PRODUCT_BATCH_SIZE) * 1.25 headroom, rounded up
+	 * to the nearest 500.
+	 *
+	 * @param int $total_products Total published product count.
+	 * @return int
+	 */
+	protected function calculate_recommended_batch_limit( int $total_products ): int {
+		$needed   = (int) ceil( $total_products / self::DEFAULT_PRODUCT_BATCH_SIZE );
+		$buffered = (int) ceil( $needed * 1.25 );
+		return (int) ( ceil( $buffered / 500 ) * 500 );
 	}
 
 	/**
