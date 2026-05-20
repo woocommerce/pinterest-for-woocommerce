@@ -6,13 +6,22 @@ use Automattic\WooCommerce\Admin\Notes\Note;
 use Automattic\WooCommerce\Admin\Notes\Notes;
 use Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote;
 
+/**
+ * FeedCircuitBreakerNoteTest class.
+ */
 class FeedCircuitBreakerNoteTest extends \WP_UnitTestCase {
 
+	/**
+	 * @inheritDoc
+	 */
 	public function setUp(): void {
 		parent::setUp();
 		Notes::delete_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function tearDown(): void {
 		Notes::delete_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
 		parent::tearDown();
@@ -94,7 +103,7 @@ class FeedCircuitBreakerNoteTest extends \WP_UnitTestCase {
 	public function test_note_has_catalog_sync_and_dismiss_actions() {
 		FeedCircuitBreakerNote::add_note( 2500 );
 
-		$note        = Notes::get_note(
+		$note         = Notes::get_note(
 			current( Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME ) )
 		);
 		$action_names = array_map( fn( $a ) => $a->name, $note->get_actions() );

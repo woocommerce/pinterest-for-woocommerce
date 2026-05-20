@@ -77,8 +77,9 @@ class FeedCircuitBreakerNote {
 	/**
 	 * Delete any existing note and save a fresh one.
 	 *
-	 * Called on every circuit breaker trip so the note reappears even if the
-	 * merchant previously dismissed it.
+	 * Unlike other notes that use NoteTraits::possibly_add_note() (which no-ops
+	 * if the note already exists), this always deletes and re-saves so the note
+	 * reappears even if the merchant previously dismissed it.
 	 *
 	 * @param int $recommended_limit Recommended value for the max batches filter.
 	 * @return void
