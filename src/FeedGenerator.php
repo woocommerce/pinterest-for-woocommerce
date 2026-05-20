@@ -580,13 +580,6 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @return void
 	 */
 	private function handle_error( Throwable $th, string $hook_name = '' ) {
-		if ( $th instanceof FeedCircuitBreakerException ) {
-			// Use a live product count rather than the batch-run status cache — the batch
-			// may have been interrupted mid-update, so the cached count could be stale.
-			$recommended = $this->calculate_recommended_batch_limit( $this->count_published_products() );
-			FeedCircuitBreakerNote::add_note( $recommended );
-		}
-
 		ProductFeedStatus::set(
 			array(
 				'status'        => 'error',
@@ -594,6 +587,13 @@ class FeedGenerator extends AbstractChainedJob {
 			)
 		);
 		ProductFeedStatus::mark_feed_file_generation_as_failed();
+
+		if ( $th instanceof FeedCircuitBreakerException ) {
+			// Use a live product count rather than the batch-run status cache — the batch
+			// may have been interrupted mid-update, so the cached count could be stale.
+			$recommended = $this->calculate_recommended_batch_limit( $this->count_published_products() );
+			FeedCircuitBreakerNote::add_note( $recommended );
+		}
 
 		self::log(
 			sprintf(
@@ -731,7 +731,7 @@ class FeedGenerator extends AbstractChainedJob {
 	protected function calculate_recommended_batch_limit( int $total_products ): int {
 		$needed   = (int) ceil( $total_products / self::DEFAULT_PRODUCT_BATCH_SIZE );
 		$buffered = (int) ceil( $needed * 1.25 );
-		return (int) ( ceil( $buffered / 500 ) * 500 );
+		return max( 500, (int) ( ceil( $buffered / 500 ) * 500 ) );
 	}
 
 	/**

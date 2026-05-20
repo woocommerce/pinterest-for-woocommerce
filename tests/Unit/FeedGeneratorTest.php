@@ -820,6 +820,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 */
 	public function provide_product_count_to_recommended_limit(): array {
 		return array(
+			'0 products'    => array( 0, 500 ),
 			'50k products'  => array( 50000, 1000 ),
 			'120k products' => array( 120000, 1500 ),
 			'200k products' => array( 200000, 2500 ),
