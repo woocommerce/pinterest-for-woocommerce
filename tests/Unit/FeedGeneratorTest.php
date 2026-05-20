@@ -785,7 +785,12 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		// Draft product — should NOT be counted.
 		$draft = WC_Helper_Product::create_simple_product();
-		wp_update_post( array( 'ID' => $draft->get_id(), 'post_status' => 'draft' ) );
+		wp_update_post(
+			array(
+				'ID'          => $draft->get_id(),
+				'post_status' => 'draft',
+			)
+		);
 
 		$after = $this->invoke_protected( $this->feed_generator, 'count_published_products', array() );
 
@@ -812,7 +817,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 */
 	public function provide_product_count_to_recommended_limit(): array {
 		return array(
-			'50k products'  => array( 50000,  1000 ),
+			'50k products'  => array( 50000, 1000 ),
 			'120k products' => array( 120000, 1500 ),
 			'200k products' => array( 200000, 2500 ),
 			'500k products' => array( 500000, 6500 ),

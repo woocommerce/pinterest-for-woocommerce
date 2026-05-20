@@ -712,6 +712,10 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Formula: ceil(total / DEFAULT_PRODUCT_BATCH_SIZE) * 1.25 headroom, rounded up
 	 * to the nearest 500.
 	 *
+	 * Uses DEFAULT_PRODUCT_BATCH_SIZE (not the current runtime batch size) so the
+	 * recommendation remains stable across retry cycles where the batch size is
+	 * temporarily halved due to timeouts.
+	 *
 	 * @param int $total_products Total published product count.
 	 * @return int
 	 */
