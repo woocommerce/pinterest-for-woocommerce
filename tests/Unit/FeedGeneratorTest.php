@@ -6,8 +6,10 @@ use ActionScheduler_Action;
 use ActionScheduler_QueueRunner;
 use ActionScheduler;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
+use Automattic\WooCommerce\Admin\Notes\Notes;
 use Automattic\WooCommerce\Pinterest\Exception\FeedCircuitBreakerException;
 use Automattic\WooCommerce\Pinterest\FeedFileOperations;
+use Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote;
 use Automattic\WooCommerce\Pinterest\FeedGenerator;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
@@ -100,6 +102,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 */
 	public function tearDown(): void {
 		as_unschedule_all_actions( 'pinterest/jobs/generate_feed/chain_batch', null, 'pinterest-for-woocommerce' );
+		Notes::delete_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
 		parent::tearDown();
 	}
 
@@ -579,7 +582,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->assertIsArray( $items );
 
 		// The next batch exceeds the limit and must throw so the feed is never silently truncated.
-		$this->expectException( Exception::class );
+		$this->expectException( FeedCircuitBreakerException::class );
 		$this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( FeedGenerator::MAX_BATCHES_PER_CYCLE + 1, array() ) );
 	}
 
@@ -822,5 +825,27 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			'200k products' => array( 200000, 2500 ),
 			'500k products' => array( 500000, 6500 ),
 		);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_handle_error_with_circuit_breaker_exception_creates_inbox_note() {
+		$exception = new FeedCircuitBreakerException( 'limit reached' );
+		$this->invoke_protected( $this->feed_generator, 'handle_error', array( $exception, 'chain_batch' ) );
+
+		$note_ids = Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
+		$this->assertNotEmpty( $note_ids, 'Inbox note should be created when the circuit breaker trips' );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_handle_error_with_generic_exception_does_not_create_inbox_note() {
+		$exception = new \Exception( 'some other error' );
+		$this->invoke_protected( $this->feed_generator, 'handle_error', array( $exception, 'chain_batch' ) );
+
+		$note_ids = Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
+		$this->assertEmpty( $note_ids, 'No inbox note should be created for non-circuit-breaker errors' );
 	}
 }

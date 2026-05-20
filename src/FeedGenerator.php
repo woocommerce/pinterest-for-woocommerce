@@ -15,7 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Utilities\BatchQueryOffset;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\AbstractChainedJob;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
+use Automattic\WooCommerce\Pinterest\Exception\FeedCircuitBreakerException;
 use Automattic\WooCommerce\Pinterest\Exception\FeedFileOperationsException;
+use Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
 use ActionScheduler;
 use Exception;
@@ -368,7 +370,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @return array Items ids.
 	 *
-	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
+	 * @throws FeedCircuitBreakerException When the batch limit is exceeded, stopping the job chain.
 	 */
 	protected function get_items_for_batch( int $batch_number, array $args ): array {
 		/**
@@ -388,7 +390,7 @@ class FeedGenerator extends AbstractChainedJob {
 				$max_batches,
 				'pinterest_for_woocommerce_max_feed_batches_per_cycle'
 			);
-			throw new Exception( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			throw new FeedCircuitBreakerException( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		}
 
 		global $wpdb;
@@ -578,6 +580,11 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @return void
 	 */
 	private function handle_error( Throwable $th, string $hook_name = '' ) {
+		if ( $th instanceof FeedCircuitBreakerException ) {
+			$recommended = $this->calculate_recommended_batch_limit( $this->count_published_products() );
+			FeedCircuitBreakerNote::add_note( $recommended );
+		}
+
 		ProductFeedStatus::set(
 			array(
 				'status'        => 'error',
