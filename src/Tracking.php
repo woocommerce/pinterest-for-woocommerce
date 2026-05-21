@@ -87,6 +87,11 @@ class Tracking {
 			return;
 		}
 
+		if ( wp_is_crawler() ) {
+			// Do not track crawler requests to avoid inflating CAPI vs Tag.
+			return;
+		}
+
 		// Dumy data for when we can't get product data.
 		$data = new None( uniqid( 'page' ) );
 
@@ -124,6 +129,11 @@ class Tracking {
 	 */
 	public function handle_view_category() {
 		if ( ! is_product_category() ) {
+			return;
+		}
+
+		if ( wp_is_crawler() ) {
+			// Do not track crawler requests to avoid inflating CAPI vs Tag.
 			return;
 		}
 		$queried_object = get_queried_object();
@@ -221,6 +231,11 @@ class Tracking {
 	 */
 	public function handle_search() {
 		if ( ! is_search() ) {
+			return;
+		}
+
+		if ( wp_is_crawler() ) {
+			// Do not track crawler requests to avoid inflating CAPI vs Tag.
 			return;
 		}
 
