@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
 use Automattic\WooCommerce\Pinterest\Tracking\Data;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Category;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
@@ -16,6 +17,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Search;
 use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Automattic\WooCommerce\Pinterest\Tracking\Tracker;
+use Automattic\WooCommerce\Pinterest\Utilities\CrawlerDetector;
 use Throwable;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -87,11 +89,6 @@ class Tracking {
 			return;
 		}
 
-		if ( $this->is_crawler_request() ) {
-			// Do not track crawler requests to avoid inflating CAPI vs Tag.
-			return;
-		}
-
 		// Dumy data for when we can't get product data.
 		$data = new None( uniqid( 'page' ) );
 
@@ -129,11 +126,6 @@ class Tracking {
 	 */
 	public function handle_view_category() {
 		if ( ! is_product_category() ) {
-			return;
-		}
-
-		if ( $this->is_crawler_request() ) {
-			// Do not track crawler requests to avoid inflating CAPI vs Tag.
 			return;
 		}
 		$queried_object = get_queried_object();
@@ -234,11 +226,6 @@ class Tracking {
 			return;
 		}
 
-		if ( $this->is_crawler_request() ) {
-			// Do not track crawler requests to avoid inflating CAPI vs Tag.
-			return;
-		}
-
 		$data = new Search(
 			uniqid( 'pinterest-for-woocommerce-tag-and-conversions-event-id' ),
 			get_search_query()
@@ -247,44 +234,12 @@ class Tracking {
 	}
 
 	/**
-	 * Detects whether the current request looks like it is coming from a crawler/bot.
-	 *
-	 * WordPress core does not ship a public crawler-detection helper, so we use a
-	 * conservative User-Agent match against the most common crawler/bot tokens.
-	 * The goal is to avoid firing server-side CAPI events for requests that will
-	 * never fire the browser-side Pinterest Tag (because bots do not execute JS),
-	 * which would otherwise inflate CAPI counts relative to Tag counts.
-	 *
-	 * @since 1.4.27
-	 *
-	 * @return bool
-	 */
-	private function is_crawler_request() {
-		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] )
-			? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) )
-			: '';
-
-		if ( '' === $user_agent ) {
-			return false;
-		}
-
-		$is_crawler = (bool) preg_match( '/bot|crawl|spider|slurp|curl|wget|feed|phantom|headless/i', $user_agent );
-
-		/**
-		 * Filters whether the current request is treated as a crawler for tracking purposes.
-		 *
-		 * When true, PageVisit, ViewCategory, and Search events are not dispatched.
-		 *
-		 * @since 1.4.27
-		 *
-		 * @param bool   $is_crawler Whether the request looks like a crawler.
-		 * @param string $user_agent The raw User-Agent header value.
-		 */
-		return (bool) apply_filters( 'pinterest_for_woocommerce_is_crawler_request', $is_crawler, $user_agent );
-	}
-
-	/**
 	 * Method which iterates over all the attached trackers and delegates the event to them.
+	 *
+	 * Server-side trackers (Conversions API) are skipped for crawler/bot requests.
+	 * Browser-side rendering (Tag JS) is intentionally NOT skipped, so full-page
+	 * caches that omit `Vary: User-Agent` do not serve bot-rendered HTML missing
+	 * Tag JS to real users on a subsequent cache hit. See CrawlerDetector.
 	 *
 	 * @since 1.4.0
 	 *
@@ -294,9 +249,17 @@ class Tracking {
 	 * @return void
 	 */
 	public function track_event( string $event_name, Data $data ) {
+		$is_crawler = CrawlerDetector::is_crawler_request();
+
 		foreach ( $this->get_trackers() as $tracker ) {
 			// Skip Pinterest tag tracking if tag is not active.
 			if ( $tracker instanceof Tag && ! Tag::get_active_tag() ) {
+				continue;
+			}
+
+			// Skip server-side CAPI dispatch for crawler requests so bot
+			// traffic does not inflate CAPI counts vs Tag counts.
+			if ( $is_crawler && $tracker instanceof Conversions ) {
 				continue;
 			}
 
