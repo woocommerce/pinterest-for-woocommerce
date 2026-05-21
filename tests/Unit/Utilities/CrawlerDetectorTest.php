@@ -17,11 +17,19 @@ class CrawlerDetectorTest extends WP_UnitTestCase {
 	 */
 	private $original_user_agent;
 
+	/**
+	 * Per-test setup. Snapshots the inbound User-Agent for restoration.
+	 */
 	public function setUp(): void {
 		parent::setUp();
+		// Snapshot raw value for verbatim restoration in tearDown.
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 		$this->original_user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
 	}
 
+	/**
+	 * Per-test cleanup. Restores the User-Agent and removes any added filters.
+	 */
 	public function tearDown(): void {
 		if ( null === $this->original_user_agent ) {
 			unset( $_SERVER['HTTP_USER_AGENT'] );
@@ -68,16 +76,16 @@ class CrawlerDetectorTest extends WP_UnitTestCase {
 	 */
 	public function crawler_user_agents() {
 		return array(
-			'Googlebot'  => array( 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' ),
-			'Bingbot'    => array( 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)' ),
-			'curl'       => array( 'curl/8.4.0' ),
-			'wget'       => array( 'Wget/1.21.4' ),
-			'spider'     => array( 'Mozilla/5.0 (compatible; YandexSpider/3.0)' ),
-			'slurp'      => array( 'Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)' ),
-			'crawl'      => array( 'CCBot/2.0 (https://commoncrawl.org/faq/)' ),
-			'feed'       => array( 'Feedly/1.0 (+http://www.feedly.com/fetcher.html)' ),
-			'headless'   => array( 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/120.0.0.0 Safari/537.36' ),
-			'phantom'    => array( 'Mozilla/5.0 (Macintosh; Intel Mac OS X) AppleWebKit/538.1 (KHTML, like Gecko) PhantomJS/2.1.1 Safari/538.1' ),
+			'Googlebot' => array( 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' ),
+			'Bingbot'   => array( 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)' ),
+			'curl'      => array( 'curl/8.4.0' ),
+			'wget'      => array( 'Wget/1.21.4' ),
+			'spider'    => array( 'Mozilla/5.0 (compatible; YandexSpider/3.0)' ),
+			'slurp'     => array( 'Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)' ),
+			'crawl'     => array( 'CCBot/2.0 (https://commoncrawl.org/faq/)' ),
+			'feed'      => array( 'Feedly/1.0 (+http://www.feedly.com/fetcher.html)' ),
+			'headless'  => array( 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/120.0.0.0 Safari/537.36' ),
+			'phantom'   => array( 'Mozilla/5.0 (Macintosh; Intel Mac OS X) AppleWebKit/538.1 (KHTML, like Gecko) PhantomJS/2.1.1 Safari/538.1' ),
 		);
 	}
 
@@ -132,9 +140,9 @@ class CrawlerDetectorTest extends WP_UnitTestCase {
 	 * The filter receives both the detection result and the raw user agent.
 	 */
 	public function test_filter_receives_user_agent_and_classification() {
-		$ua                          = 'Mozilla/5.0 (compatible; CustomScanner/1.0)';
-		$_SERVER['HTTP_USER_AGENT']  = $ua;
-		$captured                    = array();
+		$ua                         = 'Mozilla/5.0 (compatible; CustomScanner/1.0)';
+		$_SERVER['HTTP_USER_AGENT'] = $ua;
+		$captured                   = array();
 
 		add_filter(
 			'pinterest_for_woocommerce_is_crawler_request',
