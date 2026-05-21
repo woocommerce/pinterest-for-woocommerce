@@ -27,30 +27,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 class CrawlerDetector {
 
 	/**
-	 * Per-request memoized result. Null = not yet computed.
-	 *
-	 * The detection runs against `$_SERVER['HTTP_USER_AGENT']`, which is
-	 * immutable for a given PHP request, so the result is safe to cache for
-	 * the lifetime of the request. Multiple tracking hooks call this on the
-	 * same request (page_visit, view_category, search and any future caller),
-	 * so the cache avoids re-running the regex and re-applying the filter.
-	 *
-	 * @var bool|null
-	 */
-	private static $cached_result = null;
-
-	/**
 	 * Returns true when the current request looks like a crawler/bot.
+	 *
+	 * Detection is intentionally NOT memoized: the regex and the filter call
+	 * are both cheap, and re-evaluating per call keeps the
+	 * `pinterest_for_woocommerce_is_crawler_request` filter responsive to
+	 * runtime changes (added/removed hooks, test fixtures) without requiring
+	 * callers to remember to reset static state.
 	 *
 	 * @since x.x.x
 	 *
 	 * @return bool
 	 */
 	public static function is_crawler_request() {
-		if ( null !== self::$cached_result ) {
-			return self::$cached_result;
-		}
-
 		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] )
 			? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) )
 			: '';
@@ -72,23 +61,10 @@ class CrawlerDetector {
 		 * @param bool   $is_crawler Whether the request looks like a crawler.
 		 * @param string $user_agent The raw User-Agent header value.
 		 */
-		self::$cached_result = (bool) apply_filters(
+		return (bool) apply_filters(
 			'pinterest_for_woocommerce_is_crawler_request',
 			$is_crawler,
 			$user_agent
 		);
-
-		return self::$cached_result;
-	}
-
-	/**
-	 * Resets the memoized result. Intended for use in tests only.
-	 *
-	 * @since x.x.x
-	 *
-	 * @return void
-	 */
-	public static function reset_cache() {
-		self::$cached_result = null;
 	}
 }

@@ -9,8 +9,38 @@ use Pinterest_For_Woocommerce;
 
 class TrackingTest extends \WP_UnitTestCase {
 
-	function setUp(): void {
+	/**
+	 * Original $_SERVER['HTTP_USER_AGENT'] value, restored after each test.
+	 *
+	 * @var string|null
+	 */
+	private $original_user_agent;
+
+	/**
+	 * Per-test setup. Snapshots the inbound User-Agent so tests can mutate it
+	 * freely and have it restored in tearDown.
+	 */
+	public function setUp(): void {
 		parent::setUp();
+		// Snapshot raw value for verbatim restoration in tearDown.
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$this->original_user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+	}
+
+	/**
+	 * Per-test cleanup. Restores the inbound User-Agent and removes any
+	 * filters added by tests on the crawler-detection hook.
+	 */
+	public function tearDown(): void {
+		if ( null === $this->original_user_agent ) {
+			unset( $_SERVER['HTTP_USER_AGENT'] );
+		} else {
+			$_SERVER['HTTP_USER_AGENT'] = $this->original_user_agent;
+		}
+
+		remove_all_filters( 'pinterest_for_woocommerce_is_crawler_request' );
+
+		parent::tearDown();
 	}
 
 	function test_tracking_adds_actions_monitoring() {
@@ -92,6 +122,94 @@ class TrackingTest extends \WP_UnitTestCase {
 		$pinterest_capi_tracker->expects( $this->once() )
 			->method( 'track_event' )
 			->with( 'test', $data );
+
+		$tracking->track_event( 'test', $data );
+	}
+
+	/**
+	 * Crawler requests must skip the Conversions (CAPI) tracker while still
+	 * dispatching to the Tag tracker. Browser-side rendering needs to keep
+	 * happening so cached HTML carries Tag JS for real users.
+	 */
+	public function test_crawler_request_skips_conversions_tracker_only() {
+		Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'WD7AFW51GS' ) );
+
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)';
+
+		$tracking = new Tracking();
+
+		$pinterest_tag_tracker  = $this->createMock( Tag::class );
+		$pinterest_capi_tracker = $this->createMock( Conversions::class );
+
+		$tracking->add_tracker( $pinterest_tag_tracker );
+		$tracking->add_tracker( $pinterest_capi_tracker );
+
+		$data = new None( 'event_id' );
+
+		$pinterest_tag_tracker->expects( $this->once() )
+			->method( 'track_event' )
+			->with( 'test', $data );
+		$pinterest_capi_tracker->expects( $this->never() )
+			->method( 'track_event' );
+
+		$tracking->track_event( 'test', $data );
+	}
+
+	/**
+	 * Non-crawler requests must dispatch to BOTH trackers (regression guard
+	 * against an over-broad skip).
+	 */
+	public function test_non_crawler_request_fires_all_trackers() {
+		Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'WD7AFW51GS' ) );
+
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+		$tracking = new Tracking();
+
+		$pinterest_tag_tracker  = $this->createMock( Tag::class );
+		$pinterest_capi_tracker = $this->createMock( Conversions::class );
+
+		$tracking->add_tracker( $pinterest_tag_tracker );
+		$tracking->add_tracker( $pinterest_capi_tracker );
+
+		$data = new None( 'event_id' );
+
+		$pinterest_tag_tracker->expects( $this->once() )
+			->method( 'track_event' )
+			->with( 'test', $data );
+		$pinterest_capi_tracker->expects( $this->once() )
+			->method( 'track_event' )
+			->with( 'test', $data );
+
+		$tracking->track_event( 'test', $data );
+	}
+
+	/**
+	 * The `pinterest_for_woocommerce_is_crawler_request` filter must be able
+	 * to flag an otherwise-human UA as a crawler and skip CAPI.
+	 */
+	public function test_filter_can_force_crawler_classification() {
+		Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'WD7AFW51GS' ) );
+
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0';
+
+		add_filter( 'pinterest_for_woocommerce_is_crawler_request', '__return_true' );
+
+		$tracking = new Tracking();
+
+		$pinterest_tag_tracker  = $this->createMock( Tag::class );
+		$pinterest_capi_tracker = $this->createMock( Conversions::class );
+
+		$tracking->add_tracker( $pinterest_tag_tracker );
+		$tracking->add_tracker( $pinterest_capi_tracker );
+
+		$data = new None( 'event_id' );
+
+		$pinterest_tag_tracker->expects( $this->once() )
+			->method( 'track_event' )
+			->with( 'test', $data );
+		$pinterest_capi_tracker->expects( $this->never() )
+			->method( 'track_event' );
 
 		$tracking->track_event( 'test', $data );
 	}
