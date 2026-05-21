@@ -255,10 +255,32 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_description( $product, $property ) {
 
-		$description = $product->get_parent_id() ? $product->get_description() : $product->get_short_description();
+		if ( $product->get_parent_id() ) {
+			$description = $product->get_description();
 
-		if ( empty( $description ) ) {
-			$description = get_the_excerpt( $product->get_id() );
+			if ( empty( $description ) ) {
+				/*
+				 * For variations without their own description, fall back to the parent
+				 * product's short description, then the parent's long description.
+				 * Avoid get_the_excerpt() here because WooCommerce stores the variation's
+				 * attribute summary in post_excerpt, which is not a useful description.
+				 */
+				$parent = wc_get_product( $product->get_parent_id() );
+
+				if ( $parent ) {
+					$description = $parent->get_short_description();
+
+					if ( empty( $description ) ) {
+						$description = $parent->get_description();
+					}
+				}
+			}
+		} else {
+			$description = $product->get_short_description();
+
+			if ( empty( $description ) ) {
+				$description = get_the_excerpt( $product->get_id() );
+			}
 		}
 
 		if ( empty( $description ) ) {

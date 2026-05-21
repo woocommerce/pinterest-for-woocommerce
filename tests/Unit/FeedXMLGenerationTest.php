@@ -172,19 +172,32 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// By passing manually created Variable Product the create_variation_product will add children to it.
 		$product           = new WC_Product_Variable();
 		$variation_product = WC_Helper_Product::create_variation_product( $product );
+
+		// Give the parent a short description so variations can fall back to it.
+		$parent_short_desc = 'Parent short description.';
+		$variation_product->set_short_description( $parent_short_desc );
+		$variation_product->save();
+
 		// create_variation_product creates multiple children, picking up the first one
 		$child_id      = $variation_product->get_children()[0];
 		$child_product = wc_get_product( $child_id );
 		$xml           = $description_method( $child_product );
 
 		/*
-		 * With no description set the code will use the excerpt.
-		 * The excerpt for the product variation is build from the attributes summary.
+		 * With no variation description set the feed should fall back to the parent's
+		 * short description, not the attribute summary stored in the variation excerpt.
 		 */
-		$attributes_summary = $child_product->get_attribute_summary( 'edit' );
-		$this->assertEquals( "<description><![CDATA[{$attributes_summary}]]></description>", $xml );
+		$this->assertEquals( "<description><![CDATA[{$parent_short_desc}]]></description>", $xml );
 
-		// Get the next variable product for tests with description set.
+		// When the parent has no short description, fall back to the parent's long description.
+		$parent_long_desc = 'Parent long description.';
+		$variation_product->set_short_description( '' );
+		$variation_product->set_description( $parent_long_desc );
+		$variation_product->save();
+		$xml = $description_method( $child_product );
+		$this->assertEquals( "<description><![CDATA[{$parent_long_desc}]]></description>", $xml );
+
+		// Get the next variable product child for tests with the variation description set directly.
 		$child_id      = $variation_product->get_children()[1];
 		$child_product = wc_get_product( $child_id );
 		$desc          = 'Test description.';
