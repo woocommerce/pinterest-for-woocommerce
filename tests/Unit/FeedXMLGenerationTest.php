@@ -228,7 +228,13 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		$child_id      = $variation_product->get_children()[0];
 		$child_product = wc_get_product( $child_id );
-		$xml           = $description_method( $child_product );
+
+		// Pin precondition: the variation must not have its own description,
+		// otherwise this test would pass for the wrong reason if WC ever
+		// auto-inherits the parent description on variations.
+		$this->assertSame( '', $child_product->get_description() );
+
+		$xml = $description_method( $child_product );
 
 		// Short description wins over long description.
 		$this->assertEquals( "<description><![CDATA[{$parent_short_desc}]]></description>", $xml );
@@ -285,6 +291,34 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		// No description should be emitted; the variation attribute summary
 		// must not leak into the feed.
+		$this->assertEquals( '', $xml );
+	}
+
+	/**
+	 * When the variation's parent product has been hard-deleted (orphaned
+	 * variation), the fallback chain must short-circuit safely instead of
+	 * throwing on the missing parent.
+	 *
+	 * @group feed
+	 */
+	public function testDescriptionVariationHandlesMissingParent() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+		$parent_id         = $variation_product->get_id();
+
+		$child_id = $variation_product->get_children()[0];
+
+		// Hard-delete the parent so wc_get_product( $parent_id ) returns false.
+		wp_delete_post( $parent_id, true );
+
+		// Reload the variation post-deletion.
+		$child_product = wc_get_product( $child_id );
+
+		$xml = $description_method( $child_product );
+
+		// No description and no fatal: the fallback chain bailed out cleanly.
 		$this->assertEquals( '', $xml );
 	}
 
