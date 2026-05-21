@@ -164,6 +164,34 @@ class CrawlerDetectorTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The filter must receive the RAW (unsanitized) User-Agent so consumers can
+	 * match against the exact string the client sent. Using a UA with characters
+	 * that sanitize_text_field would strip (HTML-tag-like sequence) proves the
+	 * value passed to the filter is not pre-sanitized.
+	 */
+	public function test_filter_receives_raw_unsanitized_user_agent() {
+		$raw_ua                     = 'Mozilla/5.0 <weird> Scanner/1.0';
+		$_SERVER['HTTP_USER_AGENT'] = $raw_ua;
+		$captured                   = null;
+
+		add_filter(
+			'pinterest_for_woocommerce_is_crawler_request',
+			function ( $is_crawler, $user_agent ) use ( &$captured ) {
+				$captured = $user_agent;
+				return $is_crawler;
+			},
+			10,
+			2
+		);
+
+		CrawlerDetector::is_crawler_request();
+
+		// The raw value must reach the filter unchanged; sanitize_text_field
+		// would have stripped the `<weird>` token.
+		$this->assertSame( $raw_ua, $captured );
+	}
+
+	/**
 	 * Filter changes must take effect immediately on the next call (no static
 	 * caching that would hold the first result).
 	 */

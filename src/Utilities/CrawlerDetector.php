@@ -5,6 +5,8 @@
  * @package Automattic\WooCommerce\Pinterest
  */
 
+declare( strict_types=1 );
+
 namespace Automattic\WooCommerce\Pinterest\Utilities;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -39,10 +41,13 @@ class CrawlerDetector {
 	 *
 	 * @return bool
 	 */
-	public static function is_crawler_request() {
-		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] )
-			? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) )
-			: '';
+	public static function is_crawler_request(): bool {
+		// Unslashed raw value for the filter, so consumers see exactly what the
+		// client sent. The sanitized copy below is only used internally for the
+		// regex check.
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+		$raw_user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) : '';
+		$user_agent     = '' === $raw_user_agent ? '' : sanitize_text_field( $raw_user_agent );
 
 		$is_crawler = '' !== $user_agent
 			&& (bool) preg_match( '/bot|crawl|spider|slurp|curl|wget|feed|phantom|headless/i', $user_agent );
@@ -59,12 +64,12 @@ class CrawlerDetector {
 		 * @since x.x.x
 		 *
 		 * @param bool   $is_crawler Whether the request looks like a crawler.
-		 * @param string $user_agent The raw User-Agent header value.
+		 * @param string $user_agent The raw (unslashed, unsanitized) User-Agent header value.
 		 */
 		return (bool) apply_filters(
 			'pinterest_for_woocommerce_is_crawler_request',
 			$is_crawler,
-			$user_agent
+			$raw_user_agent
 		);
 	}
 }
