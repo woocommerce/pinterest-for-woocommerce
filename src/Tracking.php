@@ -87,7 +87,7 @@ class Tracking {
 			return;
 		}
 
-		if ( wp_is_crawler() ) {
+		if ( $this->is_crawler_request() ) {
 			// Do not track crawler requests to avoid inflating CAPI vs Tag.
 			return;
 		}
@@ -132,7 +132,7 @@ class Tracking {
 			return;
 		}
 
-		if ( wp_is_crawler() ) {
+		if ( $this->is_crawler_request() ) {
 			// Do not track crawler requests to avoid inflating CAPI vs Tag.
 			return;
 		}
@@ -234,7 +234,7 @@ class Tracking {
 			return;
 		}
 
-		if ( wp_is_crawler() ) {
+		if ( $this->is_crawler_request() ) {
 			// Do not track crawler requests to avoid inflating CAPI vs Tag.
 			return;
 		}
@@ -244,6 +244,43 @@ class Tracking {
 			get_search_query()
 		);
 		$this->track_event( static::EVENT_SEARCH, $data );
+	}
+
+	/**
+	 * Detects whether the current request looks like it is coming from a crawler/bot.
+	 *
+	 * WordPress core does not ship a public crawler-detection helper, so we use a
+	 * conservative User-Agent match against the most common crawler/bot tokens.
+	 * The goal is to avoid firing server-side CAPI events for requests that will
+	 * never fire the browser-side Pinterest Tag (because bots do not execute JS),
+	 * which would otherwise inflate CAPI counts relative to Tag counts.
+	 *
+	 * @since 1.4.27
+	 *
+	 * @return bool
+	 */
+	private function is_crawler_request() {
+		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) )
+			: '';
+
+		if ( '' === $user_agent ) {
+			return false;
+		}
+
+		$is_crawler = (bool) preg_match( '/bot|crawl|spider|slurp|curl|wget|feed|phantom|headless/i', $user_agent );
+
+		/**
+		 * Filters whether the current request is treated as a crawler for tracking purposes.
+		 *
+		 * When true, PageVisit, ViewCategory, and Search events are not dispatched.
+		 *
+		 * @since 1.4.27
+		 *
+		 * @param bool   $is_crawler Whether the request looks like a crawler.
+		 * @param string $user_agent The raw User-Agent header value.
+		 */
+		return (bool) apply_filters( 'pinterest_for_woocommerce_is_crawler_request', $is_crawler, $user_agent );
 	}
 
 	/**
