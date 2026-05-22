@@ -50,10 +50,12 @@ class TestActionSchedulerProxy implements ActionSchedulerInterface {
 	/**
 	 * Cancel an action.
 	 *
-	 * @param mixed $action_id Action ID.
+	 * @param string $hook  Action hook.
+	 * @param mixed  $args  Action arguments.
+	 * @param string $group Action group.
 	 * @return void
 	 */
-	public function cancel( $action_id ) {}
+	public function cancel( string $hook, $args = array(), string $group = '' ) {}
 
 	/**
 	 * Cancel all actions matching criteria.
