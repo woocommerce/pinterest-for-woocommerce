@@ -180,6 +180,7 @@ class Tracking {
 
 		$items          = array();
 		$total_quantity = 0;
+		$checkout_value = 0;
 		foreach ( $order->get_items() as $order_item ) {
 			if ( ! method_exists( $order_item, 'get_product' ) ) {
 				continue;
@@ -199,6 +200,7 @@ class Tracking {
 			);
 
 			$total_quantity += $order_item->get_quantity();
+			$checkout_value += (float) $order_item->get_total();
 		}
 
 		// Deterministic event id so Pinterest can deduplicate Tag/CAPI Checkout events when
@@ -206,7 +208,7 @@ class Tracking {
 		$data = new Checkout(
 			'checkout_' . $order->get_id(),
 			(string) $order->get_id(),
-			$order->get_total(),
+			wc_format_decimal( $checkout_value, wc_get_price_decimals() ),
 			$total_quantity,
 			$order->get_currency(),
 			$items
