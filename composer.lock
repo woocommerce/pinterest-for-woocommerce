@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b2d464c01f8847a28d7030570fd20169",
+    "content-hash": "48368e5d682dfc9e908cc3b1b1cb4045",
     "packages": [
         {
             "name": "automattic/jetpack-autoloader",
@@ -67,6 +67,56 @@
                 "source": "https://github.com/Automattic/jetpack-autoloader/tree/v2.12.0"
             },
             "time": "2023-09-28T18:33:34+00:00"
+        },
+        {
+            "name": "automattic/jetpack-device-detection",
+            "version": "v3.4.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Automattic/jetpack-device-detection.git",
+                "reference": "b4b4c7b18c4e377f676458a5af11a1a8757dc1f4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Automattic/jetpack-device-detection/zipball/b4b4c7b18c4e377f676458a5af11a1a8757dc1f4",
+                "reference": "b4b4c7b18c4e377f676458a5af11a1a8757dc1f4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "automattic/phpunit-select-config": "^1.0.6",
+                "yoast/phpunit-polyfills": "^4.0.0"
+            },
+            "suggest": {
+                "automattic/jetpack-autoloader": "Allow for better interoperability with other plugins that use this package."
+            },
+            "type": "jetpack-library",
+            "extra": {
+                "autotagger": true,
+                "mirror-repo": "Automattic/jetpack-device-detection",
+                "branch-alias": {
+                    "dev-trunk": "3.4.x-dev"
+                },
+                "changelogger": {
+                    "link-template": "https://github.com/Automattic/jetpack-device-detection/compare/v${old}...v${new}"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "A way to detect device types based on User-Agent header.",
+            "support": {
+                "source": "https://github.com/Automattic/jetpack-device-detection/tree/v3.4.2"
+            },
+            "time": "2026-05-19T09:16:56+00:00"
         },
         {
             "name": "defuse/php-encryption",
@@ -3786,5 +3836,5 @@
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
