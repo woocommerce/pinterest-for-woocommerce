@@ -41,7 +41,7 @@ class FeedCircuitBreakerNote {
 		$content = sprintf(
 			// translators: %d: recommended batch limit value for the filter.
 			__(
-				'Your catalog is too large to fully sync with Pinterest. Some products may not appear on Pinterest. Ask a developer to increase the batch limit to %d — see the plugin documentation for instructions.',
+				'Your catalog is too large to fully sync with Pinterest. Some products may not appear on Pinterest yet. Please refer to plugin documentation at https://woocommerce.com/document/pinterest-for-woocommerce/ to increase the batch limit to %d to sync all products.',
 				'pinterest-for-woocommerce'
 			),
 			$recommended_limit
