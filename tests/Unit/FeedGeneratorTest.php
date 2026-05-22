@@ -83,9 +83,9 @@ class TestActionSchedulerProxy implements ActionSchedulerInterface {
 	/**
 	 * Get the next scheduled action timestamp.
 	 *
-	 * @param string      $hook  Action hook.
-	 * @param mixed       $args  Action arguments.
-	 * @param string      $group Action group.
+	 * @param string $hook  Action hook.
+	 * @param mixed  $args  Action arguments.
+	 * @param string $group Action group.
 	 * @return int|bool
 	 */
 	public function next_scheduled_action( $hook, $args = null, string $group = '' ) {

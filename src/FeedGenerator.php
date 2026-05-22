@@ -678,7 +678,7 @@ class FeedGenerator extends AbstractChainedJob {
 			Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
 		}
 		// Get last fetched ID to start from the next item after it.
-		return Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		return (int) Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
 	}
 
 	/**
