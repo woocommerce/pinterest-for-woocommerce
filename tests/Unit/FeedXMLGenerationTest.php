@@ -310,11 +310,14 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		$child_id = $variation_product->get_children()[0];
 
-		// Hard-delete the parent so wc_get_product( $parent_id ) returns false.
-		wp_delete_post( $parent_id, true );
-
-		// Reload the variation post-deletion.
+		// Load the variation BEFORE hard-deleting the parent: WC cannot
+		// instantiate a variation whose parent post is missing, so the load
+		// has to happen first to capture a live variation object.
 		$child_product = wc_get_product( $child_id );
+
+		// Hard-delete the parent so wc_get_product( $parent_id ) returns false
+		// when the fallback chain calls it from inside get_property_description.
+		wp_delete_post( $parent_id, true );
 
 		$xml = $description_method( $child_product );
 
