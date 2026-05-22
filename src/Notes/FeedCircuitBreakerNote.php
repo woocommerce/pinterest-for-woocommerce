@@ -38,19 +38,13 @@ class FeedCircuitBreakerNote {
 	 * @return Note
 	 */
 	public static function get_note( int $recommended_limit ): Note {
-		$filter_snippet = sprintf(
-			"add_filter( 'pinterest_for_woocommerce_max_feed_batches_per_cycle', function() { return %d; } );",
-			$recommended_limit
-		);
-
 		$content = sprintf(
-			// translators: 1: recommended batch limit; 2: filter code snippet.
+			// translators: %d: recommended batch limit value for the filter.
 			__(
-				'Your store has more products than Pinterest for WooCommerce processed in the last feed generation cycle. Some products may not appear on Pinterest.<br/><br/>To fix this, a developer can increase the batch limit. Based on your current product count, a value of <strong>%1$d</strong> is recommended. Add this to your theme\'s <code>functions.php</code>:<br/><br/><code>%2$s</code>',
+				'Your catalog is too large to fully sync with Pinterest. Some products may not appear on Pinterest. Ask a developer to increase the batch limit to %d — see the plugin documentation for instructions.',
 				'pinterest-for-woocommerce'
 			),
-			$recommended_limit,
-			esc_html( $filter_snippet )
+			$recommended_limit
 		);
 
 		$note = new Note();
