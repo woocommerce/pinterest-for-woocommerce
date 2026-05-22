@@ -66,6 +66,31 @@ class TestActionSchedulerProxy implements ActionSchedulerInterface {
 	 * @return void
 	 */
 	public function cancel_all( string $hook, $args = array(), string $group = '' ) {}
+
+	/**
+	 * Schedule a single action at a given timestamp.
+	 *
+	 * @param mixed  $timestamp Unix timestamp.
+	 * @param string $hook      Action hook.
+	 * @param mixed  $args      Action arguments.
+	 * @param string $group     Action group.
+	 * @return int Action ID.
+	 */
+	public function schedule_single( $timestamp, $hook, $args = array(), string $group = '' ) {
+		return as_schedule_single_action( $timestamp, $hook, $args, $group );
+	}
+
+	/**
+	 * Get the next scheduled action timestamp.
+	 *
+	 * @param string      $hook  Action hook.
+	 * @param mixed       $args  Action arguments.
+	 * @param string      $group Action group.
+	 * @return int|bool
+	 */
+	public function next_scheduled_action( $hook, $args = null, string $group = '' ) {
+		return as_next_scheduled_action( $hook, $args, $group );
+	}
 }
 
 class FeedGeneratorTest extends \WP_UnitTestCase {
