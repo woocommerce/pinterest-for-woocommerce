@@ -271,6 +271,10 @@ class ProductsXmlFeed {
 				 * product's short description, then the parent's long description.
 				 * Avoid get_the_excerpt() here because WooCommerce stores the variation's
 				 * attribute summary in post_excerpt, which is not a useful description.
+				 *
+				 * wc_get_product() has its own per-request object cache, so sibling
+				 * variations of the same parent reuse the same load without
+				 * needing a second cache layer in this method.
 				 */
 				$parent = wc_get_product( $product->get_parent_id() );
 
@@ -289,7 +293,7 @@ class ProductsXmlFeed {
 			 * fallback chain (e.g. emit a translated description, prefer parent
 			 * long over short, or inject a per-variation string).
 			 *
-			 * @since x.y.z
+			 * @since x.x.x
 			 *
 			 * @param string          $description Resolved description after the variation→parent fallback.
 			 * @param WC_Product      $product     Variation product.

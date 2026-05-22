@@ -361,17 +361,20 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		};
 		add_filter( 'pinterest_for_woocommerce_variation_description', $filter, 10, 3 );
 
-		$xml = $description_method( $child_product );
+		try {
+			$xml = $description_method( $child_product );
 
-		remove_filter( 'pinterest_for_woocommerce_variation_description', $filter, 10 );
+			$this->assertEquals( '<description><![CDATA[Filter override description.]]></description>', $xml );
 
-		$this->assertEquals( '<description><![CDATA[Filter override description.]]></description>', $xml );
-
-		// Filter receives the resolved fallback value, the variation, and the parent.
-		$this->assertEquals( 'Parent short description.', $captured['description'] );
-		$this->assertSame( $child_product->get_id(), $captured['variation']->get_id() );
-		$this->assertInstanceOf( \WC_Product::class, $captured['parent'] );
-		$this->assertSame( $variation_product->get_id(), $captured['parent']->get_id() );
+			// Filter receives the resolved fallback value, the variation, and the parent.
+			$this->assertEquals( 'Parent short description.', $captured['description'] );
+			$this->assertSame( $child_product->get_id(), $captured['variation']->get_id() );
+			$this->assertInstanceOf( \WC_Product::class, $captured['parent'] );
+			$this->assertSame( $variation_product->get_id(), $captured['parent']->get_id() );
+		} finally {
+			// Always remove the filter so an assertion failure can't leak into subsequent tests.
+			remove_filter( 'pinterest_for_woocommerce_variation_description', $filter, 10 );
+		}
 	}
 
 	/**
