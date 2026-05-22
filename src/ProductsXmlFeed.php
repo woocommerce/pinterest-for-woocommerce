@@ -255,8 +255,15 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_description( $product, $property ) {
 
+		// Guard against stale IDs or upstream lookup failures that pass a
+		// non-product value through to the feed pipeline.
+		if ( ! $product instanceof WC_Product ) {
+			return;
+		}
+
 		if ( $product->get_parent_id() ) {
 			$description = $product->get_description();
+			$parent      = null;
 
 			if ( empty( $description ) ) {
 				/*
@@ -275,6 +282,20 @@ class ProductsXmlFeed {
 					}
 				}
 			}
+
+			/**
+			 * Filters the description used for a variation product entry in the
+			 * Pinterest feed XML. Use this to override the variation→parent
+			 * fallback chain (e.g. emit a translated description, prefer parent
+			 * long over short, or inject a per-variation string).
+			 *
+			 * @since x.y.z
+			 *
+			 * @param string          $description Resolved description after the variation→parent fallback.
+			 * @param WC_Product      $product     Variation product.
+			 * @param WC_Product|null $parent      Parent product, or null when not loaded (variation had its own description, or the parent post was deleted).
+			 */
+			$description = apply_filters( 'pinterest_for_woocommerce_variation_description', $description, $product, $parent );
 		} else {
 			$description = $product->get_short_description();
 
