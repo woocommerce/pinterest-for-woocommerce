@@ -246,6 +246,9 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			array( 1, array() ),
 			'pinterest-for-woocommerce'
 		);
+		// Cancel the pending action so as_has_scheduled_action() returns false on the first call,
+		// mirroring production where the action is in-progress (not pending) at shutdown time.
+		as_unschedule_action( 'pinterest/jobs/generate_feed/chain_batch', array( 1, array() ), 'pinterest-for-woocommerce' );
 
 		$error = array(
 			'type'    => E_ERROR,
@@ -284,6 +287,9 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			array( 1, array() ),
 			'pinterest-for-woocommerce'
 		);
+		// Cancel the pending action so as_has_scheduled_action() returns false on the first call,
+		// mirroring production where the action is in-progress (not pending) at shutdown time.
+		as_unschedule_action( 'pinterest/jobs/generate_feed/chain_batch', array( 1, array() ), 'pinterest-for-woocommerce' );
 
 		$error = array(
 			'type'    => E_ERROR,
