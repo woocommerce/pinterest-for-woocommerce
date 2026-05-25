@@ -939,6 +939,122 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * @group feed
+	 */
+	public function testPropertyBrandXML() {
+		$brand_method = $this->getProductsXmlFeedAttributeMethod( 'g:brand' );
+		$product      = WC_Helper_Product::create_simple_product();
+
+		// No brand set.
+		$xml = $brand_method( $product );
+		$this->assertEquals( '', $xml );
+
+		// Assign a brand via the product_brand taxonomy.
+		$term = wp_insert_term( 'Nike', 'product_brand' );
+		wp_set_object_terms( $product->get_id(), $term['term_id'], 'product_brand' );
+
+		$xml = $brand_method( $product );
+		$this->assertEquals( '<g:brand>Nike</g:brand>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testPropertyBrandVariationUsesParentXML() {
+		$brand_method      = $this->getProductsXmlFeedAttributeMethod( 'g:brand' );
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+		$child_product     = wc_get_product( $variation_product->get_children()[0] );
+
+		// Assign brand to the parent product.
+		$term = wp_insert_term( 'Adidas', 'product_brand' );
+		wp_set_object_terms( $variation_product->get_id(), $term['term_id'], 'product_brand' );
+
+		$xml = $brand_method( $child_product );
+		$this->assertEquals( '<g:brand>Adidas</g:brand>', $xml );
+	}
+
+	/**
+	 * Test that the brand value can be overridden and suppressed via the
+	 * pinterest_for_woocommerce_product_brand filter.
+	 *
+	 * @group feed
+	 */
+	public function testPropertyBrandFilterXML() {
+		$brand_method = $this->getProductsXmlFeedAttributeMethod( 'g:brand' );
+		$product      = WC_Helper_Product::create_simple_product();
+
+		$term = wp_insert_term( 'Reebok', 'product_brand' );
+		wp_set_object_terms( $product->get_id(), $term['term_id'], 'product_brand' );
+
+		// Override the brand value.
+		add_filter(
+			'pinterest_for_woocommerce_product_brand',
+			static function () {
+				return 'Custom Brand';
+			}
+		);
+		$this->assertEquals( '<g:brand>Custom Brand</g:brand>', $brand_method( $product ) );
+		remove_all_filters( 'pinterest_for_woocommerce_product_brand' );
+
+		// Suppress the brand value.
+		add_filter( 'pinterest_for_woocommerce_product_brand', '__return_empty_string' );
+		$this->assertEquals( '', $brand_method( $product ) );
+		remove_all_filters( 'pinterest_for_woocommerce_product_brand' );
+	}
+
+	/**
+	 * Test that a brand longer than the allowed limit is truncated and logged.
+	 *
+	 * @group feed
+	 */
+	public function testPropertyBrandCharacterLimitXML() {
+		$brand_method = $this->getProductsXmlFeedAttributeMethod( 'g:brand' );
+		$product      = WC_Helper_Product::create_simple_product();
+
+		$mock_logger = $this->getMockLogger();
+
+		Logger::$logger = $mock_logger;
+
+		// Debug logging is gated behind this setting; enable it so the log is captured.
+		Pinterest_For_Woocommerce()::save_setting( 'enable_debug_logging', true );
+
+		// Brand name longer than the 100 character limit.
+		$long_brand = str_repeat( 'A', 150 );
+		$term       = wp_insert_term( $long_brand, 'product_brand' );
+		wp_set_object_terms( $product->get_id(), $term['term_id'], 'product_brand' );
+
+		$xml = $brand_method( $product );
+
+		// Extract the brand value from the XML.
+		preg_match( '/<g:brand>(.*?)<\/g:brand>/', $xml, $matches );
+		$brand = $matches[1] ?? '';
+
+		// Should be truncated to 100 characters.
+		$this->assertEquals( 100, strlen( $brand ) );
+
+		// Check that a warning was logged.
+		$this->assertStringContainsString( 'brand length is', $mock_logger::$message );
+		$this->assertStringContainsString( 'truncating to 100 characters', $mock_logger::$message );
+	}
+
+	/**
+	 * Test that the brand is included in the full feed item output, covering the
+	 * feed-structure entry and the get_xml_item() code path.
+	 *
+	 * @group feed
+	 */
+	public function testBrandInFeedItemXML() {
+		$product = WC_Helper_Product::create_simple_product();
+
+		$term = wp_insert_term( 'Puma', 'product_brand' );
+		wp_set_object_terms( $product->get_id(), $term['term_id'], 'product_brand' );
+
+		$xml = ProductsXmlFeed::get_xml_item( $product, 'US' );
+		$this->assertStringContainsString( '<g:brand>Puma</g:brand>', $xml );
+	}
+
+	/**
 	 * Mimic the method on FeedGenerator.
 	 *
 	 * @param array $taxable_location The taxable location to filter.
@@ -960,6 +1076,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		// Remove any added filter.
 		remove_all_filters( 'pinterest_for_woocommerce_product_description_apply_shortcodes' );
+		remove_all_filters( 'pinterest_for_woocommerce_product_brand' );
 
 		// Remove added shortcodes.
 		remove_shortcode( 'pinterest_for_woocommerce_sample_test_shortcode' );
