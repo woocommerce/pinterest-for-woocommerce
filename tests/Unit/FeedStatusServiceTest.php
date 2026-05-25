@@ -286,8 +286,7 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 
 		$this->assertCount( 1, $this->update_feed_requests );
 		$this->assertNull( Pinterest_For_Woocommerce::get_data( 'last_retried_processing_result_id' ) );
-		$this->assert_log_entry_contains( 'FETCH_ERROR retry failed for processing_result_id=processing-result-1' );
-		$this->assert_log_entry_contains( 'Temporary Pinterest API failure.' );
+		$this->assert_log_entry_contains( 'FETCH_ERROR retry failed for processing_result_id=processing-result-1: Temporary Pinterest API failure.' );
 	}
 
 	/**
