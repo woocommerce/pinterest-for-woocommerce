@@ -377,9 +377,6 @@ class FeedStatusService {
 		}
 
 		$feed_url = self::get_feed_url_for_feed_id( $feed_id );
-		if ( '' === $feed_url ) {
-			$feed_url = '(unresolved)';
-		}
 
 		Logger::log(
 			sprintf(

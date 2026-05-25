@@ -333,15 +333,15 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that an unresolved feed URL is logged with a sentinel value.
+	 * Tests that an unknown feed ID logs an empty feed URL rather than another feed's URL.
 	 *
 	 * @return void
 	 */
-	public function test_log_failed_processing_result_logs_unresolved_feed_url_when_no_feed_matches() {
+	public function test_log_failed_processing_result_logs_empty_feed_url_when_no_feed_matches() {
 		FeedStatusService::log_failed_processing_result( 'unknown-feed', $this->get_failed_processing_results() );
 
 		$this->assertStringContainsString(
-			'feed_url: (unresolved)',
+			"feed_url: \n",
 			$this->mock_logger->entries[0]['message']
 		);
 	}
