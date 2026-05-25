@@ -364,7 +364,10 @@ class FeedStatusService {
 			return;
 		}
 
-		$last_logged_processing_result_ids = self::get_last_logged_processing_result_ids( $feed_id );
+		$last_logged_processing_result_ids = Pinterest_For_WooCommerce()::get_data( self::LAST_LOGGED_PROCESSING_RESULT_ID_KEY );
+		if ( ! is_array( $last_logged_processing_result_ids ) ) {
+			$last_logged_processing_result_ids = array();
+		}
 		if ( ( $last_logged_processing_result_ids[ $feed_id ] ?? '' ) === $processing_result_id ) {
 			return;
 		}
@@ -397,40 +400,6 @@ class FeedStatusService {
 			self::LAST_LOGGED_PROCESSING_RESULT_ID_KEY,
 			$last_logged_processing_result_ids
 		);
-	}
-
-	/**
-	 * Get failed processing result log deduplication state by feed ID.
-	 *
-	 * @param string $feed_id Pinterest feed ID.
-	 * @return array
-	 */
-	private static function get_last_logged_processing_result_ids( string $feed_id ): array {
-		$last_logged_processing_result_ids = Pinterest_For_WooCommerce()::get_data(
-			self::LAST_LOGGED_PROCESSING_RESULT_ID_KEY
-		);
-
-		if ( is_array( $last_logged_processing_result_ids ) ) {
-			return $last_logged_processing_result_ids;
-		}
-
-		if (
-			is_string( $last_logged_processing_result_ids ) &&
-			false !== strpos( $last_logged_processing_result_ids, ':' )
-		) {
-			$parts = explode( ':', $last_logged_processing_result_ids, 2 );
-			return array(
-				$parts[0] => $parts[1],
-			);
-		}
-
-		if ( is_string( $last_logged_processing_result_ids ) && '' !== $last_logged_processing_result_ids ) {
-			return array(
-				$feed_id => $last_logged_processing_result_ids,
-			);
-		}
-
-		return array();
 	}
 
 	/**

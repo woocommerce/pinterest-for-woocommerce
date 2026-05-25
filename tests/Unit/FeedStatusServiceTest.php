@@ -347,58 +347,6 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that a legacy single-value dedup state is recognized and migrated to the per-feed format.
-	 *
-	 * @return void
-	 */
-	public function test_log_failed_processing_result_migrates_legacy_single_value_state() {
-		Pinterest_For_Woocommerce::save_data( 'last_logged_processing_result_id', 'processing-result-1' );
-
-		FeedStatusService::log_failed_processing_result( 'feed-123', $this->get_failed_processing_results() );
-
-		$this->assertCount( 0, $this->mock_logger->entries );
-
-		$new_result       = $this->get_failed_processing_results();
-		$new_result['id'] = 'processing-result-2';
-
-		FeedStatusService::log_failed_processing_result( 'feed-123', $new_result );
-
-		$this->assertCount( 1, $this->mock_logger->entries );
-		$this->assertEquals(
-			array(
-				'feed-123' => 'processing-result-2',
-			),
-			Pinterest_For_Woocommerce::get_data( 'last_logged_processing_result_id' )
-		);
-	}
-
-	/**
-	 * Tests that a legacy feed_id:processing_result_id dedup state is recognized and migrated.
-	 *
-	 * @return void
-	 */
-	public function test_log_failed_processing_result_migrates_legacy_scoped_string_state() {
-		Pinterest_For_Woocommerce::save_data( 'last_logged_processing_result_id', 'feed-123:processing-result-1' );
-
-		FeedStatusService::log_failed_processing_result( 'feed-123', $this->get_failed_processing_results() );
-
-		$this->assertCount( 0, $this->mock_logger->entries );
-
-		$new_result       = $this->get_failed_processing_results();
-		$new_result['id'] = 'processing-result-2';
-
-		FeedStatusService::log_failed_processing_result( 'feed-123', $new_result );
-
-		$this->assertCount( 1, $this->mock_logger->entries );
-		$this->assertEquals(
-			array(
-				'feed-123' => 'processing-result-2',
-			),
-			Pinterest_For_Woocommerce::get_data( 'last_logged_processing_result_id' )
-		);
-	}
-
-	/**
 	 * Tests that a FETCH_ERROR failed processing result triggers one feed update retry.
 	 *
 	 * @return void
