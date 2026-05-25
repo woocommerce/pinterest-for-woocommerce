@@ -70,17 +70,6 @@ class PinterestApiException extends \Exception {
 	public const OFFER_ALREADY_REDEEMED_VARIANT = 2322;
 
 	/**
-	 * Pinterest error codes that indicate a terminal, non-retryable failure of
-	 * the `ads_credit/redeem` endpoint. All of these mean the offer cannot be
-	 * redeemed again from this plugin's perspective.
-	 */
-	public const TERMINAL_REDEEM_ERRORS = array(
-		self::OFFER_ALREADY_REDEEMED,
-		self::OFFER_ALREADY_REDEEMED_BY_ANOTHER_ADVERTISER,
-		self::OFFER_ALREADY_REDEEMED_VARIANT,
-	);
-
-	/**
 	 * Merchant has been disapproved.
 	 * Some feeds, when deleting, may fail to delete due to the merchant has been disapproved.
 	 */
