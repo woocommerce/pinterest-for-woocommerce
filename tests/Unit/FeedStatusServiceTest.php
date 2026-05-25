@@ -96,7 +96,7 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 		Pinterest_For_Woocommerce::remove_data( 'last_logged_processing_result_id' );
 		Pinterest_For_Woocommerce::remove_data( 'last_retried_processing_result_id' );
 		LocalFeedConfigs::deregister();
-		remove_all_filters( 'pre_http_request' );
+		remove_filter( 'pre_http_request', array( $this, 'intercept_update_feed_request' ), 10 );
 
 		parent::tearDown();
 	}
@@ -287,6 +287,7 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 		$this->assertCount( 1, $this->update_feed_requests );
 		$this->assertNull( Pinterest_For_Woocommerce::get_data( 'last_retried_processing_result_id' ) );
 		$this->assert_log_entry_contains( 'FETCH_ERROR retry failed for processing_result_id=processing-result-1' );
+		$this->assert_log_entry_contains( 'Temporary Pinterest API failure.' );
 	}
 
 	/**

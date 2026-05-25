@@ -222,6 +222,23 @@ class Feeds {
 	}
 
 	/**
+	 * Reschedule Pinterest's next feed fetch to roughly five minutes from now.
+	 *
+	 * Issuing an "empty" feed update is the idiom Pinterest expects to reset the
+	 * preferred processing schedule; this wrapper makes that intent explicit.
+	 *
+	 * @since 1.4.27
+	 *
+	 * @param string $feed_id The ID of the feed.
+	 *
+	 * @return array
+	 * @throws Throwable PHP Exception if there is an error updating the feed.
+	 */
+	public static function reschedule_feed_fetch( string $feed_id ) {
+		return static::update_feed( $feed_id, array() );
+	}
+
+	/**
 	 * Get a specific merchant feed using the given arguments.
 	 *
 	 * @param string $feed_id     The ID of the feed.

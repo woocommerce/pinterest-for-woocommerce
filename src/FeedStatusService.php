@@ -427,7 +427,7 @@ class FeedStatusService {
 		}
 
 		try {
-			Feeds::update_feed( $feed_id, array() );
+			Feeds::reschedule_feed_fetch( $feed_id );
 			Pinterest_For_WooCommerce()::save_data( self::LAST_RETRIED_PROCESSING_RESULT_ID_KEY, $processing_result_id );
 			Logger::log(
 				"FETCH_ERROR retry triggered for processing_result_id={$processing_result_id}",
@@ -438,7 +438,12 @@ class FeedStatusService {
 			return true;
 		} catch ( Throwable $th ) {
 			Logger::log(
-				"FETCH_ERROR retry failed for processing_result_id={$processing_result_id}",
+				sprintf(
+					'FETCH_ERROR retry failed for processing_result_id=%s: %s (code %s)',
+					$processing_result_id,
+					$th->getMessage(),
+					$th->getCode()
+				),
 				'error',
 				'feed-ingestion-failure'
 			);
