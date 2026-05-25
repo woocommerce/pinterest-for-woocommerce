@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 class FeedStatusService {
 
 	/**
-	 * Plugin data key used to avoid logging the same failed processing result repeatedly.
+	 * Plugin data key used to avoid logging the same failed processing result for the same feed repeatedly.
 	 *
 	 * @var string
 	 */
@@ -346,7 +346,7 @@ class FeedStatusService {
 	}
 
 	/**
-	 * Log the full failed feed processing result context once per processing result ID.
+	 * Log the full failed feed processing result context once per feed and processing result ID.
 	 *
 	 * @param string $feed_id            Pinterest feed ID.
 	 * @param array  $processing_results Recent processing results array.
@@ -364,8 +364,9 @@ class FeedStatusService {
 			return;
 		}
 
+		$processing_result_log_key        = self::get_processing_result_log_key( $feed_id, $processing_result_id );
 		$last_logged_processing_result_id = Pinterest_For_WooCommerce()::get_data( self::LAST_LOGGED_PROCESSING_RESULT_ID_KEY );
-		if ( $processing_result_id === $last_logged_processing_result_id ) {
+		if ( $processing_result_log_key === $last_logged_processing_result_id ) {
 			return;
 		}
 
@@ -373,12 +374,7 @@ class FeedStatusService {
 			return;
 		}
 
-		$feed_url = '';
-		$configs  = LocalFeedConfigs::get_instance()->get_configurations();
-		if ( ! empty( $configs ) ) {
-			$config   = reset( $configs );
-			$feed_url = $config['feed_url'] ?? '';
-		}
+		$feed_url = self::get_feed_url_for_feed_id( $feed_id );
 
 		Logger::log(
 			sprintf(
@@ -394,7 +390,36 @@ class FeedStatusService {
 			'feed-ingestion-failure'
 		);
 
-		Pinterest_For_WooCommerce()::save_data( self::LAST_LOGGED_PROCESSING_RESULT_ID_KEY, $processing_result_id );
+		Pinterest_For_WooCommerce()::save_data( self::LAST_LOGGED_PROCESSING_RESULT_ID_KEY, $processing_result_log_key );
+	}
+
+	/**
+	 * Get the failed processing result log deduplication key.
+	 *
+	 * @param string $feed_id              Pinterest feed ID.
+	 * @param string $processing_result_id Pinterest processing result ID.
+	 * @return string
+	 */
+	private static function get_processing_result_log_key( string $feed_id, string $processing_result_id ): string {
+		return "{$feed_id}:{$processing_result_id}";
+	}
+
+	/**
+	 * Get the local feed URL for a Pinterest feed ID.
+	 *
+	 * @param string $feed_id Pinterest feed ID.
+	 * @return string
+	 */
+	private static function get_feed_url_for_feed_id( string $feed_id ): string {
+		$configs = LocalFeedConfigs::get_instance()->get_configurations();
+
+		foreach ( $configs as $config ) {
+			if ( ( $config['feed_id'] ?? '' ) === $feed_id ) {
+				return $config['feed_url'] ?? '';
+			}
+		}
+
+		return '';
 	}
 
 	/**

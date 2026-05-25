@@ -50,7 +50,7 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 		Pinterest_For_Woocommerce::save_data(
 			'local_feed_ids',
 			array(
-				Pinterest_For_Woocommerce::get_base_country() => 'local-feed',
+				Pinterest_For_Woocommerce::get_base_country() => 'feed-123',
 			)
 		);
 		Pinterest_For_Woocommerce::remove_data( 'last_logged_processing_result_id' );
@@ -155,7 +155,25 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 
 		$this->assertCount( 1, $this->mock_logger->entries );
 		$this->assertEquals(
-			'processing-result-1',
+			'feed-123:processing-result-1',
+			Pinterest_For_Woocommerce::get_data( 'last_logged_processing_result_id' )
+		);
+	}
+
+	/**
+	 * Tests that the same processing result ID can be logged once per feed ID.
+	 *
+	 * @return void
+	 */
+	public function test_log_failed_processing_result_scopes_deduplication_by_feed_id() {
+		$processing_results = $this->get_failed_processing_results();
+
+		FeedStatusService::log_failed_processing_result( 'feed-123', $processing_results );
+		FeedStatusService::log_failed_processing_result( 'feed-456', $processing_results );
+
+		$this->assertCount( 2, $this->mock_logger->entries );
+		$this->assertEquals(
+			'feed-456:processing-result-1',
 			Pinterest_For_Woocommerce::get_data( 'last_logged_processing_result_id' )
 		);
 	}
@@ -204,9 +222,36 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 
 		$this->assertCount( 2, $this->mock_logger->entries );
 		$this->assertEquals(
-			'processing-result-2',
+			'feed-123:processing-result-2',
 			Pinterest_For_Woocommerce::get_data( 'last_logged_processing_result_id' )
 		);
+	}
+
+	/**
+	 * Tests that the logged feed URL belongs to the failed feed ID.
+	 *
+	 * @return void
+	 */
+	public function test_log_failed_processing_result_uses_failed_feed_url() {
+		$base_country  = Pinterest_For_Woocommerce::get_base_country();
+		$other_country = 'US' === $base_country ? 'CA' : 'US';
+		Pinterest_For_Woocommerce::save_data(
+			'local_feed_ids',
+			array(
+				$base_country  => 'feed-123',
+				$other_country => 'feed-456',
+			)
+		);
+
+		FeedStatusService::log_failed_processing_result( 'feed-456', $this->get_failed_processing_results() );
+
+		$configs                = LocalFeedConfigs::get_instance()->get_configurations();
+		$failing_feed_url       = $configs[ $other_country ]['feed_url'];
+		$non_failing_feed_url   = $configs[ $base_country ]['feed_url'];
+		$logged_failure_message = $this->mock_logger->entries[0]['message'];
+
+		$this->assertStringContainsString( "feed_url: {$failing_feed_url}", $logged_failure_message );
+		$this->assertStringNotContainsString( "feed_url: {$non_failing_feed_url}", $logged_failure_message );
 	}
 
 	/**
