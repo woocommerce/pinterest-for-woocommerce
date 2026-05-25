@@ -114,8 +114,8 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 		$this->assertCount( 1, $this->mock_logger->entries );
 
 		$entry             = $this->mock_logger->entries[0];
-		$expected_feed_url = trailingslashit( wp_get_upload_dir()['baseurl'] ) .
-			PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-local-feed.xml';
+		$configs           = LocalFeedConfigs::get_instance()->get_configurations();
+		$expected_feed_url = reset( $configs )['feed_url'];
 		$expected_message  = implode(
 			"\n",
 			array(
