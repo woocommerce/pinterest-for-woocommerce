@@ -374,6 +374,9 @@ class FeedStatusService {
 		}
 
 		$feed_url = self::get_feed_url_for_feed_id( $feed_id );
+		if ( '' === $feed_url ) {
+			$feed_url = '(unresolved)';
+		}
 
 		Logger::log(
 			sprintf(
@@ -431,7 +434,11 @@ class FeedStatusService {
 	}
 
 	/**
-	 * Get the local feed URL for a Pinterest feed ID.
+	 * Get the registered feed URL (location) for a Pinterest feed ID.
+	 *
+	 * The feed ID is the remote Pinterest feed ID, so it is resolved against the
+	 * registered remote feeds. Returns an empty string when no remote feed matches
+	 * (e.g. the feeds API is unavailable).
 	 *
 	 * @param string $feed_id Pinterest feed ID.
 	 * @return string
@@ -440,14 +447,6 @@ class FeedStatusService {
 		foreach ( Feeds::get_feeds() as $feed ) {
 			if ( ( $feed['id'] ?? '' ) === $feed_id ) {
 				return $feed['location'] ?? '';
-			}
-		}
-
-		$configs = LocalFeedConfigs::get_instance()->get_configurations();
-
-		foreach ( $configs as $config ) {
-			if ( ( $config['feed_id'] ?? '' ) === $feed_id ) {
-				return $config['feed_url'] ?? '';
 			}
 		}
 

@@ -114,23 +114,28 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_log_failed_processing_result_logs_expected_payload_without_debug_logging_enabled() {
+		$feed_url           = 'https://example.test/pinterest-for-woocommerce-feed-123.xml';
+		$this->remote_feeds = array(
+			array(
+				'id'       => 'feed-123',
+				'location' => $feed_url,
+			),
+		);
 		$processing_results = $this->get_failed_processing_results();
 
 		FeedStatusService::log_failed_processing_result( 'feed-123', $processing_results );
 
 		$this->assertCount( 1, $this->mock_logger->entries );
 
-		$entry             = $this->mock_logger->entries[0];
-		$configs           = LocalFeedConfigs::get_instance()->get_configurations();
-		$expected_feed_url = reset( $configs )['feed_url'];
-		$expected_message  = implode(
+		$entry            = $this->mock_logger->entries[0];
+		$expected_message = implode(
 			"\n",
 			array(
 				'Feed ingestion FAILED',
 				'feed_id: feed-123',
 				'processing_result_id: processing-result-1',
 				'created_at: 2026-05-12T06:00:00',
-				"feed_url: {$expected_feed_url}",
+				"feed_url: {$feed_url}",
 				'validation_details: {"errors":{"FETCH_ERROR":1},"warnings":{"IMAGE_LINK_WARNING":2}}',
 				'product_counts: {"original":10,"ingested":0}',
 			)
@@ -272,21 +277,21 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_log_failed_processing_result_uses_failed_feed_url() {
-		$base_country  = Pinterest_For_Woocommerce::get_base_country();
-		$other_country = 'US' === $base_country ? 'CA' : 'US';
-		Pinterest_For_Woocommerce::save_data(
-			'local_feed_ids',
+		$failing_feed_url     = 'https://example.test/pinterest-for-woocommerce-feed-456.xml';
+		$non_failing_feed_url = 'https://example.test/pinterest-for-woocommerce-feed-123.xml';
+		$this->remote_feeds   = array(
 			array(
-				$base_country  => 'feed-123',
-				$other_country => 'feed-456',
-			)
+				'id'       => 'feed-123',
+				'location' => $non_failing_feed_url,
+			),
+			array(
+				'id'       => 'feed-456',
+				'location' => $failing_feed_url,
+			),
 		);
 
 		FeedStatusService::log_failed_processing_result( 'feed-456', $this->get_failed_processing_results() );
 
-		$configs                = LocalFeedConfigs::get_instance()->get_configurations();
-		$failing_feed_url       = $configs[ $other_country ]['feed_url'];
-		$non_failing_feed_url   = $configs[ $base_country ]['feed_url'];
 		$logged_failure_message = $this->mock_logger->entries[0]['message'];
 
 		$this->assertStringContainsString( "feed_url: {$failing_feed_url}", $logged_failure_message );
@@ -325,6 +330,72 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( "feed_url: {$remote_feed_location}", $logged_failure_message );
 		$this->assertStringNotContainsString( "feed_url: {$local_feed_url}", $logged_failure_message );
+	}
+
+	/**
+	 * Tests that an unresolved feed URL is logged with a sentinel value.
+	 *
+	 * @return void
+	 */
+	public function test_log_failed_processing_result_logs_unresolved_feed_url_when_no_feed_matches() {
+		FeedStatusService::log_failed_processing_result( 'unknown-feed', $this->get_failed_processing_results() );
+
+		$this->assertStringContainsString(
+			'feed_url: (unresolved)',
+			$this->mock_logger->entries[0]['message']
+		);
+	}
+
+	/**
+	 * Tests that a legacy single-value dedup state is recognized and migrated to the per-feed format.
+	 *
+	 * @return void
+	 */
+	public function test_log_failed_processing_result_migrates_legacy_single_value_state() {
+		Pinterest_For_Woocommerce::save_data( 'last_logged_processing_result_id', 'processing-result-1' );
+
+		FeedStatusService::log_failed_processing_result( 'feed-123', $this->get_failed_processing_results() );
+
+		$this->assertCount( 0, $this->mock_logger->entries );
+
+		$new_result       = $this->get_failed_processing_results();
+		$new_result['id'] = 'processing-result-2';
+
+		FeedStatusService::log_failed_processing_result( 'feed-123', $new_result );
+
+		$this->assertCount( 1, $this->mock_logger->entries );
+		$this->assertEquals(
+			array(
+				'feed-123' => 'processing-result-2',
+			),
+			Pinterest_For_Woocommerce::get_data( 'last_logged_processing_result_id' )
+		);
+	}
+
+	/**
+	 * Tests that a legacy feed_id:processing_result_id dedup state is recognized and migrated.
+	 *
+	 * @return void
+	 */
+	public function test_log_failed_processing_result_migrates_legacy_scoped_string_state() {
+		Pinterest_For_Woocommerce::save_data( 'last_logged_processing_result_id', 'feed-123:processing-result-1' );
+
+		FeedStatusService::log_failed_processing_result( 'feed-123', $this->get_failed_processing_results() );
+
+		$this->assertCount( 0, $this->mock_logger->entries );
+
+		$new_result       = $this->get_failed_processing_results();
+		$new_result['id'] = 'processing-result-2';
+
+		FeedStatusService::log_failed_processing_result( 'feed-123', $new_result );
+
+		$this->assertCount( 1, $this->mock_logger->entries );
+		$this->assertEquals(
+			array(
+				'feed-123' => 'processing-result-2',
+			),
+			Pinterest_For_Woocommerce::get_data( 'last_logged_processing_result_id' )
+		);
 	}
 
 	/**
