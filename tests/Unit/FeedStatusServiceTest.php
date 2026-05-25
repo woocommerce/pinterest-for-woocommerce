@@ -21,6 +21,20 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	private $mock_logger;
 
 	/**
+	 * Captured feed update requests.
+	 *
+	 * @var array
+	 */
+	private $update_feed_requests = array();
+
+	/**
+	 * Whether to return an error response for feed update requests.
+	 *
+	 * @var bool
+	 */
+	private $should_fail_update_feed_request = false;
+
+	/**
 	 * Set up the WC logger mock and local feed configuration.
 	 *
 	 * @return void
@@ -30,7 +44,9 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 
 		LocalFeedConfigs::deregister();
 		Pinterest_For_Woocommerce::set_default_settings();
+		Pinterest_For_Woocommerce::save_setting( 'tracking_advertiser', '114141241212' );
 		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', false );
+		Pinterest_For_Woocommerce::save_token_data( array( 'access_token' => 'some-fake-access-token' ) );
 		Pinterest_For_Woocommerce::save_data(
 			'local_feed_ids',
 			array(
@@ -38,6 +54,7 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 			)
 		);
 		Pinterest_For_Woocommerce::remove_data( 'last_logged_processing_result_id' );
+		Pinterest_For_Woocommerce::remove_data( 'last_retried_processing_result_id' );
 
 		$this->mock_logger = new class() {
 
@@ -66,6 +83,7 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 		};
 
 		Logger::$logger = $this->mock_logger;
+		add_filter( 'pre_http_request', array( $this, 'intercept_update_feed_request' ), 10, 3 );
 	}
 
 	/**
@@ -76,7 +94,9 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	public function tearDown(): void {
 		Logger::$logger = null;
 		Pinterest_For_Woocommerce::remove_data( 'last_logged_processing_result_id' );
+		Pinterest_For_Woocommerce::remove_data( 'last_retried_processing_result_id' );
 		LocalFeedConfigs::deregister();
+		remove_filter( 'pre_http_request', array( $this, 'intercept_update_feed_request' ), 10 );
 
 		parent::tearDown();
 	}
@@ -94,8 +114,8 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 		$this->assertCount( 1, $this->mock_logger->entries );
 
 		$entry             = $this->mock_logger->entries[0];
-		$expected_feed_url = trailingslashit( wp_get_upload_dir()['baseurl'] ) .
-			PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-local-feed.xml';
+		$configs           = LocalFeedConfigs::get_instance()->get_configurations();
+		$expected_feed_url = reset( $configs )['feed_url'];
 		$expected_message  = implode(
 			"\n",
 			array(
@@ -190,6 +210,139 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a FETCH_ERROR failed processing result triggers one feed update retry.
+	 *
+	 * @return void
+	 */
+	public function test_maybe_retry_on_fetch_error_triggers_retry_once() {
+		$processing_results = $this->get_failed_processing_results();
+
+		$this->assertTrue( FeedStatusService::maybe_retry_on_fetch_error( 'feed-123', $processing_results ) );
+
+		$this->assertCount( 1, $this->update_feed_requests );
+		$this->assertEquals( 'PATCH', $this->update_feed_requests[0]['method'] );
+		$this->assertEquals(
+			'https://api.pinterest.com/v5/catalogs/feeds/feed-123?ad_account_id=114141241212',
+			$this->update_feed_requests[0]['url']
+		);
+		$this->assertEquals( 'ACTIVE', $this->update_feed_requests[0]['body']['status'] );
+		$this->assertEquals(
+			'Etc/UTC',
+			$this->update_feed_requests[0]['body']['preferred_processing_schedule']['timezone']
+		);
+		$this->assertEquals( 'RETAIL', $this->update_feed_requests[0]['body']['catalog_type'] );
+		$this->assertEquals(
+			'processing-result-1',
+			Pinterest_For_Woocommerce::get_data( 'last_retried_processing_result_id' )
+		);
+		$this->assert_log_entry_contains( 'FETCH_ERROR retry triggered for processing_result_id=processing-result-1', 'info' );
+	}
+
+	/**
+	 * Tests that duplicate processing result IDs are not retried twice.
+	 *
+	 * @return void
+	 */
+	public function test_maybe_retry_on_fetch_error_does_not_retry_same_processing_result_id_twice() {
+		$processing_results = $this->get_failed_processing_results();
+
+		$this->assertTrue( FeedStatusService::maybe_retry_on_fetch_error( 'feed-123', $processing_results ) );
+		$this->assertFalse( FeedStatusService::maybe_retry_on_fetch_error( 'feed-123', $processing_results ) );
+
+		$this->assertCount( 1, $this->update_feed_requests );
+	}
+
+	/**
+	 * Tests that non-FETCH_ERROR failed processing results do not trigger a retry.
+	 *
+	 * @return void
+	 */
+	public function test_maybe_retry_on_fetch_error_does_not_retry_non_fetch_error_failures() {
+		$processing_results                                   = $this->get_failed_processing_results();
+		$processing_results['validation_details']['errors']   = array(
+			'NO_VERIFIED_DOMAIN' => 1,
+		);
+		$processing_results['validation_details']['warnings'] = array();
+		$processing_results['product_counts']['ingested']     = 0;
+		$processing_results['product_counts']['original']     = 10;
+		$processing_results['id']                             = 'processing-result-no-verified-domain';
+
+		$this->assertFalse( FeedStatusService::maybe_retry_on_fetch_error( 'feed-123', $processing_results ) );
+
+		$this->assertCount( 0, $this->update_feed_requests );
+		$this->assertNull( Pinterest_For_Woocommerce::get_data( 'last_retried_processing_result_id' ) );
+	}
+
+	/**
+	 * Tests that feed update exceptions are logged and swallowed.
+	 *
+	 * @return void
+	 */
+	public function test_maybe_retry_on_fetch_error_logs_and_swallows_update_exceptions() {
+		$this->should_fail_update_feed_request = true;
+		$processing_results                    = $this->get_failed_processing_results();
+
+		$this->assertFalse( FeedStatusService::maybe_retry_on_fetch_error( 'feed-123', $processing_results ) );
+
+		$this->assertCount( 1, $this->update_feed_requests );
+		$this->assertNull( Pinterest_For_Woocommerce::get_data( 'last_retried_processing_result_id' ) );
+		$this->assert_log_entry_contains( 'FETCH_ERROR retry failed for processing_result_id=processing-result-1: Temporary Pinterest API failure.' );
+	}
+
+	/**
+	 * Intercept feed update requests.
+	 *
+	 * @param mixed  $response    Preemptive response.
+	 * @param array  $parsed_args Request arguments.
+	 * @param string $url         Request URL.
+	 * @return mixed
+	 */
+	public function intercept_update_feed_request( $response, $parsed_args, $url ) {
+		if ( 'https://api.pinterest.com/v5/catalogs/feeds/feed-123?ad_account_id=114141241212' !== $url ) {
+			return $response;
+		}
+
+		$this->update_feed_requests[] = array(
+			'url'    => $url,
+			'method' => $parsed_args['method'],
+			'body'   => json_decode( $parsed_args['body'], true ),
+		);
+
+		if ( $this->should_fail_update_feed_request ) {
+			return array(
+				'headers'  => array(
+					'content-type' => 'application/json',
+				),
+				'body'     => wp_json_encode(
+					array(
+						'code'    => 500,
+						'message' => 'Temporary Pinterest API failure.',
+					)
+				),
+				'response' => array(
+					'code'    => 500,
+					'message' => 'Internal Server Error',
+				),
+				'cookies'  => array(),
+				'filename' => '',
+			);
+		}
+
+		return array(
+			'headers'  => array(
+				'content-type' => 'application/json',
+			),
+			'body'     => wp_json_encode( array( 'id' => 'feed-123' ) ),
+			'response' => array(
+				'code'    => 200,
+				'message' => 'OK',
+			),
+			'cookies'  => array(),
+			'filename' => '',
+		);
+	}
+
+	/**
 	 * Get a failed processing result fixture.
 	 *
 	 * @return array
@@ -212,5 +365,29 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 				'ingested' => 0,
 			),
 		);
+	}
+
+	/**
+	 * Assert a log entry contains a given message fragment.
+	 *
+	 * @param string $message_fragment Message fragment.
+	 * @param string $expected_level   Expected log level.
+	 * @return void
+	 */
+	private function assert_log_entry_contains( string $message_fragment, string $expected_level = 'error' ): void {
+		foreach ( $this->mock_logger->entries as $entry ) {
+			if ( false !== strpos( $entry['message'], $message_fragment ) ) {
+				$this->assertEquals( $expected_level, $entry['level'] );
+				$this->assertEquals(
+					array(
+						'source' => PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-feed-ingestion-failure',
+					),
+					$entry['handler']
+				);
+				return;
+			}
+		}
+
+		$this->fail( "Expected log entry containing: {$message_fragment}" );
 	}
 }

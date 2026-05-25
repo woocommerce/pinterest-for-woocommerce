@@ -173,6 +173,7 @@ class FeedRegistration {
 		try {
 			$processing_results = Feeds::get_feed_recent_processing_results( $feed_id );
 			FeedStatusService::log_failed_processing_result( $feed_id, $processing_results );
+			FeedStatusService::maybe_retry_on_fetch_error( $feed_id, $processing_results );
 		} catch ( Throwable $th ) {
 			Logger::log( $th->getMessage(), 'error', 'feed-ingestion-failure' );
 		}

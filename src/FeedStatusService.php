@@ -10,6 +10,7 @@ namespace Automattic\WooCommerce\Pinterest;
 
 use Automattic\WooCommerce\Pinterest\API\Base;
 use Exception;
+use Throwable;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -24,6 +25,13 @@ class FeedStatusService {
 	 * @var string
 	 */
 	private const LAST_LOGGED_PROCESSING_RESULT_ID_KEY = 'last_logged_processing_result_id';
+
+	/**
+	 * Plugin data key used to avoid retrying the same failed processing result repeatedly.
+	 *
+	 * @var string
+	 */
+	private const LAST_RETRIED_PROCESSING_RESULT_ID_KEY = 'last_retried_processing_result_id';
 
 	/**
 	 * The error contexts to search for in the workflow responses.
@@ -387,5 +395,60 @@ class FeedStatusService {
 		);
 
 		Pinterest_For_WooCommerce()::save_data( self::LAST_LOGGED_PROCESSING_RESULT_ID_KEY, $processing_result_id );
+	}
+
+	/**
+	 * Retry Pinterest feed ingestion once when a transient FETCH_ERROR failure is observed.
+	 *
+	 * @param string $feed_id            Pinterest feed ID.
+	 * @param array  $processing_results Recent processing results array.
+	 *
+	 * @return bool Whether a retry was triggered successfully.
+	 */
+	public static function maybe_retry_on_fetch_error( string $feed_id, array $processing_results ): bool {
+		if ( Feeds::FEED_PROCESSING_STATUS_FAILED !== ( $processing_results['status'] ?? '' ) ) {
+			return false;
+		}
+
+		if ( ! isset( $processing_results['validation_details']['errors']['FETCH_ERROR'] ) ) {
+			return false;
+		}
+
+		$processing_result_id = $processing_results['id'] ?? '';
+		if ( empty( $processing_result_id ) ) {
+			return false;
+		}
+
+		$last_retried_processing_result_id = Pinterest_For_WooCommerce()::get_data(
+			self::LAST_RETRIED_PROCESSING_RESULT_ID_KEY
+		);
+		if ( $processing_result_id === $last_retried_processing_result_id ) {
+			return false;
+		}
+
+		try {
+			Feeds::reschedule_feed_fetch( $feed_id );
+			Pinterest_For_WooCommerce()::save_data( self::LAST_RETRIED_PROCESSING_RESULT_ID_KEY, $processing_result_id );
+			Logger::log(
+				"FETCH_ERROR retry triggered for processing_result_id={$processing_result_id}",
+				'info',
+				'feed-ingestion-failure'
+			);
+
+			return true;
+		} catch ( Throwable $th ) {
+			Logger::log(
+				sprintf(
+					'FETCH_ERROR retry failed for processing_result_id=%s: %s (code %s)',
+					$processing_result_id,
+					$th->getMessage(),
+					$th->getCode()
+				),
+				'error',
+				'feed-ingestion-failure'
+			);
+
+			return false;
+		}
 	}
 }
