@@ -84,6 +84,13 @@ class ProductsXmlFeed {
 	 */
 	const PRODUCT_TYPE_CHARS_LIMIT = 1000;
 
+	/**
+	 * Limit of characters allowed by Pinterest in the brand.
+	 *
+	 * @var int
+	 */
+	const BRAND_CHARS_LIMIT = 100;
+
 
 	/**
 	 * Returns the XML header to be printed.
@@ -525,6 +532,12 @@ class ProductsXmlFeed {
 
 		if ( empty( $brand ) ) {
 			return '';
+		}
+
+		// Ensure brand doesn't exceed Pinterest's character limit.
+		if ( strlen( $brand ) > self::BRAND_CHARS_LIMIT ) {
+			Logger::log( sprintf( 'Product [%1$s] brand length is %2$d characters, truncating to %3$d characters as per Pinterest requirements.', $id, strlen( $brand ), self::BRAND_CHARS_LIMIT ) );
+			$brand = substr( $brand, 0, self::BRAND_CHARS_LIMIT );
 		}
 
 		return '<' . $property . '>' . self::sanitize( $brand ) . '</' . $property . '>';
