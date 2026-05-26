@@ -584,6 +584,26 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
+	 * Whether the given throwable is, or wraps, a FeedCircuitBreakerException.
+	 *
+	 * Action Scheduler's queue runner catches the original Throwable and re-throws a
+	 * generic Exception, keeping the original only as the previous exception. The
+	 * exception delivered to the failed-execution handler is therefore not the
+	 * FeedCircuitBreakerException itself, so we walk the previous chain to detect it.
+	 *
+	 * @param Throwable $th The thrown exception.
+	 * @return bool
+	 */
+	private function is_circuit_breaker_exception( Throwable $th ): bool {
+		for ( $current = $th; null !== $current; $current = $current->getPrevious() ) {
+			if ( $current instanceof FeedCircuitBreakerException ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Handle feed generation error by updating status and scheduling retry.
 	 *
 	 * @param Throwable $th - An exception that was thrown.
@@ -602,7 +622,7 @@ class FeedGenerator extends AbstractChainedJob {
 		);
 		ProductFeedStatus::mark_feed_file_generation_as_failed();
 
-		if ( $th instanceof FeedCircuitBreakerException ) {
+		if ( $this->is_circuit_breaker_exception( $th ) ) {
 			// Use a live product count rather than the batch-run status cache — the batch
 			// may have been interrupted mid-update, so the cached count could be stale.
 			$total_products = $this->count_published_products();

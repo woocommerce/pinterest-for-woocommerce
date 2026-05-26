@@ -989,4 +989,31 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		// Default MAX_BATCHES_PER_CYCLE is 1000; the floor guard bumps the recommendation to 2000.
 		$this->assertStringContainsString( '2000', $note->get_content() );
 	}
+
+	/**
+	 * Action Scheduler's queue runner catches the original Throwable and re-throws a generic
+	 * Exception, exposing the original only via getPrevious(). handle_error must still detect
+	 * the circuit breaker through the exception chain — to add the note and skip the retry.
+	 *
+	 * @return void
+	 */
+	public function test_handle_error_detects_circuit_breaker_wrapped_by_action_scheduler() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+
+		// Mirror ActionScheduler_Abstract_QueueRunner: throw new Exception( msg, code, $original ).
+		$wrapped = new \Exception( 'limit reached', 0, new FeedCircuitBreakerException( 'limit reached' ) );
+		$this->invoke_protected( $this->feed_generator, 'handle_error', array( $wrapped, 'chain_batch' ) );
+
+		$note_ids = Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
+		$this->assertNotEmpty( $note_ids, 'Note must be created even when the breaker exception is wrapped by Action Scheduler.' );
+
+		$pending = as_get_scheduled_actions(
+			array(
+				'hook'   => 'pinterest-for-woocommerce-start-feed-generation',
+				'status' => 'pending',
+				'group'  => 'pinterest-for-woocommerce',
+			)
+		);
+		$this->assertCount( 0, $pending, 'A wrapped circuit breaker exception must not schedule a full regeneration retry.' );
+	}
 }
