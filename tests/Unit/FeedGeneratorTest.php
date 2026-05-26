@@ -6,7 +6,10 @@ use ActionScheduler_Action;
 use ActionScheduler_QueueRunner;
 use ActionScheduler;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
+use Automattic\WooCommerce\Admin\Notes\Notes;
+use Automattic\WooCommerce\Pinterest\Exception\FeedCircuitBreakerException;
 use Automattic\WooCommerce\Pinterest\FeedFileOperations;
+use Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote;
 use Automattic\WooCommerce\Pinterest\FeedGenerator;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
@@ -15,6 +18,82 @@ use Pinterest_For_Woocommerce;
 use ReflectionMethod;
 use WC_Helper_Product;
 use WC_Product_Variable;
+
+/**
+ * Test helper class that wraps real Action Scheduler functions.
+ */
+class TestActionSchedulerProxy implements ActionSchedulerInterface {
+	/**
+	 * Schedule an action to run immediately.
+	 *
+	 * @param string $hook  Action hook.
+	 * @param mixed  $args  Action arguments.
+	 * @param string $group Action group.
+	 * @return int Action ID.
+	 */
+	public function schedule_immediate( string $hook, $args = array(), string $group = '' ) {
+		return as_schedule_single_action( time(), $hook, $args, $group );
+	}
+
+	/**
+	 * Search for scheduled actions — delegates to real Action Scheduler so status
+	 * filters (e.g. STATUS_PENDING) behave exactly as they would in production.
+	 *
+	 * @param mixed  $args          Search arguments (see as_get_scheduled_actions()).
+	 * @param string $return_format Return format: OBJECT, ARRAY_A, or 'ids'.
+	 * @param string $group         Action group.
+	 * @return array
+	 */
+	public function search( $args = array(), $return_format = OBJECT, string $group = '' ) {
+		$args['group'] = $group;
+		return as_get_scheduled_actions( $args, $return_format );
+	}
+
+	/**
+	 * Cancel an action.
+	 *
+	 * @param string $hook  Action hook.
+	 * @param mixed  $args  Action arguments.
+	 * @param string $group Action group.
+	 * @return void
+	 */
+	public function cancel( string $hook, $args = array(), string $group = '' ) {}
+
+	/**
+	 * Cancel all actions matching criteria.
+	 *
+	 * @param string $hook  Action hook.
+	 * @param mixed  $args  Action arguments.
+	 * @param string $group Action group.
+	 * @return void
+	 */
+	public function cancel_all( string $hook, $args = array(), string $group = '' ) {}
+
+	/**
+	 * Schedule a single action at a given timestamp.
+	 *
+	 * @param mixed  $timestamp Unix timestamp.
+	 * @param string $hook      Action hook.
+	 * @param mixed  $args      Action arguments.
+	 * @param string $group     Action group.
+	 * @return int Action ID.
+	 */
+	public function schedule_single( $timestamp, $hook, $args = array(), string $group = '' ) {
+		return as_schedule_single_action( $timestamp, $hook, $args, $group );
+	}
+
+	/**
+	 * Get the next scheduled action timestamp.
+	 *
+	 * @param string $hook  Action hook.
+	 * @param mixed  $args  Action arguments.
+	 * @param string $group Action group.
+	 * @return int|bool
+	 */
+	public function next_scheduled_action( $hook, $args = null, string $group = '' ) {
+		return as_next_scheduled_action( $hook, $args, $group );
+	}
+}
 
 class FeedGeneratorTest extends \WP_UnitTestCase {
 
@@ -42,6 +121,33 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->feed_generator = new FeedGenerator( $this->action_scheduler, $this->feed_file_operations, $this->local_feed_configs );
 
 		ProductFeedStatus::set( ProductFeedStatus::STATE_PROPS );
+	}
+
+	/**
+	 * Clean up Action Scheduler entries after each test to prevent cross-test interference
+	 * when the deduplication guard checks for pending scheduled actions.
+	 *
+	 * @return void
+	 */
+	public function tearDown(): void {
+		as_unschedule_all_actions( 'pinterest/jobs/generate_feed/chain_batch', null, 'pinterest-for-woocommerce' );
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', null, 'pinterest-for-woocommerce' );
+		Notes::delete_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
+		parent::tearDown();
+	}
+
+	/**
+	 * Helper to invoke a protected method on FeedGenerator via reflection.
+	 *
+	 * @param FeedGenerator $generator    The FeedGenerator instance.
+	 * @param string        $method_name  Name of the protected method.
+	 * @param array         $args         Arguments to pass to the method.
+	 * @return mixed Return value of the method.
+	 */
+	private function invoke_protected( FeedGenerator $generator, string $method_name, array $args = array() ) {
+		$reflection = new \ReflectionMethod( FeedGenerator::class, $method_name );
+		$reflection->setAccessible( true );
+		return $reflection->invokeArgs( $generator, $args );
 	}
 
 	/**
@@ -130,36 +236,80 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_handle_unexpected_shutdown_does_throttle_product_number_when_rescheduling_the_action() {
+		// Use real FeedGenerator that schedules actual actions.
+		$real_feed_generator = new FeedGenerator(
+			new TestActionSchedulerProxy(),
+			$this->feed_file_operations,
+			$this->local_feed_configs
+		);
+
 		$action_id = as_schedule_single_action(
 			gmdate( 'U' ) - 1,
 			'pinterest/jobs/generate_feed/chain_batch',
 			array( 1, array() ),
 			'pinterest-for-woocommerce'
 		);
-
-		$this->action_scheduler->expects( $this->exactly( 2 ) )
-			->method( 'schedule_immediate' )
-			->with(
-				'pinterest/jobs/generate_feed/chain_batch',
-				array( 1, array() ),
-				'pinterest-for-woocommerce'
-			);
-		$this->action_scheduler->method( 'search' )
-			->willReturn( array() );
+		// Simulate Action Scheduler picking up the action: mark it in-progress exactly
+		// as AS does via process_action() → log_execution() before invoking our callback.
+		// This mirrors real timeout conditions and ensures the dedup guard (STATUS_PENDING
+		// only) allows the first reschedule even while the original action is running.
+		\ActionScheduler_Store::instance()->log_execution( $action_id );
 
 		$error = array(
 			'type'    => E_ERROR,
 			'message' => 'Maximum execution time',
 		);
-		$this->feed_generator->handle_unexpected_shutdown( $action_id, $error );
 
+		// First call: should reschedule and throttle.
+		$real_feed_generator->handle_unexpected_shutdown( $action_id, $error );
 		$this->assertEquals( 50, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
 		$this->assertEquals( 2, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) );
 
-		$this->feed_generator->handle_unexpected_shutdown( $action_id, $error );
+		// Second call: should be skipped due to deduplication (action already scheduled from first call).
+		$real_feed_generator->handle_unexpected_shutdown( $action_id, $error );
 
-		$this->assertEquals( 17, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
-		$this->assertEquals( 3, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) );
+		// Batch size and attempt should remain the same since rescheduling was skipped.
+		$this->assertEquals( 50, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
+		$this->assertEquals( 2, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) );
+	}
+
+	/**
+	 * Tests that deduplication prevents rescheduling when action is already scheduled.
+	 *
+	 * @return void
+	 */
+	public function test_handle_unexpected_shutdown_skips_rescheduling_if_action_already_scheduled() {
+		// Use real FeedGenerator that actually schedules actions.
+		$real_feed_generator = new FeedGenerator(
+			new TestActionSchedulerProxy(),
+			$this->feed_file_operations,
+			$this->local_feed_configs
+		);
+
+		$action_id = as_schedule_single_action(
+			gmdate( 'U' ) - 1,
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 1, array() ),
+			'pinterest-for-woocommerce'
+		);
+		// Simulate Action Scheduler picking up the action: mark it in-progress exactly
+		// as AS does via process_action() → log_execution() before invoking our callback.
+		\ActionScheduler_Store::instance()->log_execution( $action_id );
+
+		$error = array(
+			'type'    => E_ERROR,
+			'message' => 'Maximum execution time',
+		);
+
+		// First timeout: should reschedule and decrease batch size.
+		$real_feed_generator->handle_unexpected_shutdown( $action_id, $error );
+		$this->assertEquals( 50, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
+
+		// Second timeout: deduplication should prevent rescheduling since action already exists.
+		$real_feed_generator->handle_unexpected_shutdown( $action_id, $error );
+
+		// Batch size should remain unchanged since deduplication skipped the second reschedule.
+		$this->assertEquals( 50, \Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
 	}
 
 	/**
@@ -221,10 +371,10 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->feed_generator->handle_failed_execution( $action_id, new Exception( 'Some error msg.' ), '' );
 
 		$pending_actions = as_get_scheduled_actions(
-			[
+			array(
 				'hook'   => 'pinterest/jobs/generate_feed/chain_batch_foo',
 				'status' => 'pending',
-			]
+			)
 		);
 
 		$this->assertCount( 0, $pending_actions );
@@ -244,7 +394,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		// Add a callback to throw an exception when the action is processed.
 		$callback = function () {
-			throw new Exception('Action `pinterest/jobs/generate_feed/chain_batch` failed to complete.' );
+			throw new Exception( 'Action `pinterest/jobs/generate_feed/chain_batch` failed to complete.' );
 		};
 		add_action( 'pinterest/jobs/generate_feed/chain_batch', $callback, 10, 2 );
 
@@ -280,7 +430,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$this->assertCount( 1, $future_actions );
 		/** @var ActionScheduler_Action $action */
-		$action = current( $future_actions );
+		$action         = current( $future_actions );
 		$delay_in_hours = (int) ceil( ( $action->get_schedule()->get_date()->getTimestamp() - time() ) / 3600 );
 		$this->assertEquals( 1, $delay_in_hours );
 	}
@@ -341,7 +491,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		try {
 			$this->feed_generator->handle_start_action( array() );
 		} catch ( Exception $e ) {
-			$feed_generation_status        = ProductFeedStatus::get()[ 'status' ];
+			$feed_generation_status        = ProductFeedStatus::get()['status'];
 			$feed_generation_wall_time     = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
 			$feed_generation_product_count = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT ];
 
@@ -369,7 +519,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	public function test_feed_generator_end_sets_product_count_into_persistent_state_property() {
 		ProductFeedStatus::set(
 			array(
-				'product_count'                                              => 13,
+				'product_count' => 13,
 				ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT => 1,
 			)
 		);
@@ -398,7 +548,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		try {
 			$this->feed_generator->handle_end_action( array() );
 		} catch ( Exception $e ) {
-			$feed_generation_status        = ProductFeedStatus::get()[ 'status' ];
+			$feed_generation_status        = ProductFeedStatus::get()['status'];
 			$feed_generation_wall_time     = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
 			$feed_generation_product_count = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT ];
 
@@ -418,7 +568,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$this->feed_generator->handle_start_action( array() );
 
-		$status        = ProductFeedStatus::get()[ 'status' ];
+		$status        = ProductFeedStatus::get()['status'];
 		$wall_time     = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
 		$product_count = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT ];
 
@@ -439,7 +589,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$this->feed_generator->handle_batch_action( 1, array() );
 
-		$this->assertEquals( 0, (int) \Pinterest_For_Woocommerce::get_data( 'feed_generation_retries' ));
+		$this->assertEquals( 0, (int) \Pinterest_For_Woocommerce::get_data( 'feed_generation_retries' ) );
 	}
 
 	public function test_handle_batch_action_queues_next_batch_when_there_are_items_to_process() {
@@ -456,7 +606,80 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$this->feed_generator->handle_batch_action( 1, array() );
 
-		$this->assertEquals( 0, (int) \Pinterest_For_Woocommerce::get_data( 'feed_generation_retries' ));
+		$this->assertEquals( 0, (int) \Pinterest_For_Woocommerce::get_data( 'feed_generation_retries' ) );
+	}
+
+	/**
+	 * Tests circuit breaker stops batch processing after reaching MAX_BATCHES_PER_CYCLE.
+	 *
+	 * @return void
+	 */
+	public function test_circuit_breaker_stops_processing_at_max_batches() {
+		$product = WC_Helper_Product::create_simple_product();
+		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
+		// Large batch size so the single product falls inside the boundary batch's query.
+		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', 10000 );
+
+		// The last allowed batch ( batch_number === MAX_BATCHES_PER_CYCLE ) must process
+		// normally and actually return the product — not a vacuous empty array.
+		$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( FeedGenerator::MAX_BATCHES_PER_CYCLE, array() ) );
+		$this->assertContains( $product->get_id(), $items, 'Last allowed batch must still fetch products.' );
+
+		// The next batch exceeds the limit and must throw so the feed is never silently truncated.
+		$this->expectException( FeedCircuitBreakerException::class );
+		$this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( FeedGenerator::MAX_BATCHES_PER_CYCLE + 1, array() ) );
+	}
+
+	/**
+	 * Tests the circuit breaker honours a custom limit set via the filter.
+	 *
+	 * @return void
+	 */
+	public function test_circuit_breaker_respects_custom_filter_limit() {
+		$filter = static function () {
+			return 1;
+		};
+		add_filter( 'pinterest_for_woocommerce_max_feed_batches_per_cycle', $filter );
+
+		try {
+			// Batch 1 is within the custom limit and must not throw.
+			$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( 1, array() ) );
+			$this->assertIsArray( $items );
+
+			// Batch 2 exceeds the custom limit of 1 and must throw.
+			$this->expectException( FeedCircuitBreakerException::class );
+			$this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( 2, array() ) );
+		} finally {
+			remove_filter( 'pinterest_for_woocommerce_max_feed_batches_per_cycle', $filter );
+		}
+	}
+
+	/**
+	 * Tests that cursor is only advanced after successful batch processing.
+	 *
+	 * @return void
+	 */
+	public function test_cursor_deferred_until_successful_batch_completion() {
+		// Create a product to fetch.
+		WC_Helper_Product::create_simple_product();
+
+		// Set initial cursor.
+		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
+
+		// Fetch items - this should store pending cursor but not commit it yet.
+		$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( 1, array() ) );
+		$this->assertNotEmpty( $items );
+
+		// Cursor should still be at initial value (not advanced yet).
+		$cursor_before = Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		$this->assertEquals( 0, $cursor_before, 'Cursor should not advance before handle_batch_action completes' );
+
+		// Complete batch processing.
+		$this->feed_generator->handle_batch_action( 1, array() );
+
+		// Now cursor should be advanced.
+		$cursor_after = Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		$this->assertGreaterThan( $cursor_before, $cursor_after, 'Cursor should advance after successful batch completion' );
 	}
 
 	/**
@@ -468,26 +691,26 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		update_option( 'woocommerce_hide_out_of_stock_items', 'yes' );
 		$product_a = \WC_Helper_Product::create_simple_product(
 			true,
-			[
+			array(
 				'name' => 'In stock product',
-			]
+			)
 		);
 		$product_b = \WC_Helper_Product::create_simple_product(
 			true,
-			[
+			array(
 				'name'         => 'Product on backorder',
 				'stock_status' => 'onbackorder',
-			]
+			)
 		);
 		$product_c = \WC_Helper_Product::create_simple_product(
 			true,
-			[
+			array(
 				'name'         => 'Out of stock product',
 				'stock_status' => 'outofstock',
-			]
+			)
 		);
 
-		$ids = [ $product_a->get_id(), $product_b->get_id(), $product_c->get_id() ];
+		$ids = array( $product_a->get_id(), $product_b->get_id(), $product_c->get_id() );
 
 		$products = $this->feed_generator->get_feed_products( $ids );
 
@@ -610,5 +833,187 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		foreach ( $variation_ids as $variation_id ) {
 			$this->assertNotContains( $variation_id, $batch_ids );
 		}
+	}
+
+	/**
+	 * Verifies FeedCircuitBreakerException is throwable and is-a Exception.
+	 *
+	 * @return void
+	 */
+	public function test_feed_circuit_breaker_exception_is_an_exception() {
+		$this->expectException( FeedCircuitBreakerException::class );
+		throw new FeedCircuitBreakerException( 'limit reached' );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_count_published_products_counts_only_published() {
+		$before = $this->invoke_protected( $this->feed_generator, 'count_published_products', array() );
+
+		// Published product — should be counted.
+		WC_Helper_Product::create_simple_product();
+
+		// Draft product — should NOT be counted.
+		$draft = WC_Helper_Product::create_simple_product();
+		wp_update_post(
+			array(
+				'ID'          => $draft->get_id(),
+				'post_status' => 'draft',
+			)
+		);
+
+		$after = $this->invoke_protected( $this->feed_generator, 'count_published_products', array() );
+
+		$this->assertEquals( $before + 1, $after, 'Only published products should be counted' );
+	}
+
+	/**
+	 * @dataProvider provide_product_count_to_recommended_limit
+	 * @param int $total    Total product count.
+	 * @param int $expected Expected recommended limit.
+	 * @return void
+	 */
+	public function test_calculate_recommended_batch_limit( int $total, int $expected ) {
+		$result = $this->invoke_protected(
+			$this->feed_generator,
+			'calculate_recommended_batch_limit',
+			array( $total )
+		);
+		$this->assertEquals( $expected, $result );
+	}
+
+	/**
+	 * @return array<string, array{int, int}>
+	 */
+	public function provide_product_count_to_recommended_limit(): array {
+		return array(
+			'0 products'    => array( 0, 500 ),
+			'50k products'  => array( 50000, 1000 ),
+			'120k products' => array( 120000, 1500 ),
+			'200k products' => array( 200000, 2500 ),
+			'500k products' => array( 500000, 6500 ),
+		);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_handle_error_with_circuit_breaker_exception_creates_inbox_note() {
+		$exception = new FeedCircuitBreakerException( 'limit reached' );
+		$this->invoke_protected( $this->feed_generator, 'handle_error', array( $exception, 'chain_batch' ) );
+
+		$note_ids = Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
+		$this->assertNotEmpty( $note_ids, 'Inbox note should be created when the circuit breaker trips' );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_handle_error_with_generic_exception_does_not_create_inbox_note() {
+		$exception = new \Exception( 'some other error' );
+		$this->invoke_protected( $this->feed_generator, 'handle_error', array( $exception, 'chain_batch' ) );
+
+		$note_ids = Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
+		$this->assertCount( 0, $note_ids, 'No inbox note should be created for non-circuit-breaker errors' );
+	}
+
+	/**
+	 * The circuit breaker must NOT reschedule a full regeneration — that would re-process
+	 * the over-limit catalog every cycle and trip the breaker again indefinitely.
+	 *
+	 * @return void
+	 */
+	public function test_handle_error_with_circuit_breaker_exception_does_not_schedule_retry() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+
+		$this->invoke_protected(
+			$this->feed_generator,
+			'handle_error',
+			array( new FeedCircuitBreakerException( 'limit reached' ), 'chain_batch' )
+		);
+
+		$pending = as_get_scheduled_actions(
+			array(
+				'hook'   => 'pinterest-for-woocommerce-start-feed-generation',
+				'status' => 'pending',
+				'group'  => 'pinterest-for-woocommerce',
+			)
+		);
+		$this->assertCount( 0, $pending, 'Circuit breaker must not schedule a full regeneration retry.' );
+	}
+
+	/**
+	 * A transient (non-circuit-breaker) error must still schedule a full regeneration retry.
+	 *
+	 * @return void
+	 */
+	public function test_handle_error_with_generic_exception_schedules_retry() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+
+		$this->invoke_protected(
+			$this->feed_generator,
+			'handle_error',
+			array( new \Exception( 'transient error' ), 'chain_batch' )
+		);
+
+		$pending = as_get_scheduled_actions(
+			array(
+				'hook'   => 'pinterest-for-woocommerce-start-feed-generation',
+				'status' => 'pending',
+				'group'  => 'pinterest-for-woocommerce',
+			)
+		);
+		$this->assertNotEmpty( $pending, 'Transient errors must schedule a full regeneration retry.' );
+	}
+
+	/**
+	 * When the product count is unavailable or low, the recommended limit must still
+	 * exceed the limit that just tripped — otherwise the note advises a useless value.
+	 *
+	 * @return void
+	 */
+	public function test_circuit_breaker_recommendation_exceeds_tripped_limit() {
+		// Empty product table => count is 0 => the raw formula yields 500, which is below
+		// the default tripped limit of 1000. The floor guard must bump it above 1000.
+		$this->invoke_protected(
+			$this->feed_generator,
+			'handle_error',
+			array( new FeedCircuitBreakerException( 'limit reached' ), 'chain_batch' )
+		);
+
+		$note = Notes::get_note(
+			current( Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME ) )
+		);
+
+		// Default MAX_BATCHES_PER_CYCLE is 1000; the floor guard bumps the recommendation to 2000.
+		$this->assertStringContainsString( '2000', $note->get_content() );
+	}
+
+	/**
+	 * Action Scheduler's queue runner catches the original Throwable and re-throws a generic
+	 * Exception, exposing the original only via getPrevious(). handle_error must still detect
+	 * the circuit breaker through the exception chain — to add the note and skip the retry.
+	 *
+	 * @return void
+	 */
+	public function test_handle_error_detects_circuit_breaker_wrapped_by_action_scheduler() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+
+		// Mirror ActionScheduler_Abstract_QueueRunner: throw new Exception( msg, code, $original ).
+		$wrapped = new \Exception( 'limit reached', 0, new FeedCircuitBreakerException( 'limit reached' ) );
+		$this->invoke_protected( $this->feed_generator, 'handle_error', array( $wrapped, 'chain_batch' ) );
+
+		$note_ids = Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
+		$this->assertNotEmpty( $note_ids, 'Note must be created even when the breaker exception is wrapped by Action Scheduler.' );
+
+		$pending = as_get_scheduled_actions(
+			array(
+				'hook'   => 'pinterest-for-woocommerce-start-feed-generation',
+				'status' => 'pending',
+				'group'  => 'pinterest-for-woocommerce',
+			)
+		);
+		$this->assertCount( 0, $pending, 'A wrapped circuit breaker exception must not schedule a full regeneration retry.' );
 	}
 }
