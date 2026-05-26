@@ -36,15 +36,17 @@ class TestActionSchedulerProxy implements ActionSchedulerInterface {
 	}
 
 	/**
-	 * Search for scheduled actions.
+	 * Search for scheduled actions — delegates to real Action Scheduler so status
+	 * filters (e.g. STATUS_PENDING) behave exactly as they would in production.
 	 *
-	 * @param mixed  $args          Search arguments.
-	 * @param string $return_format Return format.
+	 * @param mixed  $args          Search arguments (see as_get_scheduled_actions()).
+	 * @param string $return_format Return format: OBJECT, ARRAY_A, or 'ids'.
 	 * @param string $group         Action group.
-	 * @return array Empty array for testing.
+	 * @return array
 	 */
 	public function search( $args = array(), $return_format = OBJECT, string $group = '' ) {
-		return array();
+		$args['group'] = $group;
+		return as_get_scheduled_actions( $args, $return_format );
 	}
 
 	/**
@@ -246,9 +248,11 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			array( 1, array() ),
 			'pinterest-for-woocommerce'
 		);
-		// Cancel the pending action so as_has_scheduled_action() returns false on the first call,
-		// mirroring production where the action is in-progress (not pending) at shutdown time.
-		as_unschedule_action( 'pinterest/jobs/generate_feed/chain_batch', array( 1, array() ), 'pinterest-for-woocommerce' );
+		// Simulate Action Scheduler picking up the action: mark it in-progress exactly
+		// as AS does via process_action() → log_execution() before invoking our callback.
+		// This mirrors real timeout conditions and ensures the dedup guard (STATUS_PENDING
+		// only) allows the first reschedule even while the original action is running.
+		\ActionScheduler_Store::instance()->log_execution( $action_id );
 
 		$error = array(
 			'type'    => E_ERROR,
@@ -287,9 +291,9 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			array( 1, array() ),
 			'pinterest-for-woocommerce'
 		);
-		// Cancel the pending action so as_has_scheduled_action() returns false on the first call,
-		// mirroring production where the action is in-progress (not pending) at shutdown time.
-		as_unschedule_action( 'pinterest/jobs/generate_feed/chain_batch', array( 1, array() ), 'pinterest-for-woocommerce' );
+		// Simulate Action Scheduler picking up the action: mark it in-progress exactly
+		// as AS does via process_action() → log_execution() before invoking our callback.
+		\ActionScheduler_Store::instance()->log_execution( $action_id );
 
 		$error = array(
 			'type'    => E_ERROR,

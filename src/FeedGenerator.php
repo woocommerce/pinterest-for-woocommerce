@@ -175,9 +175,23 @@ class FeedGenerator extends AbstractChainedJob {
 			return;
 		}
 
-		// Check if an action with the same hook and args is already scheduled to prevent duplicate retries.
-		// Important: Check this BEFORE throttling to avoid unnecessary batch size adjustments.
-		if ( as_has_scheduled_action( $hook, $args, PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+		// Check if a PENDING retry already exists to prevent duplicate retries.
+		// We query STATUS_PENDING only — the timing out action itself is STATUS_RUNNING
+		// at the point this handler fires (AS marks it in-progress before invoking the
+		// callback), so as_has_scheduled_action() would incorrectly match it and block
+		// the very first reschedule.  A genuine duplicate is a *pending* retry scheduled
+		// by an earlier invocation of this handler.
+		$pending_retries = $this->action_scheduler->search(
+			array(
+				'hook'     => $hook,
+				'args'     => $args,
+				'per_page' => 1,
+				'status'   => ActionSchedulerInterface::STATUS_PENDING,
+			),
+			'ids',
+			PINTEREST_FOR_WOOCOMMERCE_PREFIX
+		);
+		if ( ! empty( $pending_retries ) ) {
 			self::log(
 				sprintf(
 					// Translators: Action Scheduler hook name.
