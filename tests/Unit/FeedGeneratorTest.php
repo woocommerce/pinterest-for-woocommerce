@@ -131,6 +131,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 */
 	public function tearDown(): void {
 		as_unschedule_all_actions( 'pinterest/jobs/generate_feed/chain_batch', null, 'pinterest-for-woocommerce' );
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', null, 'pinterest-for-woocommerce' );
 		Notes::delete_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
 		parent::tearDown();
 	}
@@ -614,13 +615,43 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_circuit_breaker_stops_processing_at_max_batches() {
-		// The last allowed batch (batch_number = MAX_BATCHES_PER_CYCLE) should process normally.
+		$product = WC_Helper_Product::create_simple_product();
+		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
+		// Large batch size so the single product falls inside the boundary batch's query.
+		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', 10000 );
+
+		// The last allowed batch ( batch_number === MAX_BATCHES_PER_CYCLE ) must process
+		// normally and actually return the product — not a vacuous empty array.
 		$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( FeedGenerator::MAX_BATCHES_PER_CYCLE, array() ) );
-		$this->assertIsArray( $items );
+		$this->assertContains( $product->get_id(), $items, 'Last allowed batch must still fetch products.' );
 
 		// The next batch exceeds the limit and must throw so the feed is never silently truncated.
 		$this->expectException( FeedCircuitBreakerException::class );
 		$this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( FeedGenerator::MAX_BATCHES_PER_CYCLE + 1, array() ) );
+	}
+
+	/**
+	 * Tests the circuit breaker honours a custom limit set via the filter.
+	 *
+	 * @return void
+	 */
+	public function test_circuit_breaker_respects_custom_filter_limit() {
+		$filter = static function () {
+			return 1;
+		};
+		add_filter( 'pinterest_for_woocommerce_max_feed_batches_per_cycle', $filter );
+
+		try {
+			// Batch 1 is within the custom limit and must not throw.
+			$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( 1, array() ) );
+			$this->assertIsArray( $items );
+
+			// Batch 2 exceeds the custom limit of 1 and must throw.
+			$this->expectException( FeedCircuitBreakerException::class );
+			$this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( 2, array() ) );
+		} finally {
+			remove_filter( 'pinterest_for_woocommerce_max_feed_batches_per_cycle', $filter );
+		}
 	}
 
 	/**
@@ -885,5 +916,77 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$note_ids = Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
 		$this->assertCount( 0, $note_ids, 'No inbox note should be created for non-circuit-breaker errors' );
+	}
+
+	/**
+	 * The circuit breaker must NOT reschedule a full regeneration — that would re-process
+	 * the over-limit catalog every cycle and trip the breaker again indefinitely.
+	 *
+	 * @return void
+	 */
+	public function test_handle_error_with_circuit_breaker_exception_does_not_schedule_retry() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+
+		$this->invoke_protected(
+			$this->feed_generator,
+			'handle_error',
+			array( new FeedCircuitBreakerException( 'limit reached' ), 'chain_batch' )
+		);
+
+		$pending = as_get_scheduled_actions(
+			array(
+				'hook'   => 'pinterest-for-woocommerce-start-feed-generation',
+				'status' => 'pending',
+				'group'  => 'pinterest-for-woocommerce',
+			)
+		);
+		$this->assertCount( 0, $pending, 'Circuit breaker must not schedule a full regeneration retry.' );
+	}
+
+	/**
+	 * A transient (non-circuit-breaker) error must still schedule a full regeneration retry.
+	 *
+	 * @return void
+	 */
+	public function test_handle_error_with_generic_exception_schedules_retry() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+
+		$this->invoke_protected(
+			$this->feed_generator,
+			'handle_error',
+			array( new \Exception( 'transient error' ), 'chain_batch' )
+		);
+
+		$pending = as_get_scheduled_actions(
+			array(
+				'hook'   => 'pinterest-for-woocommerce-start-feed-generation',
+				'status' => 'pending',
+				'group'  => 'pinterest-for-woocommerce',
+			)
+		);
+		$this->assertNotEmpty( $pending, 'Transient errors must schedule a full regeneration retry.' );
+	}
+
+	/**
+	 * When the product count is unavailable or low, the recommended limit must still
+	 * exceed the limit that just tripped — otherwise the note advises a useless value.
+	 *
+	 * @return void
+	 */
+	public function test_circuit_breaker_recommendation_exceeds_tripped_limit() {
+		// Empty product table => count is 0 => the raw formula yields 500, which is below
+		// the default tripped limit of 1000. The floor guard must bump it above 1000.
+		$this->invoke_protected(
+			$this->feed_generator,
+			'handle_error',
+			array( new FeedCircuitBreakerException( 'limit reached' ), 'chain_batch' )
+		);
+
+		$note = Notes::get_note(
+			current( Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME ) )
+		);
+
+		// Default MAX_BATCHES_PER_CYCLE is 1000; the floor guard bumps the recommendation to 2000.
+		$this->assertStringContainsString( '2000', $note->get_content() );
 	}
 }

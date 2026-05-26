@@ -605,8 +605,41 @@ class FeedGenerator extends AbstractChainedJob {
 		if ( $th instanceof FeedCircuitBreakerException ) {
 			// Use a live product count rather than the batch-run status cache — the batch
 			// may have been interrupted mid-update, so the cached count could be stale.
-			$recommended = $this->calculate_recommended_batch_limit( $this->count_published_products() );
+			$total_products = $this->count_published_products();
+			/**
+			 * Maximum number of batches allowed per generation cycle.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+			 */
+			$max_batches = (int) apply_filters( 'pinterest_for_woocommerce_max_feed_batches_per_cycle', self::MAX_BATCHES_PER_CYCLE );
+			$recommended = null === $total_products ? 0 : $this->calculate_recommended_batch_limit( $total_products );
+
+			// Never advise a value at or below the limit that just tripped. That would
+			// happen if the count query failed ( null ) or returned a stale/low value,
+			// leaving the merchant with a recommendation that cannot resolve the problem.
+			if ( $recommended <= $max_batches ) {
+				$recommended = (int) ( ceil( ( $max_batches * 2 ) / 500 ) * 500 );
+			}
+
 			FeedCircuitBreakerNote::add_note( $recommended );
+
+			// Do not reschedule a full regeneration here. An over-limit catalog would
+			// re-process every cycle and trip the breaker again — the exact runaway the
+			// breaker exists to prevent. The admin note prompts the merchant to raise the
+			// limit; the daily generator recurrence resumes the sync once they do.
+			self::log(
+				sprintf(
+					// Translators: 1: Action Scheduler hook name, 2: Error message about why action has failed to execute.
+					__(
+						'Feed Generator `%1$s` Action stopped: `%2$s`. No automatic retry scheduled; raise the batch limit filter to resume.',
+						'pinterest-for-woocommerce'
+					),
+					$hook_name,
+					$th->getMessage()
+				),
+				\WC_Log_Levels::ERROR
+			);
+
+			return;
 		}
 
 		self::log(
@@ -712,14 +745,14 @@ class FeedGenerator extends AbstractChainedJob {
 	 * subquery that restricts variations to variable-type parents — so the result
 	 * accurately reflects what the feed would include.
 	 *
-	 * @return int
+	 * @return int|null Published product count, or null if the count query failed.
 	 */
-	private function count_published_products(): int {
+	private function count_published_products(): ?int {
 		global $wpdb;
 
 		$variable_type_like = $wpdb->esc_like( 'variable' ) . '%';
 
-		return (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
 				"SELECT COUNT( post.ID )
 				FROM {$wpdb->posts} AS post
@@ -741,6 +774,19 @@ class FeedGenerator extends AbstractChainedJob {
 				$variable_type_like
 			)
 		);
+
+		// A failed query (lock timeout, killed subquery, etc.) returns null. Surface it
+		// rather than letting an (int) cast coerce it to 0, which would feed a misleading
+		// recommendation into the admin note.
+		if ( null === $count ) {
+			self::log(
+				__( 'Failed to count published products for the feed circuit breaker recommendation.', 'pinterest-for-woocommerce' ),
+				\WC_Log_Levels::WARNING
+			);
+			return null;
+		}
+
+		return (int) $count;
 	}
 
 	/**
