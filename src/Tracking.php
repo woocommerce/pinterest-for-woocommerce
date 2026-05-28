@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
 use Automattic\WooCommerce\Pinterest\Tracking\Data;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Category;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
@@ -16,6 +17,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Search;
 use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Automattic\WooCommerce\Pinterest\Tracking\Tracker;
+use Automattic\WooCommerce\Pinterest\Utilities\CrawlerDetector;
 use Throwable;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -238,6 +240,11 @@ class Tracking {
 	/**
 	 * Method which iterates over all the attached trackers and delegates the event to them.
 	 *
+	 * Server-side trackers (Conversions API) are skipped for crawler/bot requests.
+	 * Browser-side rendering (Tag JS) is intentionally NOT skipped, so full-page
+	 * caches that omit `Vary: User-Agent` do not serve bot-rendered HTML missing
+	 * Tag JS to real users on a subsequent cache hit. See CrawlerDetector.
+	 *
 	 * @since 1.4.0
 	 *
 	 * @param string $event_name Tracking event name.
@@ -246,9 +253,17 @@ class Tracking {
 	 * @return void
 	 */
 	public function track_event( string $event_name, Data $data ) {
+		$is_crawler = CrawlerDetector::is_crawler_request();
+
 		foreach ( $this->get_trackers() as $tracker ) {
 			// Skip Pinterest tag tracking if tag is not active.
 			if ( $tracker instanceof Tag && ! Tag::get_active_tag() ) {
+				continue;
+			}
+
+			// Skip server-side CAPI dispatch for crawler requests so bot
+			// traffic does not inflate CAPI counts vs Tag counts.
+			if ( $is_crawler && $tracker instanceof Conversions ) {
 				continue;
 			}
 
