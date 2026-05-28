@@ -251,7 +251,7 @@ class ProductsXmlFeed {
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
 	 *
-	 * @return string
+	 * @return string|void
 	 */
 	private static function get_property_description( $product, $property ) {
 
