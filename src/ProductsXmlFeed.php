@@ -259,14 +259,61 @@ class ProductsXmlFeed {
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
 	 *
-	 * @return string
+	 * @return string|void
 	 */
 	private static function get_property_description( $product, $property ) {
 
-		$description = $product->get_parent_id() ? $product->get_description() : $product->get_short_description();
+		// Guard against stale IDs or upstream lookup failures that pass a
+		// non-product value through to the feed pipeline.
+		if ( ! $product instanceof WC_Product ) {
+			return;
+		}
 
-		if ( empty( $description ) ) {
-			$description = get_the_excerpt( $product->get_id() );
+		if ( $product->get_parent_id() ) {
+			$description = $product->get_description();
+			$parent      = null;
+
+			if ( empty( $description ) ) {
+				/*
+				 * For variations without their own description, fall back to the parent
+				 * product's short description, then the parent's long description.
+				 * Avoid get_the_excerpt() here because WooCommerce stores the variation's
+				 * attribute summary in post_excerpt, which is not a useful description.
+				 *
+				 * wc_get_product() has its own per-request object cache, so sibling
+				 * variations of the same parent reuse the same load without
+				 * needing a second cache layer in this method.
+				 */
+				$parent = wc_get_product( $product->get_parent_id() );
+
+				if ( $parent ) {
+					$description = $parent->get_short_description();
+
+					if ( empty( $description ) ) {
+						$description = $parent->get_description();
+					}
+				}
+			}
+
+			/**
+			 * Filters the description used for a variation product entry in the
+			 * Pinterest feed XML. Use this to override the variation→parent
+			 * fallback chain (e.g. emit a translated description, prefer parent
+			 * long over short, or inject a per-variation string).
+			 *
+			 * @since x.x.x
+			 *
+			 * @param string          $description Resolved description after the variation→parent fallback.
+			 * @param WC_Product      $product     Variation product.
+			 * @param WC_Product|null $parent      Parent product, or null when not loaded (variation had its own description, or the parent post was deleted).
+			 */
+			$description = apply_filters( 'pinterest_for_woocommerce_variation_description', $description, $product, $parent );
+		} else {
+			$description = $product->get_short_description();
+
+			if ( empty( $description ) ) {
+				$description = get_the_excerpt( $product->get_id() );
+			}
 		}
 
 		if ( empty( $description ) ) {

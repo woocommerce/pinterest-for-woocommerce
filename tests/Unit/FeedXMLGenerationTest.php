@@ -172,19 +172,32 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// By passing manually created Variable Product the create_variation_product will add children to it.
 		$product           = new WC_Product_Variable();
 		$variation_product = WC_Helper_Product::create_variation_product( $product );
+
+		// Give the parent a short description so variations can fall back to it.
+		$parent_short_desc = 'Parent short description.';
+		$variation_product->set_short_description( $parent_short_desc );
+		$variation_product->save();
+
 		// create_variation_product creates multiple children, picking up the first one
 		$child_id      = $variation_product->get_children()[0];
 		$child_product = wc_get_product( $child_id );
 		$xml           = $description_method( $child_product );
 
 		/*
-		 * With no description set the code will use the excerpt.
-		 * The excerpt for the product variation is build from the attributes summary.
+		 * With no variation description set the feed should fall back to the parent's
+		 * short description, not the attribute summary stored in the variation excerpt.
 		 */
-		$attributes_summary = $child_product->get_attribute_summary( 'edit' );
-		$this->assertEquals( "<description><![CDATA[{$attributes_summary}]]></description>", $xml );
+		$this->assertEquals( "<description><![CDATA[{$parent_short_desc}]]></description>", $xml );
 
-		// Get the next variable product for tests with description set.
+		// When the parent has no short description, fall back to the parent's long description.
+		$parent_long_desc = 'Parent long description.';
+		$variation_product->set_short_description( '' );
+		$variation_product->set_description( $parent_long_desc );
+		$variation_product->save();
+		$xml = $description_method( $child_product );
+		$this->assertEquals( "<description><![CDATA[{$parent_long_desc}]]></description>", $xml );
+
+		// Get the next variable product child for tests with the variation description set directly.
 		$child_id      = $variation_product->get_children()[1];
 		$child_product = wc_get_product( $child_id );
 		$desc          = 'Test description.';
@@ -192,6 +205,189 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$child_product->save();
 		$xml = $description_method( $child_product );
 		$this->assertEquals( "<description><![CDATA[{$desc}]]></description>", $xml );
+	}
+
+	/**
+	 * When the parent has both short and long descriptions, variations without
+	 * their own description should fall back to the parent's short description
+	 * (not the long one) per the documented fallback order.
+	 *
+	 * @group feed
+	 */
+	public function testDescriptionVariationPrefersParentShortOverLong() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+
+		$parent_short_desc = 'Parent short description.';
+		$parent_long_desc  = 'Parent long description.';
+		$variation_product->set_short_description( $parent_short_desc );
+		$variation_product->set_description( $parent_long_desc );
+		$variation_product->save();
+
+		$child_id      = $variation_product->get_children()[0];
+		$child_product = wc_get_product( $child_id );
+
+		// Pin precondition: the variation must not have its own description,
+		// otherwise this test would pass for the wrong reason if WC ever
+		// auto-inherits the parent description on variations.
+		$this->assertSame( '', $child_product->get_description() );
+
+		$xml = $description_method( $child_product );
+
+		// Short description wins over long description.
+		$this->assertEquals( "<description><![CDATA[{$parent_short_desc}]]></description>", $xml );
+
+		// Parent (variable) product itself must still render its own short description,
+		// so a regression in the non-variation branch is caught by this test too.
+		$xml_parent = $description_method( $variation_product );
+		$this->assertEquals( "<description><![CDATA[{$parent_short_desc}]]></description>", $xml_parent );
+	}
+
+	/**
+	 * When the variation has its own description, it should take precedence
+	 * over both the parent short and long descriptions.
+	 *
+	 * @group feed
+	 */
+	public function testDescriptionVariationOwnDescriptionWinsOverParent() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+
+		$variation_product->set_short_description( 'Parent short description.' );
+		$variation_product->set_description( 'Parent long description.' );
+		$variation_product->save();
+
+		$child_id      = $variation_product->get_children()[0];
+		$child_product = wc_get_product( $child_id );
+
+		$own_desc = 'Variation specific description.';
+		$child_product->set_description( $own_desc );
+		$child_product->save();
+
+		$xml = $description_method( $child_product );
+		$this->assertEquals( "<description><![CDATA[{$own_desc}]]></description>", $xml );
+	}
+
+	/**
+	 * When neither the variation nor its parent provide a description, the
+	 * feed should emit no description element (rather than the variation's
+	 * auto-generated attribute summary stored in post_excerpt).
+	 *
+	 * @group feed
+	 */
+	public function testDescriptionVariationFallsBackToEmptyWhenParentEmpty() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+
+		// Explicitly clear both parent descriptions.
+		$variation_product->set_short_description( '' );
+		$variation_product->set_description( '' );
+		$variation_product->save();
+
+		$child_id      = $variation_product->get_children()[0];
+		$child_product = wc_get_product( $child_id );
+		$xml           = $description_method( $child_product );
+
+		// No description should be emitted; the variation attribute summary
+		// must not leak into the feed.
+		$this->assertEquals( '', $xml );
+	}
+
+	/**
+	 * When the variation's parent product has been hard-deleted (orphaned
+	 * variation), the fallback chain must short-circuit safely instead of
+	 * throwing on the missing parent.
+	 *
+	 * @group feed
+	 */
+	public function testDescriptionVariationHandlesMissingParent() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+		$parent_id         = $variation_product->get_id();
+
+		$child_id = $variation_product->get_children()[0];
+
+		// Load the variation BEFORE hard-deleting the parent: WC cannot
+		// instantiate a variation whose parent post is missing, so the load
+		// has to happen first to capture a live variation object.
+		$child_product = wc_get_product( $child_id );
+
+		// Hard-delete the parent so wc_get_product( $parent_id ) returns false
+		// when the fallback chain calls it from inside get_property_description.
+		wp_delete_post( $parent_id, true );
+
+		$xml = $description_method( $child_product );
+
+		// No description and no fatal: the fallback chain bailed out cleanly.
+		$this->assertEquals( '', $xml );
+	}
+
+	/**
+	 * The pinterest_for_woocommerce_variation_description filter must run
+	 * after the variation→parent fallback chain resolves, receive the
+	 * resolved value plus the variation and parent objects, and be able to
+	 * override the emitted description.
+	 *
+	 * @group feed
+	 */
+	public function testDescriptionVariationFilterCanOverrideFallback() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+
+		$variation_product->set_short_description( 'Parent short description.' );
+		$variation_product->save();
+
+		$child_id      = $variation_product->get_children()[0];
+		$child_product = wc_get_product( $child_id );
+
+		$captured = array();
+		$filter   = function ( $description, $variation, $parent_product ) use ( &$captured ) {
+			$captured = array(
+				'description' => $description,
+				'variation'   => $variation,
+				'parent'      => $parent_product,
+			);
+			return 'Filter override description.';
+		};
+		add_filter( 'pinterest_for_woocommerce_variation_description', $filter, 10, 3 );
+
+		try {
+			$xml = $description_method( $child_product );
+
+			$this->assertEquals( '<description><![CDATA[Filter override description.]]></description>', $xml );
+
+			// Filter receives the resolved fallback value, the variation, and the parent.
+			$this->assertEquals( 'Parent short description.', $captured['description'] );
+			$this->assertSame( $child_product->get_id(), $captured['variation']->get_id() );
+			$this->assertInstanceOf( \WC_Product::class, $captured['parent'] );
+			$this->assertSame( $variation_product->get_id(), $captured['parent']->get_id() );
+		} finally {
+			// Always remove the filter so an assertion failure can't leak into subsequent tests.
+			remove_filter( 'pinterest_for_woocommerce_variation_description', $filter, 10 );
+		}
+	}
+
+	/**
+	 * The function must short-circuit safely when handed a non-product
+	 * value (e.g. a stale ID that wc_get_product() resolved to false).
+	 *
+	 * @group feed
+	 */
+	public function testDescriptionInvalidProductReturnsEmpty() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$this->assertEquals( '', $description_method( false ) );
+		$this->assertEquals( '', $description_method( null ) );
 	}
 
 	/**
