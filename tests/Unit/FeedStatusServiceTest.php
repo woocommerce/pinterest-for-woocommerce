@@ -160,6 +160,12 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_log_failed_processing_result_does_not_log_same_processing_result_id_twice() {
+		$this->remote_feeds = array(
+			array(
+				'id'       => 'feed-123',
+				'location' => 'https://example.test/pinterest-for-woocommerce-feed-123.xml',
+			),
+		);
 		$processing_results = $this->get_failed_processing_results();
 
 		FeedStatusService::log_failed_processing_result( 'feed-123', $processing_results );
@@ -180,6 +186,16 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_log_failed_processing_result_scopes_deduplication_by_feed_id() {
+		$this->remote_feeds = array(
+			array(
+				'id'       => 'feed-123',
+				'location' => 'https://example.test/pinterest-for-woocommerce-feed-123.xml',
+			),
+			array(
+				'id'       => 'feed-456',
+				'location' => 'https://example.test/pinterest-for-woocommerce-feed-456.xml',
+			),
+		);
 		$processing_results = $this->get_failed_processing_results();
 
 		FeedStatusService::log_failed_processing_result( 'feed-123', $processing_results );
@@ -201,8 +217,18 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_log_failed_processing_result_keeps_deduplication_per_feed_after_other_feed_logs() {
-		$feed_a = $this->get_failed_processing_results();
-		$feed_b = $this->get_failed_processing_results();
+		$this->remote_feeds = array(
+			array(
+				'id'       => 'feed-123',
+				'location' => 'https://example.test/pinterest-for-woocommerce-feed-123.xml',
+			),
+			array(
+				'id'       => 'feed-456',
+				'location' => 'https://example.test/pinterest-for-woocommerce-feed-456.xml',
+			),
+		);
+		$feed_a             = $this->get_failed_processing_results();
+		$feed_b             = $this->get_failed_processing_results();
 
 		$feed_b['id'] = 'processing-result-2';
 
@@ -253,8 +279,14 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_log_failed_processing_result_logs_new_processing_result_id_after_previous() {
-		$first  = $this->get_failed_processing_results();
-		$second = $this->get_failed_processing_results();
+		$this->remote_feeds = array(
+			array(
+				'id'       => 'feed-123',
+				'location' => 'https://example.test/pinterest-for-woocommerce-feed-123.xml',
+			),
+		);
+		$first              = $this->get_failed_processing_results();
+		$second             = $this->get_failed_processing_results();
 
 		$second['id']         = 'processing-result-2';
 		$second['created_at'] = '2026-05-12T07:00:00';
@@ -340,9 +372,10 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	public function test_log_failed_processing_result_logs_empty_feed_url_when_no_feed_matches() {
 		FeedStatusService::log_failed_processing_result( 'unknown-feed', $this->get_failed_processing_results() );
 
-		$this->assertStringContainsString(
-			"feed_url: \n",
-			$this->mock_logger->entries[0]['message']
+		$this->assert_log_entry_contains( "feed_url: \n" );
+		$this->assert_log_entry_contains(
+			'Could not resolve feed_url: no registered feeds returned for feed_id=unknown-feed',
+			'warning'
 		);
 	}
 
@@ -361,9 +394,10 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 
 		FeedStatusService::log_failed_processing_result( 'unknown-feed', $this->get_failed_processing_results() );
 
-		$this->assertStringContainsString(
-			"feed_url: \n",
-			$this->mock_logger->entries[0]['message']
+		$this->assert_log_entry_contains( "feed_url: \n" );
+		$this->assert_log_entry_contains(
+			'Could not resolve feed_url: no registered feed matched feed_id=unknown-feed',
+			'warning'
 		);
 	}
 
