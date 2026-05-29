@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 class FeedStatusService {
 
 	/**
-	 * Plugin data key used to avoid logging the same failed processing result repeatedly.
+	 * Plugin data key used to avoid logging the same failed processing result for the same feed repeatedly.
 	 *
 	 * @var string
 	 */
@@ -346,7 +346,7 @@ class FeedStatusService {
 	}
 
 	/**
-	 * Log the full failed feed processing result context once per processing result ID.
+	 * Log the full failed feed processing result context once per feed and processing result ID.
 	 *
 	 * @param string $feed_id            Pinterest feed ID.
 	 * @param array  $processing_results Recent processing results array.
@@ -364,8 +364,11 @@ class FeedStatusService {
 			return;
 		}
 
-		$last_logged_processing_result_id = Pinterest_For_WooCommerce()::get_data( self::LAST_LOGGED_PROCESSING_RESULT_ID_KEY );
-		if ( $processing_result_id === $last_logged_processing_result_id ) {
+		$last_logged_processing_result_ids = Pinterest_For_WooCommerce()::get_data( self::LAST_LOGGED_PROCESSING_RESULT_ID_KEY );
+		if ( ! is_array( $last_logged_processing_result_ids ) ) {
+			$last_logged_processing_result_ids = array();
+		}
+		if ( ( $last_logged_processing_result_ids[ $feed_id ] ?? '' ) === $processing_result_id ) {
 			return;
 		}
 
@@ -373,12 +376,7 @@ class FeedStatusService {
 			return;
 		}
 
-		$feed_url = '';
-		$configs  = LocalFeedConfigs::get_instance()->get_configurations();
-		if ( ! empty( $configs ) ) {
-			$config   = reset( $configs );
-			$feed_url = $config['feed_url'] ?? '';
-		}
+		$feed_url = self::get_feed_url_for_feed_id( $feed_id );
 
 		Logger::log(
 			sprintf(
@@ -394,7 +392,44 @@ class FeedStatusService {
 			'feed-ingestion-failure'
 		);
 
-		Pinterest_For_WooCommerce()::save_data( self::LAST_LOGGED_PROCESSING_RESULT_ID_KEY, $processing_result_id );
+		$last_logged_processing_result_ids[ $feed_id ] = $processing_result_id;
+		Pinterest_For_WooCommerce()::save_data(
+			self::LAST_LOGGED_PROCESSING_RESULT_ID_KEY,
+			$last_logged_processing_result_ids
+		);
+	}
+
+	/**
+	 * Get the registered feed URL (location) for a Pinterest feed ID.
+	 *
+	 * The feed ID is the remote Pinterest feed ID, so it is resolved against the
+	 * registered remote feeds. Returns an empty string when no remote feed matches
+	 * (e.g. the feeds API is unavailable).
+	 *
+	 * @param string $feed_id Pinterest feed ID.
+	 * @return string
+	 */
+	private static function get_feed_url_for_feed_id( string $feed_id ): string {
+		$feeds = Feeds::get_feeds();
+
+		foreach ( $feeds as $feed ) {
+			if ( ( $feed['id'] ?? '' ) === $feed_id ) {
+				return $feed['location'] ?? '';
+			}
+		}
+
+		// Distinguish "no registered feeds returned" (e.g. feeds API unavailable) from
+		// "feeds returned but none match" (e.g. a stale or remote-only feed ID) so the
+		// empty feed_url in the failure log can be diagnosed.
+		Logger::log(
+			empty( $feeds )
+				? "Could not resolve feed_url: no registered feeds returned for feed_id={$feed_id}"
+				: "Could not resolve feed_url: no registered feed matched feed_id={$feed_id}",
+			'warning',
+			'feed-ingestion-failure'
+		);
+
+		return '';
 	}
 
 	/**
