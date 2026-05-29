@@ -410,11 +410,24 @@ class FeedStatusService {
 	 * @return string
 	 */
 	private static function get_feed_url_for_feed_id( string $feed_id ): string {
-		foreach ( Feeds::get_feeds() as $feed ) {
+		$feeds = Feeds::get_feeds();
+
+		foreach ( $feeds as $feed ) {
 			if ( ( $feed['id'] ?? '' ) === $feed_id ) {
 				return $feed['location'] ?? '';
 			}
 		}
+
+		// Distinguish "no registered feeds returned" (e.g. feeds API unavailable) from
+		// "feeds returned but none match" (e.g. a stale or remote-only feed ID) so the
+		// empty feed_url in the failure log can be diagnosed.
+		Logger::log(
+			empty( $feeds )
+				? "Could not resolve feed_url: no registered feeds returned for feed_id={$feed_id}"
+				: "Could not resolve feed_url: no registered feed matched feed_id={$feed_id}",
+			'warning',
+			'feed-ingestion-failure'
+		);
 
 		return '';
 	}

@@ -347,6 +347,27 @@ class FeedStatusServiceTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that an empty feed URL is logged when remote feeds are returned but none match the feed ID.
+	 *
+	 * @return void
+	 */
+	public function test_log_failed_processing_result_logs_empty_feed_url_when_remote_feeds_do_not_match() {
+		$this->remote_feeds = array(
+			array(
+				'id'       => 'feed-123',
+				'location' => 'https://example.test/pinterest-for-woocommerce-feed-123.xml',
+			),
+		);
+
+		FeedStatusService::log_failed_processing_result( 'unknown-feed', $this->get_failed_processing_results() );
+
+		$this->assertStringContainsString(
+			"feed_url: \n",
+			$this->mock_logger->entries[0]['message']
+		);
+	}
+
+	/**
 	 * Tests that a FETCH_ERROR failed processing result triggers one feed update retry.
 	 *
 	 * @return void
