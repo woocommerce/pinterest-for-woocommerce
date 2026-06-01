@@ -4,7 +4,7 @@ Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.4.26
+Stable tag: 1.4.27
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,22 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.4.27 - 2026-06-01 =
+* Add - WooCommerce product_brand to Pinterest feed as `g:brand`.
+* Fix - Align Pinterest checkout value with discounted merchandise line totals.
+* Fix - Correct checkout tracking item prices and preserve customer IP and user agent when sending hashed email.
+* Fix - Feed generator robustness at scale.
+* Fix - Feed location URL matching.
+* Fix - Log feed ingestion failure context to WooCommerce logs.
+* Fix - Restore class_exists guard on record_event.
+* Fix - Retry Pinterest feed ingestion sooner when Pinterest reports a FETCH_ERROR.
+* Fix - Scope failed feed ingestion logging deduplication and feed URL resolution by feed.
+* Fix - Skip Pinterest CAPI events for crawler requests to prevent CAPI vs Tag divergence.
+* Fix - Use deterministic Checkout tracking event IDs so refreshed thank-you pages can deduplicate purchases.
+* Fix - Variation feed description now falls back to the parent product's short/long description instead of the variation attribute summary.
+* Tweak - WC 10.8 compatibility.
+* Update - Treat additional Pinterest redeem error codes as terminal.
 
 = 1.4.26 - 2026-04-20 =
 * Add - Settings link to plugin action links.

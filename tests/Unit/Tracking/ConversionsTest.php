@@ -13,6 +13,7 @@ class ConversionsTest extends WP_UnitTestCase {
 		parent::tearDown();
 
 		remove_all_filters( 'pre_http_request' );
+		wp_set_current_user( 0 );
 	}
 
 	public function test_conversions_track_page_visit_event() {
@@ -42,7 +43,7 @@ class ConversionsTest extends WP_UnitTestCase {
 								'event_id'         => 'event-id-123',
 								'event_name'       => 'page_visit',
 								'action_source'    => 'web',
-								'event_source_url' => 'http://example.org',
+								'event_source_url' => $this->get_event_source_url(),
 								'partner_name'     => 'ss-woocommerce',
 								'user_data'        => array(
 									'client_ip_address' => 'Some IP address.',
@@ -88,6 +89,32 @@ class ConversionsTest extends WP_UnitTestCase {
 		$conversions->track_event( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
 	}
 
+	/**
+	 * Tests that hashed email is merged into default user data.
+	 */
+	public function test_default_data_keeps_ip_user_agent_with_logged_in_email() {
+		$user_id = self::factory()->user->create(
+			array(
+				'user_email' => 'customer@example.com',
+			)
+		);
+		wp_set_current_user( $user_id );
+
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user );
+
+		$data = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertEquals(
+			array(
+				'client_ip_address' => 'Some IP address.',
+				'client_user_agent' => 'Some user agent string.',
+				'em'                => array( hash( 'sha256', 'customer@example.com' ) ),
+			),
+			$data['user_data']
+		);
+	}
+
 	public function test_get_checkout_data() {
 		$user        = new User( 'Some IP address.', 'Some user agent string.' );
 		$conversions = new Conversions( $user );
@@ -115,7 +142,7 @@ class ConversionsTest extends WP_UnitTestCase {
 				'event_id'         => 'event-id-123',
 				'event_name'       => 'checkout',
 				'action_source'    => 'web',
-				'event_source_url' => 'http://example.org',
+				'event_source_url' => $this->get_event_source_url(),
 				'partner_name'     => 'ss-woocommerce',
 				'user_data'        => array(
 					'client_ip_address' => 'Some IP address.',
@@ -155,7 +182,7 @@ class ConversionsTest extends WP_UnitTestCase {
 				'event_id'         => 'event-id-321',
 				'event_name'       => 'add_to_cart',
 				'action_source'    => 'web',
-				'event_source_url' => 'http://example.org',
+				'event_source_url' => $this->get_event_source_url(),
 				'partner_name'     => 'ss-woocommerce',
 				'user_data'        => array(
 					'client_ip_address' => 'Some IP address.',
@@ -192,7 +219,7 @@ class ConversionsTest extends WP_UnitTestCase {
 				'event_id'         => 'event-id-312',
 				'event_name'       => 'view_category',
 				'action_source'    => 'web',
-				'event_source_url' => 'http://example.org',
+				'event_source_url' => $this->get_event_source_url(),
 				'partner_name'     => 'ss-woocommerce',
 				'user_data'        => array(
 					'client_ip_address' => 'Some IP address.',
@@ -220,7 +247,7 @@ class ConversionsTest extends WP_UnitTestCase {
 				'event_id'         => 'event-id-132',
 				'event_name'       => 'page_visit',
 				'action_source'    => 'web',
-				'event_source_url' => 'http://example.org',
+				'event_source_url' => $this->get_event_source_url(),
 				'partner_name'     => 'ss-woocommerce',
 				'user_data'        => array(
 					'client_ip_address' => 'Some IP address.',
@@ -257,7 +284,7 @@ class ConversionsTest extends WP_UnitTestCase {
 				'event_id'         => 'event-id-111',
 				'event_name'       => 'search',
 				'action_source'    => 'web',
-				'event_source_url' => 'http://example.org',
+				'event_source_url' => $this->get_event_source_url(),
 				'partner_name'     => 'ss-woocommerce',
 				'user_data'        => array(
 					'client_ip_address' => 'Some IP address.',
@@ -270,5 +297,16 @@ class ConversionsTest extends WP_UnitTestCase {
 			),
 			$data
 		);
+	}
+
+	/**
+	 * Gets the expected event source URL for the active test site.
+	 *
+	 * @return string
+	 */
+	private function get_event_source_url() {
+		global $wp;
+
+		return home_url( $wp->request );
 	}
 }

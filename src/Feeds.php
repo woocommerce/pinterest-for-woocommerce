@@ -222,6 +222,23 @@ class Feeds {
 	}
 
 	/**
+	 * Reschedule Pinterest's next feed fetch to roughly five minutes from now.
+	 *
+	 * Issuing an "empty" feed update is the idiom Pinterest expects to reset the
+	 * preferred processing schedule; this wrapper makes that intent explicit.
+	 *
+	 * @since 1.4.27
+	 *
+	 * @param string $feed_id The ID of the feed.
+	 *
+	 * @return array
+	 * @throws Throwable PHP Exception if there is an error updating the feed.
+	 */
+	public static function reschedule_feed_fetch( string $feed_id ) {
+		return static::update_feed( $feed_id, array() );
+	}
+
+	/**
 	 * Get a specific merchant feed using the given arguments.
 	 *
 	 * @param string $feed_id     The ID of the feed.
@@ -301,7 +318,8 @@ class Feeds {
 			 * When trying to match remote feed to a local configuration, we need to check both cases
 			 * not to create a new feed if the feed was created by the extension in the past.
 			 */
-			$does_match = self::does_feed_match( $feed ) && ( $feed['location'] ?? '' ) === $config['feed_url'];
+			$does_match = self::does_feed_match( $feed )
+				&& self::normalize_feed_location_url( $feed['location'] ?? '' ) === $config['feed_url'];
 			if ( $does_match ) {
 				return $feed['id'];
 			}
@@ -336,7 +354,24 @@ class Feeds {
 			return false;
 		}
 
-		return 0 === strpos( $feed['location'] ?? '', get_site_url() );
+		$upload_base_url = self::normalize_feed_location_url( wp_get_upload_dir()['baseurl'] );
+		$feed_location   = trailingslashit( $upload_base_url ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-';
+
+		return 0 === strpos( self::normalize_feed_location_url( $feed['location'] ?? '' ), $feed_location );
+	}
+
+	/**
+	 * Normalize a feed location URL to HTTPS before comparing local and remote values.
+	 *
+	 * Some sites may be misconfigured and return an HTTP scheme for the feed location URL while
+	 * Pinterest stores the URL as HTTPS (or vice versa). Forcing both sides to HTTPS prevents
+	 * scheme mismatches from breaking feed matching.
+	 *
+	 * @param string $url The feed location URL.
+	 * @return string
+	 */
+	private static function normalize_feed_location_url( string $url ): string {
+		return set_url_scheme( $url, 'https' );
 	}
 
 	/**

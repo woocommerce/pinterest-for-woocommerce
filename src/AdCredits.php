@@ -32,6 +32,19 @@ class AdCredits {
 	private const MARKETING_OFFER_CREDIT = 'MARKETING_OFFER_CREDIT';
 
 	/**
+	 * Pinterest error codes that mean the ad-credit offer can no longer be
+	 * redeemed by this plugin. When any of these is recorded we stop retrying
+	 * the redeem endpoint, since further calls would just repeat the failure.
+	 *
+	 * @var int[]
+	 */
+	private const ALREADY_REDEEMED_ERRORS = array(
+		PinterestApiException::OFFER_ALREADY_REDEEMED,
+		PinterestApiException::OFFER_ALREADY_REDEEMED_BY_ANOTHER_ADVERTISER,
+		PinterestApiException::OFFER_ALREADY_REDEEMED_VARIANT,
+	);
+
+	/**
 	 * Initialize Ad Credits actions and Action Scheduler hooks.
 	 *
 	 * @since 1.2.5
@@ -91,13 +104,9 @@ class AdCredits {
 		$redeem_status = $account_data['coupon_redeem_info']['redeem_status'] ?? false;
 		$error_id      = $account_data['coupon_redeem_info']['error_id'] ?? false;
 
-		if ( PinterestApiException::OFFER_ALREADY_REDEEMED === $error_id ) {
-			// Advertiser has already redeemed the coupon.
-			return true;
-		}
-
-		if ( PinterestApiException::OFFER_ALREADY_REDEEMED_BY_ANOTHER_ADVERTISER === $error_id ) {
-			// Different advertiser id has already redeemed the coupon.
+		if ( in_array( $error_id, self::ALREADY_REDEEMED_ERRORS, true ) ) {
+			// A prior attempt hit a terminal error from Pinterest (e.g., the
+			// offer has already been redeemed). Do not retry.
 			return true;
 		}
 
@@ -278,5 +287,4 @@ class AdCredits {
 
 		return $found_discounts;
 	}
-
 }

@@ -98,7 +98,14 @@ class FeedRegistration {
 		}
 
 		try {
-			return self::register_feed();
+			$result  = self::register_feed();
+			$feed_id = self::get_locally_stored_registered_feed_id();
+
+			if ( ! empty( $feed_id ) ) {
+				self::maybe_log_failed_processing_result( $feed_id );
+			}
+
+			return $result;
 		} catch ( PinterestApiLocaleException $e ) {
 			Pinterest_For_Woocommerce()::save_data( 'merchant_locale_not_valid', true );
 
@@ -151,6 +158,25 @@ class FeedRegistration {
 
 		static::maybe_delete_stale_feeds_for_merchant( $feed_id );
 		return true;
+	}
+
+	/**
+	 * Log the latest failed feed processing result context if Pinterest reported a failed ingestion.
+	 *
+	 * Failures inside this helper must never propagate back to the registration action — a
+	 * diagnostic-only side path should not be able to mark the parent scheduled action as failed.
+	 *
+	 * @param string $feed_id Feed ID.
+	 * @return void
+	 */
+	private static function maybe_log_failed_processing_result( string $feed_id ): void {
+		try {
+			$processing_results = Feeds::get_feed_recent_processing_results( $feed_id );
+			FeedStatusService::log_failed_processing_result( $feed_id, $processing_results );
+			FeedStatusService::maybe_retry_on_fetch_error( $feed_id, $processing_results );
+		} catch ( Throwable $th ) {
+			Logger::log( $th->getMessage(), 'error', 'feed-ingestion-failure' );
+		}
 	}
 
 	/**

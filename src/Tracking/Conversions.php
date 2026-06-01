@@ -123,9 +123,7 @@ class Conversions extends Tracker {
 
 		$email = self::maybe_get_hashed_customer_email();
 		if ( false !== $email ) {
-			$data['user_data'] = array(
-				'em' => array( $email ),
-			);
+			$data['user_data']['em'] = array( $email );
 		}
 
 		return $data;

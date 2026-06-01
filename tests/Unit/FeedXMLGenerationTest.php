@@ -87,8 +87,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// Product type not set.
 		$this->assertEquals( 'Uncategorized', $g_children['product_type'] );
 
-		// This should be the permalink.
-		$this->assertEquals( 'http://example.org/?product=dummy-product&utm_source=pinterest&utm_medium=social', $children['link'] );
+		// This should be the permalink, with the Pinterest UTM contract appended.
+		$this->assertEquals( $this->getProductPermalinkWithUtm( $product ), $children['link'] );
+		$this->assertStringContainsString( 'utm_source=pinterest&utm_medium=social', $children['link'] );
 
 		// No description set.
 		$this->assertArrayNotHasKey( 'image_link', $g_children, 'By default product does not have an image link.' );
@@ -171,19 +172,32 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// By passing manually created Variable Product the create_variation_product will add children to it.
 		$product           = new WC_Product_Variable();
 		$variation_product = WC_Helper_Product::create_variation_product( $product );
+
+		// Give the parent a short description so variations can fall back to it.
+		$parent_short_desc = 'Parent short description.';
+		$variation_product->set_short_description( $parent_short_desc );
+		$variation_product->save();
+
 		// create_variation_product creates multiple children, picking up the first one
 		$child_id      = $variation_product->get_children()[0];
 		$child_product = wc_get_product( $child_id );
 		$xml           = $description_method( $child_product );
 
 		/*
-		 * With no description set the code will use the excerpt.
-		 * The excerpt for the product variation is build from the attributes summary.
+		 * With no variation description set the feed should fall back to the parent's
+		 * short description, not the attribute summary stored in the variation excerpt.
 		 */
-		$attributes_summary = $child_product->get_attribute_summary( 'edit' );
-		$this->assertEquals( "<description><![CDATA[{$attributes_summary}]]></description>", $xml );
+		$this->assertEquals( "<description><![CDATA[{$parent_short_desc}]]></description>", $xml );
 
-		// Get the next variable product for tests with description set.
+		// When the parent has no short description, fall back to the parent's long description.
+		$parent_long_desc = 'Parent long description.';
+		$variation_product->set_short_description( '' );
+		$variation_product->set_description( $parent_long_desc );
+		$variation_product->save();
+		$xml = $description_method( $child_product );
+		$this->assertEquals( "<description><![CDATA[{$parent_long_desc}]]></description>", $xml );
+
+		// Get the next variable product child for tests with the variation description set directly.
 		$child_id      = $variation_product->get_children()[1];
 		$child_product = wc_get_product( $child_id );
 		$desc          = 'Test description.';
@@ -191,6 +205,189 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$child_product->save();
 		$xml = $description_method( $child_product );
 		$this->assertEquals( "<description><![CDATA[{$desc}]]></description>", $xml );
+	}
+
+	/**
+	 * When the parent has both short and long descriptions, variations without
+	 * their own description should fall back to the parent's short description
+	 * (not the long one) per the documented fallback order.
+	 *
+	 * @group feed
+	 */
+	public function testDescriptionVariationPrefersParentShortOverLong() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+
+		$parent_short_desc = 'Parent short description.';
+		$parent_long_desc  = 'Parent long description.';
+		$variation_product->set_short_description( $parent_short_desc );
+		$variation_product->set_description( $parent_long_desc );
+		$variation_product->save();
+
+		$child_id      = $variation_product->get_children()[0];
+		$child_product = wc_get_product( $child_id );
+
+		// Pin precondition: the variation must not have its own description,
+		// otherwise this test would pass for the wrong reason if WC ever
+		// auto-inherits the parent description on variations.
+		$this->assertSame( '', $child_product->get_description() );
+
+		$xml = $description_method( $child_product );
+
+		// Short description wins over long description.
+		$this->assertEquals( "<description><![CDATA[{$parent_short_desc}]]></description>", $xml );
+
+		// Parent (variable) product itself must still render its own short description,
+		// so a regression in the non-variation branch is caught by this test too.
+		$xml_parent = $description_method( $variation_product );
+		$this->assertEquals( "<description><![CDATA[{$parent_short_desc}]]></description>", $xml_parent );
+	}
+
+	/**
+	 * When the variation has its own description, it should take precedence
+	 * over both the parent short and long descriptions.
+	 *
+	 * @group feed
+	 */
+	public function testDescriptionVariationOwnDescriptionWinsOverParent() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+
+		$variation_product->set_short_description( 'Parent short description.' );
+		$variation_product->set_description( 'Parent long description.' );
+		$variation_product->save();
+
+		$child_id      = $variation_product->get_children()[0];
+		$child_product = wc_get_product( $child_id );
+
+		$own_desc = 'Variation specific description.';
+		$child_product->set_description( $own_desc );
+		$child_product->save();
+
+		$xml = $description_method( $child_product );
+		$this->assertEquals( "<description><![CDATA[{$own_desc}]]></description>", $xml );
+	}
+
+	/**
+	 * When neither the variation nor its parent provide a description, the
+	 * feed should emit no description element (rather than the variation's
+	 * auto-generated attribute summary stored in post_excerpt).
+	 *
+	 * @group feed
+	 */
+	public function testDescriptionVariationFallsBackToEmptyWhenParentEmpty() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+
+		// Explicitly clear both parent descriptions.
+		$variation_product->set_short_description( '' );
+		$variation_product->set_description( '' );
+		$variation_product->save();
+
+		$child_id      = $variation_product->get_children()[0];
+		$child_product = wc_get_product( $child_id );
+		$xml           = $description_method( $child_product );
+
+		// No description should be emitted; the variation attribute summary
+		// must not leak into the feed.
+		$this->assertEquals( '', $xml );
+	}
+
+	/**
+	 * When the variation's parent product has been hard-deleted (orphaned
+	 * variation), the fallback chain must short-circuit safely instead of
+	 * throwing on the missing parent.
+	 *
+	 * @group feed
+	 */
+	public function testDescriptionVariationHandlesMissingParent() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+		$parent_id         = $variation_product->get_id();
+
+		$child_id = $variation_product->get_children()[0];
+
+		// Load the variation BEFORE hard-deleting the parent: WC cannot
+		// instantiate a variation whose parent post is missing, so the load
+		// has to happen first to capture a live variation object.
+		$child_product = wc_get_product( $child_id );
+
+		// Hard-delete the parent so wc_get_product( $parent_id ) returns false
+		// when the fallback chain calls it from inside get_property_description.
+		wp_delete_post( $parent_id, true );
+
+		$xml = $description_method( $child_product );
+
+		// No description and no fatal: the fallback chain bailed out cleanly.
+		$this->assertEquals( '', $xml );
+	}
+
+	/**
+	 * The pinterest_for_woocommerce_variation_description filter must run
+	 * after the variation→parent fallback chain resolves, receive the
+	 * resolved value plus the variation and parent objects, and be able to
+	 * override the emitted description.
+	 *
+	 * @group feed
+	 */
+	public function testDescriptionVariationFilterCanOverrideFallback() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+
+		$variation_product->set_short_description( 'Parent short description.' );
+		$variation_product->save();
+
+		$child_id      = $variation_product->get_children()[0];
+		$child_product = wc_get_product( $child_id );
+
+		$captured = array();
+		$filter   = function ( $description, $variation, $parent_product ) use ( &$captured ) {
+			$captured = array(
+				'description' => $description,
+				'variation'   => $variation,
+				'parent'      => $parent_product,
+			);
+			return 'Filter override description.';
+		};
+		add_filter( 'pinterest_for_woocommerce_variation_description', $filter, 10, 3 );
+
+		try {
+			$xml = $description_method( $child_product );
+
+			$this->assertEquals( '<description><![CDATA[Filter override description.]]></description>', $xml );
+
+			// Filter receives the resolved fallback value, the variation, and the parent.
+			$this->assertEquals( 'Parent short description.', $captured['description'] );
+			$this->assertSame( $child_product->get_id(), $captured['variation']->get_id() );
+			$this->assertInstanceOf( \WC_Product::class, $captured['parent'] );
+			$this->assertSame( $variation_product->get_id(), $captured['parent']->get_id() );
+		} finally {
+			// Always remove the filter so an assertion failure can't leak into subsequent tests.
+			remove_filter( 'pinterest_for_woocommerce_variation_description', $filter, 10 );
+		}
+	}
+
+	/**
+	 * The function must short-circuit safely when handed a non-product
+	 * value (e.g. a stale ID that wc_get_product() resolved to false).
+	 *
+	 * @group feed
+	 */
+	public function testDescriptionInvalidProductReturnsEmpty() {
+		$description_method = $this->getProductsXmlFeedAttributeMethod( 'description' );
+
+		$this->assertEquals( '', $description_method( false ) );
+		$this->assertEquals( '', $description_method( null ) );
 	}
 
 	/**
@@ -407,7 +604,11 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product     = WC_Helper_Product::create_simple_product();
 		$xml         = $link_method( $product );
 		// create_simple_product gives the product 'Uncategorized' type.
-		$this->assertEquals( '<link><![CDATA[http://example.org/?product=dummy-product&utm_source=pinterest&utm_medium=social]]></link>', $xml );
+		$this->assertEquals(
+			'<link><![CDATA[' . $this->getProductPermalinkWithUtm( $product ) . ']]></link>',
+			$xml
+		);
+		$this->assertStringContainsString( 'utm_source=pinterest&utm_medium=social', $xml );
 	}
 
 	/**
@@ -433,7 +634,10 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product->save();
 
 		$xml = $image_link_method( $product );
-		$this->assertEquals( '<g:image_link><![CDATA[http://example.org/wp-content/uploads/product_image.png]]></g:image_link>', $xml );
+		$this->assertEquals(
+			'<g:image_link><![CDATA[' . wp_get_attachment_url( $attachment_id ) . ']]></g:image_link>',
+			$xml
+		);
 	}
 
 	/**
@@ -667,8 +871,14 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$product->set_gallery_image_ids( array( $attachment_id_1, $attachment_id_2 ) );
 		$product->save();
 
-		$xml = $additional_image_link_method( $product );
-		$this->assertEquals( '<g:additional_image_link><![CDATA[http://example.org/wp-content/uploads/product_image_1.png,http://example.org/wp-content/uploads/product_image_2.png]]></g:additional_image_link>', $xml );
+		$xml      = $additional_image_link_method( $product );
+		$expected = sprintf(
+			'<g:additional_image_link><![CDATA[%s,%s]]></g:additional_image_link>',
+			wp_get_attachment_url( $attachment_id_1 ),
+			wp_get_attachment_url( $attachment_id_2 )
+		);
+
+		$this->assertEquals( $expected, $xml );
 	}
 
 	/**
@@ -764,6 +974,22 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		return function ( $product ) use ( $method, $attribute ) {
 			return $method->invoke( null, $product, $attribute );
 		};
+	}
+
+	/**
+	 * Gets the product permalink with Pinterest UTM parameters.
+	 *
+	 * @param WC_Product $product Product object.
+	 * @return string
+	 */
+	private function getProductPermalinkWithUtm( $product ) {
+		return add_query_arg(
+			array(
+				'utm_source' => 'pinterest',
+				'utm_medium' => 'social',
+			),
+			$product->get_permalink()
+		);
 	}
 
 	/**
@@ -909,6 +1135,122 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * @group feed
+	 */
+	public function testPropertyBrandXML() {
+		$brand_method = $this->getProductsXmlFeedAttributeMethod( 'g:brand' );
+		$product      = WC_Helper_Product::create_simple_product();
+
+		// No brand set.
+		$xml = $brand_method( $product );
+		$this->assertEquals( '', $xml );
+
+		// Assign a brand via the product_brand taxonomy.
+		$term = wp_insert_term( 'Nike', 'product_brand' );
+		wp_set_object_terms( $product->get_id(), $term['term_id'], 'product_brand' );
+
+		$xml = $brand_method( $product );
+		$this->assertEquals( '<g:brand>Nike</g:brand>', $xml );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testPropertyBrandVariationUsesParentXML() {
+		$brand_method      = $this->getProductsXmlFeedAttributeMethod( 'g:brand' );
+		$product           = new WC_Product_Variable();
+		$variation_product = WC_Helper_Product::create_variation_product( $product );
+		$child_product     = wc_get_product( $variation_product->get_children()[0] );
+
+		// Assign brand to the parent product.
+		$term = wp_insert_term( 'Adidas', 'product_brand' );
+		wp_set_object_terms( $variation_product->get_id(), $term['term_id'], 'product_brand' );
+
+		$xml = $brand_method( $child_product );
+		$this->assertEquals( '<g:brand>Adidas</g:brand>', $xml );
+	}
+
+	/**
+	 * Test that the brand value can be overridden and suppressed via the
+	 * pinterest_for_woocommerce_product_brand filter.
+	 *
+	 * @group feed
+	 */
+	public function testPropertyBrandFilterXML() {
+		$brand_method = $this->getProductsXmlFeedAttributeMethod( 'g:brand' );
+		$product      = WC_Helper_Product::create_simple_product();
+
+		$term = wp_insert_term( 'Reebok', 'product_brand' );
+		wp_set_object_terms( $product->get_id(), $term['term_id'], 'product_brand' );
+
+		// Override the brand value.
+		add_filter(
+			'pinterest_for_woocommerce_product_brand',
+			static function () {
+				return 'Custom Brand';
+			}
+		);
+		$this->assertEquals( '<g:brand>Custom Brand</g:brand>', $brand_method( $product ) );
+		remove_all_filters( 'pinterest_for_woocommerce_product_brand' );
+
+		// Suppress the brand value.
+		add_filter( 'pinterest_for_woocommerce_product_brand', '__return_empty_string' );
+		$this->assertEquals( '', $brand_method( $product ) );
+		remove_all_filters( 'pinterest_for_woocommerce_product_brand' );
+	}
+
+	/**
+	 * Test that a brand longer than the allowed limit is truncated and logged.
+	 *
+	 * @group feed
+	 */
+	public function testPropertyBrandCharacterLimitXML() {
+		$brand_method = $this->getProductsXmlFeedAttributeMethod( 'g:brand' );
+		$product      = WC_Helper_Product::create_simple_product();
+
+		$mock_logger = $this->getMockLogger();
+
+		Logger::$logger = $mock_logger;
+
+		// Debug logging is gated behind this setting; enable it so the log is captured.
+		Pinterest_For_Woocommerce()::save_setting( 'enable_debug_logging', true );
+
+		// Brand name longer than the 100 character limit.
+		$long_brand = str_repeat( 'A', 150 );
+		$term       = wp_insert_term( $long_brand, 'product_brand' );
+		wp_set_object_terms( $product->get_id(), $term['term_id'], 'product_brand' );
+
+		$xml = $brand_method( $product );
+
+		// Extract the brand value from the XML.
+		preg_match( '/<g:brand>(.*?)<\/g:brand>/', $xml, $matches );
+		$brand = $matches[1] ?? '';
+
+		// Should be truncated to 100 characters.
+		$this->assertEquals( 100, strlen( $brand ) );
+
+		// Check that a warning was logged.
+		$this->assertStringContainsString( 'brand length is', $mock_logger::$message );
+		$this->assertStringContainsString( 'truncating to 100 characters', $mock_logger::$message );
+	}
+
+	/**
+	 * Test that the brand is included in the full feed item output, covering the
+	 * feed-structure entry and the get_xml_item() code path.
+	 *
+	 * @group feed
+	 */
+	public function testBrandInFeedItemXML() {
+		$product = WC_Helper_Product::create_simple_product();
+
+		$term = wp_insert_term( 'Puma', 'product_brand' );
+		wp_set_object_terms( $product->get_id(), $term['term_id'], 'product_brand' );
+
+		$xml = ProductsXmlFeed::get_xml_item( $product, 'US' );
+		$this->assertStringContainsString( '<g:brand>Puma</g:brand>', $xml );
+	}
+
+	/**
 	 * Mimic the method on FeedGenerator.
 	 *
 	 * @param array $taxable_location The taxable location to filter.
@@ -930,6 +1272,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		// Remove any added filter.
 		remove_all_filters( 'pinterest_for_woocommerce_product_description_apply_shortcodes' );
+		remove_all_filters( 'pinterest_for_woocommerce_product_brand' );
 
 		// Remove added shortcodes.
 		remove_shortcode( 'pinterest_for_woocommerce_sample_test_shortcode' );

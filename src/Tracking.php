@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
 use Automattic\WooCommerce\Pinterest\Tracking\Data;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Category;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
@@ -16,6 +17,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Search;
 use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Automattic\WooCommerce\Pinterest\Tracking\Tracker;
+use Automattic\WooCommerce\Pinterest\Utilities\CrawlerDetector;
 use Throwable;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -164,7 +166,7 @@ class Tracking {
 	}
 
 	/**
-	 * Used as a callback for the woocommerce_checkout_order_created hook.
+	 * Used as a callback for the woocommerce_before_thankyou hook.
 	 *
 	 * @since 1.4.0
 	 *
@@ -180,6 +182,7 @@ class Tracking {
 
 		$items          = array();
 		$total_quantity = 0;
+		$checkout_value = 0;
 		foreach ( $order->get_items() as $order_item ) {
 			if ( ! method_exists( $order_item, 'get_product' ) ) {
 				continue;
@@ -193,18 +196,21 @@ class Tracking {
 				$order_item->get_name(),
 				wc_get_product_category_list( $product->get_id() ),
 				'brand',
-				wc_get_price_to_display( $product ),
+				$order->get_item_total( $order_item, false, true ),
 				get_woocommerce_currency(),
 				$order_item->get_quantity()
 			);
 
 			$total_quantity += $order_item->get_quantity();
+			$checkout_value += (float) $order_item->get_total();
 		}
 
+		// Deterministic event id so Pinterest can deduplicate Tag/CAPI Checkout events when
+		// the thank-you page is re-rendered (woocommerce_before_thankyou fires on every render).
 		$data = new Checkout(
-			uniqid( 'checkout' ),
+			'checkout_' . $order->get_id(),
 			(string) $order->get_id(),
-			$order->get_total(),
+			wc_format_decimal( $checkout_value, wc_get_price_decimals() ),
 			$total_quantity,
 			$order->get_currency(),
 			$items
@@ -234,6 +240,11 @@ class Tracking {
 	/**
 	 * Method which iterates over all the attached trackers and delegates the event to them.
 	 *
+	 * Server-side trackers (Conversions API) are skipped for crawler/bot requests.
+	 * Browser-side rendering (Tag JS) is intentionally NOT skipped, so full-page
+	 * caches that omit `Vary: User-Agent` do not serve bot-rendered HTML missing
+	 * Tag JS to real users on a subsequent cache hit. See CrawlerDetector.
+	 *
 	 * @since 1.4.0
 	 *
 	 * @param string $event_name Tracking event name.
@@ -242,9 +253,17 @@ class Tracking {
 	 * @return void
 	 */
 	public function track_event( string $event_name, Data $data ) {
+		$is_crawler = CrawlerDetector::is_crawler_request();
+
 		foreach ( $this->get_trackers() as $tracker ) {
 			// Skip Pinterest tag tracking if tag is not active.
 			if ( $tracker instanceof Tag && ! Tag::get_active_tag() ) {
+				continue;
+			}
+
+			// Skip server-side CAPI dispatch for crawler requests so bot
+			// traffic does not inflate CAPI counts vs Tag counts.
+			if ( $is_crawler && $tracker instanceof Conversions ) {
 				continue;
 			}
 

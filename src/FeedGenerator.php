@@ -15,7 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Utilities\BatchQueryOffset;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\AbstractChainedJob;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
+use Automattic\WooCommerce\Pinterest\Exception\FeedCircuitBreakerException;
 use Automattic\WooCommerce\Pinterest\Exception\FeedFileOperationsException;
+use Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
 use ActionScheduler;
 use Exception;
@@ -43,6 +45,12 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	const MAX_RETRIES_PER_BATCH = 2;
 
+	/**
+	 * The max number of batches to process in a single generation cycle.
+	 * Circuit breaker to prevent runaway scheduling and database bloat.
+	 */
+	const MAX_BATCHES_PER_CYCLE = 1000;
+
 	public const DEFAULT_PRODUCT_BATCH_SIZE = 100;
 
 	/**
@@ -66,6 +74,14 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @var array $buffers Array of feed buffers.
 	 */
 	private $buffers = array();
+
+	/**
+	 * Pending last batch ID to be committed after successful processing.
+	 * Prevents cursor advancement before batch processing completes.
+	 *
+	 * @var int|null $pending_last_batch_id
+	 */
+	private $pending_last_batch_id = null;
 
 	/**
 	 * FeedGenerator initialization.
@@ -151,6 +167,36 @@ class FeedGenerator extends AbstractChainedJob {
 					// Translators: 1. Action Scheduler hook name.
 					__(
 						'Feed Generator `%s` Action reschedule threshold has been reached. Quit.',
+						'pinterest-for-woocommerce'
+					),
+					$hook
+				)
+			);
+			return;
+		}
+
+		// Check if a PENDING retry already exists to prevent duplicate retries.
+		// We query STATUS_PENDING only — the timing out action itself is STATUS_RUNNING
+		// at the point this handler fires (AS marks it in-progress before invoking the
+		// callback), so as_has_scheduled_action() would incorrectly match it and block
+		// the very first reschedule.  A genuine duplicate is a *pending* retry scheduled
+		// by an earlier invocation of this handler.
+		$pending_retries = $this->action_scheduler->search(
+			array(
+				'hook'     => $hook,
+				'args'     => $args,
+				'per_page' => 1,
+				'status'   => ActionSchedulerInterface::STATUS_PENDING,
+			),
+			'ids',
+			PINTEREST_FOR_WOOCOMMERCE_PREFIX
+		);
+		if ( ! empty( $pending_retries ) ) {
+			self::log(
+				sprintf(
+					// Translators: Action Scheduler hook name.
+					__(
+						'Feed Generator `%s` Action retry already scheduled. Skipping duplicate.',
 						'pinterest-for-woocommerce'
 					),
 					$hook
@@ -284,13 +330,12 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Throwable Related to issue possible when creating an empty feed temp file and populating the header.
 	 */
 	public function handle_batch_action( int $batch_number, array $args ) {
+		// Reset pending cursor to prevent stale values from previous failed batches.
+		$this->pending_last_batch_id = null;
+
 		parent::handle_batch_action( $batch_number, $args );
 
-		/*
-		 * Action has finished successfully.
-		 *   - Reset number of products per batch.
-		 *   - Reset action retries counter.
-		 */
+		// Reset number of products per batch and action retries counter on success.
 		Pinterest_For_Woocommerce::remove_data( 'feed_product_batch_size' );
 		Pinterest_For_Woocommerce::remove_data( 'feed_product_batch_attempt' );
 	}
@@ -339,9 +384,29 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @return array Items ids.
 	 *
-	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
+	 * @throws FeedCircuitBreakerException When the batch limit is exceeded, stopping the job chain.
 	 */
 	protected function get_items_for_batch( int $batch_number, array $args ): array {
+		/**
+		 * Maximum number of batches allowed per generation cycle.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
+		$max_batches = (int) apply_filters( 'pinterest_for_woocommerce_max_feed_batches_per_cycle', self::MAX_BATCHES_PER_CYCLE );
+
+		// Circuit breaker: abort with an error so the truncated feed is never silently published.
+		if ( $batch_number > $max_batches ) {
+			$message = sprintf(
+				// Translators: 1: batch limit, 2: filter name.
+				__(
+					'Feed generation truncated: maximum batch limit of %1$d reached. Use the `%2$s` filter to increase the limit.',
+					'pinterest-for-woocommerce'
+				),
+				$max_batches,
+				'pinterest_for_woocommerce_max_feed_batches_per_cycle'
+			);
+			throw new FeedCircuitBreakerException( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+		}
+
 		global $wpdb;
 
 		$variable_type_like = $wpdb->esc_like( 'variable' ) . '%';
@@ -374,9 +439,8 @@ class FeedGenerator extends AbstractChainedJob {
 			)
 		);
 
-		$product_ids = array_map( 'intval', $product_ids );
-		// We save the last product's id from the current batch to start from it next time when fetching the next batch.
-		$this->set_last_batch_id( $product_ids[ count( $product_ids ) - 1 ] ?? 0 );
+		$product_ids                 = array_map( 'intval', $product_ids );
+		$this->pending_last_batch_id = $product_ids[ count( $product_ids ) - 1 ] ?? 0;
 		return $product_ids;
 	}
 
@@ -410,6 +474,14 @@ class FeedGenerator extends AbstractChainedJob {
 
 		// May throw write to file exception.
 		$this->feed_file_operations->write_buffers_to_temp_files( $this->buffers );
+
+		// Commit cursor immediately after the successful write to minimise the duplicate-append
+		// window: if a timeout lands after write_buffers_to_temp_files() but before the commit the
+		// retry would re-fetch the same IDs and append them a second time.
+		if ( null !== $this->pending_last_batch_id ) {
+			$this->set_last_batch_id( $this->pending_last_batch_id );
+			$this->pending_last_batch_id = null;
+		}
 
 		$count = ProductFeedStatus::get()['product_count'] ?? 0;
 		ProductFeedStatus::set(
@@ -450,7 +522,7 @@ class FeedGenerator extends AbstractChainedJob {
 
 		// Do not sync out of stock products which do not support backorders if woocommerce_hide_out_of_stock_items is set.
 		if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) ) {
-			$products_query_args['stock_status'] = [ 'instock', 'onbackorder' ];
+			$products_query_args['stock_status'] = array( 'instock', 'onbackorder' );
 		}
 
 		return wc_get_products( $products_query_args );
@@ -512,6 +584,28 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
+	 * Whether the given throwable is, or wraps, a FeedCircuitBreakerException.
+	 *
+	 * Action Scheduler's queue runner catches the original Throwable and re-throws a
+	 * generic Exception, keeping the original only as the previous exception. The
+	 * exception delivered to the failed-execution handler is therefore not the
+	 * FeedCircuitBreakerException itself, so we walk the previous chain to detect it.
+	 *
+	 * @param Throwable $th The thrown exception.
+	 * @return bool
+	 */
+	private function is_circuit_breaker_exception( Throwable $th ): bool {
+		for ( $current = $th; null !== $current; $current = $current->getPrevious() ) {
+			if ( $current instanceof FeedCircuitBreakerException ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Handle feed generation error by updating status and scheduling retry.
+	 *
 	 * @param Throwable $th - An exception that was thrown.
 	 * @param string    $hook_name - The name of the hook that was being executed when the exception was thrown.
 	 *
@@ -527,6 +621,46 @@ class FeedGenerator extends AbstractChainedJob {
 			)
 		);
 		ProductFeedStatus::mark_feed_file_generation_as_failed();
+
+		if ( $this->is_circuit_breaker_exception( $th ) ) {
+			// Use a live product count rather than the batch-run status cache — the batch
+			// may have been interrupted mid-update, so the cached count could be stale.
+			$total_products = $this->count_published_products();
+			/**
+			 * Maximum number of batches allowed per generation cycle.
+			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+			 */
+			$max_batches = (int) apply_filters( 'pinterest_for_woocommerce_max_feed_batches_per_cycle', self::MAX_BATCHES_PER_CYCLE );
+			$recommended = null === $total_products ? 0 : $this->calculate_recommended_batch_limit( $total_products );
+
+			// Never advise a value at or below the limit that just tripped. That would
+			// happen if the count query failed ( null ) or returned a stale/low value,
+			// leaving the merchant with a recommendation that cannot resolve the problem.
+			if ( $recommended <= $max_batches ) {
+				$recommended = (int) ( ceil( ( $max_batches * 2 ) / 500 ) * 500 );
+			}
+
+			FeedCircuitBreakerNote::add_note( $recommended );
+
+			// Do not reschedule a full regeneration here. An over-limit catalog would
+			// re-process every cycle and trip the breaker again — the exact runaway the
+			// breaker exists to prevent. The admin note prompts the merchant to raise the
+			// limit; the daily generator recurrence resumes the sync once they do.
+			self::log(
+				sprintf(
+					// Translators: 1: Action Scheduler hook name, 2: Error message about why action has failed to execute.
+					__(
+						'Feed Generator `%1$s` Action stopped: `%2$s`. No automatic retry scheduled; raise the batch limit filter to resume.',
+						'pinterest-for-woocommerce'
+					),
+					$hook_name,
+					$th->getMessage()
+				),
+				\WC_Log_Levels::ERROR
+			);
+
+			return;
+		}
 
 		self::log(
 			sprintf(
@@ -611,7 +745,7 @@ class FeedGenerator extends AbstractChainedJob {
 			Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
 		}
 		// Get last fetched ID to start from the next item after it.
-		return Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		return (int) Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
 	}
 
 	/**
@@ -622,6 +756,76 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	protected function set_last_batch_id( int $id ): void {
 		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', $id );
+	}
+
+	/**
+	 * Count all published products and published product variations.
+	 *
+	 * Mirrors the same WHERE clause as get_items_for_batch() — including the EXISTS
+	 * subquery that restricts variations to variable-type parents — so the result
+	 * accurately reflects what the feed would include.
+	 *
+	 * @return int|null Published product count, or null if the count query failed.
+	 */
+	private function count_published_products(): ?int {
+		global $wpdb;
+
+		$variable_type_like = $wpdb->esc_like( 'variable' ) . '%';
+
+		$count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT COUNT( post.ID )
+				FROM {$wpdb->posts} AS post
+				LEFT JOIN {$wpdb->posts} AS parent ON post.post_parent = parent.ID
+				WHERE
+					(
+						( post.post_type = 'product_variation' AND parent.post_status = 'publish'
+							AND EXISTS (
+								SELECT 1
+								FROM {$wpdb->term_relationships} tr
+								INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+								INNER JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
+								WHERE tr.object_id = parent.ID AND tt.taxonomy = 'product_type' AND t.slug LIKE %s
+							)
+						)
+					OR
+						( post.post_type = 'product' AND post.post_status = 'publish' )
+					)",
+				$variable_type_like
+			)
+		);
+
+		// A failed query (lock timeout, killed subquery, etc.) returns null. Surface it
+		// rather than letting an (int) cast coerce it to 0, which would feed a misleading
+		// recommendation into the admin note.
+		if ( null === $count ) {
+			self::log(
+				__( 'Failed to count published products for the feed circuit breaker recommendation.', 'pinterest-for-woocommerce' ),
+				\WC_Log_Levels::WARNING
+			);
+			return null;
+		}
+
+		return (int) $count;
+	}
+
+	/**
+	 * Calculate the recommended max-batches-per-cycle filter value for the given product count.
+	 *
+	 * Formula: ceil(total / DEFAULT_PRODUCT_BATCH_SIZE) * 1.25 headroom, rounded up
+	 * to the nearest 500.
+	 *
+	 * Uses DEFAULT_PRODUCT_BATCH_SIZE (not the current runtime batch size) so the
+	 * recommendation remains stable across retry cycles where the batch size is
+	 * temporarily halved due to timeouts.
+	 *
+	 * @param int $total_products Total published product count.
+	 * @return int
+	 */
+	protected function calculate_recommended_batch_limit( int $total_products ): int {
+		$needed   = (int) ceil( $total_products / self::DEFAULT_PRODUCT_BATCH_SIZE );
+		$buffered = (int) ceil( $needed * 1.25 );
+		return max( 500, (int) ( ceil( $buffered / 500 ) * 500 ) );
 	}
 
 	/**
@@ -770,20 +974,20 @@ class FeedGenerator extends AbstractChainedJob {
 		 * Threshold of failed actions.
 		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 		 */
-		$threshold   = apply_filters( 'pinterest_for_woocommerce_action_failure_threshold', 3 );
+		$threshold = apply_filters( 'pinterest_for_woocommerce_action_failure_threshold', 3 );
 		/**
 		 * Time period of failed actions.
 		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 		 */
-		$time_period = apply_filters( 'pinterest_for_woocommerce_action_failure_time_period', 30 * MINUTE_IN_SECONDS );
+		$time_period    = apply_filters( 'pinterest_for_woocommerce_action_failure_time_period', 30 * MINUTE_IN_SECONDS );
 		$failed_actions = $this->action_scheduler->search(
-			[
+			array(
 				'hook'         => $hook,
 				'args'         => $args,
 				'status'       => ActionSchedulerInterface::STATUS_FAILED,
 				'date'         => gmdate( 'U' ) - $time_period,
 				'date_compare' => '>',
-			],
+			),
 			'ids'
 		);
 

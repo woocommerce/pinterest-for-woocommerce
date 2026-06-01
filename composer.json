@@ -26,7 +26,8 @@
 		"automattic/jetpack-autoloader": "^2.10.1",
 		"defuse/php-encryption": "^2.2",
 		"woocommerce/action-scheduler-job-framework": "^2.0.0",
-		"woocommerce/grow": "dev-compat-checker"
+		"woocommerce/grow": "dev-compat-checker",
+		"automattic/jetpack-device-detection": "^3.4"
 	},
 	"require-dev": {
 		"composer/installers": "^2.0",

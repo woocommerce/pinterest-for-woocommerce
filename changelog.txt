@@ -1,5 +1,21 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.4.27 - 2026-06-01 =
+* Add - WooCommerce product_brand to Pinterest feed as `g:brand`.
+* Fix - Align Pinterest checkout value with discounted merchandise line totals.
+* Fix - Correct checkout tracking item prices and preserve customer IP and user agent when sending hashed email.
+* Fix - Feed generator robustness at scale.
+* Fix - Feed location URL matching.
+* Fix - Log feed ingestion failure context to WooCommerce logs.
+* Fix - Restore class_exists guard on record_event.
+* Fix - Retry Pinterest feed ingestion sooner when Pinterest reports a FETCH_ERROR.
+* Fix - Scope failed feed ingestion logging deduplication and feed URL resolution by feed.
+* Fix - Skip Pinterest CAPI events for crawler requests to prevent CAPI vs Tag divergence.
+* Fix - Use deterministic Checkout tracking event IDs so refreshed thank-you pages can deduplicate purchases.
+* Fix - Variation feed description now falls back to the parent product's short/long description instead of the variation attribute summary.
+* Tweak - WC 10.8 compatibility.
+* Update - Treat additional Pinterest redeem error codes as terminal.
+
 = 1.4.26 - 2026-04-20 =
 * Add - Settings link to plugin action links.
 * Fix - Exclude orphaned variations from Pinterest feed.
