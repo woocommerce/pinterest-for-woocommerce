@@ -301,7 +301,7 @@ class ProductsXmlFeed {
 			 * fallback chain (e.g. emit a translated description, prefer parent
 			 * long over short, or inject a per-variation string).
 			 *
-			 * @since x.x.x
+			 * @since 1.4.27
 			 *
 			 * @param string          $description Resolved description after the variation→parent fallback.
 			 * @param WC_Product      $product     Variation product.

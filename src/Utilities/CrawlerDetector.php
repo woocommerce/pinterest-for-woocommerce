@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * browser-side Pinterest Tag, which would otherwise inflate CAPI counts
  * relative to Tag counts.
  *
- * @since x.x.x
+ * @since 1.4.27
  */
 class CrawlerDetector {
 
@@ -55,7 +55,7 @@ class CrawlerDetector {
 	 * runtime changes (added/removed hooks, test fixtures) without requiring
 	 * callers to remember to reset static state.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.27
 	 *
 	 * @return bool
 	 */
@@ -82,7 +82,7 @@ class CrawlerDetector {
 		 * `Vary: User-Agent` do not serve bot-rendered HTML (missing Tag JS)
 		 * to real users.
 		 *
-		 * @since x.x.x
+		 * @since 1.4.27
 		 *
 		 * @param bool   $is_crawler Whether the request looks like a crawler.
 		 * @param string $user_agent The raw (unslashed, unsanitized) User-Agent header value.
