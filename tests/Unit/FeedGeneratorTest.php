@@ -558,6 +558,65 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		}
 	}
 
+	/**
+	 * Content integrity guard — normal cases that must NOT throw.
+	 *
+	 * @dataProvider feed_integrity_pass_provider
+	 */
+	public function test_feed_content_integrity_passes( int $written, int $published ): void {
+		// Create exactly $published simple products so count_published_products() returns $published.
+		for ( $i = 0; $i < $published; $i++ ) {
+			WC_Helper_Product::create_simple_product();
+		}
+
+		ProductFeedStatus::set( array( 'product_count' => $written ) );
+
+		// handle_end_action must complete without throwing.
+		$this->feed_generator->handle_end_action( array() );
+		$this->assertTrue( true ); // reached without exception
+	}
+
+	public function feed_integrity_pass_provider(): array {
+		return array(
+			'exact match'                       => array( 3, 3 ),
+			'written less (filtered out stock)' => array( 2, 3 ),
+			'written at 1.0x'                   => array( 10, 10 ),
+			'written at 1.4x (under threshold)' => array( 14, 10 ),
+			'written at exactly 1.5x'           => array( 15, 10 ),
+			'empty catalog skips check'         => array( 0, 0 ),
+		);
+	}
+
+	public function test_feed_content_integrity_throws_when_written_count_exceeds_ratio(): void {
+		$product = WC_Helper_Product::create_simple_product();
+
+		// Simulate the cursor-reset duplication: 4 full traversals of a 1-product catalog.
+		ProductFeedStatus::set( array( 'product_count' => 4 ) );
+
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessageMatches( '/Feed content integrity check failed/' );
+
+		$this->feed_generator->handle_end_action( array() );
+
+		$product->delete( true );
+	}
+
+	public function test_feed_content_integrity_throws_sets_status_to_error(): void {
+		WC_Helper_Product::create_simple_product();
+
+		// Simulate 3x duplication.
+		ProductFeedStatus::set( array( 'product_count' => 3 ) );
+
+		try {
+			$this->feed_generator->handle_end_action( array() );
+		} catch ( \RuntimeException $e ) {
+			$this->assertEquals( 'error', ProductFeedStatus::get()['status'] );
+			return;
+		}
+
+		$this->fail( 'Expected RuntimeException was not thrown.' );
+	}
+
 	public function test_while_feed_generator_is_in_progress_previous_wall_time_and_recent_product_count_are_not_overwritten() {
 		ProductFeedStatus::set(
 			array(
@@ -663,22 +722,22 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		// Create a product to fetch.
 		WC_Helper_Product::create_simple_product();
 
-		// Set initial cursor.
-		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
+		// Set initial cursor via the dedicated option (cursor moved from shared data option).
+		update_option( FeedGenerator::FEED_CURSOR_OPTION, 0 );
 
 		// Fetch items - this should store pending cursor but not commit it yet.
 		$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( 1, array() ) );
 		$this->assertNotEmpty( $items );
 
 		// Cursor should still be at initial value (not advanced yet).
-		$cursor_before = Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		$cursor_before = (int) get_option( FeedGenerator::FEED_CURSOR_OPTION, 0 );
 		$this->assertEquals( 0, $cursor_before, 'Cursor should not advance before handle_batch_action completes' );
 
 		// Complete batch processing.
 		$this->feed_generator->handle_batch_action( 1, array() );
 
 		// Now cursor should be advanced.
-		$cursor_after = Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		$cursor_after = (int) get_option( FeedGenerator::FEED_CURSOR_OPTION, 0 );
 		$this->assertGreaterThan( $cursor_before, $cursor_after, 'Cursor should advance after successful batch completion' );
 	}
 
