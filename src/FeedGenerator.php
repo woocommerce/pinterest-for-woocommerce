@@ -391,13 +391,16 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Maximum ratio of feed entries written to published product count before
 	 * the feed is considered corrupted by cursor resets.
 	 *
-	 * 1.5 allows up to 50 % more entries than published products (accommodates
-	 * products added during generation) while reliably catching the ≥ 2× duplication
-	 * that occurs when the cursor is silently reset mid-cycle.
+	 * 1.1 allows up to 10 % more entries than published products (accommodates
+	 * products added or published during generation) while catching the ≥ 1.29×
+	 * duplication observed in production when the cursor race condition fires.
+	 * The previous value of 1.5 was too loose — a 29 % over-count (133,500 entries
+	 * for a 103,708-product catalog) slipped through and the corrupted feed was
+	 * published to Pinterest.
 	 *
 	 * @var float
 	 */
-	const FEED_INTEGRITY_MAX_RATIO = 1.5;
+	const FEED_INTEGRITY_MAX_RATIO = 1.1;
 
 	protected function handle_end() {
 		self::log( __( 'Feed generation end. Moving files to the final destination.', 'pinterest-for-woocommerce' ) );

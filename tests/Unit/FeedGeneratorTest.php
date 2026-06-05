@@ -581,14 +581,14 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			'exact match'                       => array( 3, 3 ),
 			'written less (filtered out stock)' => array( 2, 3 ),
 			'written at 1.0x'                   => array( 10, 10 ),
-			'written at 1.4x (under threshold)' => array( 14, 10 ),
-			'written at exactly 1.5x'           => array( 15, 10 ),
+			'written at 1.05x (under threshold)' => array( 105, 100 ),
+			'written at exactly 1.1x'            => array( 110, 100 ),
 			'empty catalog skips check'         => array( 0, 0 ),
 		);
 	}
 
 	public function test_feed_content_integrity_throws_when_written_count_exceeds_ratio(): void {
-		$product = WC_Helper_Product::create_simple_product();
+		WC_Helper_Product::create_simple_product();
 
 		// Simulate the cursor-reset duplication: 4 full traversals of a 1-product catalog.
 		ProductFeedStatus::set( array( 'product_count' => 4 ) );
@@ -597,8 +597,22 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->expectExceptionMessageMatches( '/Feed content integrity check failed/' );
 
 		$this->feed_generator->handle_end_action( array() );
+	}
 
-		$product->delete( true );
+	public function test_feed_content_integrity_throws_on_1_29x_ratio_matching_observed_production_bug(): void {
+		// Reproduce the exact production failure: 133,500 entries for 103,708 products = 1.29x.
+		// The previous 1.5x threshold silently passed this; the new 1.1x threshold must catch it.
+		for ( $i = 0; $i < 10; $i++ ) {
+			WC_Helper_Product::create_simple_product();
+		}
+
+		// 10 products published, 13 written = 1.3x (mirrors 103,708 → 133,500).
+		ProductFeedStatus::set( array( 'product_count' => 13 ) );
+
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessageMatches( '/Feed content integrity check failed/' );
+
+		$this->feed_generator->handle_end_action( array() );
 	}
 
 	public function test_feed_content_integrity_throws_sets_status_to_error(): void {
