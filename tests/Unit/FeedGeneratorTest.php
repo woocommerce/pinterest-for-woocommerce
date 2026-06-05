@@ -515,6 +515,17 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->assertGreaterThanOrEqual( $time_test_started, $feed_generation_wall_time );
 	}
 
+	public function test_feed_generator_end_clears_circuit_breaker_note_on_success(): void {
+		// Simulate a note left over from a previous circuit-breaker failure.
+		\Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote::add_note( 2000 );
+		$data_store = \Automattic\WooCommerce\Admin\Notes\Notes::load_data_store();
+		$this->assertCount( 1, $data_store->get_notes_with_name( \Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote::NOTE_NAME ), 'Pre-condition: note must exist before handle_end runs' );
+
+		$this->feed_generator->handle_end_action( array() );
+
+		$this->assertCount( 0, $data_store->get_notes_with_name( \Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote::NOTE_NAME ), 'Note should be deleted after a successful feed generation' );
+	}
+
 	public function test_feed_generator_end_sets_product_count_into_persistent_state_property() {
 		ProductFeedStatus::set(
 			array(

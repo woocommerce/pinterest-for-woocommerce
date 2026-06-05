@@ -87,4 +87,22 @@ class FeedCircuitBreakerNote {
 			return;
 		}
 	}
+
+	/**
+	 * Delete the circuit-breaker note when the feed completes successfully.
+	 *
+	 * Called from FeedGenerator::handle_end() after the feed file has been
+	 * renamed to its final location. If the note is present it means the
+	 * merchant has already raised the filter high enough for the feed to
+	 * complete — the warning is no longer relevant.
+	 *
+	 * @return void
+	 */
+	public static function delete_note(): void {
+		try {
+			Notes::delete_notes_with_name( self::NOTE_NAME );
+		} catch ( NotesUnavailableException $e ) {
+			return;
+		}
+	}
 }
