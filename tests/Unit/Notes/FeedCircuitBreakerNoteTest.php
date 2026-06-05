@@ -100,6 +100,27 @@ class FeedCircuitBreakerNoteTest extends \WP_UnitTestCase {
 	/**
 	 * @return void
 	 */
+	public function test_delete_note_removes_existing_note(): void {
+		FeedCircuitBreakerNote::add_note( 2500 );
+		$this->assertCount( 1, Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME ) );
+
+		FeedCircuitBreakerNote::delete_note();
+
+		$this->assertCount( 0, Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME ) );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_delete_note_is_safe_when_no_note_exists(): void {
+		// No note added — delete_note must not throw.
+		FeedCircuitBreakerNote::delete_note();
+		$this->assertCount( 0, Notes::load_data_store()->get_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME ) );
+	}
+
+	/**
+	 * @return void
+	 */
 	public function test_note_has_catalog_sync_and_dismiss_actions() {
 		FeedCircuitBreakerNote::add_note( 2500 );
 

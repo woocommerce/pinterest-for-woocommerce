@@ -421,6 +421,9 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 		self::log( __( 'Feed generated successfully.', 'pinterest-for-woocommerce' ) );
 
+		// Feed completed cleanly — remove any circuit-breaker warning from the WC admin inbox.
+		FeedCircuitBreakerNote::delete_note();
+
 		// Check if feed is dirty and reschedule in necessary.
 		if ( $this->feed_is_dirty() ) {
 			$this->mark_feed_clean();
