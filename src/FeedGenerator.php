@@ -734,6 +734,25 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
+	 * Dedicated option name for the feed cursor (last queued product ID).
+	 *
+	 * Stored as a standalone WordPress option — NOT inside the shared
+	 * `pinterest_for_woocommerce_data` array — to prevent concurrent
+	 * read-modify-write races with other classes (FeedRegistration, Merchants,
+	 * Feeds, etc.) that also call save_data() on that shared option.  Those
+	 * classes load the entire array, do external work (API calls), then write
+	 * the array back.  If the write happens after the feed chain committed a
+	 * new cursor value, the write silently overwrites the cursor with the stale
+	 * value read at the start, causing the chain to loop from the beginning.
+	 *
+	 * Using update_option() directly is atomic (a single SQL UPDATE) and
+	 * eliminates the race window entirely.
+	 *
+	 * @var string
+	 */
+	const FEED_CURSOR_OPTION = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_cursor';
+
+	/**
 	 * Returns last product id from the last batch of products fetched at the previous step.
 	 *
 	 * @param int $batch_number - Action Scheduler chain action batch number.
@@ -741,11 +760,12 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	protected function get_last_batch_id( int $batch_number ): int {
 		if ( 1 === $batch_number ) {
-			// Reset last fetched ID if batch number equals to 1.
-			Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
+			// Reset cursor at the start of each new generation cycle.
+			update_option( self::FEED_CURSOR_OPTION, 0, false );
+			return 0;
 		}
 		// Get last fetched ID to start from the next item after it.
-		return (int) Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		return (int) get_option( self::FEED_CURSOR_OPTION, 0 );
 	}
 
 	/**
@@ -755,7 +775,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @return void
 	 */
 	protected function set_last_batch_id( int $id ): void {
-		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', $id );
+		update_option( self::FEED_CURSOR_OPTION, $id, false );
 	}
 
 	/**
