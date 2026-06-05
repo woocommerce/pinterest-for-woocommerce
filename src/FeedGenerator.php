@@ -348,9 +348,61 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @throws Throwable Related to adding the footer or renaming the files possible issues.
 	 */
+	/**
+	 * Verify the number of product entries written this cycle is not significantly
+	 * greater than the published product count.
+	 *
+	 * The feed cursor lives in the shared `pinterest_for_woocommerce_data` option,
+	 * which is also written by FeedRegistration, Merchants, Feeds, and other classes
+	 * via a read-modify-write pattern.  If one of those writes lands while the cursor
+	 * has already advanced, it silently overwrites it with a stale value and the feed
+	 * chain re-traverses all products from the beginning — writing every product two,
+	 * three, or four times into the temp file without any error.  The circuit breaker
+	 * eventually fires, but by then the temp file already contains duplicates.
+	 *
+	 * This check is the last line of defence: if the written count exceeds the
+	 * published count by more than FEED_INTEGRITY_MAX_RATIO the temp files are
+	 * discarded and a fresh cycle is scheduled rather than publishing a corrupted feed.
+	 *
+	 * @throws \RuntimeException When duplicate entries are detected.
+	 */
+	private function assert_feed_content_integrity(): void {
+		$written  = (int) ( ProductFeedStatus::get()['product_count'] ?? 0 );
+		$expected = $this->count_published_products();
+
+		if ( $expected <= 0 || $written <= (int) ceil( $expected * self::FEED_INTEGRITY_MAX_RATIO ) ) {
+			return;
+		}
+
+		throw new \RuntimeException(
+			sprintf(
+				/* translators: 1: product entries written to feed, 2: published product count. */
+				__(
+					'Feed content integrity check failed: %1$d product entries were written but the catalog has only %2$d published products. The cursor was likely reset mid-cycle, causing duplicate entries. Discarding the temporary feed file — a fresh generation cycle will start automatically.',
+					'pinterest-for-woocommerce'
+				),
+				$written,
+				$expected
+			)
+		);
+	}
+
+	/**
+	 * Maximum ratio of feed entries written to published product count before
+	 * the feed is considered corrupted by cursor resets.
+	 *
+	 * 1.5 allows up to 50 % more entries than published products (accommodates
+	 * products added during generation) while reliably catching the ≥ 2× duplication
+	 * that occurs when the cursor is silently reset mid-cycle.
+	 *
+	 * @var float
+	 */
+	const FEED_INTEGRITY_MAX_RATIO = 1.5;
+
 	protected function handle_end() {
 		self::log( __( 'Feed generation end. Moving files to the final destination.', 'pinterest-for-woocommerce' ) );
 		try {
+			$this->assert_feed_content_integrity();
 			$this->feed_file_operations->add_footer_to_temporary_feed_files();
 			$this->feed_file_operations->rename_temporary_feed_files_to_final();
 			ProductFeedStatus::set(
