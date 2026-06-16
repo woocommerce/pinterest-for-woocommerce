@@ -68,6 +68,9 @@ $system = array(
 );
 
 // 2. Product counts — same queries the feed uses.
+$variable_like = $wpdb->esc_like( 'variable' ) . '%';
+
+// All published product posts (simple + variable parents) — matches WC admin dashboard count.
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 $simple_count = (int) $wpdb->get_var(
 	"SELECT COUNT(*)
@@ -75,7 +78,38 @@ $simple_count = (int) $wpdb->get_var(
 	 WHERE post_type = 'product' AND post_status = 'publish'"
 );
 
-$variable_like = $wpdb->esc_like( 'variable' ) . '%';
+// Simple products only (not variable type).
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+$simple_products = (int) $wpdb->get_var(
+	$wpdb->prepare(
+		"SELECT COUNT(*)
+		 FROM {$wpdb->posts}
+		 WHERE post_type = 'product' AND post_status = 'publish'
+		   AND ID NOT IN (
+		       SELECT object_id
+		       FROM {$wpdb->term_relationships} tr
+		       JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+		       JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
+		       WHERE tt.taxonomy = 'product_type' AND t.slug LIKE %s
+		   )",
+		$variable_like
+	)
+);
+
+// Variable product parents only.
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+$variable_parents = (int) $wpdb->get_var(
+	$wpdb->prepare(
+		"SELECT COUNT(*)
+		 FROM {$wpdb->posts} p
+		 JOIN {$wpdb->term_relationships} tr ON tr.object_id = p.ID
+		 JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+		 JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
+		 WHERE p.post_type = 'product' AND p.post_status = 'publish'
+		   AND tt.taxonomy = 'product_type' AND t.slug LIKE %s",
+		$variable_like
+	)
+);
 
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 $feed_total = (int) $wpdb->get_var(
@@ -193,7 +227,7 @@ if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}actionscheduler_actions'"
 $integrity_ok = null;
 if ( $feed_total > 0 && isset( $feed_status['product_count'] ) ) {
 	$written      = (int) $feed_status['product_count'];
-	$integrity_ok = $written <= (int) ceil( $feed_total * 1.5 );
+	$integrity_ok = $written <= (int) ceil( $feed_total * 1.1 );
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -317,13 +351,17 @@ if ( $simple_count !== $feed_total ) {
 
 echo '<table>';
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-echo p4wc_debug_row( 'WC dashboard count', number_format( $simple_count ), 'SELECT COUNT(*) WHERE post_type=product AND post_status=publish' );
+echo p4wc_debug_row( 'WC dashboard count', number_format( $simple_count ), 'all published products (simple + variable parents)' );
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-echo p4wc_debug_row( 'Feed query total rows', number_format( $feed_total ), 'same WHERE clause the feed iterates (products + variations)' );
+echo p4wc_debug_row( '  -> simple products', number_format( $simple_products ), 'non-variable product type' );
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-echo p4wc_debug_row( '  -> published product posts', number_format( $product_posts ) );
+echo p4wc_debug_row( '  -> variable products (parents)', number_format( $variable_parents ), 'variable product type; do NOT appear in feed directly' );
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-echo p4wc_debug_row( '  -> published variation posts', number_format( $variation_count ) );
+echo p4wc_debug_row( 'Feed query total rows', number_format( $feed_total ), 'rows the feed iterates: simple products + variations (not variable parents)' );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+echo p4wc_debug_row( '  -> simple products in feed', number_format( $product_posts - $variable_parents ), 'simple products counted by feed query' );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+echo p4wc_debug_row( '  -> variation posts in feed', number_format( $variation_count ), 'published variations with published variable parent' );
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 echo p4wc_debug_row( 'Batches needed @ 100/batch', number_format( $batches_needed ) );
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -387,7 +425,7 @@ if ( empty( $feed_status ) ) {
 		echo '<div class="err">'
 			. '&#10008; Content integrity: ' . esc_html( number_format( $written ) ) . ' entries written vs ' . esc_html( number_format( $feed_total ) ) . ' published products '
 			. '(' . esc_html( (string) round( $written / max( $feed_total, 1 ), 2 ) ) . 'x). '
-			. 'Ratio exceeds 1.5 &mdash; cursor was likely reset mid-cycle causing duplicates.'
+			. 'Ratio exceeds 1.1 &mdash; cursor was likely reset mid-cycle causing duplicates.'
 			. '</div>';
 	} elseif ( true === $integrity_ok ) {
 		echo '<div class="ok">'
@@ -488,7 +526,7 @@ if ( $simple_count !== $feed_total ) {
 	$issues[] = 'Product count mismatch: WC admin shows ' . number_format( $simple_count ) . ' but feed iterates ' . number_format( $feed_total ) . ' rows. Extra posts with post_type=product may exist in the database.';
 }
 if ( false === $integrity_ok ) {
-	$issues[] = 'Feed content integrity breach: written product count (' . number_format( (int) ( $feed_status['product_count'] ?? 0 ) ) . ') is more than 1.5x the published product count. Cursor was reset mid-cycle &mdash; duplicates were written to the feed.';
+	$issues[] = 'Feed content integrity breach: written product count (' . number_format( (int) ( $feed_status['product_count'] ?? 0 ) ) . ') is more than 1.1x the published product count. Cursor was reset mid-cycle &mdash; duplicates were written to the feed.';
 }
 if ( null === $cursor_dedicated ) {
 	$issues[] = 'Dedicated cursor option not found. The cursor race-condition fix is not yet active on this site. Apply the workaround snippet or update the plugin.';
