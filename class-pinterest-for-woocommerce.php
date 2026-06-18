@@ -278,7 +278,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// ActionScheduler is activated on init 1 so lets make sure we are updating after that.
 			add_action( 'init', array( $this, 'maybe_update_plugin' ), 5 );
-			add_action( 'init', array( self::class, 'init_tracking' ) );
+			// Consent-management plugins (and WooCommerce core's consent integration) register their
+			// consent type on `init` at priority 20. Evaluating consent on `init` would read the WP
+			// Consent API permissive default before they run, so tracking is initialised on `wp_loaded`,
+			// after every `init` callback has registered.
+			add_action( 'wp_loaded', array( self::class, 'init_tracking' ) );
 			add_action( 'init', array( Pinterest\Heartbeat::class, 'schedule_events' ) );
 			add_action( 'init', array( Pinterest\ProductSync::class, 'maybe_init' ) );
 			add_action( 'init', array( Pinterest\TrackerSnapshot::class, 'maybe_init' ) );
