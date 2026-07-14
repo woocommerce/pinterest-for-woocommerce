@@ -516,6 +516,9 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->assertGreaterThanOrEqual( $time_test_started, $feed_generation_wall_time );
 	}
 
+	/**
+	 * @return void
+	 */
 	public function test_feed_generator_end_clears_circuit_breaker_note_on_success(): void {
 		// Simulate a note left over from a previous circuit-breaker failure.
 		\Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote::add_note( 2000 );
@@ -573,6 +576,9 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * Content integrity guard — normal cases that must NOT throw.
 	 *
 	 * @dataProvider feed_integrity_pass_provider
+	 * @param int $written   Product entries written to the temp feed file.
+	 * @param int $published Published product count returned by the DB query.
+	 * @return void
 	 */
 	public function test_feed_content_integrity_passes( int $written, int $published ): void {
 		// Create exactly $published simple products so count_published_products() returns $published.
@@ -584,9 +590,12 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		// handle_end_action must complete without throwing.
 		$this->feed_generator->handle_end_action( array() );
-		$this->assertTrue( true ); // reached without exception
+		$this->assertTrue( true ); // Reached without exception.
 	}
 
+	/**
+	 * @return array<string, array{int, int}>
+	 */
 	public function feed_integrity_pass_provider(): array {
 		return array(
 			'exact match'                       => array( 3, 3 ),
@@ -598,6 +607,9 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @return void
+	 */
 	public function test_feed_content_integrity_throws_when_written_count_exceeds_ratio(): void {
 		WC_Helper_Product::create_simple_product();
 
@@ -610,6 +622,9 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->feed_generator->handle_end_action( array() );
 	}
 
+	/**
+	 * @return void
+	 */
 	public function test_feed_content_integrity_throws_on_1_29x_ratio_matching_observed_production_bug(): void {
 		// Reproduce the exact production failure: 133,500 entries for 103,708 products = 1.29x.
 		// The previous 1.5x threshold silently passed this; the new 1.1x threshold must catch it.
@@ -626,6 +641,9 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->feed_generator->handle_end_action( array() );
 	}
 
+	/**
+	 * @return void
+	 */
 	public function test_feed_content_integrity_throws_sets_status_to_error(): void {
 		WC_Helper_Product::create_simple_product();
 

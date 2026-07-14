@@ -374,6 +374,7 @@ class FeedGenerator extends AbstractChainedJob {
 			return;
 		}
 
+		// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		throw new \RuntimeException(
 			sprintf(
 				/* translators: 1: product entries written to feed, 2: published product count. */
@@ -385,6 +386,7 @@ class FeedGenerator extends AbstractChainedJob {
 				$expected
 			)
 		);
+		// phpcs:enable WordPress.Security.EscapeOutput.ExceptionNotEscaped
 	}
 
 	/**
@@ -402,6 +404,12 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	const FEED_INTEGRITY_MAX_RATIO = 1.1;
 
+	/**
+	 * Handle end of feed generation — verify integrity, rename temp files, update status.
+	 *
+	 * @return void
+	 * @throws \Throwable Re-throws any exception from the integrity check or file operations after logging.
+	 */
 	protected function handle_end() {
 		self::log( __( 'Feed generation end. Moving files to the final destination.', 'pinterest-for-woocommerce' ) );
 		try {
