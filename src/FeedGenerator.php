@@ -341,28 +341,17 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
-	 * Runs as the last step of the job.
-	 * Add XML footer to the feed files and copy the move the files from tmp to the final destination.
-	 *
-	 * @since 1.0.10
-	 *
-	 * @throws Throwable Related to adding the footer or renaming the files possible issues.
-	 */
-	/**
 	 * Verify the number of product entries written this cycle is not significantly
 	 * greater than the published product count.
 	 *
-	 * The feed cursor lives in the shared `pinterest_for_woocommerce_data` option,
-	 * which is also written by FeedRegistration, Merchants, Feeds, and other classes
-	 * via a read-modify-write pattern.  If one of those writes lands while the cursor
-	 * has already advanced, it silently overwrites it with a stale value and the feed
-	 * chain re-traverses all products from the beginning — writing every product two,
-	 * three, or four times into the temp file without any error.  The circuit breaker
-	 * eventually fires, but by then the temp file already contains duplicates.
-	 *
-	 * This check is the last line of defence: if the written count exceeds the
-	 * published count by more than FEED_INTEGRITY_MAX_RATIO the temp files are
-	 * discarded and a fresh cycle is scheduled rather than publishing a corrupted feed.
+	 * The feed cursor is stored in the dedicated FEED_CURSOR_OPTION to avoid a
+	 * read-modify-write race with FeedRegistration, Merchants, Feeds, and other
+	 * classes that write the shared `pinterest_for_woocommerce_data` option. This
+	 * check is a second line of defence for sites still running an older cursor
+	 * implementation, or for any other cause of duplicate entries: if the written
+	 * count exceeds the published count by more than FEED_INTEGRITY_MAX_RATIO the
+	 * temp files are discarded and a fresh cycle is scheduled rather than
+	 * publishing a corrupted feed.
 	 *
 	 * @throws \RuntimeException When duplicate entries are detected.
 	 */

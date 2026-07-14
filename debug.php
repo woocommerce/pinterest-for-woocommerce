@@ -190,9 +190,10 @@ if ( class_exists( '\Automattic\WooCommerce\Pinterest\ProductFeedStatus' ) ) {
 }
 
 // 5. Action Scheduler — all Pinterest actions, last 48 h.
-$as_actions = array();
+$as_actions    = array();
+$as_table_like = $wpdb->esc_like( $wpdb->prefix . 'actionscheduler_actions' );
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}actionscheduler_actions'" ) ) {
+if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $as_table_like ) ) ) {
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 	$as_actions = $wpdb->get_results(
 		$wpdb->prepare(
@@ -505,7 +506,7 @@ if ( empty( $as_actions ) ) {
 			esc_html( (string) $batch_num ),
 			esc_html( $row->scheduled_date_gmt ),
 			esc_html( $last_attempt ),
-			esc_html( mb_substr( $row->log_message ?? '', 0, 140 ) )
+			esc_html( substr( $row->log_message ?? '', 0, 140 ) )
 		);
 	}
 	echo '</table>';
