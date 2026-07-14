@@ -374,19 +374,16 @@ class FeedGenerator extends AbstractChainedJob {
 			return;
 		}
 
-		// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped
-		throw new \RuntimeException(
-			sprintf(
-				/* translators: 1: product entries written to feed, 2: published product count. */
-				__(
-					'Feed content integrity check failed: %1$d product entries were written but the catalog has only %2$d published products. The cursor was likely reset mid-cycle, causing duplicate entries. Discarding the temporary feed file — a fresh generation cycle will start automatically.',
-					'pinterest-for-woocommerce'
-				),
-				$written,
-				$expected
-			)
+		$message = sprintf(
+			/* translators: 1: product entries written to feed, 2: published product count. */
+			__(
+				'Feed content integrity check failed: %1$d product entries were written but the catalog has only %2$d published products. The cursor was likely reset mid-cycle, causing duplicate entries. Discarding the temporary feed file — a fresh generation cycle will start automatically.',
+				'pinterest-for-woocommerce'
+			),
+			$written,
+			$expected
 		);
-		// phpcs:enable WordPress.Security.EscapeOutput.ExceptionNotEscaped
+		throw new \RuntimeException( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 	}
 
 	/**
