@@ -516,6 +516,20 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->assertGreaterThanOrEqual( $time_test_started, $feed_generation_wall_time );
 	}
 
+	/**
+	 * @return void
+	 */
+	public function test_feed_generator_end_clears_circuit_breaker_note_on_success(): void {
+		// Simulate a note left over from a previous circuit-breaker failure.
+		\Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote::add_note( 2000 );
+		$data_store = \Automattic\WooCommerce\Admin\Notes\Notes::load_data_store();
+		$this->assertCount( 1, $data_store->get_notes_with_name( \Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote::NOTE_NAME ), 'Pre-condition: note must exist before handle_end runs' );
+
+		$this->feed_generator->handle_end_action( array() );
+
+		$this->assertCount( 0, $data_store->get_notes_with_name( \Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote::NOTE_NAME ), 'Note should be deleted after a successful feed generation' );
+	}
+
 	public function test_feed_generator_end_sets_product_count_into_persistent_state_property() {
 		ProductFeedStatus::set(
 			array(
@@ -556,6 +570,94 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			$this->assertEquals( 0, $feed_generation_product_count );
 			$this->assertEquals( -1, $feed_generation_wall_time );
 		}
+	}
+
+	/**
+	 * Content integrity guard — normal cases that must NOT throw.
+	 *
+	 * @dataProvider feed_integrity_pass_provider
+	 * @param int $written   Product entries written to the temp feed file.
+	 * @param int $published Published product count returned by the DB query.
+	 * @return void
+	 */
+	public function test_feed_content_integrity_passes( int $written, int $published ): void {
+		// Create exactly $published simple products so count_published_products() returns $published.
+		for ( $i = 0; $i < $published; $i++ ) {
+			WC_Helper_Product::create_simple_product();
+		}
+
+		ProductFeedStatus::set( array( 'product_count' => $written ) );
+
+		// handle_end_action must complete without throwing.
+		$this->feed_generator->handle_end_action( array() );
+		$this->assertTrue( true ); // Reached without exception.
+	}
+
+	/**
+	 * @return array<string, array{int, int}>
+	 */
+	public function feed_integrity_pass_provider(): array {
+		return array(
+			'exact match'                       => array( 3, 3 ),
+			'written less (filtered out stock)' => array( 2, 3 ),
+			'written at 1.0x'                   => array( 10, 10 ),
+			'written at 1.05x (under threshold)' => array( 105, 100 ),
+			'written at exactly 1.1x'            => array( 110, 100 ),
+			'empty catalog skips check'         => array( 0, 0 ),
+		);
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_feed_content_integrity_throws_when_written_count_exceeds_ratio(): void {
+		WC_Helper_Product::create_simple_product();
+
+		// Simulate the cursor-reset duplication: 4 full traversals of a 1-product catalog.
+		ProductFeedStatus::set( array( 'product_count' => 4 ) );
+
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessageMatches( '/Feed content integrity check failed/' );
+
+		$this->feed_generator->handle_end_action( array() );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_feed_content_integrity_throws_on_1_29x_ratio_matching_observed_production_bug(): void {
+		// Reproduce the exact production failure: 133,500 entries for 103,708 products = 1.29x.
+		// The previous 1.5x threshold silently passed this; the new 1.1x threshold must catch it.
+		for ( $i = 0; $i < 10; $i++ ) {
+			WC_Helper_Product::create_simple_product();
+		}
+
+		// 10 products published, 13 written = 1.3x (mirrors 103,708 → 133,500).
+		ProductFeedStatus::set( array( 'product_count' => 13 ) );
+
+		$this->expectException( \RuntimeException::class );
+		$this->expectExceptionMessageMatches( '/Feed content integrity check failed/' );
+
+		$this->feed_generator->handle_end_action( array() );
+	}
+
+	/**
+	 * @return void
+	 */
+	public function test_feed_content_integrity_throws_sets_status_to_error(): void {
+		WC_Helper_Product::create_simple_product();
+
+		// Simulate 3x duplication.
+		ProductFeedStatus::set( array( 'product_count' => 3 ) );
+
+		try {
+			$this->feed_generator->handle_end_action( array() );
+		} catch ( \RuntimeException $e ) {
+			$this->assertEquals( 'error', ProductFeedStatus::get()['status'] );
+			return;
+		}
+
+		$this->fail( 'Expected RuntimeException was not thrown.' );
 	}
 
 	public function test_while_feed_generator_is_in_progress_previous_wall_time_and_recent_product_count_are_not_overwritten() {
@@ -663,22 +765,22 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		// Create a product to fetch.
 		WC_Helper_Product::create_simple_product();
 
-		// Set initial cursor.
-		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
+		// Set initial cursor via the dedicated option (cursor moved from shared data option).
+		update_option( FeedGenerator::FEED_CURSOR_OPTION, 0 );
 
 		// Fetch items - this should store pending cursor but not commit it yet.
 		$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( 1, array() ) );
 		$this->assertNotEmpty( $items );
 
 		// Cursor should still be at initial value (not advanced yet).
-		$cursor_before = Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		$cursor_before = (int) get_option( FeedGenerator::FEED_CURSOR_OPTION, 0 );
 		$this->assertEquals( 0, $cursor_before, 'Cursor should not advance before handle_batch_action completes' );
 
 		// Complete batch processing.
 		$this->feed_generator->handle_batch_action( 1, array() );
 
 		// Now cursor should be advanced.
-		$cursor_after = Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		$cursor_after = (int) get_option( FeedGenerator::FEED_CURSOR_OPTION, 0 );
 		$this->assertGreaterThan( $cursor_before, $cursor_after, 'Cursor should advance after successful batch completion' );
 	}
 

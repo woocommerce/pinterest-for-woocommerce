@@ -341,16 +341,65 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
-	 * Runs as the last step of the job.
-	 * Add XML footer to the feed files and copy the move the files from tmp to the final destination.
+	 * Verify the number of product entries written this cycle is not significantly
+	 * greater than the published product count.
 	 *
-	 * @since 1.0.10
+	 * The feed cursor is stored in the dedicated FEED_CURSOR_OPTION to avoid a
+	 * read-modify-write race with FeedRegistration, Merchants, Feeds, and other
+	 * classes that write the shared `pinterest_for_woocommerce_data` option. This
+	 * check is a second line of defence for sites still running an older cursor
+	 * implementation, or for any other cause of duplicate entries: if the written
+	 * count exceeds the published count by more than FEED_INTEGRITY_MAX_RATIO the
+	 * temp files are discarded and a fresh cycle is scheduled rather than
+	 * publishing a corrupted feed.
 	 *
-	 * @throws Throwable Related to adding the footer or renaming the files possible issues.
+	 * @throws \RuntimeException When duplicate entries are detected.
+	 */
+	private function assert_feed_content_integrity(): void {
+		$written  = (int) ( ProductFeedStatus::get()['product_count'] ?? 0 );
+		$expected = $this->count_published_products();
+
+		if ( $expected <= 0 || $written <= (int) ceil( $expected * self::FEED_INTEGRITY_MAX_RATIO ) ) {
+			return;
+		}
+
+		$message = sprintf(
+			/* translators: 1: product entries written to feed, 2: published product count. */
+			__(
+				'Feed content integrity check failed: %1$d product entries were written but the catalog has only %2$d published products. The cursor was likely reset mid-cycle, causing duplicate entries. Discarding the temporary feed file — a fresh generation cycle will start automatically.',
+				'pinterest-for-woocommerce'
+			),
+			$written,
+			$expected
+		);
+		throw new \RuntimeException( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+	}
+
+	/**
+	 * Maximum ratio of feed entries written to published product count before
+	 * the feed is considered corrupted by cursor resets.
+	 *
+	 * 1.1 allows up to 10 % more entries than published products (accommodates
+	 * products added or published during generation) while catching the ≥ 1.29×
+	 * duplication observed in production when the cursor race condition fires.
+	 * The previous value of 1.5 was too loose — a 29 % over-count (133,500 entries
+	 * for a 103,708-product catalog) slipped through and the corrupted feed was
+	 * published to Pinterest.
+	 *
+	 * @var float
+	 */
+	const FEED_INTEGRITY_MAX_RATIO = 1.1;
+
+	/**
+	 * Handle end of feed generation — verify integrity, rename temp files, update status.
+	 *
+	 * @return void
+	 * @throws \Throwable Re-throws any exception from the integrity check or file operations after logging.
 	 */
 	protected function handle_end() {
 		self::log( __( 'Feed generation end. Moving files to the final destination.', 'pinterest-for-woocommerce' ) );
 		try {
+			$this->assert_feed_content_integrity();
 			$this->feed_file_operations->add_footer_to_temporary_feed_files();
 			$this->feed_file_operations->rename_temporary_feed_files_to_final();
 			ProductFeedStatus::set(
@@ -365,6 +414,9 @@ class FeedGenerator extends AbstractChainedJob {
 			throw $th;
 		}
 		self::log( __( 'Feed generated successfully.', 'pinterest-for-woocommerce' ) );
+
+		// Feed completed cleanly — remove any circuit-breaker warning from the WC admin inbox.
+		FeedCircuitBreakerNote::delete_note();
 
 		// Check if feed is dirty and reschedule in necessary.
 		if ( $this->feed_is_dirty() ) {
@@ -734,6 +786,25 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
+	 * Dedicated option name for the feed cursor (last queued product ID).
+	 *
+	 * Stored as a standalone WordPress option — NOT inside the shared
+	 * `pinterest_for_woocommerce_data` array — to prevent concurrent
+	 * read-modify-write races with other classes (FeedRegistration, Merchants,
+	 * Feeds, etc.) that also call save_data() on that shared option.  Those
+	 * classes load the entire array, do external work (API calls), then write
+	 * the array back.  If the write happens after the feed chain committed a
+	 * new cursor value, the write silently overwrites the cursor with the stale
+	 * value read at the start, causing the chain to loop from the beginning.
+	 *
+	 * Using update_option() directly is atomic (a single SQL UPDATE) and
+	 * eliminates the race window entirely.
+	 *
+	 * @var string
+	 */
+	const FEED_CURSOR_OPTION = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_feed_cursor';
+
+	/**
 	 * Returns last product id from the last batch of products fetched at the previous step.
 	 *
 	 * @param int $batch_number - Action Scheduler chain action batch number.
@@ -741,11 +812,12 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	protected function get_last_batch_id( int $batch_number ): int {
 		if ( 1 === $batch_number ) {
-			// Reset last fetched ID if batch number equals to 1.
-			Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
+			// Reset cursor at the start of each new generation cycle.
+			update_option( self::FEED_CURSOR_OPTION, 0, false );
+			return 0;
 		}
 		// Get last fetched ID to start from the next item after it.
-		return (int) Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		return (int) get_option( self::FEED_CURSOR_OPTION, 0 );
 	}
 
 	/**
@@ -755,7 +827,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @return void
 	 */
 	protected function set_last_batch_id( int $id ): void {
-		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', $id );
+		update_option( self::FEED_CURSOR_OPTION, $id, false );
 	}
 
 	/**
