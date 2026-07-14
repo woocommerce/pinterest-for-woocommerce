@@ -26,6 +26,11 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		update_option( 'woocommerce_allow_tracking', 'yes' );
 	}
 
+	public function tearDown(): void {
+		parent::tearDown();
+		remove_all_filters( 'woocommerce_tracker_data' );
+	}
+
 	function test_settings_are_tracked_by_woo_tracker_if_opt_in() {
 		Pinterest_For_Woocommerce::save_settings( self::$default_settings );
 
@@ -139,6 +144,6 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		TrackerSnapshot::maybe_init();
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
 
-		$this->assertTrue( count($tracks) === 0, "Track data should be empty whe OPT-OUT" );
+		$this->assertTrue( count( $tracks ) === 0, 'Track data should be empty whe OPT-OUT' );
 	}
 }
