@@ -144,6 +144,6 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		TrackerSnapshot::maybe_init();
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
 
-		$this->assertTrue( count( $tracks ) === 0, 'Track data should be empty when opting out' );
+		$this->assertEmpty( $tracks, 'Track data should be empty when opting out' );
 	}
 }
