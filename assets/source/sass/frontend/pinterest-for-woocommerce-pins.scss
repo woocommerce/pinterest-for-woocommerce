@@ -4,17 +4,19 @@
 	top: 10px;
 	z-index: 50;
 	opacity: 0;
-	visibility: hidden;
+	pointer-events: none;
 
 	@media (hover: none) {
 		opacity: 1;
-		visibility: visible;
+		pointer-events: auto;
 	}
 
 	.product:hover > &,
-	.wc-block-grid__product:hover > & {
+	.wc-block-grid__product:hover > &,
+	.product:focus-within > &,
+	.wc-block-grid__product:focus-within > & {
 		opacity: 1;
-		visibility: visible;
+		pointer-events: auto;
 
 		a {
 			text-decoration: none;
