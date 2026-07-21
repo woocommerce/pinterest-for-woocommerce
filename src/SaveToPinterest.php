@@ -85,7 +85,8 @@ class SaveToPinterest {
 		 * Image used is the one explicitly set in the media attribute.
 		 */
 		return sprintf(
-			'<div class="pinterest-for-woocommerce-image-wrapper"><a data-pin-do="buttonPin" href="%s"></a></div>',
+			'<div class="pinterest-for-woocommerce-image-wrapper"><span class="screen-reader-text">%s</span><a data-pin-do="buttonPin" href="%s"></a></div>',
+			esc_html__( 'Save to Pinterest (opens in a new tab)', 'pinterest-for-woocommerce' ),
 			esc_url(
 				add_query_arg(
 					$attributes,
