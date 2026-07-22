@@ -44,6 +44,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
 					// Move the span inside the processed <a> tag.
 					pinLink.appendChild( srSpan );
 
+					// Add aria-haspopup to <a> tag.
+					pinLink.setAttribute( 'aria-haspopup', 'dialog' );
+
 					// Mark as processed so it only runs once.
 					wrapper.dataset.srLabeled = 'true';
 				}
