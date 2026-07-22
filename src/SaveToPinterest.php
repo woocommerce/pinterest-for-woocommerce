@@ -66,14 +66,14 @@ class SaveToPinterest {
 	 */
 	public static function render_pin( $post_id, $post_thumbnail_id = '' ) {
 
-		$product_name = get_the_title();
+		$product_name = get_the_title( $post_id );
 
 		/* translators: %s: product name */
 		$screen_reader_text = sprintf( __( '%s to Pinterest (opens in a new window)', 'pinterest-for-woocommerce' ), $product_name );
 
 		$attributes = array(
 			'description' => esc_html( $product_name ),
-			'url'         => esc_url( get_the_permalink() ),
+			'url'         => esc_url( get_the_permalink( $post_id ) ),
 		);
 
 		$post_thumbnail_id = empty( $post_thumbnail_id ) ? get_post_thumbnail_id( $post_id ) : $post_thumbnail_id;

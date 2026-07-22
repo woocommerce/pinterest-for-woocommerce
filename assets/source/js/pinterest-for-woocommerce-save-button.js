@@ -56,30 +56,97 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	// Run initially in case Pinterest rendered on page load.
 	processWrappers();
 
-	// Observe mutations for dynamic elements or asynchronous Pinterest rendering.
-	const observer = new window.MutationObserver( function ( mutations ) {
-		let shouldProcess = false;
+	/**
+	 * Whether a mutation is related to our Save button wrappers/links.
+	 *
+	 * Pinterest often rewrites the <a> inside an existing wrapper (childList on
+	 * the wrapper) or inserts a ready-made link with data-pin-log already set
+	 * (no attribute mutation). Matching only newly added wrappers misses that.
+	 *
+	 * @param {MutationRecord} mutation Mutation to inspect.
+	 * @return {boolean} True when processWrappers should run.
+	 */
+	function isPinterestRelatedMutation( mutation ) {
+		if (
+			mutation.type === 'attributes' &&
+			mutation.attributeName === 'data-pin-log' &&
+			mutation.target &&
+			typeof mutation.target.closest === 'function' &&
+			mutation.target.closest(
+				'.pinterest-for-woocommerce-image-wrapper'
+			)
+		) {
+			return true;
+		}
 
-		for ( const mutation of mutations ) {
-			// Check for added DOM nodes or attribute changes made by Pinterest.
+		if (
+			mutation.type !== 'childList' ||
+			mutation.addedNodes.length === 0
+		) {
+			return false;
+		}
+
+		// Pinterest rewrote nodes inside an existing wrapper.
+		if (
+			mutation.target &&
+			mutation.target.nodeType === 1 &&
+			typeof mutation.target.closest === 'function' &&
+			mutation.target.closest(
+				'.pinterest-for-woocommerce-image-wrapper'
+			)
+		) {
+			return true;
+		}
+
+		for ( const node of mutation.addedNodes ) {
+			if ( node.nodeType !== 1 ) {
+				continue;
+			}
+
 			if (
-				mutation.type === 'childList' &&
-				mutation.addedNodes.length > 0
+				node.matches( '.pinterest-for-woocommerce-image-wrapper' ) ||
+				node.querySelector(
+					'.pinterest-for-woocommerce-image-wrapper'
+				) ||
+				node.matches( 'a[data-pin-do], a[data-pin-log]' ) ||
+				node.querySelector( 'a[data-pin-do], a[data-pin-log]' )
 			) {
-				shouldProcess = true;
-				break;
-			} else if (
-				mutation.type === 'attributes' &&
-				mutation.attributeName === 'data-pin-log'
-			) {
-				shouldProcess = true;
-				break;
+				return true;
 			}
 		}
 
-		if ( shouldProcess ) {
-			// Defer execution briefly to ensure DOM paint completes.
-			window.requestAnimationFrame( processWrappers );
+		return false;
+	}
+
+	let processScheduled = false;
+
+	function scheduleProcessWrappers() {
+		if ( processScheduled ) {
+			return;
+		}
+
+		processScheduled = true;
+
+		const run = () => {
+			processScheduled = false;
+			processWrappers();
+		};
+
+		// Defer briefly so DOM paint can complete; fall back when rAF is missing.
+		if ( typeof window.requestAnimationFrame === 'function' ) {
+			window.requestAnimationFrame( run );
+		} else {
+			window.setTimeout( run, 0 );
+		}
+	}
+
+	// Observe mutations for dynamic elements or asynchronous Pinterest rendering.
+	const observer = new window.MutationObserver( function ( mutations ) {
+		for ( const mutation of mutations ) {
+			if ( isPinterestRelatedMutation( mutation ) ) {
+				scheduleProcessWrappers();
+				break;
+			}
 		}
 	} );
 
