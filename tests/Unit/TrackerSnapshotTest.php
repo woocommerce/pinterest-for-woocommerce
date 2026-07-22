@@ -26,6 +26,9 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		update_option( 'woocommerce_allow_tracking', 'yes' );
 	}
 
+	/**
+	 * @return void
+	 */
 	public function tearDown(): void {
 		parent::tearDown();
 		remove_all_filters( 'woocommerce_tracker_data' );
