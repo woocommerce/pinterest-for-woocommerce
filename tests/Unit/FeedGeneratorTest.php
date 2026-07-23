@@ -1122,7 +1122,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 */
 	public function test_start_action_defers_to_live_current_cycle() {
 		update_option( FeedGenerator::OPTION_CYCLE_ID, 'live-cycle', false );
-		Pinterest_For_Woocommerce::save_data( 'feed_dirty', false );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 0, false );
 
 		$live_batch_action = new ActionScheduler_Action(
 			'pinterest/jobs/generate_feed/chain_batch',
@@ -1141,7 +1141,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$this->feed_generator->handle_start_action( array() );
 
-		$this->assertTrue( (bool) Pinterest_For_Woocommerce::get_data( 'feed_dirty' ) );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty() );
 		$this->assertEquals( 'live-cycle', get_option( FeedGenerator::OPTION_CYCLE_ID ) );
 	}
 

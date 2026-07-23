@@ -50,6 +50,16 @@ class FeedGenerator extends AbstractChainedJob {
 	const OPTION_CYCLE_ID = 'pinterest_for_woocommerce_feed_generation_cycle_id';
 
 	/**
+	 * The option storing the feed dirty flag.
+	 *
+	 * Deliberately a dedicated option: the flag is written from product-edit
+	 * requests whose options caches may be stale — writing it through the shared
+	 * plugin data option would rewrite that whole array and clobber concurrent
+	 * writes (most importantly the feed cursor) with stale copies.
+	 */
+	const OPTION_FEED_DIRTY = 'pinterest_for_woocommerce_feed_dirty';
+
+	/**
 	 * How soon (in seconds) an already pending start action must fire for
 	 * mark_feed_dirty() to skip scheduling another immediate start.
 	 */
@@ -380,7 +390,7 @@ class FeedGenerator extends AbstractChainedJob {
 		$this->refresh_data_option_cache();
 
 		if ( $this->is_current_cycle_alive() ) {
-			Pinterest_For_Woocommerce::save_data( 'feed_dirty', true );
+			update_option( self::OPTION_FEED_DIRTY, 1, false );
 			self::log( __( 'Feed generation is already running. Marked the feed dirty to regenerate when the current cycle finishes.', 'pinterest-for-woocommerce' ) );
 			return;
 		}
@@ -670,7 +680,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since 1.0.10
 	 */
 	public function mark_feed_dirty(): void {
-		Pinterest_For_Woocommerce()::save_data( 'feed_dirty', true );
+		update_option( self::OPTION_FEED_DIRTY, 1, false );
 		self::log( 'Feed is dirty.' );
 
 		if ( $this->is_running() ) {
@@ -697,17 +707,29 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since 1.0.10
 	 */
 	public function mark_feed_clean(): void {
-		Pinterest_For_Woocommerce()::save_data( 'feed_dirty', false );
+		update_option( self::OPTION_FEED_DIRTY, 0, false );
 	}
 
 	/**
 	 * Check if feed is dirty.
 	 *
+	 * Reads straight from the database: the flag may have been set by a concurrent
+	 * request after this request's options caches were primed.
+	 *
 	 * @since 1.0.10
 	 * @return bool Indicates if feed is dirty or not.
 	 */
 	public function feed_is_dirty(): bool {
-		return (bool) Pinterest_For_Woocommerce()::get_data( 'feed_dirty' );
+		global $wpdb;
+
+		$value = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
+				self::OPTION_FEED_DIRTY
+			)
+		);
+
+		return (bool) $value;
 	}
 
 	/**
@@ -827,6 +849,7 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 		as_unschedule_all_actions( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		delete_option( self::OPTION_CYCLE_ID );
+		delete_option( self::OPTION_FEED_DIRTY );
 	}
 
 	/**
