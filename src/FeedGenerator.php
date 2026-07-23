@@ -20,6 +20,7 @@ use Automattic\WooCommerce\Pinterest\Exception\FeedFileOperationsException;
 use Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
 use ActionScheduler;
+use ActionScheduler_Action;
 use Exception;
 use Pinterest_For_Woocommerce;
 use Throwable;
@@ -33,6 +34,22 @@ class FeedGenerator extends AbstractChainedJob {
 	use ProductFeedLogger;
 
 	const ACTION_START_FEED_GENERATOR = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-start-feed-generation';
+
+	/**
+	 * The job args key carrying the generation cycle ID through the action chain.
+	 */
+	const ARG_CYCLE_ID = 'cycle_id';
+
+	/**
+	 * The data key storing the ID of the current (authoritative) generation cycle.
+	 */
+	const DATA_CYCLE_ID = 'feed_generation_cycle_id';
+
+	/**
+	 * How soon (in seconds) an already pending start action must fire for
+	 * mark_feed_dirty() to skip scheduling another immediate start.
+	 */
+	const START_DEBOUNCE_WINDOW = 5 * MINUTE_IN_SECONDS;
 
 	/**
 	 * The time in seconds to wait after a failed feed generation attempt,
@@ -157,6 +174,23 @@ class FeedGenerator extends AbstractChainedJob {
 
 		// If not Pinterest Feed Generator action - ignore.
 		if ( $hook !== $this->get_action_full_name( self::CHAIN_BATCH ) ) {
+			return;
+		}
+
+		// Do not resurrect a superseded cycle, and do not let its timeout shrink the
+		// current cycle's batch size throttling state.
+		$job_args = ( isset( $args[1] ) && is_array( $args[1] ) ) ? $args[1] : array();
+		if ( $this->is_stale_cycle( $job_args ) ) {
+			self::log(
+				sprintf(
+					// Translators: Action Scheduler hook name.
+					__(
+						'Feed Generator `%s` Action from a superseded generation cycle timed out. Not rescheduling.',
+						'pinterest-for-woocommerce'
+					),
+					$hook
+				)
+			);
 			return;
 		}
 
@@ -320,6 +354,44 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
+	 * Handles the job chain start action.
+	 *
+	 * Overrides the framework handler to enforce a hard cap of one active generation
+	 * cycle. If the current cycle still has live (pending or in-progress) chain
+	 * actions, the start is skipped and the feed is marked dirty instead — the active
+	 * cycle picks the flag up in handle_end() and triggers the regeneration. Only when
+	 * the current cycle is dead or absent does the start mint a new cycle ID and take
+	 * over. The ID is stamped into the job args and propagates through every action in
+	 * the chain, so any still-scheduled action from an older cycle aborts instead of
+	 * writing to the feed files or the shared cursor.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param array $args The args for the job.
+	 *
+	 * @throws Throwable Related to creating an empty feed temp file and populating the header possible issues.
+	 */
+	public function handle_start_action( array $args ) {
+		if ( $this->is_current_cycle_alive() ) {
+			Pinterest_For_Woocommerce::save_data( 'feed_dirty', true );
+			self::log( __( 'Feed generation is already running. Marked the feed dirty to regenerate when the current cycle finishes.', 'pinterest-for-woocommerce' ) );
+			return;
+		}
+
+		// Mint the new cycle before truncating the temporary files: from this moment
+		// any still-scheduled action from an older cycle self-terminates.
+		$cycle_id = wp_generate_uuid4();
+		Pinterest_For_Woocommerce::save_data( self::DATA_CYCLE_ID, $cycle_id );
+		$args[ self::ARG_CYCLE_ID ] = $cycle_id;
+
+		/* translators: feed generation cycle ID */
+		self::log( sprintf( __( 'Starting feed generation cycle `%s`.', 'pinterest-for-woocommerce' ), $cycle_id ) );
+
+		$this->handle_start();
+		$this->queue_batch( 1, $args );
+	}
+
+	/**
 	 * Handle processing a chain batch.
 	 *
 	 * @since 1.2.14
@@ -330,6 +402,19 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Throwable Related to issue possible when creating an empty feed temp file and populating the header.
 	 */
 	public function handle_batch_action( int $batch_number, array $args ) {
+		if ( $this->is_stale_cycle( $args ) ) {
+			// A newer cycle owns the feed files and the shared cursor. Abort quietly:
+			// no processing, no successor action, no throttling state changes.
+			self::log(
+				sprintf(
+					// Translators: batch number.
+					__( 'Feed Generator batch #%d belongs to a superseded generation cycle. Skipping.', 'pinterest-for-woocommerce' ),
+					$batch_number
+				)
+			);
+			return;
+		}
+
 		// Reset pending cursor to prevent stale values from previous failed batches.
 		$this->pending_last_batch_id = null;
 
@@ -338,6 +423,28 @@ class FeedGenerator extends AbstractChainedJob {
 		// Reset number of products per batch and action retries counter on success.
 		Pinterest_For_Woocommerce::remove_data( 'feed_product_batch_size' );
 		Pinterest_For_Woocommerce::remove_data( 'feed_product_batch_attempt' );
+	}
+
+	/**
+	 * Handles the job chain end action.
+	 *
+	 * Overrides the framework handler to validate the cycle ID: a stale chain end
+	 * must not publish (rename) the temporary file that now belongs to the cycle
+	 * which superseded it, nor mark the feed as generated.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param array $args The args for the job.
+	 *
+	 * @throws Throwable Related to adding the footer or renaming the files possible issues.
+	 */
+	public function handle_end_action( array $args ) {
+		if ( $this->is_stale_cycle( $args ) ) {
+			self::log( __( 'Feed Generator end action belongs to a superseded generation cycle. Skipping.', 'pinterest-for-woocommerce' ) );
+			return;
+		}
+
+		parent::handle_end_action( $args );
 	}
 
 	/**
@@ -560,6 +667,15 @@ class FeedGenerator extends AbstractChainedJob {
 			return;
 		}
 
+		// Debounce: if a start action is running right now or already pending to fire
+		// soon, do not reschedule it. The check is time-aware because the recurring
+		// daily start action is effectively always pending (next occurrence within a
+		// day) — only a start due within the debounce window counts as "queued".
+		$next_start = as_next_scheduled_action( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		if ( true === $next_start || ( is_numeric( $next_start ) && (int) $next_start <= time() + self::START_DEBOUNCE_WINDOW ) ) {
+			return;
+		}
+
 		// Start new feed generation cycle now.
 		$this->schedule_next_generator_start( time() );
 	}
@@ -621,6 +737,10 @@ class FeedGenerator extends AbstractChainedJob {
 			)
 		);
 		ProductFeedStatus::mark_feed_file_generation_as_failed();
+
+		// Remove the temporary feed files so failed or aborted cycles do not leave
+		// potentially huge partial feeds on disk. Any retry regenerates from scratch.
+		$this->feed_file_operations->delete_temporary_feed_files();
 
 		if ( $this->is_circuit_breaker_exception( $th ) ) {
 			// Use a live product count rather than the batch-run status cache — the batch
@@ -756,6 +876,89 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	protected function set_last_batch_id( int $id ): void {
 		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', $id );
+	}
+
+	/**
+	 * Returns the ID of the current (authoritative) feed generation cycle.
+	 *
+	 * Always reads a fresh value: Action Scheduler may process many chain actions in
+	 * a single long-lived request while a concurrent request supersedes the cycle, so
+	 * the runtime settings cache cannot be trusted here.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return string Current cycle ID, or an empty string if no cycle has been started yet.
+	 */
+	protected function get_current_cycle_id(): string {
+		return (string) ( Pinterest_For_Woocommerce::get_data( self::DATA_CYCLE_ID, true ) ?? '' );
+	}
+
+	/**
+	 * Checks whether the given job args belong to a superseded generation cycle.
+	 *
+	 * Args without a cycle ID (scheduled by previous plugin versions) are considered
+	 * current as long as no cycle ID has ever been minted, which keeps in-flight
+	 * chains running across a plugin upgrade.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param array $args The args for the job.
+	 *
+	 * @return bool
+	 */
+	protected function is_stale_cycle( array $args ): bool {
+		$cycle_id = (string) ( $args[ self::ARG_CYCLE_ID ] ?? '' );
+		return $cycle_id !== $this->get_current_cycle_id();
+	}
+
+	/**
+	 * Checks whether the current generation cycle still has live scheduled actions.
+	 *
+	 * A cycle is alive when a pending or in-progress chain batch or chain end action
+	 * carries the current cycle ID. Chain start actions never carry a cycle ID — the
+	 * ID is minted when the start action executes — so queued starts are gated by
+	 * this same check when they run.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return bool
+	 */
+	protected function is_current_cycle_alive(): bool {
+		$cycle_id = $this->get_current_cycle_id();
+		if ( '' === $cycle_id ) {
+			return false;
+		}
+
+		$hooks = array(
+			$this->get_action_full_name( self::CHAIN_BATCH ),
+			$this->get_action_full_name( self::CHAIN_END ),
+		);
+
+		foreach ( $hooks as $hook ) {
+			$actions = (array) $this->action_scheduler->search(
+				array(
+					'hook'     => $hook,
+					'status'   => array( ActionSchedulerInterface::STATUS_PENDING, ActionSchedulerInterface::STATUS_RUNNING ),
+					'per_page' => 50,
+				),
+				OBJECT,
+				PINTEREST_FOR_WOOCOMMERCE_PREFIX
+			);
+
+			foreach ( $actions as $action ) {
+				if ( ! $action instanceof ActionScheduler_Action ) {
+					continue;
+				}
+				$action_args = $action->get_args();
+				// Chain batch action args are [ batch_number, job_args ]; chain end args are [ job_args ].
+				$job_args = end( $action_args );
+				if ( is_array( $job_args ) && (string) ( $job_args[ self::ARG_CYCLE_ID ] ?? '' ) === $cycle_id ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**

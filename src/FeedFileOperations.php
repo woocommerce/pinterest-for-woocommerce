@@ -71,6 +71,22 @@ class FeedFileOperations {
 	}
 
 	/**
+	 * Delete the temporary feed files.
+	 *
+	 * Used when a generation cycle fails or is aborted, so partial feeds do not
+	 * accumulate on disk.
+	 *
+	 * @since x.x.x
+	 */
+	public function delete_temporary_feed_files(): void {
+		foreach ( $this->configurations->get_configurations() as $config ) {
+			if ( isset( $config['tmp_file'] ) && file_exists( $config['tmp_file'] ) ) {
+				wp_delete_file( $config['tmp_file'] );
+			}
+		}
+	}
+
+	/**
 	 * Check if we have a feed file on the disk.
 	 *
 	 * @since 1.2.9
