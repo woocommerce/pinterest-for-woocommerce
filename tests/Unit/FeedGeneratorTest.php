@@ -1014,7 +1014,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$this->feed_generator->handle_start_action( array() );
 
-		$current_cycle_id = Pinterest_For_Woocommerce::get_data( FeedGenerator::DATA_CYCLE_ID );
+		$current_cycle_id = get_option( FeedGenerator::OPTION_CYCLE_ID );
 		$this->assertNotEmpty( $current_cycle_id, 'A cycle ID must be persisted as the current cycle.' );
 		$this->assertSame( 1, $captured_args[0], 'The first queued batch must be batch #1.' );
 		$this->assertSame(
@@ -1032,7 +1032,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 */
 	public function test_stale_batch_action_aborts_without_touching_cursor_or_throttling_state() {
 		WC_Helper_Product::create_simple_product();
-		Pinterest_For_Woocommerce::save_data( FeedGenerator::DATA_CYCLE_ID, 'current-cycle' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'current-cycle', false );
 		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 42 );
 		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', 50 );
 		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_attempt', 2 );
@@ -1060,7 +1060,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 */
 	public function test_current_cycle_batch_action_proceeds_and_propagates_cycle_id() {
 		WC_Helper_Product::create_simple_product();
-		Pinterest_For_Woocommerce::save_data( FeedGenerator::DATA_CYCLE_ID, 'current-cycle' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'current-cycle', false );
 
 		$this->action_scheduler
 			->expects( $this->once() )
@@ -1081,7 +1081,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_stale_end_action_does_not_publish_feed() {
-		Pinterest_For_Woocommerce::save_data( FeedGenerator::DATA_CYCLE_ID, 'current-cycle' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'current-cycle', false );
 		ProductFeedStatus::set( array( 'status' => 'in_progress' ) );
 
 		$this->feed_file_operations
@@ -1102,7 +1102,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_current_cycle_end_action_publishes_feed() {
-		Pinterest_For_Woocommerce::save_data( FeedGenerator::DATA_CYCLE_ID, 'current-cycle' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'current-cycle', false );
 
 		$this->feed_file_operations
 			->expects( $this->once() )
@@ -1121,7 +1121,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_start_action_defers_to_live_current_cycle() {
-		Pinterest_For_Woocommerce::save_data( FeedGenerator::DATA_CYCLE_ID, 'live-cycle' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'live-cycle', false );
 		Pinterest_For_Woocommerce::save_data( 'feed_dirty', false );
 
 		$live_batch_action = new ActionScheduler_Action(
@@ -1142,7 +1142,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->feed_generator->handle_start_action( array() );
 
 		$this->assertTrue( (bool) Pinterest_For_Woocommerce::get_data( 'feed_dirty' ) );
-		$this->assertEquals( 'live-cycle', Pinterest_For_Woocommerce::get_data( FeedGenerator::DATA_CYCLE_ID ) );
+		$this->assertEquals( 'live-cycle', get_option( FeedGenerator::OPTION_CYCLE_ID ) );
 	}
 
 	/**
@@ -1152,7 +1152,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_start_action_supersedes_dead_cycle() {
-		Pinterest_For_Woocommerce::save_data( FeedGenerator::DATA_CYCLE_ID, 'dead-cycle' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'dead-cycle', false );
 
 		$this->action_scheduler
 			->method( 'search' )
@@ -1179,7 +1179,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$this->feed_generator->handle_start_action( array() );
 
-		$new_cycle_id = Pinterest_For_Woocommerce::get_data( FeedGenerator::DATA_CYCLE_ID );
+		$new_cycle_id = get_option( FeedGenerator::OPTION_CYCLE_ID );
 		$this->assertNotEquals( 'dead-cycle', $new_cycle_id, 'A dead cycle must be superseded by a new cycle ID.' );
 		$this->assertSame( $new_cycle_id, $captured_args[1][ FeedGenerator::ARG_CYCLE_ID ] ?? null );
 	}
@@ -1191,7 +1191,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_handle_unexpected_shutdown_ignores_stale_cycle_timeouts() {
-		Pinterest_For_Woocommerce::save_data( FeedGenerator::DATA_CYCLE_ID, 'current-cycle' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'current-cycle', false );
 
 		$action_id = as_schedule_single_action(
 			gmdate( 'U' ) - 1,

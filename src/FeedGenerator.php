@@ -41,9 +41,13 @@ class FeedGenerator extends AbstractChainedJob {
 	const ARG_CYCLE_ID = 'cycle_id';
 
 	/**
-	 * The data key storing the ID of the current (authoritative) generation cycle.
+	 * The option storing the ID of the current (authoritative) generation cycle.
+	 *
+	 * Deliberately a dedicated option rather than a key inside the shared plugin
+	 * data option: the shared option is rewritten wholesale by concurrent
+	 * processes, which could clobber the cycle ID with a stale copy.
 	 */
-	const DATA_CYCLE_ID = 'feed_generation_cycle_id';
+	const OPTION_CYCLE_ID = 'pinterest_for_woocommerce_feed_generation_cycle_id';
 
 	/**
 	 * How soon (in seconds) an already pending start action must fire for
@@ -179,6 +183,7 @@ class FeedGenerator extends AbstractChainedJob {
 
 		// Do not resurrect a superseded cycle, and do not let its timeout shrink the
 		// current cycle's batch size throttling state.
+		$this->refresh_data_option_cache();
 		$job_args = ( isset( $args[1] ) && is_array( $args[1] ) ) ? $args[1] : array();
 		if ( $this->is_stale_cycle( $job_args ) ) {
 			self::log(
@@ -372,6 +377,8 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Throwable Related to creating an empty feed temp file and populating the header possible issues.
 	 */
 	public function handle_start_action( array $args ) {
+		$this->refresh_data_option_cache();
+
 		if ( $this->is_current_cycle_alive() ) {
 			Pinterest_For_Woocommerce::save_data( 'feed_dirty', true );
 			self::log( __( 'Feed generation is already running. Marked the feed dirty to regenerate when the current cycle finishes.', 'pinterest-for-woocommerce' ) );
@@ -381,7 +388,7 @@ class FeedGenerator extends AbstractChainedJob {
 		// Mint the new cycle before truncating the temporary files: from this moment
 		// any still-scheduled action from an older cycle self-terminates.
 		$cycle_id = wp_generate_uuid4();
-		Pinterest_For_Woocommerce::save_data( self::DATA_CYCLE_ID, $cycle_id );
+		update_option( self::OPTION_CYCLE_ID, $cycle_id, false );
 		$args[ self::ARG_CYCLE_ID ] = $cycle_id;
 
 		/* translators: feed generation cycle ID */
@@ -402,6 +409,8 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Throwable Related to issue possible when creating an empty feed temp file and populating the header.
 	 */
 	public function handle_batch_action( int $batch_number, array $args ) {
+		$this->refresh_data_option_cache();
+
 		if ( $this->is_stale_cycle( $args ) ) {
 			// A newer cycle owns the feed files and the shared cursor. Abort quietly:
 			// no processing, no successor action, no throttling state changes.
@@ -439,6 +448,8 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Throwable Related to adding the footer or renaming the files possible issues.
 	 */
 	public function handle_end_action( array $args ) {
+		$this->refresh_data_option_cache();
+
 		if ( $this->is_stale_cycle( $args ) ) {
 			self::log( __( 'Feed Generator end action belongs to a superseded generation cycle. Skipping.', 'pinterest-for-woocommerce' ) );
 			return;
@@ -815,6 +826,7 @@ class FeedGenerator extends AbstractChainedJob {
 			}
 		}
 		as_unschedule_all_actions( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		delete_option( self::OPTION_CYCLE_ID );
 	}
 
 	/**
@@ -881,16 +893,47 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Returns the ID of the current (authoritative) feed generation cycle.
 	 *
-	 * Always reads a fresh value: Action Scheduler may process many chain actions in
-	 * a single long-lived request while a concurrent request supersedes the cycle, so
-	 * the runtime settings cache cannot be trusted here.
+	 * Reads straight from the database, bypassing both the plugin's runtime settings
+	 * cache and the WordPress options caches: Action Scheduler processes many chain
+	 * actions inside a single long-lived request, and a concurrent request may have
+	 * superseded the cycle after this request's caches were primed.
 	 *
 	 * @since x.x.x
 	 *
 	 * @return string Current cycle ID, or an empty string if no cycle has been started yet.
 	 */
 	protected function get_current_cycle_id(): string {
-		return (string) ( Pinterest_For_Woocommerce::get_data( self::DATA_CYCLE_ID, true ) ?? '' );
+		global $wpdb;
+
+		$value = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
+				self::OPTION_CYCLE_ID
+			)
+		);
+
+		return is_string( $value ) ? $value : '';
+	}
+
+	/**
+	 * Drops the request-local caches for the plugin options so the next read fetches
+	 * fresh values from the database.
+	 *
+	 * Chain actions are processed by long-lived Action Scheduler runner requests
+	 * whose options caches were primed when the request started. Values written by
+	 * concurrent requests (the shared feed cursor, throttling state, the dirty flag)
+	 * are invisible to those caches, so every chain handler refreshes them before
+	 * acting — otherwise a stale snapshot could be read back and written out again.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	protected function refresh_data_option_cache(): void {
+		wp_cache_delete( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME, 'options' );
+		wp_cache_delete( 'alloptions', 'options' );
+		// Re-prime the plugin's static settings cache from the now-fresh options.
+		Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id', true );
 	}
 
 	/**
