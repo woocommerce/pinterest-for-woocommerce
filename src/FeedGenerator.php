@@ -42,20 +42,13 @@ class FeedGenerator extends AbstractChainedJob {
 
 	/**
 	 * The option storing the ID of the current (authoritative) generation cycle.
-	 *
-	 * Deliberately a dedicated option rather than a key inside the shared plugin
-	 * data option: the shared option is rewritten wholesale by concurrent
-	 * processes, which could clobber the cycle ID with a stale copy.
+	 * Dedicated option: concurrent whole-array writes to the shared plugin data option would clobber it.
 	 */
 	const OPTION_CYCLE_ID = 'pinterest_for_woocommerce_feed_generation_cycle_id';
 
 	/**
 	 * The option storing the feed dirty flag.
-	 *
-	 * Deliberately a dedicated option: the flag is written from product-edit
-	 * requests whose options caches may be stale — writing it through the shared
-	 * plugin data option would rewrite that whole array and clobber concurrent
-	 * writes (most importantly the feed cursor) with stale copies.
+	 * Dedicated option: written on every product edit, so it must not rewrite the shared plugin data option.
 	 */
 	const OPTION_FEED_DIRTY = 'pinterest_for_woocommerce_feed_dirty';
 
@@ -193,7 +186,6 @@ class FeedGenerator extends AbstractChainedJob {
 
 		// Do not resurrect a superseded cycle, and do not let its timeout shrink the
 		// current cycle's batch size throttling state.
-		$this->refresh_data_option_cache();
 		$job_args = ( isset( $args[1] ) && is_array( $args[1] ) ) ? $args[1] : array();
 		if ( $this->is_stale_cycle( $job_args ) ) {
 			self::log(
@@ -371,24 +363,16 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Handles the job chain start action.
 	 *
-	 * Overrides the framework handler to enforce a hard cap of one active generation
-	 * cycle. If the current cycle still has live (pending or in-progress) chain
-	 * actions, the start is skipped and the feed is marked dirty instead — the active
-	 * cycle picks the flag up in handle_end() and triggers the regeneration. Only when
-	 * the current cycle is dead or absent does the start mint a new cycle ID and take
-	 * over. The ID is stamped into the job args and propagates through every action in
-	 * the chain, so any still-scheduled action from an older cycle aborts instead of
-	 * writing to the feed files or the shared cursor.
+	 * Enforces at most one active generation cycle: defers (marking the feed dirty) while the current
+	 * cycle is alive, otherwise mints a new cycle ID that propagates through the whole new chain.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.28
 	 *
 	 * @param array $args The args for the job.
 	 *
 	 * @throws Throwable Related to creating an empty feed temp file and populating the header possible issues.
 	 */
 	public function handle_start_action( array $args ) {
-		$this->refresh_data_option_cache();
-
 		if ( $this->is_current_cycle_alive() ) {
 			update_option( self::OPTION_FEED_DIRTY, 1, false );
 			self::log( __( 'Feed generation is already running. Marked the feed dirty to regenerate when the current cycle finishes.', 'pinterest-for-woocommerce' ) );
@@ -419,8 +403,6 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Throwable Related to issue possible when creating an empty feed temp file and populating the header.
 	 */
 	public function handle_batch_action( int $batch_number, array $args ) {
-		$this->refresh_data_option_cache();
-
 		if ( $this->is_stale_cycle( $args ) ) {
 			// A newer cycle owns the feed files and the shared cursor. Abort quietly:
 			// no processing, no successor action, no throttling state changes.
@@ -447,19 +429,16 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Handles the job chain end action.
 	 *
-	 * Overrides the framework handler to validate the cycle ID: a stale chain end
-	 * must not publish (rename) the temporary file that now belongs to the cycle
-	 * which superseded it, nor mark the feed as generated.
+	 * A chain end from a superseded cycle must not publish (rename) the temporary file that now
+	 * belongs to the newer cycle, nor mark the feed as generated.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.28
 	 *
 	 * @param array $args The args for the job.
 	 *
 	 * @throws Throwable Related to adding the footer or renaming the files possible issues.
 	 */
 	public function handle_end_action( array $args ) {
-		$this->refresh_data_option_cache();
-
 		if ( $this->is_stale_cycle( $args ) ) {
 			self::log( __( 'Feed Generator end action belongs to a superseded generation cycle. Skipping.', 'pinterest-for-woocommerce' ) );
 			return;
@@ -891,6 +870,9 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Returns last product id from the last batch of products fetched at the previous step.
 	 *
+	 * Read directly from the database: the previous batch may have committed the cursor from another
+	 * process, and that write is invisible to this request's options caches.
+	 *
 	 * @param int $batch_number - Action Scheduler chain action batch number.
 	 * @return int
 	 */
@@ -898,9 +880,20 @@ class FeedGenerator extends AbstractChainedJob {
 		if ( 1 === $batch_number ) {
 			// Reset last fetched ID if batch number equals to 1.
 			Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
+			return 0;
 		}
-		// Get last fetched ID to start from the next item after it.
-		return (int) Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+
+		global $wpdb;
+
+		$value = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
+				PINTEREST_FOR_WOOCOMMERCE_DATA_NAME
+			)
+		);
+		$settings = maybe_unserialize( $value );
+
+		return (int) ( is_array( $settings ) ? ( $settings['feed_last_queued_item_id'] ?? 0 ) : 0 );
 	}
 
 	/**
@@ -916,12 +909,10 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Returns the ID of the current (authoritative) feed generation cycle.
 	 *
-	 * Reads straight from the database, bypassing both the plugin's runtime settings
-	 * cache and the WordPress options caches: Action Scheduler processes many chain
-	 * actions inside a single long-lived request, and a concurrent request may have
-	 * superseded the cycle after this request's caches were primed.
+	 * Read directly from the database: a long-lived Action Scheduler request must see a supersession
+	 * committed by a concurrent request, which its request-local options caches would hide.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.28
 	 *
 	 * @return string Current cycle ID, or an empty string if no cycle has been started yet.
 	 */
@@ -939,34 +930,12 @@ class FeedGenerator extends AbstractChainedJob {
 	}
 
 	/**
-	 * Drops the request-local caches for the plugin options so the next read fetches
-	 * fresh values from the database.
-	 *
-	 * Chain actions are processed by long-lived Action Scheduler runner requests
-	 * whose options caches were primed when the request started. Values written by
-	 * concurrent requests (the shared feed cursor, throttling state, the dirty flag)
-	 * are invisible to those caches, so every chain handler refreshes them before
-	 * acting — otherwise a stale snapshot could be read back and written out again.
-	 *
-	 * @since x.x.x
-	 *
-	 * @return void
-	 */
-	protected function refresh_data_option_cache(): void {
-		wp_cache_delete( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME, 'options' );
-		wp_cache_delete( 'alloptions', 'options' );
-		// Re-prime the plugin's static settings cache from the now-fresh options.
-		Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id', true );
-	}
-
-	/**
 	 * Checks whether the given job args belong to a superseded generation cycle.
 	 *
-	 * Args without a cycle ID (scheduled by previous plugin versions) are considered
-	 * current as long as no cycle ID has ever been minted, which keeps in-flight
-	 * chains running across a plugin upgrade.
+	 * Args without a cycle ID are current as long as no cycle ID has ever been minted, which keeps
+	 * chains scheduled by previous plugin versions running across an upgrade.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.28
 	 *
 	 * @param array $args The args for the job.
 	 *
@@ -980,12 +949,10 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Checks whether the current generation cycle still has live scheduled actions.
 	 *
-	 * A cycle is alive when a pending or in-progress chain batch or chain end action
-	 * carries the current cycle ID. Chain start actions never carry a cycle ID — the
-	 * ID is minted when the start action executes — so queued starts are gated by
-	 * this same check when they run.
+	 * Alive means a pending or in-progress chain batch/end action carries the current cycle ID.
+	 * Queued chain starts never carry an ID — they are gated by this same check when they run.
 	 *
-	 * @since x.x.x
+	 * @since 1.4.28
 	 *
 	 * @return bool
 	 */

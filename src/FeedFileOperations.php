@@ -72,11 +72,9 @@ class FeedFileOperations {
 
 	/**
 	 * Delete the temporary feed files.
+	 * Used when a generation cycle fails or is aborted, so partial feeds do not accumulate on disk.
 	 *
-	 * Used when a generation cycle fails or is aborted, so partial feeds do not
-	 * accumulate on disk.
-	 *
-	 * @since x.x.x
+	 * @since 1.4.28
 	 */
 	public function delete_temporary_feed_files(): void {
 		foreach ( $this->configurations->get_configurations() as $config ) {
