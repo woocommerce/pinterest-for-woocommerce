@@ -148,6 +148,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	} );
 
 	// Observe child node additions and attribute changes across the document.
+	// Body-level observation is required so newly inserted wrappers (AJAX
+	// product grids, etc.) are still detected; isPinterestRelatedMutation
+	// keeps processWrappers from running on unrelated DOM noise.
 	observer.observe( document.body, {
 		childList: true,
 		subtree: true,
