@@ -53,7 +53,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	// Pinterest renders its button asynchronously, so keep retrying for a short
 	// window instead of giving up after the first pass.
 	const POLL_INTERVAL = 2000; // 2 seconds.
-	const POLL_TIMEOUT  = 10000; // 10 seconds.
+	const POLL_TIMEOUT = 10000; // 10 seconds.
 
 	const deadline = Date.now() + POLL_TIMEOUT;
 
