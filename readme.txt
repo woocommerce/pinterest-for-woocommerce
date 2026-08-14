@@ -91,6 +91,9 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 
 == Changelog ==
 
+= 1.4.28 - 2026-08-14 =
+* Tweak - WC 11.1 compatibility.
+
 = 1.4.27 - 2026-06-01 =
 * Add - WooCommerce product_brand to Pinterest feed as `g:brand`.
 * Fix - Align Pinterest checkout value with discounted merchandise line totals.
