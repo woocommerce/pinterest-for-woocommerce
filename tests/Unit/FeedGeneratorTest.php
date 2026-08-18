@@ -381,6 +381,31 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * A failure from a superseded cycle must not delete the current cycle's files or change its status.
+	 *
+	 * @return void
+	 */
+	public function test_handle_failed_execution_ignores_stale_cycle_failures() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'current-cycle', false );
+		ProductFeedStatus::set( array( 'status' => 'in_progress' ) );
+
+		$action_id = as_schedule_single_action(
+			gmdate( 'U' ) - 1,
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 1, array( FeedGenerator::ARG_CYCLE_ID => 'superseded-cycle' ) ),
+			'pinterest-for-woocommerce'
+		);
+
+		$this->feed_file_operations
+			->expects( $this->never() )
+			->method( 'delete_temporary_feed_files' );
+
+		$this->feed_generator->handle_failed_execution( $action_id, new Exception( 'Stale cycle failure.' ) );
+
+		$this->assertEquals( 'in_progress', ProductFeedStatus::get()['status'] );
+	}
+
+	/**
 	 * Tests that the feed generator reschedules itself when the feed file operations fail with exception.
 	 *
 	 * @return void

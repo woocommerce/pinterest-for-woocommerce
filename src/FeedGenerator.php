@@ -298,6 +298,13 @@ class FeedGenerator extends AbstractChainedJob {
 			return;
 		}
 
+		$args     = $action->get_args();
+		$job_args = ( isset( $args[1] ) && is_array( $args[1] ) ) ? $args[1] : array();
+		if ( $this->is_stale_cycle( $job_args ) ) {
+			self::log( __( 'Feed Generator action from a superseded generation cycle failed. Ignoring the stale failure.', 'pinterest-for-woocommerce' ) );
+			return;
+		}
+
 		$this->handle_error( $throwable, $hook );
 	}
 
