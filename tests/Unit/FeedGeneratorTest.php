@@ -1203,6 +1203,46 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Liveness detection must continue past a full first page of stale actions.
+	 *
+	 * @return void
+	 */
+	public function test_start_action_pages_through_all_actions_when_checking_liveness() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'live-cycle', false );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 0, false );
+
+		$stale_action = new ActionScheduler_Action(
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 2, array( FeedGenerator::ARG_CYCLE_ID => 'stale-cycle' ) )
+		);
+		$live_action  = new ActionScheduler_Action(
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 3, array( FeedGenerator::ARG_CYCLE_ID => 'live-cycle' ) )
+		);
+		$offsets      = array();
+
+		$this->action_scheduler
+			->expects( $this->exactly( 2 ) )
+			->method( 'search' )
+			->willReturnCallback(
+				function ( $args ) use ( $stale_action, $live_action, &$offsets ) {
+					$offsets[] = $args['offset'];
+					return 0 === $args['offset'] ? array_fill( 0, 50, $stale_action ) : array( $live_action );
+				}
+			);
+
+		$this->feed_file_operations
+			->expects( $this->never() )
+			->method( 'prepare_temporary_files' );
+
+		$this->feed_generator->handle_start_action( array() );
+
+		$this->assertSame( array( 0, 50 ), $offsets );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty() );
+		$this->assertEquals( 'live-cycle', get_option( FeedGenerator::OPTION_CYCLE_ID ) );
+	}
+
+	/**
 	 * A concurrent start must not inspect liveness or truncate files while another start owns the lock.
 	 *
 	 * @return void

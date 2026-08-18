@@ -1102,27 +1102,38 @@ class FeedGenerator extends AbstractChainedJob {
 		);
 
 		foreach ( $hooks as $hook ) {
-			$actions = (array) $this->action_scheduler->search(
-				array(
-					'hook'     => $hook,
-					'status'   => array( ActionSchedulerInterface::STATUS_PENDING, ActionSchedulerInterface::STATUS_RUNNING ),
-					'per_page' => 50,
-				),
-				OBJECT,
-				PINTEREST_FOR_WOOCOMMERCE_PREFIX
-			);
+			$per_page = 50;
+			$offset   = 0;
 
-			foreach ( $actions as $action ) {
-				if ( ! $action instanceof ActionScheduler_Action ) {
-					continue;
+			do {
+				$actions = (array) $this->action_scheduler->search(
+					array(
+						'hook'     => $hook,
+						'status'   => array( ActionSchedulerInterface::STATUS_PENDING, ActionSchedulerInterface::STATUS_RUNNING ),
+						'per_page' => $per_page,
+						'offset'   => $offset,
+						'orderby'  => 'date',
+						'order'    => 'DESC',
+					),
+					OBJECT,
+					PINTEREST_FOR_WOOCOMMERCE_PREFIX
+				);
+
+				foreach ( $actions as $action ) {
+					if ( ! $action instanceof ActionScheduler_Action ) {
+						continue;
+					}
+					$action_args = $action->get_args();
+					// Chain batch action args are [ batch_number, job_args ]; chain end args are [ job_args ].
+					$job_args = end( $action_args );
+					if ( is_array( $job_args ) && (string) ( $job_args[ self::ARG_CYCLE_ID ] ?? '' ) === $cycle_id ) {
+						return true;
+					}
 				}
-				$action_args = $action->get_args();
-				// Chain batch action args are [ batch_number, job_args ]; chain end args are [ job_args ].
-				$job_args = end( $action_args );
-				if ( is_array( $job_args ) && (string) ( $job_args[ self::ARG_CYCLE_ID ] ?? '' ) === $cycle_id ) {
-					return true;
-				}
-			}
+
+				$action_count = count( $actions );
+				$offset      += $per_page;
+			} while ( $action_count === $per_page );
 		}
 
 		return false;
