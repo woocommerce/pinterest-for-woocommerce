@@ -388,7 +388,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Enforces at most one active generation cycle: defers (marking the feed dirty) while the current
 	 * cycle is alive, otherwise mints a new cycle ID that propagates through the whole new chain.
 	 *
-	 * @since 1.4.28
+	 * @since x.x.x
 	 *
 	 * @param array $args The args for the job.
 	 *
@@ -465,7 +465,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * A chain end from a superseded cycle must not publish (rename) the temporary file that now
 	 * belongs to the newer cycle, nor mark the feed as generated.
 	 *
-	 * @since 1.4.28
+	 * @since x.x.x
 	 *
 	 * @param array $args The args for the job.
 	 *
@@ -950,7 +950,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Read directly from the database: a long-lived Action Scheduler request must see a supersession
 	 * committed by a concurrent request, which its request-local options caches would hide.
 	 *
-	 * @since 1.4.28
+	 * @since x.x.x
 	 *
 	 * @return string Current cycle ID, or an empty string if no cycle has been started yet.
 	 */
@@ -965,7 +965,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Args without a cycle ID are current as long as no cycle ID has ever been minted, which keeps
 	 * chains scheduled by previous plugin versions running across an upgrade.
 	 *
-	 * @since 1.4.28
+	 * @since x.x.x
 	 *
 	 * @param array $args The args for the job.
 	 *
@@ -1073,7 +1073,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Alive means a pending or in-progress chain batch/end action carries the current cycle ID.
 	 * Queued chain starts never carry an ID — they are gated by this same check when they run.
 	 *
-	 * @since 1.4.28
+	 * @since x.x.x
 	 *
 	 * @return bool
 	 */
