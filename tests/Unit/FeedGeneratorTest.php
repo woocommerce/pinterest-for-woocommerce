@@ -132,6 +132,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	public function tearDown(): void {
 		as_unschedule_all_actions( 'pinterest/jobs/generate_feed/chain_batch', null, 'pinterest-for-woocommerce' );
 		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', null, 'pinterest-for-woocommerce' );
+		delete_option( FeedGenerator::OPTION_CURSOR );
 		delete_option( FeedGenerator::OPTION_START_LOCK );
 		Notes::delete_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
 		parent::tearDown();
@@ -642,7 +643,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 */
 	public function test_circuit_breaker_stops_processing_at_max_batches() {
 		$product = WC_Helper_Product::create_simple_product();
-		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
+		$this->invoke_protected( $this->feed_generator, 'set_last_batch_id', array( 0 ) );
 		// Large batch size so the single product falls inside the boundary batch's query.
 		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', 10000 );
 
@@ -690,22 +691,52 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		WC_Helper_Product::create_simple_product();
 
 		// Set initial cursor.
-		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
+		$this->invoke_protected( $this->feed_generator, 'set_last_batch_id', array( 0 ) );
 
 		// Fetch items - this should store pending cursor but not commit it yet.
 		$items = $this->invoke_protected( $this->feed_generator, 'get_items_for_batch', array( 1, array() ) );
 		$this->assertNotEmpty( $items );
 
 		// Cursor should still be at initial value (not advanced yet).
-		$cursor_before = Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		$cursor_before = $this->invoke_protected( $this->feed_generator, 'get_last_batch_id', array( 2 ) );
 		$this->assertEquals( 0, $cursor_before, 'Cursor should not advance before handle_batch_action completes' );
 
 		// Complete batch processing.
 		$this->feed_generator->handle_batch_action( 1, array() );
 
 		// Now cursor should be advanced.
-		$cursor_after = Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' );
+		$cursor_after = $this->invoke_protected( $this->feed_generator, 'get_last_batch_id', array( 2 ) );
 		$this->assertGreaterThan( $cursor_before, $cursor_after, 'Cursor should advance after successful batch completion' );
+	}
+
+	/**
+	 * Cursor writes must not rewrite unrelated values in the shared plugin data option.
+	 *
+	 * @return void
+	 */
+	public function test_cursor_write_uses_a_dedicated_option() {
+		Pinterest_For_Woocommerce::save_data( 'unrelated_value', 'preserved' );
+		$shared_data_before = get_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+
+		$this->invoke_protected( $this->feed_generator, 'set_last_batch_id', array( 321 ) );
+
+		$this->assertSame( $shared_data_before, get_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME ) );
+		$this->assertSame( 321, $this->invoke_protected( $this->feed_generator, 'get_last_batch_id', array( 2 ) ) );
+	}
+
+	/**
+	 * An in-flight legacy chain must migrate its shared-option cursor without rewinding.
+	 *
+	 * @return void
+	 */
+	public function test_cursor_is_lazily_migrated_from_the_shared_option() {
+		delete_option( FeedGenerator::OPTION_CURSOR );
+		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 73 );
+
+		$this->assertSame( 73, $this->invoke_protected( $this->feed_generator, 'get_last_batch_id', array( 2 ) ) );
+
+		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 12 );
+		$this->assertSame( 73, $this->invoke_protected( $this->feed_generator, 'get_last_batch_id', array( 2 ) ) );
 	}
 
 	/**
@@ -1059,7 +1090,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	public function test_stale_batch_action_aborts_without_touching_cursor_or_throttling_state() {
 		WC_Helper_Product::create_simple_product();
 		update_option( FeedGenerator::OPTION_CYCLE_ID, 'current-cycle', false );
-		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 42 );
+		$this->invoke_protected( $this->feed_generator, 'set_last_batch_id', array( 42 ) );
 		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', 50 );
 		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_attempt', 2 );
 
@@ -1073,7 +1104,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->feed_generator->handle_batch_action( 1, array( FeedGenerator::ARG_CYCLE_ID => 'superseded-cycle' ) );
 
 		// Batch #1 normally resets the cursor to 0 — a stale batch must not.
-		$this->assertEquals( 42, Pinterest_For_Woocommerce::get_data( 'feed_last_queued_item_id' ) );
+		$this->assertEquals( 42, $this->invoke_protected( $this->feed_generator, 'get_last_batch_id', array( 2 ) ) );
 		$this->assertEquals( 50, Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
 		$this->assertEquals( 2, Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) );
 	}

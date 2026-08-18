@@ -47,6 +47,11 @@ class FeedGenerator extends AbstractChainedJob {
 	const OPTION_CYCLE_ID = 'pinterest_for_woocommerce_feed_generation_cycle_id';
 
 	/**
+	 * The option storing the last product ID queued by feed generation.
+	 */
+	const OPTION_CURSOR = 'pinterest_for_woocommerce_feed_last_queued_item_id';
+
+	/**
 	 * The option storing the feed dirty flag.
 	 * Dedicated option: written on every product edit, so it must not rewrite the shared plugin data option.
 	 */
@@ -856,6 +861,7 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 		as_unschedule_all_actions( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		delete_option( self::OPTION_CYCLE_ID );
+		delete_option( self::OPTION_CURSOR );
 		delete_option( self::OPTION_FEED_DIRTY );
 		delete_option( self::OPTION_START_LOCK );
 	}
@@ -908,7 +914,7 @@ class FeedGenerator extends AbstractChainedJob {
 	protected function get_last_batch_id( int $batch_number ): int {
 		if ( 1 === $batch_number ) {
 			// Reset last fetched ID if batch number equals to 1.
-			Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', 0 );
+			$this->set_last_batch_id( 0 );
 			return 0;
 		}
 
@@ -917,12 +923,26 @@ class FeedGenerator extends AbstractChainedJob {
 		$value = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
 				"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
+				self::OPTION_CURSOR
+			)
+		);
+		if ( null !== $value ) {
+			return (int) $value;
+		}
+
+		// Lazily migrate the legacy shared-option cursor so an in-flight chain from an
+		// older plugin version resumes from its last committed product ID.
+		$legacy_value = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
 				PINTEREST_FOR_WOOCOMMERCE_DATA_NAME
 			)
 		);
-		$settings = maybe_unserialize( $value );
+		$legacy_data  = maybe_unserialize( $legacy_value );
+		$cursor       = (int) ( is_array( $legacy_data ) ? ( $legacy_data['feed_last_queued_item_id'] ?? 0 ) : 0 );
+		$this->set_last_batch_id( $cursor );
 
-		return (int) ( is_array( $settings ) ? ( $settings['feed_last_queued_item_id'] ?? 0 ) : 0 );
+		return $cursor;
 	}
 
 	/**
@@ -932,7 +952,17 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @return void
 	 */
 	protected function set_last_batch_id( int $id ): void {
-		Pinterest_For_Woocommerce::save_data( 'feed_last_queued_item_id', $id );
+		global $wpdb;
+
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"INSERT INTO {$wpdb->options} ( option_name, option_value, autoload ) VALUES ( %s, %s, 'no' )
+				ON DUPLICATE KEY UPDATE option_value = %s, autoload = 'no'",
+				self::OPTION_CURSOR,
+				(string) $id,
+				(string) $id
+			)
+		);
 	}
 
 	/**
