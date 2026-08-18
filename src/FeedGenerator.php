@@ -732,16 +732,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @return bool Indicates if feed is dirty or not.
 	 */
 	public function feed_is_dirty(): bool {
-		global $wpdb;
-
-		$value = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
-				self::OPTION_FEED_DIRTY
-			)
-		);
-
-		return (bool) $value;
+		return (bool) $this->get_uncached_option_value( self::OPTION_FEED_DIRTY );
 	}
 
 	/**
@@ -918,26 +909,14 @@ class FeedGenerator extends AbstractChainedJob {
 			return 0;
 		}
 
-		global $wpdb;
-
-		$value = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
-				self::OPTION_CURSOR
-			)
-		);
+		$value = $this->get_uncached_option_value( self::OPTION_CURSOR );
 		if ( null !== $value ) {
 			return (int) $value;
 		}
 
 		// Lazily migrate the legacy shared-option cursor so an in-flight chain from an
 		// older plugin version resumes from its last committed product ID.
-		$legacy_value = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
-				PINTEREST_FOR_WOOCOMMERCE_DATA_NAME
-			)
-		);
+		$legacy_value = $this->get_uncached_option_value( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
 		$legacy_data  = maybe_unserialize( $legacy_value );
 		$cursor       = (int) ( is_array( $legacy_data ) ? ( $legacy_data['feed_last_queued_item_id'] ?? 0 ) : 0 );
 		$this->set_last_batch_id( $cursor );
@@ -976,15 +955,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @return string Current cycle ID, or an empty string if no cycle has been started yet.
 	 */
 	protected function get_current_cycle_id(): string {
-		global $wpdb;
-
-		$value = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
-				self::OPTION_CYCLE_ID
-			)
-		);
-
+		$value = $this->get_uncached_option_value( self::OPTION_CYCLE_ID );
 		return is_string( $value ) ? $value : '';
 	}
 
@@ -1027,12 +998,7 @@ class FeedGenerator extends AbstractChainedJob {
 			return $lock_value;
 		}
 
-		$existing_lock = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
-				self::OPTION_START_LOCK
-			)
-		);
+		$existing_lock = $this->get_uncached_option_value( self::OPTION_START_LOCK );
 		$expires_at    = (int) strstr( (string) $existing_lock, ':', true );
 		if ( $expires_at > time() ) {
 			return '';
@@ -1078,6 +1044,27 @@ class FeedGenerator extends AbstractChainedJob {
 				$lock_value
 			)
 		);
+	}
+
+	/**
+	 * Read an option directly from the database, bypassing request and persistent caches.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $option_name Option name.
+	 * @return string|null Stored option value, or null when the option does not exist.
+	 */
+	private function get_uncached_option_value( string $option_name ): ?string {
+		global $wpdb;
+
+		$value = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
+				$option_name
+			)
+		);
+
+		return is_string( $value ) ? $value : null;
 	}
 
 	/**
