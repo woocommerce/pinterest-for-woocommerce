@@ -53,10 +53,20 @@ class FeedGenerator extends AbstractChainedJob {
 	const OPTION_FEED_DIRTY = 'pinterest_for_woocommerce_feed_dirty';
 
 	/**
+	 * The option used as an atomic lock while a generation cycle is started.
+	 */
+	const OPTION_START_LOCK = 'pinterest_for_woocommerce_feed_generation_start_lock';
+
+	/**
 	 * How soon (in seconds) an already pending start action must fire for
 	 * mark_feed_dirty() to skip scheduling another immediate start.
 	 */
 	const START_DEBOUNCE_WINDOW = 5 * MINUTE_IN_SECONDS;
+
+	/**
+	 * Maximum lifetime for a start lock left behind by an interrupted request.
+	 */
+	const START_LOCK_TTL = 5 * MINUTE_IN_SECONDS;
 
 	/**
 	 * The time in seconds to wait after a failed feed generation attempt,
@@ -380,23 +390,34 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @throws Throwable Related to creating an empty feed temp file and populating the header possible issues.
 	 */
 	public function handle_start_action( array $args ) {
-		if ( $this->is_current_cycle_alive() ) {
+		$start_lock = $this->acquire_start_lock();
+		if ( '' === $start_lock ) {
 			update_option( self::OPTION_FEED_DIRTY, 1, false );
-			self::log( __( 'Feed generation is already running. Marked the feed dirty to regenerate when the current cycle finishes.', 'pinterest-for-woocommerce' ) );
+			self::log( __( 'Another feed generation start is in progress. Marked the feed dirty to regenerate afterward.', 'pinterest-for-woocommerce' ) );
 			return;
 		}
 
-		// Mint the new cycle before truncating the temporary files: from this moment
-		// any still-scheduled action from an older cycle self-terminates.
-		$cycle_id = wp_generate_uuid4();
-		update_option( self::OPTION_CYCLE_ID, $cycle_id, false );
-		$args[ self::ARG_CYCLE_ID ] = $cycle_id;
+		try {
+			if ( $this->is_current_cycle_alive() ) {
+				update_option( self::OPTION_FEED_DIRTY, 1, false );
+				self::log( __( 'Feed generation is already running. Marked the feed dirty to regenerate when the current cycle finishes.', 'pinterest-for-woocommerce' ) );
+				return;
+			}
 
-		/* translators: feed generation cycle ID */
-		self::log( sprintf( __( 'Starting feed generation cycle `%s`.', 'pinterest-for-woocommerce' ), $cycle_id ) );
+			// Mint the new cycle before truncating the temporary files: from this moment
+			// any still-scheduled action from an older cycle self-terminates.
+			$cycle_id = wp_generate_uuid4();
+			update_option( self::OPTION_CYCLE_ID, $cycle_id, false );
+			$args[ self::ARG_CYCLE_ID ] = $cycle_id;
 
-		$this->handle_start();
-		$this->queue_batch( 1, $args );
+			/* translators: feed generation cycle ID */
+			self::log( sprintf( __( 'Starting feed generation cycle `%s`.', 'pinterest-for-woocommerce' ), $cycle_id ) );
+
+			$this->handle_start();
+			$this->queue_batch( 1, $args );
+		} finally {
+			$this->release_start_lock( $start_lock );
+		}
 	}
 
 	/**
@@ -836,6 +857,7 @@ class FeedGenerator extends AbstractChainedJob {
 		as_unschedule_all_actions( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		delete_option( self::OPTION_CYCLE_ID );
 		delete_option( self::OPTION_FEED_DIRTY );
+		delete_option( self::OPTION_START_LOCK );
 	}
 
 	/**
@@ -951,6 +973,81 @@ class FeedGenerator extends AbstractChainedJob {
 	protected function is_stale_cycle( array $args ): bool {
 		$cycle_id = (string) ( $args[ self::ARG_CYCLE_ID ] ?? '' );
 		return $cycle_id !== $this->get_current_cycle_id();
+	}
+
+	/**
+	 * Acquire the atomic lock that serializes generation-cycle starts.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return string Lock value owned by this request, or an empty string when another request owns it.
+	 */
+	protected function acquire_start_lock(): string {
+		global $wpdb;
+
+		$lock_value = ( time() + self::START_LOCK_TTL ) . ':' . wp_generate_uuid4();
+		$inserted   = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"INSERT IGNORE INTO {$wpdb->options} ( option_name, option_value, autoload ) VALUES ( %s, %s, 'no' )",
+				self::OPTION_START_LOCK,
+				$lock_value
+			)
+		);
+		if ( 1 === $inserted ) {
+			return $lock_value;
+		}
+
+		$existing_lock = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s LIMIT 1",
+				self::OPTION_START_LOCK
+			)
+		);
+		$expires_at    = (int) strstr( (string) $existing_lock, ':', true );
+		if ( $expires_at > time() ) {
+			return '';
+		}
+
+		$deleted = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s",
+				self::OPTION_START_LOCK,
+				$existing_lock
+			)
+		);
+		if ( 1 !== $deleted ) {
+			return '';
+		}
+
+		$inserted = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"INSERT IGNORE INTO {$wpdb->options} ( option_name, option_value, autoload ) VALUES ( %s, %s, 'no' )",
+				self::OPTION_START_LOCK,
+				$lock_value
+			)
+		);
+
+		return 1 === $inserted ? $lock_value : '';
+	}
+
+	/**
+	 * Release a generation-cycle start lock only when this request still owns it.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $lock_value Lock value returned by acquire_start_lock().
+	 * @return void
+	 */
+	protected function release_start_lock( string $lock_value ): void {
+		global $wpdb;
+
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s",
+				self::OPTION_START_LOCK,
+				$lock_value
+			)
+		);
 	}
 
 	/**

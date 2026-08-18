@@ -132,6 +132,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	public function tearDown(): void {
 		as_unschedule_all_actions( 'pinterest/jobs/generate_feed/chain_batch', null, 'pinterest-for-woocommerce' );
 		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', null, 'pinterest-for-woocommerce' );
+		delete_option( FeedGenerator::OPTION_START_LOCK );
 		Notes::delete_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
 		parent::tearDown();
 	}
@@ -1168,6 +1169,36 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$this->assertTrue( $this->feed_generator->feed_is_dirty() );
 		$this->assertEquals( 'live-cycle', get_option( FeedGenerator::OPTION_CYCLE_ID ) );
+	}
+
+	/**
+	 * A concurrent start must not inspect liveness or truncate files while another start owns the lock.
+	 *
+	 * @return void
+	 */
+	public function test_start_action_defers_while_another_start_holds_the_lock() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'existing-cycle', false );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 0, false );
+		update_option(
+			FeedGenerator::OPTION_START_LOCK,
+			( time() + FeedGenerator::START_LOCK_TTL ) . ':other-request',
+			false
+		);
+
+		$this->action_scheduler
+			->expects( $this->never() )
+			->method( 'search' );
+		$this->action_scheduler
+			->expects( $this->never() )
+			->method( 'schedule_immediate' );
+		$this->feed_file_operations
+			->expects( $this->never() )
+			->method( 'prepare_temporary_files' );
+
+		$this->feed_generator->handle_start_action( array() );
+
+		$this->assertTrue( $this->feed_generator->feed_is_dirty() );
+		$this->assertEquals( 'existing-cycle', get_option( FeedGenerator::OPTION_CYCLE_ID ) );
 	}
 
 	/**
