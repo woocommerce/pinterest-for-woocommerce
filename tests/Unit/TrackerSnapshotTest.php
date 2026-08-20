@@ -26,14 +26,6 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		update_option( 'woocommerce_allow_tracking', 'yes' );
 	}
 
-	/**
-	 * @return void
-	 */
-	public function tearDown(): void {
-		parent::tearDown();
-		remove_all_filters( 'woocommerce_tracker_data' );
-	}
-
 	function test_settings_are_tracked_by_woo_tracker_if_opt_in() {
 		Pinterest_For_Woocommerce::save_settings( self::$default_settings );
 
@@ -147,6 +139,12 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		TrackerSnapshot::maybe_init();
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
 
-		$this->assertEmpty( $tracks, 'Track data should be empty when opting out' );
+		// WooCommerce core hooks its own data into this filter unconditionally (the opt-out
+		// gating happens before core invokes the filter), so only assert that this plugin
+		// added nothing rather than expecting the filter result to be completely empty.
+		$this->assertFalse(
+			isset( $tracks['extensions'][ PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX ] ),
+			'Pinterest data should not be tracked when tracking is opted out'
+		);
 	}
 }
