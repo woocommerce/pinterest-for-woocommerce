@@ -66,9 +66,14 @@ class SaveToPinterest {
 	 */
 	public static function render_pin( $post_id, $post_thumbnail_id = '' ) {
 
+		$product_name = get_the_title( $post_id );
+
+		/* translators: %s: product name */
+		$screen_reader_text = sprintf( __( '%s to Pinterest (opens in a new window)', 'pinterest-for-woocommerce' ), $product_name );
+
 		$attributes = array(
-			'description' => esc_html( get_the_title() ),
-			'url'         => esc_url( get_the_permalink() ),
+			'description' => esc_html( $product_name ),
+			'url'         => esc_url( get_the_permalink( $post_id ) ),
 		);
 
 		$post_thumbnail_id = empty( $post_thumbnail_id ) ? get_post_thumbnail_id( $post_id ) : $post_thumbnail_id;
@@ -85,7 +90,8 @@ class SaveToPinterest {
 		 * Image used is the one explicitly set in the media attribute.
 		 */
 		return sprintf(
-			'<div class="pinterest-for-woocommerce-image-wrapper"><a data-pin-do="buttonPin" href="%s"></a></div>',
+			'<div class="pinterest-for-woocommerce-image-wrapper"><span class="screen-reader-text">%s</span><a data-pin-do="buttonPin" href="%s"></a></div>',
+			esc_html( $screen_reader_text ),
 			esc_url(
 				add_query_arg(
 					$attributes,
