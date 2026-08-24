@@ -222,7 +222,7 @@ class Conversions extends Tracker {
 		}
 
 		$session = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session : false;
-		if ( ! empty( $click_id ) ) {
+		if ( false !== $click_id && '' !== $click_id ) {
 			if ( $session ) {
 				$session->set( self::CLICK_ID_SESSION_KEY, $click_id );
 			}
