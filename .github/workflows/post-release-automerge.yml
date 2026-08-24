@@ -17,4 +17,4 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: woocommerce/grow/automerge-released-trunk@actions-v1
+      - uses: woocommerce/grow/automerge-released-trunk@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1

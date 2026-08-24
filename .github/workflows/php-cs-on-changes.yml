@@ -26,7 +26,7 @@ jobs:
           fetch-depth: 0
 
       - name: Prepare PHP ${{ matrix.php }}
-        uses: woocommerce/grow/prepare-php@actions-v1
+        uses: woocommerce/grow/prepare-php@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1
         with:
           php-version: ${{ matrix.php }}
 

@@ -32,12 +32,12 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Prepare node
-        uses: woocommerce/grow/prepare-node@actions-v1
+        uses: woocommerce/grow/prepare-node@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1
         with:
           node-version-file: ".nvmrc"
 
       - name: Prepare annotation formatter
-        uses: woocommerce/grow/eslint-annotation@actions-v1
+        uses: woocommerce/grow/eslint-annotation@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1
 
       - name: Lint JavaScript and annotate linting errors
         run: npm run lint:js -- --format ./eslintFormatter.cjs
@@ -51,12 +51,12 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Prepare node
-        uses: woocommerce/grow/prepare-node@actions-v1
+        uses: woocommerce/grow/prepare-node@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1
         with:
           node-version-file: ".nvmrc"
 
       - name: Prepare annotation formatter
-        uses: woocommerce/grow/stylelint-annotation@actions-v1
+        uses: woocommerce/grow/stylelint-annotation@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1
 
       - name: Lint CSS and annotate linting errors
         run: npm run lint:css -- --custom-formatter ./stylelintFormatter.cjs
