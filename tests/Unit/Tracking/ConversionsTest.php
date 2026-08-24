@@ -10,10 +10,15 @@ use WP_UnitTestCase;
 class ConversionsTest extends WP_UnitTestCase {
 
 	public function tearDown(): void {
-		parent::tearDown();
-
 		remove_all_filters( 'pre_http_request' );
 		wp_set_current_user( 0 );
+		unset( $_GET['epik'], $_COOKIE['_epik'] );
+
+		if ( function_exists( 'WC' ) && isset( WC()->session ) ) {
+			WC()->session->__unset( 'pinterest_for_woocommerce_click_id' );
+		}
+
+		parent::tearDown();
 	}
 
 	public function test_conversions_track_page_visit_event() {
@@ -90,9 +95,9 @@ class ConversionsTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that hashed email is merged into default user data.
+	 * Tests that hashed customer identifiers are merged into default user data.
 	 */
-	public function test_default_data_keeps_ip_user_agent_with_logged_in_email() {
+	public function test_default_data_keeps_ip_user_agent_with_logged_in_customer_identifiers() {
 		$user_id = self::factory()->user->create(
 			array(
 				'user_email' => 'customer@example.com',
@@ -110,9 +115,46 @@ class ConversionsTest extends WP_UnitTestCase {
 				'client_ip_address' => 'Some IP address.',
 				'client_user_agent' => 'Some user agent string.',
 				'em'                => array( hash( 'sha256', 'customer@example.com' ) ),
+				'external_id'       => array( hash( 'sha256', (string) $user_id ) ),
 			),
 			$data['user_data']
 		);
+	}
+
+	/**
+	 * Tests that the click ID is captured from the landing URL and persisted.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_uses_and_persists_epik_query_parameter() {
+		$_GET['epik'] = 'pinterest-click-id';
+
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user );
+		$data        = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertSame( 'pinterest-click-id', $data['user_data']['click_id'] );
+		$this->assertSame( 'pinterest-click-id', WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+
+		unset( $_GET['epik'] );
+		$data = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-456' ) );
+
+		$this->assertSame( 'pinterest-click-id', $data['user_data']['click_id'] );
+	}
+
+	/**
+	 * Tests that the Pinterest tag cookie supplies the click ID.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_uses_epik_cookie() {
+		$_COOKIE['_epik'] = 'pinterest-cookie-click-id';
+
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user );
+		$data        = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertSame( 'pinterest-cookie-click-id', $data['user_data']['click_id'] );
 	}
 
 	public function test_get_checkout_data() {
