@@ -25,12 +25,12 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Prepare PHP
-        uses: woocommerce/grow/prepare-php@actions-v1
+        uses: woocommerce/grow/prepare-php@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1
         with:
           php-version: "${{ matrix.php }}"
 
       - name: Prepare MySQL
-        uses: woocommerce/grow/prepare-mysql@actions-v1
+        uses: woocommerce/grow/prepare-mysql@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1
 
       - name: Install WP tests
         shell: bash
