@@ -25,6 +25,7 @@ jobs:
   UnitTests:
     name: PHP unit tests - PHP ${{ matrix.php }}, WP ${{ matrix.wp-version }}
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
       WP_CORE_DIR: "/tmp/wordpress/src"
       WP_TESTS_DIR: "/tmp/wordpress/tests/phpunit"
