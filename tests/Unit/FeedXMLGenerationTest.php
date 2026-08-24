@@ -763,6 +763,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$this->assertStringNotContainsString( '<sale_price>', ProductsXmlFeed::get_xml_item( $product, 'US' ) );
 
 		$product->set_date_on_sale_from( time() - WEEK_IN_SECONDS );
+		$product->set_date_on_sale_to( null );
+		$this->assertEquals( '<sale_price>5.00USD</sale_price>', $sale_price_method( $product ) );
+
 		$product->set_date_on_sale_to( time() - DAY_IN_SECONDS );
 		$this->assertEquals( '', $sale_price_method( $product ) );
 
