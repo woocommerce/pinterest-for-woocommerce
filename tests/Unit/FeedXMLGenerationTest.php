@@ -748,6 +748,95 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 */
+	public function testScheduledSalePriceXML() {
+		$sale_price_method = $this->getProductsXmlFeedAttributeMethod( 'sale_price' );
+		$product           = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'regular_price' => 15,
+				'sale_price'    => 5,
+			)
+		);
+
+		$product->set_date_on_sale_from( time() + WEEK_IN_SECONDS );
+		$this->assertEquals( '', $sale_price_method( $product ) );
+		$this->assertStringNotContainsString( '<sale_price>', ProductsXmlFeed::get_xml_item( $product, 'US' ) );
+
+		$product->set_date_on_sale_from( time() - WEEK_IN_SECONDS );
+		$product->set_date_on_sale_to( time() - DAY_IN_SECONDS );
+		$this->assertEquals( '', $sale_price_method( $product ) );
+
+		$product->set_date_on_sale_to( time() + WEEK_IN_SECONDS );
+		$this->assertEquals( '<sale_price>5.00USD</sale_price>', $sale_price_method( $product ) );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testScheduledVariationSalePriceXML() {
+		$sale_price_method     = $this->getProductsXmlFeedAttributeMethod( 'sale_price' );
+		$effective_date_method = $this->getProductsXmlFeedAttributeMethod( 'sale_price_effective_date' );
+		$product               = new WC_Product_Variable();
+		$variable_product      = WC_Helper_Product::create_variation_product( $product );
+		$variation             = wc_get_product( $variable_product->get_children()[0] );
+
+		$variation->set_regular_price( 15 );
+		$variation->set_sale_price( 5 );
+		$variation->set_date_on_sale_from( time() + WEEK_IN_SECONDS );
+
+		$this->assertEquals( '', $sale_price_method( $variation ) );
+
+		$variation->set_date_on_sale_from( time() - WEEK_IN_SECONDS );
+		$variation->set_date_on_sale_to( time() + WEEK_IN_SECONDS );
+
+		$this->assertEquals( '<sale_price>5.00USD</sale_price>', $sale_price_method( $variation ) );
+
+		$start_date = gmdate( 'Y-m-d\TH:i:s\Z', $variation->get_date_on_sale_from()->getTimestamp() );
+		$end_date   = gmdate( 'Y-m-d\TH:i:s\Z', $variation->get_date_on_sale_to()->getTimestamp() );
+		$expected   = '<sale_price_effective_date>' . $start_date . '/' . $end_date . '</sale_price_effective_date>';
+
+		$this->assertEquals( $expected, $effective_date_method( $variation ) );
+	}
+
+	/**
+	 * @group feed
+	 */
+	public function testPropertySalePriceEffectiveDateXML() {
+		$effective_date_method = $this->getProductsXmlFeedAttributeMethod( 'sale_price_effective_date' );
+		$product               = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'regular_price' => 15,
+				'sale_price'    => 5,
+			)
+		);
+
+		$this->assertEquals( '', $effective_date_method( $product ) );
+
+		$product->set_date_on_sale_from( time() + DAY_IN_SECONDS );
+		$product->set_date_on_sale_to( time() + WEEK_IN_SECONDS );
+		$this->assertEquals( '', $effective_date_method( $product ) );
+
+		$product->set_date_on_sale_from( time() - WEEK_IN_SECONDS );
+		$product->set_date_on_sale_to( null );
+		$this->assertEquals( '', $effective_date_method( $product ) );
+
+		$product->set_date_on_sale_to( time() - DAY_IN_SECONDS );
+		$this->assertEquals( '', $effective_date_method( $product ) );
+
+		$product->set_date_on_sale_to( time() + WEEK_IN_SECONDS );
+
+		$start_date = gmdate( 'Y-m-d\TH:i:s\Z', $product->get_date_on_sale_from()->getTimestamp() );
+		$end_date   = gmdate( 'Y-m-d\TH:i:s\Z', $product->get_date_on_sale_to()->getTimestamp() );
+		$expected   = '<sale_price_effective_date>' . $start_date . '/' . $end_date . '</sale_price_effective_date>';
+
+		$this->assertEquals( $expected, $effective_date_method( $product ) );
+		$this->assertStringContainsString( $expected, ProductsXmlFeed::get_xml_item( $product, 'US' ) );
+	}
+
+	/**
+	 * @group feed
+	 */
 	public function testPropertyPriceVariableProductXML() {
 		$price_method      = $this->getProductsXmlFeedAttributeMethod( 'g:price' );
 		$product           = new WC_Product_Variable();
