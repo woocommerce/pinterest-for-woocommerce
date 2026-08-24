@@ -40,6 +40,7 @@ jobs:
         needs: qit-tests
         name: Handle success
         runs-on: ubuntu-latest
+        timeout-minutes: 5
         env:
             SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         steps:
@@ -53,6 +54,7 @@ jobs:
       needs: qit-tests
       name: Handle failure
       runs-on: ubuntu-latest
+      timeout-minutes: 5
       env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       steps:
