@@ -31,16 +31,29 @@ class Conversions extends Tracker {
 	 */
 	private const CLICK_ID_SESSION_KEY = 'pinterest_for_woocommerce_click_id';
 
-	/** @var User $user User data object. Data for Conversions API. */
+	/**
+	 * User data for the Conversions API.
+	 *
+	 * @var User
+	 */
 	private $user;
+
+	/**
+	 * URL where the event occurred.
+	 *
+	 * @var string
+	 */
+	private $event_source_url;
 
 	/**
 	 * Pinterest Conversions API class constructor.
 	 *
-	 * @param User $user User data object to hold ip address and agent string.
+	 * @param User   $user             User data object to hold ip address and agent string.
+	 * @param string $event_source_url Optional URL where the event occurred.
 	 */
-	public function __construct( User $user ) {
-		$this->user = $user;
+	public function __construct( User $user, string $event_source_url = '' ) {
+		$this->user             = $user;
+		$this->event_source_url = $event_source_url;
 	}
 
 	/**
@@ -115,11 +128,13 @@ class Conversions extends Tracker {
 	private function get_default_data( string $event_name ) {
 		global $wp;
 
+		$event_source_url = $this->event_source_url ? $this->event_source_url : home_url( $wp->request );
+
 		$data = array(
 			'event_name'       => $event_name,
 			'action_source'    => 'web',
 			'event_time'       => time(),
-			'event_source_url' => home_url( $wp->request ),
+			'event_source_url' => $event_source_url,
 			'partner_name'     => 'ss-woocommerce',
 			'user_data'        => array(
 				'client_ip_address' => $this->user->get_client_ip_address(),

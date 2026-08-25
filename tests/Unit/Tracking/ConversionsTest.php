@@ -157,6 +157,19 @@ class ConversionsTest extends WP_UnitTestCase {
 		$this->assertSame( 'pinterest-cookie-click-id', $data['user_data']['click_id'] );
 	}
 
+	/**
+	 * The PageVisit beacon can preserve the URL of the cached storefront page.
+	 */
+	public function test_uses_explicit_event_source_url() {
+		$source_url  = home_url( '/cached-product/?campaign=pinterest' );
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user, $source_url );
+
+		$data = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertSame( $source_url, $data['event_source_url'] );
+	}
+
 	public function test_get_checkout_data() {
 		$user        = new User( 'Some IP address.', 'Some user agent string.' );
 		$conversions = new Conversions( $user );
