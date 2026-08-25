@@ -107,6 +107,7 @@ class PageVisitTest extends WP_UnitTestCase {
 
 		$code = PageVisit::get_tag_event_code( array( 'event_id' => '' ) );
 
+		$this->assertStringContainsString( 'var eventData={};', $code );
 		$this->assertStringContainsString( 'pintrk("track","PageVisit",eventData)', $code );
 		$this->assertStringNotContainsString( PageVisit::AJAX_ACTION, $code );
 		$this->assertStringNotContainsString( 'sendBeacon', $code );
@@ -182,6 +183,34 @@ class PageVisitTest extends WP_UnitTestCase {
 		);
 
 		PageVisit::handle_request();
+
+		$this->assertSame( 0, $requests );
+	}
+
+	/**
+	 * Non-scalar beacon fields are rejected before sanitization or dispatch.
+	 */
+	public function test_beacon_rejects_non_scalar_fields() {
+		$requests = 0;
+		add_filter(
+			'pre_http_request',
+			function () use ( &$requests ) {
+				++$requests;
+				return false;
+			}
+		);
+
+		$valid_request = array(
+			'event_id'         => 'page_1234567890abcdef',
+			'event_source_url' => home_url( '/shop/' ),
+			'product_id'       => '0',
+		);
+
+		foreach ( array_keys( $valid_request ) as $field ) {
+			$_POST           = $valid_request;
+			$_POST[ $field ] = array( 'invalid' );
+			PageVisit::handle_request();
+		}
 
 		$this->assertSame( 0, $requests );
 	}

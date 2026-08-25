@@ -53,7 +53,7 @@ class Conversions extends Tracker {
 	 */
 	public function __construct( User $user, string $event_source_url = '' ) {
 		$this->user             = $user;
-		$this->event_source_url = $event_source_url;
+		$this->event_source_url = esc_url_raw( $event_source_url, array( 'http', 'https' ) );
 	}
 
 	/**

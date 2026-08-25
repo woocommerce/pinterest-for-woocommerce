@@ -55,7 +55,7 @@ class PageVisit {
 	public static function get_tag_event_code( array $data ) {
 		unset( $data['event_id'] );
 
-		$event_data = wp_json_encode( $data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES );
+		$event_data = wp_json_encode( (object) $data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES );
 		$event_data = $event_data ? $event_data : '{}';
 		$capi_code  = '';
 
@@ -112,18 +112,26 @@ class PageVisit {
 		}
 
 		// This is a public analytics beacon and intentionally is not nonce-gated.
-		$event_id = isset( $_POST['event_id'] ) ? sanitize_text_field( wp_unslash( $_POST['event_id'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$event_id_raw   = $_POST['event_id'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
+		$source_url_raw = $_POST['event_source_url'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
+		$product_id_raw = $_POST['product_id'] ?? '0'; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
+
+		if ( ! is_string( $event_id_raw ) || ! is_string( $source_url_raw ) || ! is_string( $product_id_raw ) ) {
+			return;
+		}
+
+		$event_id = sanitize_text_field( wp_unslash( $event_id_raw ) );
 		if ( ! preg_match( '/^page_[A-Za-z0-9_-]{10,100}$/', $event_id ) ) {
 			return;
 		}
 
-		$source_url = isset( $_POST['event_source_url'] ) ? esc_url_raw( wp_unslash( $_POST['event_source_url'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$source_url = esc_url_raw( wp_unslash( $source_url_raw ) );
 		$source_url = static::validate_source_url( $source_url );
 		if ( ! $source_url ) {
 			return;
 		}
 
-		$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$product_id = absint( wp_unslash( $product_id_raw ) );
 		$data       = static::get_event_data( $event_id, $product_id );
 		$user       = new User( \WC_Geolocation::get_ip_address(), wc_get_user_agent() );
 		$tracker    = new Conversions( $user, $source_url );
