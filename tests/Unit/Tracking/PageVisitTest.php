@@ -96,6 +96,7 @@ class PageVisitTest extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'eventData.event_id=eventId', $code );
 		$this->assertStringContainsString( 'pintrk("track","PageVisit",eventData)', $code );
 		$this->assertStringContainsString( PageVisit::AJAX_ACTION, $code );
+		$this->assertStringNotContainsString( 'requestData.append("product_id"', $code );
 		$this->assertStringNotContainsString( '_wpnonce', $code );
 	}
 
@@ -117,9 +118,10 @@ class PageVisitTest extends WP_UnitTestCase {
 	 * A nonce-free beacon sends one matching PageVisit event to CAPI.
 	 */
 	public function test_beacon_dispatches_page_visit_without_nonce() {
-		$product    = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => 25 ) );
-		$source_url = home_url( '/product/cached-product/?campaign=pinterest' );
-		$requests   = 0;
+		$product         = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => 25 ) );
+		$spoofed_product = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => 50 ) );
+		$source_url      = add_query_arg( 'campaign', 'pinterest', $product->get_permalink() );
+		$requests        = 0;
 
 		add_filter(
 			'pre_http_request',
@@ -155,7 +157,7 @@ class PageVisitTest extends WP_UnitTestCase {
 		$_POST = array(
 			'event_id'         => 'page_1234567890abcdef',
 			'event_source_url' => $source_url,
-			'product_id'       => (string) $product->get_id(),
+			'product_id'       => (string) $spoofed_product->get_id(),
 		);
 
 		PageVisit::handle_request();
@@ -179,7 +181,6 @@ class PageVisitTest extends WP_UnitTestCase {
 		$_POST = array(
 			'event_id'         => 'cached-id',
 			'event_source_url' => home_url( '/shop/' ),
-			'product_id'       => '0',
 		);
 
 		PageVisit::handle_request();
@@ -188,7 +189,7 @@ class PageVisitTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Non-scalar beacon fields are rejected before sanitization or dispatch.
+	 * Non-scalar required beacon fields are rejected before sanitization or dispatch.
 	 */
 	public function test_beacon_rejects_non_scalar_fields() {
 		$requests = 0;
@@ -203,7 +204,6 @@ class PageVisitTest extends WP_UnitTestCase {
 		$valid_request = array(
 			'event_id'         => 'page_1234567890abcdef',
 			'event_source_url' => home_url( '/shop/' ),
-			'product_id'       => '0',
 		);
 
 		foreach ( array_keys( $valid_request ) as $field ) {
@@ -213,5 +213,54 @@ class PageVisitTest extends WP_UnitTestCase {
 		}
 
 		$this->assertSame( 0, $requests );
+	}
+
+	/**
+	 * A non-product URL produces a generic PageVisit event.
+	 */
+	public function test_beacon_ignores_product_id_for_non_product_url() {
+		$product    = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => 25 ) );
+		$page_id    = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$source_url = get_permalink( $page_id );
+		$requests   = 0;
+
+		add_filter(
+			'pre_http_request',
+			function ( $response, $parsed_args ) use ( $source_url, &$requests ) {
+				++$requests;
+				$body  = json_decode( $parsed_args['body'], true );
+				$event = $body['data'][0];
+
+				$this->assertSame( $source_url, $event['event_source_url'] );
+				$this->assertArrayNotHasKey( 'custom_data', $event );
+
+				return array(
+					'headers'  => array( 'content-type' => 'application/json' ),
+					'body'     => wp_json_encode(
+						array(
+							'events' => array( array( 'status' => 'processed' ) ),
+						)
+					),
+					'response' => array(
+						'code'    => 200,
+						'message' => 'OK',
+					),
+					'cookies'  => array(),
+					'filename' => '',
+				);
+			},
+			10,
+			2
+		);
+
+		$_POST = array(
+			'event_id'         => 'page_1234567890abcdef',
+			'event_source_url' => $source_url,
+			'product_id'       => (string) $product->get_id(),
+		);
+
+		PageVisit::handle_request();
+
+		$this->assertSame( 1, $requests );
 	}
 }

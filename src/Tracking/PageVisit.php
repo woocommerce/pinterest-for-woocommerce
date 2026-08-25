@@ -60,11 +60,9 @@ class PageVisit {
 		$capi_code  = '';
 
 		if ( Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' ) ) {
-			$product_id = absint( $data['product_id'] ?? 0 );
-			$capi_code  = sprintf(
-				'var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);requestData.append("product_id",%2$d);var beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%3$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%3$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}',
+			$capi_code = sprintf(
+				'var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);var beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}',
 				wp_json_encode( static::AJAX_ACTION ),
-				$product_id,
 				wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 			);
 		}
@@ -114,9 +112,8 @@ class PageVisit {
 		// This is a public analytics beacon and intentionally is not nonce-gated.
 		$event_id_raw   = $_POST['event_id'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
 		$source_url_raw = $_POST['event_source_url'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
-		$product_id_raw = $_POST['product_id'] ?? '0'; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
 
-		if ( ! is_string( $event_id_raw ) || ! is_string( $source_url_raw ) || ! is_string( $product_id_raw ) ) {
+		if ( ! is_string( $event_id_raw ) || ! is_string( $source_url_raw ) ) {
 			return;
 		}
 
@@ -131,7 +128,7 @@ class PageVisit {
 			return;
 		}
 
-		$product_id = absint( wp_unslash( $product_id_raw ) );
+		$product_id = url_to_postid( $source_url );
 		$data       = static::get_event_data( $event_id, $product_id );
 		$user       = new User( \WC_Geolocation::get_ip_address(), wc_get_user_agent() );
 		$tracker    = new Conversions( $user, $source_url );
