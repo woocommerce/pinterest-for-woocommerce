@@ -217,6 +217,26 @@ class TagsTest extends WP_Test_REST_TestCase {
 
 				// 2. POST new tag.
 				if ( 'POST' === $parsed_args['method'] ) {
+					$this->assertSame( 'https://api.pinterest.com/v5/ad_accounts/ai-123456789/conversion_tags', $url );
+
+					$request_body = json_decode( $parsed_args['body'], true );
+					$this->assertArrayHasKey( 'name', $request_body );
+					unset( $request_body['name'] );
+
+					$this->assertSame(
+						array(
+							'aem_enabled'             => true,
+							'md_frequency'            => 1,
+							'aem_fnln_enabled'        => true,
+							'aem_ph_enabled'          => true,
+							'aem_ge_enabled'          => true,
+							'aem_db_enabled'          => true,
+							'aem_loc_enabled'         => true,
+							'aem_external_id_enabled' => true,
+						),
+						$request_body
+					);
+
 					$body = array(
 						'ad_account_id'         => 'ai-123456789',
 						'code_snippet'          => '<!-- Pinterest Tag New -->',
@@ -227,13 +247,14 @@ class TagsTest extends WP_Test_REST_TestCase {
 						'status'                => 'ACTIVE',
 						'version'               => 2,
 						'configs'               => array(
-							'aem_enabled' => false,
-							'md_frequency' => 1,
-							'aem_fnln_enabled' => false,
-							'aem_ph_enabled' => false,
-							'aem_ge_enabled' => false,
-							'aem_db_enabled' => false,
-							'aem_loc_enabled' => false,
+							'aem_enabled'             => true,
+							'md_frequency'            => 1,
+							'aem_fnln_enabled'        => true,
+							'aem_ph_enabled'          => true,
+							'aem_ge_enabled'          => true,
+							'aem_db_enabled'          => true,
+							'aem_loc_enabled'         => true,
+							'aem_external_id_enabled' => true,
 						),
 					);
 				}

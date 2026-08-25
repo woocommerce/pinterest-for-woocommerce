@@ -31,6 +31,23 @@ class APIV5Test extends WP_UnitTestCase {
 		add_filter(
 			'pre_http_request',
 			function ( $response, $parsed_args, $url ) {
+				$this->assertSame( 'https://api.pinterest.com/v5/ad_accounts/aai-1234567890/conversion_tags', $url );
+				$this->assertSame( 'POST', $parsed_args['method'] );
+				$this->assertSame(
+					array(
+						'name'                    => 'Some tag name 42',
+						'aem_enabled'             => true,
+						'md_frequency'            => 1,
+						'aem_fnln_enabled'        => true,
+						'aem_ph_enabled'          => true,
+						'aem_ge_enabled'          => true,
+						'aem_db_enabled'          => true,
+						'aem_loc_enabled'         => true,
+						'aem_external_id_enabled' => true,
+					),
+					json_decode( $parsed_args['body'], true )
+				);
+
 				return array(
 					'headers' => array(
 						'content-type' => 'application/json',
@@ -45,13 +62,14 @@ class APIV5Test extends WP_UnitTestCase {
 							'status'             => 'ACTIVE',
 							'version'            => 'v1',
 							'configs' => array(
-								'aem_enabled'      => true,
-								'md_frequency'     => 1,
-								'aem_fnln_enabled' => true,
-								'aem_ph_enabled'   => true,
-								'aem_ge_enabled'   => true,
-								'aem_db_enabled'   => true,
-								'ae_loc_enabled'   => true,
+								'aem_enabled'             => true,
+								'md_frequency'            => 1,
+								'aem_fnln_enabled'        => true,
+								'aem_ph_enabled'          => true,
+								'aem_ge_enabled'          => true,
+								'aem_db_enabled'          => true,
+								'aem_loc_enabled'         => true,
+								'aem_external_id_enabled' => true,
 							),
 						)
 					),
@@ -77,13 +95,14 @@ class APIV5Test extends WP_UnitTestCase {
 		// Check if enhanced match is enabled.
 		$this->assertEquals(
 			array(
-				'aem_enabled'      => true,
-				'md_frequency'     => 1,
-				'aem_fnln_enabled' => true,
-				'aem_ph_enabled'   => true,
-				'aem_ge_enabled'   => true,
-				'aem_db_enabled'   => true,
-				'ae_loc_enabled'   => true,
+				'aem_enabled'             => true,
+				'md_frequency'            => 1,
+				'aem_fnln_enabled'        => true,
+				'aem_ph_enabled'          => true,
+				'aem_ge_enabled'          => true,
+				'aem_db_enabled'          => true,
+				'aem_loc_enabled'         => true,
+				'aem_external_id_enabled' => true,
 			),
 			$output['configs']
 		);
