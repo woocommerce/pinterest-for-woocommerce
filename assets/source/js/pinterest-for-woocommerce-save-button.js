@@ -23,17 +23,18 @@ window.addEventListener( 'load', function () {
 	checkForPinterestExtension();
 } );
 
-document.addEventListener('keydown', (event) => {
+// eslint-disable-next-line @wordpress/no-global-event-listener
+document.addEventListener( 'keydown', ( event ) => {
 	// Check if target is a Pinterest span and Enter was pressed.
-	const isPinSpan = event.target.matches('span[data-pin-log]');
+	const isPinSpan = event.target.matches( 'span[data-pin-log]' );
 
-	if (isPinSpan && event.key === 'Enter') {
+	if ( isPinSpan && event.key === 'Enter' ) {
 		event.preventDefault();
 
 		// Programmatically trigger Pinterest's click event.
 		event.target.click();
 	}
-});
+} );
 
 // eslint-disable-next-line @wordpress/no-global-event-listener
 document.addEventListener( 'DOMContentLoaded', function () {
@@ -44,13 +45,18 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				// Skip if already processed.
 				if ( wrapper.dataset.srLabeled ) return;
 
-				const pinLink = wrapper.querySelector( 'a' ) || wrapper.querySelector( 'span[data-pin-log]' );
+				const pinLink =
+					wrapper.querySelector( 'a' ) ||
+					wrapper.querySelector( 'span[data-pin-log]' );
 				const srSpan = wrapper.querySelector( '.screen-reader-text' );
 
 				// Check that both elements exist AND Pinterest has finished adding its attribute.
 				const isPinterestReady =
 					pinLink &&
-					( pinLink.getAttribute( 'data-pin-log' ) === 'button_pinit' || pinLink.getAttribute( 'data-pin-log' ) === 'button_pinit_bookmarklet' );
+					( pinLink.getAttribute( 'data-pin-log' ) ===
+						'button_pinit' ||
+						pinLink.getAttribute( 'data-pin-log' ) ===
+							'button_pinit_bookmarklet' );
 
 				if ( isPinterestReady && srSpan ) {
 					// Move the span inside the processed <a> tag.
