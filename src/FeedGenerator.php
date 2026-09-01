@@ -346,10 +346,17 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Start the queue processing.
 	 *
+	 * Gates on the current cycle rather than is_running(): a still-pending batch action
+	 * from a superseded cycle must not prevent a new cycle from starting.
+	 *
 	 * @since 1.0.10
 	 */
 	private function start_generation() {
-		if ( $this->is_running() ) {
+		if ( $this->action_scheduler->next_scheduled_action( $this->get_action_full_name( self::CHAIN_START ), null, $this->get_group_name() ) ) {
+			return;
+		}
+
+		if ( $this->is_current_cycle_alive() ) {
 			return;
 		}
 
