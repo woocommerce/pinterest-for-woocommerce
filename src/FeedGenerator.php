@@ -352,7 +352,12 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since 1.0.10
 	 */
 	private function start_generation() {
-		if ( $this->action_scheduler->next_scheduled_action( $this->get_action_full_name( self::CHAIN_START ), null, $this->get_group_name() ) ) {
+		$next_start = $this->action_scheduler->next_scheduled_action(
+			$this->get_action_full_name( self::CHAIN_START ),
+			null,
+			$this->get_group_name()
+		);
+		if ( $next_start ) {
 			return;
 		}
 

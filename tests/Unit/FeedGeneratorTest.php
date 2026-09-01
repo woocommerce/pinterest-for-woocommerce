@@ -1339,7 +1339,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->action_scheduler
 			->expects( $this->once() )
 			->method( 'schedule_immediate' )
-			->with( 'pinterest/jobs/generate_feed/chain_start' );
+			->with( 'pinterest/jobs/generate_feed/chain_start', $this->anything(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 
 		$this->invoke_protected( $this->feed_generator, 'start_generation' );
 	}
@@ -1383,7 +1383,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	public function test_start_generation_defers_while_chain_start_pending() {
 		$this->action_scheduler
 			->method( 'next_scheduled_action' )
-			->with( 'pinterest/jobs/generate_feed/chain_start' )
+			->with( 'pinterest/jobs/generate_feed/chain_start', null, PINTEREST_FOR_WOOCOMMERCE_PREFIX )
 			->willReturn( time() + 10 );
 		$this->action_scheduler
 			->expects( $this->never() )
