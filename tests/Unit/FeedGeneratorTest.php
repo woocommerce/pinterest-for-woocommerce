@@ -1312,6 +1312,90 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * A pending batch from a superseded cycle must not prevent start_generation()
+	 * from queueing a new chain start.
+	 *
+	 * @return void
+	 */
+	public function test_start_generation_proceeds_when_only_stale_cycle_actions_pending() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'live-cycle', false );
+
+		$stale_action = new ActionScheduler_Action(
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 2, array( FeedGenerator::ARG_CYCLE_ID => 'stale-cycle' ) )
+		);
+
+		$this->action_scheduler
+			->method( 'next_scheduled_action' )
+			->willReturn( false );
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturnCallback(
+				function ( $args ) use ( $stale_action ) {
+					$is_batch_first_page = 'pinterest/jobs/generate_feed/chain_batch' === $args['hook'] && 0 === $args['offset'];
+					return $is_batch_first_page ? array( $stale_action ) : array();
+				}
+			);
+		$this->action_scheduler
+			->expects( $this->once() )
+			->method( 'schedule_immediate' )
+			->with( 'pinterest/jobs/generate_feed/chain_start' );
+
+		$this->invoke_protected( $this->feed_generator, 'start_generation' );
+	}
+
+	/**
+	 * start_generation() must defer while the current cycle still has live chain actions.
+	 *
+	 * @return void
+	 */
+	public function test_start_generation_defers_while_current_cycle_alive() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'live-cycle', false );
+
+		$live_action = new ActionScheduler_Action(
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 2, array( FeedGenerator::ARG_CYCLE_ID => 'live-cycle' ) )
+		);
+
+		$this->action_scheduler
+			->method( 'next_scheduled_action' )
+			->willReturn( false );
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturnCallback(
+				function ( $args ) use ( $live_action ) {
+					$is_batch_first_page = 'pinterest/jobs/generate_feed/chain_batch' === $args['hook'] && 0 === $args['offset'];
+					return $is_batch_first_page ? array( $live_action ) : array();
+				}
+			);
+		$this->action_scheduler
+			->expects( $this->never() )
+			->method( 'schedule_immediate' );
+
+		$this->invoke_protected( $this->feed_generator, 'start_generation' );
+	}
+
+	/**
+	 * start_generation() must defer while a chain start action is already queued.
+	 *
+	 * @return void
+	 */
+	public function test_start_generation_defers_while_chain_start_pending() {
+		$this->action_scheduler
+			->method( 'next_scheduled_action' )
+			->with( 'pinterest/jobs/generate_feed/chain_start' )
+			->willReturn( time() + 10 );
+		$this->action_scheduler
+			->expects( $this->never() )
+			->method( 'search' );
+		$this->action_scheduler
+			->expects( $this->never() )
+			->method( 'schedule_immediate' );
+
+		$this->invoke_protected( $this->feed_generator, 'start_generation' );
+	}
+
+	/**
 	 * A timed out batch from a superseded cycle must not be rescheduled and must not
 	 * shrink the current cycle's batch size throttling state.
 	 *
