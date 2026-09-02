@@ -28,7 +28,10 @@ document.addEventListener( 'keydown', ( event ) => {
 	// Check if target is a Pinterest span and Enter was pressed.
 	const isPinSpan = event.target.matches( 'span[data-pin-log]' );
 
-	if ( isPinSpan && event.key === 'Enter' ) {
+	// Check for Enter or Spacebar press.
+	const isActivateKey = event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar' || event.code === 'Space';
+
+	if ( isPinSpan && isActivateKey ) {
 		event.preventDefault();
 
 		// Programmatically trigger Pinterest's click event.
