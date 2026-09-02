@@ -62,10 +62,8 @@ document.addEventListener( 'DOMContentLoaded', function () {
 					// Move the span inside the processed <a> tag.
 					pinLink.appendChild( srSpan );
 
-					// Add aria-haspopup to <a> tag.
-					pinLink.setAttribute( 'aria-haspopup', 'dialog' );
-
 					if ( pinLink.tagName.toLowerCase() === 'span' ) {
+						pinLink.setAttribute( 'aria-haspopup', 'dialog' );
 						pinLink.setAttribute( 'role', 'link' );
 						pinLink.setAttribute( 'tabindex', '0' );
 					}
