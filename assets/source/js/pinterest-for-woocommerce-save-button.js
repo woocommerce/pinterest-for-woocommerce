@@ -29,7 +29,11 @@ document.addEventListener( 'keydown', ( event ) => {
 	const isPinSpan = event.target.matches( 'span[data-pin-log]' );
 
 	// Check for Enter or Spacebar press.
-	const isActivateKey = event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar' || event.code === 'Space';
+	const isActivateKey =
+		event.key === 'Enter' ||
+		event.key === ' ' ||
+		event.key === 'Spacebar' ||
+		event.code === 'Space';
 
 	if ( isPinSpan && isActivateKey ) {
 		event.preventDefault();
