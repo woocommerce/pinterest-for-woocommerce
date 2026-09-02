@@ -42,6 +42,7 @@ class ProductsXmlFeed {
 		'g:availability',
 		'g:price',
 		'sale_price',
+		'sale_price_effective_date',
 		'g:mpn',
 		'g:brand',
 		'g:tax',
@@ -516,6 +517,9 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_property_sale_price( $product, $property ) {
+		if ( ! $product->is_on_sale() ) {
+			return;
+		}
 
 		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_sale_price' ) ) {
 			$regular_price = $product->get_variation_regular_price( 'min', true );
@@ -537,6 +541,32 @@ class ProductsXmlFeed {
 		}
 
 		return '<' . $property . '>' . wc_format_decimal( $price, self::get_currency_decimals() ) . get_woocommerce_currency() . '</' . $property . '>';
+	}
+
+	/**
+	 * Returns the effective date interval for an active scheduled sale.
+	 *
+	 * @param WC_Product $product  The product.
+	 * @param string     $property The name of the property.
+	 *
+	 * @return string
+	 */
+	private static function get_property_sale_price_effective_date( $product, $property ) {
+		if ( ! $product->is_on_sale() ) {
+			return;
+		}
+
+		$start_date = $product->get_date_on_sale_from();
+		$end_date   = $product->get_date_on_sale_to();
+
+		if ( ! $start_date || ! $end_date ) {
+			return;
+		}
+
+		$start_date = gmdate( 'Y-m-d\TH:i:s\Z', $start_date->getTimestamp() );
+		$end_date   = gmdate( 'Y-m-d\TH:i:s\Z', $end_date->getTimestamp() );
+
+		return '<' . $property . '>' . $start_date . '/' . $end_date . '</' . $property . '>';
 	}
 
 	/**
