@@ -59,13 +59,16 @@ document.addEventListener( 'DOMContentLoaded', function () {
 							'button_pinit_bookmarklet' );
 
 				if ( isPinterestReady && srSpan ) {
-					// Move the span inside the processed <a> tag.
-					pinLink.appendChild( srSpan );
-
 					if ( pinLink.tagName.toLowerCase() === 'span' ) {
 						pinLink.setAttribute( 'aria-haspopup', 'dialog' );
 						pinLink.setAttribute( 'role', 'link' );
 						pinLink.setAttribute( 'tabindex', '0' );
+
+						// Remove the screen reader text from wrapper tag.
+						wrapper.removeChild( srSpan );
+					} else {
+						// Move the screen reader text inside the processed <a> tag.
+						pinLink.appendChild( srSpan );
 					}
 
 					// Mark as processed so it only runs once.
