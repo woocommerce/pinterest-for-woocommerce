@@ -204,8 +204,8 @@ class FeedRegistration {
 		foreach ( $feeds as $feed ) {
 			$registered_feed_id = $feed['id'] ?? '';
 
-			// Local feed should not be deleted.
-			if ( $feed_id === $registered_feed_id ) {
+			// Skip the local feed and any entry without an ID: it cannot be deleted anyway.
+			if ( '' === $registered_feed_id || $feed_id === $registered_feed_id ) {
 				continue;
 			}
 

@@ -153,6 +153,38 @@ class FeedRegistrationTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A feed entry without an ID cannot be deleted, so the cleanup must skip it instead of
+	 * sending a malformed DELETE request for an empty ID.
+	 *
+	 * @return void
+	 */
+	public function test_stale_feed_cleanup_skips_feeds_without_an_id() {
+		self::$remote_feeds = array(
+			array(
+				'id'       => 'plugin-owned-feed-id',
+				'location' => get_site_url() . '/wp-content/uploads/pinterest-for-woocommerce-Ab1cD2.xml',
+			),
+			array(
+				'location' => get_site_url() . '/wp-content/uploads/pinterest-for-woocommerce-Ef3gH4.xml',
+			),
+			array(
+				'id'       => '',
+				'location' => get_site_url() . '/wp-content/uploads/pinterest-for-woocommerce-Ij5kL6.xml',
+			),
+		);
+
+		add_filter( 'pre_http_request', array( self::class, 'fake_pinterest_api' ), 10, 3 );
+
+		FeedRegistration::maybe_delete_stale_feeds_for_merchant( 'plugin-owned-feed-id' );
+
+		$this->assertSame(
+			array(),
+			self::$deleted_feed_ids,
+			'Feeds without an ID must not trigger a DELETE request.'
+		);
+	}
+
+	/**
 	 * Puts the plugin in a connected business account state so that disconnect() runs
 	 * the merchant cleanup instead of bailing out early.
 	 *
@@ -214,7 +246,7 @@ class FeedRegistrationTest extends WP_UnitTestCase {
 			return self::response( array( 'items' => self::$remote_feeds ) );
 		}
 
-		if ( 'DELETE' === $args['method'] && preg_match( '#catalogs/feeds/([^?]+)#', $url, $matches ) ) {
+		if ( 'DELETE' === $args['method'] && preg_match( '#catalogs/feeds/([^?]*)#', $url, $matches ) ) {
 			self::$deleted_feed_ids[] = $matches[1];
 			return self::response( array(), 204 );
 		}
