@@ -38,19 +38,19 @@ function flush( ms = 50 ) {
 	return new Promise( ( resolve ) => setTimeout( resolve, ms ) );
 }
 
-/**
- * Load the script and fire the events it waits for.
- */
-function loadScript() {
-	require( SCRIPT_PATH );
-	document.dispatchEvent( new window.Event( 'DOMContentLoaded' ) );
-}
-
 describe( 'Save to Pinterest button', () => {
-	beforeEach( () => {
-		// The shared preset enables fake timers, which the retry loop needs.
+	// Load the script once: its DOMContentLoaded listener registers a
+	// MutationObserver on the body, and loading it per test would stack one
+	// observer per copy and inflate build() call counts.
+	beforeAll( () => {
+		// The shared preset enables fake timers; switch to real ones so the
+		// MutationObserver callbacks, rAF and retry timers run on their own.
 		jest.useRealTimers();
-		jest.resetModules();
+		require( SCRIPT_PATH );
+		document.dispatchEvent( new window.Event( 'DOMContentLoaded' ) );
+	} );
+
+	beforeEach( () => {
 		document.body.innerHTML = '';
 		document.head
 			.querySelectorAll( 'style' )
@@ -84,7 +84,6 @@ describe( 'Save to Pinterest button', () => {
 		document.body.innerHTML = unbuiltWrapper( 'Save Shirt to Pinterest' );
 		window.PinUtils = { build: jest.fn() };
 
-		loadScript();
 		markAsBuilt(
 			document.querySelector( '.pinterest-for-woocommerce-image-wrapper' )
 		);
@@ -101,11 +100,24 @@ describe( 'Save to Pinterest button', () => {
 		expect( window.PinUtils.build ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'rebuilds when the wrapper itself is the added node', async () => {
+		window.PinUtils = { build: jest.fn() };
+
+		// Some grids append the wrapper directly rather than a parent block.
+		const wrapper = document.createElement( 'div' );
+		wrapper.className = 'pinterest-for-woocommerce-image-wrapper';
+		wrapper.innerHTML =
+			'<span class="screen-reader-text">Save Hoodie to Pinterest</span><a data-pin-do="buttonPin" href="https://www.pinterest.com/pin/create/button/"></a>';
+		document.body.appendChild( wrapper );
+		await flush();
+
+		expect( window.PinUtils.build ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	it( 'does not rebuild when the added markup holds no unbuilt pin', async () => {
 		document.body.innerHTML = unbuiltWrapper( 'Save Shirt to Pinterest' );
 		window.PinUtils = { build: jest.fn() };
 
-		loadScript();
 		markAsBuilt(
 			document.querySelector( '.pinterest-for-woocommerce-image-wrapper' )
 		);
@@ -120,8 +132,6 @@ describe( 'Save to Pinterest button', () => {
 	} );
 
 	it( 'waits for pinit.js when PinUtils is not available yet', async () => {
-		loadScript();
-
 		const grid = document.createElement( 'div' );
 		grid.innerHTML = unbuiltWrapper( 'Save Hoodie to Pinterest' );
 		document.body.appendChild( grid );
@@ -135,8 +145,6 @@ describe( 'Save to Pinterest button', () => {
 	} );
 
 	it( 'stops retrying when pinit.js never loads', async () => {
-		loadScript();
-
 		const grid = document.createElement( 'div' );
 		grid.innerHTML = unbuiltWrapper( 'Save Hoodie to Pinterest' );
 		document.body.appendChild( grid );
@@ -156,8 +164,6 @@ describe( 'Save to Pinterest button', () => {
 		);
 		window.PinUtils = { build: jest.fn() };
 
-		loadScript();
-
 		// The Interactivity API router disables every stylesheet missing from
 		// the page it fetched, including pinit.js's runtime one.
 		pinStyle.sheet.disabled = true;
@@ -170,8 +176,6 @@ describe( 'Save to Pinterest button', () => {
 	it( 'leaves unrelated disabled stylesheets alone', async () => {
 		const otherStyle = addStyle( '.some-theme-thing{color:red}' );
 		window.PinUtils = { build: jest.fn() };
-
-		loadScript();
 
 		otherStyle.sheet.disabled = true;
 		swapInNewPage();
@@ -190,8 +194,6 @@ describe( 'Save to Pinterest button', () => {
 					.forEach( markAsBuilt );
 			} ),
 		};
-
-		loadScript();
 
 		const grid = document.createElement( 'div' );
 		grid.innerHTML = unbuiltWrapper( 'Save Hoodie to Pinterest' );
