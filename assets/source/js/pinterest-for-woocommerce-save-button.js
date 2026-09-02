@@ -61,7 +61,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				if ( isPinterestReady && srSpan ) {
 					if ( pinLink.tagName.toLowerCase() === 'span' ) {
 						pinLink.setAttribute( 'aria-haspopup', 'dialog' );
-						pinLink.setAttribute( 'role', 'link' );
+						pinLink.setAttribute( 'role', 'button' );
 						pinLink.setAttribute( 'tabindex', '0' );
 
 						// Remove the screen reader text from wrapper tag.
