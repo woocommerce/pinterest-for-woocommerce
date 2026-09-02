@@ -364,6 +364,11 @@ class Feeds {
 	 * by LocalFeedConfigs. Any other location belongs to a data source the merchant configured
 	 * manually and must not be touched, even when it is hosted on the store's own domain.
 	 *
+	 * Known limitation: this is a naming heuristic. A file a merchant uploads under the same
+	 * prefix (for example `pinterest-for-woocommerce-manual.csv`) is treated as plugin generated.
+	 * The plugin does not keep a record of the Pinterest feed IDs it created, which would be the
+	 * reliable way to establish ownership for older or orphaned feeds.
+	 *
 	 * @since 1.4.29
 	 *
 	 * @param string $location The feed location URL as stored by Pinterest.
