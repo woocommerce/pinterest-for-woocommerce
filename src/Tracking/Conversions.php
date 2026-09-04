@@ -153,7 +153,7 @@ class Conversions extends Tracker {
 			$data['user_data']['external_id'] = array( $external_id );
 		}
 
-		$click_id = self::maybe_get_click_id();
+		$click_id = self::maybe_get_click_id( $this->event_source_url );
 		if ( false !== $click_id ) {
 			$data['user_data']['click_id'] = $click_id;
 		}
@@ -220,20 +220,26 @@ class Conversions extends Tracker {
 	/**
 	 * Returns the Pinterest click ID for the current visitor.
 	 *
-	 * The landing-page `epik` parameter is the freshest source. Pinterest's
-	 * `_epik` cookie and the WooCommerce session retain it for later events.
+	 * The landing-page `epik` parameter is the freshest source. Beacon requests
+	 * carry the landing page as the event source URL, so its query string is
+	 * checked before the current request. Pinterest's `_epik` cookie and the
+	 * WooCommerce session retain the click ID for later events.
+	 *
+	 * @param string $event_source_url Optional URL where the event occurred.
 	 *
 	 * @return string|false Click ID, or false if it is unavailable.
 	 */
-	private static function maybe_get_click_id() {
-		$click_id = false;
+	private static function maybe_get_click_id( string $event_source_url = '' ) {
+		$click_id = self::get_click_id_from_url( $event_source_url );
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only attribution parameter.
-		if ( isset( $_GET['epik'] ) && is_string( $_GET['epik'] ) ) {
+		if ( false === $click_id ) {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only attribution parameter.
-			$click_id = sanitize_text_field( wp_unslash( $_GET['epik'] ) );
-		} elseif ( isset( $_COOKIE['_epik'] ) && is_string( $_COOKIE['_epik'] ) ) {
-			$click_id = sanitize_text_field( wp_unslash( $_COOKIE['_epik'] ) );
+			if ( isset( $_GET['epik'] ) && is_string( $_GET['epik'] ) ) {
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only attribution parameter.
+				$click_id = sanitize_text_field( wp_unslash( $_GET['epik'] ) );
+			} elseif ( isset( $_COOKIE['_epik'] ) && is_string( $_COOKIE['_epik'] ) ) {
+				$click_id = sanitize_text_field( wp_unslash( $_COOKIE['_epik'] ) );
+			}
 		}
 
 		$session = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session : false;
@@ -252,6 +258,24 @@ class Conversions extends Tracker {
 		$click_id = $session->get( self::CLICK_ID_SESSION_KEY );
 
 		return is_string( $click_id ) && '' !== $click_id ? $click_id : false;
+	}
+
+	/**
+	 * Extracts the Pinterest click ID from the query string of an event source URL.
+	 *
+	 * @param string $event_source_url URL where the event occurred.
+	 *
+	 * @return string|false Click ID, or false if the URL does not carry one.
+	 */
+	private static function get_click_id_from_url( string $event_source_url ) {
+		$query = wp_parse_url( $event_source_url, PHP_URL_QUERY );
+		if ( ! $query ) {
+			return false;
+		}
+
+		wp_parse_str( $query, $params );
+
+		return isset( $params['epik'] ) && is_string( $params['epik'] ) ? sanitize_text_field( $params['epik'] ) : false;
 	}
 
 	/**
