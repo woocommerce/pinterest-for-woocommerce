@@ -24,8 +24,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Tag extends Tracker {
 
-	private const TAG_ID_SLUG       = '%%TAG_ID%%';
-	private const HASHED_EMAIL_SLUG = '%%HASHED_EMAIL%%';
+	private const TAG_ID_SLUG    = '%%TAG_ID%%';
+	private const USER_DATA_SLUG = '%%USER_DATA%%';
 
 	/**
 	 * The base tracking snippet.
@@ -33,15 +33,7 @@ class Tag extends Tracker {
 	 *
 	 * @var string
 	 */
-	private static $base_tag = "<!-- Pinterest Pixel Base Code -->\n<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "', { np: \"woocommerce\" } );\n  pintrk('page');\n</script>\n<!-- End Pinterest Pixel Base Code -->\n";
-
-	/**
-	 * The base tracking snippet with Enchanced match support.
-	 * Documentation: https://help.pinterest.com/en/business/article/enhanced-match
-	 *
-	 * @var string
-	 */
-	private static $base_tag_em = "<!-- Pinterest Pixel Base Code -->\n<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n pintrk('load', '" . self::TAG_ID_SLUG . "', { em: '" . self::HASHED_EMAIL_SLUG . "', np: \"woocommerce\" });\n  pintrk('page');\n</script>\n<!-- End Pinterest Pixel Base Code -->\n";
+	private static $base_tag = "<!-- Pinterest Pixel Base Code -->\n<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "', " . self::USER_DATA_SLUG . " );\n  pintrk('page');\n</script>\n<!-- End Pinterest Pixel Base Code -->\n";
 
 	/**
 	 * The noscript base tracking snippet.
@@ -100,15 +92,25 @@ class Tag extends Tracker {
 	 */
 	public function print_script() {
 		$active_tag = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
-		$email      = Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' )
-			? static::maybe_get_hashed_customer_email()
-			: '';
+		$user_data  = array( 'np' => 'woocommerce' );
 
-		$script = ! empty( $email ) ? self::$base_tag_em : self::$base_tag;
+		if ( Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) ) {
+			$email       = static::maybe_get_hashed_customer_email();
+			$external_id = static::maybe_get_hashed_customer_external_id();
+
+			if ( ! empty( $email ) ) {
+				$user_data['em'] = $email;
+			}
+
+			if ( false !== $external_id ) {
+				$user_data['external_id'] = $external_id;
+			}
+		}
+
 		$script = str_replace(
-			array( self::TAG_ID_SLUG, self::HASHED_EMAIL_SLUG ),
-			array( sanitize_key( $active_tag ), $email ),
-			$script
+			array( self::TAG_ID_SLUG, self::USER_DATA_SLUG ),
+			array( sanitize_key( $active_tag ), wp_json_encode( $user_data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) ),
+			self::$base_tag
 		);
 		//phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo $script;

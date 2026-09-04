@@ -24,6 +24,13 @@ use Throwable;
  */
 class Conversions extends Tracker {
 
+	/**
+	 * Session key used to persist the Pinterest click ID.
+	 *
+	 * @var string
+	 */
+	private const CLICK_ID_SESSION_KEY = 'pinterest_for_woocommerce_click_id';
+
 	/** @var User $user User data object. Data for Conversions API. */
 	private $user;
 
@@ -126,6 +133,16 @@ class Conversions extends Tracker {
 			$data['user_data']['em'] = array( $email );
 		}
 
+		$external_id = self::maybe_get_hashed_customer_external_id();
+		if ( false !== $external_id ) {
+			$data['user_data']['external_id'] = array( $external_id );
+		}
+
+		$click_id = self::maybe_get_click_id();
+		if ( false !== $click_id ) {
+			$data['user_data']['click_id'] = $click_id;
+		}
+
 		return $data;
 	}
 
@@ -183,6 +200,43 @@ class Conversions extends Tracker {
 			$user_email       = $session_customer ? $session_customer['email'] : '';
 		}
 		return $user_email ? hash( 'sha256', $user_email ) : false;
+	}
+
+	/**
+	 * Returns the Pinterest click ID for the current visitor.
+	 *
+	 * The landing-page `epik` parameter is the freshest source. Pinterest's
+	 * `_epik` cookie and the WooCommerce session retain it for later events.
+	 *
+	 * @return string|false Click ID, or false if it is unavailable.
+	 */
+	private static function maybe_get_click_id() {
+		$click_id = false;
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only attribution parameter.
+		if ( isset( $_GET['epik'] ) && is_string( $_GET['epik'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only attribution parameter.
+			$click_id = sanitize_text_field( wp_unslash( $_GET['epik'] ) );
+		} elseif ( isset( $_COOKIE['_epik'] ) && is_string( $_COOKIE['_epik'] ) ) {
+			$click_id = sanitize_text_field( wp_unslash( $_COOKIE['_epik'] ) );
+		}
+
+		$session = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session : false;
+		if ( false !== $click_id && '' !== $click_id ) {
+			if ( $session ) {
+				$session->set( self::CLICK_ID_SESSION_KEY, $click_id );
+			}
+
+			return $click_id;
+		}
+
+		if ( ! $session ) {
+			return false;
+		}
+
+		$click_id = $session->get( self::CLICK_ID_SESSION_KEY );
+
+		return is_string( $click_id ) && '' !== $click_id ? $click_id : false;
 	}
 
 	/**
