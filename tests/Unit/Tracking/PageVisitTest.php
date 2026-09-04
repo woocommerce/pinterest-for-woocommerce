@@ -57,6 +57,10 @@ class PageVisitTest extends WP_UnitTestCase {
 		$_POST = array();
 		remove_all_filters( 'pre_http_request' );
 
+		if ( function_exists( 'WC' ) && isset( WC()->session ) ) {
+			WC()->session->__unset( 'pinterest_for_woocommerce_click_id' );
+		}
+
 		if ( null === $this->original_user_agent ) {
 			unset( $_SERVER['HTTP_USER_AGENT'] );
 		} else {
@@ -163,6 +167,53 @@ class PageVisitTest extends WP_UnitTestCase {
 		PageVisit::handle_request();
 
 		$this->assertSame( 1, $requests );
+	}
+
+	/**
+	 * A first landing on `?epik=...` reports the click ID even though the beacon
+	 * request itself carries no query parameter, cookie, or session value yet.
+	 */
+	public function test_beacon_reads_click_id_from_source_url() {
+		$product    = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => 25 ) );
+		$source_url = add_query_arg( 'epik', 'landing-click-id', $product->get_permalink() );
+		$requests   = 0;
+
+		add_filter(
+			'pre_http_request',
+			function ( $response, $parsed_args ) use ( &$requests ) {
+				++$requests;
+				$body = json_decode( $parsed_args['body'], true );
+
+				$this->assertSame( 'landing-click-id', $body['data'][0]['user_data']['click_id'] );
+
+				return array(
+					'headers'  => array( 'content-type' => 'application/json' ),
+					'body'     => wp_json_encode(
+						array(
+							'events' => array( array( 'status' => 'processed' ) ),
+						)
+					),
+					'response' => array(
+						'code'    => 200,
+						'message' => 'OK',
+					),
+					'cookies'  => array(),
+					'filename' => '',
+				);
+			},
+			10,
+			2
+		);
+
+		$_POST = array(
+			'event_id'         => 'page_1234567890abcdef',
+			'event_source_url' => $source_url,
+		);
+
+		PageVisit::handle_request();
+
+		$this->assertSame( 1, $requests );
+		$this->assertSame( 'landing-click-id', WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
 	}
 
 	/**
