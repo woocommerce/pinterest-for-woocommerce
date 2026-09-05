@@ -346,10 +346,13 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Start the queue processing.
 	 *
+	 * Gates on is_generation_active() rather than is_running(): a still-pending batch
+	 * action from a superseded cycle must not prevent a new cycle from starting.
+	 *
 	 * @since 1.0.10
 	 */
 	private function start_generation() {
-		if ( $this->is_running() ) {
+		if ( $this->is_generation_active() ) {
 			return;
 		}
 
@@ -695,8 +698,8 @@ class FeedGenerator extends AbstractChainedJob {
 		update_option( self::OPTION_FEED_DIRTY, 1, false );
 		self::log( 'Feed is dirty.' );
 
-		if ( $this->is_running() ) {
-			// New generation will be started at the end of current one.
+		if ( $this->is_generation_active() ) {
+			// New generation will be started at the end of the current cycle.
 			return;
 		}
 
@@ -1065,6 +1068,27 @@ class FeedGenerator extends AbstractChainedJob {
 		);
 
 		return is_string( $value ) ? $value : null;
+	}
+
+	/**
+	 * Whether a feed generation is queued or in progress.
+	 *
+	 * True while a chain start action is pending or the current cycle still has live
+	 * batch or end actions. Unlike the framework's is_running(), a leftover action from
+	 * a superseded cycle does not count.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return bool
+	 */
+	private function is_generation_active(): bool {
+		$next_start = $this->action_scheduler->next_scheduled_action(
+			$this->get_action_full_name( self::CHAIN_START ),
+			null,
+			$this->get_group_name()
+		);
+
+		return (bool) $next_start || $this->is_current_cycle_alive();
 	}
 
 	/**

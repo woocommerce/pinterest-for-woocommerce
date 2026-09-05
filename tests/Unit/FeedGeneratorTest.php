@@ -1312,6 +1312,183 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * A pending batch from a superseded cycle must not prevent start_generation()
+	 * from queueing a new chain start.
+	 *
+	 * @return void
+	 */
+	public function test_start_generation_proceeds_when_only_stale_cycle_actions_pending() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'live-cycle', false );
+
+		$stale_action = new ActionScheduler_Action(
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 2, array( FeedGenerator::ARG_CYCLE_ID => 'stale-cycle' ) )
+		);
+
+		$this->action_scheduler
+			->method( 'next_scheduled_action' )
+			->willReturn( false );
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturnCallback(
+				function ( $args ) use ( $stale_action ) {
+					$is_batch_first_page = 'pinterest/jobs/generate_feed/chain_batch' === $args['hook'] && 0 === $args['offset'];
+					return $is_batch_first_page ? array( $stale_action ) : array();
+				}
+			);
+		$this->action_scheduler
+			->expects( $this->once() )
+			->method( 'schedule_immediate' )
+			->with( 'pinterest/jobs/generate_feed/chain_start', $this->anything(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+
+		$this->invoke_protected( $this->feed_generator, 'start_generation' );
+	}
+
+	/**
+	 * start_generation() must defer while the current cycle still has live chain actions.
+	 *
+	 * @return void
+	 */
+	public function test_start_generation_defers_while_current_cycle_alive() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'live-cycle', false );
+
+		$live_action = new ActionScheduler_Action(
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 2, array( FeedGenerator::ARG_CYCLE_ID => 'live-cycle' ) )
+		);
+
+		$this->action_scheduler
+			->method( 'next_scheduled_action' )
+			->willReturn( false );
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturnCallback(
+				function ( $args ) use ( $live_action ) {
+					$is_batch_first_page = 'pinterest/jobs/generate_feed/chain_batch' === $args['hook'] && 0 === $args['offset'];
+					return $is_batch_first_page ? array( $live_action ) : array();
+				}
+			);
+		$this->action_scheduler
+			->expects( $this->never() )
+			->method( 'schedule_immediate' );
+
+		$this->invoke_protected( $this->feed_generator, 'start_generation' );
+	}
+
+	/**
+	 * start_generation() must defer while a chain start action is already queued.
+	 *
+	 * @return void
+	 */
+	public function test_start_generation_defers_while_chain_start_pending() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'dead-cycle', false );
+
+		$this->action_scheduler
+			->method( 'next_scheduled_action' )
+			->with( 'pinterest/jobs/generate_feed/chain_start', null, PINTEREST_FOR_WOOCOMMERCE_PREFIX )
+			->willReturn( time() + 10 );
+		$this->action_scheduler
+			->expects( $this->never() )
+			->method( 'search' );
+		$this->action_scheduler
+			->expects( $this->never() )
+			->method( 'schedule_immediate' );
+
+		$this->invoke_protected( $this->feed_generator, 'start_generation' );
+	}
+
+	/**
+	 * mark_feed_dirty() must reschedule the start action when only actions from a
+	 * superseded cycle are pending, since no live cycle will pick up the dirty flag.
+	 *
+	 * @return void
+	 */
+	public function test_mark_feed_dirty_reschedules_start_when_only_stale_cycle_actions_pending() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'live-cycle', false );
+
+		$stale_action = new ActionScheduler_Action(
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 2, array( FeedGenerator::ARG_CYCLE_ID => 'stale-cycle' ) )
+		);
+
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturnCallback(
+				function ( $args ) use ( $stale_action ) {
+					$is_batch_first_page = 'pinterest/jobs/generate_feed/chain_batch' === $args['hook'] && 0 === $args['offset'];
+					return $is_batch_first_page ? array( $stale_action ) : array();
+				}
+			);
+
+		$this->feed_generator->mark_feed_dirty();
+
+		$next_start = as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		$this->assertIsInt( $next_start, 'A stale cycle must not suppress rescheduling the start action.' );
+		$this->assertLessThanOrEqual( time() + 1, $next_start, 'The start action must be rescheduled to run now.' );
+	}
+
+	/**
+	 * mark_feed_dirty() must not reschedule the start action while the current cycle
+	 * is alive; the end of that cycle picks up the dirty flag instead.
+	 *
+	 * @return void
+	 */
+	public function test_mark_feed_dirty_defers_while_current_cycle_alive() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'live-cycle', false );
+
+		$live_action = new ActionScheduler_Action(
+			'pinterest/jobs/generate_feed/chain_batch',
+			array( 2, array( FeedGenerator::ARG_CYCLE_ID => 'live-cycle' ) )
+		);
+
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturnCallback(
+				function ( $args ) use ( $live_action ) {
+					$is_batch_first_page = 'pinterest/jobs/generate_feed/chain_batch' === $args['hook'] && 0 === $args['offset'];
+					return $is_batch_first_page ? array( $live_action ) : array();
+				}
+			);
+
+		$this->feed_generator->mark_feed_dirty();
+
+		$this->assertEquals( 1, get_option( FeedGenerator::OPTION_FEED_DIRTY ), 'The feed must still be flagged dirty.' );
+		$this->assertFalse(
+			as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' ),
+			'A live cycle must defer the restart to the end of the cycle.'
+		);
+	}
+
+	/**
+	 * mark_feed_dirty() must not reschedule the start action while a chain start is
+	 * already queued; that start picks up the dirty flag.
+	 *
+	 * @return void
+	 */
+	public function test_mark_feed_dirty_defers_while_chain_start_pending() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'dead-cycle', false );
+
+		$this->action_scheduler
+			->method( 'next_scheduled_action' )
+			->with( 'pinterest/jobs/generate_feed/chain_start', null, PINTEREST_FOR_WOOCOMMERCE_PREFIX )
+			->willReturn( time() + 10 );
+		$this->action_scheduler
+			->expects( $this->never() )
+			->method( 'search' );
+
+		$this->feed_generator->mark_feed_dirty();
+
+		$this->assertEquals( 1, get_option( FeedGenerator::OPTION_FEED_DIRTY ), 'The feed must still be flagged dirty.' );
+		$this->assertFalse(
+			as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' ),
+			'A queued chain start must defer the restart.'
+		);
+	}
+
+	/**
 	 * A timed out batch from a superseded cycle must not be rescheduled and must not
 	 * shrink the current cycle's batch size throttling state.
 	 *
