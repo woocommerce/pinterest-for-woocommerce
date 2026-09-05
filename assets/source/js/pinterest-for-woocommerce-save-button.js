@@ -24,6 +24,26 @@ window.addEventListener( 'load', function () {
 } );
 
 // eslint-disable-next-line @wordpress/no-global-event-listener
+document.addEventListener( 'keydown', ( event ) => {
+	// Check if target is a Pinterest span and Enter was pressed.
+	const isPinSpan = event.target.matches( 'span[data-pin-log]' );
+
+	// Check for Enter or Spacebar press.
+	const isActivateKey =
+		event.key === 'Enter' ||
+		event.key === ' ' ||
+		event.key === 'Spacebar' ||
+		event.code === 'Space';
+
+	if ( isPinSpan && isActivateKey ) {
+		event.preventDefault();
+
+		// Programmatically trigger Pinterest's click event.
+		event.target.click();
+	}
+} );
+
+// eslint-disable-next-line @wordpress/no-global-event-listener
 document.addEventListener( 'DOMContentLoaded', function () {
 	// Placeholder markup that pinit.js has not turned into a button yet.
 	const UNBUILT_PIN_SELECTOR =
@@ -48,20 +68,31 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				// Skip if already processed.
 				if ( wrapper.dataset.srLabeled ) return;
 
-				const pinLink = wrapper.querySelector( 'a' );
+				const pinLink =
+					wrapper.querySelector( 'a' ) ||
+					wrapper.querySelector( 'span[data-pin-log]' );
 				const srSpan = wrapper.querySelector( '.screen-reader-text' );
 
 				// Check that both elements exist AND Pinterest has finished adding its attribute.
 				const isPinterestReady =
 					pinLink &&
-					pinLink.getAttribute( 'data-pin-log' ) === 'button_pinit';
+					( pinLink.getAttribute( 'data-pin-log' ) ===
+						'button_pinit' ||
+						pinLink.getAttribute( 'data-pin-log' ) ===
+							'button_pinit_bookmarklet' );
 
 				if ( isPinterestReady && srSpan ) {
-					// Move the span inside the processed <a> tag.
-					pinLink.appendChild( srSpan );
+					if ( pinLink.tagName.toLowerCase() === 'span' ) {
+						pinLink.setAttribute( 'aria-haspopup', 'dialog' );
+						pinLink.setAttribute( 'role', 'button' );
+						pinLink.setAttribute( 'tabindex', '0' );
 
-					// Add aria-haspopup to <a> tag.
-					pinLink.setAttribute( 'aria-haspopup', 'dialog' );
+						// Remove the screen reader text from wrapper tag.
+						wrapper.removeChild( srSpan );
+					} else {
+						// Move the screen reader text inside the processed <a> tag.
+						pinLink.appendChild( srSpan );
+					}
 
 					// Mark as processed so it only runs once.
 					wrapper.dataset.srLabeled = 'true';
