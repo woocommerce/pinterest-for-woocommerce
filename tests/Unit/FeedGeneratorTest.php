@@ -1462,6 +1462,33 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * mark_feed_dirty() must not reschedule the start action while a chain start is
+	 * already queued; that start picks up the dirty flag.
+	 *
+	 * @return void
+	 */
+	public function test_mark_feed_dirty_defers_while_chain_start_pending() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'dead-cycle', false );
+
+		$this->action_scheduler
+			->method( 'next_scheduled_action' )
+			->with( 'pinterest/jobs/generate_feed/chain_start', null, PINTEREST_FOR_WOOCOMMERCE_PREFIX )
+			->willReturn( time() + 10 );
+		$this->action_scheduler
+			->expects( $this->never() )
+			->method( 'search' );
+
+		$this->feed_generator->mark_feed_dirty();
+
+		$this->assertEquals( 1, get_option( FeedGenerator::OPTION_FEED_DIRTY ), 'The feed must still be flagged dirty.' );
+		$this->assertFalse(
+			as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' ),
+			'A queued chain start must defer the restart.'
+		);
+	}
+
+	/**
 	 * A timed out batch from a superseded cycle must not be rescheduled and must not
 	 * shrink the current cycle's batch size throttling state.
 	 *
