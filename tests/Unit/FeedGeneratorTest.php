@@ -1381,6 +1381,8 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_start_generation_defers_while_chain_start_pending() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'dead-cycle', false );
+
 		$this->action_scheduler
 			->method( 'next_scheduled_action' )
 			->with( 'pinterest/jobs/generate_feed/chain_start', null, PINTEREST_FOR_WOOCOMMERCE_PREFIX )
