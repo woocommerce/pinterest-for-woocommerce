@@ -707,8 +707,10 @@ class FeedGenerator extends AbstractChainedJob {
 		update_option( self::OPTION_FEED_DIRTY, 1, false );
 		self::log( 'Feed is dirty.' );
 
-		if ( $this->is_running() ) {
-			// New generation will be started at the end of current one.
+		if ( $this->is_current_cycle_alive() ) {
+			// New generation will be started at the end of the current cycle. Gate on the
+			// cycle rather than is_running() so a stale action from a superseded cycle
+			// cannot suppress the restart.
 			return;
 		}
 
