@@ -155,6 +155,10 @@ class Tag extends Tracker {
 	 * @return string A generated event call.
 	 */
 	private static function get_event_code( string $event_name, array $data ) {
+		if ( Tracking::EVENT_PAGE_VISIT === $event_name ) {
+			return PageVisit::get_tag_event_code( $data );
+		}
+
 		$data_string = empty( $data ) ? null : wp_json_encode( $data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES );
 		return sprintf(
 			'pintrk( \'track\', \'%s\' %s);',
