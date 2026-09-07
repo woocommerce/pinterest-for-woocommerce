@@ -18,6 +18,17 @@ function unbuiltWrapper( label ) {
 }
 
 /**
+ * Markup rendered server side for a product with a featured image, where the
+ * screen reader label carries the "opens in a new window" hint.
+ *
+ * @param {string} name Product name.
+ * @return {string} Wrapper markup with an unbuilt Pinterest placeholder.
+ */
+function unbuiltWrapperWithHint( name ) {
+	return `<div class="pinterest-for-woocommerce-image-wrapper"><span class="screen-reader-text">${ name }<span class="pinterest-for-woocommerce-new-window-hint"> (opens in a new window)</span></span><a data-pin-do="buttonPin" href="https://www.pinterest.com/pin/create/button/"></a></div>`;
+}
+
+/**
  * Simulate what pinit.js does to a placeholder once it builds it.
  *
  * @param {Element} wrapper Wrapper holding the placeholder.
@@ -26,6 +37,22 @@ function markAsBuilt( wrapper ) {
 	wrapper
 		.querySelector( 'a[data-pin-do]' )
 		.setAttribute( 'data-pin-log', 'button_pinit' );
+}
+
+/**
+ * Simulate what pinit.js does on a product with no image: the placeholder is
+ * replaced by a bookmarklet control, which is a span rather than a link.
+ *
+ * @param {Element} wrapper Wrapper holding the placeholder.
+ * @return {Element} The span standing in for the bookmarklet control.
+ */
+function markAsBookmarklet( wrapper ) {
+	const placeholder = wrapper.querySelector( 'a[data-pin-do]' );
+	const span = document.createElement( 'span' );
+	span.setAttribute( 'data-pin-log', 'button_pinit_bookmarklet' );
+	placeholder.replaceWith( span );
+
+	return span;
 }
 
 /**
@@ -203,5 +230,54 @@ describe( 'Save to Pinterest button', () => {
 		const pinLink = document.querySelector( 'a[data-pin-do]' );
 		expect( pinLink.querySelector( '.screen-reader-text' ) ).not.toBeNull();
 		expect( pinLink.getAttribute( 'aria-haspopup' ) ).toBeNull();
+	} );
+
+	it( 'makes the bookmarklet control keyboard operable on products with no image', async () => {
+		const grid = document.createElement( 'div' );
+		grid.innerHTML = unbuiltWrapperWithHint( 'Hoodie to Pinterest' );
+		document.body.appendChild( grid );
+
+		const wrapper = grid.querySelector(
+			'.pinterest-for-woocommerce-image-wrapper'
+		);
+		const control = markAsBookmarklet( wrapper );
+		await flush( 200 );
+
+		// The span is exposed as a button and reachable by keyboard.
+		expect( control.getAttribute( 'role' ) ).toBe( 'button' );
+		expect( control.getAttribute( 'tabindex' ) ).toBe( '0' );
+		expect( control.getAttribute( 'aria-haspopup' ) ).toBe( 'dialog' );
+
+		// The label moves into the control and drops the new-window hint,
+		// since the bookmarklet opens an in-page dialog.
+		const srSpan = control.querySelector( '.screen-reader-text' );
+		expect( srSpan ).not.toBeNull();
+		expect(
+			srSpan.querySelector( '.pinterest-for-woocommerce-new-window-hint' )
+		).toBeNull();
+	} );
+
+	it( 'activates the bookmarklet control on Enter and Spacebar', () => {
+		const control = document.createElement( 'span' );
+		control.setAttribute( 'data-pin-log', 'button_pinit_bookmarklet' );
+		document.body.appendChild( control );
+
+		const click = jest.fn();
+		control.click = click;
+
+		for ( const key of [ 'Enter', ' ' ] ) {
+			const event = new window.KeyboardEvent( 'keydown', {
+				key,
+				bubbles: true,
+				cancelable: true,
+			} );
+			control.dispatchEvent( event );
+
+			// Pinterest only listens for clicks, so the key press is
+			// forwarded as one and the default scroll/submit is suppressed.
+			expect( event.defaultPrevented ).toBe( true );
+		}
+
+		expect( click ).toHaveBeenCalledTimes( 2 );
 	} );
 } );
