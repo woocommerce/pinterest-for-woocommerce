@@ -6,6 +6,7 @@ jobs:
   setup-node:
     name: Setup NodeJS and Dependencies
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
@@ -31,6 +32,7 @@ jobs:
   setup-php:
     name: Setup PHP and Dependencies
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

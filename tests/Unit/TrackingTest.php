@@ -190,6 +190,33 @@ class TrackingTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * PageVisit CAPI is sent by the browser beacon, not during HTML rendering.
+	 */
+	public function test_page_visit_skips_synchronous_conversions_tracker() {
+		Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'WD7AFW51GS' ) );
+
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0';
+
+		$tracking = new Tracking();
+
+		$pinterest_tag_tracker  = $this->createMock( Tag::class );
+		$pinterest_capi_tracker = $this->createMock( Conversions::class );
+
+		$tracking->add_tracker( $pinterest_tag_tracker );
+		$tracking->add_tracker( $pinterest_capi_tracker );
+
+		$data = new None( '' );
+
+		$pinterest_tag_tracker->expects( $this->once() )
+			->method( 'track_event' )
+			->with( Tracking::EVENT_PAGE_VISIT, $data );
+		$pinterest_capi_tracker->expects( $this->never() )
+			->method( 'track_event' );
+
+		$tracking->track_event( Tracking::EVENT_PAGE_VISIT, $data );
+	}
+
+	/**
 	 * The `pinterest_for_woocommerce_is_crawler_request` filter must be able
 	 * to flag an otherwise-human UA as a crawler and skip CAPI.
 	 */

@@ -15,5 +15,6 @@ jobs:
   automerge_trunk:
     name: Automerge released trunk
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - uses: woocommerce/grow/automerge-released-trunk@actions-v1
+      - uses: woocommerce/grow/automerge-released-trunk@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
