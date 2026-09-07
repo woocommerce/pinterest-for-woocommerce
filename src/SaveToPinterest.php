@@ -69,7 +69,14 @@ class SaveToPinterest {
 		$product_name = get_the_title( $post_id );
 
 		/* translators: %s: product name */
-		$screen_reader_text = sprintf( __( '%s to Pinterest (opens in a new window)', 'pinterest-for-woocommerce' ), $product_name );
+		$screen_reader_text = esc_html( sprintf( __( '%s to Pinterest', 'pinterest-for-woocommerce' ), $product_name ) );
+
+		$product = wc_get_product( $post_id );
+		if ( $product && $product->get_image_id() ) {
+			$screen_reader_text .= '<span class="pinterest-for-woocommerce-new-window-hint"> '
+				. esc_html__( '(opens in a new window)', 'pinterest-for-woocommerce' )
+				. '</span>';
+		}
 
 		$attributes = array(
 			'description' => esc_html( $product_name ),
@@ -91,7 +98,7 @@ class SaveToPinterest {
 		 */
 		return sprintf(
 			'<div class="pinterest-for-woocommerce-image-wrapper"><span class="screen-reader-text">%s</span><a data-pin-do="buttonPin" href="%s"></a></div>',
-			esc_html( $screen_reader_text ),
+			$screen_reader_text,
 			esc_url(
 				add_query_arg(
 					$attributes,

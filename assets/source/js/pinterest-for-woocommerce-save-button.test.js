@@ -202,6 +202,6 @@ describe( 'Save to Pinterest button', () => {
 
 		const pinLink = document.querySelector( 'a[data-pin-do]' );
 		expect( pinLink.querySelector( '.screen-reader-text' ) ).not.toBeNull();
-		expect( pinLink.getAttribute( 'aria-haspopup' ) ).toBe( 'dialog' );
+		expect( pinLink.getAttribute( 'aria-haspopup' ) ).toBeNull();
 	} );
 } );
