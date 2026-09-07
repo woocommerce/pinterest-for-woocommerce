@@ -46,14 +46,20 @@ class Auth extends VendorAPI {
 	 * @return boolean
 	 */
 	public function permissions_check( WP_REST_Request $request ) {
-
-		$nonce = $request->get_param( 'state' ) ?? '';
-
 		/*
-		 * Check if the nonce is valid. We grab the nonce from the transient because wp_verify_nonce() in REST API call
-		 * is generated for user 0 and therefore it always returns false.
+		 * The expected state is read from the transient because wp_verify_nonce() in a REST API call
+		 * is generated for user 0 and therefore always returns false.
+		 * Fail closed when no state has been issued, and only accept a string that matches it exactly.
 		 */
-		return get_transient( \PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE ) === $nonce;
+		$expected = get_transient( \PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE );
+
+		if ( ! is_string( $expected ) || '' === $expected ) {
+			return false;
+		}
+
+		$state = $request->get_param( 'state' );
+
+		return is_string( $state ) && hash_equals( $expected, $state );
 	}
 
 
@@ -86,6 +92,9 @@ class Auth extends VendorAPI {
 	 * @param WP_REST_Request $request The request.
 	 */
 	public function connect_callback( WP_REST_Request $request ) {
+
+		// The state is single use: a new one is issued each time the connect flow starts.
+		delete_transient( \PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE );
 
 		$error      = $request->has_param( 'error' ) ? sanitize_text_field( $request->get_param( 'error' ) ) : '';
 		$token_data = $request->get_param( 'token_data' );
