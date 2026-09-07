@@ -71,12 +71,18 @@ document.addEventListener( 'DOMContentLoaded', function () {
 						pinLink.setAttribute( 'role', 'button' );
 						pinLink.setAttribute( 'tabindex', '0' );
 
-						// Remove the screen reader text from wrapper tag.
-						wrapper.removeChild( srSpan );
-					} else {
-						// Move the screen reader text inside the processed <a> tag.
-						pinLink.appendChild( srSpan );
+						// The bookmarklet opens an in-page dialog, so the
+						// "opens in a new window" hint no longer applies.
+						const newWindowHint = srSpan.querySelector(
+							'.pinterest-for-woocommerce-new-window-hint'
+						);
+						if ( newWindowHint ) {
+							srSpan.removeChild( newWindowHint );
+						}
 					}
+
+					// Move the screen reader text inside the srSpan.
+					pinLink.appendChild( srSpan );
 
 					// Mark as processed so it only runs once.
 					wrapper.dataset.srLabeled = 'true';
