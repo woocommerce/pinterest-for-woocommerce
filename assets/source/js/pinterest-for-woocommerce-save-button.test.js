@@ -21,11 +21,11 @@ function unbuiltWrapper( label ) {
  * Markup rendered server side for a product with a featured image, where the
  * screen reader label carries the "opens in a new window" hint.
  *
- * @param {string} name Product name.
+ * @param {string} label Screen reader label.
  * @return {string} Wrapper markup with an unbuilt Pinterest placeholder.
  */
-function unbuiltWrapperWithHint( name ) {
-	return `<div class="pinterest-for-woocommerce-image-wrapper"><span class="screen-reader-text">${ name }<span class="pinterest-for-woocommerce-new-window-hint"> (opens in a new window)</span></span><a data-pin-do="buttonPin" href="https://www.pinterest.com/pin/create/button/"></a></div>`;
+function unbuiltWrapperWithHint( label ) {
+	return `<div class="pinterest-for-woocommerce-image-wrapper"><span class="screen-reader-text">${ label }<span class="pinterest-for-woocommerce-new-window-hint"> (opens in a new window)</span></span><a data-pin-do="buttonPin" href="https://www.pinterest.com/pin/create/button/"></a></div>`;
 }
 
 /**
@@ -232,7 +232,7 @@ describe( 'Save to Pinterest button', () => {
 		expect( pinLink.getAttribute( 'aria-haspopup' ) ).toBeNull();
 	} );
 
-	it( 'makes the bookmarklet control keyboard operable on products with no image', async () => {
+	it( 'makes the bookmarklet control keyboard operable', async () => {
 		const grid = document.createElement( 'div' );
 		grid.innerHTML = unbuiltWrapperWithHint( 'Hoodie to Pinterest' );
 		document.body.appendChild( grid );
