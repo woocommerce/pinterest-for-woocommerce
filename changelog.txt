@@ -1,5 +1,28 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.5.0 - 2026-09-09 =
+* Add - Include external and Pinterest click identifiers in Tag and Conversions API events to improve event matching and attribution.
+* Bump squizlabs/php_codesniffer from 3.13.5 to 3.13.6.
+* Bump wp-coding-standards/wpcs from 3.3.0 to 3.4.1.
+* Dev - Add test coverage for the Save button bookmarklet keyboard path.
+* Dev - Pin GitHub Actions and their nested dependencies to immutable commit SHAs.
+* Fix - Accessibility: Added `aria-haspopup="dialog"` attribute to the Pinterest image button to properly announce to screen reader users that activating the button opens a modal window.
+* Fix - Add accessible screen reader label to the Save to Pinterest button.
+* Fix - Do not let pending actions from a superseded feed generation cycle block a new cycle from starting.
+* Fix - Fix PageVisit tracking on full-page cache hits.
+* Fix - Fixed AEM configuration for auto-created tags.
+* Fix - Fixed scheduled sale pricing in product feeds.
+* Fix - Make the Pinterest Save button keyboard-accessible on products with no featured image.
+* Fix - Make the Pinterest Save button reachable and usable with keyboard navigation by removing `visibility: hidden` from the image wrapper on shop and product page.
+* Fix - Prevent overlapping feed generation runs from corrupting the product feed.
+* Fix - Save button does not render after pagination or filtering.
+* Fix - Send failed Pinterest OAuth callbacks back to the settings page instead of showing a raw REST error.
+* Fix - Stale feed cleanup no longer deletes manually configured Pinterest catalog data sources hosted on the store domain.
+* None — workflow-only configuration.
+* Tweak - Tidy up the Pinterest OAuth callback state handling.
+* Tweak - WP 7.1 compatibility.
+* ci: add job-level timeout-minutes to workflow jobs.
+
 = 1.4.28 - 2026-08-14 =
 * Tweak - WC 11.1 compatibility.
 
