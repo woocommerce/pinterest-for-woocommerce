@@ -144,6 +144,38 @@ class AuthTest extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Tests a rejected request is sent back to the settings page rather than served as a raw error.
+	 *
+	 * @return void
+	 */
+	public function test_callback_rejection_redirects_to_settings_page() {
+		rest_get_server()->dispatch( $this->request( 'not-issued' ) );
+
+		$this->assertSame( 10, has_filter( 'rest_pre_serve_request', array( $this->auth(), 'redirect_to_settings_page' ) ) );
+	}
+
+	/**
+	 * Tests an accepted request is served normally with no redirect hooked.
+	 *
+	 * @return void
+	 */
+	public function test_callback_acceptance_does_not_hook_redirect() {
+		$this->issue_state();
+
+		$this->assertTrue( $this->dispatch_until_redirect( $this->request( 'issued-state' ) ) );
+		$this->assertFalse( has_filter( 'rest_pre_serve_request', array( $this->auth(), 'redirect_to_settings_page' ) ) );
+	}
+
+	/**
+	 * Returns the Auth controller instance registered for the callback route.
+	 *
+	 * @return object
+	 */
+	private function auth() {
+		return rest_get_server()->get_routes()[ self::ROUTE ][0]['permission_callback'][0];
+	}
+
+	/**
 	 * Builds a callback request, optionally carrying a state parameter.
 	 *
 	 * @param string|null $state The state parameter, or null to omit it.

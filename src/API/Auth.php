@@ -52,14 +52,16 @@ class Auth extends VendorAPI {
 		 * Fail closed when no state has been issued, and only accept a string that matches it exactly.
 		 */
 		$expected = get_transient( \PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE );
+		$state    = $request->get_param( 'state' );
 
-		if ( ! is_string( $expected ) || '' === $expected ) {
-			return false;
+		if ( is_string( $expected ) && '' !== $expected && is_string( $state ) && hash_equals( $expected, $state ) ) {
+			return true;
 		}
 
-		$state = $request->get_param( 'state' );
+		// Send the merchant back to the settings page instead of serving a raw REST error.
+		add_filter( 'rest_pre_serve_request', array( $this, 'redirect_to_settings_page' ), 10, 3 );
 
-		return is_string( $state ) && hash_equals( $expected, $state );
+		return false;
 	}
 
 
