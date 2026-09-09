@@ -54,12 +54,27 @@ class Auth extends VendorAPI {
 		$expected = get_transient( \PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE );
 
 		if ( ! is_string( $expected ) || '' === $expected ) {
-			return false;
+			return $this->reject();
 		}
 
 		$state = $request->get_param( 'state' );
 
-		return is_string( $state ) && hash_equals( $expected, $state );
+		if ( ! is_string( $state ) || ! hash_equals( $expected, $state ) ) {
+			return $this->reject();
+		}
+
+		return true;
+	}
+
+	/**
+	 * Rejects the request, sending the merchant back to the settings page instead of a raw REST error.
+	 *
+	 * @return bool Always false.
+	 */
+	private function reject(): bool {
+		add_filter( 'rest_pre_serve_request', array( $this, 'redirect_to_settings_page' ), 10, 3 );
+
+		return false;
 	}
 
 
