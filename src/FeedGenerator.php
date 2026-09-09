@@ -391,7 +391,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Enforces at most one active generation cycle: defers (marking the feed dirty) while the current
 	 * cycle is alive, otherwise mints a new cycle ID that propagates through the whole new chain.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.0
 	 *
 	 * @param array $args The args for the job.
 	 *
@@ -468,7 +468,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * A chain end from a superseded cycle must not publish (rename) the temporary file that now
 	 * belongs to the newer cycle, nor mark the feed as generated.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.0
 	 *
 	 * @param array $args The args for the job.
 	 *
@@ -953,7 +953,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Read directly from the database: a long-lived Action Scheduler request must see a supersession
 	 * committed by a concurrent request, which its request-local options caches would hide.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.0
 	 *
 	 * @return string Current cycle ID, or an empty string if no cycle has been started yet.
 	 */
@@ -968,7 +968,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Args without a cycle ID are current as long as no cycle ID has ever been minted, which keeps
 	 * chains scheduled by previous plugin versions running across an upgrade.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.0
 	 *
 	 * @param array $args The args for the job.
 	 *
@@ -982,7 +982,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Acquire the atomic lock that serializes generation-cycle starts.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.0
 	 *
 	 * @return string Lock value owned by this request, or an empty string when another request owns it.
 	 */
@@ -1032,7 +1032,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Release a generation-cycle start lock only when this request still owns it.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.0
 	 *
 	 * @param string $lock_value Lock value returned by acquire_start_lock().
 	 * @return void
@@ -1052,7 +1052,7 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Read an option directly from the database, bypassing request and persistent caches.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.0
 	 *
 	 * @param string $option_name Option name.
 	 * @return string|null Stored option value, or null when the option does not exist.
@@ -1077,7 +1077,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * batch or end actions. Unlike the framework's is_running(), a leftover action from
 	 * a superseded cycle does not count.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.0
 	 *
 	 * @return bool
 	 */
@@ -1097,7 +1097,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Alive means a pending or in-progress chain batch/end action carries the current cycle ID.
 	 * Queued chain starts never carry an ID — they are gated by this same check when they run.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.0
 	 *
 	 * @return bool
 	 */
