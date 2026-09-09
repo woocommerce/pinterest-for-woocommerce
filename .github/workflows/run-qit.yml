@@ -78,6 +78,7 @@ jobs:
 
         name: Run QIT Tests
         runs-on: ubuntu-latest
+        timeout-minutes: 35
         steps:
 
           - name: Install QIT via composer

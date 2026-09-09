@@ -2,9 +2,9 @@
 Contributors: automattic, pinterest, woocommerce
 Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
 Requires at least: 5.6
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.4.28
+Stable tag: 1.5.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -90,6 +90,23 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.5.0 - 2026-09-09 =
+* Add - Include external and Pinterest click identifiers in Tag and Conversions API events to improve event matching and attribution.
+* Fix - Accessibility: Added `aria-haspopup="dialog"` attribute to the Pinterest image button to properly announce to screen reader users that activating the button opens a modal window.
+* Fix - Add accessible screen reader label to the Save to Pinterest button.
+* Fix - Do not let pending actions from a superseded feed generation cycle block a new cycle from starting.
+* Fix - Fix PageVisit tracking on full-page cache hits.
+* Fix - Fixed AEM configuration for auto-created tags.
+* Fix - Fixed scheduled sale pricing in product feeds.
+* Fix - Make the Pinterest Save button keyboard-accessible on products with no featured image.
+* Fix - Make the Pinterest Save button reachable and usable with keyboard navigation by removing `visibility: hidden` from the image wrapper on shop and product page.
+* Fix - Prevent overlapping feed generation runs from corrupting the product feed.
+* Fix - Save button does not render after pagination or filtering.
+* Fix - Send failed Pinterest OAuth callbacks back to the settings page instead of showing a raw REST error.
+* Fix - Stale feed cleanup no longer deletes manually configured Pinterest catalog data sources hosted on the store domain.
+* Tweak - Tidy up the Pinterest OAuth callback state handling.
+* Tweak - WP 7.1 compatibility.
 
 = 1.4.28 - 2026-08-14 =
 * Tweak - WC 11.1 compatibility.

@@ -66,9 +66,21 @@ class SaveToPinterest {
 	 */
 	public static function render_pin( $post_id, $post_thumbnail_id = '' ) {
 
+		$product_name = get_the_title( $post_id );
+
+		/* translators: %s: product name */
+		$screen_reader_text = esc_html( sprintf( __( '%s to Pinterest', 'pinterest-for-woocommerce' ), $product_name ) );
+
+		$product = wc_get_product( $post_id );
+		if ( $product && $product->get_image_id() ) {
+			$screen_reader_text .= '<span class="pinterest-for-woocommerce-new-window-hint"> '
+				. esc_html__( '(opens in a new window)', 'pinterest-for-woocommerce' )
+				. '</span>';
+		}
+
 		$attributes = array(
-			'description' => esc_html( get_the_title() ),
-			'url'         => esc_url( get_the_permalink() ),
+			'description' => esc_html( $product_name ),
+			'url'         => esc_url( get_the_permalink( $post_id ) ),
 		);
 
 		$post_thumbnail_id = empty( $post_thumbnail_id ) ? get_post_thumbnail_id( $post_id ) : $post_thumbnail_id;
@@ -85,7 +97,8 @@ class SaveToPinterest {
 		 * Image used is the one explicitly set in the media attribute.
 		 */
 		return sprintf(
-			'<div class="pinterest-for-woocommerce-image-wrapper"><a data-pin-do="buttonPin" href="%s"></a></div>',
+			'<div class="pinterest-for-woocommerce-image-wrapper"><span class="screen-reader-text">%s</span><a data-pin-do="buttonPin" href="%s"></a></div>',
+			$screen_reader_text,
 			esc_url(
 				add_query_arg(
 					$attributes,

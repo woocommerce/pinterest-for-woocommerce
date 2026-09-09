@@ -89,8 +89,9 @@ class Tracking {
 			return;
 		}
 
-		// Dumy data for when we can't get product data.
-		$data = new None( uniqid( 'page' ) );
+		// The PageVisit event ID is generated in the browser so full-page caches
+		// cannot reuse a PHP-generated ID across multiple visitors.
+		$data = new None( '' );
 
 		// Not a product page.
 		if ( ! is_product() ) {
@@ -105,7 +106,7 @@ class Tracking {
 		}
 
 		$data = new Product(
-			uniqid( 'page' ),
+			'',
 			$product->get_id(),
 			$product->get_name(),
 			wc_get_product_category_list( $product->get_id() ),
@@ -264,6 +265,12 @@ class Tracking {
 			// Skip server-side CAPI dispatch for crawler requests so bot
 			// traffic does not inflate CAPI counts vs Tag counts.
 			if ( $is_crawler && $tracker instanceof Conversions ) {
+				continue;
+			}
+
+			// PageVisit CAPI events are dispatched by the browser beacon so they
+			// also run when the page HTML is served from a full-page cache.
+			if ( static::EVENT_PAGE_VISIT === $event_name && $tracker instanceof Conversions ) {
 				continue;
 			}
 
