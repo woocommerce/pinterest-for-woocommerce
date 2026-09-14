@@ -70,23 +70,23 @@
         },
         {
             "name": "automattic/jetpack-device-detection",
-            "version": "v3.4.2",
+            "version": "v3.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-device-detection.git",
-                "reference": "b4b4c7b18c4e377f676458a5af11a1a8757dc1f4"
+                "reference": "771ab993388ea1726c138abeaba8b43912993ae8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-device-detection/zipball/b4b4c7b18c4e377f676458a5af11a1a8757dc1f4",
-                "reference": "b4b4c7b18c4e377f676458a5af11a1a8757dc1f4",
+                "url": "https://api.github.com/repos/Automattic/jetpack-device-detection/zipball/771ab993388ea1726c138abeaba8b43912993ae8",
+                "reference": "771ab993388ea1726c138abeaba8b43912993ae8",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2"
             },
             "require-dev": {
-                "automattic/phpunit-select-config": "^1.0.6",
+                "automattic/phpunit-select-config": "^1.0.9",
                 "yoast/phpunit-polyfills": "^4.0.0"
             },
             "suggest": {
@@ -114,9 +114,9 @@
             ],
             "description": "A way to detect device types based on User-Agent header.",
             "support": {
-                "source": "https://github.com/Automattic/jetpack-device-detection/tree/v3.4.2"
+                "source": "https://github.com/Automattic/jetpack-device-detection/tree/v3.4.6"
             },
-            "time": "2026-05-19T09:16:56+00:00"
+            "time": "2026-08-25T12:14:34+00:00"
         },
         {
             "name": "defuse/php-encryption",
