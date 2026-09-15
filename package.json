@@ -40,7 +40,7 @@
     "@wordpress/env": "^5.16.0",
     "@wordpress/scripts": "^35.0.0",
     "@wordpress/stylelint-config": "^19.1.0",
-    "browser-sync": "^2.26.3",
+    "browser-sync": "^3.0.4",
     "eslint": "^10.10.0",
     "github-label-sync": "^2.0.2",
     "gulp": "^4.0.0",
