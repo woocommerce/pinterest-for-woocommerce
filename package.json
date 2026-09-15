@@ -181,6 +181,7 @@
     "@woocommerce/number@^2.0.0": "^2.6.0",
     "@wp-g2/create-styles": {
       "rtlcss": "^4.3.0"
-    }
+    },
+    "uuid@>=7 <9": "^11.1.1"
   }
 }
