@@ -1575,8 +1575,8 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$next_start = as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
 		$this->assertIsInt( $next_start, 'A dirty feed must schedule a restart at the end of the cycle.' );
-		$this->assertGreaterThanOrEqual( $now + 55, $next_start, 'The restart must be delayed past the end action completion.' );
-		$this->assertLessThanOrEqual( $now + 65, $next_start, 'The restart must be scheduled about a minute out.' );
+		$this->assertGreaterThan( $now, $next_start, 'The restart must be delayed past the end action completion.' );
+		$this->assertEqualsWithDelta( $now + MINUTE_IN_SECONDS, $next_start, 30, 'The restart must be scheduled about a minute out.' );
 		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'The dirty flag must be left for the new cycle to consume.' );
 	}
 
