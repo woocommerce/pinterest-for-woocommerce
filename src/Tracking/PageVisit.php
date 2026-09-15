@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
@@ -82,6 +83,7 @@ class PageVisit {
 	 */
 	public static function handle_request() {
 		if ( ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' ) || ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' ) ) {
+			static::reject( 'conversion tracking or the Conversions API is disabled' );
 			return;
 		}
 
@@ -102,10 +104,12 @@ class PageVisit {
 		 * @param bool $disable_tracking Whether to disable tracking based on consent conditions.
 		 */
 		if ( apply_filters( 'woocommerce_pinterest_disable_tracking', $is_tracking_disabled_user_consent ) ) {
+			static::reject( 'tracking is disabled by consent or filter' );
 			return;
 		}
 
 		if ( CrawlerDetector::is_crawler_request() ) {
+			static::reject( 'the request comes from a crawler' );
 			return;
 		}
 
@@ -114,17 +118,20 @@ class PageVisit {
 		$source_url_raw = $_POST['event_source_url'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
 
 		if ( ! is_string( $event_id_raw ) || ! is_string( $source_url_raw ) ) {
+			static::reject( 'event_id or event_source_url is not a string' );
 			return;
 		}
 
 		$event_id = sanitize_text_field( wp_unslash( $event_id_raw ) );
 		if ( ! preg_match( '/^page_[A-Za-z0-9_-]{10,100}$/', $event_id ) ) {
+			static::reject( 'event_id is malformed' );
 			return;
 		}
 
 		$source_url = esc_url_raw( wp_unslash( $source_url_raw ) );
 		$source_url = static::validate_source_url( $source_url );
 		if ( ! $source_url ) {
+			static::reject( 'event_source_url is not an absolute URL on this site' );
 			return;
 		}
 
@@ -142,7 +149,24 @@ class PageVisit {
 	}
 
 	/**
-	 * Validates that an event source URL belongs to this site.
+	 * Logs why a beacon was dropped.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param string $reason Human readable rejection reason.
+	 *
+	 * @return void
+	 */
+	private static function reject( string $reason ) {
+		Logger::log( 'PageVisit beacon rejected: ' . $reason . '.', 'debug', 'conversions' );
+	}
+
+	/**
+	 * Validates that an event source URL is an absolute http(s) URL on this site.
+	 *
+	 * Protocol-relative URLs, URLs carrying user info and over-long URLs are rejected.
+	 *
+	 * @since 1.5.1 Requires an http(s) scheme, no user info and at most 2048 characters.
 	 *
 	 * @param string $source_url Untrusted event source URL.
 	 *
@@ -150,10 +174,16 @@ class PageVisit {
 	 */
 	private static function validate_source_url( string $source_url ) {
 		$source_url  = esc_url_raw( $source_url, array( 'http', 'https' ) );
-		$source_host = wp_parse_url( $source_url, PHP_URL_HOST );
+		$parts       = (array) wp_parse_url( $source_url );
+		$source_host = $parts['host'] ?? '';
 		$home_host   = wp_parse_url( home_url(), PHP_URL_HOST );
 
-		if ( ! $source_host || ! $home_host || strtolower( $source_host ) !== strtolower( $home_host ) ) {
+		if (
+			strlen( $source_url ) > 2048
+			|| ! in_array( $parts['scheme'] ?? '', array( 'http', 'https' ), true )
+			|| isset( $parts['user'] )
+			|| ! $source_host || ! $home_host || strtolower( $source_host ) !== strtolower( $home_host )
+		) {
 			return '';
 		}
 
