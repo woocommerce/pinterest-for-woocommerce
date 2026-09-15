@@ -171,7 +171,6 @@
     "@babel/runtime@^7.0.0": "^7.26.10",
     "@babel/runtime-corejs2@^7.0.0": "^7.26.10",
     "moment@^2.0.0": "^2.29.4",
-    "locutus@^2.0.0": "^2.0.39",
     "lodash": "$lodash",
     "form-data@^2.0.0": "^2.5.6",
     "@wordpress/scripts": {
@@ -179,6 +178,7 @@
     },
     "copy-webpack-plugin": {
       "serialize-javascript": "^7.0.3"
-    }
+    },
+    "@woocommerce/number@^2.0.0": "^2.6.0"
   }
 }
