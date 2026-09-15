@@ -31,8 +31,8 @@ Pinterest for WooCommerce is an official WordPress plugin that integrates WooCom
 - **Build System:** @wordpress/scripts with webpack
 - **UI Framework:** @woocommerce/components, @wordpress/components
 - **State Management:** @wordpress/data
-- **Node:** 14.16 (pinned via `.nvmrc`)
-- **npm:** 6.14.10 to <7
+- **Node:** 24.18 (pinned via `.nvmrc`)
+- **npm:** 11
 
 ### Development Environment
 - **Build Tools:** Gulp (legacy), webpack (modern)
@@ -331,7 +331,7 @@ When creating PRs:
 | Commit `.env` files or credentials | Security risk |
 | Use `--no-verify` or `--no-gpg-sign` | Preserve hooks and configured signing |
 | Claim unrun or skipped checks passed | Report the actual validation |
-| Use Node versions outside 12.20.1 to <15 | Check with `nvm use` |
+| Use Node versions outside the package engine range | Check with `nvm use` |
 
 ### CRITICAL - ALWAYS Do These Things
 
@@ -407,7 +407,7 @@ npm start  # recompile
 
 Read platform requirements from the plugin header and use `nvm use` with `.nvmrc`. Keep these repository-specific workflows when applying shared extension standards; changes to the toolchain or release process need their own scope:
 
-- Node 14/npm 6, webpack, and Gulp remain the current build toolchain. A coordinated upgrade needs its own dependency and build validation.
+- Node 24/npm 11, webpack, and Gulp form the build toolchain. `legacy-peer-deps` preserves the previous npm 6 peer dependency selection; runtime WordPress and React requirements remain unchanged.
 - PSR-4 code in `src/` coexists with WordPress-style classes in `includes/`.
 - The PR template collects changelog text. This repo has no Changelogger command or `changelog/` change files; do not import that workflow from other extensions.
 - Feature PRs target `develop`, but `.github/workflows/prepare-release.yml` configures `trunk` as its main branch and `ci-merge.yml` targets `trunk`. Reconcile release automation separately; those settings do not change the approved feature base.
