@@ -155,9 +155,19 @@ class ConversionsTest extends WP_UnitTestCase {
 			'pre_http_request',
 			function () {
 				return array(
-					'headers'  => array( 'content-type' => 'application/json' ),
-					'body'     => json_encode( array( 'code' => 2, 'message' => 'Advertiser not found.' ) ),
-					'response' => array( 'code' => 404, 'message' => 'Not Found' ),
+					'headers'  => array(
+						'content-type' => 'application/json',
+					),
+					'body'     => json_encode(
+						array(
+							'code'    => 2,
+							'message' => 'Advertiser not found.',
+						)
+					),
+					'response' => array(
+						'code'    => 404,
+						'message' => 'Not Found',
+					),
 					'cookies'  => array(),
 					'filename' => '',
 				);
