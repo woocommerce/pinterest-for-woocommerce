@@ -391,6 +391,7 @@ class Conversions extends Tracker {
 	private function send_request( string $event_name, array $data ) {
 		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 		if ( empty( $ad_account_id ) ) {
+			Logger::log( 'Skipping Pinterest Conversions API event ' . $event_name . ': no ad account (tracking_advertiser) is configured.', 'debug', 'conversions' );
 			return;
 		}
 
