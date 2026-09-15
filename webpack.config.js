@@ -25,6 +25,7 @@ const ourPlugins = [
 
 const webpackConfig = {
 	...defaultConfig,
+	target: 'web',
 	plugins: ourPlugins,
 	entry: {
 		'setup-guide': __dirname + '/assets/source/setup-guide/index.js',
