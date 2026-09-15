@@ -180,7 +180,7 @@ class PageVisit {
 
 		if (
 			strlen( $source_url ) > 2048
-			|| ! in_array( $parts['scheme'] ?? '', array( 'http', 'https' ), true )
+			|| ! in_array( strtolower( $parts['scheme'] ?? '' ), array( 'http', 'https' ), true )
 			|| isset( $parts['user'] )
 			|| ! $source_host || ! $home_host || strtolower( $source_host ) !== strtolower( $home_host )
 		) {
