@@ -115,11 +115,9 @@ class Tracking {
 			);
 		}
 
-		$this->track_event( static::EVENT_PAGE_VISIT, $data );
-
 		$this->page_visit = array(
 			$data,
-			! CrawlerDetector::is_crawler_request() && $this->has_tracker( Conversions::class ),
+			$this->track_event( static::EVENT_PAGE_VISIT, $data ),
 			$this->has_tracker( Tag::class ) && (bool) Tag::get_active_tag(),
 		);
 	}
@@ -272,10 +270,11 @@ class Tracking {
 	 * @param string $event_name Tracking event name.
 	 * @param Data   $data       Event Data object.
 	 *
-	 * @return void
+	 * @return bool True when a Conversions tracker dispatched the event to the API.
 	 */
 	public function track_event( string $event_name, Data $data ) {
 		$is_crawler = CrawlerDetector::is_crawler_request();
+		$sent       = false;
 
 		foreach ( $this->get_trackers() as $tracker ) {
 			// Skip Pinterest tag tracking if tag is not active.
@@ -296,7 +295,8 @@ class Tracking {
 			}
 
 			try {
-				$tracker->track_event( $event_name, $data );
+				$result = $tracker->track_event( $event_name, $data );
+				$sent   = $sent || ( $tracker instanceof Conversions && true === $result );
 			} catch ( Throwable $e ) {
 				/* translators: %1$s - event name, %2$s - tracker class name, %3$s - error message */
 				$message = sprintf(
@@ -308,6 +308,8 @@ class Tracking {
 				Logger::log( $message, 'error' );
 			}
 		}
+
+		return $sent;
 	}
 
 	/**

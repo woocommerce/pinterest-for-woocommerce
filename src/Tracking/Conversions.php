@@ -64,13 +64,13 @@ class Conversions extends Tracker {
 	 *
 	 * @throws Throwable In case of an API error.
 	 *
-	 * @return void
+	 * @return bool True when the event was dispatched to the API.
 	 */
 	public function track_event( string $event_name, Data $data ) {
 		$data = $this->prepare_request_data( $event_name, $data );
 
 		try {
-			$this->send_request( $event_name, $data );
+			$sent = $this->send_request( $event_name, $data );
 
 			/* translators: 1: Conversions API event name, 2: JSON encoded event data. */
 			$messages = sprintf(
@@ -92,6 +92,8 @@ class Conversions extends Tracker {
 
 			throw $e;
 		}
+
+		return $sent;
 	}
 
 	/**
@@ -386,13 +388,13 @@ class Conversions extends Tracker {
 	 * @param array  $data       Event data.
 	 *
 	 * @throws Throwable|Exception If any exception during the request happen.|If response was not successful enough.
-	 * @return void
+	 * @return bool True when the event was dispatched, false when no ad account is configured.
 	 */
 	private function send_request( string $event_name, array $data ) {
 		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 		if ( empty( $ad_account_id ) ) {
 			Logger::log( 'Skipping Pinterest Conversions API event ' . $event_name . ': no ad account (tracking_advertiser) is configured.', 'debug', 'conversions' );
-			return;
+			return false;
 		}
 
 		$response = APIV5::send_conversions_api_event( $ad_account_id, $data );
@@ -424,5 +426,7 @@ class Conversions extends Tracker {
 				);
 			}
 		}
+
+		return true;
 	}
 }

@@ -276,6 +276,32 @@ class TrackingTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Without an ad account the Conversions tracker cannot send, so the HTML
+	 * must not claim a server send or the browser would skip the beacon.
+	 */
+	public function test_page_visit_without_advertiser_marks_render_as_not_sent() {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_tag'           => '',
+				'track_conversions'      => true,
+				'track_conversions_capi' => true,
+				'tracking_advertiser'    => '',
+			)
+		);
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0';
+
+		$tracking = new Tracking( array( new Tag(), new Conversions( new User( '127.0.0.1', 'test-agent' ) ) ) );
+
+		ob_start();
+		$tracking->handle_page_visit();
+		$tracking->print_page_visit_script();
+		$output = ob_get_clean();
+
+		$this->assertStringContainsString( 'serverSent=0;', $output );
+		$this->assertStringContainsString( PageVisit::AJAX_ACTION, $output );
+	}
+
+	/**
 	 * Renders wp_footer for a human visitor with CAPI enabled and returns the
 	 * event ID sent to the Conversions API.
 	 *
