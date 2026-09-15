@@ -121,6 +121,33 @@ class PageVisitTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The standalone beacon generates the event ID in the browser and never calls pintrk.
+	 */
+	public function test_print_beacon_script_omits_pintrk() {
+		ob_start();
+		PageVisit::print_beacon_script();
+		$code = ob_get_clean();
+
+		$this->assertStringStartsWith( '<script>(function(){var eventId="page_"+', $code );
+		$this->assertStringEndsWith( '}());</script>', $code );
+		$this->assertStringContainsString( 'requestData.append("action","' . PageVisit::AJAX_ACTION . '")', $code );
+		$this->assertStringContainsString( 'sendBeacon', $code );
+		$this->assertStringNotContainsString( 'pintrk', $code );
+	}
+
+	/**
+	 * The standalone beacon prints nothing when the Conversions API is disabled.
+	 */
+	public function test_print_beacon_script_prints_nothing_when_capi_is_disabled() {
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions_capi', false );
+
+		ob_start();
+		PageVisit::print_beacon_script();
+
+		$this->assertSame( '', ob_get_clean() );
+	}
+
+	/**
 	 * A nonce-free beacon sends one matching PageVisit event to CAPI.
 	 */
 	public function test_beacon_dispatches_page_visit_without_nonce() {

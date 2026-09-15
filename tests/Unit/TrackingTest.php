@@ -7,6 +7,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
+use Automattic\WooCommerce\Pinterest\Tracking\PageVisit;
 use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Automattic\WooCommerce\Pinterest\Tracking\Tracker;
 use Pinterest_For_Woocommerce;
@@ -214,6 +215,81 @@ class TrackingTest extends \WP_UnitTestCase {
 			->method( 'track_event' );
 
 		$tracking->track_event( Tracking::EVENT_PAGE_VISIT, $data );
+	}
+
+	/**
+	 * Without an active Tag the Tag tracker is skipped, so the CAPI beacon is
+	 * printed by the page visit handler itself, once and without a pintrk call.
+	 */
+	public function test_page_visit_prints_beacon_when_tag_inactive_and_capi_enabled() {
+		$output = $this->render_footer( '', true );
+
+		$this->assertSame( 1, substr_count( $output, PageVisit::AJAX_ACTION ) );
+		$this->assertSame( 1, substr_count( $output, 'var eventId="page_"+' ) );
+		$this->assertStringNotContainsString( 'pintrk("track"', $output );
+	}
+
+	/**
+	 * Without a Tag and without the Conversions API there is nothing to print.
+	 */
+	public function test_page_visit_prints_nothing_when_tag_inactive_and_capi_disabled() {
+		$output = $this->render_footer( '', false );
+
+		$this->assertStringNotContainsString( PageVisit::AJAX_ACTION, $output );
+		$this->assertStringNotContainsString( 'var eventId=', $output );
+	}
+
+	/**
+	 * With an active Tag the beacon is printed once, inside the Tag event code.
+	 */
+	public function test_page_visit_beacon_printed_once_when_tag_active() {
+		$output = $this->render_footer( 'WD7AFW51GS', true );
+
+		$this->assertSame( 1, substr_count( $output, PageVisit::AJAX_ACTION ) );
+		$this->assertStringContainsString( 'pintrk("track","PageVisit",eventData);var requestData=new FormData();', $output );
+	}
+
+	/**
+	 * Renders wp_footer for a human visitor and returns the captured output.
+	 *
+	 * @param string $tracking_tag Tag ID setting, empty for no active Tag.
+	 * @param bool   $capi         Whether the Conversions API is enabled.
+	 *
+	 * @return string
+	 */
+	private function render_footer( string $tracking_tag, bool $capi ) {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_tag'           => $tracking_tag,
+				'track_conversions'      => true,
+				'track_conversions_capi' => $capi,
+				'tracking_advertiser'    => 'PFW-123456789',
+			)
+		);
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0';
+
+		// Tag events are collected in a static list that survives across tests.
+		$events = new \ReflectionProperty( Tag::class, 'events' );
+		$events->setAccessible( true );
+		$events->setValue( array() );
+
+		$tracking = new Tracking( array( new Tag() ) );
+		if ( $capi ) {
+			$tracking->add_tracker( new Conversions( new User( '127.0.0.1', 'test-agent' ) ) );
+		}
+
+		// Core hooks a deprecated function on wp_footer which the test case would report.
+		remove_action( 'wp_footer', 'the_block_template_skip_link' );
+
+		ob_start();
+		/**
+		 * Renders the storefront footer, where the trackers print their output.
+		 *
+		 * @since 1.5.1
+		 */
+		do_action( 'wp_footer' );
+
+		return ob_get_clean();
 	}
 
 	/**
