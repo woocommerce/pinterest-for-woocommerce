@@ -353,6 +353,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 */
 	private function start_generation() {
 		if ( $this->is_generation_active() ) {
+			self::log( __( 'Feed generation is already active. Skipping the start.', 'pinterest-for-woocommerce' ) );
 			return;
 		}
 
@@ -389,7 +390,8 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Handles the job chain start action.
 	 *
 	 * Enforces at most one active generation cycle: defers (marking the feed dirty) while the current
-	 * cycle is alive, otherwise mints a new cycle ID that propagates through the whole new chain.
+	 * cycle is alive, otherwise mints a new cycle ID, consumes the dirty flag and propagates the ID
+	 * through the whole new chain.
 	 *
 	 * @since 1.5.0
 	 *
@@ -416,6 +418,9 @@ class FeedGenerator extends AbstractChainedJob {
 			// any still-scheduled action from an older cycle self-terminates.
 			$cycle_id = wp_generate_uuid4();
 			update_option( self::OPTION_CYCLE_ID, $cycle_id, false );
+			// The new cycle reads every product from here on, so the changes flagged so far are
+			// covered. Later edits set the flag again and handle_end() starts a follow-up cycle.
+			$this->mark_feed_clean();
 			$args[ self::ARG_CYCLE_ID ] = $cycle_id;
 
 			/* translators: feed generation cycle ID */
@@ -509,9 +514,11 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 		self::log( __( 'Feed generated successfully.', 'pinterest-for-woocommerce' ) );
 
-		// Check if feed is dirty and reschedule in necessary.
+		// A change flagged during this cycle needs a fresh cycle. The flag is consumed when
+		// that cycle starts, so a restart deferred by the gate in start_generation() (this end
+		// action is still in progress while the restart runs) leaves it set for the next
+		// product save or the daily start.
 		if ( $this->feed_is_dirty() ) {
-			$this->mark_feed_clean();
 			$this->schedule_next_generator_start( time() );
 		}
 	}
