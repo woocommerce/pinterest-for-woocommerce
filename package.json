@@ -37,7 +37,7 @@
     "@woocommerce/dependency-extraction-webpack-plugin": "~2.2.0",
     "@woocommerce/eslint-plugin": "^4.0.0",
     "@wordpress/base-styles": "^3.6.0",
-    "@wordpress/env": "^5.16.0",
+    "@wordpress/env": "^11.15.0",
     "@wordpress/scripts": "^35.0.0",
     "@wordpress/stylelint-config": "^19.1.0",
     "browser-sync": "^3.0.4",
@@ -116,7 +116,7 @@
     "test:php": "npm run test:php-prepare -- wordpress_test root root localhost && npm run test:php-run",
     "test:php-prepare": "./bin/install-wp-tests.sh",
     "test:php-run": "composer test-unit",
-    "test:php:wp-env": "wp-env run tests-cli \"bash /var/www/html/wp-content/plugins/pinterest-for-woocommerce/bin/phpunit-wp-env.sh\"",
+    "test:php:wp-env": "wp-env run tests-cli bash /var/www/html/wp-content/plugins/pinterest-for-woocommerce/bin/phpunit-wp-env.sh",
     "wp-env": "wp-env"
   },
   "browserslist": [
