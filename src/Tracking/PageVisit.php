@@ -89,10 +89,19 @@ class PageVisit {
 
 		$beacon_code = '';
 		if ( $capi_enabled ) {
+			$product_fields = '';
+			if ( $data instanceof Product ) {
+				$product_fields = sprintf(
+					'requestData.append("product_id","%1$d");requestData.append("product_token","%2$s");',
+					$data->get_id(),
+					static::get_product_token( (int) $data->get_id() )
+				);
+			}
 			$beacon_code = sprintf(
-				'if(!fresh){var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);var beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}}',
+				'if(!fresh){var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);%3$svar beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}}',
 				wp_json_encode( static::AJAX_ACTION ),
-				wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
+				wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				$product_fields
 			);
 		}
 
@@ -163,7 +172,7 @@ class PageVisit {
 			return;
 		}
 
-		$data    = static::get_event_data( $event_id, url_to_postid( $source_url ) );
+		$data    = static::get_event_data( $event_id, static::get_product_id( $source_url ) );
 		$user    = new User( \WC_Geolocation::get_ip_address(), wc_get_user_agent() );
 		$tracker = new Conversions( $user, $source_url );
 
@@ -173,6 +182,46 @@ class PageVisit {
 			// Conversions::track_event() records the failure for support visibility.
 			return;
 		}
+	}
+
+	/**
+	 * Builds the token that lets the beacon vouch for a server-rendered product ID.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param int $product_id Product ID rendered on the page.
+	 *
+	 * @return string
+	 */
+	private static function get_product_token( int $product_id ) {
+		return hash_hmac( 'sha256', 'pfw_page_visit|' . $product_id, wp_salt() );
+	}
+
+	/**
+	 * Resolves the product ID for a beacon.
+	 *
+	 * The posted product ID is accepted only with a valid token; otherwise the
+	 * source URL is resolved, which fails on many permalink setups and yields 0.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param string $source_url Validated event source URL.
+	 *
+	 * @return int Product ID, or 0 when unknown.
+	 */
+	private static function get_product_id( string $source_url ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
+		$product_id = is_scalar( $_POST['product_id'] ?? null ) ? absint( $_POST['product_id'] ) : 0;
+		$token      = $_POST['product_token'] ?? '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
+
+		if ( $product_id && is_string( $token ) ) {
+			if ( hash_equals( static::get_product_token( $product_id ), $token ) ) {
+				return $product_id;
+			}
+		}
+
+		return url_to_postid( $source_url );
 	}
 
 	/**
