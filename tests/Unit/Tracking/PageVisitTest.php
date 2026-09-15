@@ -315,7 +315,16 @@ class PageVisitTest extends WP_UnitTestCase {
 			'pre_http_request',
 			function () use ( &$requests ) {
 				++$requests;
-				return false;
+				return array(
+					'headers'  => array( 'content-type' => 'application/json' ),
+					'body'     => wp_json_encode( array( 'events' => array( array( 'status' => 'processed' ) ) ) ),
+					'response' => array(
+						'code'    => 200,
+						'message' => 'OK',
+					),
+					'cookies'  => array(),
+					'filename' => '',
+				);
 			}
 		);
 

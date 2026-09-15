@@ -45,6 +45,7 @@ class TrackingTest extends \WP_UnitTestCase {
 		}
 
 		remove_all_filters( 'pinterest_for_woocommerce_is_crawler_request' );
+		$this->reset_tag_events();
 
 		parent::tearDown();
 	}
@@ -240,6 +241,18 @@ class TrackingTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * The standalone beacon is deliberately not crawler-gated: HTML rendered for
+	 * a crawler can be served to humans from a full-page cache, and the handler
+	 * filters on the User-Agent of the beacon request itself.
+	 */
+	public function test_page_visit_beacon_prints_for_crawler_render_when_tag_inactive() {
+		$output = $this->render_footer( '', true, 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' );
+
+		$this->assertSame( 1, substr_count( $output, PageVisit::AJAX_ACTION ) );
+		$this->assertStringNotContainsString( 'pintrk("track"', $output );
+	}
+
+	/**
 	 * With an active Tag the beacon is printed once, inside the Tag event code.
 	 */
 	public function test_page_visit_beacon_printed_once_when_tag_active() {
@@ -250,14 +263,15 @@ class TrackingTest extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Renders wp_footer for a human visitor and returns the captured output.
+	 * Renders wp_footer and returns the captured output.
 	 *
 	 * @param string $tracking_tag Tag ID setting, empty for no active Tag.
 	 * @param bool   $capi         Whether the Conversions API is enabled.
+	 * @param string $user_agent   Visitor User-Agent, a desktop browser by default.
 	 *
 	 * @return string
 	 */
-	private function render_footer( string $tracking_tag, bool $capi ) {
+	private function render_footer( string $tracking_tag, bool $capi, string $user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0' ) {
 		Pinterest_For_Woocommerce::save_settings(
 			array(
 				'tracking_tag'           => $tracking_tag,
@@ -266,12 +280,9 @@ class TrackingTest extends \WP_UnitTestCase {
 				'tracking_advertiser'    => 'PFW-123456789',
 			)
 		);
-		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0';
+		$_SERVER['HTTP_USER_AGENT'] = $user_agent;
 
-		// Tag events are collected in a static list that survives across tests.
-		$events = new \ReflectionProperty( Tag::class, 'events' );
-		$events->setAccessible( true );
-		$events->setValue( array() );
+		$this->reset_tag_events();
 
 		$tracking = new Tracking( array( new Tag() ) );
 		if ( $capi ) {
@@ -288,8 +299,20 @@ class TrackingTest extends \WP_UnitTestCase {
 		 * @since 1.5.1
 		 */
 		do_action( 'wp_footer' );
+		$output = ob_get_clean();
 
-		return ob_get_clean();
+		$this->reset_tag_events();
+
+		return $output;
+	}
+
+	/**
+	 * Empties the static list of Tag events, which would otherwise leak into other tests.
+	 */
+	private function reset_tag_events() {
+		$events = new \ReflectionProperty( Tag::class, 'events' );
+		$events->setAccessible( true );
+		$events->setValue( null, array() );
 	}
 
 	/**
