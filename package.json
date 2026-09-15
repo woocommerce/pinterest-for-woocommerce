@@ -33,13 +33,15 @@
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.0.3",
+    "@typescript-eslint/parser": "^8.70.0",
     "@woocommerce/dependency-extraction-webpack-plugin": "^1.7.0",
-    "@woocommerce/eslint-plugin": "^1.2.0",
+    "@woocommerce/eslint-plugin": "^4.0.0",
     "@wordpress/base-styles": "^3.6.0",
     "@wordpress/env": "^5.16.0",
     "@wordpress/scripts": "^35.0.0",
     "@wordpress/stylelint-config": "^19.1.0",
     "browser-sync": "^2.26.3",
+    "eslint": "^10.10.0",
     "github-label-sync": "^2.0.2",
     "gulp": "^4.0.0",
     "gulp-add-src": "^1.0.0",
@@ -70,12 +72,8 @@
     "semver": "^6.0.0",
     "simple-git": "~3.20.0",
     "stylelint": "^13.13.1",
+    "typescript": "^5.9.3",
     "underscore": "^1.9.1"
-  },
-  "eslintConfig": {
-    "extends": [
-      "plugin:@woocommerce/eslint-plugin/recommended"
-    ]
   },
   "stylelint": {
     "extends": [
