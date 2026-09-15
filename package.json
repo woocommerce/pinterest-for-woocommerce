@@ -39,7 +39,7 @@
     "@wordpress/base-styles": "^3.6.0",
     "@wordpress/env": "^11.15.0",
     "@wordpress/scripts": "^35.0.0",
-    "@wordpress/stylelint-config": "^19.1.0",
+    "@wordpress/stylelint-config": "^25.0.0",
     "browser-sync": "^3.0.4",
     "eslint": "^10.10.0",
     "github-label-sync": "^2.0.2",
@@ -72,6 +72,7 @@
     "semver": "^6.0.0",
     "simple-git": "^3.36.0",
     "stylelint": "^17.15.0",
+    "stylelint-scss": "^7.3.0",
     "typescript": "^5.9.3",
     "underscore": "^1.9.1"
   },
@@ -92,6 +93,15 @@
         "vh",
         "ms",
         "fr"
+      ],
+      "scss/load-no-partial-leading-underscore": null,
+      "value-keyword-case": [
+        "lower",
+        {
+          "ignoreKeywords": [
+            "currentColor"
+          ]
+        }
       ]
     }
   },
@@ -104,8 +114,8 @@
     "dev": "wp-scripts build && gulp build",
     "format:js": "wp-scripts format ./assets/source",
     "i18n": "WP_CLI_PHP_ARGS='-d memory_limit=2048M' ./vendor/bin/wp i18n make-pot ./ i18n/languages/$npm_package_name.pot --slug=$npm_package_name --domain=$npm_package_name --exclude='bin,*.asset.php,assets/source/_maps,assets/setup-*,assets/catalog-sync,assets/build,tests,woo-tracking-jsdoc,index.php,gulpfile.js,jest.config.js'",
-    "lint:css": "wp-scripts lint-style ./assets/source",
-    "lint:css:fix": "wp-scripts lint-style ./assets/source --fix",
+    "lint:css": "wp-scripts lint-style \"./assets/source/**/*.{css,scss}\"",
+    "lint:css:fix": "wp-scripts lint-style \"./assets/source/**/*.{css,scss}\" --fix",
     "lint:js": "wp-scripts lint-js ./assets/source",
     "lint:js:fix": "wp-scripts lint-js ./assets/source --fix",
     "lint:php": "composer run-script phpcs ./",
