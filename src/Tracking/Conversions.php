@@ -240,13 +240,13 @@ class Conversions extends Tracker {
 		$click_id = self::get_click_id_from_url( $event_source_url );
 
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only attribution parameter.
-		if ( false === $click_id && isset( $_GET['epik'] ) ) {
-			$click_id = self::normalize_click_id( sanitize_text_field( wp_unslash( $_GET['epik'] ) ) );
+		if ( false === $click_id && isset( $_GET['epik'] ) && is_string( $_GET['epik'] ) ) {
+			$click_id = self::normalize_click_id( wp_unslash( $_GET['epik'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in normalize_click_id().
 		}
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
-		if ( false === $click_id && isset( $_COOKIE['_epik'] ) ) {
-			$click_id = self::normalize_click_id( sanitize_text_field( wp_unslash( $_COOKIE['_epik'] ) ) );
+		if ( false === $click_id && isset( $_COOKIE['_epik'] ) && is_string( $_COOKIE['_epik'] ) ) {
+			$click_id = self::normalize_click_id( wp_unslash( $_COOKIE['_epik'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in normalize_click_id().
 		}
 
 		$session = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session : false;
@@ -258,27 +258,47 @@ class Conversions extends Tracker {
 			return $click_id;
 		}
 
-		return $session ? self::normalize_click_id( $session->get( self::CLICK_ID_SESSION_KEY ) ) : false;
+		if ( ! $session ) {
+			return false;
+		}
+
+		$stored   = $session->get( self::CLICK_ID_SESSION_KEY );
+		$click_id = self::normalize_click_id( $stored );
+		if ( false === $click_id && null !== $stored ) {
+			// Evict values stored before validation existed so they stop being re-serialized.
+			$session->__unset( self::CLICK_ID_SESSION_KEY );
+		}
+
+		return $click_id;
 	}
 
 	/**
 	 * Normalizes a visitor-supplied click ID.
 	 *
-	 * Over-length values are discarded rather than truncated because a
-	 * truncated click ID cannot match anything at Pinterest.
+	 * Values changed by sanitize_text_field() are discarded rather than stored
+	 * mutated, and over-length values are discarded rather than truncated: in
+	 * both cases the result could not match anything at Pinterest.
 	 *
 	 * @param mixed $value Raw click ID value.
 	 *
-	 * @return string|false Sanitized click ID, or false when empty or longer than CLICK_ID_MAX_LENGTH.
+	 * @return string|false Click ID, or false when empty, mutated by sanitization or longer than CLICK_ID_MAX_LENGTH.
 	 */
 	private static function normalize_click_id( $value ) {
 		if ( ! is_string( $value ) ) {
 			return false;
 		}
 
-		$value = sanitize_text_field( $value );
+		$sanitized = sanitize_text_field( $value );
+		if ( $sanitized !== $value || '' === $sanitized ) {
+			return false;
+		}
 
-		return '' !== $value && strlen( $value ) <= self::CLICK_ID_MAX_LENGTH ? $value : false;
+		if ( strlen( $sanitized ) > self::CLICK_ID_MAX_LENGTH ) {
+			Logger::log( sprintf( 'Discarding Pinterest click ID longer than %d bytes.', self::CLICK_ID_MAX_LENGTH ), 'debug', 'conversions' );
+			return false;
+		}
+
+		return $sanitized;
 	}
 
 	/**
