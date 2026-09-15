@@ -418,15 +418,16 @@ class FeedGenerator extends AbstractChainedJob {
 			// any still-scheduled action from an older cycle self-terminates.
 			$cycle_id = wp_generate_uuid4();
 			update_option( self::OPTION_CYCLE_ID, $cycle_id, false );
-			// The new cycle reads every product from here on, so the changes flagged so far are
-			// covered. Later edits set the flag again and handle_end() starts a follow-up cycle.
-			$this->mark_feed_clean();
 			$args[ self::ARG_CYCLE_ID ] = $cycle_id;
 
 			/* translators: feed generation cycle ID */
 			self::log( sprintf( __( 'Starting feed generation cycle `%s`.', 'pinterest-for-woocommerce' ), $cycle_id ) );
 
 			$this->handle_start();
+			// The cycle has started and reads the products from here on, so the changes flagged
+			// so far should be covered. Later edits set the flag again and handle_end() starts a
+			// follow-up cycle. A failed start leaves the flag set.
+			$this->mark_feed_clean();
 			$this->queue_batch( 1, $args );
 		} finally {
 			$this->release_start_lock( $start_lock );
@@ -514,12 +515,14 @@ class FeedGenerator extends AbstractChainedJob {
 		}
 		self::log( __( 'Feed generated successfully.', 'pinterest-for-woocommerce' ) );
 
-		// A change flagged during this cycle needs a fresh cycle. The flag is consumed when
-		// that cycle starts, so a restart deferred by the gate in start_generation() (this end
-		// action is still in progress while the restart runs) leaves it set for the next
+		// A change flagged during this cycle needs a fresh cycle. This end action stays in
+		// progress for a moment after returning, and a restart due now could be claimed by a
+		// concurrent runner in that window and be deferred by the gate in start_generation().
+		// The delay keeps the restart out of that window; the flag stays set until the new
+		// cycle starts and consumes it, so a deferred restart still leaves it for the next
 		// product save or the daily start.
 		if ( $this->feed_is_dirty() ) {
-			$this->schedule_next_generator_start( time() );
+			$this->schedule_next_generator_start( time() + MINUTE_IN_SECONDS );
 		}
 	}
 
