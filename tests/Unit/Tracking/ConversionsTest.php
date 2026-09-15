@@ -211,6 +211,7 @@ class ConversionsTest extends WP_UnitTestCase {
 		$data = $this->prepare_page_visit_data();
 
 		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
 	}
 
 	/**
@@ -225,6 +226,91 @@ class ConversionsTest extends WP_UnitTestCase {
 
 		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
 		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that a non-string query parameter yields no click ID.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_ignores_array_epik_query_parameter() {
+		$_GET['epik'] = array( 'x' );
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that values changed by sanitization are discarded rather than stored mutated.
+	 *
+	 * @dataProvider mutated_click_id_provider
+	 *
+	 * @param string $click_id Raw click ID that sanitize_text_field() would alter.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_click_id_changed_by_sanitization( string $click_id ) {
+		$_GET['epik'] = $click_id;
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Click ID values that sanitize_text_field() alters.
+	 *
+	 * @return array[]
+	 */
+	public function mutated_click_id_provider() {
+		return array(
+			'percent sequence' => array( 'click%41id' ),
+			'html tag'         => array( 'click<b>id</b>' ),
+		);
+	}
+
+	/**
+	 * Tests that a literal "0" click ID is kept and persisted.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_keeps_zero_click_id() {
+		$_GET['epik'] = '0';
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertSame( '0', $data['user_data']['click_id'] );
+		$this->assertSame( '0', WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that an empty query parameter falls through to the cookie.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_uses_cookie_when_epik_query_parameter_is_empty() {
+		$_GET['epik']     = '';
+		$_COOKIE['_epik'] = 'cookie1';
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertSame( 'cookie1', $data['user_data']['click_id'] );
+	}
+
+	/**
+	 * Tests that an empty event source URL parameter falls through to the query string.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_uses_query_parameter_when_event_source_url_epik_is_empty() {
+		$_GET['epik'] = 'getval';
+
+		$data = $this->prepare_page_visit_data( home_url( '/p/?epik=' ) );
+
+		$this->assertSame( 'getval', $data['user_data']['click_id'] );
 	}
 
 	/**
