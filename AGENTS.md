@@ -16,9 +16,9 @@ Pinterest for WooCommerce is an official WordPress plugin that integrates WooCom
 ## Technology Stack
 
 ### Backend
-- **PHP:** 7.4+ (minimum supported version)
-- **WordPress:** 5.6+ (minimum), tested up to 6.9
-- **WooCommerce:** 7.0+ (minimum), tested up to 10.5
+- **Supported versions:** read the PHP, WordPress, and WooCommerce requirements and
+  tested versions from `pinterest-for-woocommerce.php`. Check `composer.json` for the
+  PHP dependency constraint and platform version.
 - **Architecture:** PSR-4 autoloading for modern code, WordPress conventions for legacy code
 - **Dependencies:**
   - `automattic/jetpack-autoloader` - Version resolution for shared dependencies
@@ -180,15 +180,15 @@ This project follows **WooCommerce-Core** coding standards, which extend WordPre
 - PSR-4 naming in `src/` directory (e.g., `class ProductSync` in file `ProductSync.php`)
 - WordPress naming conventions in `includes/` directory (e.g., `class-pinterest-for-woocommerce-admin.php`)
 - Text domain MUST be `pinterest-for-woocommerce`
-- Minimum WordPress version: 5.6
-- Minimum PHP version: 7.4
+- Check the plugin header for minimum WordPress and PHP versions.
 - PHPCompatibility checks enabled
 - File comments required (except in `src/` and `tests/`)
 - Function comments required with proper @param and @return tags
 
 **PHPCS Configuration:** See `phpcs.xml` for complete ruleset.
 
-**CRITICAL:** ALWAYS run `vendor/bin/phpcs` before committing code. CI will fail if code doesn't pass phpcs checks.
+Run `vendor/bin/phpcs` for PHP changes before committing. Use the JS/CSS checks for
+changes to those sources; documentation changes need command/path and formatting checks.
 
 ### JavaScript Standards
 
@@ -265,54 +265,37 @@ public static function update_or_create_merchant( $merchant_id, $args ) {
 
 ## Git Workflow
 
-### Branching
+### Branching and worktrees
 
-**ALWAYS create feature branches from `develop`:**
+Use `develop` as the feature base and PR target. This is the approved exception to the
+SWW workspace's default `trunk` base. Use the issue's exact Linear-generated branch name;
+the values below are examples:
+
 ```bash
-# Create new feature branch
-git checkout develop
-git pull origin develop
-git checkout -b feature/your-feature-name
-
-# Create bugfix branch
-git checkout -b fix/bug-description
+git fetch origin develop
+main_checkout="$PWD"
+branch_name=pin4woo-123-short-description
+worktree_path=../pinterest-for-woocommerce-pin4woo-123
+git worktree add "$worktree_path" -b "$branch_name" origin/develop
+cd "$worktree_path"
+nvm use
+npm install
+composer install
 ```
 
-**NEVER** branch from or merge directly to `main` or `master`. The main development branch is `develop`.
+For a Docker environment, use `npm run wp-env -- start` from this worktree. Give each
+concurrent environment unique development and test ports in its gitignored
+`.wp-env.override.json`; keep that configuration for every wp-env command. The local
+PHP test command is `npm run test:php:wp-env` after the environment starts. That script
+expects `/var/www/html/wp-content/plugins/pinterest-for-woocommerce`; map the worktree
+to `wp-content/plugins/pinterest-for-woocommerce` in the override before using it.
 
-#### Branch Naming Format
+Destroy the environment before removing the worktree:
 
-**Format:** `<prefix>/<short-description>`
-
-**Allowed prefixes:**
-- `feature/` - New functionality or enhancements
-- `fix/` - Bug fixes
-- `update/` - Dependency updates or version bumps
-- `refactor/` - Code refactoring without changing functionality
-- `chore/` - Maintenance tasks, build config changes
-
-**Naming conventions:**
-- Use imperative mood (e.g., `add`, `fix`, `update`, not `adding`, `fixed`, `updated`)
-- Use lowercase
-- Use hyphens (not underscores or spaces)
-- Keep descriptions short and descriptive
-- Do NOT include issue/ticket numbers in branch names
-
-**Good examples:**
-```
-feature/add-catalog-retry-logic
-fix/product-attribute-mapping
-update/bump-min-woocommerce-version
-refactor/simplify-merchant-creation
-chore/update-phpcs-config
-```
-
-**Bad examples:**
-```
-Feature/AddRetryLogic          # Wrong: capitalized
-fix_bug                        # Wrong: too vague, uses underscore
-feature/PINT-123-add-feature   # Wrong: includes ticket number
-updateDependencies             # Wrong: missing prefix, camelCase
+```bash
+npm run wp-env -- destroy
+cd "$main_checkout"
+git worktree remove "$worktree_path"
 ```
 
 ### Commit Practices
@@ -321,9 +304,9 @@ Follow these commit guidelines:
 - **Concise, one-line commit messages** preferred
 - **Incremental commits** - break changes into logical, self-contained commits
 - **Present tense, imperative mood** (e.g., "Add feature" not "Added feature")
-- **Run phpcs before committing** - CRITICAL
-- **Do NOT use `--no-verify`** to skip git hooks unless absolutely necessary
-- **Do NOT commit without testing** - at minimum, ensure code passes linting
+- Run the checks appropriate to the changed files before committing.
+- Do not bypass git hooks or configured commit signing.
+- Report failed, skipped, and untested checks accurately.
 
 **Good commit message examples:**
 ```
@@ -337,10 +320,11 @@ Refactor admin settings validation
 
 When creating PRs:
 - Target the `develop` branch
-- Provide clear description of changes
-- Include test instructions
-- Reference related issues
-- Ensure all CI checks pass (phpcs, PHPUnit, JS tests)
+- Follow `.github/PULL_REQUEST_TEMPLATE.md`; it has no auto-assign-milestone checkbox.
+- Start the description with `Closes PIN4WOO-<n>` and include test instructions.
+- Supply changelog text in the template's Changelog entry section. Explain any
+  documentation-only exemption there; do not invent checkboxes or change labels.
+- Check CI results and distinguish passing, failed, and skipped jobs.
 
 ## Common Pitfalls
 
@@ -350,12 +334,12 @@ When creating PRs:
 |---------|-----|
 | Edit WordPress core files | Only modify plugin code |
 | Edit WooCommerce plugin files | Only modify this plugin's code |
-| Commit without running `vendor/bin/phpcs` first | CI will fail |
+| Commit PHP changes without running `vendor/bin/phpcs` | Check the changed code |
 | Modify `changelog.txt` | Unless explicitly requested |
 | Commit `node_modules/` or `vendor/` directories | These are gitignored |
 | Commit `.env` files or credentials | Security risk |
-| Use `--no-verify` or `--no-gpg-sign` | Unless explicitly required |
-| Skip running tests before pushing to remote | May break production |
+| Use `--no-verify` or `--no-gpg-sign` | Preserve hooks and configured signing |
+| Claim unrun or skipped checks passed | Report the actual validation |
 | Use Node versions outside 12.20.1 to <15 | Check with `nvm use` |
 
 ### CRITICAL - ALWAYS Do These Things
@@ -365,7 +349,7 @@ When creating PRs:
 | Follow WooCommerce coding standards | Enforced by phpcs |
 | Use text domain `pinterest-for-woocommerce` | Required for translations |
 | Branch from `develop`, not main/master | Main development branch |
-| Run linting before commits | `vendor/bin/phpcs`, `npm run lint:js`, `npm run lint:css` |
+| Run checks for the changed files | PHP: `vendor/bin/phpcs`; JS/CSS: their lint scripts; docs: command/path and formatting checks |
 | Write PHPUnit tests for new PHP functionality | Ensure code quality and prevent regressions |
 | Use PSR-4 naming in `src/` directory | Modern PHP autoloading standard |
 | Use WordPress naming conventions in `includes/` | Legacy code compatibility |
@@ -428,20 +412,20 @@ npm start  # recompile
 
 **Reason:** WordPress cron is unreliable for critical tasks (depends on site traffic). Action Scheduler provides robust background job processing with retries, error handling, failure logging, and admin UI for monitoring scheduled actions.
 
-### Why separate WordPress/WooCommerce minimum versions?
+### Supported versions and repository differences
 
-**Reason:** WordPress and WooCommerce release independently. We support recent versions of each to balance feature availability with user adoption:
+Read platform requirements from the plugin header and use `nvm use` with `.nvmrc`.
+Keep these repository-specific workflows when applying shared extension standards;
+changes to the toolchain or release process need their own scope:
 
-| Platform | Support Policy | Current Minimum |
-|----------|---------------|-----------------|
-| WordPress | Last 2 major versions | 5.6+ |
-| WooCommerce | Last several major versions | 7.0+ |
-
-Always check the plugin header in `pinterest-for-woocommerce.php` for current requirements.
-
-### Why is Node pinned to v14.16?
-
-**Reason:** The build toolchain and dependencies have proven difficult to update without breaking changes. Updating Node and related packages (webpack, @wordpress/scripts, etc.) requires significant testing and potential code changes. The current pinned version (v14.16, specified in `.nvmrc`) works reliably, so we maintain it until a coordinated update effort can be planned. Always use `nvm use` to ensure you're on the correct version.
+- Node 14/npm 6, webpack, and Gulp remain the current build toolchain. A coordinated
+  upgrade needs its own dependency and build validation.
+- PSR-4 code in `src/` coexists with WordPress-style classes in `includes/`.
+- The PR template collects changelog text. This repo has no Changelogger command or
+  `changelog/` change files; do not import that workflow from other extensions.
+- Feature PRs target `develop`, but `.github/workflows/prepare-release.yml` configures
+  `trunk` as its main branch and `ci-merge.yml` targets `trunk`. Reconcile release
+  automation separately; those settings do not change the approved feature base.
 
 ## Testing Strategy
 
@@ -582,6 +566,6 @@ Per WordPress Core Handbook, we support:
 
 ---
 
-**Last Updated:** 2026-02-25
+**Last Updated:** 2026-09-15
 **Maintained by:** WooCommerce Team
 **License:** GPL-3.0-or-later
