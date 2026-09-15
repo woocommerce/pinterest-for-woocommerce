@@ -71,7 +71,7 @@
     "sass": "^1.104.1",
     "semver": "^6.0.0",
     "simple-git": "^3.36.0",
-    "stylelint": "^13.13.1",
+    "stylelint": "^17.15.0",
     "typescript": "^5.9.3",
     "underscore": "^1.9.1"
   },
