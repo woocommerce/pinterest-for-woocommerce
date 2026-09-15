@@ -428,7 +428,13 @@ class FeedGenerator extends AbstractChainedJob {
 			// so far should be covered. Later edits set the flag again and handle_end() starts a
 			// follow-up cycle. A failed start leaves the flag set.
 			$this->mark_feed_clean();
-			$this->queue_batch( 1, $args );
+			try {
+				$this->queue_batch( 1, $args );
+			} catch ( Throwable $th ) {
+				// No batch was queued, so the cycle never reads the products: restore the flag.
+				update_option( self::OPTION_FEED_DIRTY, 1, false );
+				throw $th;
+			}
 		} finally {
 			$this->release_start_lock( $start_lock );
 		}
