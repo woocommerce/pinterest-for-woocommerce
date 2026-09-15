@@ -402,14 +402,14 @@ class FeedGenerator extends AbstractChainedJob {
 	public function handle_start_action( array $args ) {
 		$start_lock = $this->acquire_start_lock();
 		if ( '' === $start_lock ) {
-			update_option( self::OPTION_FEED_DIRTY, 1, false );
+			$this->set_feed_dirty_flag( true );
 			self::log( __( 'Another feed generation start is in progress. Marked the feed dirty to regenerate afterward.', 'pinterest-for-woocommerce' ) );
 			return;
 		}
 
 		try {
 			if ( $this->is_current_cycle_alive() ) {
-				update_option( self::OPTION_FEED_DIRTY, 1, false );
+				$this->set_feed_dirty_flag( true );
 				self::log( __( 'Feed generation is already running. Marked the feed dirty to regenerate when the current cycle finishes.', 'pinterest-for-woocommerce' ) );
 				return;
 			}
@@ -432,7 +432,7 @@ class FeedGenerator extends AbstractChainedJob {
 				$this->queue_batch( 1, $args );
 			} catch ( Throwable $th ) {
 				// No batch was queued, so the cycle never reads the products: restore the flag.
-				update_option( self::OPTION_FEED_DIRTY, 1, false );
+				$this->set_feed_dirty_flag( true );
 				throw $th;
 			}
 		} finally {
@@ -711,7 +711,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since 1.0.10
 	 */
 	public function mark_feed_dirty(): void {
-		update_option( self::OPTION_FEED_DIRTY, 1, false );
+		$this->set_feed_dirty_flag( true );
 		self::log( 'Feed is dirty.' );
 
 		if ( $this->is_generation_active() ) {
@@ -738,7 +738,16 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since 1.0.10
 	 */
 	public function mark_feed_clean(): void {
-		update_option( self::OPTION_FEED_DIRTY, 0, false );
+		$this->set_feed_dirty_flag( false );
+	}
+
+	/**
+	 * Writes the dirty flag.
+	 *
+	 * @param bool $dirty Whether the feed needs regenerating.
+	 */
+	private function set_feed_dirty_flag( bool $dirty ): void {
+		update_option( self::OPTION_FEED_DIRTY, $dirty ? 1 : 0, false );
 	}
 
 	/**
