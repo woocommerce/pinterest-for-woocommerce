@@ -165,5 +165,8 @@
       "pinterest-for-woocommerce.php",
       "uninstall.php"
     ]
+  },
+  "overrides": {
+    "qs@^6.0.0": "^6.16.0"
   }
 }
