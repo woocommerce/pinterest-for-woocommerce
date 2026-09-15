@@ -83,7 +83,7 @@ class PageVisit {
 			unset( $event_data['event_id'] );
 			$tag_code = sprintf(
 				'if(window.pintrk){var eventData=%1$s;eventData.event_id=eventId;pintrk("track","%2$s",eventData);}',
-				wp_json_encode( (object) $event_data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				static::encode( (object) $event_data, '{}' ),
 				Tracking::EVENT_PAGE_VISIT
 			);
 		}
@@ -100,15 +100,15 @@ class PageVisit {
 			}
 			$beacon_code = sprintf(
 				'if(!fresh){var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);%3$svar beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}}',
-				wp_json_encode( static::AJAX_ACTION ),
-				wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				static::encode( static::AJAX_ACTION ),
+				static::encode( admin_url( 'admin-ajax.php' ) ),
 				$product_fields
 			);
 		}
 
 		$script = sprintf(
 			'(function(){try{var serverId=%1$s,renderedAt=%2$d,serverSent=%3$d;var fresh=serverSent&&Math.abs(Date.now()/1000-renderedAt)<%4$d;var eventId=fresh?serverId:"page_"+(window.crypto&&window.crypto.randomUUID?window.crypto.randomUUID():Date.now().toString(36)+"_"+Math.random().toString(36).slice(2));%5$s%6$s}catch(e){}}());',
-			wp_json_encode( $data->get_event_id() ),
+			static::encode( $data->get_event_id() ),
 			time(),
 			(int) $server_sent,
 			static::FRESH_WINDOW,
@@ -118,6 +118,22 @@ class PageVisit {
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON encoded values inside a script tag.
 		echo '<script>' . $script . '</script>';
+	}
+
+	/**
+	 * JSON encodes a value for the script, falling back to an empty literal
+	 * so a failed encode cannot produce a syntax error.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param mixed  $value    Value to encode.
+	 * @param string $fallback JavaScript literal used when encoding fails.
+	 *
+	 * @return string
+	 */
+	private static function encode( $value, string $fallback = '""' ) {
+		$json = wp_json_encode( $value, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES );
+		return $json ? $json : $fallback;
 	}
 
 	/**
@@ -235,7 +251,7 @@ class PageVisit {
 		$token      = $_POST['product_token'] ?? '';
 		// phpcs:enable WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
 
-		if ( $product_id && is_string( $token ) ) {
+		if ( $product_id && is_string( $token ) && '' !== $token ) {
 			if ( hash_equals( static::get_product_token( $product_id ), $token ) ) {
 				return $product_id;
 			}

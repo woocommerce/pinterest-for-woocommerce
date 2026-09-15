@@ -179,6 +179,26 @@ class PageVisitTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A beacon without a token falls back to the URL without logging a token error.
+	 */
+	public function test_beacon_without_token_is_not_logged_as_invalid() {
+		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', true );
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		$logger->method( 'log' )->willReturnCallback(
+			function ( $level, $message ) {
+				$this->assertStringNotContainsString( 'token', $message );
+			}
+		);
+		Logger::$logger = $logger;
+
+		$product = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => 25 ) );
+		$event   = $this->send_product_beacon( $product, home_url( '/unresolvable-product-path/' ), '' );
+
+		$this->assertArrayNotHasKey( 'custom_data', $event );
+	}
+
+	/**
 	 * Dropped beacons leave a debug log entry in the conversions log.
 	 */
 	public function test_rejected_beacon_is_logged() {
