@@ -1332,6 +1332,31 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * A start action whose temporary file preparation fails must leave the dirty flag
+	 * set: no cycle started, so nothing covers the flagged changes.
+	 *
+	 * @return void
+	 */
+	public function test_failed_start_action_leaves_dirty_flag_set() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'dead-cycle', false );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 1, false );
+
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturn( array() );
+		$this->feed_file_operations
+			->method( 'prepare_temporary_files' )
+			->willThrowException( new Exception() );
+
+		try {
+			$this->feed_generator->handle_start_action( array() );
+			$this->fail( 'The start action must rethrow the preparation failure.' );
+		} catch ( Exception $e ) {
+			$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'A failed start must not consume the dirty flag.' );
+		}
+	}
+
+	/**
 	 * A pending batch from a superseded cycle must not prevent start_generation()
 	 * from queueing a new chain start.
 	 *
@@ -1510,7 +1535,8 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 	/**
 	 * A dirty flag set during the cycle must make the end action schedule a restart
-	 * and must stay set until the new cycle starts and consumes it.
+	 * shortly after, outside the window where this end action is still in progress,
+	 * and the flag must stay set until the new cycle starts and consumes it.
 	 *
 	 * @return void
 	 */
@@ -1523,20 +1549,24 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$next_start = as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
 		$this->assertIsInt( $next_start, 'A dirty feed must schedule a restart at the end of the cycle.' );
-		$this->assertLessThanOrEqual( time() + 1, $next_start, 'The restart must be scheduled to run now.' );
-		$this->assertEquals( 1, get_option( FeedGenerator::OPTION_FEED_DIRTY ), 'The dirty flag must be left for the new cycle to consume.' );
+		$this->assertGreaterThanOrEqual( time() + 55, $next_start, 'The restart must be delayed past the end action completion.' );
+		$this->assertLessThanOrEqual( time() + 65, $next_start, 'The restart must be scheduled about a minute out.' );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'The dirty flag must be left for the new cycle to consume.' );
 	}
 
 	/**
-	 * When the restart scheduled by the end action runs while that end action is still
-	 * in progress, start_generation() defers and the dirty flag must survive so the
-	 * regeneration is not lost.
+	 * When the restart scheduled by the end action is claimed while that end action is
+	 * still in progress, start_generation() defers. The dirty flag and the scheduled
+	 * restart must survive so the regeneration is not lost.
 	 *
 	 * @return void
 	 */
 	public function test_start_generation_deferred_by_finalizing_end_action_leaves_dirty_flag_set() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
 		update_option( FeedGenerator::OPTION_CYCLE_ID, 'current-cycle', false );
 		update_option( FeedGenerator::OPTION_FEED_DIRTY, 1, false );
+
+		$this->feed_generator->handle_end_action( array( FeedGenerator::ARG_CYCLE_ID => 'current-cycle' ) );
 
 		$running_end_action = new ActionScheduler_Action(
 			'pinterest/jobs/generate_feed/chain_end',
@@ -1560,7 +1590,10 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		$this->invoke_protected( $this->feed_generator, 'start_generation' );
 
-		$this->assertEquals( 1, get_option( FeedGenerator::OPTION_FEED_DIRTY ), 'A deferred restart must leave the dirty flag set.' );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'A deferred restart must leave the dirty flag set.' );
+		$next_start = as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		$this->assertIsInt( $next_start, 'The restart must still be scheduled.' );
+		$this->assertGreaterThan( time(), $next_start, 'The restart must still be in the future.' );
 	}
 
 	/**
