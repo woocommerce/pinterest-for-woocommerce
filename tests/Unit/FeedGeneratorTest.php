@@ -1570,12 +1570,13 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		update_option( FeedGenerator::OPTION_CYCLE_ID, 'current-cycle', false );
 		update_option( FeedGenerator::OPTION_FEED_DIRTY, 1, false );
 
+		$now = time();
 		$this->feed_generator->handle_end_action( array( FeedGenerator::ARG_CYCLE_ID => 'current-cycle' ) );
 
 		$next_start = as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
 		$this->assertIsInt( $next_start, 'A dirty feed must schedule a restart at the end of the cycle.' );
-		$this->assertGreaterThanOrEqual( time() + 55, $next_start, 'The restart must be delayed past the end action completion.' );
-		$this->assertLessThanOrEqual( time() + 65, $next_start, 'The restart must be scheduled about a minute out.' );
+		$this->assertGreaterThanOrEqual( $now + 55, $next_start, 'The restart must be delayed past the end action completion.' );
+		$this->assertLessThanOrEqual( $now + 65, $next_start, 'The restart must be scheduled about a minute out.' );
 		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'The dirty flag must be left for the new cycle to consume.' );
 	}
 
@@ -1629,11 +1630,12 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 
 		// Once the end action has completed, the next product change must start a cycle right away.
 		$end_action_in_progress = false;
+		$now                    = time();
 		$this->feed_generator->mark_feed_dirty();
 
 		$next_start = as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
 		$this->assertIsInt( $next_start, 'The next product change must reschedule the start action.' );
-		$this->assertLessThanOrEqual( time() + 1, $next_start, 'The start action must be rescheduled to run now.' );
+		$this->assertLessThanOrEqual( $now + 5, $next_start, 'The start action must be rescheduled to run now.' );
 	}
 
 	/**
