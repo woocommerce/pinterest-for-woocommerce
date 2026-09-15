@@ -7,6 +7,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
+use Automattic\WooCommerce\Pinterest\Tracking\PageVisit;
 use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Automattic\WooCommerce\Pinterest\Tracking\Tracker;
 use Pinterest_For_Woocommerce;
@@ -44,6 +45,7 @@ class TrackingTest extends \WP_UnitTestCase {
 		}
 
 		remove_all_filters( 'pinterest_for_woocommerce_is_crawler_request' );
+		remove_all_filters( 'pre_http_request' );
 
 		parent::tearDown();
 	}
@@ -52,6 +54,7 @@ class TrackingTest extends \WP_UnitTestCase {
 		$tracking = new Tracking();
 
 		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_page_visit' ) ) );
+		$this->assertEquals( 11, has_action( 'wp_footer', array( $tracking, 'print_page_visit_script' ) ) );
 		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_view_category' ) ) );
 		$this->assertEquals( 10, has_action( 'woocommerce_add_to_cart', array( $tracking, 'handle_add_to_cart' ) ) );
 		$this->assertEquals( 10, has_action( 'woocommerce_before_thankyou', array( $tracking, 'handle_checkout' ) ) );
@@ -190,9 +193,10 @@ class TrackingTest extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * PageVisit CAPI is sent by the browser beacon, not during HTML rendering.
+	 * PageVisit CAPI is sent during HTML rendering. The Tag call is printed by
+	 * PageVisit::print_script() instead of the Tag tracker.
 	 */
-	public function test_page_visit_skips_synchronous_conversions_tracker() {
+	public function test_page_visit_dispatches_conversions_tracker_on_render() {
 		Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'WD7AFW51GS' ) );
 
 		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0';
@@ -205,15 +209,129 @@ class TrackingTest extends \WP_UnitTestCase {
 		$tracking->add_tracker( $pinterest_tag_tracker );
 		$tracking->add_tracker( $pinterest_capi_tracker );
 
-		$data = new None( '' );
+		$data = new None( 'page_1234567890abc' );
 
-		$pinterest_tag_tracker->expects( $this->once() )
+		$pinterest_tag_tracker->expects( $this->never() )
+			->method( 'track_event' );
+		$pinterest_capi_tracker->expects( $this->once() )
 			->method( 'track_event' )
 			->with( Tracking::EVENT_PAGE_VISIT, $data );
+
+		$tracking->track_event( Tracking::EVENT_PAGE_VISIT, $data );
+	}
+
+	/**
+	 * Without an active Tag the PageVisit CAPI event is still sent on render
+	 * and the cache-hit beacon is still printed, without any pintrk call.
+	 */
+	public function test_page_visit_prints_beacon_when_tag_inactive_and_capi_enabled() {
+		$sent_event_id = $this->render_page_visit( '', $output );
+
+		$this->assertMatchesRegularExpression( '/^page_[a-f0-9]{13}$/', $sent_event_id );
+		$this->assertStringContainsString( 'var serverId="' . $sent_event_id . '",renderedAt=', $output );
+		$this->assertStringContainsString( 'serverSent=1;', $output );
+		$this->assertStringContainsString( PageVisit::AJAX_ACTION, $output );
+		$this->assertStringNotContainsString( 'pintrk("track"', $output );
+	}
+
+	/**
+	 * With an active Tag the pintrk call is printed after the Tag base code and
+	 * reuses the event ID sent to CAPI so Pinterest can deduplicate the pair.
+	 */
+	public function test_page_visit_tag_call_reuses_server_event_id() {
+		$sent_event_id = $this->render_page_visit( 'WD7AFW51GS', $output );
+
+		$script = strpos( $output, 'var serverId="' . $sent_event_id . '"' );
+		$this->assertNotFalse( $script );
+		$this->assertLessThan( $script, strpos( $output, "pintrk('load', 'WD7AFW51GS'" ) );
+		$this->assertStringContainsString( 'if(window.pintrk){var eventData={};eventData.event_id=eventId;pintrk("track","PageVisit",eventData);}', $output );
+		$this->assertSame( 1, substr_count( $output, 'PageVisit' ) );
+	}
+
+	/**
+	 * Crawler renders skip CAPI and flag the HTML so a later human cache hit beacons.
+	 */
+	public function test_crawler_render_marks_page_visit_as_not_sent() {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_tag'           => '',
+				'track_conversions_capi' => true,
+			)
+		);
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)';
+
+		$pinterest_capi_tracker = $this->createMock( Conversions::class );
 		$pinterest_capi_tracker->expects( $this->never() )
 			->method( 'track_event' );
 
-		$tracking->track_event( Tracking::EVENT_PAGE_VISIT, $data );
+		$tracking = new Tracking( array( new Tag(), $pinterest_capi_tracker ) );
+
+		ob_start();
+		$tracking->handle_page_visit();
+		$tracking->print_page_visit_script();
+		$output = ob_get_clean();
+
+		$this->assertStringContainsString( 'serverSent=0;', $output );
+		$this->assertStringContainsString( PageVisit::AJAX_ACTION, $output );
+	}
+
+	/**
+	 * Renders wp_footer for a human visitor with CAPI enabled and returns the
+	 * event ID sent to the Conversions API.
+	 *
+	 * @param string $tracking_tag Tag ID setting, empty for no active Tag.
+	 * @param string $output       Captured wp_footer output.
+	 *
+	 * @return string Event ID sent to CAPI.
+	 */
+	private function render_page_visit( string $tracking_tag, &$output ) {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_tag'           => $tracking_tag,
+				'track_conversions'      => true,
+				'track_conversions_capi' => true,
+				'tracking_advertiser'    => 'PFW-123456789',
+			)
+		);
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0';
+
+		$sent_event_id = '';
+		add_filter(
+			'pre_http_request',
+			function ( $response, $parsed_args ) use ( &$sent_event_id ) {
+				$body          = json_decode( $parsed_args['body'], true );
+				$sent_event_id = $body['data'][0]['event_id'];
+				return array(
+					'headers'  => array( 'content-type' => 'application/json' ),
+					'body'     => wp_json_encode( array( 'events' => array( array( 'status' => 'processed' ) ) ) ),
+					'response' => array(
+						'code'    => 200,
+						'message' => 'OK',
+					),
+					'cookies'  => array(),
+					'filename' => '',
+				);
+			},
+			10,
+			2
+		);
+
+		$tracking = new Tracking( array( new Tag() ) );
+		$tracking->add_tracker( new Conversions( new User( '127.0.0.1', 'test-agent' ) ) );
+
+		// Core hooks a deprecated function on wp_footer which the test case would report.
+		remove_action( 'wp_footer', 'the_block_template_skip_link' );
+
+		ob_start();
+		/**
+		 * Renders the storefront footer, where the trackers print their output.
+		 *
+		 * @since 1.5.1
+		 */
+		do_action( 'wp_footer' );
+		$output = ob_get_clean();
+
+		return $sent_event_id;
 	}
 
 	/**
