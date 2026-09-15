@@ -66,7 +66,7 @@ class Conversions extends Tracker {
 	 *
 	 * @return bool Whether the event was dispatched.
 	 */
-	public function track_event( string $event_name, Data $data ): bool {
+	public function track_event( string $event_name, Data $data ) {
 		$data = $this->prepare_request_data( $event_name, $data );
 
 		try {

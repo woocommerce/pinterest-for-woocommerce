@@ -72,7 +72,7 @@ abstract class Tracker {
 	 *
 	 * @throws Throwable In case of an API error.
 	 *
-	 * @return bool Whether the event was dispatched.
+	 * @return bool True when the event was handled; Conversions returns false when nothing was dispatched.
 	 */
-	abstract public function track_event( string $event_name, Data $data ): bool;
+	abstract public function track_event( string $event_name, Data $data );
 }
