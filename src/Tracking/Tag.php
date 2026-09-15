@@ -250,7 +250,7 @@ class Tag extends Tracker {
 	 *
 	 * @return true
 	 */
-	public function track_event( string $event_name, Data $data ) {
+	public function track_event( string $event_name, Data $data ): bool {
 		$data = $this->prepare_request_data( $event_name, $data );
 		if ( wp_doing_ajax() ) {
 			return static::maybe_add_fragment( $event_name, $data );

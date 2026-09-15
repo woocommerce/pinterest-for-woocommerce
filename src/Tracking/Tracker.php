@@ -74,5 +74,5 @@ abstract class Tracker {
 	 *
 	 * @return bool Whether the event was dispatched.
 	 */
-	abstract public function track_event( string $event_name, Data $data );
+	abstract public function track_event( string $event_name, Data $data ): bool;
 }

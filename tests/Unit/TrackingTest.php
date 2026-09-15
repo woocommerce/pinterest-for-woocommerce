@@ -493,7 +493,7 @@ class TrackingTest extends \WP_UnitTestCase {
 			 * @param Data   $data       Event data.
 			 * @return true
 			 */
-			public function track_event( string $event_name, Data $data ) {
+			public function track_event( string $event_name, Data $data ): bool {
 				$this->tracked_events[] = array(
 					'event_name' => $event_name,
 					'data'       => $data,
