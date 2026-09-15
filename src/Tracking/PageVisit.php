@@ -58,21 +58,62 @@ class PageVisit {
 
 		$event_data = wp_json_encode( (object) $data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES );
 		$event_data = $event_data ? $event_data : '{}';
-		$capi_code  = '';
 
-		if ( Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' ) ) {
-			$capi_code = sprintf(
-				'var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);var beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}',
-				wp_json_encode( static::AJAX_ACTION ),
-				wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
-			);
+		return sprintf(
+			'(function(){%1$svar eventData=%2$s;eventData.event_id=eventId;pintrk("track","%3$s",eventData);%4$s}());',
+			static::get_event_id_code(),
+			$event_data,
+			Tracking::EVENT_PAGE_VISIT,
+			static::get_beacon_code()
+		);
+	}
+
+	/**
+	 * Prints the CAPI beacon on its own for stores without an active Tag.
+	 *
+	 * Prints nothing when the Conversions API is disabled.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @return void
+	 */
+	public static function print_beacon_script() {
+		$beacon_code = static::get_beacon_code();
+		if ( ! $beacon_code ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Printing hardcoded JS tracking code.
+		echo '<script>(function(){' . static::get_event_id_code() . $beacon_code . '}());</script>';
+	}
+
+	/**
+	 * Builds the JavaScript that generates a browser-side PageVisit event ID.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @return string JavaScript defining `eventId`.
+	 */
+	private static function get_event_id_code() {
+		return 'var eventId="page_"+(window.crypto&&window.crypto.randomUUID?window.crypto.randomUUID():Date.now().toString(36)+"_"+Math.random().toString(36).slice(2));';
+	}
+
+	/**
+	 * Builds the JavaScript that sends the PageVisit CAPI beacon.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @return string JavaScript using `eventId`, or an empty string when the Conversions API is disabled.
+	 */
+	private static function get_beacon_code() {
+		if ( ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' ) ) {
+			return '';
 		}
 
 		return sprintf(
-			'(function(){var eventId="page_"+(window.crypto&&window.crypto.randomUUID?window.crypto.randomUUID():Date.now().toString(36)+"_"+Math.random().toString(36).slice(2));var eventData=%1$s;eventData.event_id=eventId;pintrk("track","%2$s",eventData);%3$s}());',
-			$event_data,
-			Tracking::EVENT_PAGE_VISIT,
-			$capi_code
+			'var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);var beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}',
+			wp_json_encode( static::AJAX_ACTION ),
+			wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 		);
 	}
 
