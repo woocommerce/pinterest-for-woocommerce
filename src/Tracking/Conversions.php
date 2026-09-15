@@ -62,9 +62,9 @@ class Conversions extends Tracker {
 	 * @param string $event_name Tracking event name.
 	 * @param Data   $data       Tracking event data class.
 	 *
-	 * @throws Throwable In case of an API error.
+	 * @throws Throwable In case of an API error, after logging it at error level.
 	 *
-	 * @return bool Whether the event was dispatched.
+	 * @return bool True after a dispatch, false when the event was skipped because no ad account is configured.
 	 */
 	public function track_event( string $event_name, Data $data ) {
 		$data = $this->prepare_request_data( $event_name, $data );
