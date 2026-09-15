@@ -118,7 +118,7 @@ class ConversionsTest extends WP_UnitTestCase {
 			'pre_http_request',
 			function () use ( &$requests ) {
 				++$requests;
-				return false;
+				return new \WP_Error( 'pfw_test_blocked', 'Unexpected HTTP request in test.' );
 			}
 		);
 
