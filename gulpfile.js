@@ -192,12 +192,13 @@ gulp.task(
 					[
 						`${folder}/{assets,i18n,includes,src,vendor,views}/**/*`,
 						`${folder}/*.{php,txt,md}`,
+						'LICENSE',
 						`!${folder}/README.md`,
-						`!${folder}/i18n/languages/README.md`,
-						'LICENSE'
+						`!${folder}/i18n/languages/README.md`
 					],
 					{
 						base: path.join( folder, '..' ),
+						encoding: false,
 					}
 				)
 					.pipe( $.vinylZip.dest( filename ) )
