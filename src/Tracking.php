@@ -15,6 +15,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Search;
+use Automattic\WooCommerce\Pinterest\Tracking\PageVisit;
 use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Automattic\WooCommerce\Pinterest\Tracking\Tracker;
 use Automattic\WooCommerce\Pinterest\Utilities\CrawlerDetector;
@@ -45,6 +46,13 @@ class Tracking {
 	private $trackers = array();
 
 	/**
+	 * Arguments for PageVisit::print_script(), collected by handle_page_visit().
+	 *
+	 * @var array|null
+	 */
+	private $page_visit = null;
+
+	/**
 	 * Attaches all the required tracking events to corresponding WP/WC hooks.
 	 *
 	 * @since 1.4.0
@@ -54,8 +62,9 @@ class Tracking {
 	public function __construct( array $trackers = array() ) {
 		$this->trackers = $trackers;
 
-		// Tracks page visit events.
+		// Tracks page visit events. The script prints after the Tag base code.
 		add_action( 'wp_footer', array( $this, 'handle_page_visit' ) );
+		add_action( 'wp_footer', array( $this, 'print_page_visit_script' ), 11 );
 
 		// Tracks category visit events.
 		add_action( 'wp_footer', array( $this, 'handle_view_category' ) );
@@ -89,33 +98,45 @@ class Tracking {
 			return;
 		}
 
-		// The PageVisit event ID is generated in the browser so full-page caches
-		// cannot reuse a PHP-generated ID across multiple visitors.
-		$data = new None( '' );
+		$event_id = uniqid( 'page_' );
+		$data     = new None( $event_id );
+		$product  = is_product() ? wc_get_product() : false;
 
-		// Not a product page.
-		if ( ! is_product() ) {
-			$this->track_event( static::EVENT_PAGE_VISIT, $data );
-			return;
+		if ( $product instanceof \WC_Product ) {
+			$data = new Product(
+				$event_id,
+				$product->get_id(),
+				$product->get_name(),
+				wc_get_product_category_list( $product->get_id() ),
+				'brand',
+				wc_get_price_to_display( $product ),
+				get_woocommerce_currency(),
+				1
+			);
 		}
 
-		$product = wc_get_product();
-		if ( ! $product instanceof \WC_Product ) {
-			$this->track_event( static::EVENT_PAGE_VISIT, $data );
-			return;
-		}
-
-		$data = new Product(
-			'',
-			$product->get_id(),
-			$product->get_name(),
-			wc_get_product_category_list( $product->get_id() ),
-			'brand',
-			wc_get_price_to_display( $product ),
-			get_woocommerce_currency(),
-			1
-		);
 		$this->track_event( static::EVENT_PAGE_VISIT, $data );
+
+		$this->page_visit = array(
+			$data,
+			! CrawlerDetector::is_crawler_request() && $this->has_tracker( Conversions::class ),
+			$this->has_tracker( Tag::class ) && (bool) Tag::get_active_tag(),
+		);
+	}
+
+	/**
+	 * Prints the PageVisit Tag call and CAPI beacon collected by handle_page_visit().
+	 *
+	 * Hooked after Tag::print_script() so the Tag base code is already defined.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @return void
+	 */
+	public function print_page_visit_script() {
+		if ( $this->page_visit ) {
+			PageVisit::print_script( ...$this->page_visit );
+		}
 	}
 
 	/**
@@ -268,9 +289,9 @@ class Tracking {
 				continue;
 			}
 
-			// PageVisit CAPI events are dispatched by the browser beacon so they
-			// also run when the page HTML is served from a full-page cache.
-			if ( static::EVENT_PAGE_VISIT === $event_name && $tracker instanceof Conversions ) {
+			// The PageVisit Tag call is printed by PageVisit::print_script() so the
+			// browser can pick a fresh event ID when the HTML comes from a full-page cache.
+			if ( static::EVENT_PAGE_VISIT === $event_name && $tracker instanceof Tag ) {
 				continue;
 			}
 
@@ -298,6 +319,24 @@ class Tracking {
 	 */
 	public function get_trackers() {
 		return $this->trackers;
+	}
+
+	/**
+	 * Checks whether a tracker of the given class is registered.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param string $tracker_class Tracker class name. e.g. Tag::class, Conversions::class.
+	 *
+	 * @return bool
+	 */
+	private function has_tracker( string $tracker_class ) {
+		foreach ( $this->trackers as $tracker ) {
+			if ( $tracker instanceof $tracker_class ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

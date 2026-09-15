@@ -46,33 +46,68 @@ class PageVisit {
 	}
 
 	/**
-	 * Builds a cache-safe Pinterest Tag call and optional CAPI beacon.
-	 *
-	 * @param array $data Prepared Pinterest Tag PageVisit data.
-	 *
-	 * @return string JavaScript event code.
+	 * Seconds after rendering during which the PHP event ID is considered fresh.
 	 */
-	public static function get_tag_event_code( array $data ) {
-		unset( $data['event_id'] );
+	const FRESH_WINDOW = 300;
 
-		$event_data = wp_json_encode( (object) $data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES );
-		$event_data = $event_data ? $event_data : '{}';
-		$capi_code  = '';
+	/**
+	 * Prints the PageVisit Tag call and, when needed, the CAPI beacon.
+	 *
+	 * The PHP event ID is reused in the browser only when the server already
+	 * sent the CAPI event and the HTML is less than FRESH_WINDOW seconds old, so
+	 * the Tag and CAPI events for an uncached render share one ID. Older
+	 * full-page cache hits and crawler-rendered HTML generate a fresh ID and
+	 * send it through the beacon. Two bounded failure modes follow from the
+	 * time gate: a visitor whose clock is off by more than FRESH_WINDOW sends
+	 * one extra unmatched CAPI event, and visitors served the cached HTML within
+	 * FRESH_WINDOW of its creation share the PHP ID for the Tag and send no beacon.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param Data $data        PageVisit event data.
+	 * @param bool $server_sent Whether the Conversions tracker sent the event during rendering.
+	 * @param bool $tag_active  Whether the Pinterest Tag is active on the page.
+	 *
+	 * @return void
+	 */
+	public static function print_script( Data $data, bool $server_sent, bool $tag_active ) {
+		$capi_enabled = (bool) Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' );
+		if ( ! $capi_enabled && ! $tag_active ) {
+			return;
+		}
 
-		if ( Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' ) ) {
-			$capi_code = sprintf(
-				'var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);var beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}',
+		$tag_code = '';
+		if ( $tag_active ) {
+			$event_data = Tag::get_page_visit_data( $data );
+			unset( $event_data['event_id'] );
+			$tag_code = sprintf(
+				'if(window.pintrk){var eventData=%1$s;eventData.event_id=eventId;pintrk("track","%2$s",eventData);}',
+				wp_json_encode( (object) $event_data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+				Tracking::EVENT_PAGE_VISIT
+			);
+		}
+
+		$beacon_code = '';
+		if ( $capi_enabled ) {
+			$beacon_code = sprintf(
+				'if(!fresh){var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);var beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}}',
 				wp_json_encode( static::AJAX_ACTION ),
 				wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 			);
 		}
 
-		return sprintf(
-			'(function(){var eventId="page_"+(window.crypto&&window.crypto.randomUUID?window.crypto.randomUUID():Date.now().toString(36)+"_"+Math.random().toString(36).slice(2));var eventData=%1$s;eventData.event_id=eventId;pintrk("track","%2$s",eventData);%3$s}());',
-			$event_data,
-			Tracking::EVENT_PAGE_VISIT,
-			$capi_code
+		$script = sprintf(
+			'(function(){try{var serverId=%1$s,renderedAt=%2$d,serverSent=%3$d;var fresh=serverSent&&Math.abs(Date.now()/1000-renderedAt)<%4$d;var eventId=fresh?serverId:"page_"+(window.crypto&&window.crypto.randomUUID?window.crypto.randomUUID():Date.now().toString(36)+"_"+Math.random().toString(36).slice(2));%5$s%6$s}catch(e){}}());',
+			wp_json_encode( $data->get_event_id() ),
+			time(),
+			(int) $server_sent,
+			static::FRESH_WINDOW,
+			$tag_code,
+			$beacon_code
 		);
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON encoded values inside a script tag.
+		echo '<script>' . $script . '</script>';
 	}
 
 	/**
@@ -128,10 +163,9 @@ class PageVisit {
 			return;
 		}
 
-		$product_id = url_to_postid( $source_url );
-		$data       = static::get_event_data( $event_id, $product_id );
-		$user       = new User( \WC_Geolocation::get_ip_address(), wc_get_user_agent() );
-		$tracker    = new Conversions( $user, $source_url );
+		$data    = static::get_event_data( $event_id, url_to_postid( $source_url ) );
+		$user    = new User( \WC_Geolocation::get_ip_address(), wc_get_user_agent() );
+		$tracker = new Conversions( $user, $source_url );
 
 		try {
 			$tracker->track_event( Tracking::EVENT_PAGE_VISIT, $data );
