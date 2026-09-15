@@ -184,6 +184,7 @@
       "rtlcss": "^4.3.0"
     },
     "uuid@>=7 <9": "^11.1.1",
-    "isomorphic-fetch@^2.0.0": "^3.0.0"
+    "isomorphic-fetch@^2.0.0": "^3.0.0",
+    "@babel/runtime-corejs3@^7.0.0": "^7.26.10"
   }
 }
