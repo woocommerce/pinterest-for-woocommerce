@@ -158,6 +158,91 @@ class ConversionsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that an over-length click ID in the query string is discarded.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_over_length_epik_query_parameter() {
+		$_GET['epik'] = str_repeat( 'a', 513 );
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that a click ID at the maximum length is kept and persisted.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_keeps_epik_query_parameter_at_maximum_length() {
+		$click_id     = str_repeat( 'a', 512 );
+		$_GET['epik'] = $click_id;
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertSame( $click_id, $data['user_data']['click_id'] );
+		$this->assertSame( $click_id, WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that an over-length click ID in the Pinterest tag cookie is discarded.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_over_length_epik_cookie() {
+		$_COOKIE['_epik'] = str_repeat( 'a', 513 );
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that an over-length click ID already stored in the session is discarded.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_over_length_session_click_id() {
+		WC()->session->set( 'pinterest_for_woocommerce_click_id', str_repeat( 'a', 513 ) );
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+	}
+
+	/**
+	 * Tests that an over-length click ID in the event source URL is discarded.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_over_length_epik_in_event_source_url() {
+		$source_url = add_query_arg( 'epik', str_repeat( 'a', 513 ), home_url( '/p/' ) );
+
+		$data = $this->prepare_page_visit_data( $source_url );
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that a rejected query parameter falls through to a valid cookie.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_uses_cookie_when_epik_query_parameter_is_over_length() {
+		$_GET['epik']     = str_repeat( 'a', 513 );
+		$_COOKIE['_epik'] = 'pinterest-cookie-click-id';
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertSame( 'pinterest-cookie-click-id', $data['user_data']['click_id'] );
+		$this->assertSame( 'pinterest-cookie-click-id', WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
 	 * The PageVisit beacon can preserve the URL of the cached storefront page.
 	 */
 	public function test_uses_explicit_event_source_url() {
@@ -364,6 +449,20 @@ class ConversionsTest extends WP_UnitTestCase {
 			),
 			$data
 		);
+	}
+
+	/**
+	 * Prepares page visit request data for a fresh Conversions tracker.
+	 *
+	 * @param string $event_source_url Optional URL where the event occurred.
+	 *
+	 * @return array Prepared request data.
+	 */
+	private function prepare_page_visit_data( string $event_source_url = '' ) {
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user, $event_source_url );
+
+		return $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
 	}
 
 	/**

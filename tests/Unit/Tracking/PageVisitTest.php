@@ -217,6 +217,53 @@ class PageVisitTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An over-length `epik` value on the landing URL is discarded rather than
+	 * stored and forwarded to the Conversions API.
+	 */
+	public function test_beacon_discards_over_length_click_id_from_source_url() {
+		$product    = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => 25 ) );
+		$source_url = add_query_arg( 'epik', str_repeat( 'a', 513 ), $product->get_permalink() );
+		$requests   = 0;
+
+		add_filter(
+			'pre_http_request',
+			function ( $response, $parsed_args ) use ( &$requests ) {
+				++$requests;
+				$body = json_decode( $parsed_args['body'], true );
+
+				$this->assertArrayNotHasKey( 'click_id', $body['data'][0]['user_data'] );
+
+				return array(
+					'headers'  => array( 'content-type' => 'application/json' ),
+					'body'     => wp_json_encode(
+						array(
+							'events' => array( array( 'status' => 'processed' ) ),
+						)
+					),
+					'response' => array(
+						'code'    => 200,
+						'message' => 'OK',
+					),
+					'cookies'  => array(),
+					'filename' => '',
+				);
+			},
+			10,
+			2
+		);
+
+		$_POST = array(
+			'event_id'         => 'page_1234567890abcdef',
+			'event_source_url' => $source_url,
+		);
+
+		PageVisit::handle_request();
+
+		$this->assertSame( 1, $requests );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
 	 * Malformed browser event IDs are rejected before CAPI dispatch.
 	 */
 	public function test_beacon_rejects_invalid_event_id() {
