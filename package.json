@@ -42,7 +42,6 @@
     "@wordpress/stylelint-config": "^25.0.0",
     "browser-sync": "^3.0.4",
     "eslint": "^10.10.0",
-    "github-label-sync": "^2.0.2",
     "gulp": "^5.0.1",
     "gulp-add-src": "^1.0.0",
     "gulp-autoprefixer": "^8.0.0",
