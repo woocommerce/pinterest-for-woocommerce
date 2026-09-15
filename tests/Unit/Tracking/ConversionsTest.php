@@ -2,6 +2,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
 use Pinterest_For_Woocommerce;
@@ -11,6 +12,7 @@ class ConversionsTest extends WP_UnitTestCase {
 
 	public function tearDown(): void {
 		remove_all_filters( 'pre_http_request' );
+		Logger::$logger = null;
 		wp_set_current_user( 0 );
 		unset( $_GET['epik'], $_COOKIE['_epik'] );
 
@@ -92,6 +94,39 @@ class ConversionsTest extends WP_UnitTestCase {
 		$user        = new User( 'Some IP address.', 'Some user agent string.' );
 		$conversions = new Conversions( $user );
 		$conversions->track_event( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+	}
+
+	/**
+	 * Without an ad account the event is skipped, reported as not sent and no "Sending" log line is written.
+	 */
+	public function test_track_event_without_ad_account_is_skipped_and_not_logged_as_sent() {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_advertiser'  => '',
+				'enable_debug_logging' => true,
+			)
+		);
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		$logger->expects( $this->once() )
+			->method( 'log' )
+			->with( 'debug', $this->stringStartsWith( 'Skipping Pinterest Conversions API event' ), $this->anything() );
+		Logger::$logger = $logger;
+
+		$requests = 0;
+		add_filter(
+			'pre_http_request',
+			function () use ( &$requests ) {
+				++$requests;
+				return false;
+			}
+		);
+
+		$conversions = new Conversions( new User( 'ip', 'ua' ) );
+		$sent        = $conversions->track_event( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertFalse( $sent );
+		$this->assertSame( 0, $requests );
 	}
 
 	/**
