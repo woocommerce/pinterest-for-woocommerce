@@ -83,7 +83,7 @@ class PageVisit {
 			return;
 		}
 
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Printing hardcoded JS tracking code.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded JS whose embedded values are JSON encoded with JSON_HEX_TAG.
 		echo '<script>(function(){' . static::get_event_id_code() . $beacon_code . '}());</script>';
 	}
 
@@ -112,7 +112,7 @@ class PageVisit {
 
 		return sprintf(
 			'var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);var beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}',
-			wp_json_encode( static::AJAX_ACTION ),
+			wp_json_encode( static::AJAX_ACTION, JSON_HEX_TAG ),
 			wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 		);
 	}
@@ -184,7 +184,8 @@ class PageVisit {
 		try {
 			$tracker->track_event( Tracking::EVENT_PAGE_VISIT, $data );
 		} catch ( Throwable $e ) {
-			// Conversions::track_event() records the failure for support visibility.
+			// Conversions::track_event() already logged the API error.
+			static::reject( 'the Conversions API dispatch failed' );
 			return;
 		}
 	}
