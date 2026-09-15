@@ -134,6 +134,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', null, 'pinterest-for-woocommerce' );
 		delete_option( FeedGenerator::OPTION_CURSOR );
 		delete_option( FeedGenerator::OPTION_START_LOCK );
+		delete_option( FeedGenerator::OPTION_FEED_DIRTY );
 		Notes::delete_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
 		parent::tearDown();
 	}
@@ -1312,6 +1313,25 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * A start action that mints a new cycle must consume the dirty flag: every change
+	 * flagged so far is covered by the cycle that is about to read all products.
+	 *
+	 * @return void
+	 */
+	public function test_start_action_consumes_dirty_flag() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'dead-cycle', false );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 1, false );
+
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturn( array() );
+
+		$this->feed_generator->handle_start_action( array() );
+
+		$this->assertFalse( $this->feed_generator->feed_is_dirty(), 'A new cycle must consume the dirty flag.' );
+	}
+
+	/**
 	 * A pending batch from a superseded cycle must not prevent start_generation()
 	 * from queueing a new chain start.
 	 *
@@ -1486,6 +1506,61 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' ),
 			'A queued chain start must defer the restart.'
 		);
+	}
+
+	/**
+	 * A dirty flag set during the cycle must make the end action schedule a restart
+	 * and must stay set until the new cycle starts and consumes it.
+	 *
+	 * @return void
+	 */
+	public function test_end_action_restarts_generation_and_leaves_dirty_flag_for_the_new_cycle() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'current-cycle', false );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 1, false );
+
+		$this->feed_generator->handle_end_action( array( FeedGenerator::ARG_CYCLE_ID => 'current-cycle' ) );
+
+		$next_start = as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		$this->assertIsInt( $next_start, 'A dirty feed must schedule a restart at the end of the cycle.' );
+		$this->assertLessThanOrEqual( time() + 1, $next_start, 'The restart must be scheduled to run now.' );
+		$this->assertEquals( 1, get_option( FeedGenerator::OPTION_FEED_DIRTY ), 'The dirty flag must be left for the new cycle to consume.' );
+	}
+
+	/**
+	 * When the restart scheduled by the end action runs while that end action is still
+	 * in progress, start_generation() defers and the dirty flag must survive so the
+	 * regeneration is not lost.
+	 *
+	 * @return void
+	 */
+	public function test_start_generation_deferred_by_finalizing_end_action_leaves_dirty_flag_set() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'current-cycle', false );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 1, false );
+
+		$running_end_action = new ActionScheduler_Action(
+			'pinterest/jobs/generate_feed/chain_end',
+			array( array( FeedGenerator::ARG_CYCLE_ID => 'current-cycle' ) )
+		);
+
+		$this->action_scheduler
+			->method( 'next_scheduled_action' )
+			->willReturn( false );
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturnCallback(
+				function ( $args ) use ( $running_end_action ) {
+					$is_end_first_page = 'pinterest/jobs/generate_feed/chain_end' === $args['hook'] && 0 === $args['offset'];
+					return $is_end_first_page ? array( $running_end_action ) : array();
+				}
+			);
+		$this->action_scheduler
+			->expects( $this->never() )
+			->method( 'schedule_immediate' );
+
+		$this->invoke_protected( $this->feed_generator, 'start_generation' );
+
+		$this->assertEquals( 1, get_option( FeedGenerator::OPTION_FEED_DIRTY ), 'A deferred restart must leave the dirty flag set.' );
 	}
 
 	/**
