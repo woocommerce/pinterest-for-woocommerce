@@ -70,7 +70,7 @@
     "prettier": "npm:wp-prettier@^2.2.1-beta-1",
     "sass": "^1.104.1",
     "semver": "^6.0.0",
-    "simple-git": "~3.20.0",
+    "simple-git": "^3.36.0",
     "stylelint": "^13.13.1",
     "typescript": "^5.9.3",
     "underscore": "^1.9.1"
