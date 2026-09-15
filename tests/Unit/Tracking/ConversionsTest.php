@@ -2,6 +2,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
 use Pinterest_For_Woocommerce;
@@ -11,6 +12,7 @@ class ConversionsTest extends WP_UnitTestCase {
 
 	public function tearDown(): void {
 		remove_all_filters( 'pre_http_request' );
+		Logger::$logger = null;
 		wp_set_current_user( 0 );
 		unset( $_GET['epik'], $_COOKIE['_epik'] );
 
@@ -169,6 +171,29 @@ class ConversionsTest extends WP_UnitTestCase {
 
 		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
 		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that discarding an over-length click ID writes the debug diagnostic.
+	 *
+	 * @return void
+	 */
+	public function test_discarding_over_length_click_id_is_logged() {
+		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', true );
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		$logger->expects( $this->once() )
+			->method( 'log' )
+			->with(
+				'debug',
+				'Discarding Pinterest click ID longer than 512 bytes.',
+				array( 'source' => 'pinterest-for-woocommerce-conversions' )
+			);
+		Logger::$logger = $logger;
+
+		$_GET['epik'] = str_repeat( 'a', 513 );
+
+		$this->prepare_page_visit_data();
 	}
 
 	/**
