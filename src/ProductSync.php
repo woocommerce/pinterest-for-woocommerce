@@ -57,8 +57,12 @@ class ProductSync {
 		self::initialize_feed_components();
 		/**
 		 * Mark feed as needing re-generation whenever a product is edited or changed.
+		 * edit_post fires before WooCommerce writes the product meta, so the product hooks
+		 * flag the feed again once the saved data is complete.
 		 */
 		add_action( 'edit_post', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
+		add_action( 'woocommerce_new_product', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
+		add_action( 'woocommerce_update_product', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
 
 		if ( 'yes' === get_option( 'woocommerce_manage_stock' ) ) {
 			add_action( 'woocommerce_variation_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
