@@ -67,6 +67,7 @@
     "minimist": "^1.2.8",
     "path": "^0.12.7",
     "prettier": "npm:wp-prettier@^2.2.1-beta-1",
+    "process": "^0.11.10",
     "sass": "^1.104.1",
     "semver": "^6.0.0",
     "simple-git": "^3.36.0",

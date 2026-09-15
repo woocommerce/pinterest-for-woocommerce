@@ -1,3 +1,4 @@
+const { ProvidePlugin } = require( 'webpack' );
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 const WooCommerceDependencyExtractionWebpackPlugin = require( '@woocommerce/dependency-extraction-webpack-plugin' );
 
@@ -13,6 +14,8 @@ const requestToExternal = ( request ) => {
 // Replace the default DependencyExtractionWebpackPlugin with the Woo version
 // and override to bundle specific newer packages (see requestToExternal above).
 const ourPlugins = [
+	// Preserve Webpack 4's browser process shim for bundled WordPress components.
+	new ProvidePlugin( { process: require.resolve( 'process/browser' ) } ),
 	...defaultConfig.plugins.filter(
 		( plugin ) =>
 			plugin.constructor.name !== 'DependencyExtractionWebpackPlugin'
