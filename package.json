@@ -34,7 +34,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.0.3",
     "@typescript-eslint/parser": "^8.70.0",
-    "@woocommerce/dependency-extraction-webpack-plugin": "^1.7.0",
+    "@woocommerce/dependency-extraction-webpack-plugin": "~2.2.0",
     "@woocommerce/eslint-plugin": "^4.0.0",
     "@wordpress/base-styles": "^3.6.0",
     "@wordpress/env": "^5.16.0",
