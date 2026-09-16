@@ -56,7 +56,7 @@ class ProductSync {
 	 * g:availability, which ProductsXmlFeed derives from the stock status, so a quantity
 	 * decrement at checkout produces a byte identical feed.
 	 *
-	 * @since 1.5.0
+	 * @since x.x.x
 	 *
 	 * @var string[]
 	 */
@@ -80,7 +80,7 @@ class ProductSync {
 	 * Several hooks fire for a single save, and imports, bulk edits or wc_scheduled_sales
 	 * save many products in one request. One flag per product is enough.
 	 *
-	 * @since 1.5.0
+	 * @since x.x.x
 	 *
 	 * @var array<int, bool>
 	 */
@@ -294,7 +294,7 @@ class ProductSync {
 	 * woocommerce_product_object_updated_props afterwards, and a generation cycle can consume
 	 * the flag in between, so the post-write notification has to be able to set it again.
 	 *
-	 * @since 1.5.0
+	 * @since x.x.x
 	 *
 	 * @param integer $product_id The product ID.
 	 * @param string  $source     Identifier of the notification source.
@@ -321,7 +321,7 @@ class ProductSync {
 	/**
 	 * Mark the feed as dirty for a newly created product.
 	 *
-	 * @since 1.5.0
+	 * @since x.x.x
 	 *
 	 * @param integer $product_id The product ID.
 	 *
@@ -338,7 +338,7 @@ class ProductSync {
 	 * filtered against FEED_RELEVANT_PRODUCT_PROPS to skip the saves that cannot change
 	 * the feed output.
 	 *
-	 * @since 1.5.0
+	 * @since x.x.x
 	 *
 	 * @param WC_Product $product       The saved product.
 	 * @param array      $updated_props Names of the properties written by the save.
@@ -360,7 +360,7 @@ class ProductSync {
 	 * pending product cannot change the feed. Products leaving the published state are not
 	 * filtered here: they travel through wp_update_post(), which fires edit_post.
 	 *
-	 * @since 1.5.0
+	 * @since x.x.x
 	 *
 	 * @param WC_Product|false|null $product The product, or a falsy value when the lookup failed.
 	 * @param string                $source  Identifier of the notification source.

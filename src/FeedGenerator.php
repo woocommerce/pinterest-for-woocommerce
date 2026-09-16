@@ -744,6 +744,8 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Writes the dirty flag.
 	 *
+	 * @since x.x.x
+	 *
 	 * @param bool $dirty Whether the feed needs regenerating.
 	 */
 	private function set_feed_dirty_flag( bool $dirty ): void {
