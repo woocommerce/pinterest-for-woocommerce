@@ -108,7 +108,7 @@ $ ./bin/install-wp-tests.sh wordpress_tests root root localhost
 To test the minimum supported versions, use a fresh test directory and a dedicated database:
 
 ```bash
-$ WC_VERSION=10.9.0 ./bin/install-wp-tests.sh wordpress_tests root root localhost 6.9
+$ WC_VERSION=10.9.0 ./bin/install-wp-tests.sh wordpress_tests root root localhost 6.9.0
 ```
 
 `WC_VERSION` accepts a release tag; `latest` and the default `trunk` select the latest stable release. The script reuses an existing WooCommerce directory, so use a fresh `TMPDIR` and `WP_CORE_DIR` when switching versions.
