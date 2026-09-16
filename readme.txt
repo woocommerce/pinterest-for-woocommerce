@@ -1,7 +1,7 @@
 === Pinterest for WooCommerce ===
 Contributors: automattic, pinterest, woocommerce
 Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
-Requires at least: 5.6
+Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 1.5.0
@@ -62,8 +62,8 @@ Pinterest is a visual discovery engine people use to find inspiration for their 
 
 = Minimum Requirements =
 
-* WordPress 5.6 or greater
-* WooCommerce 7.0 or greater
+* WordPress 6.9 or greater
+* WooCommerce 10.9 or greater
 * PHP version 7.4 or greater
 * MySQL version 5.6 or greater
 
