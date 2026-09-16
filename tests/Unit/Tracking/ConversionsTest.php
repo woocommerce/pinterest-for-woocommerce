@@ -197,6 +197,32 @@ class ConversionsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An over-length value is reported even when sanitizing would also have altered it.
+	 *
+	 * @return void
+	 */
+	public function test_discarding_over_length_click_id_is_logged_for_mutated_values() {
+		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', true );
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		$logger->expects( $this->once() )
+			->method( 'log' )
+			->with(
+				'debug',
+				'Discarding Pinterest click ID longer than 512 bytes.',
+				array( 'source' => 'pinterest-for-woocommerce-conversions' )
+			);
+		Logger::$logger = $logger;
+
+		// Over the cap and carrying a percent sequence sanitize_text_field() would strip.
+		$_GET['epik'] = str_repeat( 'a', 512 ) . '%41';
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+	}
+
+	/**
 	 * Tests that a click ID at the maximum length is kept and persisted.
 	 *
 	 * @return void

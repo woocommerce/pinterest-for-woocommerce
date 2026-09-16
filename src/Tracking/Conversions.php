@@ -288,13 +288,16 @@ class Conversions extends Tracker {
 			return false;
 		}
 
-		$sanitized = sanitize_text_field( $value );
-		if ( $sanitized !== $value || '' === $sanitized ) {
+		// Bound the length before sanitizing: sanitize_text_field() decodes percent
+		// sequences in a loop, so an unbounded value is expensive to clean up, and an
+		// over-length value should be reported whether or not sanitizing would alter it.
+		if ( strlen( $value ) > self::CLICK_ID_MAX_LENGTH ) {
+			Logger::log( sprintf( 'Discarding Pinterest click ID longer than %d bytes.', self::CLICK_ID_MAX_LENGTH ), 'debug', 'conversions' );
 			return false;
 		}
 
-		if ( strlen( $sanitized ) > self::CLICK_ID_MAX_LENGTH ) {
-			Logger::log( sprintf( 'Discarding Pinterest click ID longer than %d bytes.', self::CLICK_ID_MAX_LENGTH ), 'debug', 'conversions' );
+		$sanitized = sanitize_text_field( $value );
+		if ( $sanitized !== $value || '' === $sanitized ) {
 			return false;
 		}
 
