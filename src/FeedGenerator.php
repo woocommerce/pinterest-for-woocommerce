@@ -744,11 +744,19 @@ class FeedGenerator extends AbstractChainedJob {
 	/**
 	 * Writes the dirty flag.
 	 *
+	 * The flag is written from storefront requests, cron, Action Scheduler runners and WP-CLI,
+	 * and cleared by whichever process runs the chain start. update_option() skips the write
+	 * when the value matches its per-process options cache, so a long-lived process that
+	 * flagged the feed earlier would write nothing after a concurrent cycle consumed the flag,
+	 * and a long-lived runner would skip a later clear. Dropping the cached copy first forces
+	 * a fresh read from the database.
+	 *
 	 * @since x.x.x
 	 *
 	 * @param bool $dirty Whether the feed needs regenerating.
 	 */
 	private function set_feed_dirty_flag( bool $dirty ): void {
+		wp_cache_delete( self::OPTION_FEED_DIRTY, 'options' );
 		update_option( self::OPTION_FEED_DIRTY, $dirty ? 1 : 0, false );
 	}
 

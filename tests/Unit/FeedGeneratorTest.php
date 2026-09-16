@@ -1382,6 +1382,52 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * The flag is written from storefront requests, cron, Action Scheduler runners and WP-CLI,
+	 * and cleared by whichever process runs the chain start. A long-lived process keeps the
+	 * value it last wrote in its options cache, and update_option() skips writes that match
+	 * that cache, so the write must not depend on it.
+	 *
+	 * @dataProvider stale_options_cache_provider
+	 *
+	 * @param bool $dirty Direction of the write under test.
+	 *
+	 * @return void
+	 */
+	public function test_dirty_flag_writes_ignore_a_stale_options_cache( bool $dirty ) {
+		global $wpdb;
+
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturn( array() );
+
+		$write = $dirty ? 'mark_feed_dirty' : 'mark_feed_clean';
+
+		// Prime this process's options cache with the value under test.
+		$this->feed_generator->$write();
+		$this->assertSame( $dirty, $this->feed_generator->feed_is_dirty() );
+
+		// Another process writes the opposite value straight to the database.
+		$wpdb->update( $wpdb->options, array( 'option_value' => $dirty ? '0' : '1' ), array( 'option_name' => FeedGenerator::OPTION_FEED_DIRTY ) );
+		$this->assertSame( ! $dirty, $this->feed_generator->feed_is_dirty(), 'The concurrent write must be visible to the uncached read.' );
+
+		$this->feed_generator->$write();
+
+		$this->assertSame( $dirty, $this->feed_generator->feed_is_dirty(), 'The write must not be skipped because of a stale options cache.' );
+	}
+
+	/**
+	 * Both directions of the flag write.
+	 *
+	 * @return array[]
+	 */
+	public function stale_options_cache_provider() {
+		return array(
+			'set after a concurrent clear' => array( true ),
+			'clear after a concurrent set' => array( false ),
+		);
+	}
+
+	/**
 	 * A pending batch from a superseded cycle must not prevent start_generation()
 	 * from queueing a new chain start.
 	 *
