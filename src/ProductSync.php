@@ -283,9 +283,29 @@ class ProductSync {
 	 * @return void
 	 */
 	public static function mark_feed_dirty( $product_id ) {
-		$product_id = (int) $product_id;
+		self::mark_feed_dirty_once( $product_id, 'post' );
+	}
 
-		if ( isset( self::$flagged_product_ids[ $product_id ] ) ) {
+	/**
+	 * Marks the feed dirty at most once per product and notification source per request.
+	 *
+	 * The sources are deduplicated separately on purpose. A product save notifies through
+	 * edit_post before WooCommerce writes the meta and through
+	 * woocommerce_product_object_updated_props afterwards, and a generation cycle can consume
+	 * the flag in between, so the post-write notification has to be able to set it again.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param integer $product_id The product ID.
+	 * @param string  $source     Identifier of the notification source.
+	 *
+	 * @return void
+	 */
+	private static function mark_feed_dirty_once( $product_id, $source ) {
+		$product_id = (int) $product_id;
+		$key        = $source . ':' . $product_id;
+
+		if ( isset( self::$flagged_product_ids[ $key ] ) ) {
 			return;
 		}
 
@@ -293,7 +313,7 @@ class ProductSync {
 			return;
 		}
 
-		self::$flagged_product_ids[ $product_id ] = true;
+		self::$flagged_product_ids[ $key ] = true;
 
 		self::$feed_generator->mark_feed_dirty();
 	}
@@ -308,7 +328,7 @@ class ProductSync {
 	 * @return void
 	 */
 	public static function mark_feed_dirty_on_new_product( $product_id ) {
-		self::mark_feed_dirty_if_in_feed( wc_get_product( $product_id ) );
+		self::mark_feed_dirty_if_in_feed( wc_get_product( $product_id ), 'new_product' );
 	}
 
 	/**
@@ -330,7 +350,7 @@ class ProductSync {
 			return;
 		}
 
-		self::mark_feed_dirty_if_in_feed( $product );
+		self::mark_feed_dirty_if_in_feed( $product, 'updated_props' );
 	}
 
 	/**
@@ -343,14 +363,15 @@ class ProductSync {
 	 * @since 1.5.0
 	 *
 	 * @param WC_Product|false|null $product The product, or a falsy value when the lookup failed.
+	 * @param string                $source  Identifier of the notification source.
 	 *
 	 * @return void
 	 */
-	private static function mark_feed_dirty_if_in_feed( $product ) {
+	private static function mark_feed_dirty_if_in_feed( $product, $source ) {
 		if ( ! $product instanceof WC_Product || 'publish' !== $product->get_status() ) {
 			return;
 		}
 
-		self::mark_feed_dirty( $product->get_id() );
+		self::mark_feed_dirty_once( $product->get_id(), $source );
 	}
 }

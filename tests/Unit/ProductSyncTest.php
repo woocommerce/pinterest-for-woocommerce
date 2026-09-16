@@ -265,4 +265,35 @@ class ProductSyncTest extends \WP_UnitTestCase {
 
 		$this->assertFalse( $this->feed_generator->feed_is_dirty(), 'Editing a draft product must not mark the feed dirty.' );
 	}
+	/**
+	 * A cycle consuming the flag between the pre-write and post-write notifications must not
+	 * leave the completed write unflagged.
+	 *
+	 * @return void
+	 */
+	public function test_post_write_notification_re_marks_after_the_flag_is_consumed() {
+		$product = WC_Helper_Product::create_simple_product();
+		$product->set_status( 'publish' );
+		$product->save();
+
+		// Creating the fixture already ran the hooks, so start from a clean request state.
+		$this->set_static_property( 'flagged_product_ids', array() );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 0, false );
+
+		// Pre-write notification, as edit_post delivers it.
+		ProductSync::mark_feed_dirty( $product->get_id() );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'The pre-write notification must mark the feed dirty.' );
+
+		// A generation cycle starts and consumes the flag.
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 0, false );
+
+		// The save completes and the post-write notification arrives for the same product.
+		ProductSync::mark_feed_dirty_on_updated_props( $product, array( 'regular_price' ) );
+
+		$this->assertTrue(
+			$this->feed_generator->feed_is_dirty(),
+			'A completed write must mark the feed dirty even when the pre-write notification already fired.'
+		);
+	}
+
 }
