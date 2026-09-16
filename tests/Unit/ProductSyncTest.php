@@ -295,5 +295,4 @@ class ProductSyncTest extends \WP_UnitTestCase {
 			'A completed write must mark the feed dirty even when the pre-write notification already fired.'
 		);
 	}
-
 }
