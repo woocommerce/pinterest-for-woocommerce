@@ -75,14 +75,17 @@ class ProductSync {
 	);
 
 	/**
-	 * IDs of the products already flagged during this request, keyed by product ID.
+	 * Products already flagged during this request, keyed by notification source and product ID.
 	 *
 	 * Several hooks fire for a single save, and imports, bulk edits or wc_scheduled_sales
-	 * save many products in one request. One flag per product is enough.
+	 * save many products in one request, so a product notifies the generator once while the
+	 * flag it wrote is still set. The guard is not trusted once a generation cycle has consumed
+	 * the flag: long-lived CLI and Action Scheduler workers save the same product again later
+	 * and must be able to flag the feed again.
 	 *
 	 * @since x.x.x
 	 *
-	 * @var array<int, bool>
+	 * @var array<string, bool>
 	 */
 	private static $flagged_product_ids = array();
 
@@ -287,12 +290,16 @@ class ProductSync {
 	}
 
 	/**
-	 * Marks the feed dirty at most once per product and notification source per request.
+	 * Marks the feed dirty at most once per product and notification source while the flag is set.
 	 *
 	 * The sources are deduplicated separately on purpose. A product save notifies through
 	 * edit_post before WooCommerce writes the meta and through
 	 * woocommerce_product_object_updated_props afterwards, and a generation cycle can consume
 	 * the flag in between, so the post-write notification has to be able to set it again.
+	 *
+	 * The guard only stands while the flag this process wrote is still set. Once a cycle has
+	 * consumed it, the same notification writes it again; otherwise a long-lived worker would
+	 * never flag a product twice and its later changes would wait for the daily run.
 	 *
 	 * @since x.x.x
 	 *
@@ -305,7 +312,7 @@ class ProductSync {
 		$product_id = (int) $product_id;
 		$key        = $source . ':' . $product_id;
 
-		if ( isset( self::$flagged_product_ids[ $key ] ) ) {
+		if ( isset( self::$flagged_product_ids[ $key ] ) && self::$feed_generator->feed_is_dirty() ) {
 			return;
 		}
 

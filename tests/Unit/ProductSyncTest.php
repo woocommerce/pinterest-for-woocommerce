@@ -39,18 +39,7 @@ class ProductSyncTest extends \WP_UnitTestCase {
 	public function setUp(): void {
 		parent::setUp();
 
-		$action_scheduler = $this->createMock( ActionSchedulerInterface::class );
-		$action_scheduler->method( 'search' )->willReturn( array() );
-		$action_scheduler->method( 'next_scheduled_action' )->willReturn( false );
-
-		$local_feed_configs = $this->createMock( LocalFeedConfigs::class );
-		$local_feed_configs->method( 'get_configurations' )->willReturn( array() );
-
-		$this->feed_generator = new FeedGenerator(
-			$action_scheduler,
-			$this->createMock( FeedFileOperations::class ),
-			$local_feed_configs
-		);
+		$this->feed_generator = $this->create_feed_generator();
 
 		$this->set_static_property( 'feed_generator', $this->feed_generator );
 		$this->set_static_property( 'flagged_product_ids', array() );
@@ -89,6 +78,45 @@ class ProductSyncTest extends \WP_UnitTestCase {
 		$property = new ReflectionProperty( ProductSync::class, $name );
 		$property->setAccessible( true );
 		$property->setValue( null, $value );
+	}
+
+	/**
+	 * Builds a feed generator on mocked collaborators, optionally with methods stubbed.
+	 *
+	 * @param string[] $mocked_methods FeedGenerator methods to stub.
+	 *
+	 * @return FeedGenerator
+	 */
+	private function create_feed_generator( array $mocked_methods = array() ) {
+		$action_scheduler = $this->createMock( ActionSchedulerInterface::class );
+		$action_scheduler->method( 'search' )->willReturn( array() );
+		$action_scheduler->method( 'next_scheduled_action' )->willReturn( false );
+
+		$local_feed_configs = $this->createMock( LocalFeedConfigs::class );
+		$local_feed_configs->method( 'get_configurations' )->willReturn( array() );
+
+		$arguments = array( $action_scheduler, $this->createMock( FeedFileOperations::class ), $local_feed_configs );
+
+		if ( empty( $mocked_methods ) ) {
+			return new FeedGenerator( ...$arguments );
+		}
+
+		return $this->getMockBuilder( FeedGenerator::class )
+			->setConstructorArgs( $arguments )
+			->onlyMethods( $mocked_methods )
+			->getMock();
+	}
+
+	/**
+	 * Clears the dirty flag the way a concurrent generation cycle does: straight in the
+	 * database, leaving this process's options cache untouched.
+	 *
+	 * @return void
+	 */
+	private function consume_flag_from_another_process() {
+		global $wpdb;
+
+		$wpdb->update( $wpdb->options, array( 'option_value' => '0' ), array( 'option_name' => FeedGenerator::OPTION_FEED_DIRTY ) );
 	}
 
 	/**
@@ -170,25 +198,48 @@ class ProductSyncTest extends \WP_UnitTestCase {
 
 	/**
 	 * Several hooks fire for a single save, and bulk operations save many products in one
-	 * request, so a product is only allowed to flag the feed once per request.
+	 * request, so a product notifies the feed generator only once while the flag it wrote
+	 * is still set.
 	 *
 	 * @return void
 	 */
-	public function test_guard_flags_the_same_product_only_once_per_request() {
+	public function test_guard_flags_the_same_product_only_once_while_the_flag_is_set() {
+		$product = $this->create_clean_product();
+
+		$spy = $this->create_feed_generator( array( 'mark_feed_dirty' ) );
+		$spy->expects( $this->once() )->method( 'mark_feed_dirty' );
+		$this->set_static_property( 'feed_generator', $spy );
+
+		// The stubbed mark_feed_dirty() writes nothing, so set the flag the first save would have written.
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 1, false );
+
+		$product->set_regular_price( 20 );
+		$product->save();
+		$product->set_regular_price( 30 );
+		$product->save();
+	}
+
+	/**
+	 * Long-lived CLI and Action Scheduler workers save the same product repeatedly. Once a
+	 * generation cycle in another process consumes the flag, the next save of a product this
+	 * process already flagged must flag the feed again, or the change waits for the daily run.
+	 *
+	 * @return void
+	 */
+	public function test_guard_lets_a_product_flag_again_after_the_flag_is_consumed() {
 		$product = $this->create_clean_product();
 
 		$product->set_regular_price( 20 );
 		$product->save();
 		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'The first save must mark the feed dirty.' );
 
-		// Clear the flag without clearing the guard: a second save of the same product
-		// within the same request must not write it again.
-		$this->feed_generator->mark_feed_clean();
+		$this->consume_flag_from_another_process();
+		$this->assertFalse( $this->feed_generator->feed_is_dirty(), 'The concurrent clear must be visible to the uncached read.' );
 
 		$product->set_regular_price( 30 );
 		$product->save();
 
-		$this->assertFalse( $this->feed_generator->feed_is_dirty(), 'The guard must collapse repeated saves of one product.' );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'A save after the flag was consumed must mark the feed dirty again.' );
 	}
 
 	/**
@@ -284,8 +335,8 @@ class ProductSyncTest extends \WP_UnitTestCase {
 		ProductSync::mark_feed_dirty( $product->get_id() );
 		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'The pre-write notification must mark the feed dirty.' );
 
-		// A generation cycle starts and consumes the flag.
-		update_option( FeedGenerator::OPTION_FEED_DIRTY, 0, false );
+		// A generation cycle in another process consumes the flag.
+		$this->consume_flag_from_another_process();
 
 		// The save completes and the post-write notification arrives for the same product.
 		ProductSync::mark_feed_dirty_on_updated_props( $product, array( 'regular_price' ) );
