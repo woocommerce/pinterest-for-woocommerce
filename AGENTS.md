@@ -2,6 +2,8 @@
 
 This document provides coding agent guidelines for working with the Pinterest for WooCommerce plugin. It contains information that may be difficult for agents to discover independently and follows industry best practices for agent instruction files.
 
+For PHP work, also read `.github/instructions/php.instructions.md`.
+
 ## Project Overview
 
 Pinterest for WooCommerce is an official WordPress plugin that integrates WooCommerce stores with Pinterest. It enables:
@@ -16,9 +18,7 @@ Pinterest for WooCommerce is an official WordPress plugin that integrates WooCom
 ## Technology Stack
 
 ### Backend
-- **PHP:** 7.4+ (minimum supported version)
-- **WordPress:** 5.6+ (minimum), tested up to 6.9
-- **WooCommerce:** 7.0+ (minimum), tested up to 10.5
+- **Supported versions:** read the PHP, WordPress, and WooCommerce requirements and tested versions from `pinterest-for-woocommerce.php`. Check `composer.json` for the PHP dependency constraint and platform version.
 - **Architecture:** PSR-4 autoloading for modern code, WordPress conventions for legacy code
 - **Dependencies:**
   - `automattic/jetpack-autoloader` - Version resolution for shared dependencies
@@ -180,15 +180,14 @@ This project follows **WooCommerce-Core** coding standards, which extend WordPre
 - PSR-4 naming in `src/` directory (e.g., `class ProductSync` in file `ProductSync.php`)
 - WordPress naming conventions in `includes/` directory (e.g., `class-pinterest-for-woocommerce-admin.php`)
 - Text domain MUST be `pinterest-for-woocommerce`
-- Minimum WordPress version: 5.6
-- Minimum PHP version: 7.4
+- Check the plugin header for minimum WordPress and PHP versions.
 - PHPCompatibility checks enabled
 - File comments required (except in `src/` and `tests/`)
 - Function comments required with proper @param and @return tags
 
 **PHPCS Configuration:** See `phpcs.xml` for complete ruleset.
 
-**CRITICAL:** ALWAYS run `vendor/bin/phpcs` before committing code. CI will fail if code doesn't pass phpcs checks.
+Run `vendor/bin/phpcs` for PHP changes before committing. Use the JS/CSS checks for changes to those sources; documentation changes need command/path and formatting checks.
 
 ### JavaScript Standards
 
@@ -265,54 +264,30 @@ public static function update_or_create_merchant( $merchant_id, $args ) {
 
 ## Git Workflow
 
-### Branching
+### Branching and worktrees
 
-**ALWAYS create feature branches from `develop`:**
+Use `develop` as the feature base and PR target. This is the approved exception to the SWW workspace's default `trunk` base. Use the issue's exact Linear-generated branch name; the values below are examples:
+
 ```bash
-# Create new feature branch
-git checkout develop
-git pull origin develop
-git checkout -b feature/your-feature-name
-
-# Create bugfix branch
-git checkout -b fix/bug-description
+git fetch origin develop
+main_checkout="$PWD"
+branch_name=pin4woo-123-short-description
+worktree_path=../pinterest-for-woocommerce-pin4woo-123
+git worktree add "$worktree_path" -b "$branch_name" origin/develop
+cd "$worktree_path"
+nvm use
+npm install
+composer install
 ```
 
-**NEVER** branch from or merge directly to `main` or `master`. The main development branch is `develop`.
+For a Docker environment, use `npm run wp-env -- start` from this worktree. Give each concurrent environment unique development and test ports in its gitignored `.wp-env.override.json`; keep that configuration for every wp-env command. The local PHP test command is `npm run test:php:wp-env` after the environment starts. That script expects `/var/www/html/wp-content/plugins/pinterest-for-woocommerce`; map the worktree to `wp-content/plugins/pinterest-for-woocommerce` in the override before using it.
 
-#### Branch Naming Format
+Destroy the environment before removing the worktree:
 
-**Format:** `<prefix>/<short-description>`
-
-**Allowed prefixes:**
-- `feature/` - New functionality or enhancements
-- `fix/` - Bug fixes
-- `update/` - Dependency updates or version bumps
-- `refactor/` - Code refactoring without changing functionality
-- `chore/` - Maintenance tasks, build config changes
-
-**Naming conventions:**
-- Use imperative mood (e.g., `add`, `fix`, `update`, not `adding`, `fixed`, `updated`)
-- Use lowercase
-- Use hyphens (not underscores or spaces)
-- Keep descriptions short and descriptive
-- Do NOT include issue/ticket numbers in branch names
-
-**Good examples:**
-```
-feature/add-catalog-retry-logic
-fix/product-attribute-mapping
-update/bump-min-woocommerce-version
-refactor/simplify-merchant-creation
-chore/update-phpcs-config
-```
-
-**Bad examples:**
-```
-Feature/AddRetryLogic          # Wrong: capitalized
-fix_bug                        # Wrong: too vague, uses underscore
-feature/PINT-123-add-feature   # Wrong: includes ticket number
-updateDependencies             # Wrong: missing prefix, camelCase
+```bash
+npm run wp-env -- destroy
+cd "$main_checkout"
+git worktree remove "$worktree_path"
 ```
 
 ### Commit Practices
@@ -321,9 +296,9 @@ Follow these commit guidelines:
 - **Concise, one-line commit messages** preferred
 - **Incremental commits** - break changes into logical, self-contained commits
 - **Present tense, imperative mood** (e.g., "Add feature" not "Added feature")
-- **Run phpcs before committing** - CRITICAL
-- **Do NOT use `--no-verify`** to skip git hooks unless absolutely necessary
-- **Do NOT commit without testing** - at minimum, ensure code passes linting
+- Run the checks appropriate to the changed files before committing.
+- Do not bypass git hooks or configured commit signing.
+- Report failed, skipped, and untested checks accurately.
 
 **Good commit message examples:**
 ```
@@ -337,10 +312,10 @@ Refactor admin settings validation
 
 When creating PRs:
 - Target the `develop` branch
-- Provide clear description of changes
-- Include test instructions
-- Reference related issues
-- Ensure all CI checks pass (phpcs, PHPUnit, JS tests)
+- Follow `.github/PULL_REQUEST_TEMPLATE.md`; it has no auto-assign-milestone checkbox.
+- Start the description with `Closes PIN4WOO-<n>` and include test instructions.
+- Supply changelog text in the template's Changelog entry section. Explain any documentation-only exemption there; do not invent checkboxes or change labels.
+- Check CI results and distinguish passing, failed, and skipped jobs.
 
 ## Common Pitfalls
 
@@ -350,12 +325,12 @@ When creating PRs:
 |---------|-----|
 | Edit WordPress core files | Only modify plugin code |
 | Edit WooCommerce plugin files | Only modify this plugin's code |
-| Commit without running `vendor/bin/phpcs` first | CI will fail |
+| Commit PHP changes without running `vendor/bin/phpcs` | Check the changed code |
 | Modify `changelog.txt` | Unless explicitly requested |
 | Commit `node_modules/` or `vendor/` directories | These are gitignored |
 | Commit `.env` files or credentials | Security risk |
-| Use `--no-verify` or `--no-gpg-sign` | Unless explicitly required |
-| Skip running tests before pushing to remote | May break production |
+| Use `--no-verify` or `--no-gpg-sign` | Preserve hooks and configured signing |
+| Claim unrun or skipped checks passed | Report the actual validation |
 | Use Node versions outside 12.20.1 to <15 | Check with `nvm use` |
 
 ### CRITICAL - ALWAYS Do These Things
@@ -365,7 +340,7 @@ When creating PRs:
 | Follow WooCommerce coding standards | Enforced by phpcs |
 | Use text domain `pinterest-for-woocommerce` | Required for translations |
 | Branch from `develop`, not main/master | Main development branch |
-| Run linting before commits | `vendor/bin/phpcs`, `npm run lint:js`, `npm run lint:css` |
+| Run checks for the changed files | PHP: `vendor/bin/phpcs`; JS/CSS: their lint scripts; docs: command/path and formatting checks |
 | Write PHPUnit tests for new PHP functionality | Ensure code quality and prevent regressions |
 | Use PSR-4 naming in `src/` directory | Modern PHP autoloading standard |
 | Use WordPress naming conventions in `includes/` | Legacy code compatibility |
@@ -428,20 +403,14 @@ npm start  # recompile
 
 **Reason:** WordPress cron is unreliable for critical tasks (depends on site traffic). Action Scheduler provides robust background job processing with retries, error handling, failure logging, and admin UI for monitoring scheduled actions.
 
-### Why separate WordPress/WooCommerce minimum versions?
+### Supported versions and repository differences
 
-**Reason:** WordPress and WooCommerce release independently. We support recent versions of each to balance feature availability with user adoption:
+Read platform requirements from the plugin header and use `nvm use` with `.nvmrc`. Keep these repository-specific workflows when applying shared extension standards; changes to the toolchain or release process need their own scope:
 
-| Platform | Support Policy | Current Minimum |
-|----------|---------------|-----------------|
-| WordPress | Last 2 major versions | 5.6+ |
-| WooCommerce | Last several major versions | 7.0+ |
-
-Always check the plugin header in `pinterest-for-woocommerce.php` for current requirements.
-
-### Why is Node pinned to v14.16?
-
-**Reason:** The build toolchain and dependencies have proven difficult to update without breaking changes. Updating Node and related packages (webpack, @wordpress/scripts, etc.) requires significant testing and potential code changes. The current pinned version (v14.16, specified in `.nvmrc`) works reliably, so we maintain it until a coordinated update effort can be planned. Always use `nvm use` to ensure you're on the correct version.
+- Node 14/npm 6, webpack, and Gulp remain the current build toolchain. A coordinated upgrade needs its own dependency and build validation.
+- PSR-4 code in `src/` coexists with WordPress-style classes in `includes/`.
+- The PR template collects changelog text. This repo has no Changelogger command or `changelog/` change files; do not import that workflow from other extensions.
+- Feature PRs target `develop`, but `.github/workflows/prepare-release.yml` configures `trunk` as its main branch and `ci-merge.yml` targets `trunk`. Reconcile release automation separately; those settings do not change the approved feature base.
 
 ## Testing Strategy
 
@@ -501,11 +470,8 @@ The plugin uses standard WordPress/WooCommerce hooks:
 ## Security Guidelines
 
 ### Data Handling
-- **API credentials encrypted** using defuse/php-encryption
-- **Nonce verification** on all AJAX and form submissions
-- **Capability checks** before admin operations
-- **Input sanitization** on all user-provided data
-- **Output escaping** when rendering data
+
+Keep API credentials encrypted with `defuse/php-encryption`. Apply the shared security and defensive-coding safeguards below to all entry points.
 
 ### Confidentiality
 This is a **public open-source repository**. NEVER commit:
@@ -582,6 +548,64 @@ Per WordPress Core Handbook, we support:
 
 ---
 
-**Last Updated:** 2026-02-25
-**Maintained by:** WooCommerce Team
-**License:** GPL-3.0-or-later
+**Last Updated:** 2026-09-15 **Maintained by:** WooCommerce Team **License:** GPL-3.0-or-later
+
+## Shared implementation safeguards
+
+These safeguards complement the repository-specific guidance. In the SWW workspace, the parent `AGENTS.md` remains authoritative for approvals, GitHub writes, and Linear workflow. Local instructions do not relax it.
+
+### Compatibility and extension contracts
+
+- Preserve existing public classes, interfaces, functions, methods, constants, signatures, hooks, hook timing, CSS classes, externally consumed file paths, templates, saved markup, and persisted formats. Assume unseen consumers in extensions, themes, and merchant snippets. Treat changes to any exposed surface as high-risk: state what changes, who could consume it, and why it is safe or how consumers can migrate in the PR description. When in doubt, assume the surface is exposed. If that impact cannot be established, stop and flag it for review before changing it.
+- Deprecate instead of removing or renaming a public contract in place. Mark the old symbol `@deprecated` and keep it working alongside its replacement for a migration window. Append hook arguments; do not remove or reorder existing ones, or change when or whether a hook fires without assessing consumers. Retire hooks through `do_action_deprecated()` or `apply_filters_deprecated()`.
+- Adding a required interface method breaks existing implementers and must be flagged explicitly. Prefer a compatible concrete-class addition, a separate interface, or a default implementation in an existing abstract base where that fits the extension contract. Removing an interface requirement does not make an implementation's extra method invalid, but it changes the contract available to consumers. Assess both callers and implementers.
+- Public and protected overrides are contracts, including whether they run. A fast path that skips an overridable method can disable third-party behavior without changing a signature. Preserve those calls or treat the change as breaking.
+- Adding or tightening parameter/return types can reject previously accepted values or break subclasses. Check actual inputs, including `null`, `false`, empty values from metadata, and numeric-string IDs; PHP still coerces some scalar values in weak mode. Adding `declare(strict_types=1)` changes scalar checks on calls made from that file. Tightening a comparison to `===` or adding a strict `instanceof` check can also reject values that shipped code accepted.
+- Do not add parameter or return types to filter callbacks, or parameter types to action callbacks. Validate values in the body before passing them to typed code. A filter must preserve an unexpected value unchanged rather than discard another extension's customization. Action return values are ignored.
+- Registered script/style handles are public contracts, including handles registered incidentally. Preserve old handles during renames as aliases depending on the new handle; do not load the same file twice.
+- Guard global and lifecycle dependencies in admin, REST, CLI, cron, AJAX, webhook, and frontend contexts. Do not assume `$post`, `$wp_query`, a session, or a cart exists. Use `function_exists()` / `class_exists()` for optional symbols, `isset()` for variables, and `did_action()` for lifecycle state. Verify that `WC()` and the required component are initialized before dereferencing them.
+- Account for multisite storage: site versus network options (`get_option()` / `get_site_option()`), per-site tables, roles, capabilities, and upload paths. For changes that read or write site state, state whether multisite behavior was verified and report when it was not tested.
+- Support subdirectory installs, relocated `wp-content`, and reverse proxies. Derive paths and URLs with WordPress APIs such as `plugins_url()`, `plugin_dir_path()`, and `wp_upload_dir()`; preserve the distinction between `home_url()` and `site_url()`.
+
+### Upgrades and persistent data
+
+When a change introduces or alters persistent state:
+
+- Add a stored version and a version-gated migration reachable by existing installs. Fresh-install setup alone is insufficient. Never edit or reuse an already-shipped migration version.
+- Make migrations idempotent and batch large updates, using Action Scheduler where appropriate. New code must read both old and new formats until the migration completes, including requests before cron runs. A synchronous update over an unbounded table can time out on a large store.
+- Preserve compatibility with the previous release after migration so rolling back does not fatal or corrupt data. Retain readable old formats for a transition period.
+- Do not silently change defaults for existing stores; gate new defaults to new installs.
+- Preserve cron/action names with queued jobs and stored option/meta keys, or provide a migration and transition path. Do not assume removing code removes stored data; keep its read path or clean it up through a migration that preserves rollback compatibility.
+
+### Core APIs, security, and defensive coding
+
+Use WordPress/WooCommerce APIs and existing repository abstractions before adding helpers. Hand-written replacements can lose HPOS compatibility, filters, caching, and theme overrides.
+
+| Instead of | Use |
+| --- | --- |
+| `curl_*` or `file_get_contents()` on a URL | `wp_remote_get()`, `wp_remote_post()` |
+| Hand-built database queries | `wc_get_orders()`, `wc_get_products()`, `WP_Query`; use `$wpdb->prepare()` when direct SQL is required |
+| Direct product or order metadata reads | The relevant WooCommerce CRUD getters and data stores |
+| Manual price, decimal, or date formatting | `wc_price()`, `wc_format_decimal()`, `wc_get_price_to_display()`, `date_i18n()` |
+| Ad-hoc statics or options used as a cache | Transients, `wp_cache_*`, `WC_Cache_Helper` |
+| Custom `wp_cron` plumbing | Action Scheduler |
+| Custom regex or `strip_tags()` sanitizing | `wc_clean()`, `sanitize_text_field()`, `wp_kses_post()`, `absint()` |
+
+Build on existing extension points such as `WC_Data`, `WC_Data_Store_WP`, `WC_Settings_Page`, `WC_Integration`, `WC_Email`, `WP_List_Table`, and `WP_REST_Controller`, or the repository's own base classes. Check existing helpers before adding a parallel implementation.
+
+- Validate filter results before indexing or passing them to typed APIs, including filterable WooCommerce helpers such as `wc_get_image_size()`. Use a meaningful supported default; an arbitrary `0`, `''`, or `[]` can break image dimensions, prices, or quantities.
+- Check optional methods with `method_exists()` and optional functions/classes with `function_exists()` / `class_exists()` across supported versions. Branch on `is_wp_error()` explicitly; `WP_Error` is truthy. Handle or propagate a returned error rather than silently discarding it. Validate array/object shapes before accessing keys that may be absent; use `isset()` or `array_key_exists()` as appropriate when `null` is meaningful.
+- Before changing filter registrations, inspect `has_filter()` and retain the callback and priority. Restore only state this operation changed; cleanup must not remove registrations owned by the caller or restore state on a path that never changed it.
+- Require authorization/capability checks such as `current_user_can()` for state changes and appropriate nonce checks (`check_admin_referer()`, `check_ajax_referer()`, `wp_verify_nonce()`) for cookie-authenticated requests. Admin location alone is not protection. REST routes need a real `permission_callback`, never `__return_true` on a write, plus argument `validate_callback` / `sanitize_callback` definitions.
+- Apply `wp_unslash()` to slash-escaped WordPress input, such as `$_GET`, `$_POST`, and `$_REQUEST`, before sanitizing with the appropriate API. Do not unslash already-decoded REST/JSON values again. Escape at output for its context (`esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()`); escaping at assignment before concatenation does not protect the final output. Prepare interpolated SQL with `$wpdb->prepare()`; `%i` supports identifiers on WordPress 6.2+, and identifiers still need an allowlist where appropriate.
+- Do not pass untrusted input to raw `unserialize()` or allow untrusted objects to be instantiated; use an existing safe decoder where the format requires one. Do not evaluate input as code, construct callables from user input, or allow unrestricted uploads. Use `wp_safe_redirect()` for user-influenced redirects and keep secrets and personal data out of source and logs.
+- Avoid unbounded queries/updates, repeated queries in loops, `'posts_per_page' => -1` on unbounded sets, and `meta_query` on an unindexed key over a large table. Keep expensive work off unconditional `init` / `plugins_loaded` paths when it belongs behind a condition, cache, or admin guard. Reuse existing caches, invalidate them on writes, and batch expensive work with a bounded memory footprint.
+
+### Validation and change scope
+
+- Keep changes focused; preserve existing conventions and supported runtimes. Edit the actual source files, not generated output, using the repository's asset map.
+- For behavior fixes, reproduce the failure at the relevant test layer and verify the result. Cover the happy path and boundary/error inputs, `null` / `false` / empty values, filtered values, existing data, and affected integrations. Give migrations, capability/nonce checks, and price/quantity calculations particular attention because silent failures are costly.
+- Extend an existing test instead of adding a near-duplicate. Use meaningful assertions: a test that only repeats a mock's configured return value, or still passes when the fix is reverted, does not establish the fix. If the repository has no fixture for a layer, report it as untested instead of writing a hollow test.
+- Use the repository's existing test frameworks. Run checks appropriate to the changed files and report failures, skipped checks, and untested layers accurately. Documentation changes need command/path and formatting verification, not invented runtime tests.
+- Use isolated worktrees and environment ports where the repository supports them. Follow Linear-generated branch names when working from an issue. Keep commits small and stage only intended paths; never bypass hooks to force a commit through.
+- Follow the current PR template. Changelog exemptions and milestone automation differ by repository: describe the actual workflow and missing automation rather than inventing checkboxes, changing labels without authorization, or claiming checks passed.
