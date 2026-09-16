@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
 use Automattic\WooCommerce\Pinterest\Utilities\ProductFeedLogger;
+use WC_Product;
 
 /**
  * Class Handling registration & generation of the XML product feed.
@@ -45,6 +46,47 @@ class ProductSync {
 	private static $configurations = null;
 
 	/**
+	 * Product properties the XML feed renders.
+	 *
+	 * Only meta backed properties are listed. WooCommerce collects the updated props in
+	 * WC_Product_Data_Store_CPT::update_post_meta(), while post fields (name, description,
+	 * slug, status) go through wp_update_post() and are covered by the edit_post hook.
+	 *
+	 * stock_quantity is deliberately absent: the only stock related field in the feed is
+	 * g:availability, which ProductsXmlFeed derives from the stock status, so a quantity
+	 * decrement at checkout produces a byte identical feed.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @var string[]
+	 */
+	const FEED_RELEVANT_PRODUCT_PROPS = array(
+		'regular_price',
+		'sale_price',
+		'date_on_sale_from',
+		'date_on_sale_to',
+		'stock_status',
+		'sku',
+		'tax_status',
+		'tax_class',
+		'image_id',
+		'gallery_image_ids',
+		'virtual',
+	);
+
+	/**
+	 * IDs of the products already flagged during this request, keyed by product ID.
+	 *
+	 * Several hooks fire for a single save, and imports, bulk edits or wc_scheduled_sales
+	 * save many products in one request. One flag per product is enough.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @var array<int, bool>
+	 */
+	private static $flagged_product_ids = array();
+
+	/**
 	 * Initiate class.
 	 */
 	public static function maybe_init() {
@@ -57,12 +99,17 @@ class ProductSync {
 		self::initialize_feed_components();
 		/**
 		 * Mark feed as needing re-generation whenever a product is edited or changed.
-		 * edit_post fires before WooCommerce writes the product meta, so the product hooks
-		 * flag the feed again once the saved data is complete.
+		 *
+		 * The edit_post hook covers the post fields and any status transition, but it fires
+		 * before WooCommerce writes the product meta and does not fire at all for meta only
+		 * saves. The woocommerce_product_object_updated_props hook covers those, filtered
+		 * down to the properties the feed renders so that saves which cannot change the feed
+		 * (a stock quantity decrement at checkout, a sales counter bump) do not schedule a
+		 * regeneration. Creates never reach edit_post, hence woocommerce_new_product.
 		 */
 		add_action( 'edit_post', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
-		add_action( 'woocommerce_new_product', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
-		add_action( 'woocommerce_update_product', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
+		add_action( 'woocommerce_new_product', array( __CLASS__, 'mark_feed_dirty_on_new_product' ), 10, 1 );
+		add_action( 'woocommerce_product_object_updated_props', array( __CLASS__, 'mark_feed_dirty_on_updated_props' ), 10, 2 );
 
 		if ( 'yes' === get_option( 'woocommerce_manage_stock' ) ) {
 			add_action( 'woocommerce_variation_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
@@ -236,10 +283,74 @@ class ProductSync {
 	 * @return void
 	 */
 	public static function mark_feed_dirty( $product_id ) {
+		$product_id = (int) $product_id;
+
+		if ( isset( self::$flagged_product_ids[ $product_id ] ) ) {
+			return;
+		}
+
 		if ( ! wc_get_product( $product_id ) ) {
 			return;
 		}
 
+		self::$flagged_product_ids[ $product_id ] = true;
+
 		self::$feed_generator->mark_feed_dirty();
+	}
+
+	/**
+	 * Mark the feed as dirty for a newly created product.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param integer $product_id The product ID.
+	 *
+	 * @return void
+	 */
+	public static function mark_feed_dirty_on_new_product( $product_id ) {
+		self::mark_feed_dirty_if_in_feed( wc_get_product( $product_id ) );
+	}
+
+	/**
+	 * Mark the feed as dirty when a save wrote a property the feed renders.
+	 *
+	 * WooCommerce fires this for every product data store write, so the properties are
+	 * filtered against FEED_RELEVANT_PRODUCT_PROPS to skip the saves that cannot change
+	 * the feed output.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param WC_Product $product       The saved product.
+	 * @param array      $updated_props Names of the properties written by the save.
+	 *
+	 * @return void
+	 */
+	public static function mark_feed_dirty_on_updated_props( $product, $updated_props ) {
+		if ( ! is_array( $updated_props ) || ! array_intersect( $updated_props, self::FEED_RELEVANT_PRODUCT_PROPS ) ) {
+			return;
+		}
+
+		self::mark_feed_dirty_if_in_feed( $product );
+	}
+
+	/**
+	 * Mark the feed as dirty only for products the feed can include.
+	 *
+	 * FeedGenerator::get_items_for_batch() reads published products only, so a draft or a
+	 * pending product cannot change the feed. Products leaving the published state are not
+	 * filtered here: they travel through wp_update_post(), which fires edit_post.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param WC_Product|false|null $product The product, or a falsy value when the lookup failed.
+	 *
+	 * @return void
+	 */
+	private static function mark_feed_dirty_if_in_feed( $product ) {
+		if ( ! $product instanceof WC_Product || 'publish' !== $product->get_status() ) {
+			return;
+		}
+
+		self::mark_feed_dirty( $product->get_id() );
 	}
 }
