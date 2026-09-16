@@ -81,7 +81,7 @@ class Tracking {
 	 *
 	 * @since 1.4.0
 	 * @since 1.4.8 Added check for product page.
-	 * @since 1.5.1 Prints the CAPI beacon itself when no Tag is active.
+	 * @since x.x.x Prints the CAPI beacon itself when no Tag is active.
 	 *
 	 * @return void
 	 */
@@ -303,7 +303,7 @@ class Tracking {
 	/**
 	 * Checks whether a tracker of the given class is registered.
 	 *
-	 * @since 1.5.1
+	 * @since x.x.x
 	 *
 	 * @param string $tracker_class Tracker class name. e.g. Tag::class, Conversions::class.
 	 *

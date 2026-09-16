@@ -296,7 +296,7 @@ class TrackingTest extends \WP_UnitTestCase {
 		/**
 		 * Renders the storefront footer, where the trackers print their output.
 		 *
-		 * @since 1.5.1
+		 * @since x.x.x
 		 */
 		do_action( 'wp_footer' );
 		$output = ob_get_clean();
