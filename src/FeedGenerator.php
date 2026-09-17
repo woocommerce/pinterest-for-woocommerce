@@ -1376,7 +1376,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Handle error on generate feed timeout.
 	 *
 	 * @since 1.2.14
-	 * @deprecated x.x.x
+	 * @deprecated 1.3.1
 	 *
 	 * @param int $action_id The ID of the action marked as failed.
 	 *
