@@ -9,6 +9,9 @@ _      = require( 'underscore' );
 $      = require( 'gulp-load-plugins' )( {pattern: [ '*', '!sass', '!gulp-sass' ]} );
 $.sass = require( 'gulp-sass' )( require( 'sass' ) );
 
+var argv = require( 'minimist' )( process.argv.slice( 2 ) );
+var through = require( 'through2' );
+
 if( path.sep !== '/' ) {
 	var oldJoin = path.join;
 	path.join = function(){
@@ -18,10 +21,10 @@ if( path.sep !== '/' ) {
 }
 
 CONFIG = {
-	production: ! ! $.util.env.production,
-	watch: ! ! $.util.env.watch,
-	bs: ! ! $.util.env.bs,
-	noprefix: ! ! $.util.env.noprefix
+	production: ! ! argv.production,
+	watch: ! ! argv.watch,
+	bs: ! ! argv.bs,
+	noprefix: ! ! argv.noprefix
 };
 
 // Here are defined relative paths for source files, dest paths and maps
@@ -189,12 +192,13 @@ gulp.task(
 					[
 						`${folder}/{assets,i18n,includes,src,vendor,views}/**/*`,
 						`${folder}/*.{php,txt,md}`,
+						'LICENSE',
 						`!${folder}/README.md`,
-						`!${folder}/i18n/languages/README.md`,
-						'LICENSE'
+						`!${folder}/i18n/languages/README.md`
 					],
 					{
 						base: path.join( folder, '..' ),
+						encoding: false,
 					}
 				)
 					.pipe( $.vinylZip.dest( filename ) )
@@ -240,14 +244,14 @@ gulp.task(
 					.pipe( $.plumber() )
 					.pipe( $.sourcemaps.init() )
 					.pipe( $.sass( { precision: 10 } ).on( 'error', $.sass.logError ) )
-					.pipe( ! CONFIG.noprefix ? $.autoprefixer() : $.util.noop() )
-					.pipe( ! CONFIG.production ? $.sourcemaps.write( destination.maps ) : $.util.noop() )
+					.pipe( ! CONFIG.noprefix ? $.autoprefixer() : through.obj() )
+					.pipe( ! CONFIG.production ? $.sourcemaps.write( destination.maps ) : through.obj() )
 					.pipe( $.cached( 'sass' ) )
 					.pipe( gulp.dest( destination.dest ) )
 					.pipe( $.filter( '**/*.css' ) )
 					.pipe( $.cleanCss() )
 					.pipe( $.rename( {suffix: '.min'} ) )
-					.pipe( ! CONFIG.production ? $.sourcemaps.write( destination.maps ) : $.util.noop() )
+					.pipe( ! CONFIG.production ? $.sourcemaps.write( destination.maps ) : through.obj() )
 					.pipe( $.cached( 'sass' ) )
 					.pipe( gulp.dest( destination.dest ) )
 					.pipe( $.size( {title: folder + ' css'} ) );
@@ -283,13 +287,13 @@ gulp.task(
 				var base = gulp.src( SRC, { base: baseSRC } )
 					.pipe( $.plumber() )
 					.pipe( $.sourcemaps.init() )
-					.pipe( ! CONFIG.production ? $.sourcemaps.write( destination.maps ) : $.util.noop() )
+					.pipe( ! CONFIG.production ? $.sourcemaps.write( destination.maps ) : through.obj() )
 					.pipe( $.cached( 'js' ) )
 					.pipe( gulp.dest( destination.dest ) )
 					.pipe( $.filter( [ '**/*.js', '!**/*.min.js' ] ) )
 					.pipe( $.uglify() )
 					.pipe( $.rename( {suffix: '.min'} ) )
-					.pipe( ! CONFIG.production ? $.sourcemaps.write( destination.maps ) : $.util.noop() )
+					.pipe( ! CONFIG.production ? $.sourcemaps.write( destination.maps ) : through.obj() )
 					.pipe( $.cached( 'js' ) )
 					.pipe( gulp.dest( destination.dest ) )
 					.pipe( $.size( {title: folder + ' js'} ) );
@@ -320,20 +324,20 @@ gulp.task(
 							thisDest           = gulp.src( [ dest ].getFlattened() )
 								.pipe( $.plumber() )
 								.pipe( $.sourcemaps.init() )
-								.pipe( keepUnminified ? keepUnminified : $.util.noop() )
-								.pipe( keepUnminified && ! CONFIG.production ? $.sourcemaps.write( thisDestination.maps ) : $.util.noop() )
-								.pipe( keepUnminified ? $.cached( 'js' ) : $.util.noop() )
-								.pipe( keepUnminified ? gulp.dest( thisDestination.dest ) : $.util.noop() )
-								.pipe( keepUnminified ? keepUnminified.restore : $.util.noop() )
+								.pipe( keepUnminified ? keepUnminified : through.obj() )
+								.pipe( keepUnminified && ! CONFIG.production ? $.sourcemaps.write( thisDestination.maps ) : through.obj() )
+								.pipe( keepUnminified ? $.cached( 'js' ) : through.obj() )
+								.pipe( keepUnminified ? gulp.dest( thisDestination.dest ) : through.obj() )
+								.pipe( keepUnminified ? keepUnminified.restore : through.obj() )
 								.pipe( $.filter( [ '**/*.js' ] ) )
 								.pipe( $.concat( path.basename( dest.name ) ) )
-								.pipe( ! dest.minifiedOnly && ! CONFIG.production ? $.sourcemaps.write( thisDestination.maps ) : $.util.noop() )
-								.pipe( ! dest.minifiedOnly ? $.cached( 'js' ) : $.util.noop() )
-								.pipe( ! dest.minifiedOnly ? gulp.dest( thisDestination.dest ) : $.util.noop() )
+								.pipe( ! dest.minifiedOnly && ! CONFIG.production ? $.sourcemaps.write( thisDestination.maps ) : through.obj() )
+								.pipe( ! dest.minifiedOnly ? $.cached( 'js' ) : through.obj() )
+								.pipe( ! dest.minifiedOnly ? gulp.dest( thisDestination.dest ) : through.obj() )
 								.pipe( $.filter( [ '**/*.js' ] ) )
 								.pipe( $.uglify() )
 								.pipe( $.rename( {suffix: '.min'} ) )
-								.pipe( ! CONFIG.production ? $.sourcemaps.write( thisDestination.maps ) : $.util.noop() )
+								.pipe( ! CONFIG.production ? $.sourcemaps.write( thisDestination.maps ) : through.obj() )
 								.pipe( $.cached( 'js' ) )
 								.pipe( gulp.dest( thisDestination.dest ) )
 								.pipe( $.size( {title: folder + ' concat ' + dest.name } ) );
