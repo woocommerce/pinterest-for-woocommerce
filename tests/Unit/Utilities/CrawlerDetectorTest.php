@@ -76,16 +76,18 @@ class CrawlerDetectorTest extends WP_UnitTestCase {
 	 */
 	public function crawler_user_agents() {
 		return array(
-			'Googlebot' => array( 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' ),
-			'Bingbot'   => array( 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)' ),
-			'curl'      => array( 'curl/8.4.0' ),
-			'wget'      => array( 'Wget/1.21.4' ),
-			'spider'    => array( 'Mozilla/5.0 (compatible; YandexSpider/3.0)' ),
-			'slurp'     => array( 'Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)' ),
-			'crawl'     => array( 'CCBot/2.0 (https://commoncrawl.org/faq/)' ),
-			'feed'      => array( 'Feedly/1.0 (+http://www.feedly.com/fetcher.html)' ),
-			'headless'  => array( 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/120.0.0.0 Safari/537.36' ),
-			'phantom'   => array( 'Mozilla/5.0 (Macintosh; Intel Mac OS X) AppleWebKit/538.1 (KHTML, like Gecko) PhantomJS/2.1.1 Safari/538.1' ),
+			'Googlebot'     => array( 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' ),
+			'Bingbot'       => array( 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)' ),
+			'Pinterestbot'  => array( 'Mozilla/5.0 (compatible; Pinterestbot/1.0; +http://www.pinterest.com/bot.html)' ),
+			'Pinterest 0.2' => array( 'Pinterest/0.2 (+http://www.pinterest.com/bot.html)' ),
+			'curl'          => array( 'curl/8.4.0' ),
+			'wget'          => array( 'Wget/1.21.4' ),
+			'spider'        => array( 'Mozilla/5.0 (compatible; YandexSpider/3.0)' ),
+			'slurp'         => array( 'Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)' ),
+			'crawl'         => array( 'CCBot/2.0 (https://commoncrawl.org/faq/)' ),
+			'feed'          => array( 'Feedly/1.0 (+http://www.feedly.com/fetcher.html)' ),
+			'headless'      => array( 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/120.0.0.0 Safari/537.36' ),
+			'phantom'       => array( 'Mozilla/5.0 (Macintosh; Intel Mac OS X) AppleWebKit/538.1 (KHTML, like Gecko) PhantomJS/2.1.1 Safari/538.1' ),
 		);
 	}
 
@@ -107,6 +109,7 @@ class CrawlerDetectorTest extends WP_UnitTestCase {
 	 */
 	public function human_user_agents() {
 		return array(
+			'Pinterest app'   => array( 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [Pinterest/iOS]' ),
 			'Chrome desktop'  => array( 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' ),
 			'Firefox desktop' => array( 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0' ),
 			'Safari iPhone'   => array( 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Mobile/15E148 Safari/604.1' ),

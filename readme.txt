@@ -1,10 +1,10 @@
 === Pinterest for WooCommerce ===
 Contributors: automattic, pinterest, woocommerce
 Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
-Requires at least: 5.6
+Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.0
+Stable tag: 1.5.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -62,8 +62,8 @@ Pinterest is a visual discovery engine people use to find inspiration for their 
 
 = Minimum Requirements =
 
-* WordPress 5.6 or greater
-* WooCommerce 7.0 or greater
+* WordPress 6.9 or greater
+* WooCommerce 10.9 or greater
 * PHP version 7.4 or greater
 * MySQL version 5.6 or greater
 
@@ -90,6 +90,14 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.5.1 - 2026-09-17 =
+* Fix - Consume the feed dirty flag when a generation cycle starts, so a product change no longer triggers a redundant second cycle and a deferred restart is not lost.
+* Fix - Detect and bypass conversion events triggered by Pinterest's documented crawler user agents.
+* Fix - Ignore Pinterest click IDs longer than 512 bytes instead of storing and forwarding them to the Conversions API.
+* Fix - Send PageVisit Conversions API events for stores without an active Pinterest Tag.
+* Fix - Stop sending AddToCart events for add-to-cart runs that do not change the customer's cart, such as express checkout price simulations and retried requests.
+* Tweak - Raised minimum requirements to WordPress 6.9 and WooCommerce 10.9.
 
 = 1.5.0 - 2026-09-09 =
 * Add - Include external and Pinterest click identifiers in Tag and Conversions API events to improve event matching and attribution.

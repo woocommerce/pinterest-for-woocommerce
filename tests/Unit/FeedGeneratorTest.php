@@ -134,6 +134,7 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', null, 'pinterest-for-woocommerce' );
 		delete_option( FeedGenerator::OPTION_CURSOR );
 		delete_option( FeedGenerator::OPTION_START_LOCK );
+		delete_option( FeedGenerator::OPTION_FEED_DIRTY );
 		Notes::delete_notes_with_name( FeedCircuitBreakerNote::NOTE_NAME );
 		parent::tearDown();
 	}
@@ -1312,6 +1313,121 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * A start action that mints a new cycle must consume the dirty flag: every change
+	 * flagged so far is covered by the cycle that is about to read all products.
+	 *
+	 * @return void
+	 */
+	public function test_start_action_consumes_dirty_flag() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'dead-cycle', false );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 1, false );
+
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturn( array() );
+
+		$this->feed_generator->handle_start_action( array() );
+
+		$this->assertFalse( $this->feed_generator->feed_is_dirty(), 'A new cycle must consume the dirty flag.' );
+	}
+
+	/**
+	 * A start action whose temporary file preparation fails must leave the dirty flag
+	 * set: no cycle started, so nothing covers the flagged changes.
+	 *
+	 * @return void
+	 */
+	public function test_failed_start_action_leaves_dirty_flag_set() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'dead-cycle', false );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 1, false );
+
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturn( array() );
+		$this->feed_file_operations
+			->method( 'prepare_temporary_files' )
+			->willThrowException( new Exception() );
+
+		try {
+			$this->feed_generator->handle_start_action( array() );
+			$this->fail( 'The start action must rethrow the preparation failure.' );
+		} catch ( Exception $e ) {
+			$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'A failed start must not consume the dirty flag.' );
+		}
+	}
+
+	/**
+	 * When the first batch cannot be queued, no batch will ever read the products, so the
+	 * consumed dirty flag must be restored for the next start.
+	 *
+	 * @return void
+	 */
+	public function test_failed_first_batch_enqueue_restores_dirty_flag() {
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'dead-cycle', false );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 1, false );
+
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturn( array() );
+		$this->action_scheduler
+			->method( 'schedule_immediate' )
+			->willThrowException( new Exception() );
+
+		try {
+			$this->feed_generator->handle_start_action( array() );
+			$this->fail( 'The start action must rethrow the enqueue failure.' );
+		} catch ( Exception $e ) {
+			$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'A failed enqueue must restore the dirty flag.' );
+		}
+	}
+
+	/**
+	 * The flag is written from storefront requests, cron, Action Scheduler runners and WP-CLI,
+	 * and cleared by whichever process runs the chain start. A long-lived process keeps the
+	 * value it last wrote in its options cache, and update_option() skips writes that match
+	 * that cache, so the write must not depend on it.
+	 *
+	 * @dataProvider stale_options_cache_provider
+	 *
+	 * @param bool $dirty Direction of the write under test.
+	 *
+	 * @return void
+	 */
+	public function test_dirty_flag_writes_ignore_a_stale_options_cache( bool $dirty ) {
+		global $wpdb;
+
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturn( array() );
+
+		$write = $dirty ? 'mark_feed_dirty' : 'mark_feed_clean';
+
+		// Prime this process's options cache with the value under test.
+		$this->feed_generator->$write();
+		$this->assertSame( $dirty, $this->feed_generator->feed_is_dirty() );
+
+		// Another process writes the opposite value straight to the database.
+		$wpdb->update( $wpdb->options, array( 'option_value' => $dirty ? '0' : '1' ), array( 'option_name' => FeedGenerator::OPTION_FEED_DIRTY ) );
+		$this->assertSame( ! $dirty, $this->feed_generator->feed_is_dirty(), 'The concurrent write must be visible to the uncached read.' );
+
+		$this->feed_generator->$write();
+
+		$this->assertSame( $dirty, $this->feed_generator->feed_is_dirty(), 'The write must not be skipped because of a stale options cache.' );
+	}
+
+	/**
+	 * Both directions of the flag write.
+	 *
+	 * @return array[]
+	 */
+	public function stale_options_cache_provider() {
+		return array(
+			'set after a concurrent clear' => array( true ),
+			'clear after a concurrent set' => array( false ),
+		);
+	}
+
+	/**
 	 * A pending batch from a superseded cycle must not prevent start_generation()
 	 * from queueing a new chain start.
 	 *
@@ -1486,6 +1602,86 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' ),
 			'A queued chain start must defer the restart.'
 		);
+	}
+
+	/**
+	 * A dirty flag set during the cycle must make the end action schedule a restart
+	 * shortly after, outside the window where this end action is still in progress,
+	 * and the flag must stay set until the new cycle starts and consumes it.
+	 *
+	 * @return void
+	 */
+	public function test_end_action_restarts_generation_and_leaves_dirty_flag_for_the_new_cycle() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'current-cycle', false );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 1, false );
+
+		$now = time();
+		$this->feed_generator->handle_end_action( array( FeedGenerator::ARG_CYCLE_ID => 'current-cycle' ) );
+
+		$next_start = as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		$this->assertIsInt( $next_start, 'A dirty feed must schedule a restart at the end of the cycle.' );
+		$this->assertGreaterThan( $now, $next_start, 'The restart must be delayed past the end action completion.' );
+		$this->assertEqualsWithDelta( $now + MINUTE_IN_SECONDS, $next_start, 30, 'The restart must be scheduled about a minute out.' );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'The dirty flag must be left for the new cycle to consume.' );
+	}
+
+	/**
+	 * When a concurrent runner claims the restart scheduled by the end action while that end
+	 * action is still in progress, start_generation() defers and the claimed instance is gone.
+	 * The dirty flag must survive so the next mark_feed_dirty() call schedules an immediate
+	 * start instead of waiting for the daily run.
+	 *
+	 * @return void
+	 */
+	public function test_start_generation_deferred_by_finalizing_end_action_leaves_dirty_flag_set() {
+		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		update_option( FeedGenerator::OPTION_CYCLE_ID, 'current-cycle', false );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, 1, false );
+
+		$this->feed_generator->handle_end_action( array( FeedGenerator::ARG_CYCLE_ID => 'current-cycle' ) );
+
+		// Mirror Action Scheduler running the due instance of the recurring start action:
+		// the claimed instance is consumed and the next one is scheduled an interval later.
+		$claimed_start = as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		as_unschedule_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		as_schedule_recurring_action( $claimed_start + DAY_IN_SECONDS, DAY_IN_SECONDS, 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+
+		$end_action_in_progress = true;
+		$running_end_action     = new ActionScheduler_Action(
+			'pinterest/jobs/generate_feed/chain_end',
+			array( array( FeedGenerator::ARG_CYCLE_ID => 'current-cycle' ) )
+		);
+
+		$this->action_scheduler
+			->method( 'next_scheduled_action' )
+			->willReturn( false );
+		$this->action_scheduler
+			->method( 'search' )
+			->willReturnCallback(
+				function ( $args ) use ( $running_end_action, &$end_action_in_progress ) {
+					$is_end_first_page = 'pinterest/jobs/generate_feed/chain_end' === $args['hook'] && 0 === $args['offset'];
+					return $is_end_first_page && $end_action_in_progress ? array( $running_end_action ) : array();
+				}
+			);
+		$this->action_scheduler
+			->expects( $this->never() )
+			->method( 'schedule_immediate' );
+
+		$this->invoke_protected( $this->feed_generator, 'start_generation' );
+
+		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'A deferred restart must leave the dirty flag set.' );
+		$next_start = as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		$this->assertGreaterThan( time() + HOUR_IN_SECONDS, $next_start, 'The claimed restart is gone; only the daily start remains.' );
+
+		// Once the end action has completed, the next product change must start a cycle right away.
+		$end_action_in_progress = false;
+		$now                    = time();
+		$this->feed_generator->mark_feed_dirty();
+
+		$next_start = as_next_scheduled_action( 'pinterest-for-woocommerce-start-feed-generation', array(), 'pinterest-for-woocommerce' );
+		$this->assertIsInt( $next_start, 'The next product change must reschedule the start action.' );
+		$this->assertLessThanOrEqual( $now + 5, $next_start, 'The start action must be rescheduled to run now.' );
 	}
 
 	/**

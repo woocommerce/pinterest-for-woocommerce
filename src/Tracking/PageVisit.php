@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
@@ -57,21 +58,62 @@ class PageVisit {
 
 		$event_data = wp_json_encode( (object) $data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES );
 		$event_data = $event_data ? $event_data : '{}';
-		$capi_code  = '';
 
-		if ( Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' ) ) {
-			$capi_code = sprintf(
-				'var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);var beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}',
-				wp_json_encode( static::AJAX_ACTION ),
-				wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
-			);
+		return sprintf(
+			'(function(){%1$svar eventData=%2$s;eventData.event_id=eventId;pintrk("track","%3$s",eventData);%4$s}());',
+			static::get_event_id_code(),
+			$event_data,
+			Tracking::EVENT_PAGE_VISIT,
+			static::get_beacon_code()
+		);
+	}
+
+	/**
+	 * Prints the CAPI beacon on its own for stores without an active Tag.
+	 *
+	 * Prints nothing when the Conversions API is disabled.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @return void
+	 */
+	public static function print_beacon_script() {
+		$beacon_code = static::get_beacon_code();
+		if ( ! $beacon_code ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded JS whose embedded values are JSON encoded with JSON_HEX_TAG.
+		echo '<script>(function(){' . static::get_event_id_code() . $beacon_code . '}());</script>';
+	}
+
+	/**
+	 * Builds the JavaScript that generates a browser-side PageVisit event ID.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @return string JavaScript defining `eventId`.
+	 */
+	private static function get_event_id_code() {
+		return 'var eventId="page_"+(window.crypto&&window.crypto.randomUUID?window.crypto.randomUUID():Date.now().toString(36)+"_"+Math.random().toString(36).slice(2));';
+	}
+
+	/**
+	 * Builds the JavaScript that sends the PageVisit CAPI beacon.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @return string JavaScript using `eventId`, or an empty string when the Conversions API is disabled.
+	 */
+	private static function get_beacon_code() {
+		if ( ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' ) ) {
+			return '';
 		}
 
 		return sprintf(
-			'(function(){var eventId="page_"+(window.crypto&&window.crypto.randomUUID?window.crypto.randomUUID():Date.now().toString(36)+"_"+Math.random().toString(36).slice(2));var eventData=%1$s;eventData.event_id=eventId;pintrk("track","%2$s",eventData);%3$s}());',
-			$event_data,
-			Tracking::EVENT_PAGE_VISIT,
-			$capi_code
+			'var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);var beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}',
+			wp_json_encode( static::AJAX_ACTION, JSON_HEX_TAG ),
+			wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 		);
 	}
 
@@ -82,6 +124,7 @@ class PageVisit {
 	 */
 	public static function handle_request() {
 		if ( ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' ) || ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' ) ) {
+			static::reject( 'conversion tracking or the Conversions API is disabled' );
 			return;
 		}
 
@@ -102,10 +145,12 @@ class PageVisit {
 		 * @param bool $disable_tracking Whether to disable tracking based on consent conditions.
 		 */
 		if ( apply_filters( 'woocommerce_pinterest_disable_tracking', $is_tracking_disabled_user_consent ) ) {
+			static::reject( 'tracking is disabled by consent or filter' );
 			return;
 		}
 
 		if ( CrawlerDetector::is_crawler_request() ) {
+			static::reject( 'the request comes from a crawler' );
 			return;
 		}
 
@@ -114,17 +159,20 @@ class PageVisit {
 		$source_url_raw = $_POST['event_source_url'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
 
 		if ( ! is_string( $event_id_raw ) || ! is_string( $source_url_raw ) ) {
+			static::reject( 'event_id or event_source_url is not a string' );
 			return;
 		}
 
 		$event_id = sanitize_text_field( wp_unslash( $event_id_raw ) );
 		if ( ! preg_match( '/^page_[A-Za-z0-9_-]{10,100}$/', $event_id ) ) {
+			static::reject( 'event_id is malformed' );
 			return;
 		}
 
 		$source_url = esc_url_raw( wp_unslash( $source_url_raw ) );
 		$source_url = static::validate_source_url( $source_url );
 		if ( ! $source_url ) {
+			static::reject( 'event_source_url is not an absolute URL on this site' );
 			return;
 		}
 
@@ -136,13 +184,31 @@ class PageVisit {
 		try {
 			$tracker->track_event( Tracking::EVENT_PAGE_VISIT, $data );
 		} catch ( Throwable $e ) {
-			// Conversions::track_event() records the failure for support visibility.
+			// Conversions::track_event() already logged the API error.
+			static::reject( 'the Conversions API dispatch failed' );
 			return;
 		}
 	}
 
 	/**
-	 * Validates that an event source URL belongs to this site.
+	 * Logs why a beacon was dropped.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param string $reason Human readable rejection reason.
+	 *
+	 * @return void
+	 */
+	private static function reject( string $reason ) {
+		Logger::log( 'PageVisit beacon rejected: ' . $reason . '.', 'debug', 'conversions' );
+	}
+
+	/**
+	 * Validates that an event source URL is an absolute http(s) URL on this site.
+	 *
+	 * Protocol-relative URLs, URLs carrying user info and over-long URLs are rejected.
+	 *
+	 * @since 1.5.1 Requires an http(s) scheme, no user info and at most 2048 characters.
 	 *
 	 * @param string $source_url Untrusted event source URL.
 	 *
@@ -150,10 +216,16 @@ class PageVisit {
 	 */
 	private static function validate_source_url( string $source_url ) {
 		$source_url  = esc_url_raw( $source_url, array( 'http', 'https' ) );
-		$source_host = wp_parse_url( $source_url, PHP_URL_HOST );
+		$parts       = (array) wp_parse_url( $source_url );
+		$source_host = $parts['host'] ?? '';
 		$home_host   = wp_parse_url( home_url(), PHP_URL_HOST );
 
-		if ( ! $source_host || ! $home_host || strtolower( $source_host ) !== strtolower( $home_host ) ) {
+		if (
+			strlen( $source_url ) > 2048
+			|| ! in_array( strtolower( $parts['scheme'] ?? '' ), array( 'http', 'https' ), true )
+			|| isset( $parts['user'] )
+			|| ! $source_host || ! $home_host || strtolower( $source_host ) !== strtolower( $home_host )
+		) {
 			return '';
 		}
 

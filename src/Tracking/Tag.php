@@ -248,7 +248,7 @@ class Tag extends Tracker {
 	 * @param string $event_name Event name. e.g. Checkout, AddToCart, etc.
 	 * @param Data   $data       Corresponding event data object.
 	 *
-	 * @return true
+	 * @return bool
 	 */
 	public function track_event( string $event_name, Data $data ) {
 		$data = $this->prepare_request_data( $event_name, $data );
