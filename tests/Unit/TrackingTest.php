@@ -49,6 +49,20 @@ class TrackingTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Builds a throwaway cart the way express checkout simulators do: no session
+	 * hooks, never WC()->cart.
+	 *
+	 * @return \WC_Cart
+	 */
+	private function get_isolated_cart() {
+		add_filter( 'woocommerce_cart_session_initialize', '__return_false' );
+		$cart = new \WC_Cart();
+		remove_filter( 'woocommerce_cart_session_initialize', '__return_false' );
+
+		return $cart;
+	}
+
+	/**
 	 * Builds a tracker that records the events handed to it.
 	 *
 	 * @return Tracker
@@ -109,9 +123,9 @@ class TrackingTest extends \WP_UnitTestCase {
 		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_page_visit' ) ) );
 		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_view_category' ) ) );
 		$this->assertEquals( 10, has_action( 'woocommerce_add_to_cart', array( $tracking, 'handle_add_to_cart' ) ) );
-		$this->assertEquals( 10, has_action( 'woocommerce_cart_item_removed', array( $tracking, 'forget_add_to_cart_signatures' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_cart_item_removed', array( $tracking, 'handle_cart_item_removed' ) ) );
 		$this->assertEquals( 10, has_action( 'woocommerce_after_cart_item_quantity_update', array( $tracking, 'handle_cart_item_quantity_update' ) ) );
-		$this->assertEquals( 10, has_action( 'woocommerce_cart_emptied', array( $tracking, 'forget_add_to_cart_signatures' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_cart_emptied', array( $tracking, 'handle_cart_emptied' ) ) );
 		$this->assertEquals( 10, has_action( 'woocommerce_before_thankyou', array( $tracking, 'handle_checkout' ) ) );
 		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_search' ) ) );
 	}
@@ -684,10 +698,7 @@ class TrackingTest extends \WP_UnitTestCase {
 		$product = \WC_Helper_Product::create_simple_product();
 		$tracker = $this->get_recording_tracker();
 
-		$prevent_session = '__return_false';
-		add_filter( 'woocommerce_cart_session_initialize', $prevent_session );
-		$isolated_cart = new \WC_Cart();
-		remove_filter( 'woocommerce_cart_session_initialize', $prevent_session );
+		$isolated_cart = $this->get_isolated_cart();
 
 		$tracking      = new Tracking( array( $tracker ) );
 		$cart_item_key = $isolated_cart->add_to_cart( $product->get_id(), 1 );
@@ -823,5 +834,33 @@ class TrackingTest extends \WP_UnitTestCase {
 		$this->assertCount( 1, $tracker->get_tracked_events() );
 		$claims = WC()->session->get( 'pinterest_for_woocommerce_add_to_cart_signatures' );
 		$this->assertGreaterThanOrEqual( time() - 1, $claims[ $signature ] );
+	}
+
+	/**
+	 * A simulator disposing of its throwaway cart removes items from that cart,
+	 * firing the same global hooks. That must not release the guard for the same
+	 * product in the customer's cart.
+	 */
+	public function test_throwaway_cart_cleanup_does_not_release_the_guard() {
+		$product  = \WC_Helper_Product::create_simple_product();
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$this->assertCount( 1, $tracker->get_tracked_events() );
+
+		$isolated_cart = $this->get_isolated_cart();
+		$isolated_cart->add_to_cart( $product->get_id(), 1 );
+		$isolated_cart->remove_cart_item( $cart_item_key );
+		$isolated_cart->add_to_cart( $product->get_id(), 1 );
+		$isolated_cart->empty_cart();
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$later = new Tracking( array( $tracker ) );
+		$later->handle_add_to_cart( $cart_item_key, $product->get_id(), 1, 0 );
+		$later->remove_tracker( get_class( $tracker ) );
+
+		$this->assertSame( 1, WC()->cart->get_cart_item( $cart_item_key )['quantity'] );
+		$this->assertCount( 1, $tracker->get_tracked_events() );
 	}
 }
