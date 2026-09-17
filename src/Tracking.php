@@ -40,6 +40,36 @@ class Tracking {
 	const EVENT_VIEW_CATEGORY = 'ViewCategory';
 
 	/**
+	 * WooCommerce session key holding recently reported AddToCart signatures.
+	 *
+	 * @since x.x.x
+	 *
+	 * @var string
+	 */
+	private const ADD_TO_CART_SIGNATURES_SESSION_KEY = 'pinterest_for_woocommerce_add_to_cart_signatures';
+
+	/**
+	 * How long, in seconds, a reported AddToCart signature suppresses a repeat.
+	 *
+	 * The window slides: every suppressed repeat pushes the expiry forward, so a
+	 * chain of retries spaced under the window is collapsed into one event.
+	 *
+	 * @since x.x.x
+	 *
+	 * @var int
+	 */
+	private const ADD_TO_CART_REPEAT_WINDOW = 30;
+
+	/**
+	 * AddToCart signatures already reported during the current request.
+	 *
+	 * @since x.x.x
+	 *
+	 * @var array<string, true>
+	 */
+	private $reported_add_to_cart_signatures = array();
+
+	/**
 	 * @var Tracker[] $trackers A list of available trackers.
 	 */
 	private $trackers = array();
@@ -153,7 +183,15 @@ class Tracking {
 	public function handle_add_to_cart( $cart_item_key, $product_id, $quantity, $variation_id ) {
 		$object_id = empty( $variation_id ) ? $product_id : $variation_id;
 		$product   = wc_get_product( $object_id );
-		$data      = new Product(
+		if ( ! $product instanceof \WC_Product ) {
+			return;
+		}
+
+		if ( ! $this->should_report_add_to_cart( $cart_item_key ) ) {
+			return;
+		}
+
+		$data = new Product(
 			uniqid( 'cart' ),
 			$product->get_id(),
 			$product->get_name(),
@@ -164,6 +202,133 @@ class Tracking {
 			$quantity
 		);
 		$this->track_event( static::EVENT_ADD_TO_CART, $data );
+	}
+
+	/**
+	 * Decides whether an add-to-cart hook fire is a customer action worth reporting.
+	 *
+	 * `woocommerce_add_to_cart` is a global action, so it also fires for carts
+	 * that are not the customer's. Express checkout buttons add products to a
+	 * throwaway WC_Cart to price them, which runs add_to_cart() for real while
+	 * WC()->cart is left untouched. Retried requests fire it again for a cart
+	 * that did not change. Neither is a customer adding something to their cart.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $cart_item_key WooCommerce cart item key.
+	 *
+	 * @return bool
+	 */
+	private function should_report_add_to_cart( $cart_item_key ) {
+		if ( $this->is_simulated_add_to_cart() ) {
+			return false;
+		}
+
+		$signature = $this->get_customer_cart_signature( $cart_item_key );
+
+		return '' !== $signature && $this->claim_add_to_cart_signature( $signature );
+	}
+
+	/**
+	 * Builds a signature describing the customer cart state this fire reports.
+	 *
+	 * Reads the customer's cart rather than trusting the hook arguments, so an
+	 * add that landed in some other cart yields no signature. The signature pairs
+	 * the cart item with the quantity it holds once the item has been added, so
+	 * two fires that leave the cart in the same state share a signature however
+	 * many times WooCommerce ran add_to_cart().
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $cart_item_key WooCommerce cart item key.
+	 *
+	 * @return string Signature, empty when the item is not in the customer's cart.
+	 */
+	private function get_customer_cart_signature( $cart_item_key ) {
+		if ( ! function_exists( 'WC' ) || ! isset( WC()->cart ) ) {
+			return '';
+		}
+
+		$cart_item = WC()->cart->get_cart_item( $cart_item_key );
+		if ( empty( $cart_item ) ) {
+			return '';
+		}
+
+		return $cart_item_key . ':' . $cart_item['quantity'];
+	}
+
+	/**
+	 * Returns true while another extension is pricing a simulated cart.
+	 *
+	 * WooCommerce PayPal Payments raises this flag around the isolated cart its
+	 * `ppc-simulate-cart` endpoint builds. The cart lookup alone cannot catch a
+	 * simulation of a product the customer already holds, because it produces
+	 * the cart item key that is in their cart.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return bool
+	 */
+	private function is_simulated_add_to_cart() {
+		/**
+		 * Filter owned by WooCommerce PayPal Payments, true during a cart simulation.
+		 *
+		 * @since x.x.x
+		 *
+		 * @param bool $is_simulating Whether a cart simulation is in progress.
+		 */
+		return (bool) apply_filters( 'woocommerce_paypal_payments_is_simulating_cart', false );
+	}
+
+	/**
+	 * Claims a signature for reporting, or refuses it as a repeat.
+	 *
+	 * Retried or replayed add-to-cart requests leave the cart unchanged, so they
+	 * produce a signature that was claimed moments earlier. Claiming is recorded
+	 * per request and in the WooCommerce session, which is what carries the guard
+	 * across the separate requests a retry produces.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $signature Signature from get_customer_cart_signature().
+	 *
+	 * @return bool True when the caller should report the event.
+	 */
+	private function claim_add_to_cart_signature( $signature ) {
+		if ( isset( $this->reported_add_to_cart_signatures[ $signature ] ) ) {
+			return false;
+		}
+		$this->reported_add_to_cart_signatures[ $signature ] = true;
+
+		$session = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session : false;
+		if ( ! $session ) {
+			return true;
+		}
+
+		$now        = time();
+		$signatures = $session->get( self::ADD_TO_CART_SIGNATURES_SESSION_KEY );
+		$signatures = is_array( $signatures ) ? $signatures : array();
+
+		$signatures = array_filter(
+			$signatures,
+			function ( $claimed_at ) use ( $now ) {
+				return is_int( $claimed_at ) && $now - $claimed_at < self::ADD_TO_CART_REPEAT_WINDOW;
+			}
+		);
+
+		$is_repeat                = isset( $signatures[ $signature ] );
+		$signatures[ $signature ] = $now;
+
+		$session->set( self::ADD_TO_CART_SIGNATURES_SESSION_KEY, $signatures );
+
+		// Persist the claim now rather than at shutdown. The Conversions request
+		// runs before shutdown and can block for seconds, which is long enough for
+		// a retried add-to-cart request to read a session that has not been written.
+		if ( method_exists( $session, 'save_data' ) ) {
+			$session->save_data();
+		}
+
+		return ! $is_repeat;
 	}
 
 	/**
