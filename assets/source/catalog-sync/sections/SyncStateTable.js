@@ -2,8 +2,10 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import { Icon } from '@wordpress/components';
 import { Table, TablePlaceholder } from '@woocommerce/components';
+import DOMPurify from 'dompurify';
 
 const SyncStateTable = ( { workflow } ) => {
 	const defaultHeaderAttributes = {
@@ -54,11 +56,29 @@ const SyncStateTable = ( { workflow } ) => {
 							{ row.extra_info ? (
 								<>
 									{ ` \xa0 • \xa0 ` }
-									<span
-										dangerouslySetInnerHTML={ {
-											__html: row.extra_info,
-										} }
-									/>
+									{ DOMPurify.isSupported ? (
+										<span
+											dangerouslySetInnerHTML={ {
+												__html: DOMPurify.sanitize(
+													row.extra_info,
+													{
+														ALLOWED_TAGS: [ 'a' ],
+														ALLOWED_ATTR: [
+															'href',
+															'target',
+															'rel',
+														],
+														ALLOW_DATA_ATTR: false,
+														ALLOW_ARIA_ATTR: false,
+													}
+												),
+											} }
+										/>
+									) : (
+										<span>
+											{ decodeEntities( row.extra_info ) }
+										</span>
+									) }
 								</>
 							) : (
 								''
