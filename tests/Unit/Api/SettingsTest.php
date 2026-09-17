@@ -11,29 +11,8 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
 use Pinterest_For_Woocommerce;
 use WP_REST_Request;
 use WP_Test_REST_TestCase;
-use Automattic\WooCommerce\Pinterest\API\Settings;
 
 class SettingsTest extends WP_Test_REST_TestCase {
-
-	/**
-	 * Register the real settings route for the isolated REST test server.
-	 */
-	public function setUp(): void {
-		parent::setUp();
-		rest_get_server();
-		add_action(
-			'rest_api_init',
-			function () {
-				new Settings();
-			}
-		);
-		/**
-		 * Register the native REST route in its expected lifecycle.
-		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
-		 */
-		do_action( 'rest_api_init' );
-		// phpcs:enable WooCommerce.Commenting.CommentHooks.MissingSinceComment
-	}
 
 	/**
 	 * A merchant save cannot replace account data or discard other stored settings.
