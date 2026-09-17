@@ -863,4 +863,20 @@ class TrackingTest extends \WP_UnitTestCase {
 		$this->assertSame( 1, WC()->cart->get_cart_item( $cart_item_key )['quantity'] );
 		$this->assertCount( 1, $tracker->get_tracked_events() );
 	}
+
+	/**
+	 * A hook fire for a product that no longer exists (deleted between the add
+	 * and the hook, or a stale variation) must bail rather than call methods on
+	 * false.
+	 */
+	public function test_add_to_cart_for_a_missing_product_is_not_reported() {
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		$tracking->handle_add_to_cart( 'stale-cart-item-key', PHP_INT_MAX, 1, 0 );
+		$tracking->handle_add_to_cart( 'stale-cart-item-key', 0, 1, PHP_INT_MAX );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 0, $tracker->get_tracked_events() );
+	}
 }
