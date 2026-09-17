@@ -281,11 +281,10 @@ class Base {
 		}
 
 		$request_args = array(
-			'method'    => $request['method'],
-			'headers'   => $request['headers'],
-			'sslverify' => false,
-			'body'      => $request['args'],
-			'timeout'   => 15,
+			'method'  => $request['method'],
+			'headers' => $request['headers'],
+			'body'    => $request['args'],
+			'timeout' => 15,
 		);
 
 		Logger::log_request( $request['url'], $request_args );
