@@ -15,6 +15,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Search;
+use Automattic\WooCommerce\Pinterest\Tracking\PageVisit;
 use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Automattic\WooCommerce\Pinterest\Tracking\Tracker;
 use Automattic\WooCommerce\Pinterest\Utilities\CrawlerDetector;
@@ -115,6 +116,7 @@ class Tracking {
 	 *
 	 * @since 1.4.0
 	 * @since 1.4.8 Added check for product page.
+	 * @since x.x.x Prints the CAPI beacon itself when no Tag is active.
 	 *
 	 * @return void
 	 */
@@ -126,31 +128,29 @@ class Tracking {
 
 		// The PageVisit event ID is generated in the browser so full-page caches
 		// cannot reuse a PHP-generated ID across multiple visitors.
-		$data = new None( '' );
+		$data    = new None( '' );
+		$product = is_product() ? wc_get_product() : false;
 
-		// Not a product page.
-		if ( ! is_product() ) {
-			$this->track_event( static::EVENT_PAGE_VISIT, $data );
-			return;
+		if ( $product instanceof \WC_Product ) {
+			$data = new Product(
+				'',
+				$product->get_id(),
+				$product->get_name(),
+				wc_get_product_category_list( $product->get_id() ),
+				'brand',
+				wc_get_price_to_display( $product ),
+				get_woocommerce_currency(),
+				1
+			);
 		}
 
-		$product = wc_get_product();
-		if ( ! $product instanceof \WC_Product ) {
-			$this->track_event( static::EVENT_PAGE_VISIT, $data );
-			return;
-		}
-
-		$data = new Product(
-			'',
-			$product->get_id(),
-			$product->get_name(),
-			wc_get_product_category_list( $product->get_id() ),
-			'brand',
-			wc_get_price_to_display( $product ),
-			get_woocommerce_currency(),
-			1
-		);
 		$this->track_event( static::EVENT_PAGE_VISIT, $data );
+
+		// The Tag tracker prints the beacon together with its PageVisit call, but it
+		// is skipped without an active Tag, so print the beacon here for CAPI-only stores.
+		if ( ! Tag::get_active_tag() && $this->has_tracker( Conversions::class ) ) {
+			PageVisit::print_beacon_script();
+		}
 	}
 
 	/**
@@ -567,6 +567,24 @@ class Tracking {
 	 */
 	public function get_trackers() {
 		return $this->trackers;
+	}
+
+	/**
+	 * Checks whether a tracker of the given class is registered.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $tracker_class Tracker class name. e.g. Tag::class, Conversions::class.
+	 *
+	 * @return bool
+	 */
+	private function has_tracker( string $tracker_class ) {
+		foreach ( $this->trackers as $tracker ) {
+			if ( $tracker instanceof $tracker_class ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

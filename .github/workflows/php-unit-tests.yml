@@ -10,12 +10,14 @@ on:
       - composer.json
       - composer.lock
       - .github/workflows/php-unit-tests.yml
+      - bin/install-wp-tests.sh
   pull_request:
     paths:
       - "**.php"
       - composer.json
       - composer.lock
       - .github/workflows/php-unit-tests.yml
+      - bin/install-wp-tests.sh
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -23,7 +25,7 @@ concurrency:
 
 jobs:
   UnitTests:
-    name: PHP unit tests - PHP ${{ matrix.php }}, WP ${{ matrix.wp-version }}
+    name: PHP unit tests - PHP ${{ matrix.php }}, WP ${{ matrix.wp-version }}, WC ${{ matrix.wc-version }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -33,10 +35,15 @@ jobs:
       matrix:
         php: [7.4, 8.3]
         wp-version: [latest]
+        wc-version: [latest]
+        include:
+          - php: 7.4
+            wp-version: '6.9.0'
+            wc-version: '10.9.0'
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Prepare PHP
         uses: woocommerce/grow/prepare-php@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
@@ -48,7 +55,10 @@ jobs:
 
       - name: Install WP tests
         shell: bash
-        run: ./bin/install-wp-tests.sh wordpress_test root root localhost ${{ matrix.wp-version }}
+        env:
+          WP_VERSION: ${{ matrix.wp-version }}
+          WC_VERSION: ${{ matrix.wc-version }}
+        run: ./bin/install-wp-tests.sh wordpress_test root root localhost "$WP_VERSION"
 
       - name: Run PHP unit tests
         run: composer test-unit
