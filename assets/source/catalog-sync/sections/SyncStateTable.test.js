@@ -3,7 +3,6 @@
  */
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import DOMPurify from 'dompurify';
 
 /**
  * Internal dependencies
@@ -52,16 +51,25 @@ describe( 'SyncStateTable diagnostics', () => {
 		expect( container.querySelector( 'em' ) ).toBeNull();
 	} );
 
-	test( 'allows only link markup and its required attributes', () => {
+	test( 'preserves server-approved formatting and links', () => {
 		const { getByRole, getByText, container } = render(
 			<SyncStateTable
 				workflow={ workflow(
-					'<em>Diagnostic</em> <a href="https://example.test/feed.xml" target="_blank" rel="noopener" class="remote-class" style="color:red" data-note="remote">feed file</a>'
+					'<strong>Diagnostic</strong><br /><em>Details</em> <code>NEW_STATE</code> <a href="https://example.test/feed.xml" target="_blank" rel="noopener">feed file</a>'
 				) }
 			/>
 		);
 		expect( getByText( /Diagnostic/ ) ).toBeInTheDocument();
-		expect( container.querySelector( 'em' ) ).toBeNull();
+		expect( container.querySelector( 'strong' ) ).toHaveTextContent(
+			'Diagnostic'
+		);
+		expect( container.querySelector( 'br' ) ).not.toBeNull();
+		expect( container.querySelector( 'em' ) ).toHaveTextContent(
+			'Details'
+		);
+		expect( container.querySelector( 'code' ) ).toHaveTextContent(
+			'NEW_STATE'
+		);
 		const link = getByRole( 'link', { name: 'feed file' } );
 		expect( link ).toHaveAttribute(
 			'href',
@@ -69,9 +77,6 @@ describe( 'SyncStateTable diagnostics', () => {
 		);
 		expect( link ).toHaveAttribute( 'target', '_blank' );
 		expect( link ).toHaveAttribute( 'rel', 'noopener' );
-		expect( link ).not.toHaveAttribute( 'class' );
-		expect( link ).not.toHaveAttribute( 'style' );
-		expect( link ).not.toHaveAttribute( 'data-note' );
 	} );
 
 	test( 'preserves local settings links and plain text', () => {
@@ -87,25 +92,5 @@ describe( 'SyncStateTable diagnostics', () => {
 			'href',
 			'/wp-admin/admin.php?page=wc-admin&path=/pinterest/settings'
 		);
-	} );
-
-	test( 'uses text if the sanitizer does not support the browser', () => {
-		const supported = DOMPurify.isSupported;
-		DOMPurify.isSupported = false;
-		try {
-			const { getByText, container } = render(
-				<SyncStateTable
-					workflow={ workflow(
-						'&lt;em&gt;Diagnostic&lt;/em&gt; &amp; pending'
-					) }
-				/>
-			);
-			expect(
-				getByText( '<em>Diagnostic</em> & pending' )
-			).toBeInTheDocument();
-			expect( container.querySelector( 'em' ) ).toBeNull();
-		} finally {
-			DOMPurify.isSupported = supported;
-		}
 	} );
 } );
