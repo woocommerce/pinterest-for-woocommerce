@@ -26,7 +26,7 @@
     "@wordpress/notices": "^2.12.7",
     "@wordpress/url": "^3.1.1",
     "classnames": "^2.2.6",
-    "lodash": "^4.17.15"
+    "lodash": "^4.18.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.15.1",
@@ -167,11 +167,18 @@
     ]
   },
   "overrides": {
+    "qs@^6.0.0": "^6.16.0",
+    "@babel/runtime@^7.0.0": "^7.26.10",
+    "@babel/runtime-corejs2@^7.0.0": "^7.26.10",
+    "moment@^2.0.0": "^2.29.4",
+    "lodash": "$lodash",
+    "form-data@^2.0.0": "^2.5.6",
     "@wordpress/scripts": {
       "markdownlint-cli": "^0.49.1"
     },
     "copy-webpack-plugin": {
       "serialize-javascript": "^7.0.3"
-    }
+    },
+    "@babel/runtime-corejs3@^7.0.0": "^7.26.10"
   }
 }
