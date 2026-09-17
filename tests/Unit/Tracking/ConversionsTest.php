@@ -2,6 +2,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
 use Pinterest_For_Woocommerce;
@@ -11,6 +12,7 @@ class ConversionsTest extends WP_UnitTestCase {
 
 	public function tearDown(): void {
 		remove_all_filters( 'pre_http_request' );
+		Logger::$logger = null;
 		wp_set_current_user( 0 );
 		unset( $_GET['epik'], $_COOKIE['_epik'] );
 
@@ -155,6 +157,226 @@ class ConversionsTest extends WP_UnitTestCase {
 		$data        = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
 
 		$this->assertSame( 'pinterest-cookie-click-id', $data['user_data']['click_id'] );
+	}
+
+	/**
+	 * Tests that an over-length click ID in the query string is discarded.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_over_length_epik_query_parameter() {
+		$_GET['epik'] = str_repeat( 'a', 513 );
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that discarding an over-length click ID writes the debug diagnostic.
+	 *
+	 * @return void
+	 */
+	public function test_discarding_over_length_click_id_is_logged() {
+		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', true );
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		$logger->expects( $this->once() )
+			->method( 'log' )
+			->with(
+				'debug',
+				'Discarding Pinterest click ID longer than 512 bytes.',
+				array( 'source' => 'pinterest-for-woocommerce-conversions' )
+			);
+		Logger::$logger = $logger;
+
+		$_GET['epik'] = str_repeat( 'a', 513 );
+
+		$this->prepare_page_visit_data();
+	}
+
+	/**
+	 * An over-length value is reported even when sanitizing would also have altered it.
+	 *
+	 * @return void
+	 */
+	public function test_discarding_over_length_click_id_is_logged_for_mutated_values() {
+		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', true );
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		$logger->expects( $this->once() )
+			->method( 'log' )
+			->with(
+				'debug',
+				'Discarding Pinterest click ID longer than 512 bytes.',
+				array( 'source' => 'pinterest-for-woocommerce-conversions' )
+			);
+		Logger::$logger = $logger;
+
+		// Over the cap and carrying a percent sequence sanitize_text_field() would strip.
+		$_GET['epik'] = str_repeat( 'a', 512 ) . '%41';
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+	}
+
+	/**
+	 * Tests that a click ID at the maximum length is kept and persisted.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_keeps_epik_query_parameter_at_maximum_length() {
+		$click_id     = str_repeat( 'a', 512 );
+		$_GET['epik'] = $click_id;
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertSame( $click_id, $data['user_data']['click_id'] );
+		$this->assertSame( $click_id, WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that an over-length click ID in the Pinterest tag cookie is discarded.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_over_length_epik_cookie() {
+		$_COOKIE['_epik'] = str_repeat( 'a', 513 );
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that an over-length click ID already stored in the session is discarded.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_over_length_session_click_id() {
+		WC()->session->set( 'pinterest_for_woocommerce_click_id', str_repeat( 'a', 513 ) );
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that an over-length click ID in the event source URL is discarded.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_over_length_epik_in_event_source_url() {
+		$source_url = add_query_arg( 'epik', str_repeat( 'a', 513 ), home_url( '/p/' ) );
+
+		$data = $this->prepare_page_visit_data( $source_url );
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that a non-string query parameter yields no click ID.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_ignores_array_epik_query_parameter() {
+		$_GET['epik'] = array( 'x' );
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that values changed by sanitization are discarded rather than stored mutated.
+	 *
+	 * @dataProvider mutated_click_id_provider
+	 *
+	 * @param string $click_id Raw click ID that sanitize_text_field() would alter.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_click_id_changed_by_sanitization( string $click_id ) {
+		$_GET['epik'] = $click_id;
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Click ID values that sanitize_text_field() alters.
+	 *
+	 * @return array[]
+	 */
+	public function mutated_click_id_provider() {
+		return array(
+			'percent sequence' => array( 'click%41id' ),
+			'html tag'         => array( 'click<b>id</b>' ),
+		);
+	}
+
+	/**
+	 * Tests that a literal "0" click ID is kept and persisted.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_keeps_zero_click_id() {
+		$_GET['epik'] = '0';
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertSame( '0', $data['user_data']['click_id'] );
+		$this->assertSame( '0', WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that an empty query parameter falls through to the cookie.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_uses_cookie_when_epik_query_parameter_is_empty() {
+		$_GET['epik']     = '';
+		$_COOKIE['_epik'] = 'cookie1';
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertSame( 'cookie1', $data['user_data']['click_id'] );
+	}
+
+	/**
+	 * Tests that an empty event source URL parameter falls through to the query string.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_uses_query_parameter_when_event_source_url_epik_is_empty() {
+		$_GET['epik'] = 'getval';
+
+		$data = $this->prepare_page_visit_data( home_url( '/p/?epik=' ) );
+
+		$this->assertSame( 'getval', $data['user_data']['click_id'] );
+	}
+
+	/**
+	 * Tests that a rejected query parameter falls through to a valid cookie.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_uses_cookie_when_epik_query_parameter_is_over_length() {
+		$_GET['epik']     = str_repeat( 'a', 513 );
+		$_COOKIE['_epik'] = 'pinterest-cookie-click-id';
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertSame( 'pinterest-cookie-click-id', $data['user_data']['click_id'] );
+		$this->assertSame( 'pinterest-cookie-click-id', WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
 	}
 
 	/**
@@ -364,6 +586,20 @@ class ConversionsTest extends WP_UnitTestCase {
 			),
 			$data
 		);
+	}
+
+	/**
+	 * Prepares page visit request data for a fresh Conversions tracker.
+	 *
+	 * @param string $event_source_url Optional URL where the event occurred.
+	 *
+	 * @return array Prepared request data.
+	 */
+	private function prepare_page_visit_data( string $event_source_url = '' ) {
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user, $event_source_url );
+
+		return $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
 	}
 
 	/**

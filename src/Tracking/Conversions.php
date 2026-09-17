@@ -32,6 +32,13 @@ class Conversions extends Tracker {
 	private const CLICK_ID_SESSION_KEY = 'pinterest_for_woocommerce_click_id';
 
 	/**
+	 * Maximum accepted click ID length in bytes. Longer values are discarded.
+	 *
+	 * @var int
+	 */
+	private const CLICK_ID_MAX_LENGTH = 512;
+
+	/**
 	 * User data for the Conversions API.
 	 *
 	 * @var User
@@ -232,18 +239,18 @@ class Conversions extends Tracker {
 	private static function maybe_get_click_id( string $event_source_url = '' ) {
 		$click_id = self::get_click_id_from_url( $event_source_url );
 
-		if ( false === $click_id ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only attribution parameter.
-			if ( isset( $_GET['epik'] ) && is_string( $_GET['epik'] ) ) {
-				// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only attribution parameter.
-				$click_id = sanitize_text_field( wp_unslash( $_GET['epik'] ) );
-			} elseif ( isset( $_COOKIE['_epik'] ) && is_string( $_COOKIE['_epik'] ) ) {
-				$click_id = sanitize_text_field( wp_unslash( $_COOKIE['_epik'] ) );
-			}
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only attribution parameter.
+		if ( false === $click_id && isset( $_GET['epik'] ) && is_string( $_GET['epik'] ) ) {
+			$click_id = self::normalize_click_id( wp_unslash( $_GET['epik'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in normalize_click_id().
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		if ( false === $click_id && isset( $_COOKIE['_epik'] ) && is_string( $_COOKIE['_epik'] ) ) {
+			$click_id = self::normalize_click_id( wp_unslash( $_COOKIE['_epik'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in normalize_click_id().
 		}
 
 		$session = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session : false;
-		if ( false !== $click_id && '' !== $click_id ) {
+		if ( false !== $click_id ) {
 			if ( $session ) {
 				$session->set( self::CLICK_ID_SESSION_KEY, $click_id );
 			}
@@ -255,9 +262,46 @@ class Conversions extends Tracker {
 			return false;
 		}
 
-		$click_id = $session->get( self::CLICK_ID_SESSION_KEY );
+		$stored   = $session->get( self::CLICK_ID_SESSION_KEY );
+		$click_id = self::normalize_click_id( $stored );
+		if ( false === $click_id && null !== $stored ) {
+			// Evict values stored before validation existed so they stop being re-serialized.
+			$session->__unset( self::CLICK_ID_SESSION_KEY );
+		}
 
-		return is_string( $click_id ) && '' !== $click_id ? $click_id : false;
+		return $click_id;
+	}
+
+	/**
+	 * Normalizes a visitor-supplied click ID.
+	 *
+	 * Values changed by sanitize_text_field() are discarded rather than stored
+	 * mutated, and over-length values are discarded rather than truncated: in
+	 * both cases the result could not match anything at Pinterest.
+	 *
+	 * @param mixed $value Raw click ID value.
+	 *
+	 * @return string|false Click ID, or false when empty, mutated by sanitization or longer than CLICK_ID_MAX_LENGTH.
+	 */
+	private static function normalize_click_id( $value ) {
+		if ( ! is_string( $value ) ) {
+			return false;
+		}
+
+		// Bound the length before sanitizing: sanitize_text_field() decodes percent
+		// sequences in a loop, so an unbounded value is expensive to clean up, and an
+		// over-length value should be reported whether or not sanitizing would alter it.
+		if ( strlen( $value ) > self::CLICK_ID_MAX_LENGTH ) {
+			Logger::log( sprintf( 'Discarding Pinterest click ID longer than %d bytes.', self::CLICK_ID_MAX_LENGTH ), 'debug', 'conversions' );
+			return false;
+		}
+
+		$sanitized = sanitize_text_field( $value );
+		if ( $sanitized !== $value || '' === $sanitized ) {
+			return false;
+		}
+
+		return $sanitized;
 	}
 
 	/**
@@ -275,7 +319,7 @@ class Conversions extends Tracker {
 
 		wp_parse_str( $query, $params );
 
-		return isset( $params['epik'] ) && is_string( $params['epik'] ) ? sanitize_text_field( $params['epik'] ) : false;
+		return self::normalize_click_id( $params['epik'] ?? null );
 	}
 
 	/**
