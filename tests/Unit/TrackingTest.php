@@ -31,6 +31,74 @@ class TrackingTest extends \WP_UnitTestCase {
 		// Snapshot raw value for verbatim restoration in tearDown.
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 		$this->original_user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+		$this->reset_cart_state();
+	}
+
+	/**
+	 * Empties the cart and the AddToCart repeat guard so tests start clean.
+	 */
+	private function reset_cart_state() {
+		if ( ! function_exists( 'WC' ) ) {
+			return;
+		}
+		if ( isset( WC()->cart ) ) {
+			WC()->cart->empty_cart();
+		}
+		if ( isset( WC()->session ) ) {
+			WC()->session->__unset( 'pinterest_for_woocommerce_add_to_cart_signatures' );
+		}
+	}
+
+	/**
+	 * Builds a throwaway cart the way express checkout simulators do: no session
+	 * hooks, never WC()->cart.
+	 *
+	 * @return \WC_Cart
+	 */
+	private function get_isolated_cart() {
+		add_filter( 'woocommerce_cart_session_initialize', '__return_false' );
+		$cart = new \WC_Cart();
+		remove_filter( 'woocommerce_cart_session_initialize', '__return_false' );
+
+		return $cart;
+	}
+
+	/**
+	 * Builds a tracker that records the events handed to it.
+	 *
+	 * @return Tracker
+	 */
+	private function get_recording_tracker() {
+		return new class() extends Tracker {
+			/**
+			 * @var array Tracked event calls.
+			 */
+			private $tracked_events = array();
+
+			/**
+			 * Records a tracked event call.
+			 *
+			 * @param string $event_name Event name.
+			 * @param Data   $data       Event data.
+			 * @return true
+			 */
+			public function track_event( string $event_name, Data $data ) {
+				$this->tracked_events[] = array(
+					'event_name' => $event_name,
+					'data'       => $data,
+				);
+				return true;
+			}
+
+			/**
+			 * Gets recorded tracked event calls.
+			 *
+			 * @return array
+			 */
+			public function get_tracked_events() {
+				return $this->tracked_events;
+			}
+		};
 	}
 
 	/**
@@ -45,6 +113,7 @@ class TrackingTest extends \WP_UnitTestCase {
 		}
 
 		remove_all_filters( 'pinterest_for_woocommerce_is_crawler_request' );
+		$this->reset_cart_state();
 		$this->reset_tag_events();
 
 		parent::tearDown();
@@ -56,6 +125,9 @@ class TrackingTest extends \WP_UnitTestCase {
 		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_page_visit' ) ) );
 		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_view_category' ) ) );
 		$this->assertEquals( 10, has_action( 'woocommerce_add_to_cart', array( $tracking, 'handle_add_to_cart' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_cart_item_removed', array( $tracking, 'handle_cart_item_removed' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_after_cart_item_quantity_update', array( $tracking, 'handle_cart_item_quantity_update' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_cart_emptied', array( $tracking, 'handle_cart_emptied' ) ) );
 		$this->assertEquals( 10, has_action( 'woocommerce_before_thankyou', array( $tracking, 'handle_checkout' ) ) );
 		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_search' ) ) );
 	}
@@ -645,5 +717,265 @@ class TrackingTest extends \WP_UnitTestCase {
 
 		$this->assertSame( $expected_event_id, $tag_data['event_id'] );
 		$this->assertSame( $expected_event_id, $conversions_data['event_id'] );
+	}
+
+	/**
+	 * Repeated hook fires that leave the cart in the same state describe one
+	 * customer action, so only the first is reported. A fresh Tracking instance
+	 * per fire stands in for the separate requests a retried add-to-cart makes.
+	 */
+	public function test_repeated_add_to_cart_for_unchanged_cart_is_reported_once() {
+		$product = \WC_Helper_Product::create_simple_product();
+		$tracker = $this->get_recording_tracker();
+
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+
+		for ( $fire = 0; $fire < 4; $fire++ ) {
+			$tracking = new Tracking( array( $tracker ) );
+			$tracking->handle_add_to_cart( $cart_item_key, $product->get_id(), 1, 0 );
+			$tracking->remove_tracker( get_class( $tracker ) );
+		}
+
+		$tracked_events = $tracker->get_tracked_events();
+		$this->assertCount( 1, $tracked_events );
+		$this->assertSame( Tracking::EVENT_ADD_TO_CART, $tracked_events[0]['event_name'] );
+	}
+
+	/**
+	 * A second add that actually changes the cart is a separate customer action
+	 * and is reported, with its own event id.
+	 */
+	public function test_add_to_cart_is_reported_again_when_cart_quantity_changes() {
+		$product = \WC_Helper_Product::create_simple_product();
+		$tracker = $this->get_recording_tracker();
+
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$tracking      = new Tracking( array( $tracker ) );
+		$tracking->handle_add_to_cart( $cart_item_key, $product->get_id(), 1, 0 );
+
+		WC()->cart->set_quantity( $cart_item_key, 2, false );
+		$tracking->handle_add_to_cart( $cart_item_key, $product->get_id(), 1, 0 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$tracked_events = $tracker->get_tracked_events();
+		$this->assertCount( 2, $tracked_events );
+		$this->assertNotSame(
+			$tracked_events[0]['data']->get_event_id(),
+			$tracked_events[1]['data']->get_event_id()
+		);
+		// AddToCart reports what was added, not what the cart holds afterwards.
+		$this->assertSame( 1, $tracked_events[0]['data']->get_quantity() );
+		$this->assertSame( 1, $tracked_events[1]['data']->get_quantity() );
+	}
+
+	/**
+	 * Two different products added in the same request are both reported.
+	 */
+	public function test_add_to_cart_guard_is_scoped_to_the_cart_item() {
+		$first   = \WC_Helper_Product::create_simple_product();
+		$second  = \WC_Helper_Product::create_simple_product();
+		$tracker = $this->get_recording_tracker();
+
+		$first_key  = WC()->cart->add_to_cart( $first->get_id(), 1 );
+		$second_key = WC()->cart->add_to_cart( $second->get_id(), 1 );
+
+		$tracking = new Tracking( array( $tracker ) );
+		$tracking->handle_add_to_cart( $first_key, $first->get_id(), 1, 0 );
+		$tracking->handle_add_to_cart( $second_key, $second->get_id(), 1, 0 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 2, $tracker->get_tracked_events() );
+	}
+
+	/**
+	 * Express checkout buttons price a product by adding it to a throwaway cart.
+	 * That runs add_to_cart() for real, firing the global hook, while the
+	 * customer's cart is untouched. No customer action happened, so nothing is
+	 * reported. Mirrors WooCommerce PayPal Payments' IsolatedCartSimulator.
+	 */
+	public function test_add_to_cart_on_an_isolated_cart_is_not_reported() {
+		$product = \WC_Helper_Product::create_simple_product();
+		$tracker = $this->get_recording_tracker();
+
+		$isolated_cart = $this->get_isolated_cart();
+
+		$tracking      = new Tracking( array( $tracker ) );
+		$cart_item_key = $isolated_cart->add_to_cart( $product->get_id(), 1 );
+		$tracking->handle_add_to_cart( $cart_item_key, $product->get_id(), 1, 0 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$this->assertNotEmpty( $cart_item_key );
+		$this->assertEmpty( WC()->cart->get_cart_contents() );
+		$this->assertCount( 0, $tracker->get_tracked_events() );
+	}
+
+	/**
+	 * A simulation of a product the customer already holds produces the cart item
+	 * key that is in their cart, so the cart lookup cannot tell it apart. The
+	 * simulation flag the pricing extension raises closes that case.
+	 */
+	public function test_add_to_cart_during_a_declared_cart_simulation_is_not_reported() {
+		$product = \WC_Helper_Product::create_simple_product();
+		$tracker = $this->get_recording_tracker();
+
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$tracking      = new Tracking( array( $tracker ) );
+
+		add_filter( 'woocommerce_paypal_payments_is_simulating_cart', '__return_true' );
+		$tracking->handle_add_to_cart( $cart_item_key, $product->get_id(), 1, 0 );
+		remove_filter( 'woocommerce_paypal_payments_is_simulating_cart', '__return_true' );
+
+		$this->assertCount( 0, $tracker->get_tracked_events() );
+
+		// The customer's own add is still reported once the simulation ends.
+		$tracking->handle_add_to_cart( $cart_item_key, $product->get_id(), 1, 0 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 1, $tracker->get_tracked_events() );
+	}
+
+	/**
+	 * Removing the item and adding it again lands on the same signature, but it
+	 * is a new customer action, so the removal releases the guard. Driven through
+	 * the live hooks rather than direct handler calls.
+	 */
+	public function test_add_to_cart_is_reported_again_after_the_item_is_removed() {
+		$product  = \WC_Helper_Product::create_simple_product();
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		WC()->cart->remove_cart_item( $cart_item_key );
+		WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 2, $tracker->get_tracked_events() );
+	}
+
+	/**
+	 * Emptying the cart releases the guard for every item.
+	 */
+	public function test_add_to_cart_is_reported_again_after_the_cart_is_emptied() {
+		$product  = \WC_Helper_Product::create_simple_product();
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		WC()->cart->add_to_cart( $product->get_id(), 1 );
+		WC()->cart->empty_cart();
+		WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 2, $tracker->get_tracked_events() );
+	}
+
+	/**
+	 * Lowering the quantity and adding again lands on a quantity already reported,
+	 * but the decrease releases the guard. The increase add_to_cart() itself makes
+	 * through set_quantity() must not.
+	 */
+	public function test_add_to_cart_is_reported_again_after_a_quantity_decrease() {
+		$product  = \WC_Helper_Product::create_simple_product();
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		WC()->cart->add_to_cart( $product->get_id(), 1 );
+		WC()->cart->set_quantity( $cart_item_key, 1, false );
+		WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 3, $tracker->get_tracked_events() );
+		$this->assertSame( 2, WC()->cart->get_cart_item( $cart_item_key )['quantity'] );
+	}
+
+	/**
+	 * A claim older than the repeat window no longer suppresses. The session
+	 * timestamp is aged by hand to stand in for elapsed time.
+	 */
+	public function test_add_to_cart_repeat_guard_expires() {
+		$product  = \WC_Helper_Product::create_simple_product();
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+		$this->assertCount( 1, $tracker->get_tracked_events() );
+
+		$signature = $cart_item_key . ':1';
+		WC()->session->set( 'pinterest_for_woocommerce_add_to_cart_signatures', array( $signature => time() - 31 ) );
+
+		$later = new Tracking( array( $tracker ) );
+		$later->handle_add_to_cart( $cart_item_key, $product->get_id(), 1, 0 );
+		$later->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 2, $tracker->get_tracked_events() );
+	}
+
+	/**
+	 * A suppressed repeat refreshes the claim, so a chain of retries spaced under
+	 * the window keeps collapsing instead of leaking one event per window.
+	 */
+	public function test_add_to_cart_repeat_guard_window_slides() {
+		$product  = \WC_Helper_Product::create_simple_product();
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$signature = $cart_item_key . ':1';
+		WC()->session->set( 'pinterest_for_woocommerce_add_to_cart_signatures', array( $signature => time() - 20 ) );
+
+		$later = new Tracking( array( $tracker ) );
+		$later->handle_add_to_cart( $cart_item_key, $product->get_id(), 1, 0 );
+		$later->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 1, $tracker->get_tracked_events() );
+		$claims = WC()->session->get( 'pinterest_for_woocommerce_add_to_cart_signatures' );
+		$this->assertGreaterThanOrEqual( time() - 1, $claims[ $signature ] );
+	}
+
+	/**
+	 * A simulator disposing of its throwaway cart removes items from that cart,
+	 * firing the same global hooks. That must not release the guard for the same
+	 * product in the customer's cart.
+	 */
+	public function test_throwaway_cart_cleanup_does_not_release_the_guard() {
+		$product  = \WC_Helper_Product::create_simple_product();
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$this->assertCount( 1, $tracker->get_tracked_events() );
+
+		$isolated_cart = $this->get_isolated_cart();
+		$isolated_cart->add_to_cart( $product->get_id(), 1 );
+		$isolated_cart->remove_cart_item( $cart_item_key );
+		$isolated_cart->add_to_cart( $product->get_id(), 1 );
+		$isolated_cart->empty_cart();
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$later = new Tracking( array( $tracker ) );
+		$later->handle_add_to_cart( $cart_item_key, $product->get_id(), 1, 0 );
+		$later->remove_tracker( get_class( $tracker ) );
+
+		$this->assertSame( 1, WC()->cart->get_cart_item( $cart_item_key )['quantity'] );
+		$this->assertCount( 1, $tracker->get_tracked_events() );
+	}
+
+	/**
+	 * A hook fire for a product that no longer exists (deleted between the add
+	 * and the hook, or a stale variation) must bail rather than call methods on
+	 * false.
+	 */
+	public function test_add_to_cart_for_a_missing_product_is_not_reported() {
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		$tracking->handle_add_to_cart( 'stale-cart-item-key', PHP_INT_MAX, 1, 0 );
+		$tracking->handle_add_to_cart( 'stale-cart-item-key', 0, 1, PHP_INT_MAX );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 0, $tracker->get_tracked_events() );
 	}
 }
