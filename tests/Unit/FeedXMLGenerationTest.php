@@ -123,6 +123,59 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * Stored protection excludes feed items regardless of the worker or visitor.
+	 *
+	 * @dataProvider protected_product_cases
+	 * @param string $kind  Product protection to apply.
+	 * @param bool   $admin Whether to run as an administrator.
+	 */
+	public function testPasswordProtectedProductsAreSkipped( $kind, $admin ) {
+		if ( 'simple' === $kind ) {
+			$product      = WC_Helper_Product::create_simple_product();
+			$protected_id = $product->get_id();
+		} else {
+			$parent       = WC_Helper_Product::create_variation_product();
+			$product      = wc_get_product( $parent->get_children()[0] );
+			$protected_id = 'parent' === $kind ? $parent->get_id() : $product->get_id();
+		}
+
+		wp_update_post(
+			array(
+				'ID'            => $protected_id,
+				'post_password' => '0',
+			)
+		);
+		wp_set_current_user( $admin ? self::factory()->user->create( array( 'role' => 'administrator' ) ) : 0 );
+		$password_not_required = static function () {
+			return false;
+		};
+		add_filter( 'post_password_required', $password_not_required );
+
+		try {
+			$this->assertFalse( post_password_required( $protected_id ) );
+			$this->assertSame( '', ProductsXmlFeed::get_xml_item( $product, 'US' ) );
+		} finally {
+			remove_filter( 'post_password_required', $password_not_required );
+		}
+	}
+
+	/**
+	 * Protection and worker cases.
+	 *
+	 * @return array
+	 */
+	public function protected_product_cases() {
+		return array(
+			'simple guest'    => array( 'simple', false ),
+			'simple admin'    => array( 'simple', true ),
+			'variation guest' => array( 'variation', false ),
+			'variation admin' => array( 'variation', true ),
+			'parent guest'    => array( 'parent', false ),
+			'parent admin'    => array( 'parent', true ),
+		);
+	}
+
+	/**
 	 * Test if a product with price set to 0 is skipped from the feed
 	 *
 	 * @group feed
