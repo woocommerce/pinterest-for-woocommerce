@@ -73,7 +73,7 @@ class PageVisit {
 	 *
 	 * Prints nothing when the Conversions API is disabled.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @return void
 	 */
@@ -90,7 +90,7 @@ class PageVisit {
 	/**
 	 * Builds the JavaScript that generates a browser-side PageVisit event ID.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @return string JavaScript defining `eventId`.
 	 */
@@ -101,7 +101,7 @@ class PageVisit {
 	/**
 	 * Builds the JavaScript that sends the PageVisit CAPI beacon.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @return string JavaScript using `eventId`, or an empty string when the Conversions API is disabled.
 	 */
@@ -193,7 +193,7 @@ class PageVisit {
 	/**
 	 * Logs why a beacon was dropped.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param string $reason Human readable rejection reason.
 	 *
@@ -208,7 +208,7 @@ class PageVisit {
 	 *
 	 * Protocol-relative URLs, URLs carrying user info and over-long URLs are rejected.
 	 *
-	 * @since x.x.x Requires an http(s) scheme, no user info and at most 2048 characters.
+	 * @since 1.5.1 Requires an http(s) scheme, no user info and at most 2048 characters.
 	 *
 	 * @param string $source_url Untrusted event source URL.
 	 *

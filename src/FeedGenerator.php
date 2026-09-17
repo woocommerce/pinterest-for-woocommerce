@@ -751,7 +751,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * and a long-lived runner would skip a later clear. Dropping the cached copy first forces
 	 * a fresh read from the database.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param bool $dirty Whether the feed needs regenerating.
 	 */
@@ -1376,7 +1376,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Handle error on generate feed timeout.
 	 *
 	 * @since 1.2.14
-	 * @deprecated x.x.x
+	 * @deprecated 1.3.1
 	 *
 	 * @param int $action_id The ID of the action marked as failed.
 	 *

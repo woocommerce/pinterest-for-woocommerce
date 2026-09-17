@@ -56,7 +56,7 @@ class ProductSync {
 	 * g:availability, which ProductsXmlFeed derives from the stock status, so a quantity
 	 * decrement at checkout produces a byte identical feed.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @var string[]
 	 */
@@ -83,7 +83,7 @@ class ProductSync {
 	 * the flag: long-lived CLI and Action Scheduler workers save the same product again later
 	 * and must be able to flag the feed again.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @var array<string, bool>
 	 */
@@ -301,7 +301,7 @@ class ProductSync {
 	 * consumed it, the same notification writes it again; otherwise a long-lived worker would
 	 * never flag a product twice and its later changes would wait for the daily run.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param integer $product_id The product ID.
 	 * @param string  $source     Identifier of the notification source.
@@ -328,7 +328,7 @@ class ProductSync {
 	/**
 	 * Mark the feed as dirty for a newly created product.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param integer $product_id The product ID.
 	 *
@@ -345,7 +345,7 @@ class ProductSync {
 	 * filtered against FEED_RELEVANT_PRODUCT_PROPS to skip the saves that cannot change
 	 * the feed output.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param WC_Product $product       The saved product.
 	 * @param array      $updated_props Names of the properties written by the save.
@@ -367,7 +367,7 @@ class ProductSync {
 	 * pending product cannot change the feed. Products leaving the published state are not
 	 * filtered here: they travel through wp_update_post(), which fires edit_post.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param WC_Product|false|null $product The product, or a falsy value when the lookup failed.
 	 * @param string                $source  Identifier of the notification source.
