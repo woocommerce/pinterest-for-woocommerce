@@ -345,11 +345,11 @@ const SetupTracking = ( { view = 'settings' } ) => {
 								? __(
 										'Select your advertiser and tag',
 										'pinterest-for-woocommerce'
-								  )
+									)
 								: __(
 										'Track conversions with the Pinterest tag',
 										'pinterest-for-woocommerce'
-								  )
+									)
 						}
 						description={
 							<>

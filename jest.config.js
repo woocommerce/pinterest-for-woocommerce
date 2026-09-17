@@ -31,7 +31,10 @@ module.exports = {
 		[ `(${ packagesNeedMocking })` ]: '<rootDir>/assets/source/tests/dependencies/$1',
 	},
 	// Exclude e2e tests from unit testing.
-	testPathIgnorePatterns: [ '/node_modules/' ],
+	testPathIgnorePatterns: [ '/node_modules/', '/assets/js/' ],
+	testEnvironmentOptions: {
+		customExportConditions: [ 'node', 'node-addons' ],
+	},
 	globals: {
 		wcSettings: {
 			pinterest_for_woocommerce: {

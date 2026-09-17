@@ -246,11 +246,11 @@ const ClaimWebsite = ( { view } ) => {
 								? __(
 										'Claim your website',
 										'pinterest-for-woocommerce'
-								  )
+									)
 								: __(
 										'Verified domain',
 										'pinterest-for-woocommerce'
-								  )
+									)
 						}
 						description={ __(
 							'Claim your website to get access to analytics for the Pins you publish from your site, the analytics on Pins that other people create from your site and let people know where they can find more of your content.'

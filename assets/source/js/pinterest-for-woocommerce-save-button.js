@@ -1,7 +1,6 @@
 /**
  * Disable the Save to Pinterest button if the Pinterest browser extension is detected.
  */
-// eslint-disable-next-line @wordpress/no-global-event-listener
 window.addEventListener( 'load', function () {
 	const disableSaveButton = () => {
 		document
@@ -23,7 +22,6 @@ window.addEventListener( 'load', function () {
 	checkForPinterestExtension();
 } );
 
-// eslint-disable-next-line @wordpress/no-global-event-listener
 document.addEventListener( 'keydown', ( event ) => {
 	// Check if target is a Pinterest span and Enter was pressed.
 	const isPinSpan = event.target.matches( 'span[data-pin-log]' );
@@ -43,7 +41,6 @@ document.addEventListener( 'keydown', ( event ) => {
 	}
 } );
 
-// eslint-disable-next-line @wordpress/no-global-event-listener
 document.addEventListener( 'DOMContentLoaded', function () {
 	// Placeholder markup that pinit.js has not turned into a button yet.
 	const UNBUILT_PIN_SELECTOR =

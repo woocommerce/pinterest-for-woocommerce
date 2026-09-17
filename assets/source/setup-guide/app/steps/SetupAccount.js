@@ -1,4 +1,3 @@
-/* eslint-disable @wordpress/no-global-event-listener */
 /**
  * External dependencies
  */
@@ -122,11 +121,11 @@ const SetupAccount = ( {
 								? __(
 										'Pinterest business account',
 										'pinterest-for-woocommerce'
-								  )
+									)
 								: __(
 										'Linked account',
 										'pinterest-for-woocommerce'
-								  )
+									)
 						}
 						description={ createInterpolateElement(
 							__(

@@ -1,7 +1,13 @@
+const { ProvidePlugin } = require( 'webpack' );
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 const WooCommerceDependencyExtractionWebpackPlugin = require( '@woocommerce/dependency-extraction-webpack-plugin' );
 
 const requestToExternal = ( request ) => {
+	// Keep the JSX runtime in sync with WordPress's React version.
+	if ( request === 'react/jsx-runtime' ) {
+		return 'ReactJSXRuntime';
+	}
+
 	// Bundle these packages & components so we can use the latest, independent of WordPress version.
 	// Without bundling these specific recent versions, components like LandingPageApp don't render correctly.
 	const bundled = [ '@wordpress/components', '@wordpress/compose' ];
@@ -13,6 +19,8 @@ const requestToExternal = ( request ) => {
 // Replace the default DependencyExtractionWebpackPlugin with the Woo version
 // and override to bundle specific newer packages (see requestToExternal above).
 const ourPlugins = [
+	// Preserve Webpack 4's browser process shim for bundled WordPress components.
+	new ProvidePlugin( { process: require.resolve( 'process/browser' ) } ),
 	...defaultConfig.plugins.filter(
 		( plugin ) =>
 			plugin.constructor.name !== 'DependencyExtractionWebpackPlugin'
@@ -20,11 +28,14 @@ const ourPlugins = [
 	new WooCommerceDependencyExtractionWebpackPlugin( {
 		injectPolyfill: true, // TBD Confirm this is needed for Pinterest.
 		requestToExternal,
+		requestToHandle: ( request ) =>
+			request === 'react/jsx-runtime' ? 'react-jsx-runtime' : undefined,
 	} ),
 ];
 
 const webpackConfig = {
 	...defaultConfig,
+	target: 'web',
 	plugins: ourPlugins,
 	entry: {
 		'setup-guide': __dirname + '/assets/source/setup-guide/index.js',
@@ -32,6 +43,7 @@ const webpackConfig = {
 			__dirname + '/assets/source/product-attributes/index.js',
 	},
 	output: {
+		clean: defaultConfig.output.clean,
 		filename: '[name].js',
 		path: __dirname + '/assets/build',
 	},

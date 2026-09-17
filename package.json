@@ -33,13 +33,15 @@
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.0.3",
-    "@woocommerce/dependency-extraction-webpack-plugin": "^1.7.0",
-    "@woocommerce/eslint-plugin": "^1.2.0",
+    "@typescript-eslint/parser": "^8.70.0",
+    "@woocommerce/dependency-extraction-webpack-plugin": "~2.2.0",
+    "@woocommerce/eslint-plugin": "^4.0.0",
     "@wordpress/base-styles": "^3.6.0",
     "@wordpress/env": "^5.16.0",
-    "@wordpress/scripts": "^16.1.4",
-    "@wordpress/stylelint-config": "^19.1.0",
+    "@wordpress/scripts": "^35.0.0",
+    "@wordpress/stylelint-config": "^25.0.0",
     "browser-sync": "^2.26.3",
+    "eslint": "^10.10.0",
     "gulp": "^4.0.0",
     "gulp-add-src": "^1.0.0",
     "gulp-autoprefixer": "^6.0.0",
@@ -52,30 +54,27 @@
     "gulp-plumber": "^1.2.1",
     "gulp-rename": "^1.4.0",
     "gulp-replace": "^1.0.0",
-    "gulp-sass": "^4.0.2",
+    "gulp-sass": "^6.0.1",
     "gulp-size": "^3.0.0",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-uglify": "^3.0.2",
     "gulp-util": "^3.0.8",
     "gulp-vinyl-zip": "^2.1.2",
     "gulp-wp-pot": "^2.3.4",
-    "jest": "^25.5.4",
     "jsdoc": "^3.6.7",
     "jsdoc-plugin-typescript": "^2.0.6",
     "md5": "^2.3.0",
     "merge-stream": "^1.0.1",
-    "node-sass": "^4.14.1",
     "path": "^0.12.7",
-    "prettier": "npm:wp-prettier@^2.2.1-beta-1",
+    "prettier": "npm:wp-prettier@^3.9.6",
+    "process": "^0.11.10",
+    "sass": "^1.104.1",
     "semver": "^6.0.0",
     "simple-git": "~3.20.0",
-    "stylelint": "^13.13.1",
+    "stylelint": "^17.15.0",
+    "stylelint-scss": "^7.3.0",
+    "typescript": "^5.9.3",
     "underscore": "^1.9.1"
-  },
-  "eslintConfig": {
-    "extends": [
-      "plugin:@woocommerce/eslint-plugin/recommended"
-    ]
   },
   "stylelint": {
     "extends": [
@@ -94,6 +93,15 @@
         "vh",
         "ms",
         "fr"
+      ],
+      "scss/load-no-partial-leading-underscore": null,
+      "value-keyword-case": [
+        "lower",
+        {
+          "ignoreKeywords": [
+            "currentColor"
+          ]
+        }
       ]
     }
   },
@@ -106,8 +114,8 @@
     "dev": "wp-scripts build && gulp build",
     "format:js": "wp-scripts format ./assets/source",
     "i18n": "WP_CLI_PHP_ARGS='-d memory_limit=2048M' ./vendor/bin/wp i18n make-pot ./ i18n/languages/$npm_package_name.pot --slug=$npm_package_name --domain=$npm_package_name --exclude='bin,*.asset.php,assets/source/_maps,assets/setup-*,assets/catalog-sync,assets/build,tests,woo-tracking-jsdoc,index.php,gulpfile.js,jest.config.js'",
-    "lint:css": "wp-scripts lint-style ./assets/source",
-    "lint:css:fix": "wp-scripts lint-style ./assets/source --fix",
+    "lint:css": "wp-scripts lint-style \"./assets/source/**/*.{css,scss}\"",
+    "lint:css:fix": "wp-scripts lint-style \"./assets/source/**/*.{css,scss}\" --fix",
     "lint:js": "wp-scripts lint-js ./assets/source",
     "lint:js:fix": "wp-scripts lint-js ./assets/source --fix",
     "lint:php": "composer run-script phpcs ./",
@@ -142,8 +150,8 @@
   "author": "WooCommerce",
   "license": "GPL-3.0-or-later",
   "engines": {
-    "node": ">=12.20.1 <15",
-    "npm": ">=6.14.10 <7"
+    "node": ">=24.15.0 <25",
+    "npm": ">=11 <12"
   },
   "config": {
     "build_step": "npm install && npm run build:zip",
@@ -156,5 +164,13 @@
       "pinterest-for-woocommerce.php",
       "uninstall.php"
     ]
+  },
+  "overrides": {
+    "@wordpress/scripts": {
+      "markdownlint-cli": "^0.49.1"
+    },
+    "copy-webpack-plugin": {
+      "serialize-javascript": "^7.0.3"
+    }
   }
 }
