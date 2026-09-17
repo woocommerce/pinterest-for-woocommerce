@@ -68,7 +68,9 @@ class Settings extends VendorAPI {
 			return new WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_options_error', esc_html__( 'Missing option parameters.', 'pinterest-for-woocommerce' ), array( 'status' => 400 ) );
 		}
 
-		$new_settings      = $request->get_param( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME );
+		$new_settings = $request->get_param( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME );
+		// Keep merchant-editable Pinterest_For_Woocommerce::$default_settings and tracking selections here.
+		// Derived account data must remain server-owned.
 		$editable_settings = array_fill_keys(
 			array(
 				'track_conversions',
