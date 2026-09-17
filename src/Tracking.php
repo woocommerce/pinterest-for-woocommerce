@@ -270,13 +270,7 @@ class Tracking {
 	 * @return bool
 	 */
 	private function is_simulated_add_to_cart() {
-		/**
-		 * Filter owned by WooCommerce PayPal Payments, true during a cart simulation.
-		 *
-		 * @since x.x.x
-		 *
-		 * @param bool $is_simulating Whether a cart simulation is in progress.
-		 */
+		// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment -- Filter owned by WooCommerce PayPal Payments, read only.
 		return (bool) apply_filters( 'woocommerce_paypal_payments_is_simulating_cart', false );
 	}
 
