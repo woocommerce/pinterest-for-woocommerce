@@ -111,8 +111,8 @@ class FeedState extends VendorAPI {
 			$result = apply_filters( 'pinterest_for_woocommerce_feed_state', array() );
 			if ( is_array( $result ) && isset( $result['workflow'] ) && is_array( $result['workflow'] ) ) {
 				foreach ( $result['workflow'] as $key => $row ) {
-					if ( is_array( $row ) && isset( $row['extra_info'] ) && is_string( $row['extra_info'] ) ) {
-						$result['workflow'][ $key ]['extra_info'] = wp_kses_post( $row['extra_info'] );
+					if ( is_array( $row ) && isset( $row['extra_info'] ) ) {
+						$result['workflow'][ $key ]['extra_info'] = is_scalar( $row['extra_info'] ) ? wp_kses_post( (string) $row['extra_info'] ) : '';
 					}
 				}
 			}

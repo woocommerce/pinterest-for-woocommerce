@@ -57,6 +57,8 @@ class FeedStateTest extends WP_UnitTestCase {
 			array( 'extra_info' => '<a href="https://example.test/feed.xml" target="_blank" rel="noopener">feed file</a>' ),
 			array( 'extra_info' => '<neo-diagnostic>Plain diagnostic</neo-diagnostic>' ),
 			array( 'label' => 'No extra information' ),
+			array( 'extra_info' => array( '<em>Aggregate diagnostic</em>' ) ),
+			array( 'extra_info' => 3 ),
 		);
 		$fixture = static function () use ( $rows ) {
 			return array(
@@ -71,6 +73,8 @@ class FeedStateTest extends WP_UnitTestCase {
 			$this->assertSame( $rows[1], $result['workflow'][1] );
 			$this->assertSame( 'Plain diagnostic', $result['workflow'][2]['extra_info'] );
 			$this->assertSame( $rows[3], $result['workflow'][3] );
+			$this->assertSame( '', $result['workflow'][4]['extra_info'] );
+			$this->assertSame( '3', $result['workflow'][5]['extra_info'] );
 			$this->assertSame( array( 'total' => 3 ), $result['overview'] );
 		} finally {
 			remove_filter( $hook, $fixture );
