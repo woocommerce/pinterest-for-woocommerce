@@ -20,6 +20,17 @@ class RichPins {
 	use PluginHelper;
 
 	/**
+	 * Keep password-authorized product metadata out of shared page caches.
+	 *
+	 * @return void
+	 */
+	public static function prevent_protected_product_caching() {
+		if ( is_singular( 'product' ) && '' !== get_post_field( 'post_password', get_queried_object_id(), 'raw' ) ) {
+			wc_nocache_headers();
+		}
+	}
+
+	/**
 	 * Output Pinterest Rich Pins metatags based on post_type and site setup.
 	 *
 	 * Rich Pins show metadata right on the Pin itself, giving Pinners a richer experience and increasing engagement.
@@ -106,6 +117,10 @@ class RichPins {
 	 */
 	protected static function get_opengraph_tags( $args ) {
 
+		if ( is_singular( 'product' ) && post_password_required( get_queried_object_id() ) ) {
+			return array();
+		}
+
 		if ( empty( $args['products']['enabled'] ) && empty( $args['posts']['enabled'] ) ) {
 			return array();
 		}
@@ -151,7 +166,7 @@ class RichPins {
 	 */
 	public static function add_product_opengraph_tags( $tags, $args ) {
 
-		if ( ! is_singular( 'product' ) || empty( $args['products']['enabled'] ) ) {
+		if ( ! is_singular( 'product' ) || empty( $args['products']['enabled'] ) || post_password_required( get_queried_object_id() ) ) {
 			return $tags;
 		}
 
