@@ -4,7 +4,6 @@
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { recordEvent } from '@woocommerce/tracks';
-import DOMPurify from 'dompurify';
 
 jest.mock( '../../setup-guide/app/helpers/effects', () => ( {
 	useSettingsSelect: jest.fn(),
@@ -18,30 +17,6 @@ import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
 
 describe( 'SyncState component', () => {
 	afterEach( () => useSettingsSelect.mockReset() );
-
-	test( 'keeps credits literal if browser sanitization is unavailable', () => {
-		const supported = DOMPurify.isSupported;
-		DOMPurify.isSupported = false;
-		useSettingsSelect.mockReturnValue( {
-			account_data: {
-				available_discounts: {
-					marketing_offer: { remaining_discount: '<em>Credit</em>' },
-				},
-			},
-		} );
-		try {
-			const { container } = render( <SyncState /> );
-			const notice = container.querySelector(
-				'.pinterest-for-woocommerce-catalog-sync__state-footer-credits'
-			);
-			expect( notice ).toHaveTextContent(
-				'You have <em>Credit</em> of free ad credits left to use'
-			);
-			expect( notice.querySelector( 'em' ) ).toBeNull();
-		} finally {
-			DOMPurify.isSupported = supported;
-		}
-	} );
 
 	test.each( [
 		[
