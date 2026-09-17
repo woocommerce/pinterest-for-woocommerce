@@ -96,6 +96,11 @@ class Tracking {
 		// Tracks add to cart events.
 		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_add_to_cart' ), 10, 6 );
 
+		// Cart changes made outside add-to-cart release the AddToCart repeat guard.
+		add_action( 'woocommerce_cart_item_removed', array( $this, 'forget_add_to_cart_signatures' ), 10, 1 );
+		add_action( 'woocommerce_after_cart_item_quantity_update', array( $this, 'handle_cart_item_quantity_update' ), 10, 3 );
+		add_action( 'woocommerce_cart_emptied', array( $this, 'forget_add_to_cart_signatures' ), 10, 0 );
+
 		// Tracks checkout events.
 		add_action( 'woocommerce_before_thankyou', array( $this, 'handle_checkout' ), 10, 2 );
 
@@ -202,6 +207,60 @@ class Tracking {
 			$quantity
 		);
 		$this->track_event( static::EVENT_ADD_TO_CART, $data );
+	}
+
+	/**
+	 * Used as a callback for the woocommerce_after_cart_item_quantity_update hook.
+	 *
+	 * A quantity decrease means a later add that lands on the old quantity is a
+	 * new customer action, not a repeat. Increases are left alone: add_to_cart()
+	 * raises the quantity through set_quantity() before firing its own hook.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string    $cart_item_key WooCommerce cart item key.
+	 * @param int|float $quantity      New quantity.
+	 * @param int|float $old_quantity  Previous quantity.
+	 *
+	 * @return void
+	 */
+	public function handle_cart_item_quantity_update( $cart_item_key, $quantity, $old_quantity ) {
+		if ( $quantity < $old_quantity ) {
+			$this->forget_add_to_cart_signatures( $cart_item_key );
+		}
+	}
+
+	/**
+	 * Drops reported AddToCart signatures for a cart item, or for every item.
+	 *
+	 * Used as a callback for the woocommerce_cart_item_removed hook (one item)
+	 * and the woocommerce_cart_emptied hook (all items), so a product removed and
+	 * added again inside the repeat window is reported again.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $cart_item_key WooCommerce cart item key, or empty for all.
+	 *
+	 * @return void
+	 */
+	public function forget_add_to_cart_signatures( $cart_item_key = '' ) {
+		$keep = function ( $signature ) use ( $cart_item_key ) {
+			return '' !== $cart_item_key && 0 !== strpos( $signature, $cart_item_key . ':' );
+		};
+
+		$this->reported_add_to_cart_signatures = array_filter( $this->reported_add_to_cart_signatures, $keep, ARRAY_FILTER_USE_KEY );
+
+		$session = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session : false;
+		if ( ! $session ) {
+			return;
+		}
+
+		$signatures = $session->get( self::ADD_TO_CART_SIGNATURES_SESSION_KEY );
+		if ( ! is_array( $signatures ) || empty( $signatures ) ) {
+			return;
+		}
+
+		$session->set( self::ADD_TO_CART_SIGNATURES_SESSION_KEY, array_filter( $signatures, $keep, ARRAY_FILTER_USE_KEY ) );
 	}
 
 	/**
