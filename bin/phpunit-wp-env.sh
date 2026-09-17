@@ -4,7 +4,7 @@
 # tests/bootstrap.php expects.
 #
 # Invoked from package.json scripts:
-#     "test:php:wp-env": "wp-env run tests-cli \"bash /var/www/html/.../bin/phpunit-wp-env.sh\""
+#     "test:php:wp-env": "wp-env run tests-cli bash /var/www/html/.../bin/phpunit-wp-env.sh"
 #
 # Extra args are forwarded to phpunit:
 #     npm run test:php:wp-env -- --filter MyTest
