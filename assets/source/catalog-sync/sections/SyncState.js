@@ -5,6 +5,8 @@ import { recordEvent } from '@woocommerce/tracks';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
+import DOMPurify from 'dompurify';
 import { Icon, trendingUp as trendingUpIcon } from '@wordpress/icons';
 import {
 	Card,
@@ -51,7 +53,14 @@ const SyncState = () => {
 			'You have %s of free ad credits left to use',
 			'pinterest-for-woocommerce'
 		),
-		hasAvailableCredits
+		DOMPurify.isSupported
+			? decodeEntities(
+					DOMPurify.sanitize( hasAvailableCredits, {
+						ALLOWED_TAGS: [],
+						ALLOWED_ATTR: [],
+					} )
+			  )
+			: decodeEntities( hasAvailableCredits )
 	);
 
 	return (
@@ -97,12 +106,9 @@ const SyncState = () => {
 					</FlexItem>
 					{ hasAvailableCredits && (
 						<FlexItem>
-							<Text
-								className="pinterest-for-woocommerce-catalog-sync__state-footer-credits"
-								dangerouslySetInnerHTML={ {
-									__html: availableCredits,
-								} }
-							/>
+							<Text className="pinterest-for-woocommerce-catalog-sync__state-footer-credits">
+								{ availableCredits }
+							</Text>
 						</FlexItem>
 					) }
 				</Flex>

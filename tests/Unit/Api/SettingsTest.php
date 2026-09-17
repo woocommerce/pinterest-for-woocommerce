@@ -11,8 +11,85 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
 use Pinterest_For_Woocommerce;
 use WP_REST_Request;
 use WP_Test_REST_TestCase;
+use Automattic\WooCommerce\Pinterest\API\Settings;
 
 class SettingsTest extends WP_Test_REST_TestCase {
+
+	/**
+	 * Register the real settings route for the isolated REST test server.
+	 */
+	public function setUp(): void {
+		parent::setUp();
+		rest_get_server();
+		add_action(
+			'rest_api_init',
+			function () {
+				new Settings();
+			}
+		);
+		/**
+		 * Register the native REST route in its expected lifecycle.
+		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+		 */
+		do_action( 'rest_api_init' );
+		// phpcs:enable WooCommerce.Commenting.CommentHooks.MissingSinceComment
+	}
+
+	/**
+	 * A merchant save cannot replace account data or discard other stored settings.
+	 *
+	 * @dataProvider merchant_roles
+	 * @param string $role Authorized merchant role.
+	 */
+	public function test_merchant_save_preserves_server_owned_settings( $role ) {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => $role ) ) );
+		$account = array( 'available_discounts' => array( 'marketing_offer' => array( 'remaining_discount' => '20.00' ) ) );
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'account_data'         => $account,
+				'enable_debug_logging' => false,
+				'track_conversions'    => true,
+				'extension_setting'    => 'keep existing value',
+			)
+		);
+		$request = new WP_REST_Request( 'POST', '/pinterest/v1/settings' );
+		$request->set_body_params(
+			array(
+				PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => array(
+					'enable_debug_logging' => true,
+					'tracking_advertiser'  => 'local-advertiser',
+					'tracking_tag'         => 'local-tag',
+					'account_data'         => array( 'available_discounts' => 'changed by form' ),
+					'available_discounts'  => 'changed by form',
+					'extension_setting'    => 'changed by form',
+					'unrecognized_setting' => 'new value',
+				),
+			)
+		);
+		$this->assertSame( 200, rest_get_server()->dispatch( $request )->get_status() );
+		$saved = Pinterest_For_Woocommerce::get_settings( true );
+		$this->assertSame( $account, $saved['account_data'] );
+		$this->assertTrue( $saved['enable_debug_logging'] );
+		$this->assertTrue( $saved['track_conversions'] );
+		$this->assertSame( 'local-advertiser', $saved['tracking_advertiser'] );
+		$this->assertSame( 'local-tag', $saved['tracking_tag'] );
+		$this->assertSame( 'keep existing value', $saved['extension_setting'] );
+		$this->assertArrayNotHasKey( 'available_discounts', $saved );
+		$this->assertArrayNotHasKey( 'unrecognized_setting', $saved );
+		$this->assertSame( 200, rest_get_server()->dispatch( $request )->get_status(), 'An unchanged save remains successful.' );
+		$request->set_body_params( array( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => array() ) );
+		$this->assertSame( 200, rest_get_server()->dispatch( $request )->get_status() );
+		$this->assertSame( $saved, Pinterest_For_Woocommerce::get_settings( true ) );
+	}
+
+	/**
+	 * Roles which can manage the plugin settings.
+	 *
+	 * @return array
+	 */
+	public function merchant_roles() {
+		return array( array( 'administrator' ), array( 'shop_manager' ) );
+	}
 
 	/**
 	 * Tests if the settings route is registered.
