@@ -109,6 +109,9 @@ class TrackingTest extends \WP_UnitTestCase {
 		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_page_visit' ) ) );
 		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_view_category' ) ) );
 		$this->assertEquals( 10, has_action( 'woocommerce_add_to_cart', array( $tracking, 'handle_add_to_cart' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_cart_item_removed', array( $tracking, 'forget_add_to_cart_signatures' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_after_cart_item_quantity_update', array( $tracking, 'handle_cart_item_quantity_update' ) ) );
+		$this->assertEquals( 10, has_action( 'woocommerce_cart_emptied', array( $tracking, 'forget_add_to_cart_signatures' ) ) );
 		$this->assertEquals( 10, has_action( 'woocommerce_before_thankyou', array( $tracking, 'handle_checkout' ) ) );
 		$this->assertEquals( 10, has_action( 'wp_footer', array( $tracking, 'handle_search' ) ) );
 	}
@@ -647,7 +650,9 @@ class TrackingTest extends \WP_UnitTestCase {
 			$tracked_events[0]['data']->get_event_id(),
 			$tracked_events[1]['data']->get_event_id()
 		);
+		// AddToCart reports what was added, not what the cart holds afterwards.
 		$this->assertSame( 1, $tracked_events[0]['data']->get_quantity() );
+		$this->assertSame( 1, $tracked_events[1]['data']->get_quantity() );
 	}
 
 	/**
@@ -717,5 +722,106 @@ class TrackingTest extends \WP_UnitTestCase {
 		$tracking->remove_tracker( get_class( $tracker ) );
 
 		$this->assertCount( 1, $tracker->get_tracked_events() );
+	}
+
+	/**
+	 * Removing the item and adding it again lands on the same signature, but it
+	 * is a new customer action, so the removal releases the guard. Driven through
+	 * the live hooks rather than direct handler calls.
+	 */
+	public function test_add_to_cart_is_reported_again_after_the_item_is_removed() {
+		$product  = \WC_Helper_Product::create_simple_product();
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		WC()->cart->remove_cart_item( $cart_item_key );
+		WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 2, $tracker->get_tracked_events() );
+	}
+
+	/**
+	 * Emptying the cart releases the guard for every item.
+	 */
+	public function test_add_to_cart_is_reported_again_after_the_cart_is_emptied() {
+		$product  = \WC_Helper_Product::create_simple_product();
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		WC()->cart->add_to_cart( $product->get_id(), 1 );
+		WC()->cart->empty_cart();
+		WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 2, $tracker->get_tracked_events() );
+	}
+
+	/**
+	 * Lowering the quantity and adding again lands on a quantity already reported,
+	 * but the decrease releases the guard. The increase add_to_cart() itself makes
+	 * through set_quantity() must not.
+	 */
+	public function test_add_to_cart_is_reported_again_after_a_quantity_decrease() {
+		$product  = \WC_Helper_Product::create_simple_product();
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		WC()->cart->add_to_cart( $product->get_id(), 1 );
+		WC()->cart->set_quantity( $cart_item_key, 1, false );
+		WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 3, $tracker->get_tracked_events() );
+		$this->assertSame( 2, WC()->cart->get_cart_item( $cart_item_key )['quantity'] );
+	}
+
+	/**
+	 * A claim older than the repeat window no longer suppresses. The session
+	 * timestamp is aged by hand to stand in for elapsed time.
+	 */
+	public function test_add_to_cart_repeat_guard_expires() {
+		$product  = \WC_Helper_Product::create_simple_product();
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+		$this->assertCount( 1, $tracker->get_tracked_events() );
+
+		$signature = $cart_item_key . ':1';
+		WC()->session->set( 'pinterest_for_woocommerce_add_to_cart_signatures', array( $signature => time() - 31 ) );
+
+		$later = new Tracking( array( $tracker ) );
+		$later->handle_add_to_cart( $cart_item_key, $product->get_id(), 1, 0 );
+		$later->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 2, $tracker->get_tracked_events() );
+	}
+
+	/**
+	 * A suppressed repeat refreshes the claim, so a chain of retries spaced under
+	 * the window keeps collapsing instead of leaking one event per window.
+	 */
+	public function test_add_to_cart_repeat_guard_window_slides() {
+		$product  = \WC_Helper_Product::create_simple_product();
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$signature = $cart_item_key . ':1';
+		WC()->session->set( 'pinterest_for_woocommerce_add_to_cart_signatures', array( $signature => time() - 20 ) );
+
+		$later = new Tracking( array( $tracker ) );
+		$later->handle_add_to_cart( $cart_item_key, $product->get_id(), 1, 0 );
+		$later->remove_tracker( get_class( $tracker ) );
+
+		$this->assertCount( 1, $tracker->get_tracked_events() );
+		$claims = WC()->session->get( 'pinterest_for_woocommerce_add_to_cart_signatures' );
+		$this->assertGreaterThanOrEqual( time() - 1, $claims[ $signature ] );
 	}
 }
