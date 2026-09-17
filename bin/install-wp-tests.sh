@@ -20,7 +20,7 @@ WP_CORE_DIR=${WP_CORE_DIR-$TMPDIR/wordpress}
 # Plugin variables.
 PLUGINS_DIR="${WP_CORE_DIR}/wp-content/plugins"
 WC_DIR="${PLUGINS_DIR}/woocommerce"
-WC_VERSION=trunk
+WC_VERSION=${WC_VERSION-trunk}
 
 # Check if svn is installed
 if ! command -v svn &> /dev/null; then
@@ -197,23 +197,21 @@ install_wc() {
   if [ ! -d "$WC_DIR" ]; then
     # set up testing suite
     mkdir -p "$WC_DIR"
-    LATEST_WC_VERSION=$( php -r 'print json_decode( file_get_contents("https://api.wordpress.org/plugins/info/1.0/woocommerce.json") )->version;' )
-    echo "Installing WooCommerce ($LATEST_WC_VERSION)."
-    # Grab the necessary plugins.
-    if [ $WC_VERSION == 'trunk' ]; then
-      rm -rf "$TMPDIR"/woocommerce-trunk
-      git clone --quiet --depth=1 --branch="$LATEST_WC_VERSION" https://github.com/woocommerce/woocommerce.git "$TMPDIR"/woocommerce-trunk
-
-      # Install composer for WooCommerce
-      cd "$TMPDIR"/woocommerce-trunk/plugins/woocommerce
-      composer install --ignore-platform-reqs --no-interaction --no-dev
-
-      # Symlink woocommerce plugin
-      mv "$TMPDIR"/woocommerce-trunk/plugins/woocommerce/* "$WC_DIR"
-    else
-      echo "Test with specified WooCommerce version ${WC_VERSION} is not yet supported."
-      exit 1
+    if [ "$WC_VERSION" = 'trunk' ] || [ "$WC_VERSION" = 'latest' ]; then
+      WC_VERSION=$( php -r 'print json_decode( file_get_contents("https://api.wordpress.org/plugins/info/1.0/woocommerce.json") )->version;' )
     fi
+    echo "Installing WooCommerce ($WC_VERSION)."
+    # Grab the requested WooCommerce release and its test helpers.
+    rm -rf "$TMPDIR"/woocommerce-trunk
+    git clone --quiet --depth=1 --branch="$WC_VERSION" https://github.com/woocommerce/woocommerce.git "$TMPDIR"/woocommerce-trunk
+
+    # Install composer for WooCommerce
+    cd "$TMPDIR"/woocommerce-trunk/plugins/woocommerce
+    composer install --ignore-platform-reqs --no-interaction --no-dev --no-scripts
+    # Load WooCommerce test helpers without installing its development dependencies.
+    composer dump-autoload --dev --no-scripts --optimize
+
+    mv "$TMPDIR"/woocommerce-trunk/plugins/woocommerce/* "$WC_DIR"
 
     cd "$WC_DIR"
 	# Generate feature config for WooCommerce

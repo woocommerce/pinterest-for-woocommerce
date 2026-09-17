@@ -22,7 +22,7 @@ This repository is not suitable for support. Please don't use our issue tracker 
 
 ### Requirements
 
-Pinterest for WooCommerce requires recent versions of PHP (7.3 or newer), and WordPress and WooCommerce (we recommend the latest, and support the last two versions, a.k.a. L-2).
+Pinterest for WooCommerce requires PHP 7.4 or newer, WordPress 6.9 or newer, and WooCommerce 10.9 or newer.
 
 See [pinterest-for-woocommerce.php](https://github.com/woocommerce/pinterest-for-woocommerce/blob/develop/pinterest-for-woocommerce.php) for current required versions.
 
@@ -104,6 +104,14 @@ Example:
 ```bash
 $ ./bin/install-wp-tests.sh wordpress_tests root root localhost
 ```
+
+To test the minimum supported versions, use a fresh test directory and a dedicated database:
+
+```bash
+$ WC_VERSION=10.9.0 ./bin/install-wp-tests.sh wordpress_tests root root localhost 6.9.0
+```
+
+`WC_VERSION` accepts a release tag; `latest` and the default `trunk` select the latest stable release. The script reuses an existing WooCommerce directory, so use a fresh `TMPDIR` and `WP_CORE_DIR` when switching versions.
 
 This script installs the test dependencies into your system's temporary directory and also creates a test database.
 

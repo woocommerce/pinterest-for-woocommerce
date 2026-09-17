@@ -22,11 +22,11 @@
  * Domain Path:       /i18n/languages
  * Requires Plugins:  woocommerce
  *
- * Requires at least: 5.6
+ * Requires at least: 6.9
  * Tested up to: 7.1
  * Requires PHP: 7.4
  *
- * WC requires at least: 7.0
+ * WC requires at least: 10.9
  * WC tested up to: 11.1
  */
 
