@@ -96,10 +96,10 @@ class Tracking {
 		// Tracks add to cart events.
 		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_add_to_cart' ), 10, 6 );
 
-		// Cart changes made outside add-to-cart release the AddToCart repeat guard.
-		add_action( 'woocommerce_cart_item_removed', array( $this, 'forget_add_to_cart_signatures' ), 10, 1 );
-		add_action( 'woocommerce_after_cart_item_quantity_update', array( $this, 'handle_cart_item_quantity_update' ), 10, 3 );
-		add_action( 'woocommerce_cart_emptied', array( $this, 'forget_add_to_cart_signatures' ), 10, 0 );
+		// Customer cart changes made outside add-to-cart release the AddToCart repeat guard.
+		add_action( 'woocommerce_cart_item_removed', array( $this, 'handle_cart_item_removed' ), 10, 2 );
+		add_action( 'woocommerce_after_cart_item_quantity_update', array( $this, 'handle_cart_item_quantity_update' ), 10, 4 );
+		add_action( 'woocommerce_cart_emptied', array( $this, 'handle_cart_emptied' ) );
 
 		// Tracks checkout events.
 		add_action( 'woocommerce_before_thankyou', array( $this, 'handle_checkout' ), 10, 2 );
@@ -210,6 +210,25 @@ class Tracking {
 	}
 
 	/**
+	 * Used as a callback for the woocommerce_cart_item_removed hook.
+	 *
+	 * A product removed and added again inside the repeat window is a new
+	 * customer action, so the removal releases the guard for that item.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string   $cart_item_key WooCommerce cart item key.
+	 * @param \WC_Cart $cart          Cart the item was removed from.
+	 *
+	 * @return void
+	 */
+	public function handle_cart_item_removed( $cart_item_key, $cart ) {
+		if ( $this->is_customer_cart( $cart ) ) {
+			$this->forget_add_to_cart_signatures( $cart_item_key );
+		}
+	}
+
+	/**
 	 * Used as a callback for the woocommerce_after_cart_item_quantity_update hook.
 	 *
 	 * A quantity decrease means a later add that lands on the old quantity is a
@@ -221,21 +240,53 @@ class Tracking {
 	 * @param string    $cart_item_key WooCommerce cart item key.
 	 * @param int|float $quantity      New quantity.
 	 * @param int|float $old_quantity  Previous quantity.
+	 * @param \WC_Cart  $cart          Cart the item belongs to.
 	 *
 	 * @return void
 	 */
-	public function handle_cart_item_quantity_update( $cart_item_key, $quantity, $old_quantity ) {
-		if ( $quantity < $old_quantity ) {
+	public function handle_cart_item_quantity_update( $cart_item_key, $quantity, $old_quantity, $cart ) {
+		if ( $quantity < $old_quantity && $this->is_customer_cart( $cart ) ) {
 			$this->forget_add_to_cart_signatures( $cart_item_key );
 		}
 	}
 
 	/**
-	 * Drops reported AddToCart signatures for a cart item, or for every item.
+	 * Used as a callback for the woocommerce_cart_emptied hook.
 	 *
-	 * Used as a callback for the woocommerce_cart_item_removed hook (one item)
-	 * and the woocommerce_cart_emptied hook (all items), so a product removed and
-	 * added again inside the repeat window is reported again.
+	 * The hook does not pass the cart, so the customer's cart is inspected
+	 * instead: empty_cart() clears its contents before firing, so a customer cart
+	 * that still holds items means some other cart was emptied.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	public function handle_cart_emptied() {
+		if ( function_exists( 'WC' ) && isset( WC()->cart ) && WC()->cart->is_empty() ) {
+			$this->forget_add_to_cart_signatures();
+		}
+	}
+
+	/**
+	 * Returns true when the cart passed by a hook is the customer's cart.
+	 *
+	 * Cart hooks are global, so they also fire for throwaway carts that express
+	 * checkout buttons build and dispose of. Only the customer's cart may
+	 * release the guard, otherwise a simulator cleaning up after itself would
+	 * reopen a claim on the same product in the customer's cart.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param mixed $cart Cart passed by the hook.
+	 *
+	 * @return bool
+	 */
+	private function is_customer_cart( $cart ) {
+		return function_exists( 'WC' ) && isset( WC()->cart ) && WC()->cart === $cart;
+	}
+
+	/**
+	 * Drops reported AddToCart signatures for a cart item, or for every item.
 	 *
 	 * @since x.x.x
 	 *
@@ -243,7 +294,7 @@ class Tracking {
 	 *
 	 * @return void
 	 */
-	public function forget_add_to_cart_signatures( $cart_item_key = '' ) {
+	private function forget_add_to_cart_signatures( $cart_item_key = '' ) {
 		$keep = function ( $signature ) use ( $cart_item_key ) {
 			return '' !== $cart_item_key && 0 !== strpos( $signature, $cart_item_key . ':' );
 		};
