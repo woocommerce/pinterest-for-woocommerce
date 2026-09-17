@@ -69,15 +69,17 @@ class Conversions extends Tracker {
 	 * @param string $event_name Tracking event name.
 	 * @param Data   $data       Tracking event data class.
 	 *
-	 * @throws Throwable In case of an API error.
+	 * @throws Throwable In case of an API error, after logging it at error level.
 	 *
-	 * @return void
+	 * @return bool True after a dispatch, false when the event was skipped because no ad account is configured.
 	 */
 	public function track_event( string $event_name, Data $data ) {
 		$data = $this->prepare_request_data( $event_name, $data );
 
 		try {
-			$this->send_request( $event_name, $data );
+			if ( ! $this->send_request( $event_name, $data ) ) {
+				return false;
+			}
 
 			/* translators: 1: Conversions API event name, 2: JSON encoded event data. */
 			$messages = sprintf(
@@ -86,6 +88,8 @@ class Conversions extends Tracker {
 				wp_json_encode( $data )
 			);
 			Logger::log( $messages, 'debug', 'conversions' );
+
+			return true;
 		} catch ( Throwable $e ) {
 			/* translators: 1: Conversions API event name, 2: JSON encoded event data, 3: Error code, 4: Error message. */
 			$messages = sprintf(
@@ -430,12 +434,13 @@ class Conversions extends Tracker {
 	 * @param array  $data       Event data.
 	 *
 	 * @throws Throwable|Exception If any exception during the request happen.|If response was not successful enough.
-	 * @return void
+	 * @return bool False when no ad account is configured, true after a successful dispatch.
 	 */
 	private function send_request( string $event_name, array $data ) {
 		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 		if ( empty( $ad_account_id ) ) {
-			return;
+			Logger::log( 'Skipping Pinterest Conversions API event ' . $event_name . ': no ad account (tracking_advertiser) is configured.', 'debug', 'conversions' );
+			return false;
 		}
 
 		$response = APIV5::send_conversions_api_event( $ad_account_id, $data );
@@ -467,5 +472,7 @@ class Conversions extends Tracker {
 				);
 			}
 		}
+
+		return true;
 	}
 }

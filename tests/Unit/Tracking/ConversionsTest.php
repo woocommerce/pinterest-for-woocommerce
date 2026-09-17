@@ -97,6 +97,90 @@ class ConversionsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Without an ad account the event is skipped, reported as not sent and no "Sending" log line is written.
+	 */
+	public function test_track_event_without_ad_account_is_skipped_and_not_logged_as_sent() {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_advertiser'  => '',
+				'enable_debug_logging' => true,
+			)
+		);
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		$logger->expects( $this->once() )
+			->method( 'log' )
+			->with( 'debug', $this->stringStartsWith( 'Skipping Pinterest Conversions API event' ), $this->anything() );
+		Logger::$logger = $logger;
+
+		$requests = 0;
+		add_filter(
+			'pre_http_request',
+			function () use ( &$requests ) {
+				++$requests;
+				return new \WP_Error( 'pfw_test_blocked', 'Unexpected HTTP request in test.' );
+			}
+		);
+
+		$conversions = new Conversions( new User( 'ip', 'ua' ) );
+		$sent        = $conversions->track_event( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertFalse( $sent );
+		$this->assertSame( 0, $requests );
+	}
+
+	/**
+	 * An API error is logged at error level, rethrown, and never logged as "Sending".
+	 */
+	public function test_track_event_api_error_is_logged_and_rethrown() {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_advertiser'  => 'PFW-123456789',
+				'enable_debug_logging' => true,
+			)
+		);
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		// The API client and the tracker log the request and the failure; the success line must never appear.
+		$logger->expects( $this->atLeastOnce() )
+			->method( 'log' )
+			->with(
+				$this->anything(),
+				$this->logicalNot( $this->stringStartsWith( 'Sending Pinterest Conversions API event PageVisit with a payload:' ) ),
+				$this->anything()
+			);
+		Logger::$logger = $logger;
+
+		add_filter(
+			'pre_http_request',
+			function () {
+				return array(
+					'headers'  => array(
+						'content-type' => 'application/json',
+					),
+					'body'     => json_encode(
+						array(
+							'code'    => 2,
+							'message' => 'Advertiser not found.',
+						)
+					),
+					'response' => array(
+						'code'    => 404,
+						'message' => 'Not Found',
+					),
+					'cookies'  => array(),
+					'filename' => '',
+				);
+			}
+		);
+
+		$conversions = new Conversions( new User( 'ip', 'ua' ) );
+
+		$this->expectException( \Exception::class );
+		$conversions->track_event( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+	}
+
+	/**
 	 * Tests that hashed customer identifiers are merged into default user data.
 	 */
 	public function test_default_data_keeps_ip_user_agent_with_logged_in_customer_identifiers() {

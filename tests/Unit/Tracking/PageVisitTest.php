@@ -2,6 +2,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Pinterest_For_Woocommerce;
 use WC_Helper_Product;
@@ -54,7 +55,8 @@ class PageVisitTest extends WP_UnitTestCase {
 	 * Restore request globals and filters.
 	 */
 	public function tearDown(): void {
-		$_POST = array();
+		$_POST          = array();
+		Logger::$logger = null;
 		remove_all_filters( 'pre_http_request' );
 
 		if ( function_exists( 'WC' ) && isset( WC()->session ) ) {
@@ -116,6 +118,33 @@ class PageVisitTest extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'pintrk("track","PageVisit",eventData)', $code );
 		$this->assertStringNotContainsString( PageVisit::AJAX_ACTION, $code );
 		$this->assertStringNotContainsString( 'sendBeacon', $code );
+	}
+
+	/**
+	 * The standalone beacon generates the event ID in the browser and never calls pintrk.
+	 */
+	public function test_print_beacon_script_omits_pintrk() {
+		ob_start();
+		PageVisit::print_beacon_script();
+		$code = ob_get_clean();
+
+		$this->assertStringStartsWith( '<script>(function(){var eventId="page_"+', $code );
+		$this->assertStringEndsWith( '}());</script>', $code );
+		$this->assertStringContainsString( 'requestData.append("action","' . PageVisit::AJAX_ACTION . '")', $code );
+		$this->assertStringContainsString( 'sendBeacon', $code );
+		$this->assertStringNotContainsString( 'pintrk', $code );
+	}
+
+	/**
+	 * The standalone beacon prints nothing when the Conversions API is disabled.
+	 */
+	public function test_print_beacon_script_prints_nothing_when_capi_is_disabled() {
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions_capi', false );
+
+		ob_start();
+		PageVisit::print_beacon_script();
+
+		$this->assertSame( '', ob_get_clean() );
 	}
 
 	/**
@@ -272,7 +301,7 @@ class PageVisitTest extends WP_UnitTestCase {
 			'pre_http_request',
 			function () use ( &$requests ) {
 				++$requests;
-				return false;
+				return new \WP_Error( 'pfw_test_blocked', 'Unexpected HTTP request in test.' );
 			}
 		);
 
@@ -287,6 +316,83 @@ class PageVisitTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Dropped beacons leave a debug log entry in the conversions log.
+	 */
+	public function test_rejected_beacon_is_logged() {
+		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', true );
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		$logger->expects( $this->once() )
+			->method( 'log' )
+			->with(
+				'debug',
+				'PageVisit beacon rejected: event_id is malformed.',
+				array( 'source' => 'pinterest-for-woocommerce-conversions' )
+			);
+		Logger::$logger = $logger;
+
+		$_POST = array(
+			'event_id'         => 'cached-id',
+			'event_source_url' => home_url( '/shop/' ),
+		);
+
+		PageVisit::handle_request();
+	}
+
+	/**
+	 * Protocol-relative source URLs are rejected even when the host matches.
+	 */
+	public function test_beacon_rejects_protocol_relative_source_url() {
+		$this->assert_source_url_rejected( '//' . wp_parse_url( home_url(), PHP_URL_HOST ) . '/shop/' );
+	}
+
+	/**
+	 * Source URLs carrying user info are rejected.
+	 */
+	public function test_beacon_rejects_source_url_with_user_info() {
+		$this->assert_source_url_rejected( str_replace( '://', '://visitor@', home_url( '/shop/' ) ) );
+	}
+
+	/**
+	 * Uppercase schemes are valid URLs and must not be rejected.
+	 */
+	public function test_beacon_accepts_uppercase_scheme_in_source_url() {
+		$requests = 0;
+		add_filter(
+			'pre_http_request',
+			function () use ( &$requests ) {
+				++$requests;
+				return array(
+					'headers'  => array( 'content-type' => 'application/json' ),
+					'body'     => wp_json_encode( array( 'events' => array( array( 'status' => 'processed' ) ) ) ),
+					'response' => array(
+						'code'    => 200,
+						'message' => 'OK',
+					),
+					'cookies'  => array(),
+					'filename' => '',
+				);
+			}
+		);
+
+		$_POST = array(
+			'event_id'         => 'page_1234567890abcdef',
+			'event_source_url' => str_replace( array( 'http://', 'https://' ), array( 'HTTP://', 'HTTPS://' ), home_url( '/shop/' ) ),
+		);
+
+		PageVisit::handle_request();
+
+		$this->assertSame( 1, $requests );
+	}
+
+	/**
+	 * Over-long source URLs are rejected.
+	 */
+	public function test_beacon_rejects_over_long_source_url() {
+		$this->assert_source_url_rejected( home_url( '/' . str_repeat( 'a', 2048 ) . '/' ) );
+	}
+
+	/**
 	 * Non-scalar required beacon fields are rejected before sanitization or dispatch.
 	 */
 	public function test_beacon_rejects_non_scalar_fields() {
@@ -295,7 +401,7 @@ class PageVisitTest extends WP_UnitTestCase {
 			'pre_http_request',
 			function () use ( &$requests ) {
 				++$requests;
-				return false;
+				return new \WP_Error( 'pfw_test_blocked', 'Unexpected HTTP request in test.' );
 			}
 		);
 
@@ -360,5 +466,30 @@ class PageVisitTest extends WP_UnitTestCase {
 		PageVisit::handle_request();
 
 		$this->assertSame( 1, $requests );
+	}
+
+	/**
+	 * Sends an otherwise valid beacon with the given source URL and asserts no CAPI request is made.
+	 *
+	 * @param string $source_url Event source URL to post.
+	 */
+	private function assert_source_url_rejected( string $source_url ) {
+		$requests = 0;
+		add_filter(
+			'pre_http_request',
+			function () use ( &$requests ) {
+				++$requests;
+				return new \WP_Error( 'pfw_test_blocked', 'Unexpected HTTP request in test.' );
+			}
+		);
+
+		$_POST = array(
+			'event_id'         => 'page_1234567890abcdef',
+			'event_source_url' => $source_url,
+		);
+
+		PageVisit::handle_request();
+
+		$this->assertSame( 0, $requests );
 	}
 }
