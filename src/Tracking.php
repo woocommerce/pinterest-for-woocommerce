@@ -43,7 +43,7 @@ class Tracking {
 	/**
 	 * WooCommerce session key holding recently reported AddToCart signatures.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @var string
 	 */
@@ -55,7 +55,7 @@ class Tracking {
 	 * The window slides: every suppressed repeat pushes the expiry forward, so a
 	 * chain of retries spaced under the window is collapsed into one event.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @var int
 	 */
@@ -64,7 +64,7 @@ class Tracking {
 	/**
 	 * AddToCart signatures already reported during the current request.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @var array<string, true>
 	 */
@@ -116,7 +116,7 @@ class Tracking {
 	 *
 	 * @since 1.4.0
 	 * @since 1.4.8 Added check for product page.
-	 * @since x.x.x Prints the CAPI beacon itself when no Tag is active.
+	 * @since 1.5.1 Prints the CAPI beacon itself when no Tag is active.
 	 *
 	 * @return void
 	 */
@@ -215,7 +215,7 @@ class Tracking {
 	 * A product removed and added again inside the repeat window is a new
 	 * customer action, so the removal releases the guard for that item.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param string   $cart_item_key WooCommerce cart item key.
 	 * @param \WC_Cart $cart          Cart the item was removed from.
@@ -235,7 +235,7 @@ class Tracking {
 	 * new customer action, not a repeat. Increases are left alone: add_to_cart()
 	 * raises the quantity through set_quantity() before firing its own hook.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param string    $cart_item_key WooCommerce cart item key.
 	 * @param int|float $quantity      New quantity.
@@ -257,7 +257,7 @@ class Tracking {
 	 * instead: empty_cart() clears its contents before firing, so a customer cart
 	 * that still holds items means some other cart was emptied.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @return void
 	 */
@@ -275,7 +275,7 @@ class Tracking {
 	 * release the guard, otherwise a simulator cleaning up after itself would
 	 * reopen a claim on the same product in the customer's cart.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param mixed $cart Cart passed by the hook.
 	 *
@@ -288,7 +288,7 @@ class Tracking {
 	/**
 	 * Drops reported AddToCart signatures for a cart item, or for every item.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param string $cart_item_key WooCommerce cart item key, or empty for all.
 	 *
@@ -323,7 +323,7 @@ class Tracking {
 	 * WC()->cart is left untouched. Retried requests fire it again for a cart
 	 * that did not change. Neither is a customer adding something to their cart.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param string $cart_item_key WooCommerce cart item key.
 	 *
@@ -348,7 +348,7 @@ class Tracking {
 	 * two fires that leave the cart in the same state share a signature however
 	 * many times WooCommerce ran add_to_cart().
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param string $cart_item_key WooCommerce cart item key.
 	 *
@@ -375,7 +375,7 @@ class Tracking {
 	 * simulation of a product the customer already holds, because it produces
 	 * the cart item key that is in their cart.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @return bool
 	 */
@@ -392,7 +392,7 @@ class Tracking {
 	 * per request and in the WooCommerce session, which is what carries the guard
 	 * across the separate requests a retry produces.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param string $signature Signature from get_customer_cart_signature().
 	 *
@@ -572,7 +572,7 @@ class Tracking {
 	/**
 	 * Checks whether a tracker of the given class is registered.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param string $tracker_class Tracker class name. e.g. Tag::class, Conversions::class.
 	 *

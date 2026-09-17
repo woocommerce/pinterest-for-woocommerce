@@ -751,7 +751,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * and a long-lived runner would skip a later clear. Dropping the cached copy first forces
 	 * a fresh read from the database.
 	 *
-	 * @since x.x.x
+	 * @since 1.5.1
 	 *
 	 * @param bool $dirty Whether the feed needs regenerating.
 	 */
