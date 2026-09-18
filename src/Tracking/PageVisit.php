@@ -83,8 +83,7 @@ class PageVisit {
 			return;
 		}
 
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded JS whose embedded values are JSON encoded with JSON_HEX_TAG.
-		echo '<script>(function(){' . static::get_event_id_code() . $beacon_code . '}());</script>';
+		wp_print_inline_script_tag( '(function(){' . static::get_event_id_code() . $beacon_code . '}());' );
 	}
 
 	/**

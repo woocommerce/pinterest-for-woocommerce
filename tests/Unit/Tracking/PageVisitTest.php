@@ -128,8 +128,9 @@ class PageVisitTest extends WP_UnitTestCase {
 		PageVisit::print_beacon_script();
 		$code = ob_get_clean();
 
-		$this->assertStringStartsWith( '<script>(function(){var eventId="page_"+', $code );
-		$this->assertStringEndsWith( '}());</script>', $code );
+		$this->assertStringStartsWith( '<script type="text/javascript">', $code );
+		$this->assertStringContainsString( '(function(){var eventId="page_"+', $code );
+		$this->assertStringEndsWith( "}());\n/* ]]> */\n</script>\n", $code );
 		$this->assertStringContainsString( 'requestData.append("action","' . PageVisit::AJAX_ACTION . '")', $code );
 		$this->assertStringContainsString( 'sendBeacon', $code );
 		$this->assertStringNotContainsString( 'pintrk', $code );
@@ -145,6 +146,24 @@ class PageVisitTest extends WP_UnitTestCase {
 		PageVisit::print_beacon_script();
 
 		$this->assertSame( '', ob_get_clean() );
+	}
+
+	/** Native script attributes also apply to the standalone CAPI beacon. */
+	public function test_beacon_uses_wordpress_script_attributes() {
+		$attributes = static function ( $attributes ) {
+			$attributes['nonce'] = 'pinterest-beacon-test';
+			return $attributes;
+		};
+		add_filter( 'wp_inline_script_attributes', $attributes );
+		try {
+			ob_start();
+			PageVisit::print_beacon_script();
+			$output = ob_get_clean();
+			$this->assertStringContainsString( 'nonce="pinterest-beacon-test"', $output );
+			$this->assertStringContainsString( 'requestData.append("action","' . PageVisit::AJAX_ACTION . '")', $output );
+		} finally {
+			remove_filter( 'wp_inline_script_attributes', $attributes );
+		}
 	}
 
 	/**
