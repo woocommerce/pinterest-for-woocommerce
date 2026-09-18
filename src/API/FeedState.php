@@ -108,7 +108,15 @@ class FeedState extends VendorAPI {
 			 * Returns feed state.
 			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 			 */
-			return apply_filters( 'pinterest_for_woocommerce_feed_state', array() );
+			$result = apply_filters( 'pinterest_for_woocommerce_feed_state', array() );
+			if ( is_array( $result ) && isset( $result['workflow'] ) && is_array( $result['workflow'] ) ) {
+				foreach ( $result['workflow'] as $key => $row ) {
+					if ( is_array( $row ) && isset( $row['extra_info'] ) ) {
+						$result['workflow'][ $key ]['extra_info'] = is_scalar( $row['extra_info'] ) ? wp_kses_post( (string) $row['extra_info'] ) : '';
+					}
+				}
+			}
+			return $result;
 
 		} catch ( \Throwable $th ) {
 
@@ -474,7 +482,7 @@ class FeedState extends VendorAPI {
 				$info = sprintf(
 					/* Translators: The status text returned by the API. */
 					esc_html__( 'Pinterest returned an unknown feed status: %1$s', 'pinterest-for-woocommerce' ),
-					$status ?? '<empty string>'
+					esc_html( $status ?? '<empty string>' )
 				);
 				$global_error = Pinterest\FeedStatusService::get_processing_results_global_error( $processing_results );
 				return $info . ( $global_error ? ' - ' . $global_error : '' );
