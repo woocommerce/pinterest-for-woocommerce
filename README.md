@@ -231,3 +231,8 @@ The tests will execute, and you'll be presented with a summary.
 	<a href="https://woocommerce.com/careers/">We're hiring</a>! Come work with us!
 </p>
 
+
+### Browser regression journeys
+
+See [tests/browser/README.md](tests/browser/README.md) for isolated browser setup,
+merchant and checkout journeys, focused runs and fixture reset.
