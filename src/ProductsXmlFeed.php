@@ -167,6 +167,15 @@ class ProductsXmlFeed {
 	 */
 	private static function is_product_fit_for_feed( $product ) {
 
+		if ( $product->get_id() && '' !== get_post_field( 'post_password', $product->get_id(), 'raw' ) ) {
+			return false;
+		}
+
+		if ( $product instanceof WC_Product_Variation && $product->get_parent_id()
+			&& '' !== get_post_field( 'post_password', $product->get_parent_id(), 'raw' ) ) {
+			return false;
+		}
+
 		// Decide if product is fit for the feed based on price.
 		$price = self::get_product_regular_price( $product );
 
