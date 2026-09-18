@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adds PinterestTag tracker support.
  *
  * @class   Tag
- * @version 1.5.2
+ * @version x.x.x
  */
 class Tag extends Tracker {
 
@@ -36,7 +36,7 @@ class Tag extends Tracker {
 	 *
 	 * @var string
 	 */
-	private static $base_tag = "<!-- Pinterest Pixel Base Code -->\n<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "', " . self::USER_DATA_SLUG . " );\n  pintrk('page');\n</script>\n<!-- End Pinterest Pixel Base Code -->\n";
+	private static $base_tag = "  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '" . self::TAG_ID_SLUG . "', " . self::USER_DATA_SLUG . " );\n  pintrk('page');";
 
 	/**
 	 * The noscript base tracking snippet.
@@ -115,20 +115,19 @@ class Tag extends Tracker {
 			array( sanitize_key( $active_tag ), wp_json_encode( $user_data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) ),
 			self::$base_tag
 		);
-		//phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo $script;
+		echo "<!-- Pinterest Pixel Base Code -->\n";
+		wp_print_inline_script_tag( $script, array( 'type' => 'text/javascript' ) );
+		echo "<!-- End Pinterest Pixel Base Code -->\n";
 
 		$events = array_merge(
 			self::$events,
 			static::load_deferred_events()
 		);
 		if ( ! empty( $events ) ) {
-			//phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			echo '<script>' . implode( PHP_EOL, $events ) . '</script>';
+			wp_print_inline_script_tag( implode( PHP_EOL, $events ) );
 		}
 
-		//phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo '<script id="pinterest-tag-placeholder"></script>';
+		wp_print_inline_script_tag( '', array( 'id' => 'pinterest-tag-placeholder' ) );
 	}
 
 	/**
@@ -512,11 +511,7 @@ class Tag extends Tracker {
 			add_filter(
 				'woocommerce_add_to_cart_fragments',
 				function ( $fragments ) use ( $event ) {
-					$fragments['script#pinterest-tag-placeholder'] = <<<JS
-<script id="pinterest-tag-placeholder">
-	{$event}
-</script>
-JS;
+					$fragments['script#pinterest-tag-placeholder'] = wp_get_inline_script_tag( $event, array( 'id' => 'pinterest-tag-placeholder' ) );
 					return $fragments;
 				}
 			);
