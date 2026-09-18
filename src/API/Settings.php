@@ -81,6 +81,7 @@ class Settings extends VendorAPI {
 				'rich_pins_on_posts',
 				'rich_pins_on_products',
 				'product_sync_enabled',
+				'product_sync_categories',
 				'enable_debug_logging',
 				'erase_plugin_data',
 				'tracking_advertiser',

@@ -113,6 +113,10 @@ class ProductSync {
 		add_action( 'edit_post', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
 		add_action( 'woocommerce_new_product', array( __CLASS__, 'mark_feed_dirty_on_new_product' ), 10, 1 );
 		add_action( 'woocommerce_product_object_updated_props', array( __CLASS__, 'mark_feed_dirty_on_updated_props' ), 10, 2 );
+		add_action( 'update_option_' . PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME, array( __CLASS__, 'mark_feed_dirty_on_category_settings_change' ), 10, 2 );
+		add_action( 'set_object_terms', array( __CLASS__, 'mark_feed_dirty_on_product_categories_change' ), 10, 4 );
+		add_action( 'edited_product_cat', array( __CLASS__, 'mark_feed_dirty_on_category_tree_change' ) );
+		add_action( 'delete_product_cat', array( __CLASS__, 'mark_feed_dirty_on_category_tree_change' ) );
 
 		if ( 'yes' === get_option( 'woocommerce_manage_stock' ) ) {
 			add_action( 'woocommerce_variation_set_stock_status', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
@@ -164,6 +168,41 @@ class ProductSync {
 		$should_deregister = $has_changed && false === $value['product_sync_enabled'];
 		if ( $should_deregister ) {
 			self::deregister();
+		}
+	}
+
+	/**
+	 * Refresh the feed when category inclusion changes, including a return to all products.
+	 *
+	 * @param array $old_value Previous settings.
+	 * @param array $value     Saved settings.
+	 */
+	public static function mark_feed_dirty_on_category_settings_change( $old_value, $value ) {
+		if ( is_array( $value ) && ! empty( $value['product_sync_enabled'] ) && ( $old_value['product_sync_categories'] ?? array() ) !== ( $value['product_sync_categories'] ?? array() ) ) {
+			self::$feed_generator->mark_feed_dirty();
+		}
+	}
+
+	/**
+	 * Category assignments can change without updating the product post or meta.
+	 *
+	 * @param int    $object_id Product ID.
+	 * @param array  $terms     Assigned terms.
+	 * @param array  $tt_ids    Term taxonomy IDs.
+	 * @param string $taxonomy Taxonomy name.
+	 */
+	public static function mark_feed_dirty_on_product_categories_change( $object_id, $terms, $tt_ids, $taxonomy ) {
+		if ( 'product_cat' === $taxonomy && Pinterest_For_Woocommerce()::get_setting( 'product_sync_categories' ) ) {
+			self::mark_feed_dirty_if_in_feed( wc_get_product( $object_id ), 'categories' );
+		}
+	}
+
+	/**
+	 * Moving or deleting a category can change which descendants are included.
+	 */
+	public static function mark_feed_dirty_on_category_tree_change() {
+		if ( Pinterest_For_Woocommerce()::get_setting( 'product_sync_categories' ) ) {
+			self::$feed_generator->mark_feed_dirty();
 		}
 	}
 

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Spinner } from '@woocommerce/components';
+import { Search, Spinner } from '@woocommerce/components';
 import {
 	Card,
 	CardBody,
@@ -82,6 +82,36 @@ const SetupProductSync = ( { view } ) => {
 											)
 										}
 									/>
+									{ appSettings.product_sync_enabled && (
+										<>
+											<Search
+												type="categories"
+												placeholder={ __(
+													'Search product categories',
+													'pinterest-for-woocommerce'
+												) }
+												selected={
+													Array.isArray(
+														appSettings.product_sync_categories
+													)
+														? appSettings.product_sync_categories
+														: []
+												}
+												onChange={ ( categories ) =>
+													handleOptionChange(
+														'product_sync_categories',
+														categories
+													)
+												}
+											/>
+											<p>
+												{ __(
+													'Leave empty to sync all eligible products. Selected categories include their subcategories.',
+													'pinterest-for-woocommerce'
+												) }
+											</p>
+										</>
+									) }
 								</>
 							) : (
 								<Spinner />
