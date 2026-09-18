@@ -93,23 +93,18 @@ class Base {
 			static::maybe_cache_api_response( $endpoint, $method, $payload, $api, $response, $cache_expiry );
 			return $response;
 		} catch ( PinterestApiException $e ) {
-			if ( ! empty( Pinterest_For_WooCommerce()::get_setting( 'enable_debug_logging' ) ) ) {
-				/* Translators: 1: Error message 2: Stack trace */
-				Logger::log( sprintf( "%1\$s\n%2\$s", $e->getMessage(), $e->getTraceAsString() ), 'error' );
-			} else {
-				Logger::log(
-					sprintf(
-						/* Translators: 1: Request method 2: Request endpoint 3: Response status code 4: Response message 5: Pinterest code */
-						esc_html__( "%1\$s Request: %2\$s\nStatus Code: %3\$s\nAPI response: %4\$s\nPinterest Code: %5\$s", 'pinterest-for-woocommerce' ),
-						$method,
-						$request['url'],
-						$e->getCode(),
-						$e->getMessage(),
-						$e->get_pinterest_code(),
-					),
-					'error'
-				);
-			}
+			Logger::log(
+				sprintf(
+					/* Translators: 1: Request method 2: Request endpoint 3: Response status code 4: Response message 5: Pinterest code */
+					esc_html__( "%1\$s Request: %2\$s\nStatus Code: %3\$s\nAPI response: %4\$s\nPinterest Code: %5\$s", 'pinterest-for-woocommerce' ),
+					$method,
+					Logger::get_url_path( $request['url'] ),
+					$e->getCode(),
+					$e->getMessage(),
+					$e->get_pinterest_code(),
+				),
+				'error'
+			);
 
 			/**
 			 * Filter to disconnect the merchant from the Pinterest platform on authentication failure.
