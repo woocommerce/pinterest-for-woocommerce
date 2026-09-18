@@ -21,7 +21,7 @@ use \Throwable;
  * Class Handling registration & generation of the XML product feed.
  *
  * @class   Merchants
- * @version 1.4.10
+ * @version x.x.x
  */
 class Merchants {
 
@@ -162,7 +162,8 @@ class Merchants {
 			'merchant_name'    => $merchant_name,
 		);
 
-		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( wp_json_encode( $args ) );
+		// Earlier zero-delay failures could leave permanent entries under the legacy key.
+		$cache_key = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_create_merchant_error_v2_' . md5( wp_json_encode( $args ) );
 		$cache     = get_transient( $cache_key );
 
 		if ( false !== $cache ) {
@@ -172,7 +173,7 @@ class Merchants {
 		try {
 			$response = Base::update_or_create_merchant( $args );
 		} catch ( Throwable $th ) {
-			$delay = Pinterest_For_Woocommerce()::get_data( 'create_merchant_delay' ) ?? MINUTE_IN_SECONDS;
+			$delay = max( MINUTE_IN_SECONDS, (int) Pinterest_For_Woocommerce()::get_data( 'create_merchant_delay' ) );
 
 			set_transient( $cache_key, $th->getCode(), $delay );
 
