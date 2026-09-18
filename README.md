@@ -58,6 +58,10 @@ Now you can build the plugin using one of these commands:
 
 -   `develop` branch is the most up-to-date code.
 
+### Public API compatibility
+
+Follow the [deprecation policy](docs/deprecations.md) when replacing public functions or methods.
+
 ### AI code reviews
 
 [CodeRabbit](https://docs.coderabbit.ai/platforms/github-com) requires its GitHub App
