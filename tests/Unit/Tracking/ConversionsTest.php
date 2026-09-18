@@ -146,7 +146,7 @@ class ConversionsTest extends WP_UnitTestCase {
 			->method( 'log' )
 			->with(
 				$this->anything(),
-				$this->logicalNot( $this->stringStartsWith( 'Sending Pinterest Conversions API event PageVisit with a payload:' ) ),
+				$this->logicalNot( $this->stringStartsWith( 'Sending Pinterest Conversions API event PageVisit.' ) ),
 				$this->anything()
 			);
 		Logger::$logger = $logger;
@@ -670,6 +670,114 @@ class ConversionsTest extends WP_UnitTestCase {
 			),
 			$data
 		);
+	}
+
+	/**
+	 * Keep failed and successful dispatch diagnostics free of event data.
+	 *
+	 * @dataProvider logging_cases
+	 * @param string $outcome Local HTTP outcome.
+	 * @param bool   $debug Whether debug logging is enabled.
+	 */
+	public function test_conversion_logs_omit_event_data( $outcome, $debug ) {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_advertiser'  => 'local-advertiser',
+				'enable_debug_logging' => $debug,
+			)
+		);
+		$messages        = array();
+		$original_logger = Logger::$logger;
+		Logger::$logger  = $this->getMockBuilder( \WC_Logger::class )->disableOriginalConstructor()->onlyMethods( array( 'log' ) )->getMock();
+		Logger::$logger->method( 'log' )->willReturnCallback(
+			function ( $level, $message ) use ( &$messages ) {
+				$messages[] = $message;
+			}
+		);
+		$http = function () use ( $outcome ) {
+			if ( 'transport' === $outcome ) {
+				return new \WP_Error( 'http_request_failed', 'local-upstream-transport-message' );
+			}
+			if ( 'exception' === $outcome ) {
+				throw new \RuntimeException( 'local-upstream-exception-message', 321 );
+			}
+			$body = array( 'events' => array( array( 'status' => 'processed' ) ) );
+			if ( in_array( $outcome, array( 'api', 'tracker', 'unknown', 'long' ), true ) ) {
+				$body = array(
+					'code'    => 345,
+					'message' => 'local-upstream-api-message' . ( 'long' === $outcome ? str_repeat( 'x', 500 ) : '' ),
+					'details' => 'local-private-body',
+				);
+			} elseif ( 'event' === $outcome ) {
+				$body = array(
+					'events' => array(
+						array(
+							'status'        => 'failed',
+							'error_message' => 'local-upstream-event-message',
+						),
+					),
+				);
+			}
+			return array(
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'headers'  => array(),
+				'body'     => wp_json_encode( $body ),
+			);
+		};
+		add_filter( 'pre_http_request', $http );
+		$thrown      = null;
+		$event_name  = 'unknown' === $outcome ? 'LocalCustomEvent' : Tracking::EVENT_CHECKOUT;
+		$data        = new Data\Checkout( 'local-private-event-id', 'local-private-order', '18.75', 1, 'USD', array() );
+		$conversions = new Conversions( new User( 'local-private-ip', 'local-private-agent' ), home_url( '/local-private-url?epik=local-private-click' ) );
+		try {
+			if ( 'tracker' === $outcome ) {
+				( new Tracking( array( $conversions ) ) )->track_event( $event_name, $data );
+			} else {
+				$conversions->track_event( $event_name, $data );
+			}
+		} catch ( \Throwable $error ) {
+			$thrown = $error;
+		} finally {
+			remove_filter( 'pre_http_request', $http );
+			Logger::$logger = $original_logger;
+		}
+		if ( in_array( $outcome, array( 'success', 'tracker' ), true ) ) {
+			$this->assertNull( $thrown );
+		} else {
+			$this->assertInstanceOf( \Throwable::class, $thrown );
+			$this->assertStringContainsString( 'local-upstream', $thrown->getMessage() );
+		}
+		$messages = implode( "\n", $messages );
+		if ( 'success' === $outcome && ! $debug ) {
+			$this->assertSame( '', $messages );
+			return;
+		}
+		$this->assertStringNotContainsString( 'local-private', $messages );
+		$this->assertStringNotContainsString( '?', $messages );
+		$this->assertStringContainsString( $event_name, $messages );
+		if ( 'success' !== $outcome ) {
+			$this->assertStringContainsString( 'local-upstream', $messages );
+		}
+		if ( 'long' === $outcome ) {
+			$this->assertStringNotContainsString( str_repeat( 'x', 200 ), $messages );
+		}
+	}
+
+	/**
+	 * Debug and production diagnostics across native dispatch outcomes.
+	 *
+	 * @return array
+	 */
+	public function logging_cases() {
+		$cases = array();
+		foreach ( array( 'transport', 'exception', 'api', 'event', 'tracker', 'unknown', 'long', 'success' ) as $outcome ) {
+			$cases[ $outcome . ' production' ] = array( $outcome, false );
+			$cases[ $outcome . ' debug' ]      = array( $outcome, true );
+		}
+		return $cases;
 	}
 
 	/**

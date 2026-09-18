@@ -81,23 +81,20 @@ class Conversions extends Tracker {
 				return false;
 			}
 
-			/* translators: 1: Conversions API event name, 2: JSON encoded event data. */
 			$messages = sprintf(
-				'Sending Pinterest Conversions API event %1$s with a payload: %2$s',
-				$event_name,
-				wp_json_encode( $data )
+				'Sending Pinterest Conversions API event %s.',
+				$event_name
 			);
 			Logger::log( $messages, 'debug', 'conversions' );
 
 			return true;
 		} catch ( Throwable $e ) {
-			/* translators: 1: Conversions API event name, 2: JSON encoded event data, 3: Error code, 4: Error message. */
 			$messages = sprintf(
-				'Sending Pinterest Conversions API event %1$s with a payload %2$s has failed with the error %3$d code and %4$s message',
+				'Sending Pinterest Conversions API event %1$s has failed with the error %2$d code and %3$s message',
 				$event_name,
-				wp_json_encode( $data ),
 				$e->getCode(),
-				$e->getMessage()
+				// The upstream message is free text: keep it on one line and bounded.
+				mb_substr( sanitize_text_field( $e->getMessage() ), 0, 200 )
 			);
 			Logger::log( $messages, 'error', 'conversions' );
 
