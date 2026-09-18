@@ -10,6 +10,11 @@ module.exports = [
 	{
 		settings: {
 			react: { version: '16.14' },
+			'import/resolver': {
+				typescript: {
+					alias: { '.~': [ __dirname + '/assets/source' ] },
+				},
+			},
 		},
 		rules: {
 			// Keep the previous lint policy during the dependency migration.
