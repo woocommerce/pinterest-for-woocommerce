@@ -1,0 +1,175 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Action callback returns Automattic\\WooCommerce\\Pinterest\\Tracking\|false but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Action callback returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 2
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Action callback returns bool but should not return anything\.$#'
+			identifier: return.void
+			count: 2
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Class Automattic\\WooCommerce\\Admin\\Features\\Navigation\\Menu not found\.$#'
+			identifier: class.notFound
+			count: 2
+			path: includes/admin/class-pinterest-for-woocommerce-admin.php
+
+		-
+			message: '#^Class Automattic\\WooCommerce\\Admin\\Features\\Navigation\\Screen not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: includes/admin/class-pinterest-for-woocommerce-admin.php
+
+		-
+			message: '#^Filter callback return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: includes/admin/class-pinterest-for-woocommerce-admin.php
+
+		-
+			message: '#^Action callback returns mixed but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/AdCredits.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/Admin/Input/FormException.php
+
+		-
+			message: '#^Class Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\SelectWithTextInput not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Admin/Product/Attributes/AttributesForm.php
+
+		-
+			message: '#^Instantiated class Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\SelectWithTextInput not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Admin/Product/Attributes/AttributesForm.php
+
+		-
+			message: '#^Action callback returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Admin/Product/Attributes/AttributesTab.php
+
+		-
+			message: '#^Action callback returns mixed but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Billing.php
+
+		-
+			message: '#^Action callback returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/CommerceIntegration.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 3
+			path: src/Exception/InvalidClass.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 7
+			path: src/Exception/InvalidValue.php
+
+		-
+			message: '#^Action callback returns bool but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/FeedRegistration.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/LocalFeedConfigs.php
+
+		-
+			message: '#^Caught class Psr\\Container\\ContainerExceptionInterface not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/MultichannelMarketing/MarketingChannelRegistrar.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/MultichannelMarketing/PinterestChannel.php
+
+		-
+			message: '#^One or more @param tags has an invalid name or invalid syntax\.$#'
+			identifier: phpDoc.parseError
+			count: 2
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Action callback returns true but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/RefreshToken.php
+
+		-
+			message: '#^@param Automattic\\WooCommerce\\Pinterest\\WC_Product \$product does not accept actual type of parameter\: WC_Product\.$#'
+			identifier: parameter.phpDocType
+			count: 1
+			path: src/RichPins.php
+
+		-
+			message: '#^One or more @param tags has an invalid name or invalid syntax\.$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: src/RichPins.php
+
+		-
+			message: '#^Callback expects 1 parameter, \$accepted_args is set to 2\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Tracking.php
+
+		-
+			message: '#^Callback expects 4 parameters, \$accepted_args is set to 6\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Tracking.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 3
+			path: src/View/ViewException.php
+
+		-
+			message: '#^Function wp_has_consent not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/WPConsentAPI.php
+
+		-
+			message: '#^Access to constant CUSTOM_INPUT_KEY on an unknown class Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\SelectWithTextInput\.$#'
+			identifier: class.notFound
+			count: 3
+			path: views/attributes/variations-form.php
+
+		-
+			message: '#^Access to constant SELECT_INPUT_KEY on an unknown class Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\SelectWithTextInput\.$#'
+			identifier: class.notFound
+			count: 3
+			path: views/attributes/variations-form.php

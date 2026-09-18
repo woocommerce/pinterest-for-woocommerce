@@ -35,7 +35,10 @@
 		"sirbrillig/phpcs-changed": "^2.12.0",
 		"phpunit/phpunit": "^9.6",
 		"yoast/phpunit-polyfills": "^1.0",
-		"wp-cli/i18n-command": "^2.6"
+		"wp-cli/i18n-command": "^2.6",
+		"phpstan/phpstan": "^2.1",
+		"szepeviktor/phpstan-wordpress": "^2.0",
+		"php-stubs/woocommerce-stubs": "^10.6"
 	},
 	"autoload": {
 		"psr-4": {
@@ -59,7 +62,9 @@
 		"lint-staged": "chg=$(git diff HEAD --relative --name-only -- '*.php'); [[ -z $chg ]] || phpcs-changed -s --git $chg",
 		"lint-branch": "bash ./bin/lint-branch.sh",
 		"phpcbf": "phpcbf -p",
-		"test-unit": "./vendor/bin/phpunit"
+		"test-unit": "./vendor/bin/phpunit",
+		"lint:phpstan": "phpstan analyse --configuration=phpstan.neon.dist --no-progress --memory-limit=2G",
+		"lint:phpstan:baseline:update": "@lint:phpstan --generate-baseline=phpstan-baseline.neon --allow-empty-baseline"
 	},
 	"extra": {
 		"scripts-description": {

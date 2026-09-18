@@ -30,12 +30,11 @@ on:
         type: choice
         options:
           - 'WooCommerce Pre-Release Tests (includes Activation, WooCommerce E2E and API tests)'
-          - 'Code Quality Checks (includes Security, Validation, Malware, PHPStan, and PHP Compatibility tests)'
+          - 'Code Quality Checks (includes Security, Validation, Malware, and PHP Compatibility tests)'
           - 'Activation'
           - 'Security'
           - 'Validation'
           - 'Malware'
-          - 'PHPStan'
           - 'PHP Compatibility'
           - 'WooCommerce E2E and API tests'
           - 'Plugin Checks (for dotOrg metadata)'
@@ -85,8 +84,6 @@ jobs:
       test-activation: ${{ contains(inputs.qit-tests, 'Activation') && true || false }}
       test-security: ${{ contains(inputs.qit-tests, 'Security') && true || false }}
       test-phpcompatibility: ${{ contains(inputs.qit-tests, 'Compatibility') && true || false }}
-      # TODO: Enable this once the PHPStan tests are fixed
-      # test-phpstan: ${{ contains(inputs.qit-tests, 'PHPStan') && true || false }}
       test-woo-api: ${{ contains(inputs.qit-tests, 'API') && true || false }}
       test-woo-e2e: ${{ contains(inputs.qit-tests, 'WooCommerce E2E') && true || false }}
       test-malware: ${{ contains(inputs.qit-tests, 'Malware') && true || false }}
