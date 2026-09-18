@@ -1,0 +1,17 @@
+{
+  "source_version": "1.3.9",
+  "settings": {
+    "tracking_advertiser": "merchant-advertiser",
+    "tracking_tag": "merchant-tag",
+    "track_conversions": true,
+    "track_conversions_capi": true,
+    "merchant_extension_setting": {"keep": "unchanged"}
+  },
+  "data": {
+    "merchant_id": "merchant-123",
+    "local_feed_ids": {"US": "local-feed-123"},
+    "merchant_extension_data": {"keep": "unchanged"}
+  },
+  "feed_status": {"status": "generated", "product_count": 17, "last_activity": 1609459200},
+  "merchant_feeds": [{"id": "merchant-feed-789", "name": "Manual merchant feed", "location": "https://example.test/merchant.xml"}]
+}
