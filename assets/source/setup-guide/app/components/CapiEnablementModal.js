@@ -156,7 +156,7 @@ const CapiEnablementModal = ( { onCloseModal, onDismiss } ) => {
 						: __(
 								'Enable Conversions API',
 								'pinterest-for-woocommerce'
-						  ) }
+							) }
 				</Button>
 			</Flex>
 		</Modal>
