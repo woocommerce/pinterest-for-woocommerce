@@ -169,7 +169,7 @@ class Merchants {
 		try {
 			$response = Base::update_or_create_merchant( $args );
 		} catch ( Throwable $th ) {
-			$delay = Pinterest_For_Woocommerce()::get_data( 'create_merchant_delay' ) ?? MINUTE_IN_SECONDS;
+			$delay = max( MINUTE_IN_SECONDS, (int) Pinterest_For_Woocommerce()::get_data( 'create_merchant_delay' ) );
 
 			set_transient( $cache_key, $th->getCode(), $delay );
 
