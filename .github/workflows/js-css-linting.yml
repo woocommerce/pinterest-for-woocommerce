@@ -7,11 +7,17 @@ on:
       - develop
     paths:
       - "**.js"
+      - "**.cjs"
+      - package.json
+      - package-lock.json
       - "**.scss"
       - .github/workflows/js-css-linting.yml
   pull_request:
     paths:
       - "**.js"
+      - "**.cjs"
+      - package.json
+      - package-lock.json
       - "**.scss"
       - .github/workflows/js-css-linting.yml
 
@@ -41,6 +47,9 @@ jobs:
 
       - name: Lint JavaScript and annotate linting errors
         run: npm run lint:js -- --format ./eslintFormatter.cjs
+
+      - name: Lint authored build and test configuration
+        run: npm run lint:tooling-js -- --format ./eslintFormatter.cjs
 
   CSSLintingCheck:
     name: Lint CSS

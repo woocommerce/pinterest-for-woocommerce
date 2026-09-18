@@ -119,6 +119,8 @@
     "lint:css:fix": "wp-scripts lint-style \"./assets/source/**/*.{css,scss}\" --fix",
     "lint:js": "wp-scripts lint-js ./assets/source",
     "lint:js:fix": "wp-scripts lint-js ./assets/source --fix",
+    "lint:tooling-js": "wp-scripts lint-js gulpfile.js webpack.config.js jest.config.js eslint.config.cjs",
+    "lint:tooling-js-fix": "npm run lint:tooling-js -- --fix",
     "lint:php": "composer run-script phpcs ./",
     "lint:php:fix": "composer run-script phpcbf",
     "start": "wp-scripts start",

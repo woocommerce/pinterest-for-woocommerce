@@ -1,41 +1,29 @@
-var $,
-	_,
-	gulp,
-	merge,
-	fs,
-	path,
-	semver,
-	nodegit,
-	CONFIG,
-	FOLDERS,
-	DOMAIN,
-	PATHS,
-	MATCH,
-	SRC;
+let nodegit, FOLDERS, DOMAIN, PATHS, MATCH, SRC;
 
-gulp = require( 'gulp' );
-merge = require( 'merge-stream' );
-fs = require( 'fs' );
-path = require( 'path' );
-semver = require( 'semver' );
-_ = require( 'underscore' );
-$ = require( 'gulp-load-plugins' )( {
+const gulp = require( 'gulp' );
+const merge = require( 'merge-stream' );
+const fs = require( 'fs' );
+const path = require( 'path' );
+// eslint-disable-next-line no-unused-vars -- Retain the existing build dependency during lint adoption.
+const semver = require( 'semver' );
+const _ = require( 'underscore' );
+const $ = require( 'gulp-load-plugins' )( {
 	pattern: [ '*', '!sass', '!gulp-sass' ],
 } );
 $.sass = require( 'gulp-sass' )( require( 'sass' ) );
 
-var argv = require( 'minimist' )( process.argv.slice( 2 ) );
-var through = require( 'through2' );
+const argv = require( 'minimist' )( process.argv.slice( 2 ) );
+const through = require( 'through2' );
 
 if ( path.sep !== '/' ) {
-	var oldJoin = path.join;
+	const oldJoin = path.join;
 	path.join = function () {
-		var ret = oldJoin.apply( this, arguments );
+		const ret = oldJoin.apply( this, arguments );
 		return ret.replace( new RegExp( '\\' + path.sep, 'g' ), '/' );
 	};
 }
 
-CONFIG = {
+const CONFIG = {
 	production: !! argv.production,
 	watch: !! argv.watch,
 	bs: !! argv.bs,
@@ -79,33 +67,32 @@ Array.prototype.getFiltered = function ( type ) {
 		return this.filter( function ( item ) {
 			return item.name.substr( 0, type.length ) === type;
 		} );
-	} else {
-		return this;
 	}
+	return this;
 };
 
 Array.prototype.getFlattened = function ( prefix ) {
-	if ( typeof prefix == 'undefined' ) {
+	if ( typeof prefix === 'undefined' ) {
 		prefix = '';
 	}
 
-	var paths = [];
-	this.forEach( function ( item, i ) {
-		item.files.forEach( function ( item ) {
-			paths.push( prefix + item.f );
+	const paths = [];
+	this.forEach( function ( item ) {
+		item.files.forEach( function ( file ) {
+			paths.push( prefix + file.f );
 		} );
 	} );
 	return paths;
 };
 
-var newFolders = [];
+const newFolders = [];
 _.each( FOLDERS, function ( item, key ) {
-	if ( typeof item == 'string' ) {
+	if ( typeof item === 'string' ) {
 		item = { folder: item };
-	} else if ( typeof item == 'object' ) {
-		if ( typeof item.folder == 'string' ) {
+	} else if ( typeof item === 'object' ) {
+		if ( typeof item.folder === 'string' ) {
 			// do nothing, we have a folder defined
-		} else if ( typeof key == 'string' ) {
+		} else if ( typeof key === 'string' ) {
 			// we're on an object based structure
 			item.folder = key;
 		} else {
@@ -126,11 +113,14 @@ _.each( FOLDERS, function ( item, key ) {
 		item.PATHS = {};
 	}
 	item.PATHS = _.extend( {}, PATHS, item.PATHS );
-	_.each( item.PATHS, function ( val, key, self ) {
-		var newPath = val.replace( /\{self\.(.*?)\}/g, function ( match, g1 ) {
-			return self[ g1 ];
-		} );
-		self[ key ] = newPath;
+	_.each( item.PATHS, function ( val, pathKey, self ) {
+		const newPath = val.replace(
+			/\{self\.(.*?)\}/g,
+			function ( match, g1 ) {
+				return self[ g1 ];
+			}
+		);
+		self[ pathKey ] = newPath;
 	} );
 
 	if ( _.isUndefined( item.MATCH ) ) {
@@ -157,11 +147,11 @@ _.each( FOLDERS, function ( item, key ) {
 
 	item.concat.forEach( function ( concatDest ) {
 		concatDest.files = concatDest.files.map( function ( source ) {
-			if ( typeof source == 'string' ) {
+			if ( typeof source === 'string' ) {
 				source = { f: source };
 			}
-			var prefix = '';
-			if ( source.f.substr( 0, 1 ) == '!' ) {
+			let prefix = '';
+			if ( source.f.substr( 0, 1 ) === '!' ) {
 				prefix = '!';
 				source.f = source.f.substr( 1 );
 			}
@@ -177,10 +167,10 @@ _.each( FOLDERS, function ( item, key ) {
 FOLDERS = newFolders;
 
 gulp.task( 'zip', function () {
-	var tasks = FOLDERS.map( function ( folderConfig ) {
-		var folder = folderConfig.folder;
-		var basename = path.basename( path.resolve( folder ) );
-		var filename = path.join( folder, basename + '.zip' );
+	const tasks = FOLDERS.map( function ( folderConfig ) {
+		const folder = folderConfig.folder;
+		const basename = path.basename( path.resolve( folder ) );
+		const filename = path.join( folder, basename + '.zip' );
 		try {
 			fs.unlinkSync( filename );
 		} catch ( e ) {
@@ -207,18 +197,18 @@ gulp.task( 'zip', function () {
 } );
 
 function map_destination( folderConfig, dest ) {
-	var assetsPath = path.join(
+	const assetsPath = path.join(
 		folderConfig.folder,
 		folderConfig.PATHS.assets
 	);
-	var destPath = path.join( folderConfig.folder, dest );
-	var mapsPath = path.join( folderConfig.folder, folderConfig.PATHS.maps );
-	var destRelative = path.relative( assetsPath, destPath );
+	const destPath = path.join( folderConfig.folder, dest );
+	const mapsPath = path.join( folderConfig.folder, folderConfig.PATHS.maps );
+	const destRelative = path.relative( assetsPath, destPath );
 
-	var suffix = '';
+	let suffix = '';
 	if (
-		destRelative.substr( 0, 1 ) != '.' &&
-		destRelative.substr( 0, 1 ) != path.sep
+		destRelative.substr( 0, 1 ) !== '.' &&
+		destRelative.substr( 0, 1 ) !== path.sep
 	) {
 		suffix = path.sep + destRelative;
 	}
@@ -230,18 +220,20 @@ function map_destination( folderConfig, dest ) {
 }
 
 gulp.task( 'sass', function () {
-	var tasks = FOLDERS.map( function ( folderConfig ) {
-		var folder = folderConfig.folder;
-		var PATHS = folderConfig.PATHS;
-		var MATCH = folderConfig.MATCH;
-		var SRC = JSON.parse( JSON.stringify( folderConfig.SRC.sass ) );
-		var baseSRC = path.join( folder, PATHS.sass );
-		SRC.unshift( path.join( baseSRC, MATCH.sass ) );
+	const tasks = FOLDERS.map( function ( folderConfig ) {
+		const folder = folderConfig.folder;
+		const folderPaths = folderConfig.PATHS;
+		const folderMatch = folderConfig.MATCH;
+		const folderSources = JSON.parse(
+			JSON.stringify( folderConfig.SRC.sass )
+		);
+		const baseSRC = path.join( folder, folderPaths.sass );
+		folderSources.unshift( path.join( baseSRC, folderMatch.sass ) );
 
-		var destination = map_destination( folderConfig, PATHS.css );
+		const destination = map_destination( folderConfig, folderPaths.css );
 
 		return gulp
-			.src( SRC, { base: baseSRC } )
+			.src( folderSources, { base: baseSRC } )
 			.pipe( $.plumber() )
 			.pipe( $.sourcemaps.init() )
 			.pipe( $.sass( { precision: 10 } ).on( 'error', $.sass.logError ) )
@@ -269,27 +261,27 @@ gulp.task( 'sass', function () {
 } );
 
 gulp.task( 'js', function () {
-	var tasks = FOLDERS.map( function ( folderConfig ) {
-		var folder = folderConfig.folder;
-		var PATHS = folderConfig.PATHS;
-		var MATCH = folderConfig.MATCH;
-		var SRC = JSON.parse( JSON.stringify( folderConfig.SRC.js ) );
-		var baseSRC = path.join( folder, PATHS.jsSource );
-		SRC.unshift( path.join( baseSRC, MATCH.js ) );
+	const tasks = FOLDERS.map( function ( folderConfig ) {
+		const folder = folderConfig.folder;
+		const folderPaths = folderConfig.PATHS;
+		const folderMatch = folderConfig.MATCH;
+		let folderSources = JSON.parse( JSON.stringify( folderConfig.SRC.js ) );
+		const baseSRC = path.join( folder, folderPaths.jsSource );
+		folderSources.unshift( path.join( baseSRC, folderMatch.js ) );
 
-		var destination = map_destination( folderConfig, PATHS.jsDest );
+		const destination = map_destination( folderConfig, folderPaths.jsDest );
 
 		// get concat sources for this particular folder (from the source folder)
-		var concatFiles = folderConfig.concat.getFiltered( 'js' );
+		const concatFiles = folderConfig.concat.getFiltered( 'js' );
 		// use the concat sources as ignored paths in the "base" process
-		var includePaths = concatFiles.getFlattened( '!' );
-		SRC = _.union( SRC, includePaths );
+		const includePaths = concatFiles.getFlattened( '!' );
+		folderSources = _.union( folderSources, includePaths );
 
-		var folderTasks = [];
+		const folderTasks = [];
 
 		// Do everything not included in the concat
-		var base = gulp
-			.src( SRC, { base: baseSRC } )
+		const base = gulp
+			.src( folderSources, { base: baseSRC } )
 			.pipe( $.plumber() )
 			.pipe( $.sourcemaps.init() )
 			.pipe(
@@ -315,17 +307,20 @@ gulp.task( 'js', function () {
 
 		// Process each concat dest as it's individual file
 		concatFiles.forEach( function ( dest ) {
-			var thisDest;
+			let thisDest;
 
 			if ( dest.passthrough ) {
-				var passThroughDest = destination;
+				let passThroughDest = destination;
 				if (
 					dest.files.length > 1 ||
 					dest.files[ 0 ].f.indexOf( '*' ) > -1
 				) {
 					passThroughDest = map_destination(
 						folderConfig,
-						path.join( PATHS.jsDest, path.basename( dest.name ) )
+						path.join(
+							folderPaths.jsDest,
+							path.basename( dest.name )
+						)
 					);
 				}
 				thisDest = gulp
@@ -339,16 +334,16 @@ gulp.task( 'js', function () {
 						} )
 					);
 			} else {
-				var thisDestPath = path.join(
+				const thisDestPath = path.join(
 					folderConfig.PATHS.assets,
 					path.dirname( dest.name )
 				);
-				var thisDestination = map_destination(
+				const thisDestination = map_destination(
 					folderConfig,
 					thisDestPath
 				);
 
-				var keepUnminified = _.pluck(
+				let keepUnminified = _.pluck(
 					_.filter( dest.files, 'keepUnminified' ),
 					'f'
 				);
@@ -413,8 +408,8 @@ gulp.task( 'js', function () {
 } );
 
 gulp.task( 'browser-sync', function ( done ) {
-	var files = [];
-	FOLDERS.map( function ( folderConfig ) {
+	const files = [];
+	FOLDERS.forEach( function ( folderConfig ) {
 		files.push(
 			path.join(
 				folderConfig.folder,
@@ -441,8 +436,9 @@ gulp.task( 'browser-sync', function ( done ) {
 	return done();
 } );
 
-var doWatch = function ( done ) {
-	FOLDERS.map( function ( folderConfig ) {
+// eslint-disable-next-line no-unused-vars -- Gulp uses callback arity to recognize this long-running watch task.
+const doWatch = function ( done ) {
+	FOLDERS.forEach( function ( folderConfig ) {
 		gulp.watch(
 			path.join(
 				folderConfig.folder,
@@ -461,7 +457,7 @@ var doWatch = function ( done ) {
 		);
 	} );
 };
-var watch_task;
+let watch_task;
 if ( CONFIG.bs ) {
 	watch_task = gulp.series( 'browser-sync', doWatch );
 } else {
@@ -472,23 +468,24 @@ gulp.task( 'watch', watch_task );
 
 gulp.task( 'build', gulp.parallel( 'sass', 'js' ) );
 
-var default_task;
+let default_task;
 if ( CONFIG.watch ) {
 	default_task = gulp.series( 'build', 'watch' );
 } else {
 	default_task = gulp.series( 'build' );
 }
 
+// eslint-disable-next-line no-unused-vars -- Preserve the existing optional helper during lint adoption.
 async function getDiffFiles() {
 	nodegit = require( 'nodegit' );
-	var repository = await nodegit.Repository.open( '.' );
-	var currCommit = await repository.getHeadCommit();
-	var mastCommit = await repository.getMasterCommit();
+	const repository = await nodegit.Repository.open( '.' );
+	const currCommit = await repository.getHeadCommit();
+	const mastCommit = await repository.getMasterCommit();
 
-	var currTree = await currCommit.getTree();
-	var mastTree = await mastCommit.getTree();
+	const currTree = await currCommit.getTree();
+	const mastTree = await mastCommit.getTree();
 
-	var diff = await currTree.diff( mastTree );
+	let diff = await currTree.diff( mastTree );
 	diff = await diff.patches();
 
 	diff = diff
