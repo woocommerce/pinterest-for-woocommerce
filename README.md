@@ -81,6 +81,8 @@ PR. Human review and CI checks still apply.
 
 ### Development tools
 
+See the [frontend architecture review](docs/frontend-architecture.md) for current structure and follow-up recommendations.
+
 There are a number of development tools available as npm scripts. Check the [`package.json`](https://github.com/woocommerce/pinterest-for-woocommerce/blob/develop/package.json) file for more.
 
 -   `npm run lint:js`: Run [`eslint`](https://eslint.org/) to validate JavaScript code style.
