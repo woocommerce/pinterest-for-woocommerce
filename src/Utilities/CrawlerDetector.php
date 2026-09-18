@@ -47,7 +47,7 @@ class CrawlerDetector {
 	const PROGRAMMATIC_CLIENT_REGEX = '/curl|wget|feed|phantom|headless/i';
 
 	/**
-	 * Returns true when the current request looks like a crawler/bot.
+	 * Returns true for crawler/bot or speculative browser requests.
 	 *
 	 * Detection is intentionally NOT memoized: the underlying checks and the
 	 * filter call are cheap, and re-evaluating per call keeps the
@@ -72,6 +72,7 @@ class CrawlerDetector {
 				User_Agent_Info::is_bot_user_agent( $user_agent )
 				|| 1 === preg_match( self::PROGRAMMATIC_CLIENT_REGEX, $user_agent )
 			);
+		$is_crawler = $is_crawler || self::is_speculative_request();
 
 		/**
 		 * Filters whether the current request is treated as a crawler.
@@ -92,5 +93,26 @@ class CrawlerDetector {
 			$is_crawler,
 			$raw_user_agent
 		);
+	}
+
+	/**
+	 * Detects browser prefetch, prerender and preview requests.
+	 *
+	 * @since x.x.x
+	 * @return bool Whether the browser explicitly marked a speculative request.
+	 */
+	public static function is_speculative_request(): bool {
+		foreach ( array( 'HTTP_SEC_PURPOSE', 'HTTP_PURPOSE', 'HTTP_X_PURPOSE', 'HTTP_X_MOZ' ) as $header ) {
+			if ( ! isset( $_SERVER[ $header ] ) || ! is_string( $_SERVER[ $header ] ) ) {
+				continue;
+			}
+
+			$purpose = sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) );
+			if ( 1 === preg_match( '/(?:^|[\s,;])(?:prefetch|prerender|preview)(?:$|[\s,;])/i', $purpose ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

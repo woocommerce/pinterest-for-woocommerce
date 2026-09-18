@@ -59,6 +59,52 @@ class CrawlerDetectorTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Browser speculation headers are independent of the real shopper's User-Agent.
+	 *
+	 * @dataProvider speculative_headers
+	 * @param string $header   Server header key.
+	 * @param mixed  $value    Header value.
+	 * @param bool   $expected Whether the request is speculative.
+	 */
+	public function test_speculative_headers( $header, $value, $expected ) {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$original                   = $_SERVER[ $header ] ?? null;
+		$_SERVER[ $header ]         = $value;
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 Chrome/140.0.0.0';
+		try {
+			$this->assertSame( $expected, CrawlerDetector::is_speculative_request() );
+			$this->assertSame( $expected, CrawlerDetector::is_crawler_request() );
+		} finally {
+			if ( null === $original ) {
+				unset( $_SERVER[ $header ] );
+			} else {
+				$_SERVER[ $header ] = $original;
+			}
+		}
+	}
+
+	/** @return array Browser header values and ordinary requests. */
+	public function speculative_headers() {
+		return array(
+			array( 'HTTP_SEC_PURPOSE', 'prefetch', true ),
+			array( 'HTTP_SEC_PURPOSE', 'prefetch;prerender', true ),
+			array( 'HTTP_PURPOSE', 'prefetch', true ),
+			array( 'HTTP_X_PURPOSE', 'preview', true ),
+			array( 'HTTP_X_PURPOSE', 'prefetch', true ),
+			array( 'HTTP_X_MOZ', 'prefetch', true ),
+			array( 'HTTP_X_MOZ', 'prerender', true ),
+			array( 'HTTP_SEC_PURPOSE', ' PREFETCH; PRERENDER ', true ),
+			array( 'HTTP_PURPOSE', 'navigate, prefetch', true ),
+			array( 'HTTP_PURPOSE', 'navigate', false ),
+			array( 'HTTP_PURPOSE', 'not-prefetch', false ),
+			array( 'HTTP_PURPOSE', '', false ),
+			array( 'HTTP_PURPOSE', null, false ),
+			array( 'HTTP_PURPOSE', array( 'prefetch' ), false ),
+			array( 'HTTP_UNRELATED', 'prefetch', false ),
+		);
+	}
+
+	/**
 	 * @dataProvider crawler_user_agents
 	 *
 	 * @param string $user_agent The user agent string to test.
