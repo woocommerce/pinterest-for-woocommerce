@@ -12,6 +12,7 @@ use Automattic\WooCommerce\Pinterest\FeedFileOperations;
 use Automattic\WooCommerce\Pinterest\FeedGenerator;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductSync;
+use Pinterest_For_Woocommerce;
 use ReflectionProperty;
 use WC_Helper_Product;
 use WC_Product_Simple;
@@ -46,6 +47,10 @@ class ProductSyncTest extends \WP_UnitTestCase {
 
 		add_action( 'woocommerce_new_product', array( ProductSync::class, 'mark_feed_dirty_on_new_product' ), 10, 1 );
 		add_action( 'woocommerce_product_object_updated_props', array( ProductSync::class, 'mark_feed_dirty_on_updated_props' ), 10, 2 );
+		add_action( 'update_option_' . PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME, array( ProductSync::class, 'mark_feed_dirty_on_category_settings_change' ), 10, 2 );
+		add_action( 'set_object_terms', array( ProductSync::class, 'mark_feed_dirty_on_product_categories_change' ), 10, 4 );
+		add_action( 'edited_product_cat', array( ProductSync::class, 'mark_feed_dirty_on_category_tree_change' ) );
+		add_action( 'delete_product_cat', array( ProductSync::class, 'mark_feed_dirty_on_category_tree_change' ) );
 	}
 
 	/**
@@ -56,6 +61,10 @@ class ProductSyncTest extends \WP_UnitTestCase {
 	public function tearDown(): void {
 		remove_action( 'woocommerce_new_product', array( ProductSync::class, 'mark_feed_dirty_on_new_product' ), 10 );
 		remove_action( 'woocommerce_product_object_updated_props', array( ProductSync::class, 'mark_feed_dirty_on_updated_props' ), 10 );
+		remove_action( 'update_option_' . PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME, array( ProductSync::class, 'mark_feed_dirty_on_category_settings_change' ), 10 );
+		remove_action( 'set_object_terms', array( ProductSync::class, 'mark_feed_dirty_on_product_categories_change' ), 10 );
+		remove_action( 'edited_product_cat', array( ProductSync::class, 'mark_feed_dirty_on_category_tree_change' ) );
+		remove_action( 'delete_product_cat', array( ProductSync::class, 'mark_feed_dirty_on_category_tree_change' ) );
 
 		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', null, 'pinterest-for-woocommerce' );
 		delete_option( FeedGenerator::OPTION_FEED_DIRTY );
@@ -131,6 +140,60 @@ class ProductSyncTest extends \WP_UnitTestCase {
 		$this->set_static_property( 'flagged_product_ids', array() );
 
 		return $product;
+	}
+
+	/**
+	 * Category filtering refreshes after settings, assignments and hierarchy changes.
+	 */
+	public function test_category_inclusion_changes_mark_feed_dirty() {
+		$product = $this->create_clean_product();
+		$parent  = wp_insert_term( 'Clothing', 'product_cat' )['term_id'];
+		$child   = wp_insert_term( 'Shirts', 'product_cat' )['term_id'];
+		Pinterest_For_Woocommerce::save_setting( 'product_sync_enabled', true );
+		wp_set_object_terms( $product->get_id(), $child, 'product_cat' );
+		$this->assertFalse( $this->feed_generator->feed_is_dirty(), 'Default all-products selection needs no category invalidation.' );
+
+		Pinterest_For_Woocommerce::save_setting(
+			'product_sync_categories',
+			array(
+				array(
+					'key'   => $parent,
+					'label' => 'Clothing',
+				),
+			)
+		);
+		$this->assertTrue( $this->feed_generator->feed_is_dirty() );
+		$this->feed_generator->mark_feed_clean();
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions', true );
+		wp_set_object_terms( $product->get_id(), 'Summer', 'product_tag' );
+		$this->assertFalse( $this->feed_generator->feed_is_dirty(), 'Unrelated settings and taxonomies do not change category inclusion.' );
+
+		wp_update_term( $child, 'product_cat', array( 'parent' => $parent ) );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty() );
+		$this->feed_generator->mark_feed_clean();
+		wp_set_object_terms( $product->get_id(), array(), 'product_cat' );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty() );
+		$this->feed_generator->mark_feed_clean();
+		wp_delete_term( $parent, 'product_cat' );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty() );
+		$this->feed_generator->mark_feed_clean();
+		Pinterest_For_Woocommerce::save_setting( 'product_sync_categories', array() );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'Clearing the selection must restore the all-products feed.' );
+		$this->feed_generator->mark_feed_clean();
+		wp_update_term( $child, 'product_cat', array( 'name' => 'T-shirts' ) );
+		$this->assertFalse( $this->feed_generator->feed_is_dirty() );
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'product_sync_enabled'    => false,
+				'product_sync_categories' => array(
+					array(
+						'key'   => $child,
+						'label' => 'T-shirts',
+					),
+				),
+			)
+		);
+		$this->assertFalse( $this->feed_generator->feed_is_dirty(), 'Disabling sync must not schedule a replacement feed.' );
 	}
 
 	/**
