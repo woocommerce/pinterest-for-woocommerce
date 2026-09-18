@@ -22,8 +22,9 @@ const packagesNeedMocking = [
 module.exports = {
 	...defaultConfig,
 	// Workaround https://github.com/woocommerce/woocommerce-admin/issues/6483.
+	// The patched d3-color used by WooCommerce's chart packages is ESM-only.
 	transformIgnorePatterns: [
-		`<rootDir>/node_modules/(?!@woocommerce/(${ wcPackagesNeedTransform })(/node_modules/@woocommerce/(${ wcPackagesNeedTransform }))?/build/)`,
+		`<rootDir>/node_modules/(?!(?:d3-color/|@woocommerce/(${ wcPackagesNeedTransform })(/node_modules/@woocommerce/(${ wcPackagesNeedTransform }))?/build/))`,
 	],
 	moduleNameMapper: {
 		// Transform our `.~/` alias.
