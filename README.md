@@ -176,6 +176,14 @@ Anything after `--` is forwarded to `phpunit`, so PHPUnit flags such as `--filte
 
 ### Running Tests
 
+The PHP suite runs on PHP 7.4, 8.3 and 8.4 in both PHP workflows. To reproduce the
+newer-PHP lane locally, put PHP 8.4 on your PATH, install the locked Composer
+dependencies, and prepare the isolated WordPress/WooCommerce test environment
+above. Run `composer test-unit`, the same command used in CI. The bootstrap prints
+the actual PHP, WordPress and WooCommerce versions, so a configured version can be
+checked against the installed version. For wp-env, set `"phpVersion": "8.4"` in
+your local `.wp-env.override.json` before starting the environment.
+
 Change to the plugin root directory and type:
 
 ```bash
