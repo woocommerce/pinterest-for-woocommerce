@@ -46,6 +46,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	const UNBUILT_PIN_SELECTOR =
 		'.pinterest-for-woocommerce-image-wrapper a[data-pin-do]:not([data-pin-log])';
 
+	const PRODUCT_IMAGE_SELECTOR =
+		'img.wp-post-image, .woocommerce-LoopProduct-link img, .wc-block-grid__product-image img';
+
 	// pinit.js is loaded async, so it can land after a placeholder appears.
 	const BUILD_RETRY_DELAY = 400;
 	const BUILD_MAX_RETRIES = 5;
@@ -62,6 +65,31 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		document
 			.querySelectorAll( '.pinterest-for-woocommerce-image-wrapper' )
 			.forEach( function ( wrapper ) {
+				const product = wrapper.closest(
+					'.product, .wc-block-grid__product'
+				);
+				const image = product?.querySelector( PRODUCT_IMAGE_SELECTOR );
+				const parent = wrapper.offsetParent;
+
+				if (
+					image &&
+					parent &&
+					image.closest( '.product, .wc-block-grid__product' ) ===
+						product
+				) {
+					// The image can sit below a sale badge or be narrower than its product.
+					const imageRect = image.getBoundingClientRect();
+					const parentRect = parent.getBoundingClientRect();
+					wrapper.style.setProperty(
+						'--pinterest-image-offset-x',
+						`${ imageRect.left - parentRect.left - parent.clientLeft + parent.scrollLeft }px`
+					);
+					wrapper.style.setProperty(
+						'--pinterest-image-offset-y',
+						`${ imageRect.top - parentRect.top - parent.clientTop + parent.scrollTop }px`
+					);
+				}
+
 				// Skip if already processed.
 				if ( wrapper.dataset.srLabeled ) return;
 
@@ -303,6 +331,17 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			window.setTimeout( run, 0 );
 		}
 	}
+
+	window.addEventListener( 'resize', scheduleProcessWrappers );
+	document.addEventListener(
+		'load',
+		( event ) => {
+			if ( event.target.matches?.( PRODUCT_IMAGE_SELECTOR ) ) {
+				scheduleProcessWrappers();
+			}
+		},
+		true
+	);
 
 	// Observe mutations for dynamic elements or asynchronous Pinterest rendering.
 	const observer = new window.MutationObserver( function ( mutations ) {
