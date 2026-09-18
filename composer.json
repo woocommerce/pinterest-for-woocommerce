@@ -53,10 +53,11 @@
 		}
 	},
 	"scripts": {
+		"check:php": "@lint-branch",
 		"phpcs": "phpcs --extensions=php -s -p",
 		"lint": "chg=$(git diff --relative --name-only -- '*.php'); [[ -z $chg ]] || phpcs-changed -s --git --git-unstaged $chg",
 		"lint-staged": "chg=$(git diff HEAD --relative --name-only -- '*.php'); [[ -z $chg ]] || phpcs-changed -s --git $chg",
-		"lint-branch": "sh ./bin/lint-branch.sh",
+		"lint-branch": "bash ./bin/lint-branch.sh",
 		"phpcbf": "phpcbf -p",
 		"test-unit": "./vendor/bin/phpunit"
 	},

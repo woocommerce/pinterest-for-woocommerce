@@ -92,6 +92,16 @@ There are a number of development tools available as npm scripts. Check the [`pa
 -   `npm run lint:css`: Run [`stylelint`](https://stylelint.io/) to validate CSS code style.
 -   `npm run lint:php`: Run [`phpcs`](https://github.com/squizlabs/PHP_CodeSniffer) to validate PHP code style.
 
+Use `composer check:php` for the same PHP standards check as CI. It compares
+committed PHP changes with the merge base of `origin/develop`; fetch that branch
+first, or pass another base with `composer check:php -- base-ref`. New errors
+and warnings at severity 5 or higher fail. Existing findings remain excluded by
+`phpcs-changed`. Commit changes before this check; `composer lint` and
+`composer lint-staged` remain available for work in progress.
+
+Use `composer phpcs -- .` for the full-tree debt report. Review existing debt
+separately from the changed-line gate.
+
 Please use these tools to ensure your code changes are consistent with the rest of the code base. This code follows WooCommerce and WordPress standards.
 
 This repository includes an [`EditorConfig`](https://editorconfig.org/) to automate basic code formatting. Please install the appropriate plugin for your editor.

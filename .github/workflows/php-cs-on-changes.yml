@@ -5,6 +5,10 @@ on:
     paths:
       - "**.php"
       - .github/workflows/php-cs-on-changes.yml
+      - bin/lint-branch.sh
+      - composer.json
+      - composer.lock
+      - phpcs.xml
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -30,12 +34,6 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
 
-      - name: Get Changed Files
-        id: changed-files
-        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
-        with:
-          files: "**/*.php"
-
       - name: Tool versions
         run: |
           php --version
@@ -43,5 +41,6 @@ jobs:
           vendor/bin/phpcs-changed --version
 
       - name: Run PHPCS
-        if: steps.changed-files.outputs.any_changed == 'true'
-        run: vendor/bin/phpcs-changed --warning-severity=0 -s --git --git-base ${{ github.event.pull_request.base.sha }} ${{ steps.changed-files.outputs.all_changed_files }}
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.sha }}
+        run: composer check:php -- "$BASE_REF"
