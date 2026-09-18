@@ -24,6 +24,11 @@ module.exports = [
 			// The shared preset still applies Jest rules to the Playwright tests,
 			// and they cannot detect a version now that Jest is not installed.
 			jest: { version: 30 },
+			'import/resolver': {
+				typescript: {
+					alias: { '.~': [ __dirname + '/assets/source' ] },
+				},
+			},
 		},
 		rules: {
 			// Keep the previous lint policy during the dependency migration.
