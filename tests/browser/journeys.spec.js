@@ -51,7 +51,7 @@ test( 'merchant connection failure, retry, configuration reload and disconnect',
 	await page.goto(
 		'/wp-admin/admin.php?page=wc-admin&path=%2Fpinterest%2Fsettings'
 	);
-	// The settings form appears before its initial request resolves.
+	// Confirm the persisted settings are available before editing the configuration.
 	await expect(
 		page.getByRole( 'checkbox', {
 			name: 'Add Rich Pins for Products',

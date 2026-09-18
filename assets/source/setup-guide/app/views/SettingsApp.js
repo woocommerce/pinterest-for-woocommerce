@@ -3,6 +3,8 @@
  */
 import '@wordpress/notices';
 import { Spinner } from '@woocommerce/components';
+import { useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,9 +22,24 @@ import {
 } from '../helpers/effects';
 import { SETTINGS_VIEW } from '../helpers/views';
 import NavigationClassic from '../../../components/navigation-classic';
+import { SETTINGS_STORE_NAME } from '../data';
 
 const SettingsApp = () => {
 	const appSettings = useSettingsSelect();
+	const [ hasLoadedSettings, setHasLoadedSettings ] = useState( false );
+	const hasResolvedSettings = useSelect( ( select ) => {
+		const settingsStore = select( SETTINGS_STORE_NAME );
+		return (
+			settingsStore.hasFinishedResolution( 'getSettings', [] ) &&
+			! settingsStore.getSettingsRequestingError( 'all' )
+		);
+	}, [] );
+	// A save refetches settings; keep the loaded form mounted during that refresh.
+	useEffect( () => {
+		if ( hasResolvedSettings ) {
+			setHasLoadedSettings( true );
+		}
+	}, [ hasResolvedSettings ] );
 
 	useBodyClasses();
 	useCreateNotice()( wcSettings.pinterest_for_woocommerce.error );
@@ -32,7 +49,7 @@ const SettingsApp = () => {
 			<HealthCheck />
 			<NavigationClassic />
 
-			{ appSettings ? (
+			{ hasLoadedSettings && appSettings ? (
 				<div className="woocommerce-setup-guide__container">
 					<>
 						<SyncSettings view={ SETTINGS_VIEW } />
