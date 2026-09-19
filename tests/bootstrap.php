@@ -51,6 +51,10 @@ require "{$wp_tests_dir}/includes/bootstrap.php";
 // Start up the WC testing environment.
 require_once $wc_dir . '/tests/legacy/bootstrap.php';
 
+// CLI-only diagnostics from the installed test dependencies.
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+printf( "Testing PHP %s, WordPress %s, WooCommerce %s.\n", PHP_VERSION, $GLOBALS['wp_version'], WC_VERSION );
+
 // Add helpers for shipping tests.
 require_once PLUGIN_TESTS_DIR . '/Helpers/ShippingHelpers.php';
 
