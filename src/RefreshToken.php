@@ -95,7 +95,6 @@ class RefreshToken {
 				'refresh_token' => Crypto::decrypt( $token_data['refresh_token'] ),
 				'url'           => get_site_url(),
 			),
-			'sslverify' => false,
 		);
 
 		// Translators: %s is the endpoint.
