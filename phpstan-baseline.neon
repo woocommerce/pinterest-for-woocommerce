@@ -49,18 +49,6 @@ parameters:
 			path: src/Admin/Input/FormException.php
 
 		-
-			message: '#^Class Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\SelectWithTextInput not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Admin/Product/Attributes/AttributesForm.php
-
-		-
-			message: '#^Instantiated class Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\SelectWithTextInput not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Admin/Product/Attributes/AttributesForm.php
-
-		-
 			message: '#^Action callback returns array but should not return anything\.$#'
 			identifier: return.void
 			count: 1
@@ -161,15 +149,3 @@ parameters:
 			identifier: function.notFound
 			count: 1
 			path: src/WPConsentAPI.php
-
-		-
-			message: '#^Access to constant CUSTOM_INPUT_KEY on an unknown class Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\SelectWithTextInput\.$#'
-			identifier: class.notFound
-			count: 3
-			path: views/attributes/variations-form.php
-
-		-
-			message: '#^Access to constant SELECT_INPUT_KEY on an unknown class Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\SelectWithTextInput\.$#'
-			identifier: class.notFound
-			count: 3
-			path: views/attributes/variations-form.php
