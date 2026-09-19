@@ -92,6 +92,16 @@ There are a number of development tools available as npm scripts. Check the [`pa
 -   `npm run lint:css`: Run [`stylelint`](https://stylelint.io/) to validate CSS code style.
 -   `npm run lint:php`: Run [`phpcs`](https://github.com/squizlabs/PHP_CodeSniffer) to validate PHP code style.
 
+Use `composer check:php` for the same PHP standards check as CI. It compares
+committed PHP changes with the merge base of `origin/develop`; fetch that branch
+first, or pass another base with `composer check:php -- base-ref`. New errors
+and warnings at severity 5 or higher fail. Existing findings remain excluded by
+`phpcs-changed`. Commit changes before this check; `composer lint` and
+`composer lint-staged` remain available for work in progress.
+
+Use `composer phpcs -- .` for the full-tree debt report. Review existing debt
+separately from the changed-line gate.
+
 Please use these tools to ensure your code changes are consistent with the rest of the code base. This code follows WooCommerce and WordPress standards.
 
 This repository includes an [`EditorConfig`](https://editorconfig.org/) to automate basic code formatting. Please install the appropriate plugin for your editor.
@@ -219,3 +229,15 @@ The tests will execute, and you'll be presented with a summary.
 	<a href="https://woocommerce.com/careers/">We're hiring</a>! Come work with us!
 </p>
 
+### PHPStan
+
+After `composer install`, run `composer lint:phpstan`. CI runs the same command
+on PHP, Composer and PHPStan configuration changes using PHP 8.4. PHPStan checks
+owned production PHP at level 0 against the plugin's minimum PHP version.
+WordPress and WooCommerce stubs supply core symbols. Vendor code, generated files,
+tests and build tools are outside analysis.
+
+The baseline records existing findings by message, rule, file and count. New
+findings and unmatched baseline entries fail the check. Run
+`composer lint:phpstan:baseline:update` only for a reviewed baseline change;
+never regenerate it to hide new findings. PHPCS and PHPCompatibility remain separate checks.
