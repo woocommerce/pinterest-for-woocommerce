@@ -196,6 +196,23 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 	}
 
 	/**
+	 * Feed output is refreshed once when the plugin version changes.
+	 *
+	 * @return void
+	 */
+	public function testUpgradeMarksFeedDirtyOnce() {
+		update_option( PluginUpdate::PLUGIN_UPDATE_VERSION_OPTION, '1.4.20' );
+		delete_option( \Automattic\WooCommerce\Pinterest\FeedGenerator::OPTION_FEED_DIRTY );
+
+		$this->plugin_update->maybe_update();
+		$this->assertTrue( (bool) get_option( \Automattic\WooCommerce\Pinterest\FeedGenerator::OPTION_FEED_DIRTY ) );
+
+		delete_option( \Automattic\WooCommerce\Pinterest\FeedGenerator::OPTION_FEED_DIRTY );
+		$this->plugin_update->maybe_update();
+		$this->assertFalse( get_option( \Automattic\WooCommerce\Pinterest\FeedGenerator::OPTION_FEED_DIRTY ) );
+	}
+
+	/**
 	 * Helper method for calling update_plugin_update_version_option.
 	 *
 	 * @return void

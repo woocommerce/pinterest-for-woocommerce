@@ -144,6 +144,15 @@ class PluginUpdate {
 	}
 
 	/**
+	 * Mark existing feed output for regeneration after a plugin update.
+	 *
+	 * @return void
+	 */
+	protected function invalidate_product_feeds(): void {
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, true, false );
+	}
+
+	/**
 	 * Update procedures entry point.
 	 *
 	 * @since 1.0.9
@@ -168,6 +177,9 @@ class PluginUpdate {
 				$this->perform_plugin_update_procedure( $update_procedure );
 			}
 		}
+
+		// Feed output must be rebuilt with the updated serialization rules.
+		$this->perform_plugin_update_procedure( 'invalidate_product_feeds' );
 
 		/**
 		 * Even if the update procedure has errored we still want to

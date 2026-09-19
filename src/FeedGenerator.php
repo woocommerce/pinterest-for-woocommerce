@@ -156,6 +156,10 @@ class FeedGenerator extends AbstractChainedJob {
 			$this->schedule_next_generator_start( time() );
 		}
 
+		if ( $this->feed_is_dirty() ) {
+			$this->mark_feed_dirty();
+		}
+
 		// Set the store address as taxable location.
 		add_filter( 'woocommerce_customer_taxable_address', array( $this, 'set_store_address_as_taxable_location' ) );
 

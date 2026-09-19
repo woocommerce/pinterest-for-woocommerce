@@ -140,6 +140,34 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * A dirty feed from an upgrade should not wait for tomorrow's scheduled run.
+	 *
+	 * @return void
+	 */
+	public function test_init_starts_dirty_feed_and_keeps_daily_schedule() {
+		$hook = FeedGenerator::ACTION_START_FEED_GENERATOR;
+		as_unschedule_all_actions( $hook, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_schedule_recurring_action( time() + DAY_IN_SECONDS, DAY_IN_SECONDS, $hook, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		update_option( FeedGenerator::OPTION_FEED_DIRTY, true, false );
+
+		$this->feed_generator->init();
+		$next_start = as_next_scheduled_action( $hook, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		$this->assertLessThanOrEqual( time(), $next_start );
+		$actions = as_get_scheduled_actions(
+			array(
+				'hook'   => $hook,
+				'status' => 'pending',
+				'group'  => PINTEREST_FOR_WOOCOMMERCE_PREFIX,
+			)
+		);
+		$this->assertCount( 1, $actions );
+		$this->assertSame( DAY_IN_SECONDS, reset( $actions )->get_schedule()->get_recurrence() );
+
+		$this->feed_generator->init();
+		$this->assertSame( $next_start, as_next_scheduled_action( $hook, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) );
+	}
+
+	/**
 	 * Helper to invoke a protected method on FeedGenerator via reflection.
 	 *
 	 * @param FeedGenerator $generator    The FeedGenerator instance.
