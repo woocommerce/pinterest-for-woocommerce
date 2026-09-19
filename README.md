@@ -97,6 +97,27 @@ Please use these tools to ensure your code changes are consistent with the rest 
 This repository includes an [`EditorConfig`](https://editorconfig.org/) to automate basic code formatting. Please install the appropriate plugin for your editor.
 
 
+## JavaScript unit tests
+
+Use the Node version in `.nvmrc`, then install locked dependencies and run Jest:
+
+```bash
+nvm use
+npm ci
+npm run test:js -- --runInBand
+npm run test:js -- --runInBand --runTestsByPath assets/source/setup-guide/app/data/settings/settings.test.js
+```
+
+Both commands collect line and branch coverage in `coverage/index.html`
+and `coverage/coverage-summary.json`. Coverage includes every production JavaScript
+module under `assets/source`, including modules no test imports; test files, the
+`assets/source/tests` fixtures/examples and generated output are excluded.
+Use `--coverage=false` for a faster focused run. No live Pinterest account is needed.
+
+Product attributes are server-rendered PHP forms; their submitted-value tests use
+the existing PHP runner: `composer test-unit -- --filter AttributesFormTest`.
+Prepare its WordPress/WooCommerce environment as described below.
+
 ## PHPUnit
 
 ### Prerequisites
