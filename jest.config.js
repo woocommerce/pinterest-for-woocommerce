@@ -35,7 +35,8 @@ module.exports = {
 	moduleNameMapper: {
 		// Transform our `.~/` alias.
 		'^\\.~/(.*)$': '<rootDir>/assets/source/$1',
-		[ `(${ packagesNeedMocking })` ]: '<rootDir>/assets/source/tests/dependencies/$1',
+		[ `(${ packagesNeedMocking })` ]:
+			'<rootDir>/assets/source/tests/dependencies/$1',
 	},
 	// Exclude e2e tests from unit testing.
 	testPathIgnorePatterns: [ '/node_modules/', '/assets/js/' ],

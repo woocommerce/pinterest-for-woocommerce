@@ -1,7 +1,8 @@
 const woocommerce = require( '@woocommerce/eslint-plugin' );
 
 const jsdocTypes = woocommerce.configs.recommended.find(
-	( config ) => config.rules?.[ 'jsdoc/no-undefined-types' ]?.[ 1 ]?.definedTypes
+	( config ) =>
+		config.rules?.[ 'jsdoc/no-undefined-types' ]?.[ 1 ]?.definedTypes
 ).rules[ 'jsdoc/no-undefined-types' ][ 1 ].definedTypes;
 
 module.exports = [
@@ -39,6 +40,17 @@ module.exports = [
 					],
 				},
 			],
+		},
+	},
+	{
+		files: [
+			'gulpfile.js',
+			'webpack.config.js',
+			'jest.config.js',
+			'eslint.config.cjs',
+		],
+		languageOptions: {
+			sourceType: 'commonjs',
 		},
 	},
 ];
