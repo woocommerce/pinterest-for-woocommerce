@@ -33,6 +33,7 @@ class APIV5Test extends WP_UnitTestCase {
 			function ( $response, $parsed_args, $url ) {
 				$this->assertSame( 'https://api.pinterest.com/v5/ad_accounts/aai-1234567890/conversion_tags', $url );
 				$this->assertSame( 'POST', $parsed_args['method'] );
+				$this->assertTrue( $parsed_args['sslverify'] );
 				$this->assertSame(
 					array(
 						'name'                    => 'Some tag name 42',
@@ -106,6 +107,31 @@ class APIV5Test extends WP_UnitTestCase {
 			),
 			$output['configs']
 		);
+	}
+
+	/**
+	 * Transport errors propagate without an unverified retry.
+	 */
+	public function test_transport_error_does_not_retry_without_verification() {
+		$calls = 0;
+		add_filter(
+			'pre_http_request',
+			function ( $response, $parsed_args ) use ( &$calls ) {
+				++$calls;
+				$this->assertTrue( $parsed_args['sslverify'] );
+				return new \WP_Error( 'http_request_failed', 'Certificate verification failed.' );
+			},
+			10,
+			2
+		);
+
+		try {
+			APIV5::create_tag( 'aai-1234567890' );
+			$this->fail( 'A failed request must not return a successful response.' );
+		} catch ( PinterestApiException $e ) {
+			$this->assertSame( 'Certificate verification failed.', $e->getMessage() );
+			$this->assertSame( 1, $calls );
+		}
 	}
 
 	public function test_create_tag_returns_unexpected_error() {

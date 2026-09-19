@@ -65,6 +65,7 @@ class RefreshTokenTest extends WP_UnitTestCase {
 					$url
 				);
 				$this->assertEquals( 'pinr.refresh_token', $parsed_args['body']['refresh_token'] ?? '' );
+				$this->assertTrue( $parsed_args['sslverify'] );
 				return array(
 					'body' =>
 						json_encode(
@@ -82,7 +83,7 @@ class RefreshTokenTest extends WP_UnitTestCase {
 			3
 		);
 
-		RefreshToken::handle_refresh();
+		$this->assertTrue( RefreshToken::handle_refresh() );
 	}
 
 	/**
@@ -132,5 +133,36 @@ class RefreshTokenTest extends WP_UnitTestCase {
 		$this->assertEquals( 'pina.access_token_new', Crypto::decrypt( $token_data['access_token'] ) );
 		$this->assertEquals( 'pinr.refresh_token_new', Crypto::decrypt( $token_data['refresh_token'] ) );
 		$this->assertEquals( 'ads:read ads:write catalogs:read catalogs:write pins:read pins:write user_accounts:read user_accounts:write', $token_data['scope'] );
+	}
+
+	/**
+	 * Transport errors preserve the stored tokens without an unverified retry.
+	 */
+	public function test_transport_error_keeps_tokens_without_retrying() {
+		$token_data = array(
+			'access_token'  => Crypto::encrypt( 'local-access-token' ),
+			'refresh_token' => Crypto::encrypt( 'local-refresh-token' ),
+			'expires_in'    => DAY_IN_SECONDS,
+			'refresh_time'  => time() - DAY_IN_SECONDS,
+		);
+		Pinterest_For_Woocommerce::save_data( 'token_data', $token_data );
+
+		$calls        = 0;
+		$verification = null;
+		add_filter(
+			'pre_http_request',
+			function ( $response, $parsed_args ) use ( &$calls, &$verification ) {
+				++$calls;
+				$verification = $parsed_args['sslverify'];
+				return new \WP_Error( 'http_request_failed', 'Certificate verification failed.' );
+			},
+			10,
+			2
+		);
+
+		$this->assertFalse( RefreshToken::handle_refresh() );
+		$this->assertTrue( $verification );
+		$this->assertSame( 1, $calls );
+		$this->assertSame( $token_data, Pinterest_For_Woocommerce::get_data( 'token_data', true ) );
 	}
 }
