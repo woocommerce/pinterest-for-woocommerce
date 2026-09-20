@@ -165,4 +165,50 @@ class RefreshTokenTest extends WP_UnitTestCase {
 		$this->assertSame( 1, $calls );
 		$this->assertSame( $token_data, Pinterest_For_Woocommerce::get_data( 'token_data', true ) );
 	}
+
+	/**
+	 * An unsuccessful response leaves stored credentials available for the next refresh.
+	 *
+	 * @dataProvider unsuccessful_response_provider
+	 * @param string $body Response body.
+	 */
+	public function test_unsuccessful_response_preserves_stored_tokens( $body ) {
+		$token_data = array(
+			'access_token'  => Crypto::encrypt( 'local-access-token' ),
+			'refresh_token' => Crypto::encrypt( 'local-refresh-token' ),
+			'expires_in'    => DAY_IN_SECONDS,
+			'refresh_time'  => time() - DAY_IN_SECONDS,
+		);
+		Pinterest_For_Woocommerce::save_data( 'token_data', $token_data );
+
+		add_filter(
+			'pre_http_request',
+			static function () use ( $body ) {
+				return array(
+					'body'     => $body,
+					'response' => array(
+						'code'    => 503,
+						'message' => 'Service Unavailable',
+					),
+				);
+			}
+		);
+
+		$result = RefreshToken::handle_refresh();
+		$this->assertSame( $token_data, Pinterest_For_Woocommerce::get_data( 'token_data', true ) );
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Ordinary unsuccessful proxy responses.
+	 *
+	 * @return array
+	 */
+	public function unsuccessful_response_provider() {
+		return array(
+			'empty'       => array( '' ),
+			'maintenance' => array( '<p>Service unavailable.</p>' ),
+			'json error'  => array( '{"error":"temporarily_unavailable"}' ),
+		);
+	}
 }

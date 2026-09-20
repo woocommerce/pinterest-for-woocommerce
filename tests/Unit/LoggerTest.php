@@ -4,6 +4,8 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
 use Automattic\WooCommerce\Pinterest\API\APIV5;
 use Automattic\WooCommerce\Pinterest\Logger;
+use Automattic\WooCommerce\Pinterest\Crypto;
+use Automattic\WooCommerce\Pinterest\RefreshToken;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Pinterest_For_Woocommerce;
 use WC_Logger;
@@ -21,6 +23,9 @@ class LoggerTest extends WP_UnitTestCase {
 	/** @var array Captured messages. */
 	private $messages = array();
 
+	/** @var array Captured log sources. */
+	private $sources = array();
+
 	/**
 	 * Capture native logger calls.
 	 */
@@ -28,10 +33,12 @@ class LoggerTest extends WP_UnitTestCase {
 		parent::setUp();
 		$this->original_logger = Logger::$logger;
 		$this->messages        = array();
+		$this->sources         = array();
 		Logger::$logger        = $this->getMockBuilder( WC_Logger::class )->disableOriginalConstructor()->onlyMethods( array( 'log' ) )->getMock();
 		Logger::$logger->method( 'log' )->willReturnCallback(
-			function ( $level, $message ) {
+			function ( $level, $message, $context ) {
 				$this->messages[] = $message;
+				$this->sources[]  = $context['source'];
 			}
 		);
 		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', true );
@@ -109,6 +116,45 @@ class LoggerTest extends WP_UnitTestCase {
 		}
 		$this->assertNotEmpty( $this->messages );
 		$this->assertStringNotContainsString( 'local-secret', implode( "\n", $this->messages ) );
+	}
+
+	/**
+	 * Renewal diagnostics use the status-only logger and preserve parsed output.
+	 */
+	public function test_renewal_response_uses_status_only_diagnostics() {
+		$body = array(
+			'access_token' => 'fixture-access',
+			'expires_in'   => DAY_IN_SECONDS,
+		);
+		$http = static function () use ( $body ) {
+			return array(
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'headers'  => array( 'set-cookie' => 'fixture-session=value' ),
+				'cookies'  => array(
+					new \WP_Http_Cookie(
+						array(
+							'name'  => 'fixture',
+							'value' => 'value',
+						)
+					),
+				),
+				'body'     => wp_json_encode( $body ),
+			);
+		};
+		add_filter( 'pre_http_request', $http );
+		try {
+			$method = new \ReflectionMethod( RefreshToken::class, 'refresh_token' );
+			$method->setAccessible( true );
+			$this->assertSame( $body, $method->invoke( null, array( 'refresh_token' => Crypto::encrypt( 'fixture-refresh' ) ) ) );
+		} finally {
+			remove_filter( 'pre_http_request', $http );
+		}
+		$this->assertCount( 2, $this->messages );
+		$this->assertSame( "Response: \n\nStatus: 200 OK\n", $this->messages[1] );
+		$this->assertSame( $this->sources[0], $this->sources[1] );
 	}
 
 	/**

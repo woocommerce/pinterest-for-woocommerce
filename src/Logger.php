@@ -100,10 +100,11 @@ class Logger {
 	 *
 	 * @param array|WP_Error $response The body of the response.
 	 * @param string         $level    The default level/context of the message to be logged.
+	 * @param string|null    $feature  Used to direct logs to a separate file.
 	 *
 	 * @return void
 	 */
-	public static function log_response( $response, $level = 'debug' ) {
+	public static function log_response( $response, $level = 'debug', $feature = null ) {
 		if ( is_wp_error( $response ) ) {
 			$level = 'error';
 			$data  = $response->get_error_code() . ': ' . $response->get_error_message();
@@ -111,7 +112,7 @@ class Logger {
 			$data = 'Status: ' . wp_remote_retrieve_response_code( $response ) . ' ' . wp_remote_retrieve_response_message( $response );
 		}
 
-		self::log( 'Response: ' . "\n\n" . $data . "\n", $level );
+		self::log( 'Response: ' . "\n\n" . $data . "\n", $level, $feature );
 	}
 }
 
