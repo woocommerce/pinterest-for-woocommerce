@@ -7,6 +7,7 @@ use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\FeedGenerator;
+use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Pinterest_For_Woocommerce;
 use Automattic\WooCommerce\Pinterest\PluginUpdate;
 use Exception;
@@ -67,6 +68,7 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 	 * @return void
 	 */
 	protected function tearDown(): void {
+		LocalFeedConfigs::deregister();
 		delete_option( FeedGenerator::OPTION_FEED_DIRTY );
 		as_unschedule_all_actions( FeedGenerator::ACTION_START_FEED_GENERATOR, null, PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		parent::tearDown();
@@ -273,7 +275,9 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 	 */
 	public function testLaterUpgradeDoesNotInvalidateFeedAgain() {
 		update_option( PluginUpdate::PLUGIN_UPDATE_VERSION_OPTION, '1.5.2' );
-		$updater = $this->getMockBuilder( PluginUpdate::class )->onlyMethods( array( 'invalidate_product_feeds' ) )->getMock();
+		$updater = $this->getMockBuilder( PluginUpdate::class )->onlyMethods( array( 'invalidate_product_feeds', 'plugin_is_up_to_date' ) )->getMock();
+		// Exercise the version map even when the plugin version reaches this migration.
+		$updater->method( 'plugin_is_up_to_date' )->willReturn( false );
 		$updater->expects( $this->never() )->method( 'invalidate_product_feeds' );
 		$updater->maybe_update();
 	}
