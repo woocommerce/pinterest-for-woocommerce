@@ -23,6 +23,9 @@ class LoggerTest extends WP_UnitTestCase {
 	/** @var array Captured messages. */
 	private $messages = array();
 
+	/** @var array Captured log sources. */
+	private $sources = array();
+
 	/**
 	 * Capture native logger calls.
 	 */
@@ -30,10 +33,12 @@ class LoggerTest extends WP_UnitTestCase {
 		parent::setUp();
 		$this->original_logger = Logger::$logger;
 		$this->messages        = array();
+		$this->sources         = array();
 		Logger::$logger        = $this->getMockBuilder( WC_Logger::class )->disableOriginalConstructor()->onlyMethods( array( 'log' ) )->getMock();
 		Logger::$logger->method( 'log' )->willReturnCallback(
-			function ( $level, $message ) {
+			function ( $level, $message, $context ) {
 				$this->messages[] = $message;
+				$this->sources[]  = $context['source'];
 			}
 		);
 		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', true );
@@ -149,6 +154,7 @@ class LoggerTest extends WP_UnitTestCase {
 		}
 		$this->assertCount( 2, $this->messages );
 		$this->assertSame( "Response: \n\nStatus: 200 OK\n", $this->messages[1] );
+		$this->assertSame( $this->sources[0], $this->sources[1] );
 	}
 
 	/**
