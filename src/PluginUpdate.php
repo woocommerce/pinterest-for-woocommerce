@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Automattic\WooCommerce\Admin\Notes\NotesUnavailableException;
+use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
 use Automattic\WooCommerce\Pinterest\API\UserInteraction;
 use Automattic\WooCommerce\Pinterest\API\TokenExchangeV3ToV5;
 use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
@@ -140,7 +141,27 @@ class PluginUpdate {
 			'1.4.19' => array(
 				'disable_capi_for_all_merchants',
 			),
+			'1.5.2'  => array(
+				'invalidate_product_feeds',
+			),
 		);
+	}
+
+	/**
+	 * Regenerate existing feed output with the protected-product exclusions.
+	 *
+	 * @since 1.5.2
+	 *
+	 * @return void
+	 */
+	protected function invalidate_product_feeds(): void {
+		if ( ! ProductSync::is_product_sync_enabled() ) {
+			return;
+		}
+
+		$configurations = LocalFeedConfigs::get_instance();
+		$generator      = new FeedGenerator( new ActionSchedulerProxy(), new FeedFileOperations( $configurations ), $configurations );
+		$generator->mark_feed_dirty();
 	}
 
 	/**
