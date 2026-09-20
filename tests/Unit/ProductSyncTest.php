@@ -41,8 +41,6 @@ class ProductSyncTest extends \WP_UnitTestCase {
 
 		$this->feed_generator = $this->create_feed_generator();
 
-		// The plugin update flags the existing feed; isolate each product change below.
-		$this->feed_generator->mark_feed_clean();
 
 		$this->set_static_property( 'feed_generator', $this->feed_generator );
 		$this->set_static_property( 'flagged_product_ids', array() );

@@ -140,19 +140,20 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * A dirty feed from an upgrade should not wait for tomorrow's scheduled run.
+	 * An already-dirty feed must retain the retry chosen by error handling.
 	 *
 	 * @return void
 	 */
-	public function test_init_starts_dirty_feed_and_keeps_daily_schedule() {
+	public function test_init_preserves_dirty_feed_retry_and_daily_schedule() {
 		$hook = FeedGenerator::ACTION_START_FEED_GENERATOR;
 		as_unschedule_all_actions( $hook, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		as_schedule_recurring_action( time() + DAY_IN_SECONDS, DAY_IN_SECONDS, $hook, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		$retry = time() + HOUR_IN_SECONDS;
+		as_schedule_recurring_action( $retry, DAY_IN_SECONDS, $hook, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
 		update_option( FeedGenerator::OPTION_FEED_DIRTY, true, false );
 
 		$this->feed_generator->init();
 		$next_start = as_next_scheduled_action( $hook, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		$this->assertLessThanOrEqual( time(), $next_start );
+		$this->assertSame( $retry, $next_start );
 		$actions = as_get_scheduled_actions(
 			array(
 				'hook'   => $hook,

@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Automattic\WooCommerce\Admin\Notes\NotesUnavailableException;
+use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler as ActionSchedulerProxy;
 use Automattic\WooCommerce\Pinterest\API\UserInteraction;
 use Automattic\WooCommerce\Pinterest\API\TokenExchangeV3ToV5;
 use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
@@ -140,16 +141,27 @@ class PluginUpdate {
 			'1.4.19' => array(
 				'disable_capi_for_all_merchants',
 			),
+			'1.5.2'  => array(
+				'invalidate_product_feeds',
+			),
 		);
 	}
 
 	/**
-	 * Mark existing feed output for regeneration after a plugin update.
+	 * Regenerate existing feed output with the protected-product exclusions.
+	 *
+	 * @since 1.5.2
 	 *
 	 * @return void
 	 */
 	protected function invalidate_product_feeds(): void {
-		update_option( FeedGenerator::OPTION_FEED_DIRTY, true, false );
+		if ( ! ProductSync::is_product_sync_enabled() ) {
+			return;
+		}
+
+		$configurations = LocalFeedConfigs::get_instance();
+		$generator      = new FeedGenerator( new ActionSchedulerProxy(), new FeedFileOperations( $configurations ), $configurations );
+		$generator->mark_feed_dirty();
 	}
 
 	/**
@@ -177,9 +189,6 @@ class PluginUpdate {
 				$this->perform_plugin_update_procedure( $update_procedure );
 			}
 		}
-
-		// Feed output must be rebuilt with the updated serialization rules.
-		$this->perform_plugin_update_procedure( 'invalidate_product_feeds' );
 
 		/**
 		 * Even if the update procedure has errored we still want to
