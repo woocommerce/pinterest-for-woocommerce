@@ -41,7 +41,6 @@ class ProductSyncTest extends \WP_UnitTestCase {
 
 		$this->feed_generator = $this->create_feed_generator();
 
-
 		$this->set_static_property( 'feed_generator', $this->feed_generator );
 		$this->set_static_property( 'flagged_product_ids', array() );
 

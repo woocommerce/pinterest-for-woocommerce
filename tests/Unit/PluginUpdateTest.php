@@ -227,7 +227,13 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 			$this->plugin_update->maybe_update();
 			$this->assertTrue( (bool) get_option( FeedGenerator::OPTION_FEED_DIRTY ) );
 			$this->assertLessThanOrEqual( time(), as_next_scheduled_action( $hook, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) );
-			$actions = as_get_scheduled_actions( array( 'hook' => $hook, 'status' => 'pending', 'group' => PINTEREST_FOR_WOOCOMMERCE_PREFIX ) );
+			$actions = as_get_scheduled_actions(
+				array(
+					'hook'   => $hook,
+					'status' => 'pending',
+					'group'  => PINTEREST_FOR_WOOCOMMERCE_PREFIX,
+				)
+			);
 			$this->assertCount( 1, $actions );
 			$this->assertSame( DAY_IN_SECONDS, reset( $actions )->get_schedule()->get_recurrence() );
 
