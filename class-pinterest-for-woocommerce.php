@@ -273,6 +273,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
 			add_action( 'wp_head', array( Pinterest\RichPins::class, 'maybe_inject_rich_pins_opengraph_tags' ) );
+			add_action( 'template_redirect', array( Pinterest\RichPins::class, 'prevent_protected_product_caching' ) );
 			add_action( 'wp', array( Pinterest\SaveToPinterest::class, 'maybe_init' ) );
 
 			add_action( 'init', array( $this, 'init' ), 0 );
