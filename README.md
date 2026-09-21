@@ -259,3 +259,7 @@ The baseline records existing findings by message, rule, file and count. New
 findings and unmatched baseline entries fail the check. Run
 `composer lint:phpstan:baseline:update` only for a reviewed baseline change;
 never regenerate it to hide new findings. PHPCS and PHPCompatibility remain separate checks.
+
+### Browser regression journeys
+
+See [tests/browser/README.md](tests/browser/README.md) for isolated browser setup, merchant and checkout journeys, focused runs and fixture reset.

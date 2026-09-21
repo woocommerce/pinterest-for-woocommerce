@@ -29,12 +29,14 @@
     "lodash": "^4.18.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.0.3",
     "@typescript-eslint/parser": "^8.70.0",
     "@woocommerce/dependency-extraction-webpack-plugin": "~2.2.0",
+    "@woocommerce/e2e-utils-playwright": "0.5.1",
     "@woocommerce/eslint-plugin": "^4.0.0",
     "@wordpress/base-styles": "^3.6.0",
     "@wordpress/env": "^11.15.0",
@@ -117,8 +119,8 @@
     "i18n": "WP_CLI_PHP_ARGS='-d memory_limit=2048M' ./vendor/bin/wp i18n make-pot ./ i18n/languages/$npm_package_name.pot --slug=$npm_package_name --domain=$npm_package_name --exclude='bin,*.asset.php,assets/source/_maps,assets/setup-*,assets/catalog-sync,assets/build,tests,woo-tracking-jsdoc,index.php,gulpfile.js,jest.config.js'",
     "lint:css": "wp-scripts lint-style \"./assets/source/**/*.{css,scss}\"",
     "lint:css:fix": "wp-scripts lint-style \"./assets/source/**/*.{css,scss}\" --fix",
-    "lint:js": "wp-scripts lint-js ./assets/source",
-    "lint:js:fix": "wp-scripts lint-js ./assets/source --fix",
+    "lint:js": "wp-scripts lint-js ./assets/source ./tests/browser",
+    "lint:js:fix": "wp-scripts lint-js ./assets/source ./tests/browser --fix",
     "lint:tooling-js": "wp-scripts lint-js gulpfile.js webpack.config.js jest.config.js eslint.config.cjs",
     "lint:tooling-js-fix": "npm run lint:tooling-js -- --fix",
     "lint:php": "composer run-script phpcs ./",
@@ -130,7 +132,10 @@
     "test:php-prepare": "./bin/install-wp-tests.sh",
     "test:php-run": "composer test-unit",
     "test:php:wp-env": "wp-env run tests-cli bash /var/www/html/wp-content/plugins/pinterest-for-woocommerce/bin/phpunit-wp-env.sh",
-    "wp-env": "wp-env"
+    "wp-env": "wp-env",
+    "test:browser": "playwright test --config tests/browser/playwright.config.js",
+    "test:browser:setup": "bash tests/browser/setup.sh",
+    "test:browser:reset": "node tests/browser/reset.js"
   },
   "browserslist": [
     "last 5 versions",

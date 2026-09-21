@@ -39,7 +39,11 @@ module.exports = {
 			'<rootDir>/assets/source/tests/dependencies/$1',
 	},
 	// Exclude e2e tests from unit testing.
-	testPathIgnorePatterns: [ '/node_modules/', '/assets/js/' ],
+	testPathIgnorePatterns: [
+		'/node_modules/',
+		'/assets/js/',
+		'/tests/browser/',
+	],
 	testEnvironmentOptions: {
 		customExportConditions: [ 'node', 'node-addons' ],
 	},
