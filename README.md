@@ -163,7 +163,9 @@ To test the minimum supported versions, use a fresh test directory and a dedicat
 $ WC_VERSION=10.9.0 ./bin/install-wp-tests.sh wordpress_tests root root localhost 6.9.0
 ```
 
-`WC_VERSION` accepts a release tag; `latest` and the default `trunk` select the latest stable release. The script reuses an existing WooCommerce directory, so use a fresh `TMPDIR` and `WP_CORE_DIR` when switching versions.
+`WC_VERSION` accepts a release tag; `latest` (the default) and the legacy `trunk` alias select the latest stable release. The script reuses an existing WooCommerce directory, so use a fresh `TMPDIR` and `WP_CORE_DIR` when switching versions.
+
+The reusable unit-test workflow accepts JSON arrays in `wp_version` and `wc_version`, both defaulting to `["latest"]`. Each matrix job passes its WordPress version as the installer's fifth argument and its WooCommerce version through `WC_VERSION`, matching the local invocation above. The PHPUnit bootstrap prints the installed PHP, WordPress, and WooCommerce versions.
 
 This script installs the test dependencies into your system's temporary directory and also creates a test database.
 
