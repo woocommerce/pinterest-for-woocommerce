@@ -18,4 +18,12 @@
 			<directory>./tests/E2e</directory>
 		</testsuite>
 	</testsuites>
+	<coverage includeUncoveredFiles="true">
+		<include>
+			<directory suffix=".php">src</directory>
+			<directory suffix=".php">includes</directory>
+			<file>class-pinterest-for-woocommerce.php</file>
+			<file>pinterest-for-woocommerce.php</file>
+		</include>
+	</coverage>
 </phpunit>

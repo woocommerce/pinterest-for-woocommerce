@@ -205,6 +205,24 @@ npx wp-env stop                          # tear down when finished
 
 Anything after `--` is forwarded to `phpunit`, so PHPUnit flags such as `--filter`, `--testsuite`, and `--group` work as usual.
 
+### Saved-data regression tests
+
+`composer test-unit` runs all PHP suites. Use `composer test-unit -- --filter SavedDataTest` for historical upgrades, product-editor attribute saves and exact order conversion values in both HPOS and legacy storage. HTTP responses are local fixtures; no Pinterest account is needed. The 1.3.9 JSON fixture records its source version and stored settings; the test separately seeds the encrypted pre-v5 token. A second case covers the pre-1.0.10 single local feed ID.
+
+Create a separate database and install directory for each dependency combination:
+
+```bash
+pinterest_test_root="$(mktemp -d /tmp/pinterest-tests.XXXXXX)"
+export WP_CORE_DIR="$pinterest_test_root/wordpress"
+export WP_TESTS_DIR="$pinterest_test_root/wordpress-tests-lib"
+TMPDIR="$pinterest_test_root" WC_VERSION=10.9.0 ./bin/install-wp-tests.sh pinterest_regression_test root "$PINTEREST_TEST_DB_PASSWORD" 127.0.0.1 6.9.0
+composer test-unit -- --filter SavedDataTest
+```
+
+Use a dedicated empty test database: the WordPress bootstrap replaces its test prefix tables on each run. Test cases roll back their fixtures, so rerunning the command resets products, orders and options. To change supported WordPress or WooCommerce versions, choose the matching installer arguments and a new directory and database; the installer reuses existing downloads. Missing dependencies are reported by the bootstrap before PHPUnit runs. The existing wp-env runner accepts the same `--filter` and `--testsuite` arguments.
+
+With Xdebug installed, run `XDEBUG_MODE=coverage composer test-unit -- --coverage-html coverage/php --path-coverage` for line and branch/path coverage. PCOV supports the same HTML report without `--path-coverage` and reports lines only. Coverage includes unexecuted plugin PHP source and excludes tests and vendor code. Open `coverage/php/index.html`; a missing driver cannot produce a report.
+
 ### Running Tests
 
 The PHP suite runs on PHP 7.4, 8.3 and 8.4 in both PHP workflows. To reproduce the
