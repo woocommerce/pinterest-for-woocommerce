@@ -13,7 +13,6 @@ use Automattic\WooCommerce\Pinterest\Admin\Input\Form;
 use Automattic\WooCommerce\Pinterest\Admin\Input\FormException;
 use Automattic\WooCommerce\Pinterest\Admin\Input\InputInterface;
 use Automattic\WooCommerce\Pinterest\Admin\Input\Select;
-use Automattic\WooCommerce\Pinterest\Admin\Input\SelectWithTextInput;
 use Automattic\WooCommerce\Pinterest\Exception\InvalidValue;
 use Automattic\WooCommerce\Pinterest\Exception\ValidateInterface;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeInterface;
@@ -85,6 +84,14 @@ class AttributesForm extends Form {
 
 			$input['pinterest_wrapper_class'] = $input['pinterest_wrapper_class'] ?? '';
 
+			// Keep stored values selectable when an extension changes the available options.
+			if ( 'select' === ( $input['type'] ?? null ) && is_scalar( $input['value'] ?? null ) && is_array( $input['options'] ?? null ) ) {
+				$value = (string) $input['value'];
+				if ( '' !== $value && ! array_key_exists( $value, $input['options'] ) ) {
+					$input['options'][ $value ] = $value;
+				}
+			}
+
 			if ( ! empty( $visible_types ) ) {
 				$input['pinterest_wrapper_class'] .= ' show_if_' . join( ' show_if_', $visible_types );
 			}
@@ -121,8 +128,8 @@ class AttributesForm extends Form {
 		$value_options = apply_filters( "wc_pinterest_product_attribute_value_options_{$attribute::get_id()}", $value_options );
 
 		if ( ! empty( $value_options ) ) {
-			if ( ! $input instanceof Select && ! $input instanceof SelectWithTextInput ) {
-				$new_input = new SelectWithTextInput();
+			if ( ! $input instanceof Select ) {
+				$new_input = new Select();
 				$new_input->set_label( $input->get_label() )
 					->set_description( $input->get_description() );
 
