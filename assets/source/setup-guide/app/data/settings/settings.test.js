@@ -138,11 +138,19 @@ describe( 'settings state', () => {
 		expect( select ).not.toHaveBeenCalled();
 	} );
 
-	it( 'stores load failures under the requested settings key', () => {
+	it( 'clears previous load errors and stores new failures under the requested key', () => {
 		const request = getSettings();
 		const error = new Error( 'Load failed' );
+		let state = reducer(
+			undefined,
+			actions.setRequestingError( new Error( 'Previous failure' ), 'all' )
+		);
+		state = reducer( state, request.next().value );
+		expect( selectors.getSettingsRequestingError( state, 'all' ) ).toBe(
+			false
+		);
 		request.next();
-		const state = reducer( undefined, request.throw( error ).value );
+		state = reducer( state, request.throw( error ).value );
 		expect( selectors.getSettingsRequestingError( state, 'all' ) ).toBe(
 			error
 		);
