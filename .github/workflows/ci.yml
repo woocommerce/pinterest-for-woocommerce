@@ -24,6 +24,7 @@ jobs:
     outputs:
       php: ${{ steps.categories.outputs.php == 'true' || steps.categories.outputs.workflows == 'true' }}
       frontend: ${{ steps.categories.outputs.frontend == 'true' || steps.categories.outputs.workflows == 'true' }}
+      docs: ${{ steps.categories.outputs.docs == 'true' || steps.categories.outputs.workflows == 'true' }}
       product: ${{ steps.product.outputs.product == 'true' || steps.categories.outputs.workflows == 'true' }}
       workflows: ${{ steps.categories.outputs.workflows }}
       deps: ${{ steps.categories.outputs.deps == 'true' || steps.categories.outputs.workflows == 'true' }}
@@ -40,6 +41,7 @@ jobs:
               - 'phpstan*.neon*'
               - 'phpunit.xml*'
               - 'bin/lint-branch.sh'
+              - 'bin/phplint.sh'
               - 'bin/install-wp-tests.sh'
               - 'tests/Integration/data/**'
             frontend:
@@ -54,6 +56,10 @@ jobs:
               - '.eslintignore'
               - '.stylelint*'
               - 'stylelint.config.*'
+              - '.npmpackagejsonlintrc.json'
+            docs:
+              - '**/*.md'
+              - '.markdownlintignore'
             workflows:
               - '.github/**'
             deps:
@@ -85,6 +91,7 @@ jobs:
               - '!assets/source/tests/**'
               - '!jest.config.js'
               - '!**/*.md'
+              - '!.markdownlintignore'
               - '!docs/**'
               - '!changelog.txt'
               - '!readme.txt'
@@ -104,10 +111,13 @@ jobs:
     uses: ./.github/workflows/phpstan.yml
 
   js-css-lint:
-    name: JavaScript and CSS
+    name: JavaScript, CSS and Markdown
     needs: changes
-    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.docs == 'true' }}
     uses: ./.github/workflows/js-css-linting.yml
+    with:
+      frontend: ${{ needs.changes.outputs.frontend == 'true' }}
+      docs: ${{ needs.changes.outputs.docs == 'true' }}
 
   js-unit:
     name: JavaScript unit tests
@@ -183,7 +193,7 @@ jobs:
           "changes": true,
           "phpcs": ${{ needs.changes.outputs.php == 'true' }},
           "phpstan": ${{ needs.changes.outputs.php == 'true' }},
-          "js-css-lint": ${{ needs.changes.outputs.frontend == 'true' }},
+          "js-css-lint": ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.docs == 'true' }},
           "js-unit": ${{ needs.changes.outputs.frontend == 'true' }},
           "actionlint": ${{ needs.changes.outputs.workflows == 'true' }},
           "audit": ${{ needs.changes.outputs.deps == 'true' }},

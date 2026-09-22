@@ -132,7 +132,7 @@ Install [`composer`](https://getcomposer.org/), `git`, `svn`, and either `wget` 
 Change to the plugin root directory and type:
 
 ```bash
-$ composer install
+composer install
 ```
 
 
@@ -143,19 +143,19 @@ To run the unit tests you need WordPress, [WooCommerce](https://github.com/wooco
 Install them using the `install-wp-tests.sh` script:
 
 ```bash
-$ ./bin/install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host>
+./bin/install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host>
 ```
 
 Example:
 
 ```bash
-$ ./bin/install-wp-tests.sh wordpress_tests root root localhost
+./bin/install-wp-tests.sh wordpress_tests root root localhost
 ```
 
 To test the minimum supported versions, use a fresh test directory and a dedicated database:
 
 ```bash
-$ WC_VERSION=10.9.0 ./bin/install-wp-tests.sh wordpress_tests root root localhost 6.9.0
+WC_VERSION=10.9.0 ./bin/install-wp-tests.sh wordpress_tests root root localhost 6.9.0
 ```
 
 `WC_VERSION` accepts a release tag; `latest` (the default) and the legacy `trunk` alias select the latest stable release. The script reuses an existing WooCommerce directory, so use a fresh `TMPDIR` and `WP_CORE_DIR` when switching versions.
@@ -174,7 +174,7 @@ You can also specify the path to their directories by setting the following envi
 
 `npm run test:php:wp-env` runs the PHPUnit suite inside [`@wordpress/env`](https://www.npmjs.com/package/@wordpress/env)'s `tests-cli` container. Compared to `./bin/install-wp-tests.sh`, this path needs no host MySQL or `svn`, and wp-env scopes its containers by working-directory hash so concurrent runs from separate worktrees stay isolated.
 
-#### Prerequisites
+#### wp-env prerequisites
 
 -   Docker (Docker Desktop on macOS/Windows is enough).
 -   A local development checkout of WooCommerce. The plugin's `tests/bootstrap.php` requires WooCommerce's `tests/legacy/bootstrap.php`, which ships only in the WooCommerce source repo — not in the WordPress.org zip the base `.wp-env.json` downloads.
@@ -233,16 +233,13 @@ your local `.wp-env.override.json` before starting the environment.
 Change to the plugin root directory and type:
 
 ```bash
-$ vendor/bin/phpunit
+vendor/bin/phpunit
 ```
 
 The tests will execute, and you'll be presented with a summary.
 
-<p align="center">
-	<br/><br/>
-	Made with 💜 by <a href="https://woocommerce.com/">WooCommerce</a>.<br/>
-	<a href="https://woocommerce.com/careers/">We're hiring</a>! Come work with us!
-</p>
+Made with 💜 by [WooCommerce](https://woocommerce.com/).
+[We're hiring](https://woocommerce.com/careers/)! Come work with us!
 
 ### PHPStan
 

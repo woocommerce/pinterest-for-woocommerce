@@ -29,6 +29,9 @@ jobs:
           composer --version
           vendor/bin/phpcs-changed --version
 
+      - name: Check PHP syntax
+        run: composer lint:php
+
       - name: Run PHPCS
         env:
           BASE_REF: ${{ github.event.pull_request.base.sha }}

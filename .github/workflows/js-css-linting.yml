@@ -13,6 +13,15 @@ on:
       - "**.scss"
       - .github/workflows/js-css-linting.yml
   workflow_call:
+    inputs:
+      frontend:
+        description: Run the JavaScript, CSS and package checks.
+        type: boolean
+        default: true
+      docs:
+        description: Run the Markdown check.
+        type: boolean
+        default: true
 
 env:
   FORCE_COLOR: 2
@@ -34,14 +43,26 @@ jobs:
       - name: Prepare annotation formatter
         uses: woocommerce/grow/eslint-annotation@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1
 
+      # Push runs have no inputs, so they run every check.
       - name: Lint JavaScript and annotate linting errors
+        if: ${{ github.event_name == 'push' || inputs.frontend }}
         run: npm run lint:js -- --format ./eslintFormatter.cjs
 
       - name: Lint authored build and test configuration
+        if: ${{ !cancelled() && (github.event_name == 'push' || inputs.frontend) }}
         run: npm run lint:tooling-js -- --format ./eslintFormatter.cjs
+
+      - name: Check package metadata
+        if: ${{ !cancelled() && (github.event_name == 'push' || inputs.frontend) }}
+        run: npm run lint:pkg-json
+
+      - name: Check Markdown documentation
+        if: ${{ !cancelled() && (github.event_name == 'push' || inputs.docs) }}
+        run: npm run lint:md:docs
 
   CSSLintingCheck:
     name: Lint CSS
+    if: ${{ github.event_name == 'push' || inputs.frontend }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
