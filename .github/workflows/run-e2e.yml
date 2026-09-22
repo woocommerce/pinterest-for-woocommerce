@@ -1,10 +1,6 @@
 name: Run E2E Tests
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches:
-      - develop
   workflow_call:
 
 permissions:
@@ -12,8 +8,6 @@ permissions:
 
 jobs:
   e2e-tests:
-    # Every revision of a ready-for-review PR runs the full suite.
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30

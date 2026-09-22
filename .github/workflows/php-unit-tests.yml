@@ -11,17 +11,7 @@ on:
       - composer.lock
       - .github/workflows/php-unit-tests.yml
       - bin/install-wp-tests.sh
-  pull_request:
-    paths:
-      - "**.php"
-      - composer.json
-      - composer.lock
-      - .github/workflows/php-unit-tests.yml
-      - bin/install-wp-tests.sh
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 jobs:
   UnitTests:

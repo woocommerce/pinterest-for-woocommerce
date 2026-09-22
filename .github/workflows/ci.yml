@@ -1,0 +1,175 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  # Detect which kinds of files changed so each check runs only when its
+  # inputs change. A workflow change counts as every kind of change, so CI
+  # edits exercise the whole pipeline.
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: read
+    outputs:
+      php: ${{ steps.categories.outputs.php == 'true' || steps.categories.outputs.workflows == 'true' }}
+      frontend: ${{ steps.categories.outputs.frontend == 'true' || steps.categories.outputs.workflows == 'true' }}
+      product: ${{ steps.product.outputs.product == 'true' || steps.categories.outputs.workflows == 'true' }}
+    steps:
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: categories
+        with:
+          filters: |
+            php:
+              - '**/*.php'
+              - 'composer.json'
+              - 'composer.lock'
+              - 'phpcs*.xml*'
+              - 'phpstan*.neon*'
+              - 'phpunit.xml*'
+              - 'bin/lint-branch.sh'
+              - 'bin/install-wp-tests.sh'
+              - 'tests/Integration/data/**'
+            frontend:
+              - '**/*.{js,jsx,ts,tsx,mjs,cjs,scss,css}'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.nvmrc'
+              - '.npmrc'
+              - '.editorconfig'
+              - 'eslint.config.*'
+              - '.eslintrc*'
+              - '.eslintignore'
+              - '.stylelint*'
+              - 'stylelint.config.*'
+            workflows:
+              - '.github/**'
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: product
+        with:
+          # A file must satisfy EVERY pattern below to count as a product
+          # change. Without this the action ORs them ('some', the default),
+          # so '**' matches on its own and every '!' negation is dead code.
+          predicate-quantifier: 'every'
+          filters: |
+            product:
+              # Anything that can affect the build or browser behavior:
+              # everything except unit tests, docs, and tooling config.
+              - '**'
+              - '!tests/Unit/**'
+              - '!tests/Integration/**'
+              - '!tests/E2e/**'
+              - '!tests/Helpers/**'
+              - '!tests/bootstrap.php'
+              - '!phpunit.xml*'
+              - '!bin/install-wp-tests.sh'
+              - '!bin/phpunit-wp-env.sh'
+              - '!assets/source/**/*.test.js'
+              - '!assets/source/tests/**'
+              - '!jest.config.js'
+              - '!**/*.md'
+              - '!docs/**'
+              - '!changelog.txt'
+              - '!readme.txt'
+              - '!.editorconfig'
+              - '!.coderabbit.yaml'
+
+  phpcs:
+    name: PHP coding standards
+    needs: changes
+    if: ${{ needs.changes.outputs.php == 'true' }}
+    uses: ./.github/workflows/php-cs-on-changes.yml
+
+  phpstan:
+    name: PHPStan
+    needs: changes
+    if: ${{ needs.changes.outputs.php == 'true' }}
+    uses: ./.github/workflows/phpstan.yml
+
+  js-css-lint:
+    name: JavaScript and CSS
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    uses: ./.github/workflows/js-css-linting.yml
+
+  js-unit:
+    name: JavaScript unit tests
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    uses: ./.github/workflows/js-unit-tests.yml
+
+  # The jobs below run only for ready-for-review PRs.
+
+  php-unit:
+    name: PHP unit tests
+    needs: changes
+    if: ${{ github.event.pull_request.draft == false && needs.changes.outputs.php == 'true' }}
+    uses: ./.github/workflows/php-unit-tests.yml
+
+  production-zip:
+    name: Production package
+    needs: changes
+    if: ${{ github.event.pull_request.draft == false && needs.changes.outputs.product == 'true' }}
+    uses: ./.github/workflows/production-zip.yml
+
+  e2e:
+    name: E2E
+    needs: changes
+    if: ${{ github.event.pull_request.draft == false && needs.changes.outputs.product == 'true' }}
+    uses: ./.github/workflows/run-e2e.yml
+
+  # The single status that branch protection requires. It fails when any
+  # applicable check failed, was cancelled, is missing or was skipped
+  # unexpectedly, and always fails on drafts so a draft-era result can never
+  # satisfy branch protection once the PR is ready for review.
+  required:
+    name: Required checks
+    if: ${{ always() }}
+    needs: [changes, phpcs, phpstan, js-css-lint, js-unit, php-unit, production-zip, e2e]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    env:
+      CI_DRAFT: ${{ github.event.pull_request.draft }}
+      CI_RESULTS: ${{ toJSON(needs) }}
+      CI_EXPECTED: >-
+        {
+          "changes": true,
+          "phpcs": ${{ needs.changes.outputs.php == 'true' }},
+          "phpstan": ${{ needs.changes.outputs.php == 'true' }},
+          "js-css-lint": ${{ needs.changes.outputs.frontend == 'true' }},
+          "js-unit": ${{ needs.changes.outputs.frontend == 'true' }},
+          "php-unit": ${{ github.event.pull_request.draft == false && needs.changes.outputs.php == 'true' }},
+          "production-zip": ${{ github.event.pull_request.draft == false && needs.changes.outputs.product == 'true' }},
+          "e2e": ${{ github.event.pull_request.draft == false && needs.changes.outputs.product == 'true' }}
+        }
+    steps:
+      - name: Check required results
+        run: |
+          node <<'NODE'
+          const results = JSON.parse(process.env.CI_RESULTS);
+          const expected = JSON.parse(process.env.CI_EXPECTED);
+          let failed = false;
+          for (const job of new Set([...Object.keys(expected), ...Object.keys(results)])) {
+            const result = results[job]?.result;
+            const passed = Object.hasOwn(expected, job) &&
+              (result === 'success' || (result === 'skipped' && expected[job] === false));
+            console.log(`${job}: ${result || 'missing'}${passed ? '' : ' (required check failed)'}`);
+            failed ||= !passed;
+          }
+          if (process.env.CI_DRAFT === 'true') {
+            console.log('::error::Draft PR: PHP unit tests, the production package and E2E tests run once the PR is ready for review.');
+            failed = true;
+          }
+          process.exitCode = failed ? 1 : 0;
+          NODE

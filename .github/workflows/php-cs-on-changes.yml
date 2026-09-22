@@ -1,18 +1,7 @@
 name: PHP Coding Standards - PR Changed Files
 
 on:
-  pull_request:
-    paths:
-      - "**.php"
-      - .github/workflows/php-cs-on-changes.yml
-      - bin/lint-branch.sh
-      - composer.json
-      - composer.lock
-      - phpcs.xml
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 jobs:
   test:

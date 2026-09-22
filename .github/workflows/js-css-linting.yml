@@ -12,18 +12,7 @@ on:
       - package-lock.json
       - "**.scss"
       - .github/workflows/js-css-linting.yml
-  pull_request:
-    paths:
-      - "**.js"
-      - "**.cjs"
-      - package.json
-      - package-lock.json
-      - "**.scss"
-      - .github/workflows/js-css-linting.yml
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 env:
   FORCE_COLOR: 2

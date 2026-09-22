@@ -10,16 +10,7 @@ on:
       - package.json
       - package-lock.json
       - .github/workflows/js-unit-tests.yml
-  pull_request:
-    paths:
-      - "**.js"
-      - package.json
-      - package-lock.json
-      - .github/workflows/js-unit-tests.yml
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 jobs:
   UnitTests:
