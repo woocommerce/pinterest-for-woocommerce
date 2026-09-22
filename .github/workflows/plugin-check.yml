@@ -1,0 +1,93 @@
+name: 'WordPress Plugin Checks'
+on:
+  push:
+    branches:
+    - trunk
+    - develop
+
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - name: Checkout
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+    # The plugin cannot load its classes without the production Composer
+    # dependencies it ships with, so runtime checks would miss its code.
+    - name: Setup PHP
+      uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # v2.37.1
+      with:
+        php-version: '7.4'
+        coverage: none
+        tools: composer
+
+    - name: Install production Composer dependencies
+      run: composer install --no-dev --prefer-dist --no-progress --no-interaction
+
+    - name: Run plugin check
+      uses: wordpress/plugin-check-action@10857da14b6c2246d15402b3e69f777edcf8c12e # v1.1.9
+      with:
+        # Keep results in annotations and artifacts.
+        repo-token: ''
+        # Enforce warnings; ignore only reviewed codes below.
+        ignore-warnings: false
+        strict: true
+
+        # Development-only directories; none of them ship in the plugin ZIP.
+        exclude-directories: |
+          .github
+          node_modules
+          vendor
+          tests
+          bin
+          docs
+          wordpress_org_assets
+
+        # Development configuration and documentation.
+        exclude-files: |
+          .coderabbit.yaml
+          .editorconfig
+          .git
+          .gitignore
+          .markdownlintignore
+          .npmpackagejsonlintrc.json
+          .npmrc
+          .nvmrc
+          .phplint.yml
+          .stylelintignore
+          .wp-env.json
+          eslint.config.cjs
+          gulpfile.js
+          jest.config.js
+          webpack.config.js
+          project-folders.json
+          phpcs.xml
+          phpunit.xml.dist
+          phpstan.neon.dist
+          phpstan-baseline.neon
+          AGENTS.md
+          CLAUDE.md
+          TRACKING.md
+
+        # Existing metadata, public hook names and reviewed legacy debt.
+        # Changing the plugin name, slug or hook names would break existing
+        # sites and integrations.
+        # These codes also suppress future occurrences; review before extending.
+        ignore-codes: |
+          PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound
+          PluginCheck.CodeAnalysis.Heredoc.NotAllowed
+          WordPress.DB.DirectDatabaseQuery.DirectQuery
+          WordPress.DB.DirectDatabaseQuery.NoCaching
+          WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+          WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+          WordPress.Security.EscapeOutput.ExceptionNotEscaped
+          WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+          WordPress.WP.AlternativeFunctions.parse_url_parse_url
+          WordPress.WP.AlternativeFunctions.rename_rename
+          trademarked_term

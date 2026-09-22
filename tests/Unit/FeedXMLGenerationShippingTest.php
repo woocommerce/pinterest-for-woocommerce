@@ -388,7 +388,7 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 
 	/**
 	 * No duplicate locations.
-	 * The continent NA location includes 'US' so we test if we don't end up with two US entires.
+	 * The continent NA location includes 'US' so we test if we don't end up with two US entries.
 	 *
 	 * @group feed
 	 * @group shipping

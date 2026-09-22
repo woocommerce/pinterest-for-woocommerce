@@ -7,6 +7,7 @@ For PHP work, also read `.github/instructions/php.instructions.md`.
 ## Project Overview
 
 Pinterest for WooCommerce is an official WordPress plugin that integrates WooCommerce stores with Pinterest. It enables:
+
 - Product catalog sync to Pinterest
 - Pinterest Save Button for products
 - Rich Pins support
@@ -18,15 +19,17 @@ Pinterest for WooCommerce is an official WordPress plugin that integrates WooCom
 ## Technology Stack
 
 ### Backend
+
 - **Supported versions:** read the PHP, WordPress, and WooCommerce requirements and tested versions from `pinterest-for-woocommerce.php`. Check `composer.json` for the PHP dependency constraint and platform version.
 - **Architecture:** PSR-4 autoloading for modern code, WordPress conventions for legacy code
 - **Dependencies:**
-  - `automattic/jetpack-autoloader` - Version resolution for shared dependencies
-  - `woocommerce/action-scheduler-job-framework` - Background job processing
-  - `defuse/php-encryption` - Secure data encryption
-  - `woocommerce/grow` - Shared utilities and compatibility checker
+    - `automattic/jetpack-autoloader` - Version resolution for shared dependencies
+    - `woocommerce/action-scheduler-job-framework` - Background job processing
+    - `defuse/php-encryption` - Secure data encryption
+    - `woocommerce/grow` - Shared utilities and compatibility checker
 
 ### Frontend
+
 - **JavaScript:** React-based admin interface
 - **Build System:** @wordpress/scripts with webpack
 - **UI Framework:** @woocommerce/components, @wordpress/components
@@ -35,11 +38,12 @@ Pinterest for WooCommerce is an official WordPress plugin that integrates WooCom
 - **npm:** 11
 
 ### Development Environment
+
 - **Build Tools:** Gulp (legacy), webpack (modern)
 
 ## Directory Structure
 
-```
+```text
 pinterest-for-woocommerce/
 ├── src/                    # Modern PHP code (PSR-4: Automattic\WooCommerce\Pinterest\)
 │   ├── Admin/             # Admin interface classes
@@ -101,6 +105,7 @@ npm run build:zip
 ### Code Quality Commands
 
 #### PHP Linting
+
 ```bash
 # Run phpcs on all PHP files
 composer phpcs
@@ -123,6 +128,7 @@ composer lint-branch
 ```
 
 #### JavaScript Linting
+
 ```bash
 # Lint JavaScript files
 npm run lint:js
@@ -132,6 +138,7 @@ npm run lint:js:fix
 ```
 
 #### CSS Linting
+
 ```bash
 # Lint CSS/SCSS files
 npm run lint:css
@@ -155,6 +162,7 @@ composer test-unit
 ```
 
 #### JavaScript Tests
+
 ```bash
 # Run JavaScript unit tests
 npm run test:js
@@ -177,6 +185,7 @@ npm run i18n
 This project follows **WooCommerce-Core** coding standards, which extend WordPress coding standards.
 
 **Key Rules:**
+
 - PSR-4 naming in `src/` directory (e.g., `class ProductSync` in file `ProductSync.php`)
 - WordPress naming conventions in `includes/` directory (e.g., `class-pinterest-for-woocommerce-admin.php`)
 - Text domain MUST be `pinterest-for-woocommerce`
@@ -255,6 +264,7 @@ public static function update_or_create_merchant( $merchant_id, $args ) {
 ```
 
 **Key style elements shown:**
+
 - Spaces inside parentheses and array brackets
 - Tab indentation (shown as spaces in this example, but use actual tabs)
 - Array alignment for readability
@@ -293,6 +303,7 @@ git worktree remove "$worktree_path"
 ### Commit Practices
 
 Follow these commit guidelines:
+
 - **Concise, one-line commit messages** preferred
 - **Incremental commits** - break changes into logical, self-contained commits
 - **Present tense, imperative mood** (e.g., "Add feature" not "Added feature")
@@ -301,7 +312,8 @@ Follow these commit guidelines:
 - Report failed, skipped, and untested checks accurately.
 
 **Good commit message examples:**
-```
+
+```text
 Add Pinterest catalog sync retry logic
 Fix product attribute mapping for variations
 Update API error handling for rate limits
@@ -311,6 +323,7 @@ Refactor admin settings validation
 ### Pull Requests
 
 When creating PRs:
+
 - Target the `develop` branch
 - Follow `.github/PULL_REQUEST_TEMPLATE.md`; it has no auto-assign-milestone checkbox.
 - Start the description with `Closes PIN4WOO-<n>` and include test instructions.
@@ -322,7 +335,7 @@ When creating PRs:
 ### CRITICAL - NEVER Do These Things
 
 | Pitfall | Why |
-|---------|-----|
+| --------- | ----- |
 | Edit WordPress core files | Only modify plugin code |
 | Edit WooCommerce plugin files | Only modify this plugin's code |
 | Commit PHP changes without running `vendor/bin/phpcs` | Check the changed code |
@@ -336,7 +349,7 @@ When creating PRs:
 ### CRITICAL - ALWAYS Do These Things
 
 | Best Practice | Why |
-|--------------|-----|
+| -------------- | ----- |
 | Follow WooCommerce coding standards | Enforced by phpcs |
 | Use text domain `pinterest-for-woocommerce` | Required for translations |
 | Branch from `develop`, not main/master | Main development branch |
@@ -351,6 +364,7 @@ When creating PRs:
 ### Common Mistakes
 
 **1. Wrong namespace in `src/` files:**
+
 ```php
 // ❌ WRONG
 namespace Pinterest\Product;
@@ -360,6 +374,7 @@ namespace Automattic\WooCommerce\Pinterest\Product;
 ```
 
 **2. Wrong text domain:**
+
 ```php
 // ❌ WRONG
 __( 'Hello', 'pinterest' )
@@ -369,6 +384,7 @@ __( 'Hello', 'pinterest-for-woocommerce' )
 ```
 
 **3. Wrong file naming in `src/`:**
+
 ```php
 // ❌ WRONG - WordPress style in PSR-4 directory
 // File: class-product-sync.php
@@ -380,6 +396,7 @@ class ProductSync {}
 ```
 
 **4. Editing compiled files:**
+
 ```bash
 # ❌ WRONG - editing compiled output
 vim assets/build/index.js
@@ -410,25 +427,28 @@ Read platform requirements from the plugin header and use `nvm use` with `.nvmrc
 - Node 24/npm 11, webpack, and Gulp form the build toolchain. `legacy-peer-deps` preserves the previous npm 6 peer dependency selection; runtime WordPress and React requirements remain unchanged.
 - PSR-4 code in `src/` coexists with WordPress-style classes in `includes/`.
 - The PR template collects changelog text. This repo has no Changelogger command or `changelog/` change files; do not import that workflow from other extensions.
-- Feature PRs target `develop`, but `.github/workflows/prepare-release.yml` configures `trunk` as its main branch and `ci-merge.yml` targets `trunk`. Reconcile release automation separately; those settings do not change the approved feature base.
+- Feature PRs target `develop`, but `.github/workflows/prepare-release.yml` configures `trunk` as its main branch. Reconcile release automation separately; that setting does not change the approved feature base.
 
 ## Testing Strategy
 
 ### What to Test
 
 **Unit Tests (PHPUnit):**
+
 - Business logic in `src/` classes
 - API integration methods
 - Data transformation and validation
 - Utility functions
 
 **Integration Tests (PHPUnit):**
+
 - WordPress/WooCommerce API interactions
 - Database operations
 - Plugin activation/deactivation
 - Settings and option handling
 
 **JavaScript Tests (Jest):**
+
 - React component rendering
 - State management logic
 - API data transformations
@@ -437,7 +457,8 @@ Read platform requirements from the plugin header and use `nvm use` with `.nvmrc
 ### Test Coverage Expectations
 
 Aim for high coverage of business logic. Test files should mirror the structure of source files:
-```
+
+```text
 src/Product/ProductSync.php → tests/Unit/Product/ProductSyncTest.php
 ```
 
@@ -446,6 +467,7 @@ src/Product/ProductSync.php → tests/Unit/Product/ProductSyncTest.php
 ### Pinterest API
 
 The plugin integrates with Pinterest Marketing API v5. Key concepts:
+
 - **Merchant ID:** Unique identifier for the merchant's Pinterest account
 - **Catalog ID:** ID of the product catalog synced to Pinterest
 - **Feed ID:** ID of the product feed within a catalog
@@ -454,6 +476,7 @@ The plugin integrates with Pinterest Marketing API v5. Key concepts:
 ### WordPress/WooCommerce Hooks
 
 The plugin uses standard WordPress/WooCommerce hooks:
+
 - `woocommerce_init` - Initialize plugin features
 - `woocommerce_product_object_updated_props` - Detect product changes
 - `woocommerce_update_product` - Trigger product sync
@@ -474,7 +497,9 @@ The plugin uses standard WordPress/WooCommerce hooks:
 Keep API credentials encrypted with `defuse/php-encryption`. Apply the shared security and defensive-coding safeguards below to all entry points.
 
 ### Confidentiality
+
 This is a **public open-source repository**. NEVER commit:
+
 - API keys, tokens, or credentials
 - Customer data or PII
 - Internal company information
@@ -486,6 +511,7 @@ Use `.gitignore` properly and audit commits before pushing.
 ## Debugging
 
 ### Enable Debug Mode
+
 ```php
 // In wp-config.php
 define( 'WP_DEBUG', true );
@@ -494,6 +520,7 @@ define( 'WP_DEBUG_DISPLAY', false );
 ```
 
 ### Useful Debug Functions
+
 ```php
 // Log to debug.log
 error_log( print_r( $variable, true ) );
@@ -505,11 +532,13 @@ wc_get_logger()->debug( 'Message', [ 'source' => 'pinterest-for-woocommerce' ] )
 ### Common Debug Scenarios
 
 **Product not syncing:**
+
 1. Check Action Scheduler admin page: WooCommerce → Status → Scheduled Actions
 2. Search for actions with group `pinterest-for-woocommerce`
 3. Check for failed actions and error logs
 
 **API errors:**
+
 1. Check `wp-content/debug.log` for API response errors
 2. Verify credentials in plugin settings
 3. Check Pinterest API status page
@@ -517,6 +546,7 @@ wc_get_logger()->debug( 'Message', [ 'source' => 'pinterest-for-woocommerce' ] )
 ## Browser Support
 
 Per WordPress Core Handbook, we support:
+
 - Last 2 versions of Chrome, Firefox, Safari, Edge, Opera
 - Last 1 version of ChromeAndroid, Android browser
 - Last 2 versions of iOS Safari
@@ -527,12 +557,14 @@ Per WordPress Core Handbook, we support:
 ## Resources
 
 ### Documentation
+
 - [Pinterest Marketing API Docs](https://developers.pinterest.com/docs/api/v5/)
 - [WooCommerce Developer Docs](https://woocommerce.com/documentation/plugins/woocommerce/)
 - [WordPress Developer Handbook](https://developer.wordpress.org/)
 - [Action Scheduler](https://actionscheduler.org/)
 
 ### Internal Files
+
 - `README.md` - General development info and setup instructions
 - `composer.json` - PHP dependencies and scripts
 - `package.json` - JavaScript dependencies and scripts
@@ -542,6 +574,7 @@ Per WordPress Core Handbook, we support:
 ## Getting Help
 
 ### This is a Public Repository
+
 - **Issue tracker:** For bug reports and feature requests (not support)
 - **Code of conduct:** Follow WordPress and WooCommerce community guidelines
 - **Contributing:** Follow the development workflow outlined in this document

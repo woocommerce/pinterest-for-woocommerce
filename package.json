@@ -1,13 +1,35 @@
 {
   "name": "pinterest-for-woocommerce",
   "title": "Pinterest for WooCommerce",
-  "description": "Pinterest for WooCommerce",
   "version": "1.5.1",
-  "main": "gulpfile.js",
+  "description": "Pinterest for WooCommerce",
+  "author": "WooCommerce",
+  "license": "GPL-3.0-or-later",
+  "keywords": [
+    "pinterest for wordpress",
+    "pinterest for woocommerce",
+    "wordpress",
+    "wordpress plugin",
+    "woocommerce",
+    "woocommerce integration",
+    "pinterest",
+    "pinterest integration",
+    "wordpress pinterest integration",
+    "woocommerce pinterest integration"
+  ],
+  "homepage": "https://woocommerce.com/products/pinterest-for-woocommerce/",
   "repository": {
     "type": "git",
     "url": "git@github.com:woocommerce/pinterest-for-woocommerce.git"
   },
+  "bugs": {
+    "url": "https://github.com/woocommerce/pinterest-for-woocommerce/issues"
+  },
+  "engines": {
+    "node": ">=24.15.0 <25",
+    "npm": ">=11 <12"
+  },
+  "main": "gulpfile.js",
   "dependencies": {
     "@woocommerce/components": "^5.1.2",
     "@woocommerce/data": "^1.1.1",
@@ -79,6 +101,40 @@
     "typescript": "^5.9.3",
     "underscore": "^1.9.1"
   },
+  "scripts": {
+    "prebuild": "composer install",
+    "build": "wp-scripts build && gulp build && npm run i18n",
+    "build:zip": "npm run build && composer install --no-dev -n && gulp zip",
+    "postbuild:zip": "composer install && npm run _remove-root-md",
+    "_remove-root-md": "zipinfo -1 pinterest-for-woocommerce.zip | grep -E '^pinterest-for-woocommerce/[^/]+\\.md$' | xargs zip -d pinterest-for-woocommerce.zip || true",
+    "dev": "wp-scripts build && gulp build",
+    "format:js": "wp-scripts format ./assets/source",
+    "i18n": "WP_CLI_PHP_ARGS='-d memory_limit=2048M' ./vendor/bin/wp i18n make-pot ./ i18n/languages/$npm_package_name.pot --slug=$npm_package_name --domain=$npm_package_name --exclude='bin,*.asset.php,assets/source/_maps,assets/setup-*,assets/catalog-sync,assets/build,tests,woo-tracking-jsdoc,index.php,gulpfile.js,jest.config.js'",
+    "lint:css": "wp-scripts lint-style \"./assets/source/**/*.{css,scss}\"",
+    "lint:css:fix": "wp-scripts lint-style \"./assets/source/**/*.{css,scss}\" --fix",
+    "lint:js": "wp-scripts lint-js ./assets/source ./tests/browser",
+    "lint:js:fix": "wp-scripts lint-js ./assets/source ./tests/browser --fix",
+    "lint:tooling-js": "wp-scripts lint-js gulpfile.js webpack.config.js jest.config.js eslint.config.cjs",
+    "lint:tooling-js-fix": "npm run lint:tooling-js -- --fix",
+    "lint:md:docs": "wp-scripts lint-md-docs",
+    "lint:pkg-json": "wp-scripts lint-pkg-json",
+    "lint:composer": "composer validate --no-check-all --no-check-publish",
+    "lint:php": "composer run-script phpcs ./",
+    "lint:php:fix": "composer run-script phpcbf",
+    "start": "wp-scripts start",
+    "test:js": "wp-scripts test-unit-js --coverage",
+    "test:js:watch": "npm run test:js -- --watch",
+    "test:php": "npm run test:php-prepare -- wordpress_test root root localhost && npm run test:php-run",
+    "test:php-prepare": "./bin/install-wp-tests.sh",
+    "test:php-run": "composer test-unit",
+    "test:php:wp-env": "wp-env run tests-cli bash /var/www/html/wp-content/plugins/pinterest-for-woocommerce/bin/phpunit-wp-env.sh",
+    "wp-env": "wp-env",
+    "test:browser": "playwright test --config tests/browser/playwright.config.js",
+    "test:browser:setup": "bash tests/browser/setup.sh",
+    "test:browser:reset": "node tests/browser/reset.js",
+    "audit:npm": "npm audit --package-lock-only --audit-level=high --include=dev",
+    "audit:composer": "composer audit --locked --no-plugins --no-scripts --abandoned=report --ignore-severity=low --ignore-severity=medium"
+  },
   "stylelint": {
     "extends": [
       "@wordpress/stylelint-config/scss"
@@ -108,59 +164,12 @@
       ]
     }
   },
-  "scripts": {
-    "prebuild": "composer install",
-    "build": "wp-scripts build && gulp build && npm run i18n",
-    "build:zip": "npm run build && composer install --no-dev -n && gulp zip",
-    "postbuild:zip": "composer install && npm run _remove-root-md",
-    "_remove-root-md": "zipinfo -1 pinterest-for-woocommerce.zip | grep -E '^pinterest-for-woocommerce/[^/]+\\.md$' | xargs zip -d pinterest-for-woocommerce.zip || true",
-    "dev": "wp-scripts build && gulp build",
-    "format:js": "wp-scripts format ./assets/source",
-    "i18n": "WP_CLI_PHP_ARGS='-d memory_limit=2048M' ./vendor/bin/wp i18n make-pot ./ i18n/languages/$npm_package_name.pot --slug=$npm_package_name --domain=$npm_package_name --exclude='bin,*.asset.php,assets/source/_maps,assets/setup-*,assets/catalog-sync,assets/build,tests,woo-tracking-jsdoc,index.php,gulpfile.js,jest.config.js'",
-    "lint:css": "wp-scripts lint-style \"./assets/source/**/*.{css,scss}\"",
-    "lint:css:fix": "wp-scripts lint-style \"./assets/source/**/*.{css,scss}\" --fix",
-    "lint:js": "wp-scripts lint-js ./assets/source ./tests/browser",
-    "lint:js:fix": "wp-scripts lint-js ./assets/source ./tests/browser --fix",
-    "lint:tooling-js": "wp-scripts lint-js gulpfile.js webpack.config.js jest.config.js eslint.config.cjs",
-    "lint:tooling-js-fix": "npm run lint:tooling-js -- --fix",
-    "lint:php": "composer run-script phpcs ./",
-    "lint:php:fix": "composer run-script phpcbf",
-    "start": "wp-scripts start",
-    "test:js": "wp-scripts test-unit-js --coverage",
-    "test:js:watch": "npm run test:js -- --watch",
-    "test:php": "npm run test:php-prepare -- wordpress_test root root localhost && npm run test:php-run",
-    "test:php-prepare": "./bin/install-wp-tests.sh",
-    "test:php-run": "composer test-unit",
-    "test:php:wp-env": "wp-env run tests-cli bash /var/www/html/wp-content/plugins/pinterest-for-woocommerce/bin/phpunit-wp-env.sh",
-    "wp-env": "wp-env",
-    "test:browser": "playwright test --config tests/browser/playwright.config.js",
-    "test:browser:setup": "bash tests/browser/setup.sh",
-    "test:browser:reset": "node tests/browser/reset.js"
-  },
   "browserslist": [
     "last 5 versions",
     "> 1%",
     "maintained node versions",
     "not dead"
   ],
-  "keywords": [
-    "pinterest for wordpress",
-    "pinterest for woocommerce",
-    "wordpress",
-    "wordpress plugin",
-    "woocommerce",
-    "woocommerce integration",
-    "pinterest",
-    "pinterest integration",
-    "wordpress pinterest integration",
-    "woocommerce pinterest integration"
-  ],
-  "author": "WooCommerce",
-  "license": "GPL-3.0-or-later",
-  "engines": {
-    "node": ">=24.15.0 <25",
-    "npm": ">=11 <12"
-  },
   "config": {
     "build_step": "npm install && npm run build:zip",
     "wp_org_slug": "pinterest-for-woocommerce",

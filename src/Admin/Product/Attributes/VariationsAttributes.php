@@ -30,7 +30,7 @@ class VariationsAttributes {
 	protected $admin;
 
 	/**
-	 * Attibute Manager.
+	 * Attribute Manager.
 	 *
 	 * @var AttributeManager
 	 */

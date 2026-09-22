@@ -1,18 +1,7 @@
 name: PHP Coding Standards - PR Changed Files
 
 on:
-  pull_request:
-    paths:
-      - "**.php"
-      - .github/workflows/php-cs-on-changes.yml
-      - bin/lint-branch.sh
-      - composer.json
-      - composer.lock
-      - phpcs.xml
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 jobs:
   test:
@@ -33,12 +22,22 @@ jobs:
         uses: woocommerce/grow/prepare-php@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           php-version: ${{ matrix.php }}
+          install-deps: 'no'
+
+      - name: Validate Composer manifest and lockfile
+        run: npm run lint:composer
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction
 
       - name: Tool versions
         run: |
           php --version
           composer --version
           vendor/bin/phpcs-changed --version
+
+      - name: Check PHP syntax
+        run: composer lint:php
 
       - name: Run PHPCS
         env:

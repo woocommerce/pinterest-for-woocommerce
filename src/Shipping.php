@@ -126,7 +126,7 @@ class Shipping {
 	 *
 	 * @since 1.0.5
 	 *
-	 * @param bool                      $is_available    Wether this shipping method should be available.
+	 * @param bool                      $is_available    Whether this shipping method should be available.
 	 * @param array                     $package         Shipping package.
 	 * @param WC_Shipping_Free_Shipping $shipping_method Shipping method.
 	 * @return boolean

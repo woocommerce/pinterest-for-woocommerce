@@ -109,10 +109,10 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		// Dummy SKU from WC_Helper_Product
 		$this->assertEquals( 'DUMMY SKU', $g_children['mpn'] );
 
-		// We don't support tax collumn yet.
+		// We don't support tax column yet.
 		$this->assertArrayNotHasKey( 'tax', $g_children, 'When tax becomes supported this test should be updated.' );
 
-		// We don't support shipping collumn yet.
+		// We don't support shipping column yet.
 		$this->assertArrayNotHasKey( 'shipping', $g_children, 'When shipping becomes supported this test should be updated.' );
 
 		// g:additional_image_link.
@@ -707,7 +707,7 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	/**
 	 * @group feed
 	 */
-	public function testPropertyAvailabiltiyXML() {
+	public function testPropertyAvailabilityXML() {
 		$availability_method = $this->getProductsXmlFeedAttributeMethod( 'g:availability' );
 		$product             = WC_Helper_Product::create_simple_product();
 

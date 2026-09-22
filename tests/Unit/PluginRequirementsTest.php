@@ -60,6 +60,7 @@ class PluginRequirementsTest extends WP_UnitTestCase {
 		$script = sprintf(
 			<<<'PHP'
 			<?php
+			define( 'ABSPATH', %s );
 			define( 'WC_VERSION', %s );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', %s );
 			$wp_version = '6.9';
@@ -73,6 +74,7 @@ class PluginRequirementsTest extends WP_UnitTestCase {
 			echo json_encode( ( new Pinterest_For_Woocommerce() )->check_plugin_requirements() );
 			PHP,
 			// phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_var_export -- Encode values as PHP literals for the isolated process.
+			var_export( dirname( __DIR__, 2 ) . '/', true ),
 			var_export( $version, true ),
 			var_export( PINTEREST_FOR_WOOCOMMERCE_VERSION, true ),
 			var_export( dirname( __DIR__, 2 ), true )

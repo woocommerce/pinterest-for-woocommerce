@@ -2,25 +2,15 @@ name: Run E2E Tests
 
 on:
   workflow_call:
-    inputs:
-      wp_version:
-        required: true
-        type: string
-      wc_version:
-        required: true
-        type: string
-      php_version:
-        required: true
-        type: string
-      test_mode:
-        required: true
-        type: string
+
+permissions:
+  contents: read
 
 jobs:
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -30,22 +20,29 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
 
-      - name: Install Node dependencies
-        run: npm ci
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer
 
-      - name: Install Docker Compose
+      - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
+          composer install --no-interaction --prefer-dist --no-progress
+          npm ci
 
-      # - name: Setup WordPress environment
-      #   run: wp-env start
+      # Builds the plugin, starts wp-env and installs the test-only MU plugin
+      # that answers Pinterest API requests locally, so no secrets are needed.
+      - name: Set up the browser test store
+        run: npm run test:browser:setup
 
       - name: Run E2E tests
-        run: |
-          echo "E2E tests are not ready yet for this repository."
-          echo "This is a placeholder message. E2E test implementation is pending."
-          exit 0
+        run: npm run test:browser
 
-      # - name: Cleanup
-      #   run: wp-env stop
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ failure() }}
+        with:
+          name: browser-test-results
+          path: test-results/browser
+          retention-days: 2

@@ -38,7 +38,8 @@
 		"wp-cli/i18n-command": "^2.6",
 		"phpstan/phpstan": "^2.1",
 		"szepeviktor/phpstan-wordpress": "^2.0",
-		"php-stubs/woocommerce-stubs": "^10.6"
+		"php-stubs/woocommerce-stubs": "^10.6",
+		"php-parallel-lint/php-parallel-lint": "^1.4"
 	},
 	"autoload": {
 		"psr-4": {
@@ -57,6 +58,7 @@
 	},
 	"scripts": {
 		"check:php": "@lint-branch",
+		"lint:php": "bash bin/phplint.sh",
 		"phpcs": "phpcs --extensions=php -s -p",
 		"lint": "chg=$(git diff --relative --name-only -- '*.php'); [[ -z $chg ]] || phpcs-changed -s --git --git-unstaged $chg",
 		"lint-staged": "chg=$(git diff HEAD --relative --name-only -- '*.php'); [[ -z $chg ]] || phpcs-changed -s --git $chg",

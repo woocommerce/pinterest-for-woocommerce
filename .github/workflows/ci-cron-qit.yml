@@ -26,14 +26,14 @@ jobs:
           artifact: 'pinterest-for-woocommerce'
           wp-version: 'nightly'
           wc-version: 'nightly'
-          test-activation: true
-          test-security: true
-          test-phpcompatibility: true
-          test-validation: true
-          test-phpstan: false # TODO: Enable this once the PHPStan tests are fixed
-          test-woo-api: true
-          test-woo-e2e: true
-          test-malware: true
+          test-activation: ${{ 'true' }}
+          test-security: ${{ 'true' }}
+          test-phpcompatibility: ${{ 'true' }}
+          test-validation: ${{ 'true' }}
+          test-phpstan: ${{ 'false' }} # TODO: Enable this once the PHPStan tests are fixed
+          test-woo-api: ${{ 'true' }}
+          test-woo-e2e: ${{ 'true' }}
+          test-malware: ${{ 'true' }}
 
     handle-success:
         if: ${{ success() }}

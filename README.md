@@ -1,10 +1,5 @@
 # Pinterest for WooCommerce
 
-[![PHP Unit Tests](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-unit-tests.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-unit-tests.yml)
-[![JavaScript Unit Tests](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-unit-tests.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-unit-tests.yml)
-[![PHP Coding Standards - PR Changed Files](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-cs-on-changes.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/php-cs-on-changes.yml)
-[![JavaScript and CSS Linting](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-css-linting.yml/badge.svg)](https://github.com/woocommerce/pinterest-for-woocommerce/actions/workflows/js-css-linting.yml)
-
 A native integration which allows you to market your store on Pinterest, including:
 
 -   [Sync your WooCommerce products to Pinterest.](https://help.pinterest.com/en/business/article/before-you-get-started-with-catalogs)
@@ -92,6 +87,8 @@ There are a number of development tools available as npm scripts. Check the [`pa
 -   `npm run lint:css`: Run [`stylelint`](https://stylelint.io/) to validate CSS code style.
 -   `npm run lint:php`: Run [`phpcs`](https://github.com/squizlabs/PHP_CodeSniffer) to validate PHP code style.
 
+Run `npm run lint:composer` to validate `composer.json` and confirm `composer.lock` is up to date. Pull request CI runs the same check before installing PHP dependencies.
+
 Use `composer check:php` for the same PHP standards check as CI. It compares
 committed PHP changes with the merge base of `origin/develop`; fetch that branch
 first, or pass another base with `composer check:php -- base-ref`. New errors
@@ -137,7 +134,7 @@ Install [`composer`](https://getcomposer.org/), `git`, `svn`, and either `wget` 
 Change to the plugin root directory and type:
 
 ```bash
-$ composer install
+composer install
 ```
 
 
@@ -148,22 +145,24 @@ To run the unit tests you need WordPress, [WooCommerce](https://github.com/wooco
 Install them using the `install-wp-tests.sh` script:
 
 ```bash
-$ ./bin/install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host>
+./bin/install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host>
 ```
 
 Example:
 
 ```bash
-$ ./bin/install-wp-tests.sh wordpress_tests root root localhost
+./bin/install-wp-tests.sh wordpress_tests root root localhost
 ```
 
 To test the minimum supported versions, use a fresh test directory and a dedicated database:
 
 ```bash
-$ WC_VERSION=10.9.0 ./bin/install-wp-tests.sh wordpress_tests root root localhost 6.9.0
+WC_VERSION=10.9.0 ./bin/install-wp-tests.sh wordpress_tests root root localhost 6.9.0
 ```
 
-`WC_VERSION` accepts a release tag; `latest` and the default `trunk` select the latest stable release. The script reuses an existing WooCommerce directory, so use a fresh `TMPDIR` and `WP_CORE_DIR` when switching versions.
+`WC_VERSION` accepts a release tag; `latest` (the default) and the legacy `trunk` alias select the latest stable release. The script reuses an existing WooCommerce directory, so use a fresh `TMPDIR` and `WP_CORE_DIR` when switching versions.
+
+The reusable unit-test workflow accepts JSON arrays in `wp_version` and `wc_version`, both defaulting to `["latest"]`. Each matrix job passes its WordPress version as the installer's fifth argument and its WooCommerce version through `WC_VERSION`, matching the local invocation above. The PHPUnit bootstrap prints the installed PHP, WordPress, and WooCommerce versions.
 
 This script installs the test dependencies into your system's temporary directory and also creates a test database.
 
@@ -177,7 +176,7 @@ You can also specify the path to their directories by setting the following envi
 
 `npm run test:php:wp-env` runs the PHPUnit suite inside [`@wordpress/env`](https://www.npmjs.com/package/@wordpress/env)'s `tests-cli` container. Compared to `./bin/install-wp-tests.sh`, this path needs no host MySQL or `svn`, and wp-env scopes its containers by working-directory hash so concurrent runs from separate worktrees stay isolated.
 
-#### Prerequisites
+#### wp-env prerequisites
 
 -   Docker (Docker Desktop on macOS/Windows is enough).
 -   A local development checkout of WooCommerce. The plugin's `tests/bootstrap.php` requires WooCommerce's `tests/legacy/bootstrap.php`, which ships only in the WooCommerce source repo — not in the WordPress.org zip the base `.wp-env.json` downloads.
@@ -236,16 +235,13 @@ your local `.wp-env.override.json` before starting the environment.
 Change to the plugin root directory and type:
 
 ```bash
-$ vendor/bin/phpunit
+vendor/bin/phpunit
 ```
 
 The tests will execute, and you'll be presented with a summary.
 
-<p align="center">
-	<br/><br/>
-	Made with 💜 by <a href="https://woocommerce.com/">WooCommerce</a>.<br/>
-	<a href="https://woocommerce.com/careers/">We're hiring</a>! Come work with us!
-</p>
+Made with 💜 by [WooCommerce](https://woocommerce.com/).
+[We're hiring](https://woocommerce.com/careers/)! Come work with us!
 
 ### PHPStan
 
@@ -263,3 +259,7 @@ never regenerate it to hide new findings. PHPCS and PHPCompatibility remain sepa
 ### Browser regression journeys
 
 See [tests/browser/README.md](tests/browser/README.md) for isolated browser setup, merchant and checkout journeys, focused runs and fixture reset.
+
+### Dependency advisories
+
+Run `npm run audit:npm` and `npm run audit:composer` to check locked dependencies, including development ones, for high or critical advisories. CI runs both when a manifest or lockfile changes and every Monday.

@@ -1,16 +1,11 @@
 name: Production package
 
 on:
-  pull_request:
-    branches: [develop]
+  workflow_call:
   workflow_dispatch:
 
 permissions:
   contents: read
-
-concurrency:
-  group: production-package-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 jobs:
   package:

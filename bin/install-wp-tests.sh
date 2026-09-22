@@ -20,7 +20,7 @@ WP_CORE_DIR=${WP_CORE_DIR-$TMPDIR/wordpress}
 # Plugin variables.
 PLUGINS_DIR="${WP_CORE_DIR}/wp-content/plugins"
 WC_DIR="${PLUGINS_DIR}/woocommerce"
-WC_VERSION=${WC_VERSION-trunk}
+WC_VERSION=${WC_VERSION-latest}
 
 # Check if svn is installed
 if ! command -v svn &> /dev/null; then
@@ -88,22 +88,9 @@ install_wp() {
   else
     if [ $WP_VERSION == 'latest' ]; then
       local ARCHIVE_NAME='latest'
-    elif [[ $WP_VERSION =~ [0-9]+\.[0-9]+ ]]; then
-      # https serves multiple offers, whereas http serves single.
-      download https://api.wordpress.org/core/version-check/1.7/ "$TMPDIR"/wp-latest.json
-      if [[ $WP_VERSION =~ [0-9]+\.[0-9]+\.[0] ]]; then
-        # version x.x.0 means the first release of the major version, so strip off the .0 and download version x.x
-        LATEST_VERSION=${WP_VERSION%??}
-      else
-        # otherwise, scan the releases and get the most up to date minor version of the major release
-        local VERSION_ESCAPED=$(echo $WP_VERSION | sed 's/\./\\\\./g')
-        LATEST_VERSION=$(grep -o '"version":"'$VERSION_ESCAPED'[^"]*' "$TMPDIR"/wp-latest.json | sed 's/"version":"//' | head -1)
-      fi
-      if [[ -z "$LATEST_VERSION" ]]; then
-        local ARCHIVE_NAME="wordpress-$WP_VERSION"
-      else
-        local ARCHIVE_NAME="wordpress-$LATEST_VERSION"
-      fi
+    elif [[ $WP_VERSION =~ ^[0-9]+\.[0-9]+\.0$ ]]; then
+      # WordPress publishes x.y.0 releases as x.y archives.
+      local ARCHIVE_NAME="wordpress-${WP_VERSION%??}"
     else
       local ARCHIVE_NAME="wordpress-$WP_VERSION"
     fi
