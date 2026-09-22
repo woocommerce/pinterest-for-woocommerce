@@ -57,7 +57,7 @@ Now you can build the plugin using one of these commands:
 
 -   `npm start`: Build a development version and watch files for changes.
 -   `npm build`: Build a production version.
--   `npm build:zip`: Build and production version and package as a zip file.
+-   `npm run build:zip`: Build the production plugin and package it as `pinterest-for-woocommerce.zip`. The Production package workflow runs this command on pull requests to `develop` and retains the ZIP as an artifact.
 
 ### Branches
 
