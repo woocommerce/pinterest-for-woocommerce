@@ -68,6 +68,9 @@ env:
   WP_VERSION: ${{ inputs.wp-version && inputs.wp-version || 'stable' }}
   WC_VERSION: ${{ inputs.wc-version && inputs.wc-version || 'stable' }}
   PHP_VERSION: ${{ inputs.php-version && inputs.php-version || '8.4' }}
+  # QIT names the WordPress/WooCommerce release candidates 'rc', not 'nightly'.
+  WP_VERSION_ARG: ${{ inputs.wp-version == 'nightly' && 'rc' || ( inputs.wp-version && inputs.wp-version || 'stable' ) }}
+  WC_VERSION_ARG: ${{ inputs.wc-version == 'nightly' && 'rc' || ( inputs.wc-version && inputs.wc-version || 'stable' ) }}
   ADDITIONAL_PLUGINS: ${{ inputs.test-additional-plugins && format( '--additional_plugins={0}', inputs.test-additional-plugins ) || '' }}
   WAIT_FLAG: ${{ inputs.wait && '--wait' || '' }}
   EXTRA_OPTIONS: ${{ inputs.options }}
@@ -83,17 +86,20 @@ jobs:
 
           - name: Install QIT via composer
             shell: bash
-            run: composer require woocommerce/qit-cli
+            run: composer require 'woocommerce/qit-cli:^1.3'
 
           - name: Add Partner and Prepare Environment
             id: prepare-environment
             shell: bash
+            env:
+              PARTNER_USER: ${{ secrets.QIT_PARTNER_USER }}
+              PARTNER_SECRET: ${{ secrets.QIT_PARTNER_SECRET }}
             run: |
 
               # Add Partner.
               ./vendor/bin/qit partner:add \
-                --user='${{ secrets.QIT_PARTNER_USER }}' \
-                --qit_token='${{ secrets.QIT_PARTNER_SECRET }}'
+                --user="$PARTNER_USER" \
+                --qit_token="$PARTNER_SECRET"
 
               # Export ZIP file path to GITHUB_ENV.
               echo "ZIP_FILE_PATH=${{ github.workspace }}/$EXTENSION_SLUG.zip" >> $GITHUB_ENV
@@ -122,8 +128,8 @@ jobs:
               ./vendor/bin/qit run:activation \
                 ${{ env.EXTENSION_SLUG }} \
                 --zip=${{ env.ZIP_FILE_PATH }} \
-                --wp=${{ env.WP_VERSION }} \
-                --woo=${{ env.WC_VERSION }} \
+                --wp=${{ env.WP_VERSION_ARG }} \
+                --woo=${{ env.WC_VERSION_ARG }} \
                 --php_version=${{ env.PHP_VERSION }} \
                 ${{ env.EXTRA_OPTIONS }} \
                 -n \
@@ -198,8 +204,8 @@ jobs:
               ./vendor/bin/qit run:phpstan \
                 ${{ env.EXTENSION_SLUG }} \
                 --zip=${{ env.ZIP_FILE_PATH }} \
-                --wordpress_version=${{ env.WP_VERSION == 'nightly' && 'rc' || env.WP_VERSION }}  \
-                --woocommerce_version=${{ env.WC_VERSION == 'nightly' && 'rc' || env.WC_VERSION }}  \
+                --wordpress_version=${{ env.WP_VERSION_ARG }}  \
+                --woocommerce_version=${{ env.WC_VERSION_ARG }}  \
                 ${{ env.ADDITIONAL_PLUGINS }} \
                 ${{ env.WAIT_FLAG }} \
                 ${{ env.EXTRA_OPTIONS }} \
@@ -299,8 +305,8 @@ jobs:
               ./vendor/bin/qit run:woo-api \
                 ${{ env.EXTENSION_SLUG }} \
                 --zip=${{ env.ZIP_FILE_PATH }} \
-                --wordpress_version=${{ env.WP_VERSION == 'nightly' && 'rc' || env.WP_VERSION }} \
-                --woocommerce_version=${{ env.WC_VERSION == 'nightly' && 'rc' || env.WC_VERSION }} \
+                --wordpress_version=${{ env.WP_VERSION_ARG }} \
+                --woocommerce_version=${{ env.WC_VERSION_ARG }} \
                 --php_version=${{ env.PHP_VERSION }} \
                 ${{ env.ADDITIONAL_PLUGINS }} \
                 ${{ env.WAIT_FLAG }} \
@@ -327,8 +333,8 @@ jobs:
               ./vendor/bin/qit run:woo-e2e \
                 ${{ env.EXTENSION_SLUG }} \
                 --zip=${{ env.ZIP_FILE_PATH }} \
-                --wordpress_version=${{ env.WP_VERSION == 'nightly' && 'rc' || env.WP_VERSION }} \
-                --woocommerce_version=${{ env.WC_VERSION == 'nightly' && 'rc' || env.WC_VERSION }} \
+                --wordpress_version=${{ env.WP_VERSION_ARG }} \
+                --woocommerce_version=${{ env.WC_VERSION_ARG }} \
                 --php_version=${{ env.PHP_VERSION }} \
                 ${{ env.ADDITIONAL_PLUGINS }} \
                 ${{ env.WAIT_FLAG }} \

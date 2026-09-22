@@ -410,7 +410,7 @@ Read platform requirements from the plugin header and use `nvm use` with `.nvmrc
 - Node 24/npm 11, webpack, and Gulp form the build toolchain. `legacy-peer-deps` preserves the previous npm 6 peer dependency selection; runtime WordPress and React requirements remain unchanged.
 - PSR-4 code in `src/` coexists with WordPress-style classes in `includes/`.
 - The PR template collects changelog text. This repo has no Changelogger command or `changelog/` change files; do not import that workflow from other extensions.
-- Feature PRs target `develop`, but `.github/workflows/prepare-release.yml` configures `trunk` as its main branch and `ci-merge.yml` targets `trunk`. Reconcile release automation separately; those settings do not change the approved feature base.
+- Feature PRs target `develop`, but `.github/workflows/prepare-release.yml` configures `trunk` as its main branch. Reconcile release automation separately; that setting does not change the approved feature base.
 
 ## Testing Strategy
 
