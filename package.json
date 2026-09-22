@@ -135,7 +135,9 @@
     "wp-env": "wp-env",
     "test:browser": "playwright test --config tests/browser/playwright.config.js",
     "test:browser:setup": "bash tests/browser/setup.sh",
-    "test:browser:reset": "node tests/browser/reset.js"
+    "test:browser:reset": "node tests/browser/reset.js",
+    "audit:npm": "npm audit --package-lock-only --audit-level=high --include=dev",
+    "audit:composer": "composer audit --locked --no-plugins --no-scripts --abandoned=report --ignore-severity=low --ignore-severity=medium"
   },
   "browserslist": [
     "last 5 versions",

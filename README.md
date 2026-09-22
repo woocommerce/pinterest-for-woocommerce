@@ -260,3 +260,7 @@ never regenerate it to hide new findings. PHPCS and PHPCompatibility remain sepa
 ### Browser regression journeys
 
 See [tests/browser/README.md](tests/browser/README.md) for isolated browser setup, merchant and checkout journeys, focused runs and fixture reset.
+
+### Dependency advisories
+
+Run `npm run audit:npm` and `npm run audit:composer` to check locked dependencies, including development ones, for high or critical advisories. CI runs both when a manifest or lockfile changes and every Monday.
