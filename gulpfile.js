@@ -186,6 +186,9 @@ gulp.task( 'zip', function () {
 					`!${ folder }/assets/**/*.test.js`,
 					`!${ folder }/assets/**/*.test.min.js`,
 					`!${ folder }/README.md`,
+					`!${ folder }/AGENTS.md`,
+					`!${ folder }/CLAUDE.md`,
+					`!${ folder }/TRACKING.md`,
 					`!${ folder }/i18n/languages/README.md`,
 				],
 				{
