@@ -25,6 +25,7 @@ jobs:
       php: ${{ steps.categories.outputs.php == 'true' || steps.categories.outputs.workflows == 'true' }}
       frontend: ${{ steps.categories.outputs.frontend == 'true' || steps.categories.outputs.workflows == 'true' }}
       product: ${{ steps.product.outputs.product == 'true' || steps.categories.outputs.workflows == 'true' }}
+      workflows: ${{ steps.categories.outputs.workflows }}
     steps:
       - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: categories
@@ -108,6 +109,28 @@ jobs:
     if: ${{ needs.changes.outputs.frontend == 'true' }}
     uses: ./.github/workflows/js-unit-tests.yml
 
+  actionlint:
+    name: Workflow lint
+    needs: changes
+    if: ${{ needs.changes.outputs.workflows == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install actionlint 1.7.12
+        working-directory: ${{ runner.temp }}
+        run: |
+          curl --fail --silent --show-error --location --output actionlint.tar.gz \
+            https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
+          echo '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  actionlint.tar.gz' | sha256sum --check
+          tar -xzf actionlint.tar.gz actionlint
+
+      # Embedded shell and Python snippets are not linted.
+      - name: Lint workflows
+        run: '"$RUNNER_TEMP/actionlint" -shellcheck= -pyflakes='
+
   # The jobs below run only for ready-for-review PRs.
 
   php-unit:
@@ -135,7 +158,7 @@ jobs:
   required:
     name: Required checks
     if: ${{ always() }}
-    needs: [changes, phpcs, phpstan, js-css-lint, js-unit, php-unit, production-zip, e2e]
+    needs: [changes, phpcs, phpstan, js-css-lint, js-unit, actionlint, php-unit, production-zip, e2e]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions: {}
@@ -149,6 +172,7 @@ jobs:
           "phpstan": ${{ needs.changes.outputs.php == 'true' }},
           "js-css-lint": ${{ needs.changes.outputs.frontend == 'true' }},
           "js-unit": ${{ needs.changes.outputs.frontend == 'true' }},
+          "actionlint": ${{ needs.changes.outputs.workflows == 'true' }},
           "php-unit": ${{ github.event.pull_request.draft == false && needs.changes.outputs.php == 'true' }},
           "production-zip": ${{ github.event.pull_request.draft == false && needs.changes.outputs.product == 'true' }},
           "e2e": ${{ github.event.pull_request.draft == false && needs.changes.outputs.product == 'true' }}

@@ -1,5 +1,4 @@
 name: Run QIT
-description: Runs QIT tests for the extension.
 
 on:
   workflow_call:
