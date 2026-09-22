@@ -118,6 +118,7 @@
     "lint:tooling-js-fix": "npm run lint:tooling-js -- --fix",
     "lint:md:docs": "wp-scripts lint-md-docs",
     "lint:pkg-json": "wp-scripts lint-pkg-json",
+    "lint:composer": "composer validate --no-check-all --no-check-publish",
     "lint:php": "composer run-script phpcs ./",
     "lint:php:fix": "composer run-script phpcbf",
     "start": "wp-scripts start",

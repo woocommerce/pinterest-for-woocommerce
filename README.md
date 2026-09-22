@@ -87,6 +87,8 @@ There are a number of development tools available as npm scripts. Check the [`pa
 -   `npm run lint:css`: Run [`stylelint`](https://stylelint.io/) to validate CSS code style.
 -   `npm run lint:php`: Run [`phpcs`](https://github.com/squizlabs/PHP_CodeSniffer) to validate PHP code style.
 
+Run `npm run lint:composer` to validate `composer.json` and confirm `composer.lock` is up to date. Pull request CI runs the same check before installing PHP dependencies.
+
 Use `composer check:php` for the same PHP standards check as CI. It compares
 committed PHP changes with the merge base of `origin/develop`; fetch that branch
 first, or pass another base with `composer check:php -- base-ref`. New errors

@@ -22,6 +22,13 @@ jobs:
         uses: woocommerce/grow/prepare-php@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           php-version: ${{ matrix.php }}
+          install-deps: 'no'
+
+      - name: Validate Composer manifest and lockfile
+        run: npm run lint:composer
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction
 
       - name: Tool versions
         run: |
