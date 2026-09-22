@@ -161,7 +161,7 @@ class Billing {
 	 * @since 1.4.1 Split storing billing setup status and updating billing setup status.
 	 * @since 1.4.1 Moved from class-pinterest-for-woocommerce.php
 	 *
-	 * @return bool Wether billing is set up or not.
+	 * @return bool Whether billing is set up or not.
 	 */
 	public static function update_billing_information() {
 		$status = self::has_billing_set_up();

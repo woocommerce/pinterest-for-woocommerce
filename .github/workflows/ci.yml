@@ -98,6 +98,10 @@ jobs:
               - '!.editorconfig'
               - '!.coderabbit.yaml'
 
+  spelling:
+    name: Spelling
+    uses: ./.github/workflows/spell-check.yml
+
   phpcs:
     name: PHP coding standards
     needs: changes
@@ -181,7 +185,7 @@ jobs:
   required:
     name: Required checks
     if: ${{ always() }}
-    needs: [changes, phpcs, phpstan, js-css-lint, js-unit, actionlint, audit, php-unit, production-zip, e2e]
+    needs: [changes, spelling, phpcs, phpstan, js-css-lint, js-unit, actionlint, audit, php-unit, production-zip, e2e]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions: {}
@@ -191,6 +195,7 @@ jobs:
       CI_EXPECTED: >-
         {
           "changes": true,
+          "spelling": true,
           "phpcs": ${{ needs.changes.outputs.php == 'true' }},
           "phpstan": ${{ needs.changes.outputs.php == 'true' }},
           "js-css-lint": ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.docs == 'true' }},

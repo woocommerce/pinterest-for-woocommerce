@@ -344,7 +344,7 @@ class PluginUpdate {
 	 *
 	 * @since 1.4.0
 	 *
-	 * @param int $retry_count Parameteres passed via Action Scheduler call. Number of retries left.
+	 * @param int $retry_count Parameters passed via Action Scheduler call. Number of retries left.
 	 *
 	 * @return void
 	 */

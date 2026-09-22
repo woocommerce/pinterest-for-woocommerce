@@ -89,13 +89,13 @@ class TagTest extends \WP_UnitTestCase {
 		$user_id = $this->factory->user->create( array( 'user_email' => 'address@somesite.com' ) );
 		wp_set_current_user( $user_id );
 
-		Tag::add_deferred_event( 'some_event_name_13512345', array( 'data' => 'James B0nd' ) );
+		Tag::add_deferred_event( 'some_event_name_13512345', array( 'data' => 'James Bond' ) );
 		Tag::save_deferred_events();
 
 		$events = Tag::load_deferred_events();
 
 		$expected = array(
-			"pintrk( 'track', 'some_event_name_13512345' , {\"data\":\"James B0nd\"});"
+			"pintrk( 'track', 'some_event_name_13512345' , {\"data\":\"James Bond\"});",
 		);
 		$this->assertEquals( $expected, $events );
 	}

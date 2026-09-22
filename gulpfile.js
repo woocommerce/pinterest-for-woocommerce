@@ -54,7 +54,7 @@ SRC = {
 	js: [],
 };
 
-/* Confing: Edit project-folders.json to set your folders and domain
+/* Config: Edit project-folders.json to set your folders and domain
 ========================================================= */
 try {
 	FOLDERS = JSON.parse( fs.readFileSync( './project-folders.json' ) );
