@@ -98,12 +98,6 @@ jobs:
     name: E2E tests
     needs: build_project
     uses: ./.github/workflows/run-e2e.yml
-    with:
-      wp_version: '[ "${{ inputs.wp-version }}" ]'
-      wc_version: '[ "${{ inputs.wc-version }}" ]'
-      php_version: '[ "${{ inputs.php-version }}" ]'
-      test_mode: '[ "legacy", "blocks" ]'
-    secrets: inherit
 
   handle-success:
     if: |
