@@ -16,8 +16,8 @@
  * Version:           1.5.1
  * Author:            WooCommerce
  * Author URI:        https://woocommerce.com
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * License:           GNU General Public License v3.0
+ * License URI:       http://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       pinterest-for-woocommerce
  * Domain Path:       /i18n/languages
  * Requires Plugins:  woocommerce

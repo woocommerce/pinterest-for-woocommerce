@@ -77,7 +77,7 @@ jobs:
 
         # Existing metadata, public hook names and reviewed legacy debt.
         # Changing the plugin name, slug or hook names would break existing
-        # sites and integrations; the licence metadata is tracked separately.
+        # sites and integrations.
         # These codes also suppress future occurrences; review before extending.
         ignore-codes: |
           PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound
@@ -90,5 +90,4 @@ jobs:
           WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
           WordPress.WP.AlternativeFunctions.parse_url_parse_url
           WordPress.WP.AlternativeFunctions.rename_rename
-          license_mismatch
           trademarked_term
