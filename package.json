@@ -116,7 +116,7 @@
     "lint:js:fix": "wp-scripts lint-js ./assets/source ./tests/browser --fix",
     "lint:tooling-js": "wp-scripts lint-js gulpfile.js webpack.config.js jest.config.js eslint.config.cjs",
     "lint:tooling-js-fix": "npm run lint:tooling-js -- --fix",
-    "lint:md:docs": "wp-scripts lint-md-docs",
+    "lint:md:docs": "wp-scripts lint-md-docs --dot",
     "lint:pkg-json": "wp-scripts lint-pkg-json",
     "lint:composer": "composer validate --no-check-all --no-check-publish",
     "lint:php": "composer run-script phpcs ./",
