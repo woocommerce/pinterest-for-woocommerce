@@ -80,7 +80,7 @@ jobs:
       extension: 'pinterest-for-woocommerce'
       artifact: 'pinterest-for-woocommerce'
       wp-version: ${{ inputs.wp-version == 'latest' && 'stable' || inputs.wp-version }}
-      wc-version: ${{ inputs.wc-version == 'latest' && 'stable' || contains( inputs.wc-version, 'rc' ) && 'rc' || inputs.wc-version }}
+      wc-version: ${{ inputs.wc-version == 'latest' && 'stable' || inputs.wc-version }}
       php-version: ${{ inputs.php-version }}
       test-activation: ${{ contains(inputs.qit-tests, 'Activation') && 'true' || 'false' }}
       test-security: ${{ contains(inputs.qit-tests, 'Security') && 'true' || 'false' }}

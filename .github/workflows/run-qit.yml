@@ -341,11 +341,20 @@ jobs:
                 -n \
                 > ${{ github.workspace }}/qit-results/qit-woo-e2e-results.txt
               echo "exitcode=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+              # A WooCommerce version without its own core E2E package (e.g. a beta) runs a
+              # mismatched package; flag it so its result is reported, not failed.
+              if grep -q 'No test package covers WooCommerce' ${{ github.workspace }}/qit-results/qit-woo-e2e-results.txt; then
+                echo "nopackage=true" >> "$GITHUB_OUTPUT"
+              fi
 
           - name: Echo WC E2E results
             if: ${{ !cancelled() && inputs.test-woo-e2e == 'true' && steps.run-woo-e2e-tests.outputs.exitcode != '' }}
             run: |
               cat -v ${{ github.workspace }}/qit-results/qit-woo-e2e-results.txt
+              if [ "${{ steps.run-woo-e2e-tests.outputs.nopackage }}" = 'true' ]; then
+                echo "::warning title=QIT Woo E2E not verified::$(grep -m1 'No test package covers WooCommerce' ${{ github.workspace }}/qit-results/qit-woo-e2e-results.txt)"
+                exit 0
+              fi
               exit ${{ steps.run-woo-e2e-tests.outputs.exitcode || '1' }}
 
           - name: Summarize QIT results
@@ -381,6 +390,8 @@ jobs:
                       elif code == '':
                           result = 'blocked'
                           failed = True
+                      elif steps.get(step, {}).get('outputs', {}).get('nopackage') == 'true':
+                          result = 'not verified: no matching test package (exit ' + code + ')'
                       elif code == '0':
                           result = 'passed'
                       else:
