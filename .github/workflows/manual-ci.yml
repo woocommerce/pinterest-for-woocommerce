@@ -64,6 +64,7 @@ jobs:
     with:
       wp_version: '[ "${{ inputs.wp-version }}" ]'
       wc_version: '[ "${{ inputs.wc-version }}" ]'
+      php_version: '[ "${{ inputs.php-version }}" ]'
     secrets: inherit
 
   build_project:
@@ -98,6 +99,10 @@ jobs:
     name: E2E tests
     needs: build_project
     uses: ./.github/workflows/run-e2e.yml
+    with:
+      wp-version: ${{ inputs.wp-version }}
+      wc-version: ${{ inputs.wc-version }}
+      php-version: ${{ inputs.php-version }}
 
   handle-success:
     if: |

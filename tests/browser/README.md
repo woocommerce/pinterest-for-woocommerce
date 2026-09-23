@@ -24,7 +24,7 @@ npm run test:browser -- --grep 'guest classic'
 npm run test:browser:reset
 ```
 
-Setup builds the plugin, starts wp-env on ports 9010/9011 and installs the MU bootstrap in the tests environment. It refuses to overwrite an existing `.wp-env.override.json`. If setup fails, remove only the override it created and rerun after resolving the error. The wp-env recipe uses current WordPress and WooCommerce.
+Setup builds the plugin, starts wp-env on ports 9010/9011 and installs the MU bootstrap in the tests environment. It refuses to overwrite an existing `.wp-env.override.json`. If setup fails, remove only the override it created and rerun after resolving the error. The wp-env recipe uses current WordPress and WooCommerce on PHP 8.4. To test other versions, set `E2E_WP_VERSION`, `E2E_WC_VERSION` (each `latest`, `nightly` or an exact version) and `E2E_PHP_VERSION` before setup; it fails if the store runs different versions.
 
 For an existing **dedicated test store** with only WooCommerce and Pinterest active:
 

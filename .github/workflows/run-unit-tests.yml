@@ -9,6 +9,9 @@ on:
       wc_version:
         type: string
         default: '["latest"]'
+      php_version:
+        type: string
+        default: '["7.4", "8.3", "8.4"]'
 
 jobs:
   php-tests:
@@ -22,7 +25,7 @@ jobs:
       WC_VERSION: ${{ matrix.wc-version }}
     strategy:
       matrix:
-        php: ['7.4', '8.3', '8.4']
+        php: ${{ fromJSON(inputs.php_version) }}
         wp-version: ${{ fromJSON(inputs.wp_version) }}
         wc-version: ${{ fromJSON(inputs.wc_version) }}
     steps:
