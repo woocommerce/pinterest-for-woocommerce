@@ -6,22 +6,23 @@ labels: 'type: bug'
 assignees: ''
 
 ---
+<!-- markdownlint-disable-file MD026 MD041 -->
 
-### Describe the bug:
+## Describe the bug:
 <!-- A clear and concise description of what the bug is. Please be as descriptive as possible; issues lacking detail, or for any other reason than to report a bug, may be closed without action. If applicable, add screenshots to help explain your problem.-->
 
-### Steps to reproduce:
+## Steps to reproduce:
 <!-- Describe the steps to reproduce the behavior.-->
 1. 
 2. 
 3. 
 
-### Expected behavior:
+## Expected behavior:
 <!-- A clear and concise description of what you expected to happen. -->
 
-### Actual behavior:
+## Actual behavior:
 <!-- A clear and concise description of what actually happens. -->
 
-### Additional details:
+## Additional details:
 <!--Any additional details you think might be helpful.-->
 <!--Ticket numbers/links, plugin versions, system statuses etc.-->

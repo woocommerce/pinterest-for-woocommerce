@@ -1,3 +1,5 @@
+<!-- markdownlint-disable-file MD026 MD041 -->
+
 ### Changes proposed in this Pull Request:
 
 <!-- You can erase any parts of this template not applicable to your Pull Request. -->

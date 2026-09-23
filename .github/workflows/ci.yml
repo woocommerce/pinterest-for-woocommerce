@@ -59,7 +59,9 @@ jobs:
               - '.npmpackagejsonlintrc.json'
             docs:
               - '**/*.md'
-              - '.markdownlintignore'
+              - '.markdownlint*'
+              - 'package.json'
+              - 'package-lock.json'
             workflows:
               - '.github/**'
             deps:

@@ -2,6 +2,19 @@ name: Run E2E Tests
 
 on:
   workflow_call:
+    inputs:
+      wp-version:
+        description: 'WordPress version: `latest` (default), `nightly` or a specific version.'
+        type: string
+        default: 'latest'
+      wc-version:
+        description: 'WooCommerce version: `latest` (default), `nightly` or a specific version.'
+        type: string
+        default: 'latest'
+      php-version:
+        description: 'PHP version of the test store.'
+        type: string
+        default: '8.4'
 
 permissions:
   contents: read
@@ -35,6 +48,10 @@ jobs:
       # Builds the plugin, starts wp-env and installs the test-only MU plugin
       # that answers Pinterest API requests locally, so no secrets are needed.
       - name: Set up the browser test store
+        env:
+          E2E_WP_VERSION: ${{ inputs.wp-version }}
+          E2E_WC_VERSION: ${{ inputs.wc-version }}
+          E2E_PHP_VERSION: ${{ inputs.php-version }}
         run: npm run test:browser:setup
 
       - name: Run E2E tests
