@@ -52,6 +52,10 @@ jobs:
         if: ${{ !cancelled() && (github.event_name == 'push' || inputs.frontend) }}
         run: npm run lint:tooling-js -- --format ./eslintFormatter.cjs
 
+      - name: Check dependency licenses
+        if: ${{ !cancelled() && (github.event_name == 'push' || inputs.frontend) }}
+        run: npm run check-licenses
+
       - name: Check package metadata
         if: ${{ !cancelled() && (github.event_name == 'push' || inputs.frontend) }}
         run: npm run lint:pkg-json
