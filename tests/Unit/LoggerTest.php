@@ -88,6 +88,28 @@ class LoggerTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Subclasses written against the original two-parameter log_response() still load.
+	 */
+	public function test_log_response_keeps_its_two_parameter_signature() {
+		$logger = new class() extends Logger {
+			/**
+			 * Original signature override that raises every response to an error.
+			 *
+			 * @param array|WP_Error $response The body of the response.
+			 * @param string         $level    The level of the message.
+			 */
+			public static function log_response( $response, $level = 'debug' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+				parent::log_response( $response, 'error' );
+			}
+		};
+
+		$logger::log_response( new WP_Error( 'http_request_failed', 'local-transport-error' ) );
+		Logger::log_feature_response( new WP_Error( 'http_request_failed', 'local-transport-error' ), 'local-feature' );
+
+		$this->assertSame( array( PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX, PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-local-feature' ), $this->sources );
+	}
+
+	/**
 	 * Keep native token exchange output while omitting credentials from logs.
 	 */
 	public function test_token_exchange_retains_tokens_without_logging_them() {

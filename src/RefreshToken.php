@@ -114,7 +114,7 @@ class RefreshToken {
 		$body = trim( wp_remote_retrieve_body( $response ) );
 		$body = json_decode( $body, true );
 
-		Logger::log_response( $response, WC_Log_Levels::DEBUG, 'pinterest-for-woocommerce-oauth-refresh' );
+		Logger::log_feature_response( $response, 'pinterest-for-woocommerce-oauth-refresh', WC_Log_Levels::DEBUG );
 
 		if ( ! is_array( $body ) || ! isset( $body['access_token'], $body['expires_in'] ) ) {
 			return false;
