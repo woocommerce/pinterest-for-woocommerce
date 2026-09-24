@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import NavigationClassic from '.~/components/navigation-classic';
 import SyncSettings from '../components/SyncSettings';
 import SetupProductSync from '../steps/SetupProductSync';
 import SetupPins from '../steps/SetupPins';
@@ -24,7 +25,6 @@ import {
 	useResetSettings,
 } from '../helpers/effects';
 import { SETTINGS_VIEW } from '../helpers/views';
-import NavigationClassic from '../../../components/navigation-classic';
 import { SETTINGS_STORE_NAME } from '../data';
 
 const SettingsApp = () => {

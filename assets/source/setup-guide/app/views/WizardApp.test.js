@@ -14,9 +14,9 @@ import { getQuery } from '@woocommerce/navigation';
 /**
  * Internal dependencies
  */
+import '.~/tests/custom-matchers';
+import { expectKnownReactDeprecations } from '.~/tests/known-react-deprecations';
 import WizardApp from './WizardApp';
-import '../../../tests/custom-matchers';
-import { expectKnownReactDeprecations } from '../../../tests/known-react-deprecations';
 import {
 	isDomainVerified,
 	isTrackingConfigured,

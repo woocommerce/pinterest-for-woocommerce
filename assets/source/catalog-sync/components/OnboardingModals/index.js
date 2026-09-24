@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
+import { useSettingsSelect } from '.~/setup-guide/app/helpers/effects';
 import OnboardingAdsModal from './OnboardingAdsModal';
 import OnboardingModal from './OnboardingModal';
 import OnboardingErrorModal from './OnboardingErrorModal';

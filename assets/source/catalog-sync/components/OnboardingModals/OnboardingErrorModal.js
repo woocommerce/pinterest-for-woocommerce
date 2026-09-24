@@ -11,8 +11,8 @@ import {
 /**
  * Internal dependencies
  */
+import { useSettingsSelect } from '.~/setup-guide/app/helpers/effects';
 import OnboardingModal from './OnboardingModal';
-import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
 
 /**
  * Ads Onboarding Modal.
