@@ -91,14 +91,14 @@ jobs:
             id: prepare-environment
             shell: bash
             env:
-              PARTNER_USER: ${{ secrets.QIT_PARTNER_USER }}
-              PARTNER_SECRET: ${{ secrets.QIT_PARTNER_SECRET }}
+              PARTNER_USER: ${{ secrets.ORG_PARTNER_USER }}
+              PARTNER_SECRET: ${{ secrets.ORG_PARTNER_SECRET }}
             run: |
 
               # Add Partner.
               ./vendor/bin/qit partner:add \
                 --user="$PARTNER_USER" \
-                --qit_token="$PARTNER_SECRET"
+                --application_password="$PARTNER_SECRET"
 
               # Export ZIP file path to GITHUB_ENV.
               echo "ZIP_FILE_PATH=${{ github.workspace }}/$EXTENSION_SLUG.zip" >> $GITHUB_ENV
