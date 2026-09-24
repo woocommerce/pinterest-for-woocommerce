@@ -13,13 +13,19 @@ jobs:
     name: PHP unit tests
     uses: ./.github/workflows/php-unit-tests.yml
 
+  php-unit-nightly:
+    name: PHP unit tests (WooCommerce nightly)
+    uses: ./.github/workflows/php-unit-tests.yml
+    with:
+      wc-version: nightly
+
   e2e:
     name: E2E
     uses: ./.github/workflows/run-e2e.yml
 
   notify:
     name: Notify Slack
-    needs: [php-unit, e2e]
+    needs: [php-unit, php-unit-nightly, e2e]
     if: ${{ failure() }}
     runs-on: ubuntu-latest
     timeout-minutes: 5

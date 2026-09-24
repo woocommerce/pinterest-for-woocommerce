@@ -12,6 +12,11 @@ on:
       - .github/workflows/php-unit-tests.yml
       - bin/install-wp-tests.sh
   workflow_call:
+    inputs:
+      # Empty keeps the matrix below; any other value (e.g. `nightly`) replaces its WooCommerce versions.
+      wc-version:
+        type: string
+        default: ''
 
 jobs:
   UnitTests:
@@ -25,11 +30,9 @@ jobs:
       matrix:
         php: ['7.4', '8.3', '8.4']
         wp-version: [latest]
-        wc-version: [latest]
-        include:
-          - php: 7.4
-            wp-version: '6.9.0'
-            wc-version: '10.9.0'
+        wc-version: ${{ fromJSON(inputs.wc-version && format('["{0}"]', inputs.wc-version) || '["latest"]') }}
+        # Minimum-version rows pin their own WooCommerce, so they run only when no wc-version is requested.
+        include: ${{ fromJSON(inputs.wc-version == '' && '[{"php":7.4,"wp-version":"6.9.0","wc-version":"10.9.0"}]' || '[]') }}
 
     steps:
       - name: Checkout repository
@@ -49,6 +52,12 @@ jobs:
           WP_VERSION: ${{ matrix.wp-version }}
           WC_VERSION: ${{ matrix.wc-version }}
         run: ./bin/install-wp-tests.sh wordpress_test root root localhost "$WP_VERSION"
+
+      - name: Report test versions
+        run: |
+          php --version
+          php -r 'require getenv("WP_CORE_DIR") . "/wp-includes/version.php"; echo "WordPress: $wp_version\n";'
+          php -r '$plugin = file_get_contents(getenv("WP_CORE_DIR") . "/wp-content/plugins/woocommerce/woocommerce.php"); preg_match("/Version:\s*(\S+)/", $plugin, $version) || exit(1); echo "WooCommerce: {$version[1]}\n";'
 
       - name: Run PHP unit tests
         run: composer test-unit
