@@ -56,16 +56,16 @@ jobs:
     name: Setup environments
     uses: ./.github/workflows/setup-env.yml
 
-  # WooCommerce: `latest` and `stable` run the default version, `rc` skips this job (QIT covers it), and `nightly` or an exact version (e.g. 10.3.0-rc.1) is installed as given.
+  # WordPress and WooCommerce: `latest` and `stable` run the default version, `rc` skips this job (QIT covers it), and an exact version (e.g. 10.3.0-rc.1) or WooCommerce `nightly` is installed as given. PHP: empty keeps the default versions, anything else replaces them.
   php-tests:
-    if: ${{ inputs.wc-version != 'rc' && (contains(inputs.extension-tests, 'All') || contains(inputs.extension-tests, 'Unit')) }}
+    if: ${{ inputs.wp-version != 'rc' && inputs.wc-version != 'rc' && (contains(inputs.extension-tests, 'All') || contains(inputs.extension-tests, 'Unit')) }}
     name: PHP
     needs: setup
     uses: ./.github/workflows/run-unit-tests.yml
     with:
-      wp_version: '[ "${{ inputs.wp-version }}" ]'
+      wp_version: ${{ format('["{0}"]', inputs.wp-version != 'latest' && inputs.wp-version != 'stable' && inputs.wp-version || 'latest') }}
       wc_version: ${{ format('["{0}"]', inputs.wc-version != 'latest' && inputs.wc-version != 'stable' && inputs.wc-version || 'latest') }}
-      php_version: '[ "${{ inputs.php-version }}" ]'
+      php_version: ${{ inputs.php-version && format('["{0}"]', inputs.php-version) || '["7.4", "8.3", "8.4"]' }}
     secrets: inherit
 
   build_project:
@@ -95,14 +95,14 @@ jobs:
       wait: ${{ inputs.qit-wait }}
     secrets: inherit
 
-  # WooCommerce: `latest` and `stable` run the default version, `rc` skips this job (QIT covers it), and `nightly` or an exact version (e.g. 10.3.0-rc.1) is installed as given.
+  # WordPress and WooCommerce: `latest` and `stable` run the default version, `rc` skips this job (QIT covers it), and an exact version (e.g. 10.3.0-rc.1) or WooCommerce `nightly` is installed as given. PHP: empty keeps the default versions, anything else replaces them.
   e2e-tests:
-    if: ${{ inputs.wc-version != 'rc' && (contains(inputs.extension-tests, 'All') || contains(inputs.extension-tests, 'E2E')) }}
+    if: ${{ inputs.wp-version != 'rc' && inputs.wc-version != 'rc' && (contains(inputs.extension-tests, 'All') || contains(inputs.extension-tests, 'E2E')) }}
     name: E2E tests
     needs: build_project
     uses: ./.github/workflows/run-e2e.yml
     with:
-      wp-version: ${{ inputs.wp-version }}
+      wp-version: ${{ inputs.wp-version != 'latest' && inputs.wp-version != 'stable' && inputs.wp-version || '' }}
       wc-version: ${{ inputs.wc-version != 'latest' && inputs.wc-version != 'stable' && inputs.wc-version || '' }}
       php-version: ${{ inputs.php-version }}
 
