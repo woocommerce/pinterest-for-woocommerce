@@ -10,7 +10,7 @@ import { fireEvent, render } from '@testing-library/react';
  * Internal dependencies
  */
 import LandingPageApp from './LandingPageApp';
-import '../../../tests/custom-matchers';
+import '.~/tests/custom-matchers';
 
 recordEvent.mockName( 'recordEvent' );
 jest.mock( '@woocommerce/settings', () => ( {

@@ -16,7 +16,7 @@ import { getQuery } from '@woocommerce/navigation';
  * Internal dependencies
  */
 import WizardApp from './WizardApp';
-import '../../../tests/custom-matchers';
+import '.~/tests/custom-matchers';
 import {
 	isDomainVerified,
 	isTrackingConfigured,
