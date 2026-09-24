@@ -80,7 +80,7 @@ jobs:
 
         name: Run QIT Tests
         runs-on: ubuntu-latest
-        timeout-minutes: 35
+        timeout-minutes: 55
         steps:
 
           - name: Install QIT via composer
@@ -342,18 +342,41 @@ jobs:
                 > ${{ github.workspace }}/qit-results/qit-woo-e2e-results.txt
               echo "exitcode=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
               # A WooCommerce version without its own core E2E package (e.g. a beta) runs a
-              # mismatched package; flag it so its result is reported, not failed.
+              # mismatched package, so its result says nothing about the extension; flag it.
               if grep -q 'No test package covers WooCommerce' ${{ github.workspace }}/qit-results/qit-woo-e2e-results.txt; then
                 echo "nopackage=true" >> "$GITHUB_OUTPUT"
               fi
+
+          # Judge the extension on stable WooCommerce, which always has a matching package.
+          - name: Run WC E2E Tests on stable WooCommerce
+            id: run-woo-e2e-stable-tests
+            if: ${{ !cancelled() && steps.run-woo-e2e-tests.outputs.nopackage == 'true' && env.WC_VERSION_ARG != 'stable' }}
+            # Do not fail when the `qit` fails, so we can annotate the results.
+            shell: bash --noprofile --norc {0}
+            run: |
+              ./vendor/bin/qit run:woo-e2e \
+                ${{ env.EXTENSION_SLUG }} \
+                --zip=${{ env.ZIP_FILE_PATH }} \
+                --wordpress_version=${{ env.WP_VERSION_ARG }} \
+                --woocommerce_version=stable \
+                --php_version=${{ env.PHP_VERSION }} \
+                ${{ env.ADDITIONAL_PLUGINS }} \
+                ${{ env.WAIT_FLAG }} \
+                ${{ env.EXTRA_OPTIONS }} \
+                -n \
+                > ${{ github.workspace }}/qit-results/qit-woo-e2e-stable-results.txt
+              echo "exitcode=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
 
           - name: Echo WC E2E results
             if: ${{ !cancelled() && inputs.test-woo-e2e == 'true' && steps.run-woo-e2e-tests.outputs.exitcode != '' }}
             run: |
               cat -v ${{ github.workspace }}/qit-results/qit-woo-e2e-results.txt
               if [ "${{ steps.run-woo-e2e-tests.outputs.nopackage }}" = 'true' ]; then
-                echo "::warning title=QIT Woo E2E not verified::$(grep -m1 'No test package covers WooCommerce' ${{ github.workspace }}/qit-results/qit-woo-e2e-results.txt)"
-                exit 0
+                echo "::warning title=QIT Woo E2E not verified on the requested WooCommerce::$(grep -m1 'No test package covers WooCommerce' ${{ github.workspace }}/qit-results/qit-woo-e2e-results.txt) The result on stable WooCommerce decides this check."
+                if [ -f ${{ github.workspace }}/qit-results/qit-woo-e2e-stable-results.txt ]; then
+                  cat -v ${{ github.workspace }}/qit-results/qit-woo-e2e-stable-results.txt
+                fi
+                exit ${{ steps.run-woo-e2e-stable-tests.outputs.exitcode || '1' }}
               fi
               exit ${{ steps.run-woo-e2e-tests.outputs.exitcode || '1' }}
 
@@ -391,7 +414,12 @@ jobs:
                           result = 'blocked'
                           failed = True
                       elif steps.get(step, {}).get('outputs', {}).get('nopackage') == 'true':
-                          result = 'not verified: no matching test package (exit ' + code + ')'
+                          stable = steps.get('run-woo-e2e-stable-tests', {}).get('outputs', {}).get('exitcode', '')
+                          if stable == '0':
+                              result = 'passed on stable WooCommerce; requested version not verified (no matching test package)'
+                          else:
+                              result = 'failed on stable WooCommerce (exit ' + (stable or 'none') + '); requested version not verified (no matching test package)'
+                              failed = True
                       elif code == '0':
                           result = 'passed'
                       else:
