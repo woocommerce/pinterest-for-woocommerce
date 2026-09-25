@@ -8,6 +8,7 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { useDocumentationLinkTracking } from '../helpers/documentation-link-props';
 import SetupAccount from '../steps/SetupAccount';
 import BillingStatus from '../steps/BillingStatus';
 import ClaimWebsite from '../steps/ClaimWebsite';
@@ -23,6 +24,7 @@ import { SETTINGS_VIEW } from '../helpers/views';
 import NavigationClassic from '../../../components/navigation-classic';
 
 const SettingsApp = () => {
+	useDocumentationLinkTracking();
 	const appSettings = useSettingsSelect();
 	const isDomainVerified = useSettingsSelect( 'isDomainVerified' );
 

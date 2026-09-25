@@ -9,6 +9,7 @@ import { recordEvent } from '@woocommerce/tracks';
 /**
  * Internal dependencies
  */
+import { useDocumentationLinkTracking } from '../setup-guide/app/helpers/documentation-link-props';
 import SyncState from './sections/SyncState';
 import AdCreditsNotice from './sections/AdCreditsNotice';
 import SyncIssues from './sections/SyncIssues';
@@ -48,6 +49,7 @@ import { useSettingsSelect } from '../setup-guide/app/helpers/effects';
  * @return {JSX.Element} rendered component
  */
 const CatalogSyncApp = () => {
+	useDocumentationLinkTracking();
 	const appSettings = useSettingsSelect();
 	const adsCampaignIsActive = appSettings?.ads_campaign_is_active;
 

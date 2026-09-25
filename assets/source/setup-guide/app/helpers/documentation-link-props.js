@@ -2,6 +2,51 @@
  * External dependencies
  */
 import { recordEvent } from '@woocommerce/tracks';
+import { useEffect } from '@wordpress/element';
+
+let owners = 0;
+
+const trackDocumentationClick = ( event ) => {
+	const link = event
+		.composedPath()
+		.find( ( node ) => node.hasAttribute?.( 'data-pfw-doc-event' ) );
+	if ( ! link ) {
+		return;
+	}
+
+	const eventName = link.getAttribute( 'data-pfw-doc-event' );
+	const payload = {
+		link_id: link.dataset.pfwDocLinkId,
+		context: link.dataset.pfwDocContext,
+		href: link.getAttribute( 'href' ) ?? undefined,
+	};
+	// A task runs after all click handlers; a microtask can run between native listeners.
+	setTimeout( () => {
+		if ( ! event.defaultPrevented ) {
+			recordEvent( eventName, payload );
+		}
+	}, 0 );
+};
+
+/**
+ * Share one click listener while Pinterest admin pages are mounted.
+ */
+export const useDocumentationLinkTracking = () => {
+	useEffect( () => {
+		if ( ! owners++ ) {
+			document.addEventListener( 'click', trackDocumentationClick, true );
+		}
+		return () => {
+			if ( ! --owners ) {
+				document.removeEventListener(
+					'click',
+					trackDocumentationClick,
+					true
+				);
+			}
+		};
+	}, [] );
+};
 
 /**
  * Clicking on an external documentation link.
@@ -29,9 +74,8 @@ import { recordEvent } from '@woocommerce/tracks';
  * Creates properties for an external documentation link.
  * May take any other props to be extended and forwarded to a link element (`<a>`, `<Button isLink>`).
  *
- * Sets `target="_blank" rel="noopener"` and `onClick` handler that fires track event.
- *
- * Please be careful not to overwrite the `onClick` handler coincidently.
+ * Marks links for delegated tracking without defining an onClick handler.
+ * The containing admin page calls useDocumentationLinkTracking.
  *
  *
  * @fires wcadmin_pfw_documentation_link_click on click, with given `linkId` and `context`.
@@ -41,10 +85,10 @@ import { recordEvent } from '@woocommerce/tracks';
  * @param {string} props.context Forwarded to {@link wcadmin_pfw_documentation_link_click}
  * @param {string} [props.target='_blank']
  * @param {string} [props.rel='noopener']
- * @param {Function} [props.onClick] onClick event handler to be decorated with firing Track event.
+ * @param {Function} [props.onClick] onClick event handler forwarded unchanged.
  * @param {string} [props.eventName='pfw_documentation_link_click'] The name of the event to be recorded
  * @param {...import('react').AnchorHTMLAttributes} props.props
- * @return {{href: string, target: string, rel: string, onClick: Function, props}} Documentation link props.
+ * @return {Object} Documentation link props and tracking attributes.
  */
 function documentationLinkProps( {
 	href,
@@ -52,7 +96,6 @@ function documentationLinkProps( {
 	context,
 	target = '_blank',
 	rel = 'noopener',
-	onClick,
 	eventName = 'pfw_documentation_link_click',
 	...props
 } ) {
@@ -61,18 +104,9 @@ function documentationLinkProps( {
 		target,
 		rel,
 		...props,
-		onClick: ( event ) => {
-			if ( onClick ) {
-				onClick( event );
-			}
-			if ( ! event.defaultPrevented ) {
-				recordEvent( eventName, {
-					link_id: linkId,
-					context,
-					href,
-				} );
-			}
-		},
+		'data-pfw-doc-event': eventName,
+		'data-pfw-doc-link-id': linkId,
+		'data-pfw-doc-context': context,
 	};
 }
 export default documentationLinkProps;

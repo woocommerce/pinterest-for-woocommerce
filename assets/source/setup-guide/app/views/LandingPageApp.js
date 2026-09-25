@@ -25,7 +25,9 @@ import {
  */
 import AdsCreditsTermsAndConditionsModal from '../components/TermsAndConditionsModal';
 import PrelaunchNotice from '../../../components/prelaunch-notice';
-import documentationLinkProps from '../helpers/documentation-link-props';
+import documentationLinkProps, {
+	useDocumentationLinkTracking,
+} from '../helpers/documentation-link-props';
 import UnsupportedCountryNotice from '../components/UnsupportedCountryNotice';
 import { useSettingsSelect } from '../helpers/effects';
 
@@ -381,6 +383,7 @@ const FaqQuestion = ( { questionId, question, answer } ) => {
 };
 
 const LandingPageApp = () => {
+	useDocumentationLinkTracking();
 	const { pluginVersion, isAdsSupportedCountry, storeCountry } =
 		wcSettings.pinterest_for_woocommerce;
 

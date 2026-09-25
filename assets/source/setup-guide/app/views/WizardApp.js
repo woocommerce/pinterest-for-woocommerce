@@ -11,6 +11,7 @@ import { updateQueryString } from '@woocommerce/navigation';
 /**
  * Internal dependencies
  */
+import { useDocumentationLinkTracking } from '../helpers/documentation-link-props';
 import SetupAccount from '../steps/SetupAccount';
 import ClaimWebsite from '../steps/ClaimWebsite';
 import OnboardingTopBar from '../components/TopBar';
@@ -32,6 +33,7 @@ import {
  * @return {JSX.Element} Rendered element.
  */
 const WizardApp = ( { query } ) => {
+	useDocumentationLinkTracking();
 	const [ isConnected, setIsConnected ] = useState(
 		wcSettings.pinterest_for_woocommerce.isConnected
 	);

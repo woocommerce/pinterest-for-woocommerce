@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { useDocumentationLinkTracking } from '../helpers/documentation-link-props';
 import SyncSettings from '../components/SyncSettings';
 import SetupProductSync from '../steps/SetupProductSync';
 import SetupPins from '../steps/SetupPins';
@@ -28,6 +29,7 @@ import NavigationClassic from '../../../components/navigation-classic';
 import { SETTINGS_STORE_NAME } from '../data';
 
 const SettingsApp = () => {
+	useDocumentationLinkTracking();
 	const appSettings = useSettingsSelect();
 	const resetSettings = useResetSettings();
 	const [ hasLoadedSettings, setHasLoadedSettings ] = useState( false );
