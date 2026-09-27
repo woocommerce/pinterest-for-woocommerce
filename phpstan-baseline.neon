@@ -43,12 +43,6 @@ parameters:
 			path: includes/admin/class-pinterest-for-woocommerce-admin.php
 
 		-
-			message: '#^Variable \$status on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.variable
-			count: 1
-			path: src/API/FeedState.php
-
-		-
 			message: '#^Action callback returns mixed but should not return anything\.$#'
 			identifier: return.void
 			count: 1
