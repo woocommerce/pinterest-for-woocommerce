@@ -159,6 +159,9 @@ npm run lint:css:fix
 vendor/bin/phpunit
 # OR
 composer test-unit
+
+# Run with HPOS instead of the default legacy order storage (cpt)
+PINTEREST_FOR_WOOCOMMERCE_TEST_ORDER_STORAGE=hpos composer test-unit
 ```
 
 #### JavaScript Tests
