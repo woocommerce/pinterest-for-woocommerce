@@ -189,6 +189,7 @@ gulp.task( 'zip', function () {
 					`!${ folder }/AGENTS.md`,
 					`!${ folder }/CLAUDE.md`,
 					`!${ folder }/TRACKING.md`,
+					`!${ folder }/phpstan-bootstrap.php`,
 					`!${ folder }/i18n/languages/README.md`,
 				],
 				{

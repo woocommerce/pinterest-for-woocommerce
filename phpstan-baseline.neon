@@ -19,6 +19,12 @@ parameters:
 			path: class-pinterest-for-woocommerce.php
 
 		-
+			message: '#^Variable \$errors in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
 			message: '#^Class Automattic\\WooCommerce\\Admin\\Features\\Navigation\\Menu not found\.$#'
 			identifier: class.notFound
 			count: 2
@@ -127,6 +133,12 @@ parameters:
 			path: src/RichPins.php
 
 		-
+			message: '#^Variable \$product in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: src/SaveToPinterest.php
+
+		-
 			message: '#^Callback expects 1 parameter, \$accepted_args is set to 2\.$#'
 			identifier: arguments.count
 			count: 1
@@ -149,3 +161,39 @@ parameters:
 			identifier: function.notFound
 			count: 1
 			path: src/WPConsentAPI.php
+
+		-
+			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$form\.$#'
+			identifier: property.notFound
+			count: 1
+			path: views/attributes/tab-panel.php
+
+		-
+			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$children\.$#'
+			identifier: property.notFound
+			count: 1
+			path: views/attributes/variations-form.php
+
+		-
+			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$is_root\.$#'
+			identifier: property.notFound
+			count: 1
+			path: views/attributes/variations-form.php
+
+		-
+			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$form\.$#'
+			identifier: property.notFound
+			count: 1
+			path: views/inputs/form.php
+
+		-
+			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$input\.$#'
+			identifier: property.notFound
+			count: 1
+			path: views/inputs/google-category.php
+
+		-
+			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$input\.$#'
+			identifier: property.notFound
+			count: 1
+			path: views/inputs/select.php

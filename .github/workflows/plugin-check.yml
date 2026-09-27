@@ -71,6 +71,7 @@ jobs:
           phpunit.xml.dist
           phpstan.neon.dist
           phpstan-baseline.neon
+          phpstan-bootstrap.php
           AGENTS.md
           CLAUDE.md
           TRACKING.md

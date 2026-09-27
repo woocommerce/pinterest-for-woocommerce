@@ -258,7 +258,7 @@ Made with 💜 by [WooCommerce](https://woocommerce.com/).
 
 After `composer install`, run `composer lint:phpstan`. CI runs the same command
 on PHP, Composer and PHPStan configuration changes using PHP 8.4. PHPStan checks
-owned production PHP at level 0 against the plugin's minimum PHP version.
+owned production PHP at level 1 against the plugin's minimum PHP version.
 WordPress and WooCommerce stubs supply core symbols. Vendor code, generated files,
 tests and build tools are outside analysis.
 
