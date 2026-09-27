@@ -19,6 +19,66 @@ parameters:
 			path: class-pinterest-for-woocommerce.php
 
 		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_API_VERSION not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_DATA_NAME not found\.$#'
+			identifier: constant.notFound
+			count: 6
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PINTEREST_API_VERSION not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_URL not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Variable \$errors in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
 			message: '#^Class Automattic\\WooCommerce\\Admin\\Features\\Navigation\\Menu not found\.$#'
 			identifier: class.notFound
 			count: 2
@@ -31,14 +91,146 @@ parameters:
 			path: includes/admin/class-pinterest-for-woocommerce-admin.php
 
 		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: includes/admin/class-pinterest-for-woocommerce-admin.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_API_VERSION not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: includes/admin/class-pinterest-for-woocommerce-admin.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: includes/admin/class-pinterest-for-woocommerce-admin.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: includes/admin/class-pinterest-for-woocommerce-admin.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 14
+			path: includes/admin/class-pinterest-for-woocommerce-admin.php
+
+		-
 			message: '#^Filter callback return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
 			path: includes/admin/class-pinterest-for-woocommerce-admin.php
 
 		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/API/AdvertiserConnect.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/API/Advertisers.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/API/Auth.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: src/API/Auth.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/API/Base.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/API/Businesses.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/API/DomainVerification.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/API/FeedState.php
+
+		-
+			message: '#^Variable \$status on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: src/API/FeedState.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME not found\.$#'
+			identifier: constant.notFound
+			count: 5
+			path: src/API/Settings.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: src/API/Settings.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/API/Tags.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME not found\.$#'
+			identifier: constant.notFound
+			count: 10
+			path: src/API/UserInteraction.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/API/UserInteraction.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/API/VendorAPI.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_API_VERSION not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/API/VendorAPI.php
+
+		-
 			message: '#^Action callback returns mixed but should not return anything\.$#'
 			identifier: return.void
+			count: 1
+			path: src/AdCredits.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
 			count: 1
 			path: src/AdCredits.php
 
@@ -61,10 +253,28 @@ parameters:
 			path: src/Billing.php
 
 		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: src/Billing.php
+
+		-
 			message: '#^Action callback returns array but should not return anything\.$#'
 			identifier: return.void
 			count: 1
 			path: src/CommerceIntegration.php
+
+		-
+			message: '#^Constant AUTH_KEY not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: src/Crypto.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/Crypto.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -79,16 +289,76 @@ parameters:
 			path: src/Exception/InvalidValue.php
 
 		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_DATA_NAME not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/FeedGenerator.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/FeedGenerator.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 11
+			path: src/FeedGenerator.php
+
+		-
 			message: '#^Action callback returns bool but should not return anything\.$#'
 			identifier: return.void
 			count: 1
 			path: src/FeedRegistration.php
 
 		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 4
+			path: src/FeedRegistration.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/Feeds.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/Feeds.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 9
+			path: src/Heartbeat.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: src/LocalFeedConfigs.php
+
+		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1
 			path: src/LocalFeedConfigs.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/Logger.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/Merchants.php
 
 		-
 			message: '#^Caught class Psr\\Container\\ContainerExceptionInterface not found\.$#'
@@ -103,6 +373,54 @@ parameters:
 			path: src/MultichannelMarketing/PinterestChannel.php
 
 		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/Notes/Collection/AbstractNote.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/Notes/MarketingNotifications.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_DATA_NAME not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: src/PluginUpdate.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/PluginUpdate.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 8
+			path: src/PluginUpdate.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/ProductFeedStatus.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/ProductSync.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: src/ProductsXmlFeed.php
+
+		-
 			message: '#^One or more @param tags has an invalid name or invalid syntax\.$#'
 			identifier: phpDoc.parseError
 			count: 2
@@ -111,6 +429,18 @@ parameters:
 		-
 			message: '#^Action callback returns true but should not return anything\.$#'
 			identifier: return.void
+			count: 1
+			path: src/RefreshToken.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/RefreshToken.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_WOO_CONNECT_SERVICE not found\.$#'
+			identifier: constant.notFound
 			count: 1
 			path: src/RefreshToken.php
 
@@ -127,6 +457,24 @@ parameters:
 			path: src/RichPins.php
 
 		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/SaveToPinterest.php
+
+		-
+			message: '#^Variable \$product in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: src/SaveToPinterest.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/TrackerSnapshot.php
+
+		-
 			message: '#^Callback expects 1 parameter, \$accepted_args is set to 2\.$#'
 			identifier: arguments.count
 			count: 1
@@ -139,13 +487,67 @@ parameters:
 			path: src/Tracking.php
 
 		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/Utilities/Utilities.php
+
+		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 3
 			path: src/View/ViewException.php
 
 		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: src/WPConsentAPI.php
+
+		-
 			message: '#^Function wp_has_consent not found\.$#'
 			identifier: function.notFound
 			count: 1
 			path: src/WPConsentAPI.php
+
+		-
+			message: '#^Constant PINTEREST_FOR_WOOCOMMERCE_PINTEREST_API_VERSION not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: uninstall.php
+
+		-
+			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$form\.$#'
+			identifier: property.notFound
+			count: 1
+			path: views/attributes/tab-panel.php
+
+		-
+			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$children\.$#'
+			identifier: property.notFound
+			count: 1
+			path: views/attributes/variations-form.php
+
+		-
+			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$is_root\.$#'
+			identifier: property.notFound
+			count: 1
+			path: views/attributes/variations-form.php
+
+		-
+			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$form\.$#'
+			identifier: property.notFound
+			count: 1
+			path: views/inputs/form.php
+
+		-
+			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$input\.$#'
+			identifier: property.notFound
+			count: 1
+			path: views/inputs/google-category.php
+
+		-
+			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$input\.$#'
+			identifier: property.notFound
+			count: 1
+			path: views/inputs/select.php
