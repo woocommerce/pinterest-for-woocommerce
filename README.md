@@ -220,6 +220,17 @@ composer test-unit -- --filter SavedDataTest
 
 Use a dedicated empty test database: the WordPress bootstrap replaces its test prefix tables on each run. Test cases roll back their fixtures, so rerunning the command resets products, orders and options. To change supported WordPress or WooCommerce versions, choose the matching installer arguments and a new directory and database; the installer reuses existing downloads. Missing dependencies are reported by the bootstrap before PHPUnit runs. The existing wp-env runner accepts the same `--filter` and `--testsuite` arguments.
 
+### Order storage
+
+The PHP suite uses legacy order storage (CPT) by default. Run the same suite with HPOS, with order synchronization disabled, using:
+
+```bash
+PINTEREST_FOR_WOOCOMMERCE_TEST_ORDER_STORAGE=hpos composer test-unit
+PINTEREST_FOR_WOOCOMMERCE_TEST_ORDER_STORAGE=cpt composer test-unit
+```
+
+The bootstrap prints the selected storage, creates the HPOS tables when needed and fails if the value is not `cpt` or `hpos` or the requested storage is inactive. CI runs one HPOS job on PHP 8.4 alongside the CPT matrix.
+
 With Xdebug installed, run `XDEBUG_MODE=coverage composer test-unit -- --coverage-html coverage/php --path-coverage` for line and branch/path coverage. PCOV supports the same HTML report without `--path-coverage` and reports lines only. Coverage includes unexecuted plugin PHP source and excludes tests and vendor code. Open `coverage/php/index.html`; a missing driver cannot produce a report.
 
 ### Running Tests
