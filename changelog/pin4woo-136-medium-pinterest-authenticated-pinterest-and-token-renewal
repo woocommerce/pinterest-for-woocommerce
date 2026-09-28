@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Verify TLS certificates for Pinterest API and token-renewal requests.

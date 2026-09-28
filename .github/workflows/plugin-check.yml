@@ -45,6 +45,8 @@ jobs:
           vendor
           tests
           bin
+          tools
+          changelog
           docs
           wordpress_org_assets
 

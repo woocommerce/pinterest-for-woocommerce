@@ -59,13 +59,18 @@ pinterest-for-woocommerce/
 │   ├── build/             # Compiled production assets (gitignored)
 │   └── images/            # Static images
 ├── bin/                   # Development scripts
+│   ├── check_changelog.sh  # Changelog change file check
 │   ├── install-wp-tests.sh  # PHPUnit test setup
 │   └── lint-branch.sh      # Linting helper
+├── changelog/             # Change files, compiled into changelog.txt at release time
+├── tools/
+│   └── changelogger/      # Jetpack Changelogger formatter for changelog.txt
 ├── tests/                 # Test files
 │   ├── Unit/              # PHPUnit unit tests
 │   ├── Integration/       # PHPUnit integration tests
 │   ├── E2e/               # End-to-end tests
-│   └── Helpers/           # Test utilities
+│   ├── Helpers/           # Test utilities
+│   └── isolated/          # PHPUnit tests without WordPress (changelog formatter)
 ├── vendor/                # PHP dependencies (gitignored, composer-managed)
 ├── node_modules/          # JavaScript dependencies (gitignored, npm-managed)
 ├── i18n/                  # Internationalization files
@@ -162,6 +167,9 @@ composer test-unit
 
 # Run with HPOS instead of the default legacy order storage (cpt)
 PINTEREST_FOR_WOOCOMMERCE_TEST_ORDER_STORAGE=hpos composer test-unit
+
+# Run the tests that need no WordPress, WooCommerce or database
+composer test:isolated
 ```
 
 #### JavaScript Tests
@@ -307,6 +315,45 @@ cd "$main_checkout"
 git worktree remove "$worktree_path"
 ```
 
+### Changelog
+
+`changelog.txt` is **generated**. Never edit it by hand. Each pull request drops a change file
+into `changelog/` instead, and [Jetpack Changelogger](https://github.com/Automattic/jetpack-changelogger)
+compiles them into `changelog.txt` at release time.
+
+```bash
+npm run changelog add          # Interactive: significance, type, and the entry
+npm run changelog validate     # Check every change file under changelog/
+npm run changelog:check        # What CI runs: this branch has a valid change file
+```
+
+`changelog:check` also counts a change file that is only staged or still untracked, and says
+so in its listing. CI diffs commits, so an uncommitted change file is one CI will never see.
+
+`changelog add` names the file after the current git branch. Commit it with the rest of the
+pull request:
+
+```text
+Significance: patch
+Type: fix
+
+Verify TLS certificates for Pinterest API and token-renewal requests.
+```
+
+| Field | Values | Notes |
+| --- | --- | --- |
+| `Significance` | `patch`, `minor`, `major` | Only `patch` may have an empty entry. Versions are set at release time, so this does not pick the next version. |
+| `Type` | `new`, `fix`, `tweak`, `dev` | Becomes the `* Fix - ...` prefix in `changelog.txt`. Entries are grouped by type in that order. |
+| Entry | One line | Multi-line entries are rejected: every line after the first is re-read as its own entry when the changelog is next parsed. Put extra detail in a `Comment:` header instead, which is not compiled into `changelog.txt`. |
+
+The `Changelog / Check changelog` CI job requires an added change file on every pull request.
+Label the pull request **`no changelog`** for changes that need no entry (CI, tooling, docs). The
+label waives the requirement, not the format: a change file added anyway is still validated.
+Release branches and Dependabot pull requests are skipped entirely.
+
+The formatter that preserves the `changelog.txt` format lives in `tools/changelogger/`, and is
+configured under `extra.changelogger` in `composer.json`.
+
 ### Commit Practices
 
 Follow these commit guidelines:
@@ -334,7 +381,7 @@ When creating PRs:
 - Target the `trunk` branch
 - Follow `.github/PULL_REQUEST_TEMPLATE.md`; it has no auto-assign-milestone checkbox.
 - Start the description with `Closes PIN4WOO-<n>` and include test instructions.
-- Supply changelog text in the template's Changelog entry section. Explain any documentation-only exemption there; do not invent checkboxes or change labels.
+- **Always add a changelog file.** Run `npm run changelog add` and commit the file it creates under `changelog/`, one per PR. Never edit `changelog.txt` directly - it is compiled from the change files at release time. See [Changelog](#changelog).
 - Check CI results and distinguish passing, failed, and skipped jobs.
 
 ## Common Pitfalls
@@ -346,7 +393,7 @@ When creating PRs:
 | Edit WordPress core files | Only modify plugin code |
 | Edit WooCommerce plugin files | Only modify this plugin's code |
 | Commit PHP changes without running `vendor/bin/phpcs` | Check the changed code |
-| Modify `changelog.txt` | Unless explicitly requested |
+| Edit `changelog.txt` by hand | It is compiled from the change files under `changelog/` at release time |
 | Commit `node_modules/` or `vendor/` directories | These are gitignored |
 | Commit `.env` files or credentials | Security risk |
 | Use `--no-verify` or `--no-gpg-sign` | Preserve hooks and configured signing |
@@ -433,7 +480,6 @@ Read platform requirements from the plugin header and use `nvm use` with `.nvmrc
 
 - Node 24/npm 11, webpack, and Gulp form the build toolchain. `legacy-peer-deps` preserves the previous npm 6 peer dependency selection; runtime WordPress and React requirements remain unchanged.
 - PSR-4 code in `src/` coexists with WordPress-style classes in `includes/`.
-- The PR template collects changelog text. This repo has no Changelogger command or `changelog/` change files; do not import that workflow from other extensions.
 
 ## Testing Strategy
 

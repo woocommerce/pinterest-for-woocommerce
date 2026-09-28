@@ -1,0 +1,4 @@
+Significance: patch
+Type: dev
+
+Build the production ZIP on pull requests.

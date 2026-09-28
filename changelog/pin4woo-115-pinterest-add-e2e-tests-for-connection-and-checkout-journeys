@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Preserve saved Pinterest settings while loading and allow failed initial requests to be retried.

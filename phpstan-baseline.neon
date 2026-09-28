@@ -115,18 +115,6 @@ parameters:
 			path: src/FeedRegistration.php
 
 		-
-			message: '#^Call to method getMessage\(\) on an unknown class Psr\\Container\\ContainerExceptionInterface\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/MultichannelMarketing/MarketingChannelRegistrar.php
-
-		-
-			message: '#^Caught class Psr\\Container\\ContainerExceptionInterface not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/MultichannelMarketing/MarketingChannelRegistrar.php
-
-		-
 			message: '#^Call to an undefined method WC_Data_Store\:\:get_notes_with_name\(\)\.$#'
 			identifier: method.notFound
 			count: 1
