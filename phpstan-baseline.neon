@@ -19,12 +19,6 @@ parameters:
 			path: class-pinterest-for-woocommerce.php
 
 		-
-			message: '#^Default value of the parameter \#2 \$args \(array\) of method Pinterest_For_Woocommerce\:\:get_middleware_url\(\) is incompatible with type string\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
 			message: '#^Variable \$errors in empty\(\) always exists and is not falsy\.$#'
 			identifier: empty.variable
 			count: 1
@@ -47,12 +41,6 @@ parameters:
 			identifier: return.missing
 			count: 1
 			path: includes/admin/class-pinterest-for-woocommerce-admin.php
-
-		-
-			message: '#^Default value of the parameter \#5 \$cache_expiry \(false\) of method Automattic\\WooCommerce\\Pinterest\\API\\Base\:\:make_request\(\) is incompatible with type int\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: src/API/Base.php
 
 		-
 			message: '#^PHPDoc tag @return with type mixed is not subtype of native type array\.$#'
@@ -201,12 +189,6 @@ parameters:
 		-
 			message: '#^Call to method get_id\(\) on an unknown class Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
 			identifier: class.notFound
-			count: 1
-			path: src/SaveToPinterest.php
-
-		-
-			message: '#^Default value of the parameter \#2 \$post_thumbnail_id \(string\) of method Automattic\\WooCommerce\\Pinterest\\SaveToPinterest\:\:render_pin\(\) is incompatible with type int\.$#'
-			identifier: parameter.defaultValue
 			count: 1
 			path: src/SaveToPinterest.php
 

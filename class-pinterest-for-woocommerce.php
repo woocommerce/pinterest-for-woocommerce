@@ -911,8 +911,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param string $context The context parameter.
-		 * @param string $args    Additional arguments like 'view' or 'business_id'.
+		 * @param string       $context The context parameter.
+		 * @param string|array $args    Additional arguments like 'view' or 'business_id'.
 		 *
 		 * @return string
 		 */

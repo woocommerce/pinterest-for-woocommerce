@@ -59,8 +59,8 @@ class SaveToPinterest {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int $post_id Post ID.
-	 * @param int $post_thumbnail_id Optional. Post Thumbnail ID.
+	 * @param int        $post_id           Post ID.
+	 * @param int|string $post_thumbnail_id Optional. Post Thumbnail ID.
 	 *
 	 * @return string
 	 */
