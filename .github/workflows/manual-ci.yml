@@ -30,12 +30,11 @@ on:
         type: choice
         options:
           - 'WooCommerce Pre-Release Tests (includes Activation, WooCommerce E2E and API tests)'
-          - 'Code Quality Checks (includes Security, Validation, Malware, PHPStan, and PHP Compatibility tests)'
+          - 'Code Quality Checks (includes Security, Validation, Malware, and PHP Compatibility tests)'
           - 'Activation'
           - 'Security'
           - 'Validation'
           - 'Malware'
-          - 'PHPStan'
           - 'PHP Compatibility'
           - 'WooCommerce E2E and API tests'
           - 'Plugin Checks (for dotOrg metadata)'
@@ -57,14 +56,16 @@ jobs:
     name: Setup environments
     uses: ./.github/workflows/setup-env.yml
 
+  # WordPress and WooCommerce: `latest` and `stable` run the default version, `rc` skips this job (QIT covers it), and an exact version (e.g. 10.3.0-rc.1) or WooCommerce `nightly` is installed as given. PHP: empty keeps the default versions, anything else replaces them.
   php-tests:
-    if: contains(inputs.extension-tests, 'All') || contains(inputs.extension-tests, 'Unit')
+    if: ${{ inputs.wp-version != 'rc' && inputs.wc-version != 'rc' && (contains(inputs.extension-tests, 'All') || contains(inputs.extension-tests, 'Unit')) }}
     name: PHP
     needs: setup
     uses: ./.github/workflows/run-unit-tests.yml
     with:
-      wp_version: '[ "${{ inputs.wp-version }}" ]'
-      wc_version: '[ "${{ inputs.wc-version }}" ]'
+      wp_version: ${{ format('["{0}"]', inputs.wp-version != 'latest' && inputs.wp-version != 'stable' && inputs.wp-version || 'latest') }}
+      wc_version: ${{ format('["{0}"]', inputs.wc-version != 'latest' && inputs.wc-version != 'stable' && inputs.wc-version || 'latest') }}
+      php_version: ${{ inputs.php-version && format('["{0}"]', inputs.php-version) || '["7.4", "8.3", "8.4"]' }}
     secrets: inherit
 
   build_project:
@@ -80,33 +81,30 @@ jobs:
       extension: 'pinterest-for-woocommerce'
       artifact: 'pinterest-for-woocommerce'
       wp-version: ${{ inputs.wp-version == 'latest' && 'stable' || inputs.wp-version }}
-      wc-version: ${{ inputs.wc-version == 'latest' && 'stable' || contains( inputs.wc-version, 'rc' ) && 'rc' || inputs.wc-version }}
+      wc-version: ${{ inputs.wc-version == 'latest' && 'stable' || inputs.wc-version }}
       php-version: ${{ inputs.php-version }}
-      test-activation: ${{ contains(inputs.qit-tests, 'Activation') && true || false }}
-      test-security: ${{ contains(inputs.qit-tests, 'Security') && true || false }}
-      test-phpcompatibility: ${{ contains(inputs.qit-tests, 'Compatibility') && true || false }}
-      # TODO: Enable this once the PHPStan tests are fixed
-      # test-phpstan: ${{ contains(inputs.qit-tests, 'PHPStan') && true || false }}
-      test-woo-api: ${{ contains(inputs.qit-tests, 'API') && true || false }}
-      test-woo-e2e: ${{ contains(inputs.qit-tests, 'WooCommerce E2E') && true || false }}
-      test-malware: ${{ contains(inputs.qit-tests, 'Malware') && true || false }}
-      test-validation: ${{ contains(inputs.qit-tests, 'Validation') && true || false }}
-      test-plugin-check: ${{ contains(inputs.qit-tests, 'dotOrg') && true || false }}
+      test-activation: ${{ contains(inputs.qit-tests, 'Activation') && 'true' || 'false' }}
+      test-security: ${{ contains(inputs.qit-tests, 'Security') && 'true' || 'false' }}
+      test-phpcompatibility: ${{ contains(inputs.qit-tests, 'Compatibility') && 'true' || 'false' }}
+      test-woo-api: ${{ contains(inputs.qit-tests, 'API') && 'true' || 'false' }}
+      test-woo-e2e: ${{ contains(inputs.qit-tests, 'WooCommerce E2E') && 'true' || 'false' }}
+      test-malware: ${{ contains(inputs.qit-tests, 'Malware') && 'true' || 'false' }}
+      test-validation: ${{ contains(inputs.qit-tests, 'Validation') && 'true' || 'false' }}
+      test-plugin-check: ${{ contains(inputs.qit-tests, 'dotOrg') && 'true' || 'false' }}
       options: ${{ inputs.options }}
       wait: ${{ inputs.qit-wait }}
     secrets: inherit
 
+  # WordPress and WooCommerce: `latest` and `stable` run the default version, `rc` skips this job (QIT covers it), and an exact version (e.g. 10.3.0-rc.1) or WooCommerce `nightly` is installed as given. PHP: empty keeps the default versions, anything else replaces them.
   e2e-tests:
-    if: contains(inputs.extension-tests, 'All') || contains(inputs.extension-tests, 'E2E')
+    if: ${{ inputs.wp-version != 'rc' && inputs.wc-version != 'rc' && (contains(inputs.extension-tests, 'All') || contains(inputs.extension-tests, 'E2E')) }}
     name: E2E tests
     needs: build_project
     uses: ./.github/workflows/run-e2e.yml
     with:
-      wp_version: '[ "${{ inputs.wp-version }}" ]'
-      wc_version: '[ "${{ inputs.wc-version }}" ]'
-      php_version: '[ "${{ inputs.php-version }}" ]'
-      test_mode: '[ "legacy", "blocks" ]'
-    secrets: inherit
+      wp-version: ${{ inputs.wp-version != 'latest' && inputs.wp-version != 'stable' && inputs.wp-version || '' }}
+      wc-version: ${{ inputs.wc-version != 'latest' && inputs.wc-version != 'stable' && inputs.wc-version || '' }}
+      php-version: ${{ inputs.php-version }}
 
   handle-success:
     if: |
@@ -117,10 +115,11 @@ jobs:
     needs: [qit-tests, e2e-tests, php-tests]
     name: Handle success
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
-      - uses: act10ns/slack@44541246747a30eb3102d87f7a4cc5471b0ffb7d #v2.1.0
+      - uses: act10ns/slack@d96404edccc6d6467fc7f8134a420c851b1e9054 # v2.2.0
         with:
           status: success
           message: "Test Runner Workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> passed."
@@ -130,10 +129,11 @@ jobs:
     needs: [qit-tests, e2e-tests, php-tests]
     name: Handle cancellation
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
-      - uses: act10ns/slack@44541246747a30eb3102d87f7a4cc5471b0ffb7d #v2.1.0
+      - uses: act10ns/slack@d96404edccc6d6467fc7f8134a420c851b1e9054 # v2.2.0
         with:
           status: cancelled
           message: "Test Runner Workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> cancelled."
@@ -143,10 +143,11 @@ jobs:
     needs: [qit-tests, e2e-tests, php-tests]
     name: Handle failure
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
-      - uses: act10ns/slack@44541246747a30eb3102d87f7a4cc5471b0ffb7d #v2.1.0
+      - uses: act10ns/slack@d96404edccc6d6467fc7f8134a420c851b1e9054 # v2.2.0
         with:
           status: failure
           message: "Test Runner Workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> failed."

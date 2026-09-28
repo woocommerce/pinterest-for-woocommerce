@@ -1,0 +1,21 @@
+name: Spell Check
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  typos:
+    name: Check for typos
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check for typos
+        uses: crate-ci/typos@f8a58b6b53f2279f71eb605f03a4ae4d10608f45 # v1.47.0
+        with:
+          config: ./.github/typos.toml

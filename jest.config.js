@@ -21,20 +21,37 @@ const packagesNeedMocking = [
 
 module.exports = {
 	...defaultConfig,
+	collectCoverageFrom: [
+		'assets/source/**/*.js',
+		'!assets/source/**/*.test.js',
+		'!assets/source/tests/**',
+	],
+	coverageReporters: [ 'text', 'html', 'json-summary' ],
 	// Workaround https://github.com/woocommerce/woocommerce-admin/issues/6483.
+	// The patched d3-color used by WooCommerce's chart packages is ESM-only.
 	transformIgnorePatterns: [
-		`<rootDir>/node_modules/(?!@woocommerce/(${ wcPackagesNeedTransform })(/node_modules/@woocommerce/(${ wcPackagesNeedTransform }))?/build/)`,
+		`<rootDir>/node_modules/(?!(?:d3-color/|@woocommerce/(${ wcPackagesNeedTransform })(/node_modules/@woocommerce/(${ wcPackagesNeedTransform }))?/build/))`,
 	],
 	moduleNameMapper: {
 		// Transform our `.~/` alias.
 		'^\\.~/(.*)$': '<rootDir>/assets/source/$1',
-		[ `(${ packagesNeedMocking })` ]: '<rootDir>/assets/source/tests/dependencies/$1',
+		[ `(${ packagesNeedMocking })` ]:
+			'<rootDir>/assets/source/tests/dependencies/$1',
 	},
 	// Exclude e2e tests from unit testing.
-	testPathIgnorePatterns: [ '/node_modules/' ],
+	testPathIgnorePatterns: [
+		'/node_modules/',
+		'/assets/js/',
+		'/tests/browser/',
+	],
+	testEnvironmentOptions: {
+		customExportConditions: [ 'node', 'node-addons' ],
+	},
 	globals: {
 		wcSettings: {
 			pinterest_for_woocommerce: {
+				apiRoute: '/pinterest/v1',
+				optionsName: 'pinterest_for_woocommerce',
 				claimWebsiteErrorStatus: [],
 				pluginVersion: '1.2.3',
 				pinterestLinks: {

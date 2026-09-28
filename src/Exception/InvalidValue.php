@@ -15,6 +15,8 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class InvalidValue
+ *
+ * @phpstan-consistent-constructor
  */
 class InvalidValue extends LogicException implements PinterestException {
 

@@ -15,7 +15,7 @@ set -e
 
 PASS="\033[0;32m✔\033[0m"
 FAIL="\033[0;31m✘\033[0m"
-BASE_BRANCH=${1:-origin/develop}
+BASE_BRANCH=${1:-origin/trunk}
 
 echo ""
 echo "=== Pre-push checks (base: $BASE_BRANCH) ==="

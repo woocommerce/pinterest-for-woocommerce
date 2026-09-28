@@ -78,11 +78,21 @@ class Logger {
 	 * @return void
 	 */
 	public static function log_request( $url, $args, $level = 'debug' ) {
-		unset( $args['headers'] );
 		$method = $args['method'] ?? 'POST';
-		$data   = ! empty( $args['body'] ) ? $args['body'] : '--- EMPTY STRING ---';
-		$data   = is_array( $data ) ? wp_json_encode( $data ) : $data;
-		self::log( "{$method} Request: " . $url . "\n\n" . $data . "\n", $level );
+		// Query strings, headers and bodies can contain credentials or customer data.
+		self::log( "{$method} Request: " . self::get_url_path( $url ) . "\n", $level );
+	}
+
+	/**
+	 * Returns the path of a URL for logging, as query strings can contain credentials or customer data.
+	 *
+	 * @param string $url The URL.
+	 *
+	 * @return string
+	 */
+	public static function get_url_path( $url ) {
+		$path = wp_parse_url( $url, PHP_URL_PATH );
+		return is_string( $path ) && '' !== $path ? $path : '(unknown path)';
 	}
 
 	/**
@@ -94,23 +104,29 @@ class Logger {
 	 * @return void
 	 */
 	public static function log_response( $response, $level = 'debug' ) {
+		self::log_feature_response( $response, null, $level );
+	}
+
+	/**
+	 * Helper for Logging API responses to a feature's log file.
+	 *
+	 * Separate from log_response() so subclasses overriding its two-parameter signature still load on PHP 8.
+	 *
+	 * @param array|WP_Error $response The body of the response.
+	 * @param string|null    $feature  Used to direct logs to a separate file.
+	 * @param string         $level    The default level/context of the message to be logged.
+	 *
+	 * @return void
+	 */
+	public static function log_feature_response( $response, $feature, $level = 'debug' ) {
 		if ( is_wp_error( $response ) ) {
 			$level = 'error';
 			$data  = $response->get_error_code() . ': ' . $response->get_error_message();
 		} else {
-			// Collecting response data.
-			$status  = wp_remote_retrieve_response_code( $response );
-			$message = wp_remote_retrieve_response_message( $response );
-			$body    = wp_remote_retrieve_body( $response );
-			$headers = wp_remote_retrieve_headers( $response );
-			if ( is_object( $headers ) ) {
-				$headers = $headers->getAll();
-			}
-
-			$data = 'Status: ' . $status . ' ' . $message . "\n\n" . 'Headers: ' . wp_json_encode( $headers ) . "\n\n" . 'Body: ' . $body;
+			$data = 'Status: ' . wp_remote_retrieve_response_code( $response ) . ' ' . wp_remote_retrieve_response_message( $response );
 		}
 
-		self::log( 'Response: ' . "\n\n" . $data . "\n", $level );
+		self::log( 'Response: ' . "\n\n" . $data . "\n", $level, $feature );
 	}
 }
 

@@ -1,4 +1,3 @@
-/* eslint-disable @wordpress/no-global-event-listener */
 /**
  * External dependencies
  */
@@ -68,16 +67,6 @@ const SetupAccount = ( {
 		wcSettings.pinterest_for_woocommerce.businessAccounts
 	);
 
-	useEffect( () => {
-		if ( undefined !== businessAccounts && businessAccounts.length > 0 ) {
-			window.removeEventListener( 'focus', fetchBusinesses );
-		} else {
-			window.addEventListener( 'focus', fetchBusinesses );
-		}
-
-		return () => window.removeEventListener( 'focus', fetchBusinesses );
-	}, [ fetchBusinesses, businessAccounts ] );
-
 	const fetchBusinesses = useCallback( async () => {
 		try {
 			setBusinessAccounts();
@@ -102,6 +91,16 @@ const SetupAccount = ( {
 		}
 	}, [ createNotice ] );
 
+	useEffect( () => {
+		if ( undefined !== businessAccounts && businessAccounts.length > 0 ) {
+			window.removeEventListener( 'focus', fetchBusinesses );
+		} else {
+			window.addEventListener( 'focus', fetchBusinesses );
+		}
+
+		return () => window.removeEventListener( 'focus', fetchBusinesses );
+	}, [ fetchBusinesses, businessAccounts ] );
+
 	return (
 		<div className="woocommerce-setup-guide__setup-account pinterest-for-woocommerce-account-setup">
 			{ view === 'wizard' && (
@@ -122,11 +121,11 @@ const SetupAccount = ( {
 								? __(
 										'Pinterest business account',
 										'pinterest-for-woocommerce'
-								  )
+									)
 								: __(
 										'Linked account',
 										'pinterest-for-woocommerce'
-								  )
+									)
 						}
 						description={ createInterpolateElement(
 							__(

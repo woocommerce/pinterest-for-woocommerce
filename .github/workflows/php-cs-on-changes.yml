@@ -1,14 +1,7 @@
 name: PHP Coding Standards - PR Changed Files
 
 on:
-  pull_request:
-    paths:
-      - "**.php"
-      - .github/workflows/php-cs-on-changes.yml
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
 
 jobs:
   test:
@@ -21,20 +14,21 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Prepare PHP ${{ matrix.php }}
-        uses: woocommerce/grow/prepare-php@actions-v1
+        uses: woocommerce/grow/prepare-php@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           php-version: ${{ matrix.php }}
+          install-deps: 'no'
 
-      - name: Get Changed Files
-        id: changed-files
-        uses: tj-actions/changed-files@716b1e13042866565e00e85fd4ec490e186c4a2f # v41.0.1
-        with:
-          files: "**/*.php"
+      - name: Validate Composer manifest and lockfile
+        run: npm run lint:composer
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction
 
       - name: Tool versions
         run: |
@@ -42,6 +36,13 @@ jobs:
           composer --version
           vendor/bin/phpcs-changed --version
 
+      - name: Check PHP syntax
+        run: composer lint:php
+
       - name: Run PHPCS
-        if: steps.changed-files.outputs.any_changed == 'true'
-        run: vendor/bin/phpcs-changed --warning-severity=0 -s --git --git-base ${{ github.event.pull_request.base.sha }} ${{ steps.changed-files.outputs.all_changed_files }}
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.sha }}
+        run: composer check:php -- "$BASE_REF"
+
+      - name: Run isolated PHP tests
+        run: composer test:isolated

@@ -18,11 +18,8 @@ export const fetch = () => {
 export const controls = {
 	...dataControls,
 	FETCH() {
-		return new Promise( ( resolve ) => {
-			const url = `${ API_ENDPOINT }`;
-			apiFetch( { path: url } ).then( ( result ) =>
-				resolve( result[ OPTIONS_NAME ] )
-			);
-		} );
+		return apiFetch( { path: API_ENDPOINT } ).then(
+			( result ) => result[ OPTIONS_NAME ]
+		);
 	},
 };

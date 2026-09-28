@@ -2,6 +2,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
+use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
 use Pinterest_For_Woocommerce;
@@ -10,10 +11,16 @@ use WP_UnitTestCase;
 class ConversionsTest extends WP_UnitTestCase {
 
 	public function tearDown(): void {
-		parent::tearDown();
-
 		remove_all_filters( 'pre_http_request' );
+		Logger::$logger = null;
 		wp_set_current_user( 0 );
+		unset( $_GET['epik'], $_COOKIE['_epik'] );
+
+		if ( function_exists( 'WC' ) && isset( WC()->session ) ) {
+			WC()->session->__unset( 'pinterest_for_woocommerce_click_id' );
+		}
+
+		parent::tearDown();
 	}
 
 	public function test_conversions_track_page_visit_event() {
@@ -90,9 +97,93 @@ class ConversionsTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that hashed email is merged into default user data.
+	 * Without an ad account the event is skipped, reported as not sent and no "Sending" log line is written.
 	 */
-	public function test_default_data_keeps_ip_user_agent_with_logged_in_email() {
+	public function test_track_event_without_ad_account_is_skipped_and_not_logged_as_sent() {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_advertiser'  => '',
+				'enable_debug_logging' => true,
+			)
+		);
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		$logger->expects( $this->once() )
+			->method( 'log' )
+			->with( 'debug', $this->stringStartsWith( 'Skipping Pinterest Conversions API event' ), $this->anything() );
+		Logger::$logger = $logger;
+
+		$requests = 0;
+		add_filter(
+			'pre_http_request',
+			function () use ( &$requests ) {
+				++$requests;
+				return new \WP_Error( 'pfw_test_blocked', 'Unexpected HTTP request in test.' );
+			}
+		);
+
+		$conversions = new Conversions( new User( 'ip', 'ua' ) );
+		$sent        = $conversions->track_event( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertFalse( $sent );
+		$this->assertSame( 0, $requests );
+	}
+
+	/**
+	 * An API error is logged at error level, rethrown, and never logged as "Sending".
+	 */
+	public function test_track_event_api_error_is_logged_and_rethrown() {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_advertiser'  => 'PFW-123456789',
+				'enable_debug_logging' => true,
+			)
+		);
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		// The API client and the tracker log the request and the failure; the success line must never appear.
+		$logger->expects( $this->atLeastOnce() )
+			->method( 'log' )
+			->with(
+				$this->anything(),
+				$this->logicalNot( $this->stringStartsWith( 'Sending Pinterest Conversions API event PageVisit.' ) ),
+				$this->anything()
+			);
+		Logger::$logger = $logger;
+
+		add_filter(
+			'pre_http_request',
+			function () {
+				return array(
+					'headers'  => array(
+						'content-type' => 'application/json',
+					),
+					'body'     => json_encode(
+						array(
+							'code'    => 2,
+							'message' => 'Advertiser not found.',
+						)
+					),
+					'response' => array(
+						'code'    => 404,
+						'message' => 'Not Found',
+					),
+					'cookies'  => array(),
+					'filename' => '',
+				);
+			}
+		);
+
+		$conversions = new Conversions( new User( 'ip', 'ua' ) );
+
+		$this->expectException( \Exception::class );
+		$conversions->track_event( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+	}
+
+	/**
+	 * Tests that hashed customer identifiers are merged into default user data.
+	 */
+	public function test_default_data_keeps_ip_user_agent_with_logged_in_customer_identifiers() {
 		$user_id = self::factory()->user->create(
 			array(
 				'user_email' => 'customer@example.com',
@@ -110,9 +201,291 @@ class ConversionsTest extends WP_UnitTestCase {
 				'client_ip_address' => 'Some IP address.',
 				'client_user_agent' => 'Some user agent string.',
 				'em'                => array( hash( 'sha256', 'customer@example.com' ) ),
+				'external_id'       => array( hash( 'sha256', (string) $user_id ) ),
 			),
 			$data['user_data']
 		);
+	}
+
+	/**
+	 * Tests that the click ID is captured from the landing URL and persisted.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_uses_and_persists_epik_query_parameter() {
+		$_GET['epik'] = 'pinterest-click-id';
+
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user );
+		$data        = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertSame( 'pinterest-click-id', $data['user_data']['click_id'] );
+		$this->assertSame( 'pinterest-click-id', WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+
+		unset( $_GET['epik'] );
+		$data = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-456' ) );
+
+		$this->assertSame( 'pinterest-click-id', $data['user_data']['click_id'] );
+	}
+
+	/**
+	 * Tests that the Pinterest tag cookie supplies the click ID.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_uses_epik_cookie() {
+		$_COOKIE['_epik'] = 'pinterest-cookie-click-id';
+
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user );
+		$data        = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertSame( 'pinterest-cookie-click-id', $data['user_data']['click_id'] );
+	}
+
+	/**
+	 * Tests that an over-length click ID in the query string is discarded.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_over_length_epik_query_parameter() {
+		$_GET['epik'] = str_repeat( 'a', 513 );
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that discarding an over-length click ID writes the debug diagnostic.
+	 *
+	 * @return void
+	 */
+	public function test_discarding_over_length_click_id_is_logged() {
+		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', true );
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		$logger->expects( $this->once() )
+			->method( 'log' )
+			->with(
+				'debug',
+				'Discarding Pinterest click ID longer than 512 bytes.',
+				array( 'source' => 'pinterest-for-woocommerce-conversions' )
+			);
+		Logger::$logger = $logger;
+
+		$_GET['epik'] = str_repeat( 'a', 513 );
+
+		$this->prepare_page_visit_data();
+	}
+
+	/**
+	 * An over-length value is reported even when sanitizing would also have altered it.
+	 *
+	 * @return void
+	 */
+	public function test_discarding_over_length_click_id_is_logged_for_mutated_values() {
+		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', true );
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		$logger->expects( $this->once() )
+			->method( 'log' )
+			->with(
+				'debug',
+				'Discarding Pinterest click ID longer than 512 bytes.',
+				array( 'source' => 'pinterest-for-woocommerce-conversions' )
+			);
+		Logger::$logger = $logger;
+
+		// Over the cap and carrying a percent sequence sanitize_text_field() would strip.
+		$_GET['epik'] = str_repeat( 'a', 512 ) . '%41';
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+	}
+
+	/**
+	 * Tests that a click ID at the maximum length is kept and persisted.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_keeps_epik_query_parameter_at_maximum_length() {
+		$click_id     = str_repeat( 'a', 512 );
+		$_GET['epik'] = $click_id;
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertSame( $click_id, $data['user_data']['click_id'] );
+		$this->assertSame( $click_id, WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that an over-length click ID in the Pinterest tag cookie is discarded.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_over_length_epik_cookie() {
+		$_COOKIE['_epik'] = str_repeat( 'a', 513 );
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that an over-length click ID already stored in the session is discarded.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_over_length_session_click_id() {
+		WC()->session->set( 'pinterest_for_woocommerce_click_id', str_repeat( 'a', 513 ) );
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that an over-length click ID in the event source URL is discarded.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_over_length_epik_in_event_source_url() {
+		$source_url = add_query_arg( 'epik', str_repeat( 'a', 513 ), home_url( '/p/' ) );
+
+		$data = $this->prepare_page_visit_data( $source_url );
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that a non-string query parameter yields no click ID.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_ignores_array_epik_query_parameter() {
+		$_GET['epik'] = array( 'x' );
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that values changed by sanitization are discarded rather than stored mutated.
+	 *
+	 * @dataProvider mutated_click_id_provider
+	 *
+	 * @param string $click_id Raw click ID that sanitize_text_field() would alter.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_discards_click_id_changed_by_sanitization( string $click_id ) {
+		$_GET['epik'] = $click_id;
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+		$this->assertNull( WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Click ID values that sanitize_text_field() alters.
+	 *
+	 * @return array[]
+	 */
+	public function mutated_click_id_provider() {
+		return array(
+			'percent sequence' => array( 'click%41id' ),
+			'html tag'         => array( 'click<b>id</b>' ),
+		);
+	}
+
+	/**
+	 * Tests that a literal "0" click ID is kept and persisted.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_keeps_zero_click_id() {
+		$_GET['epik'] = '0';
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertSame( '0', $data['user_data']['click_id'] );
+		$this->assertSame( '0', WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that an empty query parameter falls through to the cookie.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_uses_cookie_when_epik_query_parameter_is_empty() {
+		$_GET['epik']     = '';
+		$_COOKIE['_epik'] = 'cookie1';
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertSame( 'cookie1', $data['user_data']['click_id'] );
+	}
+
+	/**
+	 * Tests that an empty event source URL parameter falls through to the query string.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_uses_query_parameter_when_event_source_url_epik_is_empty() {
+		$_GET['epik'] = 'getval';
+
+		$data = $this->prepare_page_visit_data( home_url( '/p/?epik=' ) );
+
+		$this->assertSame( 'getval', $data['user_data']['click_id'] );
+	}
+
+	/**
+	 * Tests that a rejected query parameter falls through to a valid cookie.
+	 *
+	 * @return void
+	 */
+	public function test_default_data_uses_cookie_when_epik_query_parameter_is_over_length() {
+		$_GET['epik']     = str_repeat( 'a', 513 );
+		$_COOKIE['_epik'] = 'pinterest-cookie-click-id';
+
+		$data = $this->prepare_page_visit_data();
+
+		$this->assertSame( 'pinterest-cookie-click-id', $data['user_data']['click_id'] );
+		$this->assertSame( 'pinterest-cookie-click-id', WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * The PageVisit beacon can preserve the URL of the cached storefront page.
+	 */
+	public function test_uses_explicit_event_source_url() {
+		$source_url  = home_url( '/cached-product/?campaign=pinterest' );
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user, $source_url );
+
+		$data = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertSame( $source_url, $data['event_source_url'] );
+	}
+
+	/**
+	 * Invalid explicit source URLs fall back to the current request URL.
+	 */
+	public function test_invalid_explicit_event_source_url_uses_default() {
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user, 'javascript:alert(1)' );
+
+		$data = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertSame( $this->get_event_source_url(), $data['event_source_url'] );
 	}
 
 	public function test_get_checkout_data() {
@@ -297,6 +670,128 @@ class ConversionsTest extends WP_UnitTestCase {
 			),
 			$data
 		);
+	}
+
+	/**
+	 * Keep failed and successful dispatch diagnostics free of event data.
+	 *
+	 * @dataProvider logging_cases
+	 * @param string $outcome Local HTTP outcome.
+	 * @param bool   $debug Whether debug logging is enabled.
+	 */
+	public function test_conversion_logs_omit_event_data( $outcome, $debug ) {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_advertiser'  => 'local-advertiser',
+				'enable_debug_logging' => $debug,
+			)
+		);
+		$messages        = array();
+		$original_logger = Logger::$logger;
+		Logger::$logger  = $this->getMockBuilder( \WC_Logger::class )->disableOriginalConstructor()->onlyMethods( array( 'log' ) )->getMock();
+		Logger::$logger->method( 'log' )->willReturnCallback(
+			function ( $level, $message ) use ( &$messages ) {
+				$messages[] = $message;
+			}
+		);
+		$http = function () use ( $outcome ) {
+			if ( 'transport' === $outcome ) {
+				return new \WP_Error( 'http_request_failed', 'local-upstream-transport-message' );
+			}
+			if ( 'exception' === $outcome ) {
+				throw new \RuntimeException( 'local-upstream-exception-message', 321 );
+			}
+			$body = array( 'events' => array( array( 'status' => 'processed' ) ) );
+			if ( in_array( $outcome, array( 'api', 'tracker', 'unknown', 'long' ), true ) ) {
+				$body = array(
+					'code'    => 345,
+					'message' => 'local-upstream-api-message' . ( 'long' === $outcome ? str_repeat( 'x', 500 ) : '' ),
+					'details' => 'local-private-body',
+				);
+			} elseif ( 'event' === $outcome ) {
+				$body = array(
+					'events' => array(
+						array(
+							'status'        => 'failed',
+							'error_message' => 'local-upstream-event-message',
+						),
+					),
+				);
+			}
+			return array(
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+				'headers'  => array(),
+				'body'     => wp_json_encode( $body ),
+			);
+		};
+		add_filter( 'pre_http_request', $http );
+		$thrown      = null;
+		$event_name  = 'unknown' === $outcome ? 'LocalCustomEvent' : Tracking::EVENT_CHECKOUT;
+		$data        = new Data\Checkout( 'local-private-event-id', 'local-private-order', '18.75', 1, 'USD', array() );
+		$conversions = new Conversions( new User( 'local-private-ip', 'local-private-agent' ), home_url( '/local-private-url?epik=local-private-click' ) );
+		try {
+			if ( 'tracker' === $outcome ) {
+				( new Tracking( array( $conversions ) ) )->track_event( $event_name, $data );
+			} else {
+				$conversions->track_event( $event_name, $data );
+			}
+		} catch ( \Throwable $error ) {
+			$thrown = $error;
+		} finally {
+			remove_filter( 'pre_http_request', $http );
+			Logger::$logger = $original_logger;
+		}
+		if ( in_array( $outcome, array( 'success', 'tracker' ), true ) ) {
+			$this->assertNull( $thrown );
+		} else {
+			$this->assertInstanceOf( \Throwable::class, $thrown );
+			$this->assertStringContainsString( 'local-upstream', $thrown->getMessage() );
+		}
+		$messages = implode( "\n", $messages );
+		if ( 'success' === $outcome && ! $debug ) {
+			$this->assertSame( '', $messages );
+			return;
+		}
+		$this->assertStringNotContainsString( 'local-private', $messages );
+		$this->assertStringNotContainsString( '?', $messages );
+		$this->assertStringContainsString( $event_name, $messages );
+		if ( 'success' !== $outcome ) {
+			$this->assertStringContainsString( 'local-upstream', $messages );
+		}
+		if ( 'long' === $outcome ) {
+			$this->assertStringNotContainsString( str_repeat( 'x', 200 ), $messages );
+		}
+	}
+
+	/**
+	 * Debug and production diagnostics across native dispatch outcomes.
+	 *
+	 * @return array
+	 */
+	public function logging_cases() {
+		$cases = array();
+		foreach ( array( 'transport', 'exception', 'api', 'event', 'tracker', 'unknown', 'long', 'success' ) as $outcome ) {
+			$cases[ $outcome . ' production' ] = array( $outcome, false );
+			$cases[ $outcome . ' debug' ]      = array( $outcome, true );
+		}
+		return $cases;
+	}
+
+	/**
+	 * Prepares page visit request data for a fresh Conversions tracker.
+	 *
+	 * @param string $event_source_url Optional URL where the event occurred.
+	 *
+	 * @return array Prepared request data.
+	 */
+	private function prepare_page_visit_data( string $event_source_url = '' ) {
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user, $event_source_url );
+
+		return $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
 	}
 
 	/**

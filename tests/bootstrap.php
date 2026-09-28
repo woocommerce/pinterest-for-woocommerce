@@ -51,6 +51,13 @@ require "{$wp_tests_dir}/includes/bootstrap.php";
 // Start up the WC testing environment.
 require_once $wc_dir . '/tests/legacy/bootstrap.php';
 
+// Override the storage WooCommerce's test bootstrap selected.
+configure_order_storage();
+
+// CLI-only diagnostics from the installed test dependencies.
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+printf( "Testing PHP %s, WordPress %s, WooCommerce %s.\n", PHP_VERSION, $GLOBALS['wp_version'], WC_VERSION );
+
 // Add helpers for shipping tests.
 require_once PLUGIN_TESTS_DIR . '/Helpers/ShippingHelpers.php';
 
@@ -69,20 +76,42 @@ function install_woocommerce() {
 
 	WC_Install::install();
 
-	// Initialize the WC Admin extension.
-	if ( class_exists( '\Automattic\WooCommerce\Internal\Admin\Install' ) ) {
-		\Automattic\WooCommerce\Internal\Admin\Install::create_tables();
-		\Automattic\WooCommerce\Internal\Admin\Install::create_events();
-	} elseif ( class_exists( '\Automattic\WooCommerce\Admin\Install' ) ) {
-		\Automattic\WooCommerce\Admin\Install::create_tables();
-		\Automattic\WooCommerce\Admin\Install::create_events();
-	}
-
 	// Reload capabilities after install, see https://core.trac.wordpress.org/ticket/28374.
 	$GLOBALS['wp_roles'] = null; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 	wp_roles();
 
 	echo "Installing WooCommerce..." . PHP_EOL;
+}
+
+/**
+ * Select and verify the order storage used by this test run.
+ *
+ * @throws \RuntimeException When the requested storage is invalid or inactive.
+ */
+function configure_order_storage() {
+	// Storage is chosen below. Without this, WooCommerce can switch an empty shop to
+	// HPOS later in the run (e.g. on admin_init in AJAX tests).
+	add_filter( 'woocommerce_enable_hpos_by_default_for_new_shops', '__return_false' );
+
+	$storage = getenv( 'PINTEREST_FOR_WOOCOMMERCE_TEST_ORDER_STORAGE' );
+	$storage = false === $storage || '' === $storage ? 'cpt' : $storage;
+
+	if ( ! in_array( $storage, array( 'cpt', 'hpos' ), true ) ) {
+		throw new \RuntimeException( 'PINTEREST_FOR_WOOCOMMERCE_TEST_ORDER_STORAGE must be cpt or hpos.' );
+	}
+
+	if ( 'hpos' === $storage ) {
+		wc_get_container()->get( \Automattic\WooCommerce\Internal\DataStores\Orders\DataSynchronizer::class )->create_database_tables();
+	}
+
+	update_option( 'woocommerce_custom_orders_table_data_sync_enabled', 'no' );
+	update_option( 'woocommerce_custom_orders_table_enabled', 'hpos' === $storage ? 'yes' : 'no' );
+
+	if ( ( 'hpos' === $storage ) !== \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled() ) {
+		throw new \RuntimeException( 'The requested order storage is not active.' );
+	}
+
+	echo 'Order storage: ' . esc_html( $storage ) . PHP_EOL;
 }
 
 /**

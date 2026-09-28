@@ -178,6 +178,7 @@ class APIV5 extends Base {
 	 *              @type ?bool $aem_ge_enabled     Whether Automatic Enhanced Match gender is enabled.
 	 *              @type ?bool $aem_db_enabled     Whether Automatic Enhanced Match birthdate is enabled.
 	 *              @type ?bool $aem_loc_enabled    Whether Automatic Enhanced Match location is enabled.
+	 *              @type ?bool $aem_external_id_enabled Whether Automatic Enhanced Match external ID is enabled.
 	 *          }
 	 *      }
 	 * }
@@ -221,6 +222,7 @@ class APIV5 extends Base {
 	 *          @type bool    $aem_ge_enabled      Whether Automatic Enhanced Match gender is enabled.
 	 *          @type bool    $aem_db_enabled      Whether Automatic Enhanced Match birthdate is enabled.
 	 *          @type bool    $aem_loc_enabled     Whether Automatic Enhanced Match location is enabled.
+	 *          @type bool    $aem_external_id_enabled Whether Automatic Enhanced Match external ID is enabled.
 	 *      }
 	 * }
 	 * @throws PinterestApiException Throws 500 exception in case of unexpected error.
@@ -259,6 +261,7 @@ class APIV5 extends Base {
 	 *          @type ?bool $aem_ge_enabled     Whether Automatic Enhanced Match gender is enabled.
 	 *          @type ?bool $aem_db_enabled     Whether Automatic Enhanced Match birthdate is enabled.
 	 *          @type ?bool $aem_loc_enabled    Whether Automatic Enhanced Match location is enabled.
+	 *          @type ?bool $aem_external_id_enabled Whether Automatic Enhanced Match external ID is enabled.
 	 *      }
 	 * }
 	 * @throws PinterestApiException|Exception Throws 500 exception.
@@ -269,14 +272,15 @@ class APIV5 extends Base {
 			"ad_accounts/{$ad_account_id}/conversion_tags",
 			'POST',
 			array(
-				'name'             => $tag_name,
-				'aem_enabled'      => true,
-				'md_frequency'     => 1,
-				'aem_fnln_enabled' => true,
-				'aem_ph_enabled'   => true,
-				'aem_ge_enabled'   => true,
-				'aem_db_enabled'   => true,
-				'ae_loc_enabled'   => true,
+				'name'                    => $tag_name,
+				'aem_enabled'             => true,
+				'md_frequency'            => 1,
+				'aem_fnln_enabled'        => true,
+				'aem_ph_enabled'          => true,
+				'aem_ge_enabled'          => true,
+				'aem_db_enabled'          => true,
+				'aem_loc_enabled'         => true,
+				'aem_external_id_enabled' => true,
 			)
 		);
 	}

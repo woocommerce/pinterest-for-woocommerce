@@ -27,8 +27,13 @@ use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
+use Automattic\WooCommerce\Pinterest\Tracking\PageVisit;
 use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Automattic\WooCommerce\Pinterest\Utilities\Tracks;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
@@ -74,8 +79,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		const PLUGIN_REQUIREMENTS = array(
 			'php_version'      => '7.4',
-			'wp_version'       => '5.6',
-			'wc_version'       => '7.0',
+			'wp_version'       => '6.9',
+			'wc_version'       => '10.9.0',
 			'action_scheduler' => '3.3.0',
 		);
 
@@ -272,9 +277,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'rest_api_init', array( $this, 'init_api_endpoints' ) );
 			add_action( 'wp_head', array( $this, 'maybe_inject_verification_code' ) );
 			add_action( 'wp_head', array( Pinterest\RichPins::class, 'maybe_inject_rich_pins_opengraph_tags' ) );
+			add_action( 'template_redirect', array( Pinterest\RichPins::class, 'prevent_protected_product_caching' ) );
 			add_action( 'wp', array( Pinterest\SaveToPinterest::class, 'maybe_init' ) );
 
 			add_action( 'init', array( $this, 'init' ), 0 );
+			PageVisit::init_hooks();
 
 			// ActionScheduler is activated on init 1 so lets make sure we are updating after that.
 			add_action( 'init', array( $this, 'maybe_update_plugin' ), 5 );
@@ -904,8 +911,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param string $context The context parameter.
-		 * @param string $args    Additional arguments like 'view' or 'business_id'.
+		 * @param string       $context The context parameter.
+		 * @param string|array $args    Additional arguments like 'view' or 'business_id'.
 		 *
 		 * @return string
 		 */

@@ -4,50 +4,63 @@ on:
   push:
     branches:
       - trunk
-      - develop
     paths:
       - "**.php"
       - composer.json
       - composer.lock
       - .github/workflows/php-unit-tests.yml
-  pull_request:
-    paths:
-      - "**.php"
-      - composer.json
-      - composer.lock
-      - .github/workflows/php-unit-tests.yml
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+      - bin/install-wp-tests.sh
+  workflow_call:
+    inputs:
+      # Empty keeps the matrix below; any other value (e.g. `nightly`) replaces its WooCommerce versions.
+      wc-version:
+        type: string
+        default: ''
 
 jobs:
   UnitTests:
-    name: PHP unit tests - PHP ${{ matrix.php }}, WP ${{ matrix.wp-version }}
+    name: PHP unit tests - PHP ${{ matrix.php }}, WP ${{ matrix.wp-version }}, WC ${{ matrix.wc-version }}, ${{ matrix.order-storage || 'cpt' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
       WP_CORE_DIR: "/tmp/wordpress/src"
       WP_TESTS_DIR: "/tmp/wordpress/tests/phpunit"
+      PINTEREST_FOR_WOOCOMMERCE_TEST_ORDER_STORAGE: ${{ matrix.order-storage || 'cpt' }}
     strategy:
       matrix:
-        php: [7.4, 8.3]
+        php: ['7.4', '8.3', '8.4']
         wp-version: [latest]
+        wc-version: ${{ fromJSON(inputs.wc-version && format('["{0}"]', inputs.wc-version) || '["latest"]') }}
+        # WooCommerce enables HPOS for new shops, so rows select legacy storage explicitly.
+        # The single HPOS row overrides this value, so GitHub adds it as a separate job.
+        order-storage: [cpt]
+        # Minimum-version rows pin their own WooCommerce, so they run only when no wc-version is requested.
+        include: ${{ fromJSON(inputs.wc-version == '' && '[{"php":7.4,"wp-version":"6.9.0","wc-version":"10.9.0"},{"php":"8.4","wp-version":"latest","wc-version":"latest","order-storage":"hpos"}]' || format('[{{"php":"8.4","wp-version":"latest","wc-version":"{0}","order-storage":"hpos"}}]', inputs.wc-version)) }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Prepare PHP
-        uses: woocommerce/grow/prepare-php@actions-v1
+        uses: woocommerce/grow/prepare-php@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           php-version: "${{ matrix.php }}"
 
       - name: Prepare MySQL
-        uses: woocommerce/grow/prepare-mysql@actions-v1
+        uses: woocommerce/grow/prepare-mysql@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1
 
       - name: Install WP tests
         shell: bash
-        run: ./bin/install-wp-tests.sh wordpress_test root root localhost ${{ matrix.wp-version }}
+        env:
+          WP_VERSION: ${{ matrix.wp-version }}
+          WC_VERSION: ${{ matrix.wc-version }}
+        run: ./bin/install-wp-tests.sh wordpress_test root root localhost "$WP_VERSION"
+
+      - name: Report test versions
+        run: |
+          php --version
+          php -r 'require getenv("WP_CORE_DIR") . "/wp-includes/version.php"; echo "WordPress: $wp_version\n";'
+          php -r '$plugin = file_get_contents(getenv("WP_CORE_DIR") . "/wp-content/plugins/woocommerce/woocommerce.php"); preg_match("/Version:\s*(\S+)/", $plugin, $version) || exit(1); echo "WooCommerce: {$version[1]}\n";'
 
       - name: Run PHP unit tests
         run: composer test-unit

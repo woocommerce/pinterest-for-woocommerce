@@ -9,6 +9,7 @@ import { fetch } from './controls';
  */
 export function* getSettings() {
 	try {
+		yield setRequestingError( false, 'all' );
 		const result = yield fetch();
 		yield receiveSettings( result );
 	} catch ( error ) {

@@ -26,7 +26,8 @@
 		"automattic/jetpack-autoloader": "^2.10.1",
 		"defuse/php-encryption": "^2.2",
 		"woocommerce/action-scheduler-job-framework": "^2.0.0",
-		"woocommerce/grow": "dev-compat-checker"
+		"woocommerce/grow": "dev-compat-checker",
+		"automattic/jetpack-device-detection": "^3.4.6"
 	},
 	"require-dev": {
 		"composer/installers": "^2.0",
@@ -34,12 +35,22 @@
 		"sirbrillig/phpcs-changed": "^2.12.0",
 		"phpunit/phpunit": "^9.6",
 		"yoast/phpunit-polyfills": "^1.0",
-		"wp-cli/i18n-command": "^2.6"
+		"wp-cli/i18n-command": "^2.6",
+		"phpstan/phpstan": "^2.1",
+		"szepeviktor/phpstan-wordpress": "^2.0",
+		"php-stubs/woocommerce-stubs": "^10.9",
+		"php-parallel-lint/php-parallel-lint": "^1.4",
+		"automattic/jetpack-changelogger": "^6.0"
 	},
 	"autoload": {
 		"psr-4": {
 			"Automattic\\WooCommerce\\Pinterest\\": "src/"
 		}
+	},
+	"autoload-dev": {
+		"classmap": [
+			"tools/changelogger/"
+		]
 	},
 	"config": {
 		"platform": {
@@ -52,14 +63,37 @@
 		}
 	},
 	"scripts": {
+		"check:php": "@lint-branch",
+		"lint:php": "bash bin/phplint.sh",
 		"phpcs": "phpcs --extensions=php -s -p",
 		"lint": "chg=$(git diff --relative --name-only -- '*.php'); [[ -z $chg ]] || phpcs-changed -s --git --git-unstaged $chg",
 		"lint-staged": "chg=$(git diff HEAD --relative --name-only -- '*.php'); [[ -z $chg ]] || phpcs-changed -s --git $chg",
-		"lint-branch": "sh ./bin/lint-branch.sh",
+		"lint-branch": "bash ./bin/lint-branch.sh",
 		"phpcbf": "phpcbf -p",
-		"test-unit": "./vendor/bin/phpunit"
+		"test-unit": "./vendor/bin/phpunit",
+		"test:isolated": "phpunit -c tests/isolated/phpunit.xml.dist",
+		"lint:phpstan": "phpstan analyse --configuration=phpstan.neon.dist --no-progress --memory-limit=2G",
+		"lint:phpstan:baseline:update": "@lint:phpstan --generate-baseline=phpstan-baseline.neon --allow-empty-baseline"
 	},
 	"extra": {
+		"changelogger": {
+			"changelog": "changelog.txt",
+			"changes-dir": "changelog",
+			"types": {
+				"new": "New",
+				"fix": "Fix",
+				"tweak": "Tweak",
+				"dev": "Dev"
+			},
+			"ordering": [
+				"subheading"
+			],
+			"formatter": {
+				"class": "SomewhereWarm\\Changelogger\\Changelog_Formatter",
+				"title": "*** Pinterest for WooCommerce Changelog ***"
+			},
+			"versioning": "semver"
+		},
 		"scripts-description": {
 			"phpcs": "Analyze code against the WordPress coding standards with PHP_CodeSniffer",
 			"phpcbf": "Fix coding standards warnings/errors automatically with PHP Code Beautifier",

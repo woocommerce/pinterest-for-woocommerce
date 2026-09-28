@@ -191,11 +191,11 @@ const AccountConnection = ( {
 											? __(
 													'Business account',
 													'pinterest-for-woocommerce'
-											  )
+												)
 											: __(
 													'Personal account',
 													'pinterest-for-woocommerce'
-											  ) }
+												) }
 										{ ')' }
 									</span>
 								</Text>

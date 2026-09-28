@@ -59,6 +59,17 @@ class PinterestApiException extends \Exception {
 	public const OFFER_ALREADY_REDEEMED_BY_ANOTHER_ADVERTISER = 2318;
 
 	/**
+	 * Offer already redeemed — additional Pinterest error code observed for
+	 * the same condition.
+	 *
+	 * Observed during investigation for PIN4WOO-74. Pinterest returns this
+	 * code alongside 2324 / 2318 for offer-redemption conflicts; the exact
+	 * distinction is not documented in the public API, but it has the same
+	 * terminal semantics as the other already-redeemed codes.
+	 */
+	public const OFFER_ALREADY_REDEEMED_VARIANT = 2322;
+
+	/**
 	 * Merchant has been disapproved.
 	 * Some feeds, when deleting, may fail to delete due to the merchant has been disapproved.
 	 */

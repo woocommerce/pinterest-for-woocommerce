@@ -5,12 +5,46 @@ import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { recordEvent } from '@woocommerce/tracks';
 
+jest.mock( '../../setup-guide/app/helpers/effects', () => ( {
+	useSettingsSelect: jest.fn(),
+} ) );
+
 /**
  * Internal dependencies
  */
 import SyncState from './SyncState';
+import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
 
 describe( 'SyncState component', () => {
+	afterEach( () => useSettingsSelect.mockReset() );
+
+	test.each( [
+		[
+			'<span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">&euro;</span>1,234.50</bdi></span>',
+			'€1,234.50',
+		],
+		[ '<em>Account credit</em> &amp; pending', 'Account credit & pending' ],
+		[ '&lt;em&gt;Account credit&lt;/em&gt;', '<em>Account credit</em>' ],
+		[ '0.00', '0.00' ],
+	] )( 'renders credit value as text: %s', ( credit, expected ) => {
+		useSettingsSelect.mockReturnValue( {
+			account_data: {
+				available_discounts: {
+					marketing_offer: { remaining_discount: credit },
+				},
+			},
+		} );
+		const { container } = render( <SyncState /> );
+		const notice = container.querySelector(
+			'.pinterest-for-woocommerce-catalog-sync__state-footer-credits'
+		);
+		expect( notice ).toHaveTextContent(
+			`You have ${ expected } of free ad credits left to use`
+		);
+		expect(
+			notice.querySelector( 'em, .woocommerce-Price-amount' )
+		).toBeNull();
+	} );
 	test( 'should render header and footer correctly', () => {
 		const { getByRole } = render( <SyncState /> );
 

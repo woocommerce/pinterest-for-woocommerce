@@ -44,7 +44,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 		/**
 		 * Handle registration of all needed pages, depending on setup_complete status,
-		 * and wether we have the new WC nav enabled or not.
+		 * and whether we have the new WC nav enabled or not.
 		 *
 		 * @return void
 		 */

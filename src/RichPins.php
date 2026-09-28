@@ -20,6 +20,17 @@ class RichPins {
 	use PluginHelper;
 
 	/**
+	 * Keep password-authorized product metadata out of shared page caches.
+	 *
+	 * @return void
+	 */
+	public static function prevent_protected_product_caching() {
+		if ( is_singular( 'product' ) && '' !== get_post_field( 'post_password', get_queried_object_id(), 'raw' ) ) {
+			wc_nocache_headers();
+		}
+	}
+
+	/**
 	 * Output Pinterest Rich Pins metatags based on post_type and site setup.
 	 *
 	 * Rich Pins show metadata right on the Pin itself, giving Pinners a richer experience and increasing engagement.
@@ -106,6 +117,10 @@ class RichPins {
 	 */
 	protected static function get_opengraph_tags( $args ) {
 
+		if ( is_singular( 'product' ) && post_password_required( get_queried_object_id() ) ) {
+			return array();
+		}
+
 		if ( empty( $args['products']['enabled'] ) && empty( $args['posts']['enabled'] ) ) {
 			return array();
 		}
@@ -151,7 +166,7 @@ class RichPins {
 	 */
 	public static function add_product_opengraph_tags( $tags, $args ) {
 
-		if ( ! is_singular( 'product' ) || empty( $args['products']['enabled'] ) ) {
+		if ( ! is_singular( 'product' ) || empty( $args['products']['enabled'] ) || post_password_required( get_queried_object_id() ) ) {
 			return $tags;
 		}
 
@@ -182,7 +197,8 @@ class RichPins {
 			 * Filters whether the shortcodes should be applied for product descriptions on the rich pins or be stripped out.
 			 *
 			 * @param bool       $apply_shortcodes Shortcodes are applied if set to `true` and stripped out if set to `false`.
-			 * @param WC_Product $product          WooCommerce product object.
+			 * @param \WC_Product $product         WooCommerce product object.
+			 *
 			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 			 */
 			$apply_shortcodes = apply_filters( 'pinterest_for_woocommerce_rich_pins_product_description_apply_shortcodes', false, $product );
@@ -235,7 +251,8 @@ class RichPins {
 		 * Filters whether the shortcodes should be applied for product descriptions on the rich pins or be stripped out.
 		 *
 		 * @param bool $apply_shortcodes Shortcodes are applied if set to `true` and stripped out if set to `false`.
-		 * @param int  The post id.
+		 * @param int  $post_id          The post id.
+		 *
 		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 		 */
 		$apply_shortcodes = apply_filters( 'pinterest_for_woocommerce_rich_pins_post_description_apply_shortcodes', false, get_the_ID() );

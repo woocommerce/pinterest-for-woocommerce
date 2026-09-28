@@ -66,6 +66,10 @@ class RefreshToken {
 
 		try {
 			$refreshed_token_data = self::refresh_token( $token_data );
+			if ( false === $refreshed_token_data ) {
+				self::log( 'Token renewal returned no token data; keeping the stored tokens.', WC_Log_Levels::ERROR );
+				return false;
+			}
 			Pinterest_For_Woocommerce::save_token_data( $refreshed_token_data );
 			return true;
 		} catch ( Exception $e ) {
@@ -95,7 +99,6 @@ class RefreshToken {
 				'refresh_token' => Crypto::decrypt( $token_data['refresh_token'] ),
 				'url'           => get_site_url(),
 			),
-			'sslverify' => false,
 		);
 
 		// Translators: %s is the endpoint.
@@ -111,16 +114,7 @@ class RefreshToken {
 		$body = trim( wp_remote_retrieve_body( $response ) );
 		$body = json_decode( $body, true );
 
-		$response['body'] = wp_json_encode(
-			array_merge(
-				$body,
-				array(
-					'access_token'  => '***** Sensitive data. *******',
-					'refresh_token' => '******* Sensitive data. *******',
-				)
-			)
-		);
-		self::log( wp_json_encode( $response ) );
+		Logger::log_feature_response( $response, 'pinterest-for-woocommerce-oauth-refresh', WC_Log_Levels::DEBUG );
 
 		if ( ! is_array( $body ) || ! isset( $body['access_token'], $body['expires_in'] ) ) {
 			return false;

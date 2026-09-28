@@ -139,6 +139,12 @@ class TrackerSnapshotTest extends \WP_UnitTestCase {
 		TrackerSnapshot::maybe_init();
 		$tracks = apply_filters( 'woocommerce_tracker_data', [] );
 
-		$this->assertTrue( count($tracks) === 0, "Track data should be empty whe OPT-OUT" );
+		// WooCommerce core hooks its own data into this filter unconditionally (the opt-out
+		// gating happens before core invokes the filter), so only assert that this plugin
+		// added nothing rather than expecting the filter result to be completely empty.
+		$this->assertFalse(
+			isset( $tracks['extensions'][ PINTEREST_FOR_WOOCOMMERCE_TRACKER_PREFIX ] ),
+			'Pinterest data should not be tracked when tracking is opted out'
+		);
 	}
 }

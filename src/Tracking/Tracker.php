@@ -50,6 +50,19 @@ abstract class Tracker {
 	}
 
 	/**
+	 * Returns a hashed external identifier for the logged-in customer.
+	 *
+	 * @return string|false Hashed customer ID, or false for guests.
+	 */
+	protected static function maybe_get_hashed_customer_external_id() {
+		if ( ! is_user_logged_in() ) {
+			return false;
+		}
+
+		return hash( 'sha256', (string) get_current_user_id() );
+	}
+
+	/**
 	 * Tracks the event.
 	 *
 	 * @since 1.4.0
@@ -59,7 +72,7 @@ abstract class Tracker {
 	 *
 	 * @throws Throwable In case of an API error.
 	 *
-	 * @return true
+	 * @return bool True when the event was handled; Conversions returns false when nothing was dispatched.
 	 */
 	abstract public function track_event( string $event_name, Data $data );
 }

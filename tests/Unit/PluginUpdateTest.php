@@ -6,6 +6,9 @@ use ReflectionClass;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 use Automattic\WooCommerce\Pinterest\Logger;
+use Automattic\WooCommerce\Pinterest\FeedGenerator;
+use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
+use Pinterest_For_Woocommerce;
 use Automattic\WooCommerce\Pinterest\PluginUpdate;
 use Exception;
 
@@ -57,6 +60,18 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 			}
 		};
 		Logger::$logger = $this->mock_logger;
+	}
+
+	/**
+	 * Clear upgrade state created by non-transactional updater tests.
+	 *
+	 * @return void
+	 */
+	protected function tearDown(): void {
+		LocalFeedConfigs::deregister();
+		delete_option( FeedGenerator::OPTION_FEED_DIRTY );
+		as_unschedule_all_actions( FeedGenerator::ACTION_START_FEED_GENERATOR, null, PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		parent::tearDown();
 	}
 
 	/**
@@ -193,6 +208,78 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 		// No messages means that the update procedure exited early.
 		$this->assertEmpty( $this->mock_logger->message );
 
+	}
+
+	/**
+	 * The versioned upgrade requests one refresh and retains daily scheduling.
+	 *
+	 * @return void
+	 */
+	public function testUpgradeMarksFeedDirtyOnce() {
+		$settings = Pinterest_For_Woocommerce::get_settings();
+		$hook     = FeedGenerator::ACTION_START_FEED_GENERATOR;
+		Pinterest_For_Woocommerce::save_setting( 'account_data', array( 'verified_user_websites' => array( wp_parse_url( home_url(), PHP_URL_HOST ) ) ) );
+		Pinterest_For_Woocommerce::save_setting( 'product_sync_enabled', true );
+		update_option( PluginUpdate::PLUGIN_UPDATE_VERSION_OPTION, '1.4.20' );
+		delete_option( FeedGenerator::OPTION_FEED_DIRTY );
+		as_unschedule_all_actions( $hook, null, PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+		as_schedule_recurring_action( time() + DAY_IN_SECONDS, DAY_IN_SECONDS, $hook, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+
+		try {
+			$this->plugin_update->maybe_update();
+			$this->assertTrue( (bool) get_option( FeedGenerator::OPTION_FEED_DIRTY ) );
+			$this->assertLessThanOrEqual( time(), as_next_scheduled_action( $hook, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) );
+			$actions = as_get_scheduled_actions(
+				array(
+					'hook'   => $hook,
+					'status' => 'pending',
+					'group'  => PINTEREST_FOR_WOOCOMMERCE_PREFIX,
+				)
+			);
+			$this->assertCount( 1, $actions );
+			$this->assertSame( DAY_IN_SECONDS, reset( $actions )->get_schedule()->get_recurrence() );
+
+			delete_option( FeedGenerator::OPTION_FEED_DIRTY );
+			$this->plugin_update->maybe_update();
+			$this->assertFalse( get_option( FeedGenerator::OPTION_FEED_DIRTY ) );
+		} finally {
+			Pinterest_For_Woocommerce::save_settings( $settings );
+		}
+	}
+
+	/**
+	 * Stores with product sync disabled must not start a generation cycle.
+	 *
+	 * @return void
+	 */
+	public function testUpgradePreservesDisabledProductSync() {
+		$settings = Pinterest_For_Woocommerce::get_settings();
+		Pinterest_For_Woocommerce::save_setting( 'product_sync_enabled', false );
+		update_option( PluginUpdate::PLUGIN_UPDATE_VERSION_OPTION, '1.4.20' );
+		delete_option( FeedGenerator::OPTION_FEED_DIRTY );
+		as_unschedule_all_actions( FeedGenerator::ACTION_START_FEED_GENERATOR, null, PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+
+		try {
+			$this->plugin_update->maybe_update();
+			$this->assertFalse( get_option( FeedGenerator::OPTION_FEED_DIRTY ) );
+			$this->assertFalse( as_has_scheduled_action( FeedGenerator::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) );
+		} finally {
+			Pinterest_For_Woocommerce::save_settings( $settings );
+		}
+	}
+
+	/**
+	 * Later releases must not repeat this migration.
+	 *
+	 * @return void
+	 */
+	public function testLaterUpgradeDoesNotInvalidateFeedAgain() {
+		update_option( PluginUpdate::PLUGIN_UPDATE_VERSION_OPTION, '1.5.2' );
+		$updater = $this->getMockBuilder( PluginUpdate::class )->onlyMethods( array( 'invalidate_product_feeds', 'plugin_is_up_to_date' ) )->getMock();
+		// Exercise the version map even when the plugin version reaches this migration.
+		$updater->method( 'plugin_is_up_to_date' )->willReturn( false );
+		$updater->expects( $this->never() )->method( 'invalidate_product_feeds' );
+		$updater->maybe_update();
 	}
 
 	/**

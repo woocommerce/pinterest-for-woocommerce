@@ -24,16 +24,43 @@ use Throwable;
  */
 class Conversions extends Tracker {
 
-	/** @var User $user User data object. Data for Conversions API. */
+	/**
+	 * Session key used to persist the Pinterest click ID.
+	 *
+	 * @var string
+	 */
+	private const CLICK_ID_SESSION_KEY = 'pinterest_for_woocommerce_click_id';
+
+	/**
+	 * Maximum accepted click ID length in bytes. Longer values are discarded.
+	 *
+	 * @var int
+	 */
+	private const CLICK_ID_MAX_LENGTH = 512;
+
+	/**
+	 * User data for the Conversions API.
+	 *
+	 * @var User
+	 */
 	private $user;
+
+	/**
+	 * URL where the event occurred.
+	 *
+	 * @var string
+	 */
+	private $event_source_url;
 
 	/**
 	 * Pinterest Conversions API class constructor.
 	 *
-	 * @param User $user User data object to hold ip address and agent string.
+	 * @param User   $user             User data object to hold ip address and agent string.
+	 * @param string $event_source_url Optional URL where the event occurred.
 	 */
-	public function __construct( User $user ) {
-		$this->user = $user;
+	public function __construct( User $user, string $event_source_url = '' ) {
+		$this->user             = $user;
+		$this->event_source_url = esc_url_raw( $event_source_url, array( 'http', 'https' ) );
 	}
 
 	/**
@@ -42,31 +69,32 @@ class Conversions extends Tracker {
 	 * @param string $event_name Tracking event name.
 	 * @param Data   $data       Tracking event data class.
 	 *
-	 * @throws Throwable In case of an API error.
+	 * @throws Throwable In case of an API error, after logging it at error level.
 	 *
-	 * @return void
+	 * @return bool True after a dispatch, false when the event was skipped because no ad account is configured.
 	 */
 	public function track_event( string $event_name, Data $data ) {
 		$data = $this->prepare_request_data( $event_name, $data );
 
 		try {
-			$this->send_request( $event_name, $data );
+			if ( ! $this->send_request( $event_name, $data ) ) {
+				return false;
+			}
 
-			/* translators: 1: Conversions API event name, 2: JSON encoded event data. */
 			$messages = sprintf(
-				'Sending Pinterest Conversions API event %1$s with a payload: %2$s',
-				$event_name,
-				wp_json_encode( $data )
+				'Sending Pinterest Conversions API event %s.',
+				$event_name
 			);
 			Logger::log( $messages, 'debug', 'conversions' );
+
+			return true;
 		} catch ( Throwable $e ) {
-			/* translators: 1: Conversions API event name, 2: JSON encoded event data, 3: Error code, 4: Error message. */
 			$messages = sprintf(
-				'Sending Pinterest Conversions API event %1$s with a payload %2$s has failed with the error %3$d code and %4$s message',
+				'Sending Pinterest Conversions API event %1$s has failed with the error %2$d code and %3$s message',
 				$event_name,
-				wp_json_encode( $data ),
 				$e->getCode(),
-				$e->getMessage()
+				// The upstream message is free text: keep it on one line and bounded.
+				mb_substr( sanitize_text_field( $e->getMessage() ), 0, 200 )
 			);
 			Logger::log( $messages, 'error', 'conversions' );
 
@@ -108,11 +136,13 @@ class Conversions extends Tracker {
 	private function get_default_data( string $event_name ) {
 		global $wp;
 
+		$event_source_url = $this->event_source_url ? $this->event_source_url : home_url( $wp->request );
+
 		$data = array(
 			'event_name'       => $event_name,
 			'action_source'    => 'web',
 			'event_time'       => time(),
-			'event_source_url' => home_url( $wp->request ),
+			'event_source_url' => $event_source_url,
 			'partner_name'     => 'ss-woocommerce',
 			'user_data'        => array(
 				'client_ip_address' => $this->user->get_client_ip_address(),
@@ -124,6 +154,16 @@ class Conversions extends Tracker {
 		$email = self::maybe_get_hashed_customer_email();
 		if ( false !== $email ) {
 			$data['user_data']['em'] = array( $email );
+		}
+
+		$external_id = self::maybe_get_hashed_customer_external_id();
+		if ( false !== $external_id ) {
+			$data['user_data']['external_id'] = array( $external_id );
+		}
+
+		$click_id = self::maybe_get_click_id( $this->event_source_url );
+		if ( false !== $click_id ) {
+			$data['user_data']['click_id'] = $click_id;
 		}
 
 		return $data;
@@ -183,6 +223,104 @@ class Conversions extends Tracker {
 			$user_email       = $session_customer ? $session_customer['email'] : '';
 		}
 		return $user_email ? hash( 'sha256', $user_email ) : false;
+	}
+
+	/**
+	 * Returns the Pinterest click ID for the current visitor.
+	 *
+	 * The landing-page `epik` parameter is the freshest source. Beacon requests
+	 * carry the landing page as the event source URL, so its query string is
+	 * checked before the current request. Pinterest's `_epik` cookie and the
+	 * WooCommerce session retain the click ID for later events.
+	 *
+	 * @param string $event_source_url Optional URL where the event occurred.
+	 *
+	 * @return string|false Click ID, or false if it is unavailable.
+	 */
+	private static function maybe_get_click_id( string $event_source_url = '' ) {
+		$click_id = self::get_click_id_from_url( $event_source_url );
+
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only attribution parameter.
+		if ( false === $click_id && isset( $_GET['epik'] ) && is_string( $_GET['epik'] ) ) {
+			$click_id = self::normalize_click_id( wp_unslash( $_GET['epik'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in normalize_click_id().
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		if ( false === $click_id && isset( $_COOKIE['_epik'] ) && is_string( $_COOKIE['_epik'] ) ) {
+			$click_id = self::normalize_click_id( wp_unslash( $_COOKIE['_epik'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in normalize_click_id().
+		}
+
+		$session = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session : false;
+		if ( false !== $click_id ) {
+			if ( $session ) {
+				$session->set( self::CLICK_ID_SESSION_KEY, $click_id );
+			}
+
+			return $click_id;
+		}
+
+		if ( ! $session ) {
+			return false;
+		}
+
+		$stored   = $session->get( self::CLICK_ID_SESSION_KEY );
+		$click_id = self::normalize_click_id( $stored );
+		if ( false === $click_id && null !== $stored ) {
+			// Evict values stored before validation existed so they stop being re-serialized.
+			$session->__unset( self::CLICK_ID_SESSION_KEY );
+		}
+
+		return $click_id;
+	}
+
+	/**
+	 * Normalizes a visitor-supplied click ID.
+	 *
+	 * Values changed by sanitize_text_field() are discarded rather than stored
+	 * mutated, and over-length values are discarded rather than truncated: in
+	 * both cases the result could not match anything at Pinterest.
+	 *
+	 * @param mixed $value Raw click ID value.
+	 *
+	 * @return string|false Click ID, or false when empty, mutated by sanitization or longer than CLICK_ID_MAX_LENGTH.
+	 */
+	private static function normalize_click_id( $value ) {
+		if ( ! is_string( $value ) ) {
+			return false;
+		}
+
+		// Bound the length before sanitizing: sanitize_text_field() decodes percent
+		// sequences in a loop, so an unbounded value is expensive to clean up, and an
+		// over-length value should be reported whether or not sanitizing would alter it.
+		if ( strlen( $value ) > self::CLICK_ID_MAX_LENGTH ) {
+			Logger::log( sprintf( 'Discarding Pinterest click ID longer than %d bytes.', self::CLICK_ID_MAX_LENGTH ), 'debug', 'conversions' );
+			return false;
+		}
+
+		$sanitized = sanitize_text_field( $value );
+		if ( $sanitized !== $value || '' === $sanitized ) {
+			return false;
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Extracts the Pinterest click ID from the query string of an event source URL.
+	 *
+	 * @param string $event_source_url URL where the event occurred.
+	 *
+	 * @return string|false Click ID, or false if the URL does not carry one.
+	 */
+	private static function get_click_id_from_url( string $event_source_url ) {
+		$query = wp_parse_url( $event_source_url, PHP_URL_QUERY );
+		if ( ! $query ) {
+			return false;
+		}
+
+		wp_parse_str( $query, $params );
+
+		return self::normalize_click_id( $params['epik'] ?? null );
 	}
 
 	/**
@@ -293,12 +431,13 @@ class Conversions extends Tracker {
 	 * @param array  $data       Event data.
 	 *
 	 * @throws Throwable|Exception If any exception during the request happen.|If response was not successful enough.
-	 * @return void
+	 * @return bool False when no ad account is configured, true after a successful dispatch.
 	 */
 	private function send_request( string $event_name, array $data ) {
 		$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 		if ( empty( $ad_account_id ) ) {
-			return;
+			Logger::log( 'Skipping Pinterest Conversions API event ' . $event_name . ': no ad account (tracking_advertiser) is configured.', 'debug', 'conversions' );
+			return false;
 		}
 
 		$response = APIV5::send_conversions_api_event( $ad_account_id, $data );
@@ -330,5 +469,7 @@ class Conversions extends Tracker {
 				);
 			}
 		}
+
+		return true;
 	}
 }

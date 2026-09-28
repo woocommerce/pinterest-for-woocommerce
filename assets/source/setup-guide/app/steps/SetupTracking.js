@@ -65,32 +65,101 @@ const SetupTracking = ( { view = 'settings' } ) => {
 	const setAppSettings = useSettingsDispatch( view === 'wizard' );
 	const createNotice = useCreateNotice();
 
-	useEffect( () => {
-		if (
-			! isFetching &&
-			undefined !== appSettings &&
-			undefined === advertisersList &&
-			status !== 'error'
-		) {
-			fetchAdvertisers();
-		}
+	const saveOptions = useCallback(
+		async ( name, value ) => {
+			if (
+				appSettings?.tracking_advertiser &&
+				appSettings?.tracking_tag
+			) {
+				setStatus( 'success' );
+			} else {
+				setStatus( 'idle' );
+			}
 
-		if (
-			advertisersList &&
-			tagsList &&
-			appSettings?.tracking_advertiser &&
-			appSettings?.tracking_tag
-		) {
-			setStatus( 'success' );
-		}
-	}, [
-		appSettings,
-		advertisersList,
-		status,
-		fetchAdvertisers,
-		isFetching,
-		tagsList,
-	] );
+			setIsSaving( true );
+
+			try {
+				await setAppSettings( {
+					[ name ]: value ?? ! appSettings[ name ],
+				} );
+			} catch ( error ) {
+				createNotice(
+					'error',
+					__(
+						'There was a problem saving your settings.',
+						'pinterest-for-woocommerce'
+					)
+				);
+			}
+
+			setIsSaving( false );
+		},
+		[ appSettings, setStatus, setIsSaving, setAppSettings, createNotice ]
+	);
+
+	const fetchTags = useCallback(
+		async ( advertiserId ) => {
+			setIsFetching( true );
+
+			try {
+				setTagsList();
+
+				const results = await apiFetch( {
+					path:
+						wcSettings.pinterest_for_woocommerce.apiRoute +
+						'/tags/?advrtsr_id=' +
+						advertiserId,
+					method: 'GET',
+				} );
+
+				setTagsList( results );
+
+				if ( Object.keys( results ).length > 0 ) {
+					if (
+						! appSettings?.tracking_tag ||
+						typeof results[ appSettings?.tracking_tag ] ===
+							'undefined'
+					) {
+						const tagsKeys = Object.keys( results );
+						saveOptions(
+							'tracking_tag',
+							results[ tagsKeys[ 0 ] ].id
+						);
+					}
+				} else {
+					setStatus( 'error' );
+				}
+
+				if ( appSettings?.tracking_tag ) {
+					setStatus( 'success' );
+				}
+			} catch ( error ) {
+				setStatus( 'error' );
+				createNotice(
+					'error',
+					error.message ||
+						__(
+							'Couldn’t retrieve your tags.',
+							'pinterest-for-woocommerce'
+						)
+				);
+			}
+
+			setIsFetching( false );
+		},
+		[ appSettings, createNotice, setIsFetching, setStatus, saveOptions ]
+	);
+
+	const handleOptionChange = useCallback(
+		async ( name, value ) => {
+			if ( name === 'tracking_advertiser' ) {
+				fetchTags( value );
+			}
+
+			await saveOptions( name, value );
+		},
+		[ fetchTags, saveOptions ]
+	);
 
 	const fetchAdvertisers = useCallback( async () => {
 		setIsFetching( true );
@@ -143,107 +212,32 @@ const SetupTracking = ( { view = 'settings' } ) => {
 		setTermsAgreed,
 	] );
 
-	const fetchTags = useCallback(
-		async ( advertiserId ) => {
-			setIsFetching( true );
+	useEffect( () => {
+		if (
+			! isFetching &&
+			undefined !== appSettings &&
+			undefined === advertisersList &&
+			status !== 'error'
+		) {
+			fetchAdvertisers();
+		}
 
-			try {
-				setTagsList();
-
-				const results = await apiFetch( {
-					path:
-						wcSettings.pinterest_for_woocommerce.apiRoute +
-						'/tags/?advrtsr_id=' +
-						advertiserId,
-					method: 'GET',
-				} );
-
-				setTagsList( results );
-
-				if ( Object.keys( results ).length > 0 ) {
-					if (
-						! appSettings?.tracking_tag ||
-						typeof results[ appSettings?.tracking_tag ] ===
-							'undefined'
-					) {
-						const tagsKeys = Object.keys( results );
-						handleOptionChange(
-							'tracking_tag',
-							results[ tagsKeys[ 0 ] ].id
-						);
-					}
-				} else {
-					setStatus( 'error' );
-				}
-
-				if ( appSettings?.tracking_tag ) {
-					setStatus( 'success' );
-				}
-			} catch ( error ) {
-				setStatus( 'error' );
-				createNotice(
-					'error',
-					error.message ||
-						__(
-							'Couldn’t retrieve your tags.',
-							'pinterest-for-woocommerce'
-						)
-				);
-			}
-
-			setIsFetching( false );
-		},
-		[
-			appSettings,
-			createNotice,
-			setIsFetching,
-			setStatus,
-			handleOptionChange,
-		]
-	);
-
-	const handleOptionChange = useCallback(
-		async ( name, value ) => {
-			if ( name === 'tracking_advertiser' ) {
-				fetchTags( value );
-			}
-
-			if (
-				appSettings?.tracking_advertiser &&
-				appSettings?.tracking_tag
-			) {
-				setStatus( 'success' );
-			} else {
-				setStatus( 'idle' );
-			}
-
-			await saveOptions( name, value );
-		},
-		[ fetchTags, setStatus, appSettings, saveOptions ]
-	);
-
-	const saveOptions = useCallback(
-		async ( name, value ) => {
-			setIsSaving( true );
-
-			try {
-				await setAppSettings( {
-					[ name ]: value ?? ! appSettings[ name ],
-				} );
-			} catch ( error ) {
-				createNotice(
-					'error',
-					__(
-						'There was a problem saving your settings.',
-						'pinterest-for-woocommerce'
-					)
-				);
-			}
-
-			setIsSaving( false );
-		},
-		[ appSettings, setIsSaving, setAppSettings, createNotice ]
-	);
+		if (
+			advertisersList &&
+			tagsList &&
+			appSettings?.tracking_advertiser &&
+			appSettings?.tracking_tag
+		) {
+			setStatus( 'success' );
+		}
+	}, [
+		appSettings,
+		advertisersList,
+		status,
+		fetchAdvertisers,
+		isFetching,
+		tagsList,
+	] );
 
 	const handleTryAgain = () => {
 		setStatus( 'idle' );
@@ -345,11 +339,11 @@ const SetupTracking = ( { view = 'settings' } ) => {
 								? __(
 										'Select your advertiser and tag',
 										'pinterest-for-woocommerce'
-								  )
+									)
 								: __(
 										'Track conversions with the Pinterest tag',
 										'pinterest-for-woocommerce'
-								  )
+									)
 						}
 						description={
 							<>

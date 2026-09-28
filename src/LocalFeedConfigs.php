@@ -19,6 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Singleton pattern used.
  * Prevent application from having multiple instances of configuration.
  * At the same time allow distributed use of configurations.
+ *
+ * @phpstan-consistent-constructor
  */
 class LocalFeedConfigs {
 

@@ -4,20 +4,23 @@ on:
   push:
     branches:
       - trunk
-      - develop
     paths:
       - "**.js"
+      - "**.cjs"
+      - package.json
+      - package-lock.json
       - "**.scss"
       - .github/workflows/js-css-linting.yml
-  pull_request:
-    paths:
-      - "**.js"
-      - "**.scss"
-      - .github/workflows/js-css-linting.yml
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:
+    inputs:
+      frontend:
+        description: Run the JavaScript, CSS and package checks.
+        type: boolean
+        default: true
+      docs:
+        description: Run the Markdown check.
+        type: boolean
+        default: true
 
 env:
   FORCE_COLOR: 2
@@ -26,35 +29,56 @@ jobs:
   JSLintingCheck:
     name: Lint JavaScript
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Prepare node
-        uses: woocommerce/grow/prepare-node@actions-v1
+        uses: woocommerce/grow/prepare-node@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           node-version-file: ".nvmrc"
 
       - name: Prepare annotation formatter
-        uses: woocommerce/grow/eslint-annotation@actions-v1
+        uses: woocommerce/grow/eslint-annotation@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1
 
+      # Push runs have no inputs, so they run every check.
       - name: Lint JavaScript and annotate linting errors
+        if: ${{ github.event_name == 'push' || inputs.frontend }}
         run: npm run lint:js -- --format ./eslintFormatter.cjs
+
+      - name: Lint authored build and test configuration
+        if: ${{ !cancelled() && (github.event_name == 'push' || inputs.frontend) }}
+        run: npm run lint:tooling-js -- --format ./eslintFormatter.cjs
+
+      - name: Check dependency licenses
+        if: ${{ !cancelled() && (github.event_name == 'push' || inputs.frontend) }}
+        run: npm run check-licenses
+
+      - name: Check package metadata
+        if: ${{ !cancelled() && (github.event_name == 'push' || inputs.frontend) }}
+        run: npm run lint:pkg-json
+
+      - name: Check Markdown documentation
+        if: ${{ !cancelled() && (github.event_name == 'push' || inputs.docs) }}
+        run: npm run lint:md:docs
 
   CSSLintingCheck:
     name: Lint CSS
+    if: ${{ github.event_name == 'push' || inputs.frontend }}
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Prepare node
-        uses: woocommerce/grow/prepare-node@actions-v1
+        uses: woocommerce/grow/prepare-node@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           node-version-file: ".nvmrc"
 
       - name: Prepare annotation formatter
-        uses: woocommerce/grow/stylelint-annotation@actions-v1
+        uses: woocommerce/grow/stylelint-annotation@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1
 
       - name: Lint CSS and annotate linting errors
         run: npm run lint:css -- --custom-formatter ./stylelintFormatter.cjs

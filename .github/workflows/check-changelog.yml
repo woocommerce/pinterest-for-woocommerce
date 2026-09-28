@@ -1,0 +1,137 @@
+name: Changelog
+
+# Every pull request drops a change file into changelog/ instead of editing
+# changelog.txt; changelogger compiles them into changelog.txt at release time.
+#
+# This runs as its own workflow rather than a job in ci.yml so that adding or
+# removing the 'no changelog' label re-runs the check on its own, without
+# replaying the whole pipeline.
+#
+# The label is read live through the API rather than from the event payload.
+# The payload freezes the labels at trigger time, so a run queued before the
+# label was added would not see it. Concurrency cancels by dispatch order, so
+# that stale run can be the one that survives and fails a labeled pull request.
+
+on:
+  pull_request:
+    branches:
+      - trunk
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+      - labeled
+      - unlabeled
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+
+    check-changelog:
+        name: Check changelog
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        permissions:
+          contents: read
+          pull-requests: read
+
+        # Read through the environment, never interpolated into shell source.
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+
+        steps:
+
+            # The job always runs to completion so it can be a required check:
+            # a job skipped by a condition reports as skipped, not as passing.
+            - name: Decide what to check
+              id: decide
+              env:
+                GH_TOKEN: ${{ github.token }}
+                PR_NUMBER: ${{ github.event.pull_request.number }}
+              run: |
+                # Paginated: a pull request can carry more labels than one API page holds.
+                if ! LABELS=$(gh api --paginate "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/labels" --jq '.[].name'); then
+                  echo "::error::Could not read the pull request labels, so it is unknown whether a change file is required."
+                  exit 1
+                fi
+
+                if grep -qxF 'no changelog' <<< "$LABELS"; then
+                  HAS_SKIP_LABEL="true"
+                else
+                  HAS_SKIP_LABEL="false"
+                fi
+
+                # skip:     nothing to check at all.
+                # optional: no change file is required, but one that is there is
+                #           still validated. The label waives the entry, not the
+                #           format: a malformed change file merged under the label
+                #           would only surface as a broken release compile.
+                # require:  a change file must be there, and must be valid.
+                if [[ "$HEAD_REPO" == "$GITHUB_REPOSITORY" && "$HEAD_REF" == release/* ]]; then
+                  MODE="skip"
+                  REASON="Release branch: it compiles the change files rather than adding one."
+                elif [[ "$PR_AUTHOR" == "dependabot[bot]" ]]; then
+                  MODE="skip"
+                  REASON="Dependabot pull request: dependency bumps are summarized in one entry at release time."
+                elif [[ "$HAS_SKIP_LABEL" == "true" ]]; then
+                  MODE="optional"
+                  REASON="Labeled 'no changelog', so no change file is required. Any change file in the pull request is still validated."
+                else
+                  MODE="require"
+                  REASON=""
+                fi
+
+                echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+
+                if [[ -n "$REASON" ]]; then
+                  echo "$REASON" >> "$GITHUB_STEP_SUMMARY"
+                  echo "$REASON"
+                fi
+
+            - name: Checkout repository
+              if: steps.decide.outputs.mode != 'skip'
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                # The check diffs against the merge base with the target branch.
+                fetch-depth: 0
+
+            - name: Set up PHP
+              if: steps.decide.outputs.mode != 'skip'
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+              with:
+                php-version: '8.4'
+                coverage: none
+                tools: composer
+
+            - name: Get composer cache directory
+              if: steps.decide.outputs.mode != 'skip'
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache composer dependencies
+              if: steps.decide.outputs.mode != 'skip'
+              uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+              with:
+                path: ${{ steps.composer-cache.outputs.dir }}
+                key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                restore-keys: ${{ runner.os }}-composer-
+
+            - name: Install dependencies
+              if: steps.decide.outputs.mode != 'skip'
+              run: composer install --prefer-dist --no-progress --no-ansi --no-interaction
+
+            - name: Check change file
+              if: steps.decide.outputs.mode != 'skip'
+              env:
+                MODE: ${{ steps.decide.outputs.mode }}
+              run: |
+                if [[ "$MODE" == "optional" ]]; then
+                  bash bin/check_changelog.sh --optional
+                else
+                  bash bin/check_changelog.sh
+                fi

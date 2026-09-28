@@ -51,7 +51,10 @@ const SyncState = () => {
 			'You have %s of free ad credits left to use',
 			'pinterest-for-woocommerce'
 		),
-		hasAvailableCredits
+		new window.DOMParser().parseFromString(
+			String( hasAvailableCredits ?? '' ),
+			'text/html'
+		).body.textContent
 	);
 
 	return (
@@ -97,12 +100,9 @@ const SyncState = () => {
 					</FlexItem>
 					{ hasAvailableCredits && (
 						<FlexItem>
-							<Text
-								className="pinterest-for-woocommerce-catalog-sync__state-footer-credits"
-								dangerouslySetInnerHTML={ {
-									__html: availableCredits,
-								} }
-							/>
+							<Text className="pinterest-for-woocommerce-catalog-sync__state-footer-credits">
+								{ availableCredits }
+							</Text>
 						</FlexItem>
 					) }
 				</Flex>

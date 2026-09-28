@@ -1,12 +1,14 @@
 === Pinterest for WooCommerce ===
 Contributors: automattic, pinterest, woocommerce
 Tags: pinterest, woocommerce, marketing, product catalog feed, pixel
-Requires at least: 5.6
-Tested up to: 7.0
+Requires at least: 6.9
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.4.26
-License: GPLv3
-License URI: https://www.gnu.org/licenses/gpl-3.0.html
+WC requires at least: 10.9
+WC tested up to: 11.1
+Stable tag: 1.5.1
+License: GNU General Public License v3.0
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 Get your products in front of Pinterest users searching for ideas and things to buy. Connect your WooCommerce store to make your catalog browsable.
 
@@ -62,8 +64,8 @@ Pinterest is a visual discovery engine people use to find inspiration for their 
 
 = Minimum Requirements =
 
-* WordPress 5.6 or greater
-* WooCommerce 7.0 or greater
+* WordPress 6.9 or greater
+* WooCommerce 10.9 or greater
 * PHP version 7.4 or greater
 * MySQL version 5.6 or greater
 
@@ -90,6 +92,50 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.5.1 - 2026-09-17 =
+* Fix - Consume the feed dirty flag when a generation cycle starts, so a product change no longer triggers a redundant second cycle and a deferred restart is not lost.
+* Fix - Detect and bypass conversion events triggered by Pinterest's documented crawler user agents.
+* Fix - Ignore Pinterest click IDs longer than 512 bytes instead of storing and forwarding them to the Conversions API.
+* Fix - Send PageVisit Conversions API events for stores without an active Pinterest Tag.
+* Fix - Stop sending AddToCart events for add-to-cart runs that do not change the customer's cart, such as express checkout price simulations and retried requests.
+* Tweak - Raised minimum requirements to WordPress 6.9 and WooCommerce 10.9.
+
+= 1.5.0 - 2026-09-09 =
+* Add - Include external and Pinterest click identifiers in Tag and Conversions API events to improve event matching and attribution.
+* Fix - Accessibility: Added `aria-haspopup="dialog"` attribute to the Pinterest image button to properly announce to screen reader users that activating the button opens a modal window.
+* Fix - Add accessible screen reader label to the Save to Pinterest button.
+* Fix - Do not let pending actions from a superseded feed generation cycle block a new cycle from starting.
+* Fix - Fix PageVisit tracking on full-page cache hits.
+* Fix - Fixed AEM configuration for auto-created tags.
+* Fix - Fixed scheduled sale pricing in product feeds.
+* Fix - Make the Pinterest Save button keyboard-accessible on products with no featured image.
+* Fix - Make the Pinterest Save button reachable and usable with keyboard navigation by removing `visibility: hidden` from the image wrapper on shop and product page.
+* Fix - Prevent overlapping feed generation runs from corrupting the product feed.
+* Fix - Save button does not render after pagination or filtering.
+* Fix - Send failed Pinterest OAuth callbacks back to the settings page instead of showing a raw REST error.
+* Fix - Stale feed cleanup no longer deletes manually configured Pinterest catalog data sources hosted on the store domain.
+* Tweak - Tidy up the Pinterest OAuth callback state handling.
+* Tweak - WP 7.1 compatibility.
+
+= 1.4.28 - 2026-08-14 =
+* Tweak - WC 11.1 compatibility.
+
+= 1.4.27 - 2026-06-01 =
+* Add - WooCommerce product_brand to Pinterest feed as `g:brand`.
+* Fix - Align Pinterest checkout value with discounted merchandise line totals.
+* Fix - Correct checkout tracking item prices and preserve customer IP and user agent when sending hashed email.
+* Fix - Feed generator robustness at scale.
+* Fix - Feed location URL matching.
+* Fix - Log feed ingestion failure context to WooCommerce logs.
+* Fix - Restore class_exists guard on record_event.
+* Fix - Retry Pinterest feed ingestion sooner when Pinterest reports a FETCH_ERROR.
+* Fix - Scope failed feed ingestion logging deduplication and feed URL resolution by feed.
+* Fix - Skip Pinterest CAPI events for crawler requests to prevent CAPI vs Tag divergence.
+* Fix - Use deterministic Checkout tracking event IDs so refreshed thank-you pages can deduplicate purchases.
+* Fix - Variation feed description now falls back to the parent product's short/long description instead of the variation attribute summary.
+* Tweak - WC 10.8 compatibility.
+* Update - Treat additional Pinterest redeem error codes as terminal.
 
 = 1.4.26 - 2026-04-20 =
 * Add - Settings link to plugin action links.
