@@ -37,7 +37,7 @@ class FeedRegistration {
 	/**
 	 * Feed File Operations Instance
 	 *
-	 * @var $feed_file_operations FeedFileOperations
+	 * @var FeedFileOperations $feed_file_operations
 	 */
 	private $feed_file_operations;
 

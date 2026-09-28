@@ -25,7 +25,7 @@ class ProductSync {
 	/**
 	 * Feed File Generator Instance
 	 *
-	 * @var $feed_generator FeedGenerator
+	 * @var FeedGenerator $feed_generator
 	 */
 	private static $feed_generator = null;
 
@@ -33,7 +33,7 @@ class ProductSync {
 	/**
 	 * Feed File Generator Instance
 	 *
-	 * @var $feed_registration FeedRegistration
+	 * @var FeedRegistration $feed_registration
 	 */
 	private static $feed_registration = null;
 
@@ -41,7 +41,7 @@ class ProductSync {
 	/**
 	 * Local Feed Configurations class.
 	 *
-	 * @var $configurations LocalFeedConfigs
+	 * @var LocalFeedConfigs $configurations
 	 */
 	private static $configurations = null;
 

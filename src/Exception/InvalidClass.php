@@ -13,6 +13,8 @@ use LogicException;
 
 /**
  * Class InvalidClass
+ *
+ * @phpstan-consistent-constructor
  */
 class InvalidClass extends LogicException implements PinterestException {
 

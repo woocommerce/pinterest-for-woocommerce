@@ -25,14 +25,14 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	/**
 	 * Caching for internal structure of locations.
 	 *
-	 * @var $zone_countries_with_states
+	 * @var array|null
 	 */
 	private $zone_countries_with_states = null;
 
 	/**
 	 * Caching for supported shipping methods.
 	 *
-	 * @var $zone_countries_with_states
+	 * @var array|null
 	 */
 	private $supported_shipping_methods = null;
 

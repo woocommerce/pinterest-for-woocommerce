@@ -19,7 +19,7 @@ This repository is not suitable for support. Please don't use our issue tracker 
 
 Pinterest for WooCommerce requires PHP 7.4 or newer, WordPress 6.9 or newer, and WooCommerce 10.9 or newer.
 
-See [pinterest-for-woocommerce.php](https://github.com/woocommerce/pinterest-for-woocommerce/blob/develop/pinterest-for-woocommerce.php) for current required versions.
+See [pinterest-for-woocommerce.php](https://github.com/woocommerce/pinterest-for-woocommerce/blob/trunk/pinterest-for-woocommerce.php) for current required versions.
 
 ### Supported browsers
 
@@ -52,11 +52,11 @@ Now you can build the plugin using one of these commands:
 
 -   `npm start`: Build a development version and watch files for changes.
 -   `npm build`: Build a production version.
--   `npm run build:zip`: Build the production plugin and package it as `pinterest-for-woocommerce.zip`. The Production package workflow runs this command on pull requests to `develop` and retains the ZIP as an artifact.
+-   `npm run build:zip`: Build the production plugin and package it as `pinterest-for-woocommerce.zip`. The Production package workflow runs this command on pull requests to `trunk` and retains the ZIP as an artifact.
 
 ### Branches
 
--   `develop` branch is the most up-to-date code.
+-   `trunk` branch is the most up-to-date code.
 
 ### AI code reviews
 
@@ -81,7 +81,7 @@ PR. Human review and CI checks still apply.
 
 ### Development tools
 
-There are a number of development tools available as npm scripts. Check the [`package.json`](https://github.com/woocommerce/pinterest-for-woocommerce/blob/develop/package.json) file for more.
+There are a number of development tools available as npm scripts. Check the [`package.json`](https://github.com/woocommerce/pinterest-for-woocommerce/blob/trunk/package.json) file for more.
 
 -   `npm run lint:js`: Run [`eslint`](https://eslint.org/) to validate JavaScript code style.
 -   `npm run lint:css`: Run [`stylelint`](https://stylelint.io/) to validate CSS code style.
@@ -90,7 +90,7 @@ There are a number of development tools available as npm scripts. Check the [`pa
 Run `npm run lint:composer` to validate `composer.json` and confirm `composer.lock` is up to date. Pull request CI runs the same check before installing PHP dependencies.
 
 Use `composer check:php` for the same PHP standards check as CI. It compares
-committed PHP changes with the merge base of `origin/develop`; fetch that branch
+committed PHP changes with the merge base of `origin/trunk`; fetch that branch
 first, or pass another base with `composer check:php -- base-ref`. New errors
 and warnings at severity 5 or higher fail. Existing findings remain excluded by
 `phpcs-changed`. Commit changes before this check; `composer lint` and
@@ -220,6 +220,17 @@ composer test-unit -- --filter SavedDataTest
 
 Use a dedicated empty test database: the WordPress bootstrap replaces its test prefix tables on each run. Test cases roll back their fixtures, so rerunning the command resets products, orders and options. To change supported WordPress or WooCommerce versions, choose the matching installer arguments and a new directory and database; the installer reuses existing downloads. Missing dependencies are reported by the bootstrap before PHPUnit runs. The existing wp-env runner accepts the same `--filter` and `--testsuite` arguments.
 
+### Order storage
+
+The PHP suite uses legacy order storage (CPT) by default. Run the same suite with HPOS, with order synchronization disabled, using:
+
+```bash
+PINTEREST_FOR_WOOCOMMERCE_TEST_ORDER_STORAGE=hpos composer test-unit
+PINTEREST_FOR_WOOCOMMERCE_TEST_ORDER_STORAGE=cpt composer test-unit
+```
+
+The bootstrap prints the selected storage, creates the HPOS tables when needed and fails if the value is not `cpt` or `hpos` or the requested storage is inactive. CI runs one HPOS job on PHP 8.4 alongside the CPT matrix.
+
 With Xdebug installed, run `XDEBUG_MODE=coverage composer test-unit -- --coverage-html coverage/php --path-coverage` for line and branch/path coverage. PCOV supports the same HTML report without `--path-coverage` and reports lines only. Coverage includes unexecuted plugin PHP source and excludes tests and vendor code. Open `coverage/php/index.html`; a missing driver cannot produce a report.
 
 ### Running Tests
@@ -247,7 +258,7 @@ Made with 💜 by [WooCommerce](https://woocommerce.com/).
 
 After `composer install`, run `composer lint:phpstan`. CI runs the same command
 on PHP, Composer and PHPStan configuration changes using PHP 8.4. PHPStan checks
-owned production PHP at level 0 against the plugin's minimum PHP version.
+owned production PHP at level 1 against the plugin's minimum PHP version.
 WordPress and WooCommerce stubs supply core symbols. Vendor code, generated files,
 tests and build tools are outside analysis.
 

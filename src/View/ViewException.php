@@ -16,6 +16,8 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class ViewException
+ *
+ * @phpstan-consistent-constructor
  */
 class ViewException extends Exception implements PinterestException {
 

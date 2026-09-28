@@ -3,8 +3,10 @@ includes:
     - phpstan-baseline.neon
 
 parameters:
-    level: 0
+    level: 2
     phpVersion: 70400
+    bootstrapFiles:
+        - phpstan-bootstrap.php
     parallel:
         maximumNumberOfProcesses: 2
     paths:

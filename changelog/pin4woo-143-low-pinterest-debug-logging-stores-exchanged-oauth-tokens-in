@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Omit token-renewal response bodies, headers and cookies from debug logs.

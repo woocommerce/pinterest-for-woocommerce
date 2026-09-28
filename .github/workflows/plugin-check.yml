@@ -3,7 +3,6 @@ on:
   push:
     branches:
     - trunk
-    - develop
 
   workflow_call:
 
@@ -16,7 +15,7 @@ jobs:
     timeout-minutes: 10
     steps:
     - name: Checkout
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     # The plugin cannot load its classes without the production Composer
     # dependencies it ships with, so runtime checks would miss its code.
@@ -46,6 +45,8 @@ jobs:
           vendor
           tests
           bin
+          tools
+          changelog
           docs
           wordpress_org_assets
 
@@ -71,6 +72,7 @@ jobs:
           phpunit.xml.dist
           phpstan.neon.dist
           phpstan-baseline.neon
+          phpstan-bootstrap.php
           AGENTS.md
           CLAUDE.md
           TRACKING.md

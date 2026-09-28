@@ -16,5 +16,5 @@ updates:
         patterns:
           - '*'
     labels:
-      - 'changelog: none'
+      - 'no changelog'
       - 'dependencies'

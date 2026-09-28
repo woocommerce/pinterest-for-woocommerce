@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - trunk
-      - develop
     paths:
       - "**.js"
       - "**.cjs"
