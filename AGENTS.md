@@ -388,22 +388,28 @@ Refactor admin settings validation
 **MANDATORY workflow before opening or updating any PR:**
 
 1. **Rebase onto trunk** — eliminates merge conflicts before they reach GitHub:
+
    ```bash
    git fetch origin
    git rebase origin/trunk
    ```
+
    Resolve any conflicts, then continue. A PR must never have merge conflicts when pushed.
 
 2. **Run all local checks** — use the pre-push script:
+
    ```bash
    ./bin/pre-push-check.sh
    ```
+
    This runs phpcs-changed and the full PHPUnit suite. Both must be green before pushing. Fix any failures first — do not push with failing tests or linting errors.
 
 3. **Build and test on the local test site** — build the installable zip and hand it to the user for manual verification:
+
    ```bash
    npm run build:zip
    ```
+
    Wait for the user to confirm the feature works correctly on their test site before pushing or creating the PR.
 
 4. **Push only when all three steps above pass.**
