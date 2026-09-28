@@ -49,12 +49,6 @@ parameters:
 			path: src/AdCredits.php
 
 		-
-			message: '#^Unsafe usage of new static\(\)\.$#'
-			identifier: new.static
-			count: 1
-			path: src/Admin/Input/FormException.php
-
-		-
 			message: '#^Action callback returns array but should not return anything\.$#'
 			identifier: return.void
 			count: 1
@@ -73,40 +67,16 @@ parameters:
 			path: src/CommerceIntegration.php
 
 		-
-			message: '#^Unsafe usage of new static\(\)\.$#'
-			identifier: new.static
-			count: 3
-			path: src/Exception/InvalidClass.php
-
-		-
-			message: '#^Unsafe usage of new static\(\)\.$#'
-			identifier: new.static
-			count: 7
-			path: src/Exception/InvalidValue.php
-
-		-
 			message: '#^Action callback returns bool but should not return anything\.$#'
 			identifier: return.void
 			count: 1
 			path: src/FeedRegistration.php
 
 		-
-			message: '#^Unsafe usage of new static\(\)\.$#'
-			identifier: new.static
-			count: 1
-			path: src/LocalFeedConfigs.php
-
-		-
 			message: '#^Caught class Psr\\Container\\ContainerExceptionInterface not found\.$#'
 			identifier: class.notFound
 			count: 1
 			path: src/MultichannelMarketing/MarketingChannelRegistrar.php
-
-		-
-			message: '#^Unsafe usage of new static\(\)\.$#'
-			identifier: new.static
-			count: 1
-			path: src/MultichannelMarketing/PinterestChannel.php
 
 		-
 			message: '#^Action callback returns true but should not return anything\.$#'
@@ -131,12 +101,6 @@ parameters:
 			identifier: arguments.count
 			count: 1
 			path: src/Tracking.php
-
-		-
-			message: '#^Unsafe usage of new static\(\)\.$#'
-			identifier: new.static
-			count: 3
-			path: src/View/ViewException.php
 
 		-
 			message: '#^Function wp_has_consent not found\.$#'
