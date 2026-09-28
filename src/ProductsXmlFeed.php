@@ -132,8 +132,8 @@ class ProductsXmlFeed {
 		 * Filter that controls the attributes that will be added to the product XML file.
 		 *
 		 * @since 0.5.0
-		 * @param array      XML fields to add.
-		 * @param WC_Product Product for which the XML is being generated.
+		 * @param array      $feed_item_structure XML fields to add.
+		 * @param WC_Product $product             Product for which the XML is being generated.
 		 */
 		foreach ( apply_filters( 'pinterest_for_woocommerce_feed_item_structure', self::$feed_item_structure, $product ) as $attribute ) {
 			$method_name = 'get_property_' . str_replace( ':', '_', $attribute );
@@ -151,8 +151,8 @@ class ProductsXmlFeed {
 		 * Filter XML output for product
 		 *
 		 * @since 1.0.10
-		 * @param string     XML content.
-		 * @param WC_Product Product for which the XML is being generated.
+		 * @param string     $xml     XML content.
+		 * @param WC_Product $product Product for which the XML is being generated.
 		 */
 		return apply_filters( 'pinterest_for_woocommerce_feed_item_xml', $xml, $product );
 	}

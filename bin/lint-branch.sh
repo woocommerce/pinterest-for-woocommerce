@@ -12,7 +12,7 @@ set -eu
 
 ROOTDIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOTDIR"
-base_ref=${1:-origin/develop}
+base_ref=${1:-origin/trunk}
 base_commit=$(git merge-base HEAD "$base_ref")
 changed_files=$(mktemp)
 trap 'rm -f "$changed_files"' EXIT

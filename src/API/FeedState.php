@@ -482,7 +482,7 @@ class FeedState extends VendorAPI {
 				$info = sprintf(
 					/* Translators: The status text returned by the API. */
 					esc_html__( 'Pinterest returned an unknown feed status: %1$s', 'pinterest-for-woocommerce' ),
-					esc_html( $status ?? '<empty string>' )
+					esc_html( $status )
 				);
 				$global_error = Pinterest\FeedStatusService::get_processing_results_global_error( $processing_results );
 				return $info . ( $global_error ? ' - ' . $global_error : '' );

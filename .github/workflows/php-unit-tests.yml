@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - trunk
-      - develop
     paths:
       - "**.php"
       - composer.json
@@ -20,19 +19,23 @@ on:
 
 jobs:
   UnitTests:
-    name: PHP unit tests - PHP ${{ matrix.php }}, WP ${{ matrix.wp-version }}, WC ${{ matrix.wc-version }}
+    name: PHP unit tests - PHP ${{ matrix.php }}, WP ${{ matrix.wp-version }}, WC ${{ matrix.wc-version }}, ${{ matrix.order-storage || 'cpt' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
       WP_CORE_DIR: "/tmp/wordpress/src"
       WP_TESTS_DIR: "/tmp/wordpress/tests/phpunit"
+      PINTEREST_FOR_WOOCOMMERCE_TEST_ORDER_STORAGE: ${{ matrix.order-storage || 'cpt' }}
     strategy:
       matrix:
         php: ['7.4', '8.3', '8.4']
         wp-version: [latest]
         wc-version: ${{ fromJSON(inputs.wc-version && format('["{0}"]', inputs.wc-version) || '["latest"]') }}
+        # WooCommerce enables HPOS for new shops, so rows select legacy storage explicitly.
+        # The single HPOS row overrides this value, so GitHub adds it as a separate job.
+        order-storage: [cpt]
         # Minimum-version rows pin their own WooCommerce, so they run only when no wc-version is requested.
-        include: ${{ fromJSON(inputs.wc-version == '' && '[{"php":7.4,"wp-version":"6.9.0","wc-version":"10.9.0"}]' || '[]') }}
+        include: ${{ fromJSON(inputs.wc-version == '' && '[{"php":7.4,"wp-version":"6.9.0","wc-version":"10.9.0"},{"php":"8.4","wp-version":"latest","wc-version":"latest","order-storage":"hpos"}]' || format('[{{"php":"8.4","wp-version":"latest","wc-version":"{0}","order-storage":"hpos"}}]', inputs.wc-version)) }}
 
     steps:
       - name: Checkout repository

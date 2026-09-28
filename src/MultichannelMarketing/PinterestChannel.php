@@ -22,6 +22,8 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class PinterestChannel
+ *
+ * @phpstan-consistent-constructor
  */
 class PinterestChannel implements MarketingChannelInterface {
 
