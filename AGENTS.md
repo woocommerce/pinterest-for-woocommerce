@@ -184,7 +184,7 @@ npm run test:js:watch
 
 #### QIT
 
-QIT runs weekly with validation; QIT PHPStan stays off because the repo's own PHPStan (level 1) is the gate.
+QIT runs weekly with validation; QIT PHPStan stays off because the repo's own PHPStan (level 2) is the gate.
 
 ### Internationalization
 
