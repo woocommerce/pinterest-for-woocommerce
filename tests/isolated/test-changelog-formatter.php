@@ -20,7 +20,7 @@ require_once dirname( __DIR__, 2 ) . '/vendor/autoload.php';
  *
  * @version x.x.x
  */
-class Pinterest_For_Woocommerce_Changelog_Formatter_Tests extends TestCase {
+class SomewhereWarm_Changelog_Formatter_Tests extends TestCase {
 
 	/**
 	 * The formatter under test.
@@ -34,7 +34,18 @@ class Pinterest_For_Woocommerce_Changelog_Formatter_Tests extends TestCase {
 	 */
 	public function setUp(): void {
 		parent::setUp();
-		$this->formatter = new Changelog_Formatter( array( 'title' => '*** Pinterest for WooCommerce Changelog ***' ) );
+		$this->formatter = new Changelog_Formatter( array( 'title' => $this->configured_title() ) );
+	}
+
+	/**
+	 * Title configured for the formatter under `extra.changelogger` in composer.json.
+	 *
+	 * @return string
+	 */
+	private function configured_title() {
+		$composer = json_decode( file_get_contents( dirname( __DIR__, 2 ) . '/composer.json' ), true );
+
+		return $composer['extra']['changelogger']['formatter']['title'];
 	}
 
 	/**
@@ -73,10 +84,12 @@ class Pinterest_For_Woocommerce_Changelog_Formatter_Tests extends TestCase {
 	 * The shipped changelog must parse into entries, not silently into one blob.
 	 */
 	public function test_real_changelog_parses_into_entries() {
-		$changelog = $this->formatter->parse( file_get_contents( $this->changelog_path() ) );
+		$contents  = file_get_contents( $this->changelog_path() );
+		$changelog = $this->formatter->parse( $contents );
 
-		$this->assertSame( '*** Pinterest for WooCommerce Changelog ***', $changelog->getPrologue() );
-		$this->assertGreaterThan( 90, count( $changelog->getEntries() ) );
+		$this->assertSame( $this->configured_title(), $changelog->getPrologue() );
+		$this->assertNotEmpty( $changelog->getEntries() );
+		$this->assertCount( preg_match_all( '/^= /m', $contents ), $changelog->getEntries() );
 
 		$latest = $changelog->getLatestEntry();
 
@@ -89,7 +102,7 @@ class Pinterest_For_Woocommerce_Changelog_Formatter_Tests extends TestCase {
 	 */
 	public function test_parses_headings_and_typed_entries() {
 		$changelog = $this->formatter->parse(
-			"*** Pinterest for WooCommerce Changelog ***\n\n"
+			"*** Title ***\n\n"
 			. "= 1.5.1 - 2026-09-17 =\n"
 			. "* Fix - Fixed a thing.\n"
 			. "* Tweak - Tweaked a thing.\n"
@@ -114,18 +127,18 @@ class Pinterest_For_Woocommerce_Changelog_Formatter_Tests extends TestCase {
 	 */
 	public function test_entry_content_may_contain_the_separator() {
 		$changelog = $this->formatter->parse(
-			"*** Title ***\n\n= 1.5.1 - 2026-09-17 =\n* Fix - Product feeds - and their catalogs - are restored.\n"
+			"*** Title ***\n\n= 1.5.1 - 2026-09-17 =\n* Fix - Saved settings - and their defaults - are restored.\n"
 		);
 
 		$change = $changelog->getEntries()[0]->getChanges()[0];
 
 		$this->assertSame( 'Fix', $change->getSubheading() );
-		$this->assertSame( 'Product feeds - and their catalogs - are restored.', $change->getContent() );
+		$this->assertSame( 'Saved settings - and their defaults - are restored.', $change->getContent() );
 	}
 
 	/**
-	 * Legacy shapes the file still carries must round-trip untouched: bullets with no
-	 * type at all, types this plugin no longer issues, and types written with an en dash.
+	 * Legacy shapes changelogs still carry must round-trip untouched: bullets with no
+	 * type at all, types we no longer issue, and types written with a colon or an en dash.
 	 *
 	 * @dataProvider provide_legacy_shapes
 	 *
@@ -142,10 +155,13 @@ class Pinterest_For_Woocommerce_Changelog_Formatter_Tests extends TestCase {
 	 */
 	public function provide_legacy_shapes() {
 		return array(
-			'bullet with no type'    => array( "*** Title ***\n\n= 1.4.8 - 2024-08-29 =\n* Release/1.4.7.\n" ),
-			'retired type Add'       => array( "*** Title ***\n\n= 1.4.26 - 2026-04-20 =\n* Add - Settings link to plugin action links.\n" ),
-			'retired type Update'    => array( "*** Title ***\n\n= 1.4.27 - 2026-06-01 =\n* Update - Treat additional Pinterest redeem error codes as terminal.\n" ),
-			'en dash in the type'    => array( "*** Title ***\n\n= 1.0.6 - 2022-02-16 =\n* Fix – Fix the changelog for the 1.0.5 release by adding omitted changes.\n" ),
+			'bullet with no type'    => array( "*** Title ***\n\n= 1.0.0 - 2021-10-25 =\n* Initial release.\n" ),
+			'retired type Add'       => array( "*** Title ***\n\n= 1.1.0 - 2022-01-10 =\n* Add - Settings link to plugin action links.\n" ),
+			'retired type Feature'   => array( "*** Title ***\n\n= 1.1.0 - 2022-01-10 =\n* Feature - Introduced a filter.\n" ),
+			'retired type Important' => array( "*** Title ***\n\n= 1.1.1 - 2022-02-16 =\n* Important - Declared support for WooCommerce 6.2.\n" ),
+			'retired type Update'    => array( "*** Title ***\n\n= 1.1.1 - 2022-02-16 =\n* Update - Updated the settings screen copy.\n" ),
+			'colon in the type'      => array( "*** Title ***\n\n= 1.1.1 - 2022-02-16 =\n* Feature: Added support for a third-party plugin.\n" ),
+			'en dash in the type'    => array( "*** Title ***\n\n= 1.1.1 - 2022-02-16 =\n* Fix – Fixed the changelog for the 1.1.0 release.\n" ),
 			'several entries'        => array( "*** Title ***\n\n= 1.5.1 - 2026-09-17 =\n* Fix - Second.\n\n= 1.5.0 - 2026-09-09 =\n* New - First.\n" ),
 		);
 	}
@@ -212,7 +228,7 @@ class Pinterest_For_Woocommerce_Changelog_Formatter_Tests extends TestCase {
 		);
 
 		$this->assertSame(
-			"*** Pinterest for WooCommerce Changelog ***\n\n= 1.5.2 - 2026-09-01 =\n* Tweak - Tweaked a thing.\n",
+			$this->configured_title() . "\n\n= 1.5.2 - 2026-09-01 =\n* Tweak - Tweaked a thing.\n",
 			$this->formatter->format( $changelog )
 		);
 	}
@@ -234,7 +250,7 @@ class Pinterest_For_Woocommerce_Changelog_Formatter_Tests extends TestCase {
 		);
 
 		$this->assertSame(
-			"*** Pinterest for WooCommerce Changelog ***\n\n= 1.0.0 - 2021-10-25 =\n* Initial release.\n",
+			$this->configured_title() . "\n\n= 1.0.0 - 2021-10-25 =\n* Initial release.\n",
 			$this->formatter->format( $changelog )
 		);
 	}
@@ -338,7 +354,7 @@ class Pinterest_For_Woocommerce_Changelog_Formatter_Tests extends TestCase {
 
 		$written = $this->formatter->format( $changelog );
 
-		$this->assertSame( "*** Pinterest for WooCommerce Changelog ***\n\n= 1.5.2 - unreleased =\n* Fix - Fixed a thing.\n", $written );
+		$this->assertSame( $this->configured_title() . "\n\n= 1.5.2 - unreleased =\n* Fix - Fixed a thing.\n", $written );
 
 		$entry = $this->formatter->parse( $written )->getLatestEntry();
 
@@ -371,8 +387,8 @@ class Pinterest_For_Woocommerce_Changelog_Formatter_Tests extends TestCase {
 	}
 
 	/**
-	 * Malformed headings: broken WordPress.org ones, and the WooCommerce.com shape the
-	 * paid extensions use.
+	 * Malformed headings: broken WordPress.org ones, and the older WooCommerce.com shape
+	 * the changelogs used before.
 	 *
 	 * @return array
 	 */
