@@ -139,12 +139,6 @@ parameters:
 			path: src/FeedRegistration.php
 
 		-
-			message: '#^PHPDoc tag @var has invalid value \(\$feed_file_operations FeedFileOperations\)\: Unexpected token "\$feed_file_operations", expected type at offset 51 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: src/FeedRegistration.php
-
-		-
 			message: '#^Call to method getMessage\(\) on an unknown class Psr\\Container\\ContainerExceptionInterface\.$#'
 			identifier: class.notFound
 			count: 1
@@ -187,40 +181,10 @@ parameters:
 			path: src/PinterestShippingZone.php
 
 		-
-			message: '#^PHPDoc tag @var has invalid value \(\$zone_countries_with_states\)\: Unexpected token "\$zone_countries_with_states", expected type at offset 61 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: src/PinterestShippingZone.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(\$zone_countries_with_states\)\: Unexpected token "\$zone_countries_with_states", expected type at offset 66 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: src/PinterestShippingZone.php
-
-		-
 			message: '#^Parameter \$shipping_method of method Automattic\\WooCommerce\\Pinterest\\PinterestShippingZone\:\:is_shipping_method_supported\(\) has invalid type Automattic\\WooCommerce\\Pinterest\\WC_Shipping_Method\.$#'
 			identifier: class.notFound
 			count: 1
 			path: src/PinterestShippingZone.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(\$configurations LocalFeedConfigs\)\: Unexpected token "\$configurations", expected type at offset 54 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: src/ProductSync.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(\$feed_generator FeedGenerator\)\: Unexpected token "\$feed_generator", expected type at offset 50 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: src/ProductSync.php
-
-		-
-			message: '#^PHPDoc tag @var has invalid value \(\$feed_registration FeedRegistration\)\: Unexpected token "\$feed_registration", expected type at offset 50 on line 4$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: src/ProductSync.php
 
 		-
 			message: '#^Call to an undefined method WC_Product\:\:get_variation_regular_price\(\)\.$#'
