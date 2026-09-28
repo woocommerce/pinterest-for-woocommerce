@@ -55,12 +55,6 @@ parameters:
 			path: src/API/Base.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\Businesses\:\:get_businesses\(\) has invalid return type Automattic\\WooCommerce\\Pinterest\\API\\WP_Error\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/API/Businesses.php
-
-		-
 			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\API\\FeedState\:\:map_status_into_extra_info\(\) through static\:\:\.$#'
 			identifier: staticClassAccess.privateMethod
 			count: 1
@@ -187,74 +181,14 @@ parameters:
 			path: src/RefreshToken.php
 
 		-
-			message: '#^Call to method get_id\(\) on an unknown class Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/SaveToPinterest.php
-
-		-
-			message: '#^Parameter \$product of method Automattic\\WooCommerce\\Pinterest\\SaveToPinterest\:\:add_to_wc_blocks\(\) has invalid type Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/SaveToPinterest.php
-
-		-
 			message: '#^Variable \$product in empty\(\) always exists and is not falsy\.$#'
 			identifier: empty.variable
 			count: 1
 			path: src/SaveToPinterest.php
 
 		-
-			message: '#^Access to property \$min_amount on an unknown class Automattic\\WooCommerce\\Pinterest\\WC_Shipping_Free_Shipping\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Shipping.php
-
-		-
-			message: '#^Access to property \$requires on an unknown class Automattic\\WooCommerce\\Pinterest\\WC_Shipping_Free_Shipping\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Shipping.php
-
-		-
 			message: '#^Call to an undefined method WC_Data_Store\:\:get_zones\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: src/Shipping.php
-
-		-
-			message: '#^Call to method get_id\(\) on an unknown class Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Shipping.php
-
-		-
-			message: '#^Call to method get_price\(\) on an unknown class Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
-			identifier: class.notFound
-			count: 3
-			path: src/Shipping.php
-
-		-
-			message: '#^Parameter \$product of method Automattic\\WooCommerce\\Pinterest\\Shipping\:\:get_best_shipping_with_cost\(\) has invalid type Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Shipping.php
-
-		-
-			message: '#^Parameter \$product of method Automattic\\WooCommerce\\Pinterest\\Shipping\:\:prepare_shipping_info\(\) has invalid type Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Shipping.php
-
-		-
-			message: '#^Parameter \$product of method Automattic\\WooCommerce\\Pinterest\\Shipping\:\:put_product_into_a_shipping_package\(\) has invalid type Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Shipping.php
-
-		-
-			message: '#^Parameter \$shipping_method of method Automattic\\WooCommerce\\Pinterest\\Shipping\:\:is_free_shipping_available\(\) has invalid type Automattic\\WooCommerce\\Pinterest\\WC_Shipping_Free_Shipping\.$#'
-			identifier: class.notFound
 			count: 1
 			path: src/Shipping.php
 

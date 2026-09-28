@@ -126,9 +126,9 @@ class SaveToPinterest {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string     $html The html to be filtered.
-	 * @param Object     $data Data passed to the filter.
-	 * @param WC_Product $product The product object.
+	 * @param string      $html The html to be filtered.
+	 * @param Object      $data Data passed to the filter.
+	 * @param \WC_Product $product The product object.
 	 *
 	 * @return bool
 	 */

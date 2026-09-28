@@ -37,7 +37,7 @@ class Businesses extends VendorAPI {
 	 *
 	 * @param WP_REST_Request $request The request.
 	 *
-	 * @return array|WP_Error
+	 * @return array|\WP_Error
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
