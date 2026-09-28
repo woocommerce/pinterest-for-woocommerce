@@ -19,6 +19,12 @@ parameters:
 			path: class-pinterest-for-woocommerce.php
 
 		-
+			message: '#^Default value of the parameter \#2 \$args \(array\) of method Pinterest_For_Woocommerce\:\:get_middleware_url\(\) is incompatible with type string\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
 			message: '#^Variable \$errors in empty\(\) always exists and is not falsy\.$#'
 			identifier: empty.variable
 			count: 1
@@ -43,10 +49,70 @@ parameters:
 			path: includes/admin/class-pinterest-for-woocommerce-admin.php
 
 		-
+			message: '#^Default value of the parameter \#5 \$cache_expiry \(false\) of method Automattic\\WooCommerce\\Pinterest\\API\\Base\:\:make_request\(\) is incompatible with type int\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: src/API/Base.php
+
+		-
+			message: '#^PHPDoc tag @return with type mixed is not subtype of native type array\.$#'
+			identifier: return.phpDocType
+			count: 2
+			path: src/API/Base.php
+
+		-
+			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\API\\Base\:\:maybe_cache_api_response\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: src/API/Base.php
+
+		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\Businesses\:\:get_businesses\(\) has invalid return type Automattic\\WooCommerce\\Pinterest\\API\\WP_Error\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/API/Businesses.php
+
+		-
+			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\API\\FeedState\:\:map_status_into_extra_info\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: src/API/FeedState.php
+
+		-
+			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\API\\FeedState\:\:map_status_into_label\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: src/API/FeedState.php
+
+		-
+			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\API\\FeedState\:\:map_status_into_status\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: src/API/FeedState.php
+
+		-
 			message: '#^Action callback returns mixed but should not return anything\.$#'
 			identifier: return.void
 			count: 1
 			path: src/AdCredits.php
+
+		-
+			message: '#^Unsafe access to private constant Automattic\\WooCommerce\\Pinterest\\AdCredits\:\:FUTURE_CREDIT through static\:\:\.$#'
+			identifier: staticClassAccess.privateConstant
+			count: 1
+			path: src/AdCredits.php
+
+		-
+			message: '#^Unsafe access to private constant Automattic\\WooCommerce\\Pinterest\\AdCredits\:\:MARKETING_OFFER_CREDIT through static\:\:\.$#'
+			identifier: staticClassAccess.privateConstant
+			count: 1
+			path: src/AdCredits.php
+
+		-
+			message: '#^PHPDoc tag @return with type \$this\(Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\GoogleCategory\) is incompatible with native type Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\Select\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: src/Admin/Input/GoogleCategory.php
 
 		-
 			message: '#^Action callback returns array but should not return anything\.$#'
@@ -73,10 +139,94 @@ parameters:
 			path: src/FeedRegistration.php
 
 		-
+			message: '#^PHPDoc tag @var has invalid value \(\$feed_file_operations FeedFileOperations\)\: Unexpected token "\$feed_file_operations", expected type at offset 51 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: src/FeedRegistration.php
+
+		-
+			message: '#^Call to method getMessage\(\) on an unknown class Psr\\Container\\ContainerExceptionInterface\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/MultichannelMarketing/MarketingChannelRegistrar.php
+
+		-
 			message: '#^Caught class Psr\\Container\\ContainerExceptionInterface not found\.$#'
 			identifier: class.notFound
 			count: 1
 			path: src/MultichannelMarketing/MarketingChannelRegistrar.php
+
+		-
+			message: '#^Call to an undefined method WC_Data_Store\:\:get_notes_with_name\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Notes/FeedDeletionFailure.php
+
+		-
+			message: '#^PHPDoc tag @var with type Automattic\\WooCommerce\\Pinterest\\Notes\\Collection\\AbstractNote is not subtype of native type ''Automattic\\\\WooCommerce\\\\Pinterest\\\\Notes\\\\Collection\\\\CatalogSyncErrors''\|''Automattic\\\\WooCommerce\\\\Pinterest\\\\Notes\\\\Collection\\\\CompleteOnboardingAfterThreeDays''\|''Automattic\\\\WooCommerce\\\\Pinterest\\\\Notes\\\\Collection\\\\CompleteOnboardingReminderAfterFourteenDays''\|''Automattic\\\\WooCommerce\\\\Pinterest\\\\Notes\\\\Collection\\\\CompleteOnboardingReminderAfterSevenDays''\|''Automattic\\\\WooCommerce\\\\Pinterest\\\\Notes\\\\Collection\\\\CompleteOnboardingReminderAfterThirtyDays''\|''Automattic\\\\WooCommerce\\\\Pinterest\\\\Notes\\\\Collection\\\\EnableCatalogSync''\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: src/Notes/MarketingNotifications.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\Notes\\Collection\\AbstractNote\:\:should_be_added\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Notes/MarketingNotifications.php
+
+		-
+			message: '#^Access to property \$id on an unknown class Automattic\\WooCommerce\\Pinterest\\WC_Shipping_Method\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/PinterestShippingZone.php
+
+		-
+			message: '#^Access to property \$requires on an unknown class Automattic\\WooCommerce\\Pinterest\\WC_Shipping_Method\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PinterestShippingZone.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$zone_countries_with_states\)\: Unexpected token "\$zone_countries_with_states", expected type at offset 61 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: src/PinterestShippingZone.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$zone_countries_with_states\)\: Unexpected token "\$zone_countries_with_states", expected type at offset 66 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: src/PinterestShippingZone.php
+
+		-
+			message: '#^Parameter \$shipping_method of method Automattic\\WooCommerce\\Pinterest\\PinterestShippingZone\:\:is_shipping_method_supported\(\) has invalid type Automattic\\WooCommerce\\Pinterest\\WC_Shipping_Method\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/PinterestShippingZone.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$configurations LocalFeedConfigs\)\: Unexpected token "\$configurations", expected type at offset 54 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: src/ProductSync.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$feed_generator FeedGenerator\)\: Unexpected token "\$feed_generator", expected type at offset 50 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: src/ProductSync.php
+
+		-
+			message: '#^PHPDoc tag @var has invalid value \(\$feed_registration FeedRegistration\)\: Unexpected token "\$feed_registration", expected type at offset 50 on line 4$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: src/ProductSync.php
+
+		-
+			message: '#^Call to an undefined method WC_Product\:\:get_variation_regular_price\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/ProductsXmlFeed.php
 
 		-
 			message: '#^Action callback returns true but should not return anything\.$#'
@@ -85,10 +235,88 @@ parameters:
 			path: src/RefreshToken.php
 
 		-
+			message: '#^Call to method get_id\(\) on an unknown class Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/SaveToPinterest.php
+
+		-
+			message: '#^Default value of the parameter \#2 \$post_thumbnail_id \(string\) of method Automattic\\WooCommerce\\Pinterest\\SaveToPinterest\:\:render_pin\(\) is incompatible with type int\.$#'
+			identifier: parameter.defaultValue
+			count: 1
+			path: src/SaveToPinterest.php
+
+		-
+			message: '#^Parameter \$product of method Automattic\\WooCommerce\\Pinterest\\SaveToPinterest\:\:add_to_wc_blocks\(\) has invalid type Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/SaveToPinterest.php
+
+		-
 			message: '#^Variable \$product in empty\(\) always exists and is not falsy\.$#'
 			identifier: empty.variable
 			count: 1
 			path: src/SaveToPinterest.php
+
+		-
+			message: '#^Access to property \$min_amount on an unknown class Automattic\\WooCommerce\\Pinterest\\WC_Shipping_Free_Shipping\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Shipping.php
+
+		-
+			message: '#^Access to property \$requires on an unknown class Automattic\\WooCommerce\\Pinterest\\WC_Shipping_Free_Shipping\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Shipping.php
+
+		-
+			message: '#^Call to an undefined method WC_Data_Store\:\:get_zones\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Shipping.php
+
+		-
+			message: '#^Call to method get_id\(\) on an unknown class Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Shipping.php
+
+		-
+			message: '#^Call to method get_price\(\) on an unknown class Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
+			identifier: class.notFound
+			count: 3
+			path: src/Shipping.php
+
+		-
+			message: '#^Parameter \$product of method Automattic\\WooCommerce\\Pinterest\\Shipping\:\:get_best_shipping_with_cost\(\) has invalid type Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Shipping.php
+
+		-
+			message: '#^Parameter \$product of method Automattic\\WooCommerce\\Pinterest\\Shipping\:\:prepare_shipping_info\(\) has invalid type Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Shipping.php
+
+		-
+			message: '#^Parameter \$product of method Automattic\\WooCommerce\\Pinterest\\Shipping\:\:put_product_into_a_shipping_package\(\) has invalid type Automattic\\WooCommerce\\Pinterest\\WC_Product\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Shipping.php
+
+		-
+			message: '#^Parameter \$shipping_method of method Automattic\\WooCommerce\\Pinterest\\Shipping\:\:is_free_shipping_available\(\) has invalid type Automattic\\WooCommerce\\Pinterest\\WC_Shipping_Free_Shipping\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Shipping.php
+
+		-
+			message: '#^Call to an undefined method WC_Order_Item\:\:get_total\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Tracking.php
 
 		-
 			message: '#^Callback expects 1 parameter, \$accepted_args is set to 2\.$#'
@@ -101,6 +329,72 @@ parameters:
 			identifier: arguments.count
 			count: 1
 			path: src/Tracking.php
+
+		-
+			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\Tracking\\PageVisit\:\:get_beacon_code\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 2
+			path: src/Tracking/PageVisit.php
+
+		-
+			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\Tracking\\PageVisit\:\:get_event_data\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: src/Tracking/PageVisit.php
+
+		-
+			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\Tracking\\PageVisit\:\:get_event_id_code\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 2
+			path: src/Tracking/PageVisit.php
+
+		-
+			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\Tracking\\PageVisit\:\:reject\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 7
+			path: src/Tracking/PageVisit.php
+
+		-
+			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\Tracking\\PageVisit\:\:validate_source_url\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: src/Tracking/PageVisit.php
+
+		-
+			message: '#^Unsafe access to private property Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:\$deferred_events through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 5
+			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Unsafe access to private property Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:\$events through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 2
+			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:get_deferred_events_transient_key\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 2
+			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:get_event_code\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 3
+			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:maybe_add_fragment\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:maybe_get_hashed_customer_email\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
+			count: 1
+			path: src/Tracking/Tag.php
 
 		-
 			message: '#^Function wp_has_consent not found\.$#'
