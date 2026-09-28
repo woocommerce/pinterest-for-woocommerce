@@ -73,12 +73,6 @@ parameters:
 			path: src/FeedRegistration.php
 
 		-
-			message: '#^Caught class Psr\\Container\\ContainerExceptionInterface not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/MultichannelMarketing/MarketingChannelRegistrar.php
-
-		-
 			message: '#^Action callback returns true but should not return anything\.$#'
 			identifier: return.void
 			count: 1

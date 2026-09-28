@@ -44,6 +44,7 @@ jobs:
               - 'bin/phplint.sh'
               - 'bin/install-wp-tests.sh'
               - 'tests/Integration/data/**'
+              - 'tests/isolated/**'
             frontend:
               - '**/*.{js,jsx,ts,tsx,mjs,cjs,scss,css}'
               - 'package.json'
@@ -82,6 +83,7 @@ jobs:
               # everything except unit tests, docs, and tooling config.
               - '**'
               - '!tests/Unit/**'
+              - '!tests/isolated/**'
               - '!tests/Integration/**'
               - '!tests/E2e/**'
               - '!tests/Helpers/**'
@@ -96,6 +98,7 @@ jobs:
               - '!.markdownlintignore'
               - '!docs/**'
               - '!changelog.txt'
+              - '!changelog/**'
               - '!readme.txt'
               - '!.editorconfig'
               - '!.coderabbit.yaml'

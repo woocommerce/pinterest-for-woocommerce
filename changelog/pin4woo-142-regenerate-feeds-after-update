@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Regenerate existing product feeds once after the security update without resetting scheduled retries.
