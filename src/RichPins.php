@@ -197,7 +197,8 @@ class RichPins {
 			 * Filters whether the shortcodes should be applied for product descriptions on the rich pins or be stripped out.
 			 *
 			 * @param bool       $apply_shortcodes Shortcodes are applied if set to `true` and stripped out if set to `false`.
-			 * @param WC_Product $product          WooCommerce product object.
+			 * @param \WC_Product $product         WooCommerce product object.
+			 *
 			 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 			 */
 			$apply_shortcodes = apply_filters( 'pinterest_for_woocommerce_rich_pins_product_description_apply_shortcodes', false, $product );

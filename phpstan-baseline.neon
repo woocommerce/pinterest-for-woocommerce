@@ -115,12 +115,6 @@ parameters:
 			path: src/RefreshToken.php
 
 		-
-			message: '#^@param Automattic\\WooCommerce\\Pinterest\\WC_Product \$product does not accept actual type of parameter\: WC_Product\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: src/RichPins.php
-
-		-
 			message: '#^Variable \$product in empty\(\) always exists and is not falsy\.$#'
 			identifier: empty.variable
 			count: 1
