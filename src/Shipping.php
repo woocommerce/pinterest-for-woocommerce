@@ -43,7 +43,7 @@ class Shipping {
 	 *
 	 * @since 1.0.5
 	 *
-	 * @param  WC_Product $product Product for which we want to generate the shipping column.
+	 * @param  \WC_Product $product Product for which we want to generate the shipping column.
 	 * @return array               Shipping information $product.
 	 */
 	public function prepare_shipping_info( $product ) {
@@ -126,9 +126,9 @@ class Shipping {
 	 *
 	 * @since 1.0.5
 	 *
-	 * @param bool                      $is_available    Whether this shipping method should be available.
-	 * @param array                     $package         Shipping package.
-	 * @param WC_Shipping_Free_Shipping $shipping_method Shipping method.
+	 * @param bool                       $is_available    Whether this shipping method should be available.
+	 * @param array                      $package         Shipping package.
+	 * @param \WC_Shipping_Free_Shipping $shipping_method Shipping method.
 	 * @return boolean
 	 */
 	public static function is_free_shipping_available( $is_available, $package, $shipping_method ) {
@@ -150,9 +150,9 @@ class Shipping {
 	 *
 	 * @since 1.0.5
 	 *
-	 * @param array      $shipping_location Country and state values of the location.
-	 * @param array      $shipping_methods  List of shippings methods we use to calculate the best rate.
-	 * @param WC_Product $product           Product for which we want to generate the shipping column.
+	 * @param array       $shipping_location Country and state values of the location.
+	 * @param array       $shipping_methods  List of shippings methods we use to calculate the best rate.
+	 * @param \WC_Product $product           Product for which we want to generate the shipping column.
 	 * @return array|null                   Name and cost for the best found rate or null in case nothing was found.
 	 */
 	private static function get_best_shipping_with_cost( $shipping_location, $shipping_methods, $product ) {
@@ -218,8 +218,8 @@ class Shipping {
 	 *
 	 * @since 1.0.5
 	 *
-	 * @param WC_Product $product  Product to package.
-	 * @param array      $location Product destination location.
+	 * @param \WC_Product $product  Product to package.
+	 * @param array       $location Product destination location.
 	 * @return array               Product packed into a package for use by shipping methods.
 	 */
 	public static function put_product_into_a_shipping_package( $product, $location ) {
