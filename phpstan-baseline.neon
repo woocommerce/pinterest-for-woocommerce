@@ -43,12 +43,6 @@ parameters:
 			path: includes/admin/class-pinterest-for-woocommerce-admin.php
 
 		-
-			message: '#^PHPDoc tag @return with type mixed is not subtype of native type array\.$#'
-			identifier: return.phpDocType
-			count: 2
-			path: src/API/Base.php
-
-		-
 			message: '#^Unsafe call to private method Automattic\\WooCommerce\\Pinterest\\API\\Base\:\:maybe_cache_api_response\(\) through static\:\:\.$#'
 			identifier: staticClassAccess.privateMethod
 			count: 1
