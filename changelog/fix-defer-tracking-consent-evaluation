@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Read marketing consent on `wp_loaded` instead of `init` so consent-management plugins that register their consent type on `init` are respected before conversion tracking initialises.
