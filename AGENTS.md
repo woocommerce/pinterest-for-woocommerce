@@ -123,7 +123,7 @@ composer lint
 # Lint staged changes
 composer lint-staged
 
-# Lint current branch vs develop
+# Lint current branch vs trunk
 composer lint-branch
 ```
 
@@ -279,14 +279,14 @@ public static function update_or_create_merchant( $merchant_id, $args ) {
 
 ### Branching and worktrees
 
-Use `develop` as the feature base and PR target. This is the approved exception to the SWW workspace's default `trunk` base. Use the issue's exact Linear-generated branch name; the values below are examples:
+Use `trunk` as the feature base and PR target. Use the issue's exact Linear-generated branch name; the values below are examples:
 
 ```bash
-git fetch origin develop
+git fetch origin trunk
 main_checkout="$PWD"
 branch_name=pin4woo-123-short-description
 worktree_path=../pinterest-for-woocommerce-pin4woo-123
-git worktree add "$worktree_path" -b "$branch_name" origin/develop
+git worktree add "$worktree_path" -b "$branch_name" origin/trunk
 cd "$worktree_path"
 nvm use
 npm install
@@ -327,7 +327,7 @@ Refactor admin settings validation
 
 When creating PRs:
 
-- Target the `develop` branch
+- Target the `trunk` branch
 - Follow `.github/PULL_REQUEST_TEMPLATE.md`; it has no auto-assign-milestone checkbox.
 - Start the description with `Closes PIN4WOO-<n>` and include test instructions.
 - Supply changelog text in the template's Changelog entry section. Explain any documentation-only exemption there; do not invent checkboxes or change labels.
@@ -355,7 +355,7 @@ When creating PRs:
 | -------------- | ----- |
 | Follow WooCommerce coding standards | Enforced by phpcs |
 | Use text domain `pinterest-for-woocommerce` | Required for translations |
-| Branch from `develop`, not main/master | Main development branch |
+| Branch from `trunk`, not main/master | Main development branch |
 | Run checks for the changed files | PHP: `vendor/bin/phpcs`; JS/CSS: their lint scripts; docs: command/path and formatting checks |
 | Write PHPUnit tests for new PHP functionality | Ensure code quality and prevent regressions |
 | Use PSR-4 naming in `src/` directory | Modern PHP autoloading standard |
@@ -430,7 +430,6 @@ Read platform requirements from the plugin header and use `nvm use` with `.nvmrc
 - Node 24/npm 11, webpack, and Gulp form the build toolchain. `legacy-peer-deps` preserves the previous npm 6 peer dependency selection; runtime WordPress and React requirements remain unchanged.
 - PSR-4 code in `src/` coexists with WordPress-style classes in `includes/`.
 - The PR template collects changelog text. This repo has no Changelogger command or `changelog/` change files; do not import that workflow from other extensions.
-- Feature PRs target `develop`, but `.github/workflows/prepare-release.yml` configures `trunk` as its main branch. Reconcile release automation separately; that setting does not change the approved feature base.
 
 ## Testing Strategy
 
