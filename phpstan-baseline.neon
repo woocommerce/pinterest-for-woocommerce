@@ -161,39 +161,3 @@ parameters:
 			identifier: function.notFound
 			count: 1
 			path: src/WPConsentAPI.php
-
-		-
-			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$form\.$#'
-			identifier: property.notFound
-			count: 1
-			path: views/attributes/tab-panel.php
-
-		-
-			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$children\.$#'
-			identifier: property.notFound
-			count: 1
-			path: views/attributes/variations-form.php
-
-		-
-			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$is_root\.$#'
-			identifier: property.notFound
-			count: 1
-			path: views/attributes/variations-form.php
-
-		-
-			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$form\.$#'
-			identifier: property.notFound
-			count: 1
-			path: views/inputs/form.php
-
-		-
-			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$input\.$#'
-			identifier: property.notFound
-			count: 1
-			path: views/inputs/google-category.php
-
-		-
-			message: '#^Access to an undefined property Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:\$input\.$#'
-			identifier: property.notFound
-			count: 1
-			path: views/inputs/select.php
