@@ -95,7 +95,7 @@ class Tracking {
 		add_action( 'wp_footer', array( $this, 'handle_search' ) );
 
 		// Tracks add to cart events.
-		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_add_to_cart' ), 10, 6 );
+		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_add_to_cart' ), 10, 4 );
 
 		// Customer cart changes made outside add-to-cart release the AddToCart repeat guard.
 		add_action( 'woocommerce_cart_item_removed', array( $this, 'handle_cart_item_removed' ), 10, 2 );
@@ -103,7 +103,7 @@ class Tracking {
 		add_action( 'woocommerce_cart_emptied', array( $this, 'handle_cart_emptied' ) );
 
 		// Tracks checkout events.
-		add_action( 'woocommerce_before_thankyou', array( $this, 'handle_checkout' ), 10, 2 );
+		add_action( 'woocommerce_before_thankyou', array( $this, 'handle_checkout' ), 10, 1 );
 
 		array_walk(
 			$this->trackers,

@@ -115,18 +115,6 @@ parameters:
 			path: src/Tracking.php
 
 		-
-			message: '#^Callback expects 1 parameter, \$accepted_args is set to 2\.$#'
-			identifier: arguments.count
-			count: 1
-			path: src/Tracking.php
-
-		-
-			message: '#^Callback expects 4 parameters, \$accepted_args is set to 6\.$#'
-			identifier: arguments.count
-			count: 1
-			path: src/Tracking.php
-
-		-
 			message: '#^Function wp_has_consent not found\.$#'
 			identifier: function.notFound
 			count: 1
