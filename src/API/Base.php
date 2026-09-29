@@ -90,7 +90,7 @@ class Base {
 		$request = static::prepare_request( $endpoint, $method, $payload, $api );
 		try {
 			$response = static::handle_request( $request );
-			static::maybe_cache_api_response( $endpoint, $method, $payload, $api, $response, $cache_expiry );
+			self::maybe_cache_api_response( $endpoint, $method, $payload, $api, $response, $cache_expiry );
 			return $response;
 		} catch ( PinterestApiException $e ) {
 			Logger::log(

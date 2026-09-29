@@ -364,9 +364,9 @@ class FeedState extends VendorAPI {
 			);
 		} else {
 			$processing_status = $recent_feed_processing_results['status'] ?? '';
-			$status            = static::map_status_into_status( $processing_status );
-			$status_label      = static::map_status_into_label( $processing_status );
-			$extra_info        = static::map_status_into_extra_info( $recent_feed_processing_results );
+			$status            = self::map_status_into_status( $processing_status );
+			$status_label      = self::map_status_into_label( $processing_status );
+			$extra_info        = self::map_status_into_extra_info( $recent_feed_processing_results );
 		}
 		$result['overview'] = Pinterest\FeedStatusService::get_processing_result_overview_stats( $recent_feed_processing_results );
 

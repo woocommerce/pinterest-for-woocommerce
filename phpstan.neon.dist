@@ -21,3 +21,6 @@ parameters:
     scanFiles:
         - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
         - vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php
+    # PHPView resolves any context variable through __get(), so views read arbitrary properties.
+    universalObjectCratesClasses:
+        - Automattic\WooCommerce\Pinterest\View\PHPView
