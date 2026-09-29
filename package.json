@@ -82,7 +82,6 @@
     "gulp-vinyl-zip": "^2.1.2",
     "merge-stream": "^1.0.1",
     "minimist": "^1.2.8",
-    "path": "^0.12.7",
     "prettier": "npm:wp-prettier@^3.9.6",
     "process": "^0.11.10",
     "sass": "^1.104.1",
