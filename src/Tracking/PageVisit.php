@@ -61,10 +61,10 @@ class PageVisit {
 
 		return sprintf(
 			'(function(){%1$svar eventData=%2$s;eventData.event_id=eventId;pintrk("track","%3$s",eventData);%4$s}());',
-			static::get_event_id_code(),
+			self::get_event_id_code(),
 			$event_data,
 			Tracking::EVENT_PAGE_VISIT,
-			static::get_beacon_code()
+			self::get_beacon_code()
 		);
 	}
 
@@ -78,13 +78,13 @@ class PageVisit {
 	 * @return void
 	 */
 	public static function print_beacon_script() {
-		$beacon_code = static::get_beacon_code();
+		$beacon_code = self::get_beacon_code();
 		if ( ! $beacon_code ) {
 			return;
 		}
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded JS whose embedded values are JSON encoded with JSON_HEX_TAG.
-		echo '<script>(function(){' . static::get_event_id_code() . $beacon_code . '}());</script>';
+		echo '<script>(function(){' . self::get_event_id_code() . $beacon_code . '}());</script>';
 	}
 
 	/**
@@ -124,7 +124,7 @@ class PageVisit {
 	 */
 	public static function handle_request() {
 		if ( ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions' ) || ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' ) ) {
-			static::reject( 'conversion tracking or the Conversions API is disabled' );
+			self::reject( 'conversion tracking or the Conversions API is disabled' );
 			return;
 		}
 
@@ -145,12 +145,12 @@ class PageVisit {
 		 * @param bool $disable_tracking Whether to disable tracking based on consent conditions.
 		 */
 		if ( apply_filters( 'woocommerce_pinterest_disable_tracking', $is_tracking_disabled_user_consent ) ) {
-			static::reject( 'tracking is disabled by consent or filter' );
+			self::reject( 'tracking is disabled by consent or filter' );
 			return;
 		}
 
 		if ( CrawlerDetector::is_crawler_request() ) {
-			static::reject( 'the request comes from a crawler' );
+			self::reject( 'the request comes from a crawler' );
 			return;
 		}
 
@@ -159,25 +159,25 @@ class PageVisit {
 		$source_url_raw = $_POST['event_source_url'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
 
 		if ( ! is_string( $event_id_raw ) || ! is_string( $source_url_raw ) ) {
-			static::reject( 'event_id or event_source_url is not a string' );
+			self::reject( 'event_id or event_source_url is not a string' );
 			return;
 		}
 
 		$event_id = sanitize_text_field( wp_unslash( $event_id_raw ) );
 		if ( ! preg_match( '/^page_[A-Za-z0-9_-]{10,100}$/', $event_id ) ) {
-			static::reject( 'event_id is malformed' );
+			self::reject( 'event_id is malformed' );
 			return;
 		}
 
 		$source_url = esc_url_raw( wp_unslash( $source_url_raw ) );
-		$source_url = static::validate_source_url( $source_url );
+		$source_url = self::validate_source_url( $source_url );
 		if ( ! $source_url ) {
-			static::reject( 'event_source_url is not an absolute URL on this site' );
+			self::reject( 'event_source_url is not an absolute URL on this site' );
 			return;
 		}
 
 		$product_id = url_to_postid( $source_url );
-		$data       = static::get_event_data( $event_id, $product_id );
+		$data       = self::get_event_data( $event_id, $product_id );
 		$user       = new User( \WC_Geolocation::get_ip_address(), wc_get_user_agent() );
 		$tracker    = new Conversions( $user, $source_url );
 
@@ -185,7 +185,7 @@ class PageVisit {
 			$tracker->track_event( Tracking::EVENT_PAGE_VISIT, $data );
 		} catch ( Throwable $e ) {
 			// Conversions::track_event() already logged the API error.
-			static::reject( 'the Conversions API dispatch failed' );
+			self::reject( 'the Conversions API dispatch failed' );
 			return;
 		}
 	}

@@ -95,7 +95,7 @@ class Tag extends Tracker {
 		$user_data  = array( 'np' => 'woocommerce' );
 
 		if ( Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) ) {
-			$email       = static::maybe_get_hashed_customer_email();
+			$email       = self::maybe_get_hashed_customer_email();
 			$external_id = static::maybe_get_hashed_customer_external_id();
 
 			if ( ! empty( $email ) ) {
@@ -116,7 +116,7 @@ class Tag extends Tracker {
 		echo $script;
 
 		$events = array_merge(
-			static::$events,
+			self::$events,
 			static::load_deferred_events()
 		);
 		if ( ! empty( $events ) ) {
@@ -175,7 +175,7 @@ class Tag extends Tracker {
 	 * @return array
 	 */
 	public static function load_deferred_events() {
-		$transient_key = static::get_deferred_events_transient_key();
+		$transient_key = self::get_deferred_events_transient_key();
 		if ( ! $transient_key ) {
 			return array();
 		}
@@ -200,7 +200,7 @@ class Tag extends Tracker {
 	 * @return true
 	 */
 	public static function add_deferred_event( string $event_name, array $data ) {
-		static::$deferred_events[] = static::get_event_code( $event_name, $data );
+		self::$deferred_events[] = self::get_event_code( $event_name, $data );
 		return true;
 	}
 
@@ -215,7 +215,7 @@ class Tag extends Tracker {
 	 * @return true
 	 */
 	public static function add_event( string $event_name, array $data ) {
-		static::$events[] = static::get_event_code( $event_name, $data );
+		self::$events[] = self::get_event_code( $event_name, $data );
 		return true;
 	}
 
@@ -227,16 +227,16 @@ class Tag extends Tracker {
 	 * @return void
 	 */
 	public static function save_deferred_events() {
-		$transient_key = static::get_deferred_events_transient_key();
+		$transient_key = self::get_deferred_events_transient_key();
 		if ( ! $transient_key ) {
 			return;
 		}
 
-		$existing_events         = static::load_deferred_events();
-		static::$deferred_events = array_merge( $existing_events, static::$deferred_events );
+		$existing_events       = static::load_deferred_events();
+		self::$deferred_events = array_merge( $existing_events, self::$deferred_events );
 
-		if ( ! empty( static::$deferred_events ) ) {
-			set_transient( $transient_key, static::$deferred_events, DAY_IN_SECONDS );
+		if ( ! empty( self::$deferred_events ) ) {
+			set_transient( $transient_key, self::$deferred_events, DAY_IN_SECONDS );
 		}
 	}
 
@@ -253,7 +253,7 @@ class Tag extends Tracker {
 	public function track_event( string $event_name, Data $data ) {
 		$data = $this->prepare_request_data( $event_name, $data );
 		if ( wp_doing_ajax() ) {
-			return static::maybe_add_fragment( $event_name, $data );
+			return self::maybe_add_fragment( $event_name, $data );
 		}
 
 		/**
@@ -505,7 +505,7 @@ class Tag extends Tracker {
 	 */
 	private static function maybe_add_fragment( string $event_name, array $data ) {
 		if ( Tracking::EVENT_ADD_TO_CART === $event_name ) {
-			$event = static::get_event_code( $event_name, $data );
+			$event = self::get_event_code( $event_name, $data );
 			add_filter(
 				'woocommerce_add_to_cart_fragments',
 				function ( $fragments ) use ( $event ) {
