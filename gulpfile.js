@@ -4,8 +4,6 @@ const gulp = require( 'gulp' );
 const merge = require( 'merge-stream' );
 const fs = require( 'fs' );
 const path = require( 'path' );
-// eslint-disable-next-line no-unused-vars -- Retain the existing build dependency during lint adoption.
-const semver = require( 'semver' );
 const _ = require( 'underscore' );
 const $ = require( 'gulp-load-plugins' )( {
 	pattern: [ '*', '!sass', '!gulp-sass' ],
