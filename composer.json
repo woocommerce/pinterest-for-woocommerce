@@ -30,7 +30,6 @@
 		"automattic/jetpack-device-detection": "^3.4.6"
 	},
 	"require-dev": {
-		"composer/installers": "^2.0",
 		"woocommerce/woocommerce-sniffs": "1.0.0",
 		"sirbrillig/phpcs-changed": "^2.12.0",
 		"phpunit/phpunit": "^9.6",
@@ -57,7 +56,6 @@
 			"php": "7.4"
 		},
 		"allow-plugins": {
-			"composer/installers": true,
 			"dealerdirect/phpcodesniffer-composer-installer": true,
 			"automattic/jetpack-autoloader": true
 		}
