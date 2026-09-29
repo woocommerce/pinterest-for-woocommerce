@@ -55,7 +55,6 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.0.3",
     "@typescript-eslint/parser": "^8.70.0",
     "@woocommerce/dependency-extraction-webpack-plugin": "~2.2.0",
     "@woocommerce/e2e-utils-playwright": "0.5.1",
