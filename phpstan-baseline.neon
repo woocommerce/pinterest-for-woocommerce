@@ -49,12 +49,6 @@ parameters:
 			path: src/AdCredits.php
 
 		-
-			message: '#^Action callback returns array but should not return anything\.$#'
-			identifier: return.void
-			count: 1
-			path: src/Admin/Product/Attributes/AttributesTab.php
-
-		-
 			message: '#^Action callback returns mixed but should not return anything\.$#'
 			identifier: return.void
 			count: 1

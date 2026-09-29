@@ -57,7 +57,7 @@ class AttributesTab {
 			}
 		);
 
-		add_action(
+		add_filter(
 			'woocommerce_product_data_tabs',
 			function ( array $tabs ) {
 				return $this->add_tab( $tabs );
