@@ -1,11 +1,9 @@
-let nodegit, FOLDERS, DOMAIN, PATHS, MATCH, SRC;
+let FOLDERS, DOMAIN, PATHS, MATCH, SRC;
 
 const gulp = require( 'gulp' );
 const merge = require( 'merge-stream' );
 const fs = require( 'fs' );
 const path = require( 'path' );
-// eslint-disable-next-line no-unused-vars -- Retain the existing build dependency during lint adoption.
-const semver = require( 'semver' );
 const _ = require( 'underscore' );
 const $ = require( 'gulp-load-plugins' )( {
 	pattern: [ '*', '!sass', '!gulp-sass' ],
@@ -480,32 +478,6 @@ if ( CONFIG.watch ) {
 	default_task = gulp.series( 'build', 'watch' );
 } else {
 	default_task = gulp.series( 'build' );
-}
-
-// eslint-disable-next-line no-unused-vars -- Preserve the existing optional helper during lint adoption.
-async function getDiffFiles() {
-	nodegit = require( 'nodegit' );
-	const repository = await nodegit.Repository.open( '.' );
-	const currCommit = await repository.getHeadCommit();
-	const mastCommit = await repository.getMasterCommit();
-
-	const currTree = await currCommit.getTree();
-	const mastTree = await mastCommit.getTree();
-
-	let diff = await currTree.diff( mastTree );
-	diff = await diff.patches();
-
-	diff = diff
-		.map( function ( diffFile ) {
-			if ( diffFile.isDeleted() ) {
-				return false;
-			}
-			return '.' + path.sep + diffFile.newFile().path();
-		} )
-		.filter( function ( cont ) {
-			return cont ? true : false;
-		} );
-	return diff;
 }
 
 gulp.task( 'default', default_task );
