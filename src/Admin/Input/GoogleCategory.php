@@ -43,7 +43,7 @@ class GoogleCategory extends Input {
 	 *
 	 * @param array $options List of options.
 	 *
-	 * @return $this
+	 * @return Select
 	 */
 	public function set_options( array $options ): Select {
 		$this->options = $options;

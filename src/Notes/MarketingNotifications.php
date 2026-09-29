@@ -73,7 +73,11 @@ class MarketingNotifications {
 			$this->set_init_timestamp();
 		}
 
-		/** @var AbstractNote $note */
+		/**
+		 * The notes are class names, and each one is instantiated below.
+		 *
+		 * @var class-string<AbstractNote> $note
+		 */
 		foreach ( self::NOTES as $note ) {
 			if ( ! $note::should_be_added( $this->get_init_timestamp() ) ) {
 				continue;

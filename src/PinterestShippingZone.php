@@ -203,7 +203,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	 *
 	 * @since 1.0.5
 	 *
-	 * @param WC_Shipping_Method $shipping_method Shipping rate to verify.
+	 * @param \WC_Shipping_Method $shipping_method Shipping rate to verify.
 	 * @return boolean
 	 */
 	private function is_shipping_method_supported( $shipping_method ) {
