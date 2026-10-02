@@ -282,16 +282,13 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/woocommerce/grow.git",
-                "reference": "3bc225916439d7b93d4f5ecb209c94fb47e76172"
+                "reference": "44d933474841beb8fee8c90a26b29fc23dafaf3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/woocommerce/grow/zipball/3bc225916439d7b93d4f5ecb209c94fb47e76172",
-                "reference": "3bc225916439d7b93d4f5ecb209c94fb47e76172",
+                "url": "https://api.github.com/repos/woocommerce/grow/zipball/44d933474841beb8fee8c90a26b29fc23dafaf3b",
+                "reference": "44d933474841beb8fee8c90a26b29fc23dafaf3b",
                 "shasum": ""
-            },
-            "require-dev": {
-                "woocommerce/woocommerce-sniffs": "^0.1.3"
             },
             "type": "library",
             "autoload": {
@@ -307,7 +304,7 @@
                 "source": "https://github.com/woocommerce/grow/tree/compat-checker",
                 "issues": "https://github.com/woocommerce/grow/issues"
             },
-            "time": "2025-06-25T12:19:53+00:00"
+            "time": "2026-10-01T22:08:04+00:00"
         }
     ],
     "packages-dev": [
