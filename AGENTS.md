@@ -156,9 +156,14 @@ npm run lint:css:fix
 
 #### PHPUnit Tests
 
+The test environment requires a running MySQL instance. A Docker container is used locally:
+
 ```bash
-# Install WordPress test environment
-./bin/install-wp-tests.sh wordpress_test root root localhost
+# Start the database (only needed after Docker restart)
+docker start wp-tests-db
+
+# First-time setup (also run if /tmp is cleared — e.g. after a Mac restart)
+./bin/setup-test-env.sh
 
 # Run tests
 vendor/bin/phpunit
@@ -171,6 +176,8 @@ PINTEREST_FOR_WOOCOMMERCE_TEST_ORDER_STORAGE=hpos composer test-unit
 # Run the tests that need no WordPress, WooCommerce or database
 composer test:isolated
 ```
+
+See `bin/setup-test-env.sh` for the full environment bootstrap steps.
 
 #### JavaScript Tests
 
@@ -211,7 +218,9 @@ This project follows **WooCommerce-Core** coding standards, which extend WordPre
 
 **PHPCS Configuration:** See `phpcs.xml` for complete ruleset.
 
-Run `vendor/bin/phpcs` for PHP changes before committing. Use the JS/CSS checks for changes to those sources; documentation changes need command/path and formatting checks.
+**CRITICAL:** ALWAYS run `composer exec phpcs-changed -- -s --git --git-base origin/trunk` before committing code. This checks only the lines you changed against the trunk baseline — the same check CI runs. CI will fail if code doesn't pass.
+
+Use the JS/CSS checks for changes to those sources; documentation changes need command/path and formatting checks.
 
 ### JavaScript Standards
 
@@ -375,6 +384,35 @@ Refactor admin settings validation
 ```
 
 ### Pull Requests
+
+**MANDATORY workflow before opening or updating any PR:**
+
+1. **Rebase onto trunk** — eliminates merge conflicts before they reach GitHub:
+
+   ```bash
+   git fetch origin
+   git rebase origin/trunk
+   ```
+
+   Resolve any conflicts, then continue. A PR must never have merge conflicts when pushed.
+
+2. **Run all local checks** — use the pre-push script:
+
+   ```bash
+   ./bin/pre-push-check.sh
+   ```
+
+   This runs phpcs-changed and the full PHPUnit suite. Both must be green before pushing. Fix any failures first — do not push with failing tests or linting errors.
+
+3. **Build and test on the local test site** — build the installable zip and hand it to the user for manual verification:
+
+   ```bash
+   npm run build:zip
+   ```
+
+   Wait for the user to confirm the feature works correctly on their test site before pushing or creating the PR.
+
+4. **Push only when all three steps above pass.**
 
 When creating PRs:
 
