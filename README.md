@@ -273,4 +273,4 @@ See [tests/browser/README.md](tests/browser/README.md) for isolated browser setu
 
 ### Dependency advisories
 
-Run `npm run audit:npm` and `npm run audit:composer` to check locked dependencies, including development ones, for high or critical advisories. CI runs both when a manifest or lockfile changes and every Monday.
+Run `npm run audit:npm` and `npm run audit:composer` to check locked dependencies, including development ones, for high or critical advisories. CI does not run them. Instead, a scheduled run every Monday fails when the repository has open high or critical Dependabot alerts.
