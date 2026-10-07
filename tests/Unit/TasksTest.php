@@ -10,6 +10,11 @@ use \WP_UnitTestCase;
 use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
 use Automattic\WooCommerce\Pinterest\Admin\Tasks\Onboarding;
 
+/**
+ * Covering tests related to Tasks.
+ *
+ * @version 1.4.10
+ */
 class TasksTest extends WP_UnitTestCase {
 
 	/**

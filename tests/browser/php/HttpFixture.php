@@ -11,6 +11,8 @@ use Pinterest_For_Woocommerce as Plugin;
 
 /**
  * Register local Pinterest responses and record the plugin's outbound events.
+ *
+ * @version 1.5.2
  */
 class HttpFixture {
 

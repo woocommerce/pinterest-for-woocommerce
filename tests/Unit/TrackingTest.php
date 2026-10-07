@@ -13,6 +13,11 @@ use Automattic\WooCommerce\Pinterest\Tracking\Tracker;
 use Pinterest_For_Woocommerce;
 use WC_Helper_Product;
 
+/**
+ * Tests the Tracking class.
+ *
+ * @version 1.5.1
+ */
 class TrackingTest extends \WP_UnitTestCase {
 
 	/**

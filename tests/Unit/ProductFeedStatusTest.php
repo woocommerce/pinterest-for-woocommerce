@@ -4,6 +4,11 @@ namespace Automattic\WooCommerce\Pinterest;
 
 use Pinterest_For_Woocommerce;
 
+/**
+ * Tests the ProductFeedStatus class.
+ *
+ * @version 1.3.10
+ */
 class ProductFeedStatusTest extends \WP_UnitTestCase {
 
 	public function setUp(): void {

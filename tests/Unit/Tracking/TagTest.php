@@ -4,6 +4,11 @@ namespace Automattic\WooCommerce\Pinterest\Tracking;
 
 use Pinterest_For_Woocommerce;
 
+/**
+ * Tests the Tag tracker class.
+ *
+ * @version 1.5.2
+ */
 class TagTest extends \WP_UnitTestCase {
 
 	public function test_adds_hooks() {

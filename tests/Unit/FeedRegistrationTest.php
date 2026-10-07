@@ -9,6 +9,8 @@ use WP_UnitTestCase;
 
 /**
  * Tests for the stale feed cleanup performed after feed registration.
+ *
+ * @version 1.5.0
  */
 class FeedRegistrationTest extends WP_UnitTestCase {
 

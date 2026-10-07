@@ -19,6 +19,8 @@ require_once dirname( __DIR__, 4 ) . '/Helpers/GoogleCategoryWithValueOptions.ph
 
 /**
  * Verify the existing form's names and submitted values.
+ *
+ * @version 1.5.2
  */
 class AttributesFormTest extends WP_UnitTestCase {
 	/**

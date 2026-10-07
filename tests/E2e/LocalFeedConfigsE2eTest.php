@@ -5,6 +5,11 @@ namespace Automattic\WooCommerce\Pinterest\Tests\E2e;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Pinterest_For_Woocommerce;
 
+/**
+ * Tests how an empty local feed configuration is restored from the feeds registered at Pinterest.
+ *
+ * @version 1.4.27
+ */
 class LocalFeedConfigsE2eTest extends \WP_UnitTestCase {
 
 	public function setUp(): void {

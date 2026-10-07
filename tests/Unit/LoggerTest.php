@@ -14,6 +14,8 @@ use WP_UnitTestCase;
 
 /**
  * HTTP diagnostics must not copy credentials or customer data into logs.
+ *
+ * @version 1.5.2
  */
 class LoggerTest extends WP_UnitTestCase {
 

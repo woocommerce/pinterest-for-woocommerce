@@ -6,6 +6,8 @@ use Automattic\WooCommerce\Utilities\OrderUtil;
 
 /**
  * Guards the order storage selected for the test run.
+ *
+ * @version 1.5.2
  */
 class OrderStorageTest extends \WP_UnitTestCase {
 

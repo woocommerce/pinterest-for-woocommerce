@@ -11,6 +11,8 @@ use Pinterest_For_Woocommerce as Plugin;
 
 /**
  * Expose a small set of named operations to the Playwright data adapter.
+ *
+ * @version 1.5.2
  */
 class StoreFixture {
 

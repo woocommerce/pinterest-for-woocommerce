@@ -22,7 +22,11 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
 use Pinterest_For_Woocommerce as Plugin;
 use WP_UnitTestCase;
 
-/** Real migrations, save hooks and conversion payloads after database reload. */
+/**
+ * Real migrations, save hooks and conversion payloads after database reload.
+ *
+ * @version 1.5.2
+ */
 class SavedDataTest extends WP_UnitTestCase {
 	/**
 	 * HTTP requests observed at the external boundary.

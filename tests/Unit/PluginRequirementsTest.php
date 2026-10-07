@@ -13,6 +13,8 @@ use WP_UnitTestCase;
 
 /**
  * Tests the minimum WordPress and WooCommerce versions at the runtime gate.
+ *
+ * @version 1.5.2
  */
 class PluginRequirementsTest extends WP_UnitTestCase {
 

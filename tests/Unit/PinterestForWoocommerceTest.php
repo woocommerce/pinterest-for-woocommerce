@@ -10,6 +10,11 @@ use Automattic\WooCommerce\Pinterest\Tracking\Tag;
 use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
 
+/**
+ * Tests the Pinterest_For_Woocommerce main plugin class.
+ *
+ * @version 1.4.13
+ */
 class PinterestForWoocommerceTest extends WP_UnitTestCase {
 
 	public function tearDown(): void {

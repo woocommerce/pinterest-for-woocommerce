@@ -11,6 +11,11 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
 use Automattic\WooCommerce\Pinterest\API\AdvertiserConnect;
 use Exception;
 
+/**
+ * Tests connecting an advertiser and tag through the AdvertiserConnect API class.
+ *
+ * @version 1.4.10
+ */
 class AdvertiserConnectTest extends \WP_UnitTestCase {
 
 	public function tearDown(): void {

@@ -8,6 +8,11 @@ use WC_Helper_Product;
 use WP_REST_Request;
 use WP_Test_REST_TestCase;
 
+/**
+ * Tests the feed issues REST API endpoint.
+ *
+ * @version 1.4.10
+ */
 class FeedIssuesTest extends WP_Test_REST_TestCase {
 
 	public function tearDown(): void {

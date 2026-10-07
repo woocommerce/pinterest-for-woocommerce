@@ -8,6 +8,8 @@ use Automattic\WooCommerce\Pinterest\LocaleMapper;
 
 /**
  * Class for testing locale mapper.
+ *
+ * @version 1.4.17
  */
 class LocaleMapperTest extends TestCase {
 

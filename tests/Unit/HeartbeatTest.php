@@ -5,6 +5,11 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 use Automattic\WooCommerce\Pinterest\Heartbeat;
 use Pinterest_For_Woocommerce;
 
+/**
+ * Tests the Heartbeat class.
+ *
+ * @version 1.4.11
+ */
 class HeartbeatTest extends \WP_UnitTestCase {
 
 	/** @var Heartbeat */
