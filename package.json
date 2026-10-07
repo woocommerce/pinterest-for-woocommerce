@@ -58,7 +58,7 @@
     "@woocommerce/eslint-plugin": "^4.0.0",
     "@wordpress/base-styles": "^3.6.0",
     "@wordpress/env": "11.15.0",
-    "@wordpress/scripts": "^35.0.0",
+    "@wordpress/scripts": "^36.1.0",
     "@wordpress/stylelint-config": "^25.0.0",
     "browser-sync": "^3.0.4",
     "eslint": "^10.10.0",
