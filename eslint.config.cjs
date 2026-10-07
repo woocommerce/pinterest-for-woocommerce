@@ -1,9 +1,20 @@
+const vitest = require( '@vitest/eslint-plugin' );
 const woocommerce = require( '@woocommerce/eslint-plugin' );
 
 const jsdocTypes = woocommerce.configs.recommended.find(
 	( config ) =>
 		config.rules?.[ 'jsdoc/no-undefined-types' ]?.[ 1 ]?.definedTypes
 ).rules[ 'jsdoc/no-undefined-types' ][ 1 ].definedTypes;
+
+// The shared preset lints every test file as Jest. Collect what it turns on, so
+// that the unit tests can swap it for the Vitest equivalent below.
+const jestConfigs = woocommerce.configs.recommended.filter( ( config ) =>
+	Object.keys( config.rules ?? {} ).some( ( rule ) =>
+		rule.startsWith( 'jest/' )
+	)
+);
+const off = ( names ) =>
+	Object.fromEntries( names.map( ( n ) => [ n, 'off' ] ) );
 
 module.exports = [
 	...woocommerce.configs.recommended,
@@ -43,6 +54,26 @@ module.exports = [
 					],
 				},
 			],
+		},
+	},
+	{
+		files: [ 'assets/source/**/*.test.js', 'assets/source/tests/**/*.js' ],
+		plugins: { vitest },
+		languageOptions: {
+			// Vitest runs without globals: its API has to be imported.
+			globals: off(
+				jestConfigs.flatMap( ( config ) =>
+					Object.keys( config.languageOptions?.globals ?? {} )
+				)
+			),
+		},
+		rules: {
+			...off(
+				jestConfigs
+					.flatMap( ( config ) => Object.keys( config.rules ) )
+					.filter( ( rule ) => rule.startsWith( 'jest/' ) )
+			),
+			...vitest.configs.recommended.rules,
 		},
 	},
 	{

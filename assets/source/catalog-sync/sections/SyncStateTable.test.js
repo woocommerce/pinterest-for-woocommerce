@@ -26,7 +26,7 @@ describe( 'SyncStateTable diagnostics', () => {
 		error = vi.spyOn( console, 'error' ).mockImplementation( () => {} );
 	} );
 
-	// Check the known React warning after each independent test.
+	/* eslint-disable vitest/no-standalone-expect -- Check the known React warning after each independent test. */
 	afterEach( () => {
 		// React reports this existing warning in whichever test runs first.
 		if ( error.mock.calls.length ) {
@@ -41,6 +41,7 @@ describe( 'SyncStateTable diagnostics', () => {
 			);
 		}
 	} );
+	/* eslint-enable vitest/no-standalone-expect */
 
 	test( 'keeps escaped remote status as literal text', () => {
 		const { getByText, container } = render(
