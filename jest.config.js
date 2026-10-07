@@ -1,7 +1,3 @@
-// Import WP-scripts presets to extend them,
-// see https://developer.wordpress.org/block-editor/packages/packages-scripts/#advanced-information-11.
-const defaultConfig = require( '@wordpress/scripts/config/jest-unit.config' );
-
 const wcPackagesNeedTransform = [
 	'components',
 	'currency',
@@ -20,7 +16,15 @@ const packagesNeedMocking = [
 ].join( '|' );
 
 module.exports = {
-	...defaultConfig,
+	// @wordpress/scripts 36 no longer ships a Jest config, so use the
+	// published preset and Babel transform it used to wrap.
+	preset: '@wordpress/jest-preset-default',
+	transform: {
+		'\\.[jt]sx?$': [
+			'babel-jest',
+			{ presets: [ '@wordpress/babel-preset-default' ] },
+		],
+	},
 	collectCoverageFrom: [
 		'assets/source/**/*.js',
 		'!assets/source/**/*.test.js',
