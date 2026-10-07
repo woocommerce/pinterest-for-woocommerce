@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { expect, it, vi } from 'vitest';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import {
 	act,
@@ -22,27 +23,28 @@ import * as actions from '../data/settings/actions';
 import * as selectors from '../data/settings/selectors';
 import * as resolvers from '../data/settings/resolvers';
 
-jest.mock( '@wordpress/api-fetch', () => ( {
-	__esModule: true,
-	default: jest.fn(),
+vi.mock( '@wordpress/api-fetch', () => ( {
+	default: vi.fn(),
 } ) );
 
-jest.mock( '../helpers/effects', () => ( {
-	...jest.requireActual( '../helpers/effects' ),
+vi.mock( '../helpers/effects', async () => ( {
+	...( await vi.importActual( '../helpers/effects' ) ),
 	useBodyClasses: () => {},
 	useCreateNotice: () => () => {},
 } ) );
-jest.mock( '../components/HealthCheck', () => () => null );
-jest.mock( '../../../components/navigation-classic', () => () => null );
-jest.mock( '../components/SyncSettings', () => () => null );
-jest.mock( '../steps/SetupProductSync', () => () => null );
-jest.mock( '../steps/SetupPins', () => () => null );
-jest.mock( '../steps/AdvancedSettings', () => () => (
-	<input aria-label="Enable Debug Logging" />
-) );
-jest.mock( '../components/SaveSettingsButton', () => () => (
-	<button>Save changes</button>
-) );
+vi.mock( '../components/HealthCheck', () => ( { default: () => null } ) );
+vi.mock( '../../../components/navigation-classic', () => ( {
+	default: () => null,
+} ) );
+vi.mock( '../components/SyncSettings', () => ( { default: () => null } ) );
+vi.mock( '../steps/SetupProductSync', () => ( { default: () => null } ) );
+vi.mock( '../steps/SetupPins', () => ( { default: () => null } ) );
+vi.mock( '../steps/AdvancedSettings', () => ( {
+	default: () => <input aria-label="Enable Debug Logging" />,
+} ) );
+vi.mock( '../components/SaveSettingsButton', () => ( {
+	default: () => <button>Save changes</button>,
+} ) );
 
 it( 'keeps editing unavailable until full settings load, even after partial updates', async () => {
 	let finishRequest;
@@ -53,7 +55,7 @@ it( 'keeps editing unavailable until full settings load, even after partial upda
 	const refresh = new Promise( ( resolve ) => {
 		finishRefresh = resolve;
 	} );
-	const fetch = jest
+	const fetch = vi
 		.fn()
 		.mockReturnValueOnce( response )
 		.mockReturnValueOnce( refresh );

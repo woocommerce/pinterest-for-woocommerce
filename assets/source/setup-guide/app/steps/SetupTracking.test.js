@@ -1,17 +1,15 @@
-jest.mock( '@wordpress/api-fetch', () => ( {
-	__esModule: true,
-	default: jest.fn(),
+vi.mock( '@wordpress/api-fetch', () => ( {
+	default: vi.fn(),
 } ) );
 
 // Data controls may resolve a different installed copy of api-fetch.
-jest.mock( '@wordpress/data-controls', () => {
-	const actual = jest.requireActual( '@wordpress/data-controls' );
+vi.mock( '@wordpress/data-controls', async () => {
+	const actual = await vi.importActual( '@wordpress/data-controls' );
 	return {
 		...actual,
 		controls: {
 			...actual.controls,
-			API_FETCH: ( { request } ) =>
-				jest.requireMock( '@wordpress/api-fetch' ).default( request ),
+			API_FETCH: ( { request } ) => apiFetch( request ),
 		},
 	};
 } );
@@ -19,7 +17,8 @@ jest.mock( '@wordpress/data-controls', () => {
 /**
  * External dependencies
  */
-import '@testing-library/jest-dom';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 import '@wordpress/notices';
 import apiFetch from '@wordpress/api-fetch';
 import { dispatch, select } from '@wordpress/data';
@@ -74,7 +73,7 @@ describe( 'SetupTracking', () => {
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'keeps a configured tag instead of replacing it with the first tag', async () => {

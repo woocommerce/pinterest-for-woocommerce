@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { render } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 
 /**
  * Internal dependencies
@@ -19,16 +20,18 @@ const workflow = ( extraInfo ) => [
 ];
 
 describe( 'SyncStateTable diagnostics', () => {
-	/* eslint-disable jest/no-standalone-expect -- Check the known React warning after each independent test. */
+	let error;
+
+	beforeEach( () => {
+		error = vi.spyOn( console, 'error' ).mockImplementation( () => {} );
+	} );
+
+	// Check the known React warning after each independent test.
 	afterEach( () => {
 		// React reports this existing warning in whichever test runs first.
-		// eslint-disable-next-line no-console -- Validate only the known warning.
-		if ( console.error.mock.calls.length ) {
-			expect( console ).toHaveErrored();
-			// eslint-disable-next-line no-console -- Validate only the known warning.
-			expect( console.error ).toHaveBeenCalledTimes( 1 );
-			// eslint-disable-next-line no-console -- Validate only the known warning.
-			expect( console.error ).toHaveBeenCalledWith(
+		if ( error.mock.calls.length ) {
+			expect( error ).toHaveBeenCalledTimes( 1 );
+			expect( error ).toHaveBeenCalledWith(
 				expect.stringContaining( 'Failed %s type' ),
 				'prop',
 				expect.stringContaining(
@@ -38,7 +41,6 @@ describe( 'SyncStateTable diagnostics', () => {
 			);
 		}
 	} );
-	/* eslint-enable jest/no-standalone-expect */
 
 	test( 'keeps escaped remote status as literal text', () => {
 		const { getByText, container } = render(

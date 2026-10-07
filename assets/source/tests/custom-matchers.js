@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { expect } from 'vitest';
+
 expect.extend( {
 	/**
 	 * Custom matcher to check the presence and optionally the value of a search query param in the given location.

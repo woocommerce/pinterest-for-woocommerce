@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { afterEach, beforeEach, expect, vi } from 'vitest';
+
+/**
  * React 18.3 reports deprecations from the published builds of
  * `@wordpress/components` 12 (`Card` default props) and
  * `@woocommerce/components` 5 (`Link` legacy context). They cannot be fixed
@@ -14,20 +19,25 @@ const KNOWN_DEPRECATIONS = {
  * Declares the React deprecations a suite is expected to trigger.
  * Any other `console.error` call still fails the test.
  *
- * Call it inside a `describe` block, so the check runs before
- * `@wordpress/jest-console` rejects unexpected errors.
+ * Call it inside a `describe` block, before the hooks that render, so the
+ * spy takes over from the one in `setup-console.js` that rejects every error.
  *
  * @param {...string} components Names of the components known to trigger a deprecation.
  */
 export function expectKnownReactDeprecations( ...components ) {
-	/* eslint-disable no-console -- Validate only the known warnings after each independent test. */
-	afterEach( () => {
-		const { calls } = console.error.mock;
-		if ( ! calls.length ) {
-			return;
-		}
+	let calls;
 
-		expect( console ).toHaveErrored();
+	// Keep the calls outside the spy: suites clear their mocks in `afterEach`
+	// hooks that run before the check below.
+	beforeEach( () => {
+		calls = [];
+		vi.spyOn( console, 'error' ).mockImplementation( ( ...args ) => {
+			calls.push( args );
+		} );
+	} );
+
+	// Validate only the known warnings after each independent test.
+	afterEach( () => {
 		calls.forEach( ( [ format, component ] ) => {
 			expect( components ).toContain( component );
 			expect( format ).toContain( KNOWN_DEPRECATIONS[ component ] );
@@ -37,5 +47,4 @@ export function expectKnownReactDeprecations( ...components ) {
 			new Set( calls.map( ( [ , component ] ) => component ) ).size
 		);
 	} );
-	/* eslint-enable no-console */
 }

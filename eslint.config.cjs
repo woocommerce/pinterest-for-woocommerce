@@ -10,6 +10,9 @@ module.exports = [
 	{
 		settings: {
 			react: { version: '16.14' },
+			// The shared preset still applies Jest rules to the Playwright tests,
+			// and they cannot detect a version now that Jest is not installed.
+			jest: { version: 30 },
 		},
 		rules: {
 			// Keep the previous lint policy during the dependency migration.
@@ -43,12 +46,7 @@ module.exports = [
 		},
 	},
 	{
-		files: [
-			'gulpfile.js',
-			'webpack.config.js',
-			'jest.config.js',
-			'eslint.config.cjs',
-		],
+		files: [ 'gulpfile.js', 'webpack.config.js', 'eslint.config.cjs' ],
 		languageOptions: {
 			sourceType: 'commonjs',
 		},

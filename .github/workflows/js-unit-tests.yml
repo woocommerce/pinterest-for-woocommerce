@@ -6,6 +6,7 @@ on:
       - trunk
     paths:
       - "**.js"
+      - vitest.config.mjs
       - package.json
       - package-lock.json
       - .github/workflows/js-unit-tests.yml

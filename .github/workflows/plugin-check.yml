@@ -65,7 +65,7 @@ jobs:
           .wp-env.json
           eslint.config.cjs
           gulpfile.js
-          jest.config.js
+          vitest.config.mjs
           webpack.config.js
           project-folders.json
           phpcs.xml

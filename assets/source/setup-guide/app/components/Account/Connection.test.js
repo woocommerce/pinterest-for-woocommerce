@@ -1,9 +1,10 @@
-jest.mock( '../../helpers/effects' );
-jest.mock( '@woocommerce/tracks' );
+vi.mock( '../../helpers/effects' );
+vi.mock( '@woocommerce/tracks' );
 
 /**
  * External dependencies
  */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { recordEvent } from '@woocommerce/tracks';
 import { fireEvent, render } from '@testing-library/react';
 
@@ -15,7 +16,7 @@ import AccountConnection from './Connection';
 recordEvent.mockName( 'recordEvent' );
 
 afterEach( () => {
-	jest.clearAllMocks();
+	vi.clearAllMocks();
 } );
 
 describe( 'AccountConnection component', () => {

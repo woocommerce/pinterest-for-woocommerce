@@ -87,7 +87,7 @@ jobs:
               - '!bin/phpunit-wp-env.sh'
               - '!assets/source/**/*.test.js'
               - '!assets/source/tests/**'
-              - '!jest.config.js'
+              - '!vitest.config.mjs'
               - '!**/*.md'
               - '!.markdownlintignore'
               - '!docs/**'
