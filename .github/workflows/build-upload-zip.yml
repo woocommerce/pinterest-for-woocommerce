@@ -1,6 +1,10 @@
 name: Build and Upload zip
 
 on: workflow_call
+
+permissions:
+  contents: read
+
 jobs:
   build_project:
         name: Build and upload
