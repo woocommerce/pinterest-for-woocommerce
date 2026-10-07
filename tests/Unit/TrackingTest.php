@@ -16,7 +16,7 @@ use WC_Helper_Product;
 /**
  * Tests the Tracking class.
  *
- * @version 1.5.1
+ * @version x.x.x
  */
 class TrackingTest extends \WP_UnitTestCase {
 
@@ -304,7 +304,9 @@ class TrackingTest extends \WP_UnitTestCase {
 
 		$this->assertSame( 1, substr_count( $output, PageVisit::AJAX_ACTION ) );
 		$this->assertSame( 1, substr_count( $output, 'var eventId="page_"+' ) );
-		$this->assertStringNotContainsString( 'pintrk("track"', $output );
+		$this->assertStringNotContainsString( 'pintrk(', $output );
+		$this->assertStringNotContainsString( 'https://s.pinimg.com/ct/core.js', $output );
+		$this->assertStringNotContainsString( 'pinterest-tag-placeholder', $output );
 	}
 
 	/**
@@ -315,6 +317,7 @@ class TrackingTest extends \WP_UnitTestCase {
 
 		$this->assertStringNotContainsString( PageVisit::AJAX_ACTION, $output );
 		$this->assertStringNotContainsString( 'var eventId=', $output );
+		$this->assertStringNotContainsString( 'pintrk(', $output );
 	}
 
 	/**
@@ -326,7 +329,7 @@ class TrackingTest extends \WP_UnitTestCase {
 		$output = $this->render_footer( '', true, 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' );
 
 		$this->assertSame( 1, substr_count( $output, PageVisit::AJAX_ACTION ) );
-		$this->assertStringNotContainsString( 'pintrk("track"', $output );
+		$this->assertStringNotContainsString( 'pintrk(', $output );
 	}
 
 	/**
@@ -337,6 +340,8 @@ class TrackingTest extends \WP_UnitTestCase {
 
 		$this->assertSame( 1, substr_count( $output, PageVisit::AJAX_ACTION ) );
 		$this->assertStringContainsString( 'pintrk("track","PageVisit",eventData);var requestData=new FormData();', $output );
+		$this->assertStringContainsString( "pintrk('load', 'wd7afw51gs'", $output );
+		$this->assertStringContainsString( 'pinterest-tag-placeholder', $output );
 	}
 
 	/**
