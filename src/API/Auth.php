@@ -20,6 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Registers the endpoint to which we are returned to, after being authorized by Pinterest.
+ *
+ * @class   Auth
+ * @version 1.5.0
  */
 class Auth extends VendorAPI {
 

@@ -17,6 +17,9 @@ use WC_Product;
 
 /**
  * Class Handling registration & generation of the XML product feed.
+ *
+ * @class   ProductSync
+ * @version 1.5.2
  */
 class ProductSync {
 

@@ -13,7 +13,9 @@ namespace Automattic\WooCommerce\Pinterest\Utilities;
 /**
  * Utilities class.
  *
- * @since 1.1.0
+ * @class   Utilities
+ * @since   1.1.0
+ * @version 1.1.0
  */
 class Utilities {
 

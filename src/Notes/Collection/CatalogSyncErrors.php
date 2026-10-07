@@ -20,7 +20,9 @@ use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
  * Class responsible for admin Inbox notification after successful connection but
  * when the catalog ingestion fails.
  *
- * @since 1.1.0
+ * @class   CatalogSyncErrors
+ * @since   1.1.0
+ * @version 1.4.0
  */
 class CatalogSyncErrors extends AbstractNote {
 

@@ -18,7 +18,9 @@ use Automattic\WooCommerce\Pinterest\Utilities\Utilities;
  * Class responsible for admin Inbox notification after successful connection but
  * the sync feature disabled.
  *
- * @since 1.1.0
+ * @class   EnableCatalogSync
+ * @since   1.1.0
+ * @version 1.1.0
  */
 class EnableCatalogSync extends AbstractNote {
 

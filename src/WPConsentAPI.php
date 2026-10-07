@@ -15,7 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class handling WP Consent API integration.
  *
- * @since 1.4.17
+ * @class   WPConsentAPI
+ * @since   1.4.17
+ * @version 1.4.21
  */
 class WPConsentAPI {
 

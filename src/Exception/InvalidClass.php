@@ -15,6 +15,8 @@ use LogicException;
  * Class InvalidClass
  *
  * @phpstan-consistent-constructor
+ * @class   InvalidClass
+ * @version 1.5.2
  */
 class InvalidClass extends LogicException implements PinterestException {
 

@@ -14,5 +14,8 @@ use Exception;
 /**
  * Thrown when the feed generator circuit breaker trips (batch_number exceeds
  * the configured max batches per cycle limit).
+ *
+ * @class   FeedCircuitBreakerException
+ * @version 1.4.27
  */
 class FeedCircuitBreakerException extends Exception implements PinterestException {}

@@ -17,6 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Endpoint handing Pinterest linked business accounts.
+ *
+ * @class   Businesses
+ * @version 1.5.2
  */
 class Businesses extends VendorAPI {
 

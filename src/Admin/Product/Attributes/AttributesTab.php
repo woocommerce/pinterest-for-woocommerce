@@ -17,6 +17,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class AttributesTab
+ *
+ * @class   AttributesTab
+ * @version 1.5.2
  */
 class AttributesTab {
 

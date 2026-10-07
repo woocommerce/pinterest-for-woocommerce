@@ -16,6 +16,9 @@ use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
 /**
  * Helper class with functions that handle WordPress and WooCommerce deprecations.
  * Using helper class with static methods to help with autoloading.
+ *
+ * @class   Compat
+ * @version 1.4.25
  */
 class Compat {
 	/**

@@ -14,6 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Helper methods that get/set the various feed state properties.
+ *
+ * @class   ProductFeedStatus
+ * @version 1.4.0
  */
 class ProductFeedStatus {
 

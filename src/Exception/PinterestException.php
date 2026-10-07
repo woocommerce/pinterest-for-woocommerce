@@ -13,5 +13,8 @@ use Throwable;
 
 /**
  * This interface is used for all of our exceptions so that we can easily catch only our own exceptions.
+ *
+ * @class   PinterestException
+ * @version 1.0.2
  */
 interface PinterestException extends Throwable {}

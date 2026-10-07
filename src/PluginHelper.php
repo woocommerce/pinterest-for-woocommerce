@@ -11,6 +11,9 @@ namespace Automattic\WooCommerce\Pinterest;
 
 /**
  * Trait PluginHelper
+ *
+ * @class   PluginHelper
+ * @version 1.5.2
  */
 trait PluginHelper {
 

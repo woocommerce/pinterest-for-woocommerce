@@ -20,6 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Base API Methods
+ *
+ * @class   Base
+ * @version 1.5.2
  */
 class Base {
 

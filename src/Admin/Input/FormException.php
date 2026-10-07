@@ -18,6 +18,8 @@ defined( 'ABSPATH' ) || exit;
  * Class FormException
  *
  * @phpstan-consistent-constructor
+ * @class   FormException
+ * @version 1.5.2
  */
 class FormException extends Exception implements PinterestException {
 	/**

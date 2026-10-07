@@ -15,7 +15,9 @@ use Automattic\WooCommerce\Pinterest\Logger;
 /**
  * Trait ProductFeedLogger
  *
- * @since 1.0.10
+ * @class   ProductFeedLogger
+ * @since   1.0.10
+ * @version 1.0.10
  */
 trait ProductFeedLogger {
 

@@ -29,7 +29,9 @@ defined( 'ABSPATH' ) || exit;
  * be sent some time after the plugin installation. There is no retroactive
  * way of figuring out when the plugin was first installed. So we count
  *
- * @since 1.1.0
+ * @class   MarketingNotifications
+ * @since   1.1.0
+ * @version 1.5.2
  */
 class MarketingNotifications {
 

@@ -15,7 +15,9 @@ defined( 'ABSPATH' ) || exit;
  *
  * Class responsible for admin Inbox notification after three days from setup.
  *
- * @since 1.1.0
+ * @class   CompleteOnboardingAfterThreeDays
+ * @since   1.1.0
+ * @version 1.1.0
  */
 class CompleteOnboardingAfterThreeDays extends AbstractCompleteOnboarding {
 

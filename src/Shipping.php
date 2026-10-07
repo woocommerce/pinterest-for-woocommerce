@@ -27,7 +27,9 @@ use \WC_Data_Store;
  * - Simple products.
  * - Variable products.
  *
- * @since 1.0.5
+ * @class   Shipping
+ * @since   1.0.5
+ * @version 1.5.2
  */
 class Shipping {
 

@@ -18,7 +18,9 @@ defined( 'ABSPATH' ) || exit;
  * Responsible for scheduling cron heartbeat hooks.
  * Useful for performing various async actions of low intensity.
  *
- * @since 1.1.0
+ * @class   Heartbeat
+ * @since   1.1.0
+ * @version 1.4.11
  */
 class Heartbeat {
 

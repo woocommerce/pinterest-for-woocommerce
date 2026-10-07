@@ -13,6 +13,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class Select
+ *
+ * @class   Select
+ * @version 1.0.2
  */
 class Select extends Input {
 	/**
