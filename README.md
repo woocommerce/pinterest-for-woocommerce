@@ -85,6 +85,10 @@ Merging the release PR into `trunk` triggers the release workflow ([ci-release.y
 
 After a successful release, the workflow closes the released milestone and creates one for the next patch version (rename it if the next release will be a minor/major). What's left for you: post-release tasks like documentation and stakeholder notifications.
 
+### Public API compatibility
+
+Follow the [deprecation policy](docs/deprecations.md) when replacing public functions or methods.
+
 ### AI code reviews
 
 [CodeRabbit](https://docs.coderabbit.ai/platforms/github-com) requires its GitHub App
