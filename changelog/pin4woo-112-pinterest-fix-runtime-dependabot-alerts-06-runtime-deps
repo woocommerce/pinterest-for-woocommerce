@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Updated number formatting, RTL styling, UUID and fetch dependencies to address security advisories.

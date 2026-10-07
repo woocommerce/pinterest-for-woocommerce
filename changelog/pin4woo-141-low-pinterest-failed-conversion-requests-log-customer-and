@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Omit customer and order data from conversion diagnostics.

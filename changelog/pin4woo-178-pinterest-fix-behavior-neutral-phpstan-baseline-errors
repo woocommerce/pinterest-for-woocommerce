@@ -1,4 +1,0 @@
-Significance: patch
-Type: dev
-
-Corrected hook docblocks and other PHPStan findings that do not change behavior.

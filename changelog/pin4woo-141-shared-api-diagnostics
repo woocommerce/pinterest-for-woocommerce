@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Omit credentials and raw HTTP contents from shared API diagnostics.
