@@ -19,6 +19,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Endpoint handling settings updates.
+ *
+ * @class   Settings
+ * @version 1.5.2
  */
 class Settings extends VendorAPI {
 

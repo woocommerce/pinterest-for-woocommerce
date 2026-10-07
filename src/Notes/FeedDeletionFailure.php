@@ -20,6 +20,9 @@ use Automattic\WooCommerce\Pinterest\PinterestApiException;
 
 /**
  * Pinterest Feed Deletion Error Admin Note Class
+ *
+ * @class   FeedDeletionFailure
+ * @version 1.4.10
  */
 class FeedDeletionFailure {
 

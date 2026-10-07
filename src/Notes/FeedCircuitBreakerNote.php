@@ -19,6 +19,9 @@ use Automattic\WooCommerce\Admin\Notes\NoteTraits;
 
 /**
  * Feed Circuit Breaker admin note.
+ *
+ * @class   FeedCircuitBreakerNote
+ * @version 1.4.27
  */
 class FeedCircuitBreakerNote {
 

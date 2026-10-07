@@ -13,6 +13,11 @@ use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
 
+/**
+ * Pinterest for WooCommerce API v5 base class tests.
+ *
+ * @version 1.5.2
+ */
 class APIV5Test extends WP_UnitTestCase {
 
 	public function tearDown(): void {

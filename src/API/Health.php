@@ -16,6 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Endpoint used to check the Health status of the connected Merchant object.
+ *
+ * @class   Health
+ * @version 1.4.0
  */
 class Health extends VendorAPI {
 

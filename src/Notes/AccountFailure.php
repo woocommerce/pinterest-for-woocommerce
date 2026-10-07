@@ -18,7 +18,9 @@ use Automattic\WooCommerce\Admin\Notes\NoteTraits;
 /**
  * Account Failure admin notice.
  *
- * @since 1.4.13
+ * @class   AccountFailure
+ * @since   1.4.13
+ * @version 1.4.13
  */
 class AccountFailure {
 	/**

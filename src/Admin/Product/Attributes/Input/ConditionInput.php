@@ -15,6 +15,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class Condition
+ *
+ * @class   ConditionInput
+ * @version 1.0.2
  */
 class ConditionInput extends Select {
 

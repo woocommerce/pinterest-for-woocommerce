@@ -20,7 +20,9 @@ use Automattic\WooCommerce\Pinterest\Exception\PinterestApiLocaleException;
  * Most of the time, the locale codes are the same, but there are some exceptions.
  * Like for example German Standard is de_DE in WordPress, but de in Pinterest.
  *
- * @since 1.2.13
+ * @class   LocaleMapper
+ * @since   1.2.13
+ * @version 1.4.17
  */
 class LocaleMapper {
 

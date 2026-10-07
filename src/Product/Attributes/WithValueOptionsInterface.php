@@ -13,6 +13,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Interface WithValueOptionsInterface
+ *
+ * @class   WithValueOptionsInterface
+ * @version 1.0.2
  */
 interface WithValueOptionsInterface {
 	/**

@@ -13,5 +13,8 @@ use Exception;
 
 /**
  * Exception thrown when the the application locale is not supported by the API.
+ *
+ * @class   PinterestApiLocaleException
+ * @version 1.2.13
  */
 class PinterestApiLocaleException extends Exception implements PinterestException {}

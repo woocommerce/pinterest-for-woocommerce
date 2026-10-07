@@ -18,6 +18,8 @@ use WC_Product_Simple;
 
 /**
  * Covers the hooks that flag the feed for regeneration when a product changes.
+ *
+ * @version 1.5.1
  */
 class ProductSyncTest extends \WP_UnitTestCase {
 

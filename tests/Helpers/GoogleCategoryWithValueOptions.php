@@ -12,6 +12,8 @@ use Automattic\WooCommerce\Pinterest\Product\Attributes\WithValueOptionsInterfac
 
 /**
  * Attribute fixture for the form's value-options interface.
+ *
+ * @version 1.5.2
  */
 class GoogleCategoryWithValueOptions extends GoogleCategory implements WithValueOptionsInterface {
 	/**

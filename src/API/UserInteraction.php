@@ -20,6 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Endpoint handling Options.
+ *
+ * @class   UserInteraction
+ * @version 1.4.19
  */
 class UserInteraction extends VendorAPI {
 

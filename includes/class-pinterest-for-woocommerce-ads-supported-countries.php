@@ -16,6 +16,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Ads_Supported_Countries' ) ) :
 
 	/**
 	 * Class handling the settings page and onboarding Wizard registration and rendering.
+	 *
+	 * @class   Pinterest_For_Woocommerce_Ads_Supported_Countries
+	 * @version 1.5.2
 	 */
 	class Pinterest_For_Woocommerce_Ads_Supported_Countries {
 

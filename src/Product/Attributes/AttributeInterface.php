@@ -15,6 +15,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Interface AttributeInterface
+ *
+ * @class   AttributeInterface
+ * @version 1.0.2
  */
 interface AttributeInterface {
 

@@ -9,6 +9,11 @@ use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
 use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
 
+/**
+ * Tests the Feeds class.
+ *
+ * @version 1.4.27
+ */
 class FeedsTest extends WP_UnitTestCase {
 
 	public function setUp(): void {

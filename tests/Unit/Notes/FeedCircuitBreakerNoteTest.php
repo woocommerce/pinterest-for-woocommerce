@@ -8,6 +8,8 @@ use Automattic\WooCommerce\Pinterest\Notes\FeedCircuitBreakerNote;
 
 /**
  * FeedCircuitBreakerNoteTest class.
+ *
+ * @version 1.4.27
  */
 class FeedCircuitBreakerNoteTest extends \WP_UnitTestCase {
 

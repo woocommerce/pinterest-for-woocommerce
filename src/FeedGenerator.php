@@ -27,6 +27,9 @@ use Throwable;
 
 /**
  * Class Handling feed files generation.
+ *
+ * @class   FeedGenerator
+ * @version 1.5.1
  */
 class FeedGenerator extends AbstractChainedJob {
 

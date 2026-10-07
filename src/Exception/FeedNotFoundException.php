@@ -13,5 +13,8 @@ use Exception;
 
 /**
  * Exception thrown when there is no matching feed at Pinterest.
+ *
+ * @class   FeedNotFoundException
+ * @version 1.4.10
  */
 class FeedNotFoundException extends Exception {}

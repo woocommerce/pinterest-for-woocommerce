@@ -22,6 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Generates browser PageVisit events and handles their CAPI beacons.
+ *
+ * @class   PageVisit
+ * @version 1.5.2
  */
 class PageVisit {
 

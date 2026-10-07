@@ -19,6 +19,9 @@ use \Throwable;
 
 /**
  * Class Handling registration & generation of the XML product feed.
+ *
+ * @class   Merchants
+ * @version 1.4.10
  */
 class Merchants {
 

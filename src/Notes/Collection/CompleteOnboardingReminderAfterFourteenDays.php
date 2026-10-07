@@ -15,7 +15,9 @@ defined( 'ABSPATH' ) || exit;
  *
  * Class responsible for admin Inbox notification after fourteen days from setup.
  *
- * @since 1.1.0
+ * @class   CompleteOnboardingReminderAfterFourteenDays
+ * @since   1.1.0
+ * @version 1.1.0
  */
 class CompleteOnboardingReminderAfterFourteenDays extends CompleteOnboardingReminderAfterSevenDays {
 

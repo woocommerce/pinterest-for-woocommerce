@@ -21,6 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * At the same time allow distributed use of configurations.
  *
  * @phpstan-consistent-constructor
+ * @class   LocalFeedConfigs
+ * @version 1.5.2
  */
 class LocalFeedConfigs {
 

@@ -20,6 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class handling encryption and decryption of sensitive data.
+ *
+ * @class   Crypto
+ * @version 1.0.0
  */
 class Crypto {
 

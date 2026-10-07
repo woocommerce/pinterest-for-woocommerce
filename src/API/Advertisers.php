@@ -20,6 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Endpoint handing Pinterest advertisers.
+ *
+ * @class   Advertisers
+ * @version 1.4.0
  */
 class Advertisers extends VendorAPI {
 

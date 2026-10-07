@@ -8,6 +8,11 @@ use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Automattic\WooCommerce\Pinterest\ProductsXmlFeed;
 use Exception;
 
+/**
+ * Tests the FeedFileOperations class.
+ *
+ * @version 1.3.10
+ */
 class FeedFileOperationsTest extends \WP_UnitTestCase {
 
 	/** @var LocalFeedConfigs */

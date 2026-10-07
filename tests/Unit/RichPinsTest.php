@@ -9,6 +9,8 @@ use WP_UnitTestCase;
 
 /**
  * Rich Pins product-password access tests.
+ *
+ * @version 1.5.2
  */
 class RichPinsTest extends WP_UnitTestCase {
 

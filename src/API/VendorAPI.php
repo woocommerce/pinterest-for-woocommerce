@@ -16,6 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Base Class for registering our endpoints.
+ *
+ * @class   VendorAPI
+ * @version 1.0.13
  */
 class VendorAPI {
 

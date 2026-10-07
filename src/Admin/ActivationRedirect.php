@@ -16,6 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class ActivationRedirect
+ *
+ * @class   ActivationRedirect
+ * @version 1.1.0
  */
 class ActivationRedirect {
 

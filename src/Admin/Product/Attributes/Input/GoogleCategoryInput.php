@@ -15,6 +15,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class GoogleCategoryInput
+ *
+ * @class   GoogleCategoryInput
+ * @version 1.0.2
  */
 class GoogleCategoryInput extends GoogleCategory {
 

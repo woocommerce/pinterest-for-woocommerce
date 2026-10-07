@@ -18,6 +18,9 @@ use Automattic\WooCommerce\Admin\Notes\NoteTraits;
 
 /**
  * Add_First_Product.
+ *
+ * @class   TokenInvalidFailure
+ * @version 1.4.4
  */
 class TokenInvalidFailure {
 	/**

@@ -13,6 +13,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class PHPViewFactory
+ *
+ * @class   PHPViewFactory
+ * @version 1.0.2
  */
 final class PHPViewFactory implements ViewFactory {
 

@@ -19,6 +19,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class VariationsAttributes
+ *
+ * @class   VariationsAttributes
+ * @version 1.5.2
  */
 class VariationsAttributes {
 

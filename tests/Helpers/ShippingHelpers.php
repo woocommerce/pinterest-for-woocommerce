@@ -6,6 +6,8 @@ use Automattic\WooCommerce\Pinterest\Shipping;
  * ShippingHelpers class
  *
  * Utility class with tools that help in setting up the tests environment.
+ *
+ * @version 1.0.5
  */
 class ShippingHelpers {
 

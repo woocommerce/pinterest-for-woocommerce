@@ -14,6 +14,9 @@ use Automattic\WooCommerce\Admin\Features\OnboardingTasks\Task;
 
 /**
  * Onboarding Task class.
+ *
+ * @class   Onboarding
+ * @version 1.4.25
  */
 class Onboarding extends Task {
 

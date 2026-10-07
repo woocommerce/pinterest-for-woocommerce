@@ -13,6 +13,11 @@ use Pinterest_For_Woocommerce;
 use WP_REST_Request;
 use WP_Test_REST_TestCase;
 
+/**
+ * Tests the domain verification REST API endpoint.
+ *
+ * @version 1.4.10
+ */
 class DomainVerificationTest extends WP_Test_REST_TestCase {
 
 	public function setUp(): void {

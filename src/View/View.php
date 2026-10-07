@@ -13,6 +13,12 @@ use Automattic\WooCommerce\Pinterest\View\ViewException;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Defines a view that can be rendered, can render partials and can return raw context properties.
+ *
+ * @class   View
+ * @version 1.4.17
+ */
 interface View extends Renderable {
 	/**
 	 * Render the current view with a given context.

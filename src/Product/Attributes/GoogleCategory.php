@@ -15,6 +15,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class GoogleCategory
+ *
+ * @class   GoogleCategory
+ * @version 1.0.2
  */
 class GoogleCategory extends AbstractAttribute {
 

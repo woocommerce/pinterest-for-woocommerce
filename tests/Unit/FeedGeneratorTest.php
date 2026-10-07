@@ -21,6 +21,8 @@ use WC_Product_Variable;
 
 /**
  * Test helper class that wraps real Action Scheduler functions.
+ *
+ * @version 1.5.2
  */
 class TestActionSchedulerProxy implements ActionSchedulerInterface {
 	/**

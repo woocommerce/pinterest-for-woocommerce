@@ -21,6 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class adds PinterestTag tracker support.
+ *
+ * @class   Tag
+ * @version 1.5.2
  */
 class Tag extends Tracker {
 

@@ -18,7 +18,9 @@ use \WC_Shipping_Zone;
  * By extending WC_Shipping_Zone we are able to add functionality necessary for Pinterest shipping column generation.
  * This allows us to operate on familiar interface which will be useful when we will continue to expand the functionality.
  *
- * @since 1.0.5
+ * @class   PinterestShippingZone
+ * @since   1.0.5
+ * @version 1.5.2
  */
 class PinterestShippingZone extends WC_Shipping_Zone {
 

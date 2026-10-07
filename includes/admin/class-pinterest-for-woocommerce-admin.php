@@ -24,6 +24,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 	/**
 	 * Class handling the settings page and onboarding Wizard registration and rendering.
+	 *
+	 * @class   Pinterest_For_Woocommerce_Admin
+	 * @version 1.5.2
 	 */
 	class Pinterest_For_Woocommerce_Admin {
 

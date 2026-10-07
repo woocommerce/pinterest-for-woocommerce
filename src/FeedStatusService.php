@@ -16,6 +16,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class handling methods to return Pinterest Feed Status.
+ *
+ * @class   FeedStatusService
+ * @version 1.4.27
  */
 class FeedStatusService {
 

@@ -12,6 +12,9 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
 
 /**
  * Holds Checkout event related data to pass it into trackers.
+ *
+ * @class   Checkout
+ * @version 1.4.0
  */
 class Checkout extends Data {
 

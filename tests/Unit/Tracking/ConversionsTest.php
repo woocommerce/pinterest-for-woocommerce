@@ -8,6 +8,11 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
 use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
 
+/**
+ * Tests the Conversions tracker class.
+ *
+ * @version 1.5.2
+ */
 class ConversionsTest extends WP_UnitTestCase {
 
 	public function tearDown(): void {

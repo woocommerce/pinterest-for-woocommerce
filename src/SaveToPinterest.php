@@ -16,6 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class adding Save Pin support.
+ *
+ * @class   SaveToPinterest
+ * @version 1.5.2
  */
 class SaveToPinterest {
 

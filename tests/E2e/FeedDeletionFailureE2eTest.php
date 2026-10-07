@@ -7,6 +7,11 @@ use Automattic\WooCommerce\Admin\Notes\Notes;
 use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 
+/**
+ * Tests that the feed deletion failure note is added only once and that duplicate notes are deleted.
+ *
+ * @version 1.4.10
+ */
 class FeedDeletionFailureE2eTest extends \WP_UnitTestCase {
 
 	public function tearDown(): void {

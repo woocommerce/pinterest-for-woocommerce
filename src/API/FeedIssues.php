@@ -22,6 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Endpoint returning the product-level issues of the XML feed.
+ *
+ * @class   FeedIssues
+ * @version 1.4.7
  */
 class FeedIssues extends VendorAPI {
 

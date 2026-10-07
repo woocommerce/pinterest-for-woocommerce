@@ -32,7 +32,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * browser-side Pinterest Tag, which would otherwise inflate CAPI counts
  * relative to Tag counts.
  *
- * @since 1.4.27
+ * @class   CrawlerDetector
+ * @since   1.4.27
+ * @version 1.4.27
  */
 class CrawlerDetector {
 

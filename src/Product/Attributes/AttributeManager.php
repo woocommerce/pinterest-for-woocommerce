@@ -19,6 +19,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class AttributeManager
+ *
+ * @class   AttributeManager
+ * @version 1.3.10
  */
 class AttributeManager {
 

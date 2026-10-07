@@ -8,6 +8,11 @@ use Automattic\WooCommerce\Pinterest\RefreshToken;
 use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
 
+/**
+ * Tests the RefreshToken class.
+ *
+ * @version 1.5.2
+ */
 class RefreshTokenTest extends WP_UnitTestCase {
 
 	public function tearDown(): void {
