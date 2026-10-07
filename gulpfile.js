@@ -167,7 +167,12 @@ FOLDERS = newFolders;
 gulp.task( 'zip', function () {
 	const tasks = FOLDERS.map( function ( folderConfig ) {
 		const folder = folderConfig.folder;
-		const basename = path.basename( path.resolve( folder ) );
+		// Name the ZIP and its root folder after the package, not the checkout
+		// folder: CI checks the repository out under a different directory name.
+		const basename =
+			folder === '.'
+				? require( './package.json' ).name
+				: path.basename( path.resolve( folder ) );
 		const filename = path.join( folder, basename + '.zip' );
 		try {
 			fs.unlinkSync( filename );
@@ -194,6 +199,11 @@ gulp.task( 'zip', function () {
 					base: path.join( folder, '..' ),
 					encoding: false,
 				}
+			)
+			.pipe(
+				$.rename( ( file ) => {
+					file.dirname = file.dirname.replace( /^[^/]+/, basename );
+				} )
 			)
 			.pipe( $.vinylZip.dest( filename ) )
 			.pipe( $.size( { title: folder + ' zip' } ) );
