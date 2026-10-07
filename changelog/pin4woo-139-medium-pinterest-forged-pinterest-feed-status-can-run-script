@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Sanitize catalog feed diagnostics while preserving feed and settings links.

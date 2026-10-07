@@ -5,8 +5,8 @@ Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 10.9
-WC tested up to: 11.1
-Stable tag: 1.5.1
+WC tested up to: 11.2
+Stable tag: 1.5.2
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -92,6 +92,33 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.5.2 - 2026-10-07 =
+* Fix - Updated dependencies with compatible security patches.
+* Fix - Updated number formatting, RTL styling, UUID and fetch dependencies to address security advisories.
+* Fix - Preserve saved Pinterest settings while loading and allow failed initial requests to be retried.
+* Fix - Verify TLS certificates for Pinterest API and token-renewal requests.
+* Fix - Restrict Pinterest product attribute form updates to authorized product editor saves.
+* Fix - Sanitize catalog feed diagnostics while preserving feed and settings links.
+* Fix - Preserve server-owned Pinterest account settings and render credit notices as text.
+* Fix - Omit customer and order data from conversion diagnostics.
+* Fix - Omit credentials and raw HTTP contents from shared API diagnostics.
+* Fix - Exclude password-protected products and their variations from catalog feeds.
+* Fix - Regenerate existing product feeds once after the security update without resetting scheduled retries.
+* Fix - Omit token-renewal response bodies, headers and cookies from debug logs.
+* Fix - Preserve stored credentials when token renewal returns no usable token data.
+* Fix - Respect product password access when generating Rich Pins metadata.
+* Fix - Render product attribute forms with custom value options and preserve saved values outside those options.
+* Tweak - Declared compatibility with WooCommerce 11.2.
+* Dev - Removed unused JavaScript build dependencies.
+* Dev - Updated the Node, build, test and lint toolchain.
+* Dev - Updated Gulp build, release packaging and BrowserSync dependencies.
+* Dev - Updated local testing, documentation and Git tooling dependencies.
+* Dev - Update dependencies to resolve security advisories.
+* Dev - Build the production ZIP on pull requests.
+* Dev - Managed changelog entries with the Jetpack Changelogger, so pull requests add a change file instead of writing the entry in the pull request description.
+* Dev - Corrected hook docblocks and other PHPStan findings that do not change behavior.
+* Dev - Updated development dependencies to address security advisories.
 
 = 1.5.1 - 2026-09-17 =
 * Fix - Consume the feed dirty flag when a generation cycle starts, so a product change no longer triggers a redundant second cycle and a deferred restart is not lost.
