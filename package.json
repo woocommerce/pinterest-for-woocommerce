@@ -97,7 +97,7 @@
     "prebuild": "composer install",
     "build": "wp-scripts build && gulp build && npm run i18n",
     "build:zip": "npm run build && composer install --no-dev -n && gulp zip",
-    "postbuild:zip": "composer install && npm run _remove-root-md",
+    "postbuild:zip": "composer install && npm run _remove-root-md && mkdir -p deploy && mv $npm_package_name.zip deploy/",
     "_remove-root-md": "zipinfo -1 pinterest-for-woocommerce.zip | grep -E '^pinterest-for-woocommerce/[^/]+\\.md$' | xargs zip -d pinterest-for-woocommerce.zip || true",
     "dev": "wp-scripts build && gulp build",
     "format:js": "wp-scripts format ./assets/source",
