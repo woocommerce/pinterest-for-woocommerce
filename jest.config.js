@@ -25,6 +25,8 @@ module.exports = {
 			{ presets: [ '@wordpress/babel-preset-default' ] },
 		],
 	},
+	// Annotate failures on pull requests, as the scripts config did.
+	reporters: [ 'default', 'github-actions' ],
 	collectCoverageFrom: [
 		'assets/source/**/*.js',
 		'!assets/source/**/*.test.js',
