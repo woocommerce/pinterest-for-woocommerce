@@ -1,4 +1,4 @@
-jest.mock( '../helpers/effects', () => {
+vi.mock( '../helpers/effects', () => {
 	return {
 		useCreateNotice: () => () => {},
 		useSettingsSelect: () => {
@@ -8,16 +8,16 @@ jest.mock( '../helpers/effects', () => {
 	};
 } );
 
-jest.mock( '@wordpress/api-fetch', () => {
+vi.mock( '@wordpress/api-fetch', () => {
 	return {
-		__esModule: true,
-		default: jest.fn(),
+		default: vi.fn(),
 	};
 } );
 
 /**
  * External dependencies
  */
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { recordEvent } from '@woocommerce/tracks';
 import apiFetch from '@wordpress/api-fetch';
 import { render, waitFor } from '@testing-library/react';
@@ -32,7 +32,7 @@ describe( 'Claim Website Record Events', () => {
 	expectKnownReactDeprecations( 'Card' );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'pfw_domain_verify_failure is called on domain verification failure', () => {

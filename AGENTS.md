@@ -502,7 +502,7 @@ Read platform requirements from the plugin header and use `nvm use` with `.nvmrc
 - Plugin activation/deactivation
 - Settings and option handling
 
-**JavaScript Tests (Jest):**
+**JavaScript Tests (Vitest):**
 
 - React component rendering
 - State management logic

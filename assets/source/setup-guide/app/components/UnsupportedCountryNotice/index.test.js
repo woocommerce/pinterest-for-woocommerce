@@ -1,9 +1,10 @@
 /**
  * External dependencies
  */
+import { describe, expect, it } from 'vitest';
 import { recordEvent } from '@woocommerce/tracks';
 import { render, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 
 /**
  * Internal dependencies

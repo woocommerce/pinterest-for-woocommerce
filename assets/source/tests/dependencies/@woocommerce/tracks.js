@@ -1,3 +1,8 @@
-export const recordEvent = jest.fn().mockName( 'recordEvent' );
+/**
+ * External dependencies
+ */
+import { vi } from 'vitest';
+
+export const recordEvent = vi.fn().mockName( 'recordEvent' );
 
 export default recordEvent;

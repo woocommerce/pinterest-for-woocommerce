@@ -1,14 +1,13 @@
-jest.mock( '@woocommerce/tracks' );
-jest.mock( '../data/settings/selectors', () => ( {
-	...jest.requireActual( '../data/settings/selectors' ), // import and retain the original functionalities
-	isTrackingConfigured: jest.fn().mockReturnValue( false ),
-	isDomainVerified: jest.fn().mockReturnValue( false ),
-} ) );
+vi.mock( '@woocommerce/tracks' );
+// Retain the original functionalities. A factory would not do: the store reads
+// properties the module does not export, which Vitest rejects on a factory mock.
+vi.mock( '../data/settings/selectors', { spy: true } );
 /**
  * External dependencies
  */
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { recordEvent } from '@woocommerce/tracks';
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { fireEvent, render } from '@testing-library/react';
 import { getQuery } from '@woocommerce/navigation';
 
@@ -24,11 +23,13 @@ import {
 } from '../data/settings/selectors';
 
 recordEvent.mockName( 'recordEvent' );
+isTrackingConfigured.mockReturnValue( false );
+isDomainVerified.mockReturnValue( false );
 
 //Needed to be able to render the Stepper component
-jest.mock( '../steps/SetupAccount', () => () => null );
-jest.mock( '../steps/ClaimWebsite', () => () => null );
-jest.mock( '../steps/SetupTracking', () => () => null );
+vi.mock( '../steps/SetupAccount', () => ( { default: () => null } ) );
+vi.mock( '../steps/ClaimWebsite', () => ( { default: () => null } ) );
+vi.mock( '../steps/SetupTracking', () => ( { default: () => null } ) );
 
 const stepOne = /Set up your business account/;
 const stepTwo = /Claim your website/;

@@ -1,8 +1,9 @@
-jest.mock( '@woocommerce/tracks' );
+vi.mock( '@woocommerce/tracks' );
 
 /**
  * External dependencies
  */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { recordEvent } from '@woocommerce/tracks';
 import { fireEvent, render } from '@testing-library/react';
 
@@ -14,15 +15,15 @@ import '../../../tests/custom-matchers';
 import { expectKnownReactDeprecations } from '../../../tests/known-react-deprecations';
 
 recordEvent.mockName( 'recordEvent' );
-jest.mock( '@woocommerce/settings', () => ( {
-	getSetting: jest
+vi.mock( '@woocommerce/settings', () => ( {
+	getSetting: vi
 		.fn()
 		.mockName( 'getSetting' )
 		.mockReturnValue( { es: 'Spain' } ),
 } ) );
 
 afterEach( () => {
-	jest.clearAllMocks();
+	vi.clearAllMocks();
 } );
 
 describe( 'LandingPageApp component', () => {
