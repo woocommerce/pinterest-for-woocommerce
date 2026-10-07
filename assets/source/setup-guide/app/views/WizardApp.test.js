@@ -17,6 +17,7 @@ import { getQuery } from '@woocommerce/navigation';
  */
 import WizardApp from './WizardApp';
 import '../../../tests/custom-matchers';
+import { expectKnownReactDeprecations } from '../../../tests/known-react-deprecations';
 import {
 	isDomainVerified,
 	isTrackingConfigured,
@@ -33,6 +34,8 @@ const stepOne = /Set up your business account/;
 const stepTwo = /Claim your website/;
 
 describe( 'WizardApp component', () => {
+	expectKnownReactDeprecations( 'Link' );
+
 	describe( 'First rendering', () => {
 		let rendered;
 		beforeEach( () => {

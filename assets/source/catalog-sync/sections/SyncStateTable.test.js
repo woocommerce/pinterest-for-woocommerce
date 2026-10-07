@@ -29,9 +29,12 @@ describe( 'SyncStateTable diagnostics', () => {
 			expect( console.error ).toHaveBeenCalledTimes( 1 );
 			// eslint-disable-next-line no-console -- Validate only the known warning.
 			expect( console.error ).toHaveBeenCalledWith(
+				expect.stringContaining( 'Failed %s type' ),
+				'prop',
 				expect.stringContaining(
 					'The prop `caption` is marked as required'
-				)
+				),
+				expect.any( String )
 			);
 		}
 	} );

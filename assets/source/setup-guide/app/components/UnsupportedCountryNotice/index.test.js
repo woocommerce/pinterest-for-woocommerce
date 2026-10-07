@@ -9,8 +9,11 @@ import '@testing-library/jest-dom';
  * Internal dependencies
  */
 import UnsupportedCountryNotice from './index';
+import { expectKnownReactDeprecations } from '../../../../tests/known-react-deprecations';
 
 describe( 'UnsupportedCountryNotice', () => {
+	expectKnownReactDeprecations( 'Link' );
+
 	it( '`pfw_get_started_notice_link_click` is tracked on click', () => {
 		const { getByText } = render(
 			<UnsupportedCountryNotice countryCode="es" />

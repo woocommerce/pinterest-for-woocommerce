@@ -1,0 +1,4 @@
+Significance: patch
+Type: dev
+
+Updated the development and test dependencies to React 18.

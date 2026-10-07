@@ -11,6 +11,7 @@ import { fireEvent, render } from '@testing-library/react';
  */
 import LandingPageApp from './LandingPageApp';
 import '../../../tests/custom-matchers';
+import { expectKnownReactDeprecations } from '../../../tests/known-react-deprecations';
 
 recordEvent.mockName( 'recordEvent' );
 jest.mock( '@woocommerce/settings', () => ( {
@@ -25,6 +26,8 @@ afterEach( () => {
 } );
 
 describe( 'LandingPageApp component', () => {
+	expectKnownReactDeprecations( 'Card' );
+
 	describe( 'when rendered', () => {
 		let getByRole;
 		beforeEach( () => {

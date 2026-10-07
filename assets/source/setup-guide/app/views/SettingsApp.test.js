@@ -138,8 +138,10 @@ it( 'shows a failed settings load and lets the merchant retry before editing', a
 		</RegistryProvider>
 	);
 	expect(
+		// The notice is also announced through the `@wordpress/a11y` live region.
 		await screen.findByText(
-			'Could not load your Pinterest settings. Please try again.'
+			'Could not load your Pinterest settings. Please try again.',
+			{ ignore: 'script, style, .a11y-speak-region' }
 		)
 	).toBeTruthy();
 	expect(
