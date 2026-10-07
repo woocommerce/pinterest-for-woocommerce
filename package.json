@@ -166,7 +166,6 @@
     "not dead"
   ],
   "config": {
-    "build_step": "npm install && npm run build:zip",
     "wp_org_slug": "pinterest-for-woocommerce",
     "version_replace_paths": [
       "includes",
