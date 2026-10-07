@@ -50,6 +50,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
+    "@csstools/css-parser-algorithms": "^4.0.2",
+    "@csstools/css-tokenizer": "^4.0.2",
     "@playwright/test": "1.60.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
