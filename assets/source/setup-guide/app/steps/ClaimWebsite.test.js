@@ -26,8 +26,11 @@ import { render, waitFor } from '@testing-library/react';
  * Internal dependencies
  */
 import ClaimWebsite from './ClaimWebsite';
+import { expectKnownReactDeprecations } from '../../../tests/known-react-deprecations';
 
 describe( 'Claim Website Record Events', () => {
+	expectKnownReactDeprecations( 'Card' );
+
 	afterEach( () => {
 		jest.clearAllMocks();
 	} );

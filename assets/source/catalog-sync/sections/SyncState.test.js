@@ -14,8 +14,11 @@ jest.mock( '../../setup-guide/app/helpers/effects', () => ( {
  */
 import SyncState from './SyncState';
 import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
+import { expectKnownReactDeprecations } from '../../tests/known-react-deprecations';
 
 describe( 'SyncState component', () => {
+	expectKnownReactDeprecations( 'Card' );
+
 	afterEach( () => useSettingsSelect.mockReset() );
 
 	test.each( [

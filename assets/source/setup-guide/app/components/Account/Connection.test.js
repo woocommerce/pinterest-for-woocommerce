@@ -6,7 +6,6 @@ jest.mock( '@woocommerce/tracks' );
  */
 import { recordEvent } from '@woocommerce/tracks';
 import { fireEvent, render } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -96,8 +95,16 @@ describe( 'AccountConnection component', () => {
 			} );
 
 			it( "then \"Esc\" key is pressed, should call `pfw_modal_closed { name: 'account-disconnection', action: 'dismiss', context}` track event", () => {
-				// Press Esc.
-				userEvent.keyboard( '{esc}' );
+				// Press Esc where the focus is. The bundled modal reads the legacy
+				// `keyCode`, which `@testing-library/user-event` 14 no longer sends.
+				fireEvent.keyDown(
+					getByRole( 'dialog' ).ownerDocument.activeElement,
+					{
+						key: 'Escape',
+						code: 'Escape',
+						keyCode: 27,
+					}
+				);
 
 				// Assert fired event.
 				expect( recordEvent ).toHaveBeenCalledWith(

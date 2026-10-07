@@ -32,6 +32,7 @@ import userEvent from '@testing-library/user-event';
 import SetupTracking from './SetupTracking';
 import { SETTINGS_STORE_NAME } from '../data';
 import { API_ENDPOINT, OPTIONS_NAME } from '../data/settings/constants';
+import { expectKnownReactDeprecations } from '../../../tests/known-react-deprecations';
 
 const existingSettings = {
 	tracking_advertiser: '123',
@@ -41,6 +42,8 @@ const existingSettings = {
 };
 
 describe( 'SetupTracking', () => {
+	expectKnownReactDeprecations( 'Card' );
+
 	beforeEach( () => {
 		wcSettings.pinterest_for_woocommerce.apiRoute = '/pinterest/v1';
 		dispatch( SETTINGS_STORE_NAME ).receiveSettings( existingSettings );
@@ -124,10 +127,11 @@ describe( 'SetupTracking', () => {
 	} );
 
 	it( 'selects a valid tag when changing advertisers and preserves other settings', async () => {
+		const user = userEvent.setup();
 		render( <SetupTracking /> );
 		await screen.findByRole( 'combobox', { name: 'Tracking Tag' } );
 
-		userEvent.selectOptions(
+		await user.selectOptions(
 			screen.getByRole( 'combobox', { name: 'Advertiser' } ),
 			'789'
 		);

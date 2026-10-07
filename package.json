@@ -51,9 +51,10 @@
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@playwright/test": "1.60.0",
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^12.1.2",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.1",
     "@woocommerce/dependency-extraction-webpack-plugin": "~2.2.0",
     "@woocommerce/e2e-utils-playwright": "0.5.1",
     "@woocommerce/eslint-plugin": "^4.0.0",
@@ -182,6 +183,8 @@
     "@babel/runtime-corejs2@^7.0.0": "^7.26.10",
     "moment@^2.0.0": "^2.29.4",
     "lodash": "$lodash",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "@wordpress/scripts": {
       "markdownlint-cli": {
         ".": "^0.49.1",

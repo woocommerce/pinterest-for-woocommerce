@@ -17,8 +17,11 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
  */
 import SetupAccount from './SetupAccount';
 import { SETTINGS_STORE_NAME } from '../data';
+import { expectKnownReactDeprecations } from '../../../tests/known-react-deprecations';
 
 describe( 'SetupAccount', () => {
+	expectKnownReactDeprecations( 'Card' );
+
 	beforeEach( () => {
 		apiFetch.mockReset();
 		select( 'core/notices' )
