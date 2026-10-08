@@ -918,8 +918,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return void
 		 */
 		private static function flush_options() {
-			// Flush the whole data option.
+			// Flush the whole data option, and make the runtime cache in get_settings() reload it.
 			delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+			self::$dirty_settings[ PINTEREST_FOR_WOOCOMMERCE_DATA_NAME ] = true;
 			UserInteraction::flush_options();
 
 			// Remove settings that may cause issues if stale on disconnect.

@@ -142,6 +142,26 @@ class DisconnectTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Data the reset deleted must not be served from the runtime settings cache for the rest of
+	 * the request, otherwise the disconnect that follows still finds an integration to delete.
+	 *
+	 * @return void
+	 */
+	public function test_reset_connection_invalidates_the_runtime_data_cache() {
+		// Prime the cache the way a fresh request does: a forced read, then no write marking it dirty.
+		Pinterest_For_Woocommerce::get_data( 'integration_data', true );
+		$dirty_settings = new \ReflectionProperty( Pinterest_For_Woocommerce::class, 'dirty_settings' );
+		$dirty_settings->setAccessible( true );
+		$dirty_settings->setValue( null, array() );
+		$this->assertSame( 'ebi-123', Pinterest_For_Woocommerce::get_data( 'integration_data' )['external_business_id'] );
+
+		Pinterest_For_Woocommerce::reset_connection();
+
+		$this->assertNull( Pinterest_For_Woocommerce::get_data( 'integration_data' ) );
+		$this->assertSame( array(), self::$requests );
+	}
+
+	/**
 	 * Asserts that no connection data is left and that the merchant was told the token is invalid.
 	 *
 	 * @return void
