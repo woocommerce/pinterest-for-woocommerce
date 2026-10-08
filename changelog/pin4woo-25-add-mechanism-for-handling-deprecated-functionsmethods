@@ -1,0 +1,4 @@
+Significance: patch
+Type: tweak
+
+Warn developers when using the deprecated feed status check.
