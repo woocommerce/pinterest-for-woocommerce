@@ -16,7 +16,7 @@ use WC_Helper_Product;
 /**
  * Tests the Tracking class.
  *
- * @version 1.5.1
+ * @version x.x.x
  */
 class TrackingTest extends \WP_UnitTestCase {
 
@@ -237,6 +237,35 @@ class TrackingTest extends \WP_UnitTestCase {
 			->method( 'track_event' );
 
 		$tracking->track_event( 'test', $data );
+	}
+
+	/** Speculative requests suppress CAPI while retaining Tag dispatch and footer output. */
+	public function test_speculative_request_preserves_tag_rendering() {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$original                    = $_SERVER['HTTP_SEC_PURPOSE'] ?? null;
+		$_SERVER['HTTP_SEC_PURPOSE'] = 'prefetch;prerender';
+		try {
+			Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'WD7AFW51GS' ) );
+			$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 Chrome/140.0.0.0';
+			$tag                        = $this->createMock( Tag::class );
+			$conversions                = $this->createMock( Conversions::class );
+			$tag->expects( $this->once() )->method( 'track_event' );
+			$conversions->expects( $this->never() )->method( 'track_event' );
+			$tracking = new Tracking( array( $tag, $conversions ) );
+			$tracking->track_event( Tracking::EVENT_ADD_TO_CART, new None( 'speculative-event' ) );
+			$tracking->remove_tracker( get_class( $tag ) );
+			$tracking->remove_tracker( get_class( $conversions ) );
+
+			$output = $this->render_footer( 'WD7AFW51GS', true );
+			$this->assertStringContainsString( "pintrk('load', 'wd7afw51gs'", $output );
+			$this->assertStringContainsString( 'pintrk("track","PageVisit",eventData)', $output );
+		} finally {
+			if ( null === $original ) {
+				unset( $_SERVER['HTTP_SEC_PURPOSE'] );
+			} else {
+				$_SERVER['HTTP_SEC_PURPOSE'] = $original;
+			}
+		}
 	}
 
 	/**
