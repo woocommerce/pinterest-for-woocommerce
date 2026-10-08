@@ -918,6 +918,13 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			ProductFeedStatus::deregister();
 			Pinterest\CommerceIntegration::maybe_unregister_retries();
 			self::flush_options();
+
+			/*
+			 * The init hook adds the ad credits currency info back on the next request. Add it now
+			 * too, so the landing page served by this very request (where a 401 reset happens
+			 * during admin_init) gets the account data shape its ad credits section expects.
+			 */
+			self::add_currency_credits_info_to_account_data();
 		}
 
 		/**

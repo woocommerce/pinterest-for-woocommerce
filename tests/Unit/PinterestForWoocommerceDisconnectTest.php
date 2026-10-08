@@ -209,7 +209,12 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 		$this->assertFalse( Pinterest_For_Woocommerce::is_connected() );
 		$this->assertFalse( get_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME ) );
 		$this->assertFalse( Pinterest_For_Woocommerce::get_setting( 'tracking_advertiser', true ) );
-		$this->assertFalse( Pinterest_For_Woocommerce::get_setting( 'account_data', true ) );
+		$this->assertFalse( Pinterest_For_Woocommerce::is_business_connected() );
+		// Only the ad credits currency info remains, which the landing page needs on the next render.
+		$this->assertSame(
+			array( 'currency_credit_info' ),
+			array_keys( Pinterest_For_Woocommerce::get_setting( 'account_data', true ) )
+		);
 		$this->assertTrue( TokenInvalidFailure::note_exists() );
 	}
 
