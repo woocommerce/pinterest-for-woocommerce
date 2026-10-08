@@ -105,6 +105,22 @@ class FeedsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A bookmark that points back to an earlier page ends the pagination instead of looping.
+	 *
+	 * @return void
+	 */
+	public function test_get_all_feeds_stops_on_a_repeated_bookmark() {
+		add_filter( 'pre_http_request', array( self::class, 'looping_feeds' ), 10, 3 );
+
+		$feeds = Feeds::get_all_feeds();
+
+		$this->assertSame(
+			array( 'first-page-feed-id', 'second-page-feed-id', 'third-page-feed-id' ),
+			array_column( $feeds, 'id' )
+		);
+	}
+
+	/**
 	 * A feed Pinterest reports as DELETED must not be matched as the registered feed,
 	 * otherwise a force-deleted feed would be picked again instead of creating a new one.
 	 *
@@ -158,6 +174,33 @@ class FeedsTest extends WP_UnitTestCase {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Fakes a feeds endpoint whose third page points back to the second one.
+	 *
+	 * @param false|array $response    Preempted response.
+	 * @param array       $parsed_args Request arguments.
+	 * @param string      $url         Request URL.
+	 * @return false|array
+	 */
+	public static function looping_feeds( $response, $parsed_args, $url ) {
+		$pages = array(
+			'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=114141241212'                 => array( 'first-page-feed-id', 'page-2' ),
+			'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=114141241212&bookmark=page-2' => array( 'second-page-feed-id', 'page-3' ),
+			'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=114141241212&bookmark=page-3' => array( 'third-page-feed-id', 'page-2' ),
+		);
+
+		if ( ! isset( $pages[ $url ] ) ) {
+			return $response;
+		}
+
+		return self::response(
+			array(
+				'items'    => array( array( 'id' => $pages[ $url ][0] ) ),
+				'bookmark' => $pages[ $url ][1],
+			)
+		);
 	}
 
 	/**

@@ -300,13 +300,15 @@ class Feeds {
 		$ad_account_id = (string) Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 		$feeds         = array();
 		$bookmark      = '';
+		$seen          = array();
 
+		// Stop on any bookmark already fetched, so a cursor cycle cannot loop forever.
 		do {
-			$page     = APIV5::get_feeds( $ad_account_id, $bookmark );
-			$feeds    = array_merge( $feeds, $page['items'] ?? array() );
-			$next     = (string) ( $page['bookmark'] ?? '' );
-			$bookmark = $next === $bookmark ? '' : $next;
-		} while ( '' !== $bookmark );
+			$seen[ $bookmark ] = true;
+			$page              = APIV5::get_feeds( $ad_account_id, $bookmark );
+			$feeds             = array_merge( $feeds, $page['items'] ?? array() );
+			$bookmark          = (string) ( $page['bookmark'] ?? '' );
+		} while ( '' !== $bookmark && ! isset( $seen[ $bookmark ] ) );
 
 		return $feeds;
 	}
