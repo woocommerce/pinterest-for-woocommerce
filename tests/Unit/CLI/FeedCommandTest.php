@@ -8,7 +8,7 @@ use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
 
 /**
- * Tests the rows the `wp pinterest feed list` command builds from the Pinterest feed list.
+ * Tests the rows the `wp wc pinterest feed list` command builds from the Pinterest feed list.
  *
  * @version x.x.x
  */

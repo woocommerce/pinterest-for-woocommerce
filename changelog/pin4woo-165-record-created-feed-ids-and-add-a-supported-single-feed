@@ -1,4 +1,4 @@
 Significance: minor
 Type: add
 
-Record the IDs of the Pinterest feeds the plugin creates and add the `wp pinterest feed list` and `wp pinterest feed delete` WP-CLI commands to inspect the connected ad account's feeds and delete one by ID.
+Record the IDs of the Pinterest feeds the plugin creates and add the `wp wc pinterest feed list` and `wp wc pinterest feed delete` WP-CLI commands to inspect the connected ad account's feeds and delete one by ID.

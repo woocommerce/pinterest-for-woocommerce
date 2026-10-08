@@ -73,10 +73,10 @@ class FeedCommand {
 	 * ## EXAMPLES
 	 *
 	 *     # Show every feed on the connected ad account.
-	 *     $ wp pinterest feed list
+	 *     $ wp wc pinterest feed list
 	 *
 	 *     # Only the IDs and locations, as JSON.
-	 *     $ wp pinterest feed list --fields=id,location --format=json
+	 *     $ wp wc pinterest feed list --fields=id,location --format=json
 	 *
 	 * @subcommand list
 	 *
@@ -108,7 +108,7 @@ class FeedCommand {
 	 * ## OPTIONS
 	 *
 	 * <feed-id>
-	 * : Pinterest feed ID, as shown by `wp pinterest feed list`.
+	 * : Pinterest feed ID, as shown by `wp wc pinterest feed list`.
 	 *
 	 * [--force]
 	 * : Delete the feed even when it is the one this site is registered to.
@@ -119,10 +119,10 @@ class FeedCommand {
 	 * ## EXAMPLES
 	 *
 	 *     # Delete an orphaned feed after confirming the prompt.
-	 *     $ wp pinterest feed delete 1558987740004
+	 *     $ wp wc pinterest feed delete 1558987740004
 	 *
 	 *     # Delete without prompting.
-	 *     $ wp pinterest feed delete 1558987740004 --yes
+	 *     $ wp wc pinterest feed delete 1558987740004 --yes
 	 *
 	 * @param array $args       Positional arguments.
 	 * @param array $assoc_args Named arguments.

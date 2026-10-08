@@ -330,7 +330,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'init', array( $this, 'add_onboarding_task' ), 20 );
 
 			if ( defined( 'WP_CLI' ) && WP_CLI ) {
-				WP_CLI::add_command( 'pinterest feed', Pinterest\CLI\FeedCommand::class );
+				WP_CLI::add_command( 'wc pinterest feed', Pinterest\CLI\FeedCommand::class );
 			}
 		}
 
