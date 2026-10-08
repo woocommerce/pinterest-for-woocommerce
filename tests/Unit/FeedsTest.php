@@ -38,6 +38,20 @@ class FeedsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Deprecated public methods warn without changing their return values.
+	 *
+	 * @return void
+	 */
+	public function test_deprecated_feed_check_keeps_legacy_results() {
+		$this->setExpectedDeprecated( Feeds::class . '::is_local_feed_enabled' );
+		add_filter( 'pre_http_request', array( self::class, 'get_feeds' ), 10, 3 );
+
+		$this->assertTrue( Feeds::is_local_feed_enabled( '278913891236895123895' ) );
+		$this->assertFalse( Feeds::is_local_feed_enabled( 'missing-feed' ) );
+		$this->assertFalse( Feeds::is_local_feed_enabled( '' ) );
+	}
+
+	/**
 	 * Tests feed deletion produces an admin notice in case feed deletion has failed,
 	 * and keeps the feed on the ownership record because it still exists on Pinterest.
 	 *
