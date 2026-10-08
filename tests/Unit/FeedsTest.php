@@ -3,6 +3,7 @@
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
 use Automattic\WooCommerce\Pinterest\Exception\FeedNotFoundException;
+use Automattic\WooCommerce\Pinterest\FeedOwnership;
 use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
@@ -12,7 +13,7 @@ use WP_UnitTestCase;
 /**
  * Tests the Feeds class.
  *
- * @version 1.4.27
+ * @version x.x.x
  */
 class FeedsTest extends WP_UnitTestCase {
 
@@ -22,6 +23,7 @@ class FeedsTest extends WP_UnitTestCase {
 		Pinterest_For_Woocommerce::set_default_settings();
 		Pinterest_For_Woocommerce::save_setting( 'tracking_advertiser', '114141241212' );
 		LocalFeedConfigs::deregister();
+		delete_option( FeedOwnership::OPTION_NAME );
 	}
 
 	public function tearDown(): void {
@@ -31,20 +33,117 @@ class FeedsTest extends WP_UnitTestCase {
 		remove_all_filters( 'site_url' );
 		remove_all_filters( 'upload_dir' );
 		LocalFeedConfigs::deregister();
+		delete_option( FeedOwnership::OPTION_NAME );
 	}
 
 	/**
-	 * Tests feed deletion produces an admin notice in case feed deletion has failed.
+	 * Tests feed deletion produces an admin notice in case feed deletion has failed,
+	 * and keeps the feed on the ownership record because it still exists on Pinterest.
 	 *
 	 * @return void
 	 */
 	public function test_feed_delete_produces_an_admin_notification() {
+		FeedOwnership::record( '1574695656968' );
 		add_filter( 'pre_http_request', array( self::class, 'feed_delete_failure' ), 10, 3 );
 
 		$result = Feeds::delete_feed( '1574695656968' );
 
 		$this->assertFalse( $result );
 		$this->assertTrue( FeedDeletionFailure::note_exists() );
+		$this->assertTrue( FeedOwnership::is_recorded( '1574695656968' ) );
+	}
+
+	/**
+	 * A feed Pinterest confirmed as deleted is removed from the ownership record.
+	 *
+	 * @return void
+	 */
+	public function test_feed_delete_forgets_the_deleted_feed() {
+		FeedOwnership::record( '1574695656968' );
+		add_filter( 'pre_http_request', array( self::class, 'feed_delete_success' ), 10, 3 );
+
+		$result = Feeds::delete_feed( '1574695656968' );
+
+		$this->assertTrue( $result );
+		$this->assertFalse( FeedOwnership::is_recorded( '1574695656968' ) );
+	}
+
+	/**
+	 * Creating a feed records the ID Pinterest assigned to it, independently of the
+	 * location matching that produces the returned feed ID.
+	 *
+	 * @return void
+	 */
+	public function test_create_feed_records_the_created_feed_id() {
+		Pinterest_For_Woocommerce::save_data(
+			'local_feed_ids',
+			array( Pinterest_For_Woocommerce::get_base_country() => 'fIOasjj' )
+		);
+		add_filter( 'pre_http_request', array( self::class, 'feed_creation' ), 10, 3 );
+
+		$feed_id = Feeds::create_feed();
+
+		$this->assertSame( '1558987740004', $feed_id );
+		$this->assertTrue( FeedOwnership::is_recorded( '1558987740004' ) );
+	}
+
+	/**
+	 * Fakes a successful feed deletion.
+	 *
+	 * @param false|array $response    Preempted response.
+	 * @param array       $parsed_args Request arguments.
+	 * @param string      $url         Request URL.
+	 * @return false|array
+	 */
+	public static function feed_delete_success( $response, $parsed_args, $url ) {
+		if ( 'https://api.pinterest.com/v5/catalogs/feeds/1574695656968?ad_account_id=114141241212' === $url ) {
+			return self::response( array(), 204 );
+		}
+		return $response;
+	}
+
+	/**
+	 * Fakes the feeds endpoint during feed creation: the POST echoes the submitted feed back
+	 * with a Pinterest ID, the GET lists no feeds.
+	 *
+	 * @param false|array $response    Preempted response.
+	 * @param array       $parsed_args Request arguments.
+	 * @param string      $url         Request URL.
+	 * @return false|array
+	 */
+	public static function feed_creation( $response, $parsed_args, $url ) {
+		if ( 'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=114141241212' !== $url ) {
+			return $response;
+		}
+
+		if ( 'POST' === $parsed_args['method'] ) {
+			$feed           = json_decode( $parsed_args['body'], true );
+			$feed['id']     = '1558987740004';
+			$feed['status'] = 'ACTIVE';
+			return self::response( $feed, 201 );
+		}
+
+		return self::response( array( 'items' => array() ) );
+	}
+
+	/**
+	 * Builds a WordPress HTTP API response.
+	 *
+	 * @param array $body        Response body.
+	 * @param int   $status_code Response status code.
+	 * @return array
+	 */
+	private static function response( array $body, int $status_code = 200 ): array {
+		return array(
+			'headers'  => array( 'content-type' => 'application/json' ),
+			'body'     => wp_json_encode( $body ),
+			'response' => array(
+				'code'    => $status_code,
+				'message' => '',
+			),
+			'cookies'  => array(),
+			'filename' => '',
+		);
 	}
 
 	public function test_maybe_remote_feed_returns_feed_id() {

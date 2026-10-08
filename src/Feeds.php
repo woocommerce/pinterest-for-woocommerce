@@ -24,7 +24,7 @@ use Throwable;
  * Class handling fetch methods for feed profiles.
  *
  * @class   Feeds
- * @version 1.5.0
+ * @version x.x.x
  */
 class Feeds {
 
@@ -182,6 +182,7 @@ class Feeds {
 		}
 
 		static::invalidate_feeds_cache();
+		FeedOwnership::record( (string) ( $feed['id'] ?? '' ), (string) $ad_account_id );
 
 		$feed_id = static::match_local_feed_configuration_to_registered_feeds( array( $feed ) );
 
@@ -368,9 +369,10 @@ class Feeds {
 	 * manually and must not be touched, even when it is hosted on the store's own domain.
 	 *
 	 * Known limitation: this is a naming heuristic. A file a merchant uploads under the same
-	 * prefix (for example `pinterest-for-woocommerce-manual.csv`) is treated as plugin generated.
-	 * The plugin does not keep a record of the Pinterest feed IDs it created, which would be the
-	 * reliable way to establish ownership for older or orphaned feeds.
+	 * prefix (for example `pinterest-for-woocommerce-manual.csv`) is treated as plugin generated,
+	 * and a plugin feed created under a previous domain or uploads URL is not. FeedOwnership keeps
+	 * the IDs of the feeds the plugin created or registered to and is the reliable record for
+	 * those cases; this check remains the fallback for feeds that predate it.
 	 *
 	 * @since 1.4.29
 	 *
@@ -454,6 +456,7 @@ class Feeds {
 		try {
 			$ad_account_id = Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
 			APIV5::delete_feed( $feed_id, $ad_account_id );
+			FeedOwnership::forget( $feed_id, (string) $ad_account_id );
 			return true;
 		} catch ( PinterestApiException $e ) {
 			Logger::log( $e->getMessage(), 'error' );

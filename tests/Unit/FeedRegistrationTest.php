@@ -2,7 +2,10 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
+use Automattic\WooCommerce\Pinterest\FeedFileOperations;
+use Automattic\WooCommerce\Pinterest\FeedOwnership;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
+use Automattic\WooCommerce\Pinterest\LocaleMapper;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
@@ -10,7 +13,7 @@ use WP_UnitTestCase;
 /**
  * Tests for the stale feed cleanup performed after feed registration.
  *
- * @version 1.5.0
+ * @version x.x.x
  */
 class FeedRegistrationTest extends WP_UnitTestCase {
 
@@ -42,6 +45,7 @@ class FeedRegistrationTest extends WP_UnitTestCase {
 
 		self::$deleted_feed_ids = array();
 		self::$remote_feeds     = self::default_feeds();
+		delete_option( FeedOwnership::OPTION_NAME );
 	}
 
 	/**
@@ -55,6 +59,37 @@ class FeedRegistrationTest extends WP_UnitTestCase {
 		remove_all_filters( 'pre_http_request' );
 		remove_all_filters( 'site_url' );
 		LocalFeedConfigs::deregister();
+		delete_option( FeedOwnership::OPTION_NAME );
+	}
+
+	/**
+	 * Registering to a feed that already exists on Pinterest records it as plugin owned, so
+	 * feeds created before the ownership record existed get covered by the next registration run.
+	 *
+	 * @return void
+	 */
+	public function test_feed_registration_records_the_matched_feed_id() {
+		Pinterest_For_Woocommerce::save_data(
+			'local_feed_ids',
+			array( Pinterest_For_Woocommerce::get_base_country() => 'Ab1cD2' )
+		);
+		self::$remote_feeds[0]['default_country'] = Pinterest_For_Woocommerce::get_base_country();
+		self::$remote_feeds[0]['default_locale']  = LocaleMapper::get_locale_for_api();
+
+		$feed_file_operations = $this->createMock( FeedFileOperations::class );
+		$feed_file_operations->method( 'check_if_feed_file_exists' )->willReturn( true );
+		add_filter( 'pre_http_request', array( self::class, 'fake_pinterest_api' ), 10, 3 );
+
+		$registration = new FeedRegistration( LocalFeedConfigs::get_instance(), $feed_file_operations );
+		$registration->handle_feed_registration();
+
+		$this->assertSame( 'plugin-owned-feed-id', FeedRegistration::get_locally_stored_registered_feed_id() );
+		$this->assertTrue( FeedOwnership::is_recorded( 'plugin-owned-feed-id' ) );
+		$this->assertSame(
+			array( 'plugin-owned-stale-feed-id' ),
+			self::$deleted_feed_ids,
+			'Registration still cleans up the stale plugin feed.'
+		);
 	}
 
 	/**
@@ -251,6 +286,10 @@ class FeedRegistrationTest extends WP_UnitTestCase {
 		if ( 'DELETE' === $args['method'] && preg_match( '#catalogs/feeds/([^?]*)#', $url, $matches ) ) {
 			self::$deleted_feed_ids[] = $matches[1];
 			return self::response( array(), 204 );
+		}
+
+		if ( false !== strpos( $url, '/processing_results?' ) ) {
+			return self::response( array( 'items' => array() ) );
 		}
 
 		return $response;
