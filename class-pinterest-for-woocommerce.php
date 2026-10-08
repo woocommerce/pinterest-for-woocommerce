@@ -847,6 +847,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				 * Just need to clean account data in these cases.
 				 */
 				if ( self::is_business_connected() ) {
+					$cleanup_failed  = false;
 					$remote_cleanups = array(
 						// Delete all the feeds for the merchant.
 						'feed deletion'                 => function () {
@@ -859,15 +860,22 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 					);
 
 					/*
-					 * Each remote cleanup is attempted on its own: a failure must neither skip the
-					 * next one nor keep the store attached to a broken account.
+					 * Each remote cleanup is attempted on its own, so a failure never skips the next
+					 * one. Pinterest API errors are handled inside the cleanups; anything else is
+					 * unexpected, so the local data is kept for a retry. A rejected token never gets
+					 * here: its 401 already reset the connection through reset_connection().
 					 */
 					foreach ( $remote_cleanups as $what => $cleanup ) {
 						try {
 							$cleanup();
 						} catch ( Throwable $th ) {
+							$cleanup_failed = true;
 							Logger::log( sprintf( 'Remote %1$s failed while disconnecting: %2$s', $what, $th->getMessage() ), 'error' );
 						}
+					}
+
+					if ( $cleanup_failed ) {
+						return false;
 					}
 				}
 

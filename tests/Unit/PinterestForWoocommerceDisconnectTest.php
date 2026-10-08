@@ -17,7 +17,7 @@ use WP_UnitTestCase;
  *
  * @version x.x.x
  */
-class DisconnectTest extends WP_UnitTestCase {
+class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 
 	/**
 	 * Pinterest API requests the fake API received, as "METHOD path" strings.
@@ -127,6 +127,45 @@ class DisconnectTest extends WP_UnitTestCase {
 		$this->assertSame( array( false ), $nested_results, 'The nested disconnect must return false without doing anything.' );
 		$this->assertSame( array( 'GET catalogs/feeds' ), self::$requests, 'The nested disconnect must not make requests of its own.' );
 		$this->assert_connection_cleared();
+	}
+
+	/**
+	 * An unexpected error during a user-initiated disconnect keeps the local connection data so
+	 * the merchant can retry, while the remaining remote cleanup still runs.
+	 *
+	 * @return void
+	 */
+	public function test_disconnect_keeps_local_data_when_a_remote_cleanup_throws() {
+		remove_filter( 'pre_http_request', array( self::class, 'reject_every_request' ), 10 );
+		add_filter(
+			'pre_http_request',
+			function ( $response, $args, $url ) {
+				if ( false !== strpos( $url, 'catalogs/feeds' ) ) {
+					throw new \RuntimeException( 'Unexpected failure while listing feeds.' );
+				}
+
+				self::$requests[] = $args['method'] . ' ' . preg_replace( '#^/v5/#', '', (string) wp_parse_url( $url, PHP_URL_PATH ) );
+
+				return array(
+					'headers'  => array( 'content-type' => 'application/json' ),
+					'body'     => wp_json_encode( array() ),
+					'response' => array(
+						'code'    => 204,
+						'message' => '',
+					),
+					'cookies'  => array(),
+					'filename' => '',
+				);
+			},
+			10,
+			3
+		);
+
+		$this->assertFalse( Pinterest_For_Woocommerce::disconnect() );
+
+		$this->assertSame( array( 'DELETE integrations/commerce/ebi-123' ), self::$requests, 'The commerce integration deletion still runs.' );
+		$this->assertTrue( Pinterest_For_Woocommerce::is_connected() );
+		$this->assertFalse( TokenInvalidFailure::note_exists() );
 	}
 
 	/**
