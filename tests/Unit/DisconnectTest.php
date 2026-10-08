@@ -58,6 +58,9 @@ class DisconnectTest extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function tearDown(): void {
+		// Only this test's own filter: parent::tearDown() restores the hooks that existed before it.
+		remove_filter( 'pre_http_request', array( self::class, 'reject_every_request' ), 10 );
+
 		parent::tearDown();
 
 		TokenInvalidFailure::delete_failure_note();
@@ -96,6 +99,33 @@ class DisconnectTest extends WP_UnitTestCase {
 			self::$requests,
 			'Only the feed listing runs: the nested reset clears the integration data before the commerce integration delete.'
 		);
+		$this->assert_connection_cleared();
+	}
+
+	/**
+	 * A disconnect started while another one is running (for example by a hook that reacts to
+	 * one of its cleanup requests) is refused, so the two cannot feed each other.
+	 *
+	 * @return void
+	 */
+	public function test_disconnect_refuses_a_nested_disconnect() {
+		$nested_results = array();
+		add_filter(
+			'pre_http_request',
+			function ( $response, $args, $url ) use ( &$nested_results ) {
+				if ( false !== strpos( $url, 'catalogs/feeds' ) ) {
+					$nested_results[] = Pinterest_For_Woocommerce::disconnect();
+				}
+				return $response;
+			},
+			9,
+			3
+		);
+
+		$this->assertTrue( Pinterest_For_Woocommerce::disconnect() );
+
+		$this->assertSame( array( false ), $nested_results, 'The nested disconnect must return false without doing anything.' );
+		$this->assertSame( array( 'GET catalogs/feeds' ), self::$requests, 'The nested disconnect must not make requests of its own.' );
 		$this->assert_connection_cleared();
 	}
 
