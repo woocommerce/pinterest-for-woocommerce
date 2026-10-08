@@ -99,7 +99,7 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 			self::$requests,
 			'Only the feed listing runs: the nested reset clears the integration data before the commerce integration delete.'
 		);
-		$this->assert_connection_cleared();
+		$this->assert_connection_cleared( false );
 	}
 
 	/**
@@ -126,7 +126,7 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 
 		$this->assertSame( array( false ), $nested_results, 'The nested disconnect must return false without doing anything.' );
 		$this->assertSame( array( 'GET catalogs/feeds' ), self::$requests, 'The nested disconnect must not make requests of its own.' );
-		$this->assert_connection_cleared();
+		$this->assert_connection_cleared( false );
 	}
 
 	/**
@@ -169,6 +169,36 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A disconnect with no business connected skips the remote cleanup and writes no account
+	 * data back.
+	 *
+	 * @return void
+	 */
+	public function test_disconnect_without_a_business_connected_leaves_no_account_data() {
+		Pinterest_For_Woocommerce::save_token_data( array( 'access_token' => 'valid-access-token' ) );
+		Pinterest_For_Woocommerce::save_setting( 'account_data', array( 'id' => '123456789' ) );
+
+		$this->assertTrue( Pinterest_For_Woocommerce::disconnect() );
+
+		$this->assertSame( array(), self::$requests );
+		$this->assertFalse( Pinterest_For_Woocommerce::is_connected() );
+		$this->assertFalse( Pinterest_For_Woocommerce::get_setting( 'account_data', true ) );
+	}
+
+	/**
+	 * A 401 raised by a deliberate disconnect's own cleanup clears the connection without
+	 * asking the merchant to reconnect.
+	 *
+	 * @return void
+	 */
+	public function test_disconnect_with_a_rejected_token_adds_no_token_invalid_note() {
+		$this->assertTrue( Pinterest_For_Woocommerce::disconnect() );
+
+		$this->assert_connection_cleared( false );
+		$this->assertFalse( TokenInvalidFailure::note_exists() );
+	}
+
+	/**
 	 * Resetting the connection on its own never calls the API.
 	 *
 	 * @return void
@@ -201,15 +231,25 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Asserts that no connection data is left and that the merchant was told the token is invalid.
+	 * Asserts that no connection data is left.
 	 *
+	 * After a reset, the merchant was told the token is invalid and only the ad credits currency
+	 * info remains. A disconnect flushes the settings after any nested reset, so nothing remains.
+	 *
+	 * @param bool $after_reset Whether the connection was cleared by reset_connection() alone.
 	 * @return void
 	 */
-	private function assert_connection_cleared() {
+	private function assert_connection_cleared( bool $after_reset = true ) {
 		$this->assertFalse( Pinterest_For_Woocommerce::is_connected() );
 		$this->assertFalse( get_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME ) );
 		$this->assertFalse( Pinterest_For_Woocommerce::get_setting( 'tracking_advertiser', true ) );
 		$this->assertFalse( Pinterest_For_Woocommerce::is_business_connected() );
+
+		if ( ! $after_reset ) {
+			$this->assertFalse( Pinterest_For_Woocommerce::get_setting( 'account_data', true ) );
+			return;
+		}
+
 		// Only the ad credits currency info remains, which the landing page needs on the next render.
 		$this->assertSame(
 			array( 'currency_credit_info' ),
@@ -232,6 +272,23 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 		}
 
 		self::$requests[] = $args['method'] . ' ' . preg_replace( '#^/v5/#', '', (string) wp_parse_url( $url, PHP_URL_PATH ) );
+
+		/*
+		 * A non-401 does not fire the disconnect action, so a reintroduced recursion stops here and
+		 * the request-list assertion fails with a readable diff instead of the CI job timeout.
+		 */
+		if ( count( self::$requests ) > 5 ) {
+			return array(
+				'headers'  => array( 'content-type' => 'application/json' ),
+				'body'     => wp_json_encode( array() ),
+				'response' => array(
+					'code'    => 500,
+					'message' => 'Internal Server Error',
+				),
+				'cookies'  => array(),
+				'filename' => '',
+			);
+		}
 
 		return array(
 			'headers'  => array( 'content-type' => 'application/json' ),

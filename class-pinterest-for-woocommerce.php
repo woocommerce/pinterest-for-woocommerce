@@ -902,7 +902,19 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function reset_connection() {
 			self::clear_connection_data();
 
-			TokenInvalidFailure::possibly_add_note();
+			/*
+			 * The init hook adds the ad credits currency info back on the next request. Add it now
+			 * too, so the landing page served by this very request (where a 401 reset happens
+			 * during admin_init) gets the account data shape its ad credits section expects.
+			 * Not in clear_connection_data(): disconnect() also runs on deactivation and uninstall,
+			 * where WooCommerce may be inactive and get_woocommerce_currency() undefined.
+			 */
+			self::add_currency_credits_info_to_account_data();
+
+			// A 401 raised by a deliberate disconnect's own cleanup must not leave a "reconnect" note behind.
+			if ( ! self::$disconnecting ) {
+				TokenInvalidFailure::possibly_add_note();
+			}
 		}
 
 		/**
@@ -918,13 +930,6 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			ProductFeedStatus::deregister();
 			Pinterest\CommerceIntegration::maybe_unregister_retries();
 			self::flush_options();
-
-			/*
-			 * The init hook adds the ad credits currency info back on the next request. Add it now
-			 * too, so the landing page served by this very request (where a 401 reset happens
-			 * during admin_init) gets the account data shape its ad credits section expects.
-			 */
-			self::add_currency_credits_info_to_account_data();
 		}
 
 		/**
