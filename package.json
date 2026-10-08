@@ -205,6 +205,7 @@
     "d3-color@^1.0.0": "^3.1.0",
     "gulp-sourcemaps": {
       "css": "npm:@adobe/css-tools@^4.5.0"
-    }
+    },
+    "postcss-selector-parser": "7.1.6"
   }
 }
