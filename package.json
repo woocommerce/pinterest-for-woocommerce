@@ -206,6 +206,7 @@
     "gulp-sourcemaps": {
       "css": "npm:@adobe/css-tools@^4.5.0"
     },
-    "postcss-selector-parser": "7.1.6"
+    "postcss-selector-parser": "7.1.6",
+    "smol-toml": "1.9.0"
   }
 }
