@@ -85,12 +85,12 @@ class FeedCommand {
 	 * @return void
 	 */
 	public function list_( array $args, array $assoc_args ): void {
-		$ad_account_id = self::get_connected_ad_account_id();
-		$feeds         = array();
+		self::get_connected_ad_account_id();
+		$feeds = array();
 
 		Feeds::invalidate_feeds_cache();
 		try {
-			$feeds = APIV5::get_feeds( $ad_account_id )['items'] ?? array();
+			$feeds = Feeds::get_all_feeds();
 		} catch ( PinterestApiException $e ) {
 			WP_CLI::error( self::describe_exception( $e ) );
 		}
@@ -135,7 +135,7 @@ class FeedCommand {
 
 		Feeds::invalidate_feeds_cache();
 		try {
-			$feed = Feeds::get_feed( $feed_id );
+			$feed = self::find_feed( $feed_id, Feeds::get_all_feeds() );
 		} catch ( PinterestApiException $e ) {
 			WP_CLI::error( self::describe_exception( $e ) );
 		}
@@ -199,6 +199,23 @@ class FeedCommand {
 		}
 
 		return $rows;
+	}
+
+	/**
+	 * Finds a feed by ID in a feed list.
+	 *
+	 * @param string $feed_id Pinterest feed ID.
+	 * @param array  $feeds   Feed objects as returned by the Pinterest feeds endpoint.
+	 * @return array The feed object, or an empty array when the ID is not in the list.
+	 */
+	private static function find_feed( string $feed_id, array $feeds ): array {
+		foreach ( $feeds as $feed ) {
+			if ( (string) ( $feed['id'] ?? '' ) === $feed_id ) {
+				return $feed;
+			}
+		}
+
+		return array();
 	}
 
 	/**

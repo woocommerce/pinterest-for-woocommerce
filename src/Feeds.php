@@ -286,6 +286,32 @@ class Feeds {
 	}
 
 	/**
+	 * Get every feed of the ad account, following the API pagination.
+	 *
+	 * Unlike get_feeds(), this reads all pages and lets API errors reach the caller.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return array The feed profile objects of every page.
+	 *
+	 * @throws PinterestApiException Pinterest API Exception.
+	 */
+	public static function get_all_feeds(): array {
+		$ad_account_id = (string) Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
+		$feeds         = array();
+		$bookmark      = '';
+
+		do {
+			$page     = APIV5::get_feeds( $ad_account_id, $bookmark );
+			$feeds    = array_merge( $feeds, $page['items'] ?? array() );
+			$next     = (string) ( $page['bookmark'] ?? '' );
+			$bookmark = $next === $bookmark ? '' : $next;
+		} while ( '' !== $bookmark );
+
+		return $feeds;
+	}
+
+	/**
 	 * Invalidate the merchant feeds cache.
 	 *
 	 * @since 1.4.0
@@ -341,6 +367,11 @@ class Feeds {
 	 * @return bool
 	 */
 	private static function does_feed_match( array $feed ): bool {
+		// Pinterest keeps listing deleted feeds for a while; never register to one of those.
+		if ( self::FEED_STATUS_DELETED === ( $feed['status'] ?? '' ) ) {
+			return false;
+		}
+
 		$local_country = Pinterest_For_Woocommerce::get_base_country();
 		try {
 			$local_locale = LocaleMapper::get_locale_for_api();

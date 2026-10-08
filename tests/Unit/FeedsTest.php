@@ -5,6 +5,7 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 use Automattic\WooCommerce\Pinterest\Exception\FeedNotFoundException;
 use Automattic\WooCommerce\Pinterest\FeedOwnership;
 use Automattic\WooCommerce\Pinterest\Feeds;
+use Automattic\WooCommerce\Pinterest\LocaleMapper;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
 use Pinterest_For_Woocommerce;
@@ -85,6 +86,78 @@ class FeedsTest extends WP_UnitTestCase {
 
 		$this->assertSame( '1558987740004', $feed_id );
 		$this->assertTrue( FeedOwnership::is_recorded( '1558987740004' ) );
+	}
+
+	/**
+	 * Fetching every feed follows the bookmark until the API returns no further page.
+	 *
+	 * @return void
+	 */
+	public function test_get_all_feeds_follows_the_bookmark() {
+		add_filter( 'pre_http_request', array( self::class, 'paginated_feeds' ), 10, 3 );
+
+		$feeds = Feeds::get_all_feeds();
+
+		$this->assertSame(
+			array( 'first-page-feed-id', 'second-page-feed-id' ),
+			array_column( $feeds, 'id' )
+		);
+	}
+
+	/**
+	 * A feed Pinterest reports as DELETED must not be matched as the registered feed,
+	 * otherwise a force-deleted feed would be picked again instead of creating a new one.
+	 *
+	 * @return void
+	 */
+	public function test_registered_feed_match_skips_deleted_feeds() {
+		Pinterest_For_Woocommerce::save_data(
+			'local_feed_ids',
+			array( Pinterest_For_Woocommerce::get_base_country() => 'fIOasjj' )
+		);
+		$location = wp_get_upload_dir()['baseurl'] . '/pinterest-for-woocommerce-fIOasjj.xml';
+		$feed     = array(
+			'id'              => 'deleted-feed-id',
+			'status'          => Feeds::FEED_STATUS_DELETED,
+			'location'        => $location,
+			'default_locale'  => LocaleMapper::get_locale_for_api(),
+			'default_country' => Pinterest_For_Woocommerce::get_base_country(),
+		);
+		$active   = array_merge(
+			$feed,
+			array(
+				'id'     => 'active-feed-id',
+				'status' => Feeds::FEED_STATUS_ACTIVE,
+			)
+		);
+
+		$this->assertSame( '', Feeds::match_local_feed_configuration_to_registered_feeds( array( $feed ) ) );
+		$this->assertSame( 'active-feed-id', Feeds::match_local_feed_configuration_to_registered_feeds( array( $feed, $active ) ) );
+	}
+
+	/**
+	 * Fakes a two-page feeds endpoint: the first page carries a bookmark, the second does not.
+	 *
+	 * @param false|array $response    Preempted response.
+	 * @param array       $parsed_args Request arguments.
+	 * @param string      $url         Request URL.
+	 * @return false|array
+	 */
+	public static function paginated_feeds( $response, $parsed_args, $url ) {
+		if ( 'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=114141241212' === $url ) {
+			return self::response(
+				array(
+					'items'    => array( array( 'id' => 'first-page-feed-id' ) ),
+					'bookmark' => 'page-2',
+				)
+			);
+		}
+
+		if ( 'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=114141241212&bookmark=page-2' === $url ) {
+			return self::response( array( 'items' => array( array( 'id' => 'second-page-feed-id' ) ) ) );
+		}
+
+		return $response;
 	}
 
 	/**
