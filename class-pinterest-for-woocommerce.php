@@ -41,7 +41,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 	 * Base Plugin class holding generic functionality
 	 *
 	 * @class   Pinterest_For_Woocommerce
-	 * @version 1.5.2
+	 * @version x.x.x
 	 */
 	final class Pinterest_For_Woocommerce {
 
@@ -328,6 +328,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			// Hook the setup task. The hook admin_init is not triggered when the WC fetches the tasks using the endpoint: wp-json/wc-admin/onboarding/tasks and hence hooking into init.
 			add_action( 'init', array( $this, 'add_onboarding_task' ), 20 );
+
+			if ( defined( 'WP_CLI' ) && WP_CLI ) {
+				WP_CLI::add_command( 'pinterest feed', Pinterest\CLI\FeedCommand::class );
+			}
 		}
 
 		/**
