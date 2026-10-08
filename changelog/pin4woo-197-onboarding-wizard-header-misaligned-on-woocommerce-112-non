@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Fix the onboarding wizard header rendering inset and below an empty band on WooCommerce 11.2, whose admin header is no longer fixed.
