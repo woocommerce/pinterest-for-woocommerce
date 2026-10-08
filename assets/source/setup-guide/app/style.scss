@@ -51,7 +51,11 @@ $root: ".woocommerce-setup-guide";
 
 			.woocommerce-layout__main {
 
+				// The wizard renders its own top bar with WC's header markup. WC 11.2 made its
+				// header non-sticky (position: relative), so pin the position here instead of
+				// inheriting it; the 60px margin on __primary above reserves the space for it.
 				.woocommerce-layout__header {
+					position: fixed;
 					top: 0;
 					left: 0;
 					width: 100%;
