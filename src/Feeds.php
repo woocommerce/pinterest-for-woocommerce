@@ -294,7 +294,8 @@ class Feeds {
 	 *
 	 * @return array The feed profile objects of every page.
 	 *
-	 * @throws PinterestApiException Pinterest API Exception.
+	 * @throws PinterestApiException Pinterest API Exception, or when Pinterest repeats a page cursor
+	 *                               and the list cannot be completed.
 	 */
 	public static function get_all_feeds(): array {
 		$ad_account_id = (string) Pinterest_For_WooCommerce()::get_setting( 'tracking_advertiser' );
@@ -302,13 +303,20 @@ class Feeds {
 		$bookmark      = '';
 		$seen          = array();
 
-		// Stop on any bookmark already fetched, so a cursor cycle cannot loop forever.
 		do {
 			$seen[ $bookmark ] = true;
 			$page              = APIV5::get_feeds( $ad_account_id, $bookmark );
 			$feeds             = array_merge( $feeds, $page['items'] ?? array() );
 			$bookmark          = (string) ( $page['bookmark'] ?? '' );
-		} while ( '' !== $bookmark && ! isset( $seen[ $bookmark ] ) );
+
+			// A cursor already served would loop forever; a partial list must not pass as complete.
+			if ( '' !== $bookmark && isset( $seen[ $bookmark ] ) ) {
+				throw new PinterestApiException(
+					esc_html__( 'Pinterest repeated a feed page cursor, so the feed list is incomplete.', 'pinterest-for-woocommerce' ),
+					0
+				);
+			}
+		} while ( '' !== $bookmark );
 
 		return $feeds;
 	}

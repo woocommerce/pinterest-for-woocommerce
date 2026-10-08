@@ -239,6 +239,11 @@ class FeedCommand {
 	 * @return string
 	 */
 	private static function describe_exception( PinterestApiException $e ): string {
+		if ( 0 === $e->getCode() ) {
+			// Raised by the plugin itself, for example an incomplete feed list, not by an HTTP response.
+			return $e->getMessage();
+		}
+
 		return sprintf( 'Pinterest API error %d (code %d): %s', $e->getCode(), $e->get_pinterest_code(), $e->getMessage() );
 	}
 

@@ -8,6 +8,7 @@ use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\LocaleMapper;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
+use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
 
@@ -119,19 +120,18 @@ class FeedsTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A bookmark that points back to an earlier page ends the pagination instead of looping.
+	 * A bookmark that points back to an earlier page ends the pagination with an error, so a
+	 * partial list is never mistaken for the complete one.
 	 *
 	 * @return void
 	 */
-	public function test_get_all_feeds_stops_on_a_repeated_bookmark() {
+	public function test_get_all_feeds_fails_on_a_repeated_bookmark() {
 		add_filter( 'pre_http_request', array( self::class, 'looping_feeds' ), 10, 3 );
 
-		$feeds = Feeds::get_all_feeds();
+		$this->expectException( PinterestApiException::class );
+		$this->expectExceptionMessage( 'feed list is incomplete' );
 
-		$this->assertSame(
-			array( 'first-page-feed-id', 'second-page-feed-id', 'third-page-feed-id' ),
-			array_column( $feeds, 'id' )
-		);
+		Feeds::get_all_feeds();
 	}
 
 	/**
