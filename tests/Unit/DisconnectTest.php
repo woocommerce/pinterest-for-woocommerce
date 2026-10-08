@@ -60,7 +60,6 @@ class DisconnectTest extends WP_UnitTestCase {
 	public function tearDown(): void {
 		parent::tearDown();
 
-		remove_all_filters( 'pre_http_request' );
 		TokenInvalidFailure::delete_failure_note();
 	}
 

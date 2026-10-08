@@ -847,14 +847,27 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				 * Just need to clean account data in these cases.
 				 */
 				if ( self::is_business_connected() ) {
-					try {
+					$remote_cleanups = array(
 						// Delete all the feeds for the merchant.
-						FeedRegistration::maybe_delete_stale_feeds_for_merchant( '' );
+						'feed deletion'                 => function () {
+							FeedRegistration::maybe_delete_stale_feeds_for_merchant( '' );
+						},
 						// Delete Commerce Integration.
-						self::delete_commerce_integration();
-					} catch ( Throwable $th ) {
-						// A failed remote cleanup must not keep the store attached to a broken account.
-						Logger::log( sprintf( 'Remote cleanup failed while disconnecting: %s', $th->getMessage() ), 'error' );
+						'commerce integration deletion' => function () {
+							self::delete_commerce_integration();
+						},
+					);
+
+					/*
+					 * Each remote cleanup is attempted on its own: a failure must neither skip the
+					 * next one nor keep the store attached to a broken account.
+					 */
+					foreach ( $remote_cleanups as $what => $cleanup ) {
+						try {
+							$cleanup();
+						} catch ( Throwable $th ) {
+							Logger::log( sprintf( 'Remote %1$s failed while disconnecting: %2$s', $what, $th->getMessage() ), 'error' );
+						}
 					}
 				}
 
