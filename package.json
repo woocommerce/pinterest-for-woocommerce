@@ -181,7 +181,6 @@
   },
   "overrides": {
     "qs@^6.0.0": "^6.16.0",
-    "@babel/runtime@^7.0.0": "^7.26.10",
     "@babel/runtime-corejs2@^7.0.0": "^7.26.10",
     "moment@^2.0.0": "^2.29.4",
     "lodash": "$lodash",
@@ -205,6 +204,9 @@
     "d3-color@^1.0.0": "^3.1.0",
     "gulp-sourcemaps": {
       "css": "npm:@adobe/css-tools@^4.5.0"
-    }
+    },
+    "postcss-selector-parser": "7.1.6",
+    "smol-toml": "1.9.0",
+    "katex": "0.18.2"
   }
 }
