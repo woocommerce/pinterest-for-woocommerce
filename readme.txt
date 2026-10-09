@@ -6,7 +6,7 @@ Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 10.9
 WC tested up to: 11.2
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -92,6 +92,10 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.5.3 - 2026-10-09 =
+* Fix - Position the onboarding wizard header correctly instead of rendering it inset and below an empty band on WooCommerce 11.2, whose admin header is no longer fixed.
+* Fix - Stop wp-admin timing out when Pinterest rejects the stored token: a 401 no longer triggers an unbounded disconnect loop, and the connection is cleared locally without further API calls.
 
 = 1.5.2 - 2026-10-07 =
 * Fix - Updated dependencies with compatible security patches.

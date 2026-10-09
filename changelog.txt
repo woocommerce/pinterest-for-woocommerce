@@ -1,5 +1,9 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.5.3 - 2026-10-09 =
+* Fix - Position the onboarding wizard header correctly instead of rendering it inset and below an empty band on WooCommerce 11.2, whose admin header is no longer fixed.
+* Fix - Stop wp-admin timing out when Pinterest rejects the stored token: a 401 no longer triggers an unbounded disconnect loop, and the connection is cleared locally without further API calls.
+
 = 1.5.2 - 2026-10-07 =
 * Fix - Updated dependencies with compatible security patches.
 * Fix - Updated number formatting, RTL styling, UUID and fetch dependencies to address security advisories.
