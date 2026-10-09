@@ -1,0 +1,4 @@
+Significance: patch
+Type: tweak
+
+Route Pinterest tracking output through WordPress script helpers.
