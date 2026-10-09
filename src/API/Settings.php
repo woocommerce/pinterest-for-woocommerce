@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Endpoint handling settings updates.
  *
  * @class   Settings
- * @version 1.5.2
+ * @version x.x.x
  */
 class Settings extends VendorAPI {
 
@@ -84,6 +84,7 @@ class Settings extends VendorAPI {
 				'rich_pins_on_posts',
 				'rich_pins_on_products',
 				'product_sync_enabled',
+				'product_sync_categories',
 				'enable_debug_logging',
 				'erase_plugin_data',
 				'tracking_advertiser',
