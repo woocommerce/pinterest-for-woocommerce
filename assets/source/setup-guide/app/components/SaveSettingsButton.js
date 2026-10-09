@@ -8,6 +8,7 @@ import { recordEvent } from '@woocommerce/tracks';
 /**
  * Internal dependencies
  */
+import { useResetUserInteractions } from '.~/catalog-sync/helpers/effects';
 import {
 	useSettingsSelect,
 	useSettingsDispatch,
@@ -16,7 +17,6 @@ import {
 } from '../helpers/effects';
 import connectAdvertiser from '../helpers/connect-advertiser';
 import prepareForTracking from '../helpers/prepare-for-tracking';
-import { useResetUserInteractions } from '../../../catalog-sync/helpers/effects';
 
 /**
  * Clicking on "… Save changes" button.
