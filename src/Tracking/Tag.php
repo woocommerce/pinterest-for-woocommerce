@@ -21,6 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class adds PinterestTag tracker support.
+ *
+ * @class   Tag
+ * @version x.x.x
  */
 class Tag extends Tracker {
 
@@ -92,7 +95,10 @@ class Tag extends Tracker {
 	 */
 	public function print_script() {
 		$active_tag = Pinterest_For_Woocommerce()::get_setting( 'tracking_tag' );
-		$user_data  = array( 'np' => 'woocommerce' );
+		if ( ! $active_tag ) {
+			return;
+		}
+		$user_data = array( 'np' => 'woocommerce' );
 
 		if ( Pinterest_For_Woocommerce()::get_setting( 'enhanced_match_support' ) ) {
 			$email       = self::maybe_get_hashed_customer_email();

@@ -6,6 +6,11 @@ use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Pinterest_For_Woocommerce;
 
+/**
+ * Tests feed creation when Pinterest reports that a feed with the same name already exists.
+ *
+ * @version 1.4.10
+ */
 class FeedsTest extends \WP_UnitTestCase {
 
 	public function tearDown(): void {

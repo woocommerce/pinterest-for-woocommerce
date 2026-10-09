@@ -17,6 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Registers the endpoint which will handle the disconnection.
+ *
+ * @class   AuthDisconnect
+ * @version 1.4.0
  */
 class AuthDisconnect extends VendorAPI {
 

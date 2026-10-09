@@ -22,7 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * V3 to V5 token exchange class.
  * Contains the methods API methods and the update procedure.
  *
- * @since 1.4.0
+ * @class   TokenExchangeV3ToV5
+ * @since   1.4.0
+ * @version 1.4.4
  */
 class TokenExchangeV3ToV5 extends APIV5 {
 

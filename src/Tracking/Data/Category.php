@@ -12,6 +12,9 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
 
 /**
  * Category data class to hold category name and id data.
+ *
+ * @class   Category
+ * @version 1.4.0
  */
 class Category extends Data {
 

@@ -13,7 +13,9 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
 /**
  * Used as a stub when no custom data is needed.
  *
- * @since 1.4.0
+ * @class   None
+ * @since   1.4.0
+ * @version 1.4.0
  */
 class None extends Data {
 

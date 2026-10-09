@@ -1,12 +1,12 @@
-jest.mock( '@wordpress/api-fetch', () => ( {
-	__esModule: true,
-	default: jest.fn(),
+vi.mock( '@wordpress/api-fetch', () => ( {
+	default: vi.fn(),
 } ) );
 
 /**
  * External dependencies
  */
-import '@testing-library/jest-dom';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 import '@wordpress/notices';
 import apiFetch from '@wordpress/api-fetch';
 import { dispatch, select } from '@wordpress/data';
@@ -17,8 +17,11 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
  */
 import SetupAccount from './SetupAccount';
 import { SETTINGS_STORE_NAME } from '../data';
+import { expectKnownReactDeprecations } from '../../../tests/known-react-deprecations';
 
 describe( 'SetupAccount', () => {
+	expectKnownReactDeprecations( 'Card' );
+
 	beforeEach( () => {
 		apiFetch.mockReset();
 		select( 'core/notices' )
@@ -34,7 +37,7 @@ describe( 'SetupAccount', () => {
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'renders a connected account on the first render', () => {

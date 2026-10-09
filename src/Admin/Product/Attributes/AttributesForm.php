@@ -22,6 +22,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class AttributesForm
+ *
+ * @class   AttributesForm
+ * @version 1.5.2
  */
 class AttributesForm extends Form {
 

@@ -5,6 +5,11 @@ namespace Automattic\WooCommerce\Pinterest\Tests\E2e;
 use Automattic\WooCommerce\Pinterest\Notes\TokenInvalidFailure;
 use Pinterest_For_Woocommerce;
 
+/**
+ * Tests that a successful Pinterest connection stores the expected settings.
+ *
+ * @version 1.4.11
+ */
 class PinterestConnectE2eTest extends \WP_UnitTestCase {
 
 	protected function setUp(): void {

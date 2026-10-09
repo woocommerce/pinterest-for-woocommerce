@@ -13,6 +13,8 @@ use WP_UnitTestCase;
 
 /**
  * Product attributes are ingested only by an authorized editor save.
+ *
+ * @version 1.5.2
  */
 class AttributesTabTest extends WP_UnitTestCase {
 

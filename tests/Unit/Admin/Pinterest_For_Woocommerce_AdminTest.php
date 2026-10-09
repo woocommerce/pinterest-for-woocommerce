@@ -9,6 +9,8 @@ use WP_UnitTestCase;
 
 /**
  * Class Pinterest_For_Woocommerce_AdminTest.
+ *
+ * @version 1.4.26
  */
 class Pinterest_For_Woocommerce_AdminTest extends WP_UnitTestCase {
 

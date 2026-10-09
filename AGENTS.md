@@ -103,7 +103,7 @@ npm start
 # Production build
 npm run build
 
-# Build and create distribution zip
+# Build and create distribution zip (deploy/pinterest-for-woocommerce.zip)
 npm run build:zip
 ```
 
@@ -208,6 +208,7 @@ This project follows **WooCommerce-Core** coding standards, which extend WordPre
 - PHPCompatibility checks enabled
 - File comments required (except in `src/` and `tests/`)
 - Function comments required with proper @param and @return tags
+- Set `@version x.x.x` on the class docblock when modifying a class, trait, or interface. The release bump replaces `x.x.x` with the released version. Enforced in CI by `check-version.yml`.
 
 **PHPCS Configuration:** See `phpcs.xml` for complete ruleset.
 
@@ -383,6 +384,8 @@ When creating PRs:
 - Start the description with `Closes PIN4WOO-<n>` and include test instructions.
 - **Always add a changelog file.** Run `npm run changelog add` and commit the file it creates under `changelog/`, one per PR. Never edit `changelog.txt` directly - it is compiled from the change files at release time. See [Changelog](#changelog).
 - Check CI results and distinguish passing, failed, and skipped jobs.
+- Releases are started via the `Start Release` GitHub Actions workflow (Actions UI, or locally with `bin/release_start.sh [X.Y.Z] [--wp A.B] [--wc C.D]`, which dispatches it). It bumps versions, compiles `changelog/` into `changelog.txt` and copies the release's entries into the `readme.txt` changelog on a `release/X.Y.Z` branch, then opens a release PR against `trunk`. Merging the release PR triggers `.github/workflows/ci-release.yml`, which builds the ZIP, tags the release, deploys it to WordPress.org (the slug is `config.wp_org_slug` in `package.json`), and rolls the milestone over. Building a ZIP does not authorize starting a release.
+- **Never merge to `trunk` while a release PR (head `release/*`) is open.** Trunk is under code freeze until the release completes, enforced by the `Release Freeze / Check release freeze` required check.
 
 ## Common Pitfalls
 
@@ -499,7 +502,7 @@ Read platform requirements from the plugin header and use `nvm use` with `.nvmrc
 - Plugin activation/deactivation
 - Settings and option handling
 
-**JavaScript Tests (Jest):**
+**JavaScript Tests (Vitest):**
 
 - React component rendering
 - State management logic

@@ -21,6 +21,9 @@ use Throwable;
 
 /**
  * Pinterest Conversions API support.
+ *
+ * @class   Conversions
+ * @version 1.5.2
  */
 class Conversions extends Tracker {
 

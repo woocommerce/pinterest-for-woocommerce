@@ -10,6 +10,8 @@ use WP_UnitTestCase;
 
 /**
  * Tests for cache-safe PageVisit tracking.
+ *
+ * @version 1.5.1
  */
 class PageVisitTest extends WP_UnitTestCase {
 

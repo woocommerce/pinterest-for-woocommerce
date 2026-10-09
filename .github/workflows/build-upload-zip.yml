@@ -1,6 +1,10 @@
 name: Build and Upload zip
 
 on: workflow_call
+
+permissions:
+  contents: read
+
 jobs:
   build_project:
         name: Build and upload
@@ -42,5 +46,5 @@ jobs:
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
                 name: pinterest-for-woocommerce
-                path: ${{ github.workspace }}/pinterest-for-woocommerce.zip
+                path: ${{ github.workspace }}/deploy/pinterest-for-woocommerce.zip
 

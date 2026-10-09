@@ -1,11 +1,12 @@
-jest.mock( '@wordpress/data', () => ( {
-	select: jest.fn(),
-	dispatch: jest.fn(),
+vi.mock( '@wordpress/data', () => ( {
+	select: vi.fn(),
+	dispatch: vi.fn(),
 } ) );
-jest.mock( '../../../../catalog-sync/data', () => ( {
+vi.mock( '../../../../catalog-sync/data', () => ( {
 	REPORTS_STORE_NAME: 'test/reports',
 } ) );
 
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { select, dispatch } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 import reducer from './reducer';
@@ -15,7 +16,7 @@ import { API_ENDPOINT, OPTIONS_NAME, STORE_NAME } from './constants';
 import { getSettings } from './resolvers';
 
 describe( 'settings state', () => {
-	afterEach( () => jest.resetAllMocks() );
+	afterEach( () => vi.resetAllMocks() );
 
 	it.each( [
 		[ 'missing', undefined, { track_conversions: true, merchant: 'keep' } ],
@@ -76,8 +77,8 @@ describe( 'settings state', () => {
 	it( 'saves the complete settings state and finishes updating after success', () => {
 		const settings = { track_conversions: false, tracking_tag: 'tag' };
 		const reports = {
-			resetFeed: jest.fn(),
-			invalidateResolutionForStore: jest.fn(),
+			resetFeed: vi.fn(),
+			invalidateResolutionForStore: vi.fn(),
 		};
 		select.mockReturnValue( { getSettings: () => settings } );
 		dispatch.mockReturnValue( reports );

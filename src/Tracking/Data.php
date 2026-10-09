@@ -10,6 +10,9 @@ namespace Automattic\WooCommerce\Pinterest\Tracking;
 
 /**
  * Common data class to store event related data.
+ *
+ * @class   Data
+ * @version 1.4.0
  */
 class Data {
 

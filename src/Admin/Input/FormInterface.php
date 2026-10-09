@@ -13,6 +13,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Interface FormInterface
+ *
+ * @class   FormInterface
+ * @version 1.0.2
  */
 interface FormInterface {
 

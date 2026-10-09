@@ -10,6 +10,8 @@ use WP_UnitTestCase;
 
 /**
  * Tests Feed Status Service helpers.
+ *
+ * @version 1.4.27
  */
 class FeedStatusServiceTest extends WP_UnitTestCase {
 

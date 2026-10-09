@@ -6,6 +6,11 @@ use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Automattic\WooCommerce\Pinterest\TrackerSnapshot;
 use Pinterest_For_Woocommerce;
 
+/**
+ * Tests the TrackerSnapshot class.
+ *
+ * @version 1.5.0
+ */
 class TrackerSnapshotTest extends \WP_UnitTestCase {
 
 	public static $default_settings = array(

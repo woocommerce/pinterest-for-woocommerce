@@ -13,6 +13,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class Input
+ *
+ * @class   Input
+ * @version 1.0.2
  */
 class Input extends Form implements InputInterface {
 

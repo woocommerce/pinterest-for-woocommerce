@@ -15,7 +15,9 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
  *
  * @link https://developers.pinterest.com/docs/conversions/best/#Required,%20recommended,%20and%20optional%20fields
  *
- * @since 1.4.0
+ * @class   Search
+ * @since   1.4.0
+ * @version 1.4.0
  */
 class Search extends Data {
 

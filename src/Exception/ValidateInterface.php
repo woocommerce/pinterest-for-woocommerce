@@ -11,6 +11,9 @@ namespace Automattic\WooCommerce\Pinterest\Exception;
 
 /**
  * Trait ValidateInterface
+ *
+ * @class   ValidateInterface
+ * @version 1.0.2
  */
 trait ValidateInterface {
 

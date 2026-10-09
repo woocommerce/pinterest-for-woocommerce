@@ -18,6 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class Handling Token Refresh.
+ *
+ * @class   RefreshToken
+ * @version 1.5.2
  */
 class RefreshToken {
 

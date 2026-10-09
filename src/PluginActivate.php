@@ -16,6 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class PluginActivate
+ *
+ * @class   PluginActivate
+ * @version 1.1.0
  */
 class PluginActivate {
 

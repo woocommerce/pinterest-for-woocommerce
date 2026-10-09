@@ -17,7 +17,9 @@ defined( 'ABSPATH' ) || exit;
  *
  * Base class for a set of onboarding reminders.
  *
- * @since 1.1.0
+ * @class   AbstractCompleteOnboarding
+ * @since   1.1.0
+ * @version 1.1.0
  */
 abstract class AbstractCompleteOnboarding extends AbstractNote {
 

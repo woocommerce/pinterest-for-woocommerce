@@ -21,6 +21,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class Handling ad credits.
+ *
+ * @class   AdCredits
+ * @version 1.5.2
  */
 class AdCredits {
 

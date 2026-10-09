@@ -1,29 +1,29 @@
-jest.mock( '../helpers/effects', () => {
+vi.mock( '../helpers/effects', () => {
 	return {
-		useCreateNotice: jest.fn(),
-		useSettingsSelect: jest.fn(),
-		useSettingsDispatch: jest.fn(),
-		useResetSettings: jest.fn(),
+		useCreateNotice: vi.fn(),
+		useSettingsSelect: vi.fn(),
+		useSettingsDispatch: vi.fn(),
+		useResetSettings: vi.fn(),
 	};
 } );
-jest.mock( '../../../catalog-sync/helpers/effects', () => ( {
-	useResetUserInteractions: jest.fn(),
+vi.mock( '../../../catalog-sync/helpers/effects', () => ( {
+	useResetUserInteractions: vi.fn(),
 } ) );
-jest.mock( '../helpers/connect-advertiser', () => ( {
-	__esModule: true,
-	default: jest.fn(),
+vi.mock( '../helpers/connect-advertiser', () => ( {
+	default: vi.fn(),
 } ) );
-jest.mock( '@woocommerce/tracks', () => {
+vi.mock( '@woocommerce/tracks', () => {
 	return {
-		recordEvent: jest.fn().mockName( 'recordEvent' ),
+		recordEvent: vi.fn().mockName( 'recordEvent' ),
 	};
 } );
 
 /**
  * External dependencies
  */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { recordEvent } from '@woocommerce/tracks';
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 /**
@@ -39,13 +39,13 @@ import {
 import { useResetUserInteractions } from '../../../catalog-sync/helpers/effects';
 import connectAdvertiser from '../helpers/connect-advertiser';
 
-const save = jest.fn();
-const notice = jest.fn();
-const resetSettings = jest.fn();
-const resetInteractions = jest.fn();
+const save = vi.fn();
+const notice = vi.fn();
+const resetSettings = vi.fn();
+const resetInteractions = vi.fn();
 
 beforeEach( () => {
-	jest.resetAllMocks();
+	vi.resetAllMocks();
 	useCreateNotice.mockReturnValue( notice );
 	useSettingsSelect.mockImplementation( ( selector ) =>
 		selector === 'isSettingsUpdating' ? false : {}

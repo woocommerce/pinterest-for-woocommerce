@@ -39,6 +39,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 	/**
 	 * Base Plugin class holding generic functionality
+	 *
+	 * @class   Pinterest_For_Woocommerce
+	 * @version x.x.x
 	 */
 	final class Pinterest_For_Woocommerce {
 

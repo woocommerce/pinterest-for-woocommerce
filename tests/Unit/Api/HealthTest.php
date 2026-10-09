@@ -11,6 +11,11 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
 use WP_REST_Request;
 use WP_Test_REST_TestCase;
 
+/**
+ * Tests the health REST API endpoint.
+ *
+ * @version 1.4.0
+ */
 class HealthTest extends WP_Test_REST_TestCase {
 
 	/**

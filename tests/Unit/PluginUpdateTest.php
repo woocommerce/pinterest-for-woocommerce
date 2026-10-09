@@ -14,6 +14,8 @@ use Exception;
 
 /**
  * Plugin Update Procedures test class.
+ *
+ * @version 1.5.2
  */
 class Pinterest_Test_Plugin_Update extends TestCase {
 

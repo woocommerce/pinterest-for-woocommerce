@@ -9,6 +9,11 @@ use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
 use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
 
+/**
+ * Tests the Feeds class.
+ *
+ * @version x.x.x
+ */
 class FeedsTest extends WP_UnitTestCase {
 
 	public function setUp(): void {
@@ -26,6 +31,20 @@ class FeedsTest extends WP_UnitTestCase {
 		remove_all_filters( 'site_url' );
 		remove_all_filters( 'upload_dir' );
 		LocalFeedConfigs::deregister();
+	}
+
+	/**
+	 * Deprecated public methods warn without changing their return values.
+	 *
+	 * @return void
+	 */
+	public function test_deprecated_feed_check_keeps_legacy_results() {
+		$this->setExpectedDeprecated( Feeds::class . '::is_local_feed_enabled' );
+		add_filter( 'pre_http_request', array( self::class, 'get_feeds' ), 10, 3 );
+
+		$this->assertTrue( Feeds::is_local_feed_enabled( '278913891236895123895' ) );
+		$this->assertFalse( Feeds::is_local_feed_enabled( 'missing-feed' ) );
+		$this->assertFalse( Feeds::is_local_feed_enabled( '' ) );
 	}
 
 	/**

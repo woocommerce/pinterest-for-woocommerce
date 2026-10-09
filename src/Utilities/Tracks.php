@@ -13,7 +13,9 @@ namespace Automattic\WooCommerce\Pinterest\Utilities;
 /**
  * Trait Tracks
  *
- * @since 1.2.5
+ * @class   Tracks
+ * @since   1.2.5
+ * @version 1.4.27
  */
 trait Tracks {
 

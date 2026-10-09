@@ -13,6 +13,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Used to designate an object that can be rendered (e.g. views, blocks, shortcodes, etc.).
+ *
+ * @class   Renderable
+ * @version 1.0.2
  */
 interface Renderable {
 

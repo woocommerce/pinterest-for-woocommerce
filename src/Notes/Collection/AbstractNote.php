@@ -23,7 +23,9 @@ defined( 'ABSPATH' ) || exit;
  * AbstractNote class. This is a proxy that helps us using the WC Admin Note
  * class in the context of Pinterest For WooCommerce plugin.
  *
- * @since 1.1.0
+ * @class   AbstractNote
+ * @since   1.1.0
+ * @version 1.1.0
  */
 abstract class AbstractNote {
 

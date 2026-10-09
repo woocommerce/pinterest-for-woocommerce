@@ -15,6 +15,9 @@ use Automattic\WooCommerce\Pinterest\View\ViewFactory;
 
 /**
  * Class Admin
+ *
+ * @class   Admin
+ * @version 1.0.4
  */
 class Admin {
 

@@ -15,6 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class handling Woo Tracker
+ *
+ * @class   TrackerSnapshot
+ * @version 1.4.3
  */
 class TrackerSnapshot {
 

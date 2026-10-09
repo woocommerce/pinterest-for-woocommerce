@@ -49,16 +49,22 @@
     "lodash": "^4.18.0"
   },
   "devDependencies": {
+    "@csstools/css-parser-algorithms": "^4.0.2",
+    "@csstools/css-tokenizer": "^4.0.2",
     "@playwright/test": "1.60.0",
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^12.1.2",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.1",
+    "@vitejs/plugin-react-swc": "^4.3.3",
+    "@vitest/coverage-v8": "^5.0.3",
+    "@vitest/eslint-plugin": "^1.6.27",
     "@woocommerce/dependency-extraction-webpack-plugin": "~2.2.0",
     "@woocommerce/e2e-utils-playwright": "0.5.1",
     "@woocommerce/eslint-plugin": "^4.0.0",
     "@wordpress/base-styles": "^3.6.0",
     "@wordpress/env": "11.15.0",
-    "@wordpress/scripts": "^35.0.0",
+    "@wordpress/scripts": "^36.1.0",
     "@wordpress/stylelint-config": "^25.0.0",
     "browser-sync": "^3.0.4",
     "eslint": "^10.10.0",
@@ -76,6 +82,7 @@
     "gulp-sourcemaps": "^2.6.5",
     "gulp-uglify": "^3.0.2",
     "gulp-vinyl-zip": "^2.1.2",
+    "jsdom": "^26.1.0",
     "merge-stream": "^1.0.1",
     "minimist": "^1.2.8",
     "prettier": "npm:wp-prettier@^3.9.6",
@@ -85,24 +92,26 @@
     "stylelint-scss": "^7.3.0",
     "through2": "^4.0.2",
     "typescript": "^5.9.3",
-    "underscore": "^1.9.1"
+    "underscore": "^1.9.1",
+    "vite": "^8.3.3",
+    "vitest": "^5.0.3"
   },
   "scripts": {
     "prebuild": "composer install",
     "build": "wp-scripts build && gulp build && npm run i18n",
     "build:zip": "npm run build && composer install --no-dev -n && gulp zip",
-    "postbuild:zip": "composer install && npm run _remove-root-md",
+    "postbuild:zip": "composer install && npm run _remove-root-md && mkdir -p deploy && mv $npm_package_name.zip deploy/",
     "_remove-root-md": "zipinfo -1 pinterest-for-woocommerce.zip | grep -E '^pinterest-for-woocommerce/[^/]+\\.md$' | xargs zip -d pinterest-for-woocommerce.zip || true",
     "dev": "wp-scripts build && gulp build",
     "format:js": "wp-scripts format ./assets/source",
-    "i18n": "WP_CLI_PHP_ARGS='-d memory_limit=2048M' ./vendor/bin/wp i18n make-pot ./ i18n/languages/$npm_package_name.pot --slug=$npm_package_name --domain=$npm_package_name --exclude='bin,*.asset.php,assets/source/_maps,assets/setup-*,assets/catalog-sync,assets/build,tests,woo-tracking-jsdoc,index.php,gulpfile.js,jest.config.js'",
+    "i18n": "WP_CLI_PHP_ARGS='-d memory_limit=2048M' ./vendor/bin/wp i18n make-pot ./ i18n/languages/$npm_package_name.pot --slug=$npm_package_name --domain=$npm_package_name --exclude='bin,*.asset.php,assets/source/_maps,assets/setup-*,assets/catalog-sync,assets/build,tests,woo-tracking-jsdoc,index.php,gulpfile.js,vitest.config.mjs'",
     "changelog": "composer install --quiet && composer exec -- changelogger",
     "changelog:check": "bash bin/check_changelog.sh",
     "lint:css": "wp-scripts lint-style \"./assets/source/**/*.{css,scss}\"",
     "lint:css:fix": "wp-scripts lint-style \"./assets/source/**/*.{css,scss}\" --fix",
     "lint:js": "wp-scripts lint-js ./assets/source ./tests/browser",
     "lint:js:fix": "wp-scripts lint-js ./assets/source ./tests/browser --fix",
-    "lint:tooling-js": "wp-scripts lint-js gulpfile.js webpack.config.js jest.config.js eslint.config.cjs",
+    "lint:tooling-js": "wp-scripts lint-js gulpfile.js webpack.config.js vitest.config.mjs eslint.config.cjs",
     "lint:tooling-js-fix": "npm run lint:tooling-js -- --fix",
     "lint:md:docs": "wp-scripts lint-md-docs --dot",
     "check-licenses": "wp-scripts check-licenses --ignore=@woocommerce/components,@woocommerce/csv-export,@woocommerce/currency,@woocommerce/data,@woocommerce/date,@woocommerce/experimental,@woocommerce/navigation,@woocommerce/tracks",
@@ -160,7 +169,6 @@
     "not dead"
   ],
   "config": {
-    "build_step": "npm install && npm run build:zip",
     "wp_org_slug": "pinterest-for-woocommerce",
     "version_replace_paths": [
       "includes",
@@ -173,10 +181,11 @@
   },
   "overrides": {
     "qs@^6.0.0": "^6.16.0",
-    "@babel/runtime@^7.0.0": "^7.26.10",
     "@babel/runtime-corejs2@^7.0.0": "^7.26.10",
     "moment@^2.0.0": "^2.29.4",
     "lodash": "$lodash",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "@wordpress/scripts": {
       "markdownlint-cli": {
         ".": "^0.49.1",
@@ -195,6 +204,9 @@
     "d3-color@^1.0.0": "^3.1.0",
     "gulp-sourcemaps": {
       "css": "npm:@adobe/css-tools@^4.5.0"
-    }
+    },
+    "postcss-selector-parser": "7.1.6",
+    "smol-toml": "1.9.0",
+    "katex": "0.18.2"
   }
 }

@@ -11,6 +11,9 @@ namespace Automattic\WooCommerce\Pinterest\Product;
 
 /**
  * Class GoogleCategorySearch
+ *
+ * @class   GoogleCategorySearch
+ * @version 1.0.2
  */
 class GoogleCategorySearch {
 

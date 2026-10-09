@@ -13,6 +13,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Interface ViewFactory
+ *
+ * @class   ViewFactory
+ * @version 1.0.2
  */
 interface ViewFactory {
 

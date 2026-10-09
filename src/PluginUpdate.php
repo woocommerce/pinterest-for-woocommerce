@@ -27,6 +27,9 @@ use Throwable;
  * 1. Check if the plugin is up to date. If yes return immediately.
  * 2. Perform update procedures.
  * 3. Bump update version string.
+ *
+ * @class   PluginUpdate
+ * @version 1.5.2
  */
 class PluginUpdate {
 

@@ -15,6 +15,9 @@ use Automattic\WooCommerce\Pinterest\SaveToPinterest;
 
 /**
  * Pinterest_For_Woocommerce_Frontend_Scripts Class.
+ *
+ * @class   Pinterest_For_Woocommerce_Frontend_Assets
+ * @version 1.4.1
  */
 class Pinterest_For_Woocommerce_Frontend_Assets {
 

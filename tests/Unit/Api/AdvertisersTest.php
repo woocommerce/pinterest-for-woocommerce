@@ -12,6 +12,11 @@ use Pinterest_For_Woocommerce;
 use WP_REST_Request;
 use WP_Test_REST_TestCase;
 
+/**
+ * Tests the advertisers REST API endpoint.
+ *
+ * @version 1.4.10
+ */
 class AdvertisersTest extends WP_Test_REST_TestCase {
 
 	public function tearDown(): void {

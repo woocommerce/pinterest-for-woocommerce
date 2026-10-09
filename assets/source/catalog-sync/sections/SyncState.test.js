@@ -1,12 +1,18 @@
 /**
  * External dependencies
  */
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { recordEvent } from '@woocommerce/tracks';
 
-jest.mock( '../../setup-guide/app/helpers/effects', () => ( {
-	useSettingsSelect: jest.fn(),
+vi.mock( '../../setup-guide/app/helpers/effects', () => ( {
+	useSettingsSelect: vi.fn(),
+} ) );
+// The reports store requests the feed state on render. Leave it pending, as
+// the request cannot complete here and its rejection is not handled.
+vi.mock( '@wordpress/api-fetch', () => ( {
+	default: vi.fn( () => new Promise( () => {} ) ),
 } ) );
 
 /**
@@ -14,8 +20,11 @@ jest.mock( '../../setup-guide/app/helpers/effects', () => ( {
  */
 import SyncState from './SyncState';
 import { useSettingsSelect } from '../../setup-guide/app/helpers/effects';
+import { expectKnownReactDeprecations } from '../../tests/known-react-deprecations';
 
 describe( 'SyncState component', () => {
+	expectKnownReactDeprecations( 'Card' );
+
 	afterEach( () => useSettingsSelect.mockReset() );
 
 	test.each( [

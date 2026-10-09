@@ -6,6 +6,8 @@ use WP_UnitTestCase;
 
 /**
  * Class WPConsentAPITest.
+ *
+ * @version 1.4.21
  */
 class WPConsentAPITest extends WP_UnitTestCase {
 

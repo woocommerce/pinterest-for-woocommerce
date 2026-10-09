@@ -11,6 +11,11 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
 use WP_REST_Request;
 use WP_Test_REST_TestCase;
 
+/**
+ * Tests the tags REST API endpoint.
+ *
+ * @version 1.5.0
+ */
 class TagsTest extends WP_Test_REST_TestCase {
 
 	public function tearDown(): void {

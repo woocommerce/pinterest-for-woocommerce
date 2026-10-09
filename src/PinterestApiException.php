@@ -16,6 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Pinterest API Exception
  *
  * Class PinterestApiException
+ *
+ * @class   PinterestApiException
+ * @version 1.4.27
  */
 class PinterestApiException extends \Exception {
 

@@ -1,11 +1,14 @@
 /**
  * Tests for the Save to Pinterest button script.
  *
- * The script has no exports: requiring it registers the listeners, and the
+ * The script has no exports: importing it registers the listeners, and the
  * tests drive it through the DOM the same way a browser would.
  */
 
-const SCRIPT_PATH = './pinterest-for-woocommerce-save-button';
+/**
+ * External dependencies
+ */
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * Markup rendered server side by SaveToPinterest::render_pin().
@@ -69,11 +72,8 @@ describe( 'Save to Pinterest button', () => {
 	// Load the script once: its DOMContentLoaded listener registers a
 	// MutationObserver on the body, and loading it per test would stack one
 	// observer per copy and inflate build() call counts.
-	beforeAll( () => {
-		// The shared preset enables fake timers; switch to real ones so the
-		// MutationObserver callbacks, rAF and retry timers run on their own.
-		jest.useRealTimers();
-		require( SCRIPT_PATH );
+	beforeAll( async () => {
+		await import( './pinterest-for-woocommerce-save-button' );
 		document.dispatchEvent( new window.Event( 'DOMContentLoaded' ) );
 	} );
 
@@ -109,7 +109,7 @@ describe( 'Save to Pinterest button', () => {
 
 	it( 'rebuilds pins added to the DOM after the initial render', async () => {
 		document.body.innerHTML = unbuiltWrapper( 'Save Shirt to Pinterest' );
-		window.PinUtils = { build: jest.fn() };
+		window.PinUtils = { build: vi.fn() };
 
 		markAsBuilt(
 			document.querySelector( '.pinterest-for-woocommerce-image-wrapper' )
@@ -128,7 +128,7 @@ describe( 'Save to Pinterest button', () => {
 	} );
 
 	it( 'rebuilds when the wrapper itself is the added node', async () => {
-		window.PinUtils = { build: jest.fn() };
+		window.PinUtils = { build: vi.fn() };
 
 		// Some grids append the wrapper directly rather than a parent block.
 		const wrapper = document.createElement( 'div' );
@@ -143,7 +143,7 @@ describe( 'Save to Pinterest button', () => {
 
 	it( 'does not rebuild when the added markup holds no unbuilt pin', async () => {
 		document.body.innerHTML = unbuiltWrapper( 'Save Shirt to Pinterest' );
-		window.PinUtils = { build: jest.fn() };
+		window.PinUtils = { build: vi.fn() };
 
 		markAsBuilt(
 			document.querySelector( '.pinterest-for-woocommerce-image-wrapper' )
@@ -165,7 +165,7 @@ describe( 'Save to Pinterest button', () => {
 		await flush();
 
 		// pinit.js is loaded async/defer, so it can land after the swap.
-		window.PinUtils = { build: jest.fn() };
+		window.PinUtils = { build: vi.fn() };
 		await flush( 500 );
 
 		expect( window.PinUtils.build ).toHaveBeenCalled();
@@ -179,7 +179,7 @@ describe( 'Save to Pinterest button', () => {
 		// Long enough for the whole retry budget to be spent.
 		await flush( 2600 );
 
-		window.PinUtils = { build: jest.fn() };
+		window.PinUtils = { build: vi.fn() };
 		await flush( 600 );
 
 		expect( window.PinUtils.build ).not.toHaveBeenCalled();
@@ -189,7 +189,7 @@ describe( 'Save to Pinterest button', () => {
 		const pinStyle = addStyle(
 			'.PIN_1788176069676_button_pin{background-image:url(logo.svg)}'
 		);
-		window.PinUtils = { build: jest.fn() };
+		window.PinUtils = { build: vi.fn() };
 
 		// The Interactivity API router disables every stylesheet missing from
 		// the page it fetched, including pinit.js's runtime one.
@@ -202,7 +202,7 @@ describe( 'Save to Pinterest button', () => {
 
 	it( 'leaves unrelated disabled stylesheets alone', async () => {
 		const otherStyle = addStyle( '.some-theme-thing{color:red}' );
-		window.PinUtils = { build: jest.fn() };
+		window.PinUtils = { build: vi.fn() };
 
 		otherStyle.sheet.disabled = true;
 		swapInNewPage();
@@ -213,7 +213,7 @@ describe( 'Save to Pinterest button', () => {
 
 	it( 'labels pins built after a pagination swap', async () => {
 		window.PinUtils = {
-			build: jest.fn( () => {
+			build: vi.fn( () => {
 				document
 					.querySelectorAll(
 						'.pinterest-for-woocommerce-image-wrapper'
@@ -262,7 +262,7 @@ describe( 'Save to Pinterest button', () => {
 		control.setAttribute( 'data-pin-log', 'button_pinit_bookmarklet' );
 		document.body.appendChild( control );
 
-		const click = jest.fn();
+		const click = vi.fn();
 		control.click = click;
 
 		for ( const key of [ 'Enter', ' ' ] ) {

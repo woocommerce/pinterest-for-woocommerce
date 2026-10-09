@@ -17,6 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Endpoint handling SyncSettings.
+ *
+ * @class   SyncSettings
+ * @version 1.2.18
  */
 class SyncSettings extends VendorAPI {
 

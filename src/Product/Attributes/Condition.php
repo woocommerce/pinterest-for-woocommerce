@@ -15,6 +15,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class Condition
+ *
+ * @class   Condition
+ * @version 1.0.2
  */
 class Condition extends AbstractAttribute implements WithValueOptionsInterface {
 
