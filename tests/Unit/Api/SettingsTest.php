@@ -15,7 +15,7 @@ use WP_Test_REST_TestCase;
 /**
  * Tests the settings REST API endpoint.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class SettingsTest extends WP_Test_REST_TestCase {
 
@@ -64,6 +64,27 @@ class SettingsTest extends WP_Test_REST_TestCase {
 		$request->set_body_params( array( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => array() ) );
 		$this->assertSame( 200, rest_get_server()->dispatch( $request )->get_status() );
 		$this->assertSame( $saved, Pinterest_For_Woocommerce::get_settings( true ) );
+	}
+
+	/**
+	 * Category selections survive merchant saves and can be cleared.
+	 */
+	public function test_selected_categories_can_be_saved_and_cleared() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'shop_manager' ) ) );
+		$term_id = self::factory()->term->create( array( 'taxonomy' => 'product_cat' ) );
+		$request = new WP_REST_Request( 'POST', '/pinterest/v1/settings' );
+
+		$selection = array(
+			array(
+				'key'   => $term_id,
+				'label' => 'Clothing',
+			),
+		);
+		foreach ( array( $selection, array() ) as $categories ) {
+			$request->set_body_params( array( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => array( 'product_sync_categories' => $categories ) ) );
+			$this->assertSame( 200, rest_get_server()->dispatch( $request )->get_status() );
+			$this->assertSame( $categories, Pinterest_For_Woocommerce::get_settings( true )['product_sync_categories'] );
+		}
 	}
 
 	/**
