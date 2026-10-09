@@ -5,6 +5,7 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 use Automattic\WooCommerce\Pinterest\API\APIV5;
 use Automattic\WooCommerce\Pinterest\Notes\TokenInvalidFailure;
 use Automattic\WooCommerce\Pinterest\PinterestApiException;
+use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
 use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
 
@@ -130,42 +131,74 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * An unexpected error during a user-initiated disconnect keeps the local connection data so
-	 * the merchant can retry, while the remaining remote cleanup still runs.
+	 * A disconnect with a valid token deletes the plugin's feed and the commerce integration at
+	 * Pinterest, then clears the local connection.
 	 *
 	 * @return void
 	 */
-	public function test_disconnect_keeps_local_data_when_a_remote_cleanup_throws() {
+	public function test_disconnect_with_a_valid_token_deletes_the_remote_feed_and_commerce_integration() {
 		remove_filter( 'pre_http_request', array( self::class, 'reject_every_request' ), 10 );
-		add_filter(
-			'pre_http_request',
-			function ( $response, $args, $url ) {
-				if ( false !== strpos( $url, 'catalogs/feeds' ) ) {
-					throw new \RuntimeException( 'Unexpected failure while listing feeds.' );
-				}
+		add_filter( 'pre_http_request', array( self::class, 'accept_every_request' ), 10, 3 );
 
-				self::$requests[] = $args['method'] . ' ' . preg_replace( '#^/v5/#', '', (string) wp_parse_url( $url, PHP_URL_PATH ) );
+		$this->assertTrue( Pinterest_For_Woocommerce::disconnect() );
 
-				return array(
-					'headers'  => array( 'content-type' => 'application/json' ),
-					'body'     => wp_json_encode( array() ),
-					'response' => array(
-						'code'    => 204,
-						'message' => '',
-					),
-					'cookies'  => array(),
-					'filename' => '',
-				);
-			},
-			10,
-			3
+		$this->assertSame(
+			array( 'GET catalogs/feeds', 'DELETE catalogs/feeds/feed-123', 'DELETE integrations/commerce/ebi-123' ),
+			self::$requests
 		);
+		$this->assert_connection_cleared( false );
+		$this->assertFalse( TokenInvalidFailure::note_exists() );
+	}
+
+	/**
+	 * An unexpected error during a user-initiated disconnect keeps the local connection data so
+	 * the merchant can retry, while the remaining remote cleanup still runs.
+	 *
+	 * @dataProvider provide_cleanup_throwables
+	 *
+	 * @param string $throwable_class The class of the throwable the feed listing raises.
+	 * @return void
+	 */
+	public function test_disconnect_keeps_local_data_when_a_remote_cleanup_throws( string $throwable_class ) {
+		remove_filter( 'pre_http_request', array( self::class, 'reject_every_request' ), 10 );
+		$this->throw_on_feed_listing( $throwable_class );
 
 		$this->assertFalse( Pinterest_For_Woocommerce::disconnect() );
 
 		$this->assertSame( array( 'DELETE integrations/commerce/ebi-123' ), self::$requests, 'The commerce integration deletion still runs.' );
 		$this->assertTrue( Pinterest_For_Woocommerce::is_connected() );
 		$this->assertFalse( TokenInvalidFailure::note_exists() );
+	}
+
+	/**
+	 * Throwables a remote cleanup may raise that are not Pinterest API errors.
+	 *
+	 * @return array
+	 */
+	public function provide_cleanup_throwables(): array {
+		return array(
+			'exception' => array( \RuntimeException::class ),
+			'error'     => array( \Error::class ),
+		);
+	}
+
+	/**
+	 * A failed cleanup does not leave the disconnect locked, so the merchant can retry it.
+	 *
+	 * @return void
+	 */
+	public function test_disconnect_can_run_again_after_a_failed_cleanup() {
+		remove_filter( 'pre_http_request', array( self::class, 'reject_every_request' ), 10 );
+		$throwing_filter = $this->throw_on_feed_listing( \RuntimeException::class );
+
+		$this->assertFalse( Pinterest_For_Woocommerce::disconnect() );
+
+		remove_filter( 'pre_http_request', $throwing_filter, 10 );
+		add_filter( 'pre_http_request', array( self::class, 'accept_every_request' ), 10, 3 );
+		self::$requests = array();
+
+		$this->assertTrue( Pinterest_For_Woocommerce::disconnect() );
+		$this->assert_connection_cleared( false );
 	}
 
 	/**
@@ -208,6 +241,34 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 
 		$this->assertSame( array(), self::$requests );
 		$this->assert_connection_cleared();
+	}
+
+	/**
+	 * Resetting the connection clears the feed generation telemetry held for the request and
+	 * unschedules the commerce integration jobs, which would otherwise run against the old
+	 * connection.
+	 *
+	 * @return void
+	 */
+	public function test_reset_connection_clears_runtime_feed_telemetry_and_retry_jobs() {
+		ProductFeedStatus::set(
+			array(
+				'status'        => 'generated',
+				'product_count' => 10,
+				'error_message' => 'Stale error.',
+			)
+		);
+		as_schedule_single_action( time() + HOUR_IN_SECONDS, 'pinterest-for-woocommerce-create-commerce-integration-retry', array( 'attempt' => 1 ), 'pinterest-for-woocommerce' );
+		as_schedule_single_action( time() + HOUR_IN_SECONDS, 'pinterest-for-woocommerce-sync-commerce-integration', array(), 'pinterest-for-woocommerce' );
+		$this->assertSame( 'generated', ProductFeedStatus::get()['status'] );
+		$this->assertTrue( as_has_scheduled_action( 'pinterest-for-woocommerce-create-commerce-integration-retry' ) );
+		$this->assertTrue( as_has_scheduled_action( 'pinterest-for-woocommerce-sync-commerce-integration' ) );
+
+		Pinterest_For_Woocommerce::reset_connection();
+
+		$this->assertEquals( ProductFeedStatus::STATE_PROPS, ProductFeedStatus::get() );
+		$this->assertFalse( as_has_scheduled_action( 'pinterest-for-woocommerce-create-commerce-integration-retry' ) );
+		$this->assertFalse( as_has_scheduled_action( 'pinterest-for-woocommerce-sync-commerce-integration' ) );
 	}
 
 	/**
@@ -259,6 +320,85 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Makes the feed listing throw the given throwable, while every other request succeeds.
+	 *
+	 * @param string $throwable_class The class of the throwable to raise.
+	 * @return callable The added filter, so a test can remove it.
+	 */
+	private function throw_on_feed_listing( string $throwable_class ): callable {
+		$filter = function ( $response, $args, $url ) use ( $throwable_class ) {
+			if ( false === strpos( $url, 'api.pinterest.com' ) ) {
+				return $response;
+			}
+
+			if ( false !== strpos( $url, 'catalogs/feeds' ) ) {
+				throw new $throwable_class( 'Unexpected failure while listing feeds.' );
+			}
+
+			self::$requests[] = $args['method'] . ' ' . preg_replace( '#^/v5/#', '', (string) wp_parse_url( $url, PHP_URL_PATH ) );
+
+			return self::json_response( 204, array() );
+		};
+		add_filter( 'pre_http_request', $filter, 10, 3 );
+
+		return $filter;
+	}
+
+	/**
+	 * Fakes a Pinterest API that accepts the token, recording each request. The feed listing
+	 * returns one feed generated by this plugin.
+	 *
+	 * @param false|array $response Preempted response.
+	 * @param array       $args     Request arguments.
+	 * @param string      $url      Request URL.
+	 * @return false|array
+	 */
+	public static function accept_every_request( $response, $args, $url ) {
+		if ( false === strpos( $url, 'api.pinterest.com' ) ) {
+			return $response;
+		}
+
+		$request          = $args['method'] . ' ' . preg_replace( '#^/v5/#', '', (string) wp_parse_url( $url, PHP_URL_PATH ) );
+		self::$requests[] = $request;
+
+		if ( 'GET catalogs/feeds' !== $request ) {
+			return self::json_response( 204, array() );
+		}
+
+		return self::json_response(
+			200,
+			array(
+				'items' => array(
+					array(
+						'id'       => 'feed-123',
+						'location' => trailingslashit( wp_get_upload_dir()['baseurl'] ) . PINTEREST_FOR_WOOCOMMERCE_LOG_PREFIX . '-feed.xml',
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Builds a faked JSON HTTP response.
+	 *
+	 * @param int   $code HTTP status code.
+	 * @param array $body Response body.
+	 * @return array
+	 */
+	private static function json_response( int $code, array $body ): array {
+		return array(
+			'headers'  => array( 'content-type' => 'application/json' ),
+			'body'     => wp_json_encode( $body ),
+			'response' => array(
+				'code'    => $code,
+				'message' => '',
+			),
+			'cookies'  => array(),
+			'filename' => '',
+		);
+	}
+
+	/**
 	 * Fakes a Pinterest API that rejects the token on every request, recording each one.
 	 *
 	 * @param false|array $response Preempted response.
@@ -278,32 +418,15 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 		 * the request-list assertion fails with a readable diff instead of the CI job timeout.
 		 */
 		if ( count( self::$requests ) > 5 ) {
-			return array(
-				'headers'  => array( 'content-type' => 'application/json' ),
-				'body'     => wp_json_encode( array() ),
-				'response' => array(
-					'code'    => 500,
-					'message' => 'Internal Server Error',
-				),
-				'cookies'  => array(),
-				'filename' => '',
-			);
+			return self::json_response( 500, array() );
 		}
 
-		return array(
-			'headers'  => array( 'content-type' => 'application/json' ),
-			'body'     => wp_json_encode(
-				array(
-					'code'    => 2,
-					'message' => 'Authentication failed.',
-				)
-			),
-			'response' => array(
-				'code'    => 401,
-				'message' => 'Unauthorized',
-			),
-			'cookies'  => array(),
-			'filename' => '',
+		return self::json_response(
+			401,
+			array(
+				'code'    => 2,
+				'message' => 'Authentication failed.',
+			)
 		);
 	}
 }
