@@ -244,12 +244,13 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Resetting the connection clears the feed generation telemetry and the commerce
-	 * integration jobs, which would otherwise run against the old connection.
+	 * Resetting the connection clears the feed generation telemetry held for the request and
+	 * unschedules the commerce integration jobs, which would otherwise run against the old
+	 * connection.
 	 *
 	 * @return void
 	 */
-	public function test_reset_connection_clears_feed_telemetry_and_retry_jobs() {
+	public function test_reset_connection_clears_runtime_feed_telemetry_and_retry_jobs() {
 		ProductFeedStatus::set(
 			array(
 				'status'        => 'generated',
@@ -259,6 +260,9 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 		);
 		as_schedule_single_action( time() + HOUR_IN_SECONDS, 'pinterest-for-woocommerce-create-commerce-integration-retry', array( 'attempt' => 1 ), 'pinterest-for-woocommerce' );
 		as_schedule_single_action( time() + HOUR_IN_SECONDS, 'pinterest-for-woocommerce-sync-commerce-integration', array(), 'pinterest-for-woocommerce' );
+		$this->assertSame( 'generated', ProductFeedStatus::get()['status'] );
+		$this->assertTrue( as_has_scheduled_action( 'pinterest-for-woocommerce-create-commerce-integration-retry' ) );
+		$this->assertTrue( as_has_scheduled_action( 'pinterest-for-woocommerce-sync-commerce-integration' ) );
 
 		Pinterest_For_Woocommerce::reset_connection();
 
@@ -323,6 +327,10 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 	 */
 	private function throw_on_feed_listing( string $throwable_class ): callable {
 		$filter = function ( $response, $args, $url ) use ( $throwable_class ) {
+			if ( false === strpos( $url, 'api.pinterest.com' ) ) {
+				return $response;
+			}
+
 			if ( false !== strpos( $url, 'catalogs/feeds' ) ) {
 				throw new $throwable_class( 'Unexpected failure while listing feeds.' );
 			}
@@ -410,32 +418,15 @@ class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 		 * the request-list assertion fails with a readable diff instead of the CI job timeout.
 		 */
 		if ( count( self::$requests ) > 5 ) {
-			return array(
-				'headers'  => array( 'content-type' => 'application/json' ),
-				'body'     => wp_json_encode( array() ),
-				'response' => array(
-					'code'    => 500,
-					'message' => 'Internal Server Error',
-				),
-				'cookies'  => array(),
-				'filename' => '',
-			);
+			return self::json_response( 500, array() );
 		}
 
-		return array(
-			'headers'  => array( 'content-type' => 'application/json' ),
-			'body'     => wp_json_encode(
-				array(
-					'code'    => 2,
-					'message' => 'Authentication failed.',
-				)
-			),
-			'response' => array(
-				'code'    => 401,
-				'message' => 'Unauthorized',
-			),
-			'cookies'  => array(),
-			'filename' => '',
+		return self::json_response(
+			401,
+			array(
+				'code'    => 2,
+				'message' => 'Authentication failed.',
+			)
 		);
 	}
 }
