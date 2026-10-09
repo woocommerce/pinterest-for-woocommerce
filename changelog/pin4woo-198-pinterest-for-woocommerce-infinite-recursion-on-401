@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Fix wp-admin timing out when Pinterest rejects the stored token: a 401 no longer triggers an unbounded disconnect loop, and the connection is cleared locally without further API calls.
