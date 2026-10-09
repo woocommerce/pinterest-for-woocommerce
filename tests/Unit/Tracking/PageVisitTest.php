@@ -11,7 +11,7 @@ use WP_UnitTestCase;
 /**
  * Tests for cache-safe PageVisit tracking.
  *
- * @version 1.5.1
+ * @version x.x.x
  */
 class PageVisitTest extends WP_UnitTestCase {
 
@@ -315,6 +315,22 @@ class PageVisitTest extends WP_UnitTestCase {
 		PageVisit::handle_request();
 
 		$this->assertSame( 0, $requests );
+	}
+
+	/** Speculative PageVisit requests must not reach the Conversions API. */
+	public function test_speculative_beacon_is_not_dispatched() {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$original                = $_SERVER['HTTP_PURPOSE'] ?? null;
+		$_SERVER['HTTP_PURPOSE'] = 'prefetch';
+		try {
+			$this->assert_source_url_rejected( home_url( '/shop/' ) );
+		} finally {
+			if ( null === $original ) {
+				unset( $_SERVER['HTTP_PURPOSE'] );
+			} else {
+				$_SERVER['HTTP_PURPOSE'] = $original;
+			}
+		}
 	}
 
 	/**
