@@ -41,7 +41,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 	 * Base Plugin class holding generic functionality
 	 *
 	 * @class   Pinterest_For_Woocommerce
-	 * @version 1.5.2
+	 * @version x.x.x
 	 */
 	final class Pinterest_For_Woocommerce {
 
@@ -126,6 +126,15 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @since 1.0.0
 		 */
 		protected static $dirty_settings = array();
+
+		/**
+		 * Whether disconnect() is running, so that a 401 raised by its own cleanup requests
+		 * cannot start another disconnect.
+		 *
+		 * @var bool
+		 * @since x.x.x
+		 */
+		private static $disconnecting = false;
 
 		/**
 		 * The default settings that will be created
@@ -822,47 +831,105 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return bool True if disconnection was successful.
 		 */
 		public static function disconnect(): bool {
-			// Reset Feed file generation telemetry.
-			ProductFeedStatus::deregister();
-			Pinterest\CommerceIntegration::maybe_unregister_retries();
-
 			/*
-			 * If there is no business connected, disconnecting merchant will throw error.
-			 * Just need to clean account data in these cases.
+			 * Every 401 fires the auth-failure action, which resets the connection. Without this
+			 * guard a rejected token makes the remote cleanup below re-enter this method from
+			 * its own failing requests, without bound, until PHP's execution time runs out.
 			 */
-			if ( ! self::is_business_connected() ) {
-				self::flush_options();
-				// At this point we're disconnected.
-				return true;
+			if ( self::$disconnecting ) {
+				return false;
 			}
+			self::$disconnecting = true;
 
 			try {
-				// Delete all the feeds for the merchant.
-				FeedRegistration::maybe_delete_stale_feeds_for_merchant( '' );
-				// Delete Commerce Integration.
-				self::delete_commerce_integration();
-				// Remove stored data.
-				self::flush_options();
+				/*
+				 * If there is no business connected, disconnecting merchant will throw error.
+				 * Just need to clean account data in these cases.
+				 */
+				if ( self::is_business_connected() ) {
+					$cleanup_failed  = false;
+					$remote_cleanups = array(
+						// Delete all the feeds for the merchant.
+						'feed deletion'                 => function () {
+							FeedRegistration::maybe_delete_stale_feeds_for_merchant( '' );
+						},
+						// Delete Commerce Integration.
+						'commerce integration deletion' => function () {
+							self::delete_commerce_integration();
+						},
+					);
+
+					/*
+					 * Each remote cleanup is attempted on its own, so a failure never skips the next
+					 * one. Pinterest API errors are handled inside the cleanups; anything else is
+					 * unexpected, so the local data is kept for a retry. A rejected token never gets
+					 * here: its 401 already reset the connection through reset_connection().
+					 */
+					foreach ( $remote_cleanups as $what => $cleanup ) {
+						try {
+							$cleanup();
+						} catch ( Throwable $th ) {
+							$cleanup_failed = true;
+							Logger::log( sprintf( 'Remote %1$s failed while disconnecting: %2$s', $what, $th->getMessage() ), 'error' );
+						}
+					}
+
+					if ( $cleanup_failed ) {
+						return false;
+					}
+				}
+
+				self::clear_connection_data();
 				// At this point we're disconnected.
 				return true;
-			} catch ( Exception $th ) {
-				// There was an error disconnecting merchant.
-				return false;
+			} finally {
+				self::$disconnecting = false;
 			}
 		}
 
 		/**
-		 * Resets the connection by clearing the local connection data.
+		 * Resets the connection after Pinterest rejected the token (HTTP 401).
+		 *
+		 * Only the local connection data is cleared: with a rejected token every request the
+		 * remote cleanup would make fails with another 401, which fires this handler again.
 		 *
 		 * @since 1.4.4
+		 * @since x.x.x No longer calls the Pinterest API.
 		 *
 		 * @return void
 		 * @throws \Automattic\WooCommerce\Admin\Notes\NotesUnavailableException If the notes API is not available.
 		 */
 		public static function reset_connection() {
-			self::disconnect();
+			self::clear_connection_data();
 
-			TokenInvalidFailure::possibly_add_note();
+			/*
+			 * The init hook adds the ad credits currency info back on the next request. Add it now
+			 * too, so the landing page served by this very request (where a 401 reset happens
+			 * during admin_init) gets the account data shape its ad credits section expects.
+			 * Not in clear_connection_data(): disconnect() also runs on deactivation and uninstall,
+			 * where WooCommerce may be inactive and get_woocommerce_currency() undefined.
+			 */
+			self::add_currency_credits_info_to_account_data();
+
+			// A 401 raised by a deliberate disconnect's own cleanup must not leave a "reconnect" note behind.
+			if ( ! self::$disconnecting ) {
+				TokenInvalidFailure::possibly_add_note();
+			}
+		}
+
+		/**
+		 * Clears every local trace of the connection: feed telemetry, scheduled retries,
+		 * stored data and the connection settings.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		private static function clear_connection_data() {
+			// Reset Feed file generation telemetry.
+			ProductFeedStatus::deregister();
+			Pinterest\CommerceIntegration::maybe_unregister_retries();
+			self::flush_options();
 		}
 
 		/**
@@ -871,8 +938,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return void
 		 */
 		private static function flush_options() {
-			// Flush the whole data option.
+			// Flush the whole data option, and make the runtime cache in get_settings() reload it.
 			delete_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+			self::$dirty_settings[ PINTEREST_FOR_WOOCOMMERCE_DATA_NAME ] = true;
 			UserInteraction::flush_options();
 
 			// Remove settings that may cause issues if stale on disconnect.
