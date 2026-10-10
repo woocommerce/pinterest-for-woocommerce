@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Handling feed files registration.
  *
  * @class   FeedRegistration
- * @version 1.5.2
+ * @version x.x.x
  */
 class FeedRegistration {
 
@@ -158,6 +158,9 @@ class FeedRegistration {
 		if ( ! $feed_id ) {
 			return false;
 		}
+
+		// A matched feed is one the plugin created earlier, possibly before ownership was recorded.
+		FeedOwnership::record( $feed_id );
 
 		static::maybe_delete_stale_feeds_for_merchant( $feed_id );
 		return true;
