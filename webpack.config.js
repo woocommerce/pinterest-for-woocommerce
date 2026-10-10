@@ -11,7 +11,7 @@ const requestToExternal = ( request ) => {
 
 	// Bundle these packages & components so we can use the latest, independent of WordPress version.
 	// Without bundling these specific recent versions, components like LandingPageApp don't render correctly.
-	const bundled = [ '@wordpress/components', '@wordpress/compose' ];
+	const bundled = [ '@wordpress/components' ];
 	if ( bundled.includes( request ) ) {
 		return false;
 	}
