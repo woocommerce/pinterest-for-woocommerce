@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Generates browser PageVisit events and handles their CAPI beacons.
  *
  * @class   PageVisit
- * @version 1.5.2
+ * @version x.x.x
  */
 class PageVisit {
 
@@ -86,8 +86,7 @@ class PageVisit {
 			return;
 		}
 
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded JS whose embedded values are JSON encoded with JSON_HEX_TAG.
-		echo '<script>(function(){' . self::get_event_id_code() . $beacon_code . '}());</script>';
+		wp_print_inline_script_tag( '(function(){' . self::get_event_id_code() . $beacon_code . '}());' );
 	}
 
 	/**

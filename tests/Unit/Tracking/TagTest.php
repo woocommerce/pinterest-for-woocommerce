@@ -7,7 +7,7 @@ use Pinterest_For_Woocommerce;
 /**
  * Tests the Tag tracker class.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class TagTest extends \WP_UnitTestCase {
 
@@ -31,6 +31,57 @@ class TagTest extends \WP_UnitTestCase {
 		$this->assertFalse( has_action( 'shutdown', array( $tag, 'save_deferred_events' ) ) );
 	}
 
+	/** WordPress script attributes apply without changing base/event/placeholder order. */
+	public function test_tracking_scripts_use_wordpress_attributes() {
+		Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'inline-test' ) );
+		$events = new \ReflectionProperty( Tag::class, 'events' );
+		$events->setAccessible( true );
+		$saved_events = $events->getValue();
+		$attributes   = static function ( $attributes ) {
+			$attributes['nonce'] = 'pinterest-inline-test';
+			return $attributes;
+		};
+		add_filter( 'wp_inline_script_attributes', $attributes );
+		$events->setValue( null, array() );
+		Tag::add_event( 'test-event', array( 'event_id' => 'unchanged-id' ) );
+		ob_start();
+		( new Tag() )->print_script();
+		$output = ob_get_clean();
+		$events->setValue( null, $saved_events );
+		$this->assertSame( 3, substr_count( $output, 'nonce="pinterest-inline-test"' ) );
+		$this->assertLessThan( strpos( $output, "pintrk( 'track'" ), strpos( $output, "pintrk('load'" ) );
+		$this->assertLessThan( strpos( $output, 'pinterest-tag-placeholder' ), strpos( $output, "pintrk( 'track'" ) );
+		$this->assertStringContainsString( '"event_id":"unchanged-id"', $output );
+	}
+
+	/** AJAX cart fragments retain the public selector and use WordPress script attributes. */
+	public function test_cart_fragment_uses_wordpress_script_attributes() {
+		$attributes = static function ( $attributes ) {
+			$attributes['nonce'] = 'pinterest-cart-test';
+			return $attributes;
+		};
+		$is_ajax    = static function () {
+			return true;
+		};
+		add_filter( 'wp_inline_script_attributes', $attributes );
+		add_filter( 'wp_doing_ajax', $is_ajax );
+		$tag  = new Tag();
+		$data = new Data\Product( 'cart-event', 123, 'Test product', '', '', 10, 'USD', 2 );
+		$tag->track_event( \Automattic\WooCommerce\Pinterest\Tracking::EVENT_ADD_TO_CART, $data );
+		/**
+		 * Applies the native cart fragment hooks for an AJAX response.
+		 *
+		 * @since x.x.x
+		 */
+		$fragments = apply_filters( 'woocommerce_add_to_cart_fragments', array() );
+		$script    = $fragments['script#pinterest-tag-placeholder'];
+		$this->assertStringContainsString( 'id="pinterest-tag-placeholder"', $script );
+		$this->assertStringContainsString( 'nonce="pinterest-cart-test"', $script );
+		$this->assertStringContainsString( "pintrk( 'track', 'AddToCart'", $script );
+		$this->assertStringContainsString( '"event_id":"cart-event"', $script );
+		$this->assertStringContainsString( '"value":20', $script );
+	}
+
 	public function test_print_script_prints_tag() {
 		Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'YU9AOV86F', 'enhanced_match_support' => false ) );
 		wp_set_current_user( $this->factory->user->create() );
@@ -42,8 +93,7 @@ class TagTest extends \WP_UnitTestCase {
 		$script = ob_get_contents();
 		ob_end_clean();
 
-		$expected = "<!-- Pinterest Pixel Base Code -->\n<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', 'yu9aov86f', {\"np\":\"woocommerce\"} );\n  pintrk('page');\n</script>\n<!-- End Pinterest Pixel Base Code -->\n<script id=\"pinterest-tag-placeholder\"></script>";
-		$this->assertEquals( $expected, $script );
+		$this->assert_tag_script( $script, 'yu9aov86f', '{"np":"woocommerce"}' );
 	}
 
 	public function test_print_script_prints_tag_with_enhanced_match_support() {
@@ -66,8 +116,23 @@ class TagTest extends \WP_UnitTestCase {
 				'external_id' => hash( 'sha256', (string) $user_id ),
 			)
 		);
-		$expected           = "<!-- Pinterest Pixel Base Code -->\n<script type=\"text/javascript\">\n  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', 'ju9rag86q', {$expected_user_data} );\n  pintrk('page');\n</script>\n<!-- End Pinterest Pixel Base Code -->\n<script id=\"pinterest-tag-placeholder\"></script>";
-		$this->assertEquals( $expected, $script );
+		$this->assert_tag_script( $script, 'ju9rag86q', $expected_user_data );
+	}
+
+	/**
+	 * Compare the pixel output using the current WordPress script-tag format.
+	 *
+	 * @param string $script Printed HTML.
+	 * @param string $tag_id Pinterest tag ID.
+	 * @param string $user_data Encoded user data.
+	 */
+	private function assert_tag_script( $script, $tag_id, $user_data ) {
+		$base_code = "  !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version=\"3.0\";var t=document.createElement(\"script\");t.async=!0,t.src=e;var r=document.getElementsByTagName(\"script\")[0];r.parentNode.insertBefore(t,r)}}(\"https://s.pinimg.com/ct/core.js\");\n\n  pintrk('load', '{$tag_id}', {$user_data} );\n  pintrk('page');";
+		$expected  = "<!-- Pinterest Pixel Base Code -->\n";
+		$expected .= wp_get_inline_script_tag( $base_code, array( 'type' => 'text/javascript' ) );
+		$expected .= "<!-- End Pinterest Pixel Base Code -->\n";
+		$expected .= wp_get_inline_script_tag( '', array( 'id' => 'pinterest-tag-placeholder' ) );
+		$this->assertSame( $expected, $script );
 	}
 
 	public function test_print_noscript() {
