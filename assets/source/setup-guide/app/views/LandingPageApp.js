@@ -23,8 +23,8 @@ import {
 /**
  * Internal dependencies
  */
+import PrelaunchNotice from '.~/components/prelaunch-notice';
 import AdsCreditsTermsAndConditionsModal from '../components/TermsAndConditionsModal';
-import PrelaunchNotice from '../../../components/prelaunch-notice';
 import documentationLinkProps from '../helpers/documentation-link-props';
 import UnsupportedCountryNotice from '../components/UnsupportedCountryNotice';
 import { useSettingsSelect } from '../helpers/effects';

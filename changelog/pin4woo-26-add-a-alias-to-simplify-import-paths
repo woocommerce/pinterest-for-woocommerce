@@ -1,0 +1,4 @@
+Significance: patch
+Type: dev
+
+Simplify JavaScript imports with a source root alias.
