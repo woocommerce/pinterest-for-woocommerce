@@ -9,15 +9,9 @@ permissions:
   contents: read
 
 jobs:
-  php-unit:
-    name: PHP unit tests
+  php-tests:
+    name: PHP
     uses: ./.github/workflows/php-unit-tests.yml
-
-  php-unit-nightly:
-    name: PHP unit tests (WooCommerce nightly)
-    uses: ./.github/workflows/php-unit-tests.yml
-    with:
-      wc-version: nightly
 
   e2e:
     name: E2E
@@ -25,7 +19,7 @@ jobs:
 
   notify:
     name: Notify Slack
-    needs: [php-unit, php-unit-nightly, e2e]
+    needs: [php-tests, e2e]
     if: ${{ failure() }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
