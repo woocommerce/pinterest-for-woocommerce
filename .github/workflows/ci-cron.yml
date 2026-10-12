@@ -57,9 +57,15 @@ jobs:
           test-validation: ${{ 'true' }}
           test-phpstan: ${{ 'false' }} # QIT PHPStan uses its own config (no repo bootstrap/baseline); the repo's PHPStan (phpstan.yml) is the gate.
 
+    audit:
+        name: Dependency advisories
+        permissions:
+            vulnerability-alerts: read
+        uses: ./.github/workflows/run-audit.yml
+
     notify:
         name: Notify Slack
-        needs: [e2e-tests, qit-tests]
+        needs: [e2e-tests, qit-tests, audit]
         if: ${{ failure() }}
         runs-on: ubuntu-latest
         timeout-minutes: 5
