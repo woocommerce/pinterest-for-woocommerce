@@ -38,6 +38,10 @@ jobs:
         name: E2E tests
         needs: build_project
         uses: ./.github/workflows/run-e2e.yml
+        with:
+          wc-version: 'latest'
+          wp-version: 'latest'
+          php-version: '8.4'
 
     notify:
         name: Notify Slack
