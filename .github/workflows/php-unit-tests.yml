@@ -35,7 +35,7 @@ jobs:
         # The single HPOS row overrides this value, so GitHub adds it as a separate job.
         order-storage: [cpt]
         # Minimum-version rows pin their own WooCommerce, so they run only when no wc-version is requested.
-        include: ${{ fromJSON(inputs.wc-version == '' && '[{"php":7.4,"wp-version":"6.9.0","wc-version":"10.9.0"},{"php":"8.4","wp-version":"latest","wc-version":"latest","order-storage":"hpos"}]' || format('[{{"php":"8.4","wp-version":"latest","wc-version":"{0}","order-storage":"hpos"}}]', inputs.wc-version)) }}
+        include: ${{ fromJSON(inputs.wc-version == '' && '[{"php":7.4,"wp-version":"7.0.0","wc-version":"11.1.0"},{"php":"8.4","wp-version":"latest","wc-version":"latest","order-storage":"hpos"}]' || format('[{{"php":"8.4","wp-version":"latest","wc-version":"{0}","order-storage":"hpos"}}]', inputs.wc-version)) }}
 
     steps:
       - name: Checkout repository
