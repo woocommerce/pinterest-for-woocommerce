@@ -1,40 +1,106 @@
 name: Cron CI
 
 on:
-  schedule:
-    # Run at 01:00 on Mondays.
-    - cron: '0 1 * * 1'
+    schedule:
+        # Run at 01:00 on Monday.
+        - cron:  '0 1 * * 1'
 
 permissions:
-  contents: read
+    contents: read
 
 jobs:
-  php-unit:
-    name: PHP unit tests
-    uses: ./.github/workflows/php-unit-tests.yml
 
-  php-unit-nightly:
-    name: PHP unit tests (WooCommerce nightly)
-    uses: ./.github/workflows/php-unit-tests.yml
-    with:
-      wc-version: nightly
+    setup:
+        name: Setup environments
+        uses: ./.github/workflows/setup-env.yml
 
-  e2e:
-    name: E2E
-    uses: ./.github/workflows/run-e2e.yml
+    php-lint:
+        name: PHP
+        needs: setup
+        uses: ./.github/workflows/php-cs-on-changes.yml
 
-  notify:
-    name: Notify Slack
-    needs: [php-unit, php-unit-nightly, e2e]
-    if: ${{ failure() }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    env:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-    steps:
-      # Skipped until a maintainer adds the SLACK_WEBHOOK_URL secret.
-      - if: ${{ env.SLACK_WEBHOOK_URL != '' }}
-        uses: act10ns/slack@d96404edccc6d6467fc7f8134a420c851b1e9054 # v2
+    js-lint:
+        name: JS Linting
+        needs: setup
+        uses: ./.github/workflows/js-css-linting.yml
+
+    php-tests:
+        name: PHP
+        needs: [php-lint, js-lint]
+        uses: ./.github/workflows/php-unit-tests.yml
+
+    build_project:
+        name: Package
+        needs: php-tests
+        uses: ./.github/workflows/build-upload-zip.yml
+
+    e2e-tests:
+        name: E2E tests
+        needs: build_project
+        uses: ./.github/workflows/run-e2e.yml
         with:
-          status: failure
-          message: "Scheduled workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> failed."
+          wc-version: 'latest'
+          wp-version: 'latest'
+          php-version: '8.4'
+
+    qit-tests:
+        name: QIT tests
+        needs: build_project
+        uses: ./.github/workflows/run-qit.yml
+        secrets: inherit
+        with:
+          extension: 'pinterest-for-woocommerce'
+          artifact: 'pinterest-for-woocommerce'
+          test-activation: ${{ 'true' }}
+          test-security: ${{ 'true' }}
+          test-phpcompatibility: ${{ 'true' }}
+          test-validation: ${{ 'true' }}
+          test-phpstan: ${{ 'false' }} # QIT PHPStan uses its own config (no repo bootstrap/baseline); the repo's PHPStan (phpstan.yml) is the gate.
+
+    audit:
+        name: Dependency advisories
+        permissions:
+            vulnerability-alerts: read
+        uses: ./.github/workflows/run-audit.yml
+
+    handle-success:
+        if: ${{ success() }}
+        needs: [e2e-tests, qit-tests, audit]
+        name: Handle success
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        steps:
+          - uses: act10ns/slack@d96404edccc6d6467fc7f8134a420c851b1e9054 # v2
+            with:
+                status: success
+                message: "Scheduled workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> passed."
+
+    handle-cancelled:
+        if: ${{ cancelled() }}
+        needs: [e2e-tests, qit-tests, audit]
+        name: Handle cancellation
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        steps:
+          - uses: act10ns/slack@d96404edccc6d6467fc7f8134a420c851b1e9054 # v2
+            with:
+                status: cancelled
+                message: "Scheduled workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> cancelled."
+
+    handle-error:
+        if: ${{ failure() }}
+        needs: [e2e-tests, qit-tests, audit]
+        name: Handle failure
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        steps:
+          - uses: act10ns/slack@d96404edccc6d6467fc7f8134a420c851b1e9054 # v2
+            with:
+                status: failure
+                message: "Scheduled workflow <{{workflowUrl}}|{{workflow}}> with run ID <{{workflowRunUrl}}|{{runId}}> failed."
