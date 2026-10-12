@@ -1,9 +1,9 @@
-name: QIT - Cron CI
+name: Cron QIT
 
 on:
     schedule:
-        # Run at 04:00 on Tuesdays.
-        - cron: '0 4 * * 2'
+        # Run at 02:00 on Wednesdays.
+        - cron: '0 2 * * 3'
 
 jobs:
 
