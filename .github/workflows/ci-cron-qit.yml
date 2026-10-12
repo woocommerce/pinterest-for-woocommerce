@@ -5,6 +5,9 @@ on:
         # Run at 02:00 on Wednesdays.
         - cron: '0 2 * * 3'
 
+permissions:
+    contents: read
+
 jobs:
 
     setup:
