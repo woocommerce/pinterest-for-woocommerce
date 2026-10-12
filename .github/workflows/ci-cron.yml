@@ -43,9 +43,23 @@ jobs:
           wp-version: 'latest'
           php-version: '8.4'
 
+    qit-tests:
+        name: QIT tests
+        needs: build_project
+        uses: ./.github/workflows/run-qit.yml
+        secrets: inherit
+        with:
+          extension: 'pinterest-for-woocommerce'
+          artifact: 'pinterest-for-woocommerce'
+          test-activation: ${{ 'true' }}
+          test-security: ${{ 'true' }}
+          test-phpcompatibility: ${{ 'true' }}
+          test-validation: ${{ 'true' }}
+          test-phpstan: ${{ 'false' }} # QIT PHPStan uses its own config (no repo bootstrap/baseline); the repo's PHPStan (phpstan.yml) is the gate.
+
     notify:
         name: Notify Slack
-        needs: e2e-tests
+        needs: [e2e-tests, qit-tests]
         if: ${{ failure() }}
         runs-on: ubuntu-latest
         timeout-minutes: 5
