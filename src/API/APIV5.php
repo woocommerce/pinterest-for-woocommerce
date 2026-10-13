@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * API V5 Methods
  *
  * @class   APIV5
- * @version 1.5.0
+ * @version x.x.x
  */
 class APIV5 extends Base {
 
@@ -411,10 +411,12 @@ class APIV5 extends Base {
 	 * @since 1.4.0
 	 */
 	public static function create_commerce_integration( array $integration_data ): array {
-		return self::make_request(
-			'integrations/commerce',
-			'POST',
-			$integration_data
+		return self::validate_commerce_integration_response(
+			self::make_request(
+				'integrations/commerce',
+				'POST',
+				$integration_data
+			)
 		);
 	}
 
@@ -465,11 +467,30 @@ class APIV5 extends Base {
 	 * @throws PinterestApiException In case of 404, 409 and 500 errors from Pinterest.
 	 */
 	public static function update_commerce_integration( string $external_business_id, array $data ): array {
-		return self::make_request(
-			"integrations/commerce/{$external_business_id}",
-			'PATCH',
-			$data
+		return self::validate_commerce_integration_response(
+			self::make_request(
+				"integrations/commerce/{$external_business_id}",
+				'PATCH',
+				$data
+			)
 		);
+	}
+
+	/**
+	 * Turn non-array success bodies into the API exception handled by commerce retries.
+	 *
+	 * @param mixed $response Remote integration response.
+	 * @return array Integration data.
+	 * @throws PinterestApiException If the body is not an array.
+	 */
+	private static function validate_commerce_integration_response( $response ): array {
+		if ( ! is_array( $response ) ) {
+			throw new PinterestApiException(
+				esc_html__( 'Invalid commerce integration response.', 'pinterest-for-woocommerce' ),
+				502
+			);
+		}
+		return $response;
 	}
 
 	/**

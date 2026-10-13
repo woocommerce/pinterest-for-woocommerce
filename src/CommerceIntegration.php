@@ -19,7 +19,7 @@ use Pinterest_For_Woocommerce;
  * Class Handling Commerce Integration operations.
  *
  * @class   CommerceIntegration
- * @version 1.4.13
+ * @version x.x.x
  */
 class CommerceIntegration {
 
@@ -64,7 +64,7 @@ class CommerceIntegration {
 		try {
 			$integration_data = self::get_integration_data();
 
-			$response = APIV5::create_commerce_integration( $integration_data );
+			$response = self::validate_response( APIV5::create_commerce_integration( $integration_data ) );
 
 			/*
 			 * In case of successful response we save our integration data into a database.
@@ -158,8 +158,10 @@ class CommerceIntegration {
 		try {
 			$new_integration_data = self::get_integration_data( $external_business_id );
 
-			if ( $integration_data['partner_metadata'] !== $new_integration_data['partner_metadata'] ) {
-				$response = APIV5::update_commerce_integration( $external_business_id, $new_integration_data );
+			if ( ( $integration_data['partner_metadata'] ?? null ) !== $new_integration_data['partner_metadata'] ) {
+				$response = self::validate_response(
+					APIV5::update_commerce_integration( $external_business_id, $new_integration_data )
+				);
 				Pinterest_For_Woocommerce::save_integration_data( $response );
 			}
 		} catch ( PinterestApiException $e ) {
@@ -177,6 +179,23 @@ class CommerceIntegration {
 			);
 			throw $e;
 		}
+	}
+
+	/**
+	 * Require the identity this lifecycle uses before replacing the stored integration.
+	 *
+	 * @param array $response Remote integration data.
+	 * @return array Integration data.
+	 * @throws PinterestApiException If required integration fields are absent.
+	 */
+	private static function validate_response( array $response ): array {
+		if ( ! is_string( $response['external_business_id'] ?? null ) || '' === $response['external_business_id'] ) {
+			throw new PinterestApiException(
+				esc_html__( 'Invalid commerce integration response.', 'pinterest-for-woocommerce' ),
+				502
+			);
+		}
+		return $response;
 	}
 
 	/**
