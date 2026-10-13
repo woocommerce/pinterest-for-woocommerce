@@ -20,7 +20,7 @@ use WC_Unit_Test_Case;
 /**
  * Feed file generation testing class.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
@@ -615,6 +615,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		Logger::$logger = $mock_logger;
 
+		// The warning is a debug message.
+		Pinterest_For_Woocommerce()::save_setting( 'enable_debug_logging', true );
+
 		/**
 		 * Generate a description string too big for the feed.
 		 * The limit is 10K so we generate 1010 char length string.
@@ -738,24 +741,19 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$xml          = $price_method( $product );
 		$this->assertEquals( '<g:price>15.00USD</g:price>', $xml );
 
+		// Prices are entered without tax and a 20% rate applies everywhere.
+		// The test transaction rolls the tax options and the rate back.
+		update_option( 'woocommerce_calc_taxes', 'yes' );
+		update_option( 'woocommerce_prices_include_tax', 'no' );
+		ShippingHelpers::addTaxRate( '', '', '20.0000' );
+
+		// Test if the price includes taxes: 15 + 20%.
+		update_option( 'woocommerce_tax_display_shop', 'incl' );
+		$this->assertEquals( '<g:price>18.00USD</g:price>', $price_method( $product ) );
+
 		// Test if the price excludes taxes.
-		$old_tax_display_option = get_option( 'woocommerce_tax_display_shop' );
 		update_option( 'woocommerce_tax_display_shop', 'excl' );
-
-		$price_decimals_method = ( new ReflectionClass( ProductsXmlFeed::class ) )->getMethod( 'get_currency_decimals' );
-		$price_decimals_method->setAccessible( true );
-		$price_decimals = $price_decimals_method->invoke( null );
-
-		$product_price   = wc_get_price_excluding_tax(
-			$product,
-			array(
-				'price' => $product->get_regular_price(),
-			)
-		);
-		$formatted_price = wc_format_decimal( $product_price, $price_decimals );
-		$this->assertEquals( '<g:price>' . $formatted_price . get_woocommerce_currency() . '</g:price>', $xml );
-
-		update_option( 'woocommerce_tax_display_shop', $old_tax_display_option );
+		$this->assertEquals( '<g:price>15.00USD</g:price>', $price_method( $product ) );
 
 		// Test with another currency.
 		$old_currency = get_woocommerce_currency();
@@ -791,24 +789,19 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$xml     = $sale_price_method( $product );
 		$this->assertEquals( '<sale_price>5.00USD</sale_price>', $xml );
 
+		// Prices are entered without tax and a 20% rate applies everywhere.
+		// The test transaction rolls the tax options and the rate back.
+		update_option( 'woocommerce_calc_taxes', 'yes' );
+		update_option( 'woocommerce_prices_include_tax', 'no' );
+		ShippingHelpers::addTaxRate( '', '', '20.0000' );
+
+		// Test if the price includes taxes: 5 + 20%.
+		update_option( 'woocommerce_tax_display_shop', 'incl' );
+		$this->assertEquals( '<sale_price>6.00USD</sale_price>', $sale_price_method( $product ) );
+
 		// Test if the price excludes taxes.
-		$old_tax_display_option = get_option( 'woocommerce_tax_display_shop' );
 		update_option( 'woocommerce_tax_display_shop', 'excl' );
-
-		$price_decimals_method = ( new ReflectionClass( ProductsXmlFeed::class ) )->getMethod( 'get_currency_decimals' );
-		$price_decimals_method->setAccessible( true );
-		$price_decimals = $price_decimals_method->invoke( null );
-
-		$product_price   = wc_get_price_excluding_tax(
-			$product,
-			array(
-				'price' => $product->get_sale_price(),
-			)
-		);
-		$formatted_price = wc_format_decimal( $product_price, $price_decimals );
-		$this->assertEquals( '<sale_price>' . $formatted_price . get_woocommerce_currency() . '</sale_price>', $xml );
-
-		update_option( 'woocommerce_tax_display_shop', $old_tax_display_option );
+		$this->assertEquals( '<sale_price>5.00USD</sale_price>', $sale_price_method( $product ) );
 	}
 
 	/**
@@ -1205,6 +1198,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		Logger::$logger = $mock_logger;
 
+		// The warning is a debug message.
+		Pinterest_For_Woocommerce()::save_setting( 'enable_debug_logging', true );
+
 		// Create 7 categories and assign them to the product.
 		$category_ids = array();
 		for ( $i = 1; $i <= 7; $i++ ) {
@@ -1237,6 +1233,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$mock_logger = $this->getMockLogger();
 
 		Logger::$logger = $mock_logger;
+
+		// The warning is a debug message.
+		Pinterest_For_Woocommerce()::save_setting( 'enable_debug_logging', true );
 
 		// Create categories with long names to exceed 1000 character limit.
 		// Each category name is 300 chars, so 4 categories = 1200 chars + separators.
@@ -1280,6 +1279,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$mock_logger = $this->getMockLogger();
 
 		Logger::$logger = $mock_logger;
+
+		// A warning would be a debug message.
+		Pinterest_For_Woocommerce()::save_setting( 'enable_debug_logging', true );
 
 		// Create exactly 5 categories.
 		$category_ids = array();

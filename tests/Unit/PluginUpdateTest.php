@@ -15,7 +15,7 @@ use Exception;
 /**
  * Plugin Update Procedures test class.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class Pinterest_Test_Plugin_Update extends TestCase {
 
@@ -32,6 +32,13 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 	 * @var object|null Mocked logger object.
 	 */
 	private $mock_logger = null;
+
+	/**
+	 * Debug logging setting to restore after the test.
+	 *
+	 * @var mixed
+	 */
+	private $debug_logging = false;
 
 	/**
 	 * Current plugin version.
@@ -62,6 +69,10 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 			}
 		};
 		Logger::$logger = $this->mock_logger;
+
+		// The update flow reports through debug messages.
+		$this->debug_logging = Pinterest_For_Woocommerce::get_setting( 'enable_debug_logging', true );
+		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', true );
 	}
 
 	/**
@@ -70,6 +81,7 @@ class Pinterest_Test_Plugin_Update extends TestCase {
 	 * @return void
 	 */
 	protected function tearDown(): void {
+		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', $this->debug_logging );
 		LocalFeedConfigs::deregister();
 		delete_option( FeedGenerator::OPTION_FEED_DIRTY );
 		as_unschedule_all_actions( FeedGenerator::ACTION_START_FEED_GENERATOR, null, PINTEREST_FOR_WOOCOMMERCE_PREFIX );
