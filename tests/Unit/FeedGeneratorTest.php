@@ -22,7 +22,7 @@ use WC_Product_Variable;
 /**
  * Test helper class that wraps real Action Scheduler functions.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class TestActionSchedulerProxy implements ActionSchedulerInterface {
 	/**
@@ -97,6 +97,11 @@ class TestActionSchedulerProxy implements ActionSchedulerInterface {
 	}
 }
 
+/**
+ * Native feed lifecycle, scheduling and failure contracts.
+ *
+ * @version x.x.x
+ */
 class FeedGeneratorTest extends \WP_UnitTestCase {
 
 	/** @var ActionSchedulerInterface */
@@ -242,11 +247,11 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests feed generator does nothing if the action is not found.
+	 * A timeout on another Action Scheduler hook must not change feed state or jobs.
 	 *
 	 * @return void
 	 */
-	public function test_handle_unexpected_shutdown_does_nothing_if_timeout_but_not_a_different_action() {
+	public function test_handle_unexpected_shutdown_ignores_timeout_for_unrelated_action() {
 		$action_id = as_schedule_single_action(
 			gmdate( 'U' ) - 1,
 			'pinterest/jobs/generate_feed/chain_batch_foo',
@@ -254,14 +259,40 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			'pinterest-for-woocommerce'
 		);
 
-		$this->action_scheduler->expects( $this->never() )
-			->method( 'schedule_immediate' );
+		// A shutdown follows execution, so the original job cannot mask a retry as pending.
+		\ActionScheduler_Store::instance()->log_execution( $action_id );
+		$generator = new FeedGenerator( new TestActionSchedulerProxy(), $this->feed_file_operations, $this->local_feed_configs );
+		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_size', 100 );
+		Pinterest_For_Woocommerce::save_data( 'feed_product_batch_attempt', 1 );
 
-		$error = array(
+		$error          = array(
 			'type'    => E_ERROR,
-			'message' => 'A non timeout error',
+			'message' => 'Maximum execution time of 60 seconds exceeded',
 		);
-		$this->feed_generator->handle_unexpected_shutdown( $action_id, $error );
+		$before_state   = ProductFeedStatus::get();
+		$before_actions = as_get_scheduled_actions(
+			array(
+				'group'    => PINTEREST_FOR_WOOCOMMERCE_PREFIX,
+				'status'   => 'pending',
+				'per_page' => -1,
+			),
+			'ids'
+		);
+		$generator->handle_unexpected_shutdown( $action_id, $error );
+		$this->assertSame( $before_state, ProductFeedStatus::get() );
+		$this->assertSame( 100, Pinterest_For_Woocommerce::get_data( 'feed_product_batch_size' ) );
+		$this->assertSame( 1, Pinterest_For_Woocommerce::get_data( 'feed_product_batch_attempt' ) );
+		$this->assertSame(
+			$before_actions,
+			as_get_scheduled_actions(
+				array(
+					'group'    => PINTEREST_FOR_WOOCOMMERCE_PREFIX,
+					'status'   => 'pending',
+					'per_page' => -1,
+				),
+				'ids'
+			)
+		);
 	}
 
 	/**
@@ -547,32 +578,39 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			->method( 'prepare_temporary_files' )
 			->willThrowException( new Exception() );
 
+		$exception = null;
 		try {
 			$this->feed_generator->handle_start_action( array() );
 		} catch ( Exception $e ) {
-			$feed_generation_status        = ProductFeedStatus::get()['status'];
-			$feed_generation_wall_time     = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
-			$feed_generation_product_count = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT ];
-
-			$this->assertEquals( 'error', $feed_generation_status );
-			$this->assertEquals( 0, $feed_generation_product_count );
-			$this->assertEquals( -1, $feed_generation_wall_time );
+			$exception = $e;
 		}
+		$this->assertInstanceOf( Exception::class, $exception );
+		$feed_generation_status        = ProductFeedStatus::get()['status'];
+		$feed_generation_wall_time     = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
+		$feed_generation_product_count = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT ];
+
+		$this->assertEquals( 'error', $feed_generation_status );
+		$this->assertEquals( 0, $feed_generation_product_count );
+		$this->assertEquals( -1, $feed_generation_wall_time );
+		$this->assertFalse( get_option( FeedGenerator::OPTION_START_LOCK ) );
 	}
 
 	public function test_feed_generator_end_sets_time_it_took_to_generate_the_feed() {
-		$time_test_started = time();
+		$time_test_started = time() - 10;
 		ProductFeedStatus::set(
 			array(
-				ProductFeedStatus::PROP_FEED_GENERATION_WALL_START_TIME => 0,
+				ProductFeedStatus::PROP_FEED_GENERATION_WALL_START_TIME => $time_test_started,
 			)
 		);
 
+		$minimum_elapsed = time() - $time_test_started;
 		$this->feed_generator->handle_end_action( array() );
+		$maximum_elapsed = time() - $time_test_started;
 
 		$feed_generation_wall_time = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
 
-		$this->assertGreaterThanOrEqual( $time_test_started, $feed_generation_wall_time );
+		$this->assertGreaterThanOrEqual( $minimum_elapsed, $feed_generation_wall_time );
+		$this->assertLessThanOrEqual( $maximum_elapsed, $feed_generation_wall_time );
 	}
 
 	public function test_feed_generator_end_sets_product_count_into_persistent_state_property() {
@@ -1305,6 +1343,78 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Independent database workers observe stale takeover and preserve the new owner's lease.
+	 *
+	 * @return void
+	 */
+	public function test_stale_lock_takeover_preserves_the_new_database_workers_ownership() {
+		global $wpdb;
+		$original = $wpdb;
+		$worker_a = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+		$worker_b = new \wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+		$worker_a->set_prefix( $original->prefix );
+		$worker_b->set_prefix( $original->prefix );
+		$generator_b = new FeedGenerator( $this->action_scheduler, $this->feed_file_operations, $this->local_feed_configs );
+		$owner_b     = '';
+		$interleaved = false;
+		$takeover    = function ( $query ) use ( $worker_a, $worker_b, $generator_b, &$owner_b, &$interleaved ) {
+			global $wpdb;
+			if ( ! $interleaved && $wpdb === $worker_a && strpos( $query, "DELETE FROM {$worker_a->options}" ) === 0 && strpos( $query, FeedGenerator::OPTION_START_LOCK ) !== false ) {
+				$interleaved = true;
+				$wpdb        = $worker_b;
+				try {
+					$owner_b = $this->invoke_protected( $generator_b, 'acquire_start_lock' );
+				} finally {
+					$wpdb = $worker_a;
+				}
+			}
+			return $query;
+		};
+		try {
+			$this->assertNotSame( $worker_a->get_var( 'SELECT CONNECTION_ID()' ), $worker_b->get_var( 'SELECT CONNECTION_ID()' ) );
+			$wpdb    = $worker_a;
+			$owner_a = $this->invoke_protected( $this->feed_generator, 'acquire_start_lock' );
+			$this->assertNotEmpty( $owner_a );
+			$wpdb = $worker_b;
+			$this->assertSame( '', $this->invoke_protected( $generator_b, 'acquire_start_lock' ) );
+			// Move the lease's expiry into the past without waiting five minutes; retain its native UUID.
+			$expired_a = ( time() - 1 ) . substr( $owner_a, strpos( $owner_a, ':' ) );
+			$this->assertSame(
+				1,
+				$worker_b->update(
+					$worker_b->options,
+					array( 'option_value' => $expired_a ),
+					array(
+						'option_name'  => FeedGenerator::OPTION_START_LOCK,
+						'option_value' => $owner_a,
+					)
+				)
+			);
+			// B takes the expired lease after A reads it, but before A's conditional deletion.
+			add_filter( 'query', $takeover );
+			$wpdb = $worker_a;
+			$this->assertSame( '', $this->invoke_protected( $this->feed_generator, 'acquire_start_lock' ) );
+			remove_filter( 'query', $takeover );
+			$this->assertTrue( $interleaved );
+			$this->assertNotEmpty( $owner_b );
+			$this->assertNotSame( $expired_a, $owner_b );
+			$wpdb = $worker_a;
+			$this->invoke_protected( $this->feed_generator, 'release_start_lock', array( $owner_a ) );
+			$this->assertSame( $owner_b, $worker_a->get_var( $worker_a->prepare( "SELECT option_value FROM {$worker_a->options} WHERE option_name = %s", FeedGenerator::OPTION_START_LOCK ) ) );
+			$wpdb = $worker_b;
+			$this->invoke_protected( $generator_b, 'release_start_lock', array( $owner_b ) );
+			$this->assertNull( $worker_b->get_var( $worker_b->prepare( "SELECT option_value FROM {$worker_b->options} WHERE option_name = %s", FeedGenerator::OPTION_START_LOCK ) ) );
+			$this->assertNotEmpty( $this->invoke_protected( $generator_b, 'acquire_start_lock' ) );
+		} finally {
+			remove_filter( 'query', $takeover );
+			$worker_a->delete( $worker_a->options, array( 'option_name' => FeedGenerator::OPTION_START_LOCK ) );
+			$wpdb = $original;
+			$worker_a->close();
+			$worker_b->close();
+		}
+	}
+
+	/**
 	 * When the current cycle has no live chain actions left (a dead run), a start
 	 * action must supersede it: mint a new cycle ID and begin a fresh chain.
 	 *
@@ -1377,14 +1487,18 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			->willReturn( array() );
 		$this->feed_file_operations
 			->method( 'prepare_temporary_files' )
-			->willThrowException( new Exception() );
+			->willThrowException( new Exception( 'File preparation failed.' ) );
 
+		$exception = null;
 		try {
 			$this->feed_generator->handle_start_action( array() );
-			$this->fail( 'The start action must rethrow the preparation failure.' );
 		} catch ( Exception $e ) {
-			$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'A failed start must not consume the dirty flag.' );
+			$exception = $e;
 		}
+		$this->assertInstanceOf( Exception::class, $exception );
+		$this->assertSame( 'File preparation failed.', $exception->getMessage() );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'A failed start must not consume the dirty flag.' );
+		$this->assertFalse( get_option( FeedGenerator::OPTION_START_LOCK ) );
 	}
 
 	/**
@@ -1402,14 +1516,18 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			->willReturn( array() );
 		$this->action_scheduler
 			->method( 'schedule_immediate' )
-			->willThrowException( new Exception() );
+			->willThrowException( new Exception( 'Batch enqueue failed.' ) );
 
+		$exception = null;
 		try {
 			$this->feed_generator->handle_start_action( array() );
-			$this->fail( 'The start action must rethrow the enqueue failure.' );
 		} catch ( Exception $e ) {
-			$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'A failed enqueue must restore the dirty flag.' );
+			$exception = $e;
 		}
+		$this->assertInstanceOf( Exception::class, $exception );
+		$this->assertSame( 'Batch enqueue failed.', $exception->getMessage() );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'A failed enqueue must restore the dirty flag.' );
+		$this->assertFalse( get_option( FeedGenerator::OPTION_START_LOCK ) );
 	}
 
 	/**
