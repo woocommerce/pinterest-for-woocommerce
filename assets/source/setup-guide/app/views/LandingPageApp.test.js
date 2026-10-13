@@ -77,9 +77,11 @@ describe( 'LandingPageApp component', () => {
 				} );
 
 				it( 'should not call `wcadmin_pfw_setup` track event', () => {
-					expect( recordEvent ).not.toHaveBeenCalledWith(
-						'pfw_setup'
+					const eventNames = recordEvent.mock.calls.map(
+						( [ name ] ) => name
 					);
+
+					expect( eventNames ).not.toContain( 'pfw_setup' );
 				} );
 
 				it( 'should navigate to `/pinterest/catalog`', () => {
