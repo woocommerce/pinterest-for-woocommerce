@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Registers the endpoint to which we are returned to, after being authorized by Pinterest.
  *
  * @class   Auth
- * @version 1.5.0
+ * @version x.x.x
  */
 class Auth extends VendorAPI {
 
@@ -120,14 +120,33 @@ class Auth extends VendorAPI {
 			$this->log_error_and_redirect( $request, $error );
 		}
 
-		$token_string = base64_decode( $token_data ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
-		$token_data   = (array) json_decode( urldecode( $token_string ) );
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+		$token_string = is_string( $token_data ) ? base64_decode( $token_data, true ) : false;
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+		$info_string = is_string( $info ) ? base64_decode( $info, true ) : false;
+		$token_data  = false !== $token_string ? json_decode( urldecode( $token_string ) ) : null;
+		$info_data   = false !== $info_string
+			? json_decode( urldecode( $info_string ), false, 512, JSON_BIGINT_AS_STRING )
+			: null;
+		$token_data  = is_object( $token_data ) ? (array) $token_data : null;
+		$info_data   = is_object( $info_data ) ? (array) $info_data : null;
+
+		// Validate both payloads before replacing a working connection or applying its settings.
+		if ( ! is_array( $token_data )
+			|| ! is_string( $token_data['access_token'] ?? null )
+			|| '' === $token_data['access_token']
+			|| ( isset( $token_data['refresh_token'] ) && ! is_string( $token_data['refresh_token'] ) )
+			|| ! is_array( $info_data )
+			|| ( ! is_string( $info_data['advertiser_id'] ?? null ) && ! is_int( $info_data['advertiser_id'] ?? null ) )
+			|| empty( $info_data['advertiser_id'] ) ) {
+			$this->log_error_and_redirect(
+				$request,
+				esc_html__( 'Invalid connection data, please try again later.', 'pinterest-for-woocommerce' )
+			);
+		}
 
 		Pinterest_For_Woocommerce()::save_token_data( $token_data );
-
-		$info_string = base64_decode( $info ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
-		$info_data   = (array) json_decode( urldecode( $info_string ) );
-		$features    = (array) $info_data['feature_flags'] ?? array();
+		$features = (array) ( $info_data['feature_flags'] ?? array() );
 
 		$this->apply_oauth_flow_features( $features );
 
