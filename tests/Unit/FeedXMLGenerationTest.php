@@ -20,7 +20,7 @@ use WC_Unit_Test_Case;
 /**
  * Feed file generation testing class.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
@@ -615,6 +615,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		Logger::$logger = $mock_logger;
 
+		// The warning is a debug message.
+		Pinterest_For_Woocommerce()::save_setting( 'enable_debug_logging', true );
+
 		/**
 		 * Generate a description string too big for the feed.
 		 * The limit is 10K so we generate 1010 char length string.
@@ -1205,6 +1208,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 		Logger::$logger = $mock_logger;
 
+		// The warning is a debug message.
+		Pinterest_For_Woocommerce()::save_setting( 'enable_debug_logging', true );
+
 		// Create 7 categories and assign them to the product.
 		$category_ids = array();
 		for ( $i = 1; $i <= 7; $i++ ) {
@@ -1237,6 +1243,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$mock_logger = $this->getMockLogger();
 
 		Logger::$logger = $mock_logger;
+
+		// The warning is a debug message.
+		Pinterest_For_Woocommerce()::save_setting( 'enable_debug_logging', true );
 
 		// Create categories with long names to exceed 1000 character limit.
 		// Each category name is 300 chars, so 4 categories = 1200 chars + separators.
@@ -1280,6 +1289,9 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$mock_logger = $this->getMockLogger();
 
 		Logger::$logger = $mock_logger;
+
+		// A warning would be a debug message.
+		Pinterest_For_Woocommerce()::save_setting( 'enable_debug_logging', true );
 
 		// Create exactly 5 categories.
 		$category_ids = array();
