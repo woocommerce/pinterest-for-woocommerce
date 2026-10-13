@@ -25,7 +25,7 @@ use WP_UnitTestCase;
 /**
  * Real migrations, save hooks and conversion payloads after database reload.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class SavedDataTest extends WP_UnitTestCase {
 	/**
@@ -110,7 +110,7 @@ class SavedDataTest extends WP_UnitTestCase {
 		$this->requests[] = array( $args['method'], $url );
 		$path             = wp_parse_url( $url, PHP_URL_PATH );
 		$responses        = array(
-			'POST /v5/oauth/commerce_integrations/token/exchange/' => array(
+			'POST /v3/oauth/commerce_integrations/token/exchange/' => array(
 				'status' => 'success',
 				'data'   => array(
 					'access_token'             => 'local-new-access',
