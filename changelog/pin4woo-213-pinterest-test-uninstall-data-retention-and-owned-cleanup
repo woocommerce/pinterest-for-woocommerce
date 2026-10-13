@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Fix a fatal error on the order received page when a purchased product was deleted, and a PHP warning when uninstalling a store that never saved its settings.

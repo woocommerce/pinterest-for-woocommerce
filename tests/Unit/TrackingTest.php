@@ -974,6 +974,59 @@ class TrackingTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * The order received page stays up when a purchased product has been deleted
+	 * since: the page is reachable for as long as the customer keeps its link. The
+	 * deleted product cannot be reported, but what was paid for it still is.
+	 */
+	public function test_checkout_for_an_order_with_a_deleted_product_reports_the_full_paid_value() {
+		$kept    = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'regular_price' => 8,
+				'price'         => 8,
+			)
+		);
+		$deleted = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'regular_price' => 12.5,
+				'price'         => 12.5,
+			)
+		);
+
+		$order = wc_create_order();
+		$order->add_product( $kept, 1 );
+		$order->add_product( $deleted, 2 );
+		$order->calculate_totals();
+		$order->save();
+
+		$deleted->delete( true );
+
+		$tracker  = $this->get_recording_tracker();
+		$tracking = new Tracking( array( $tracker ) );
+		$tracking->handle_checkout( $order->get_id() );
+
+		$events = $tracker->get_tracked_events();
+		$this->assertCount( 1, $events );
+		$this->assertSame( Tracking::EVENT_CHECKOUT, $events[0]['event_name'] );
+
+		$checkout = $events[0]['data'];
+		$this->assertSame( '33.00', $checkout->get_price() );
+		$this->assertSame( 3, $checkout->get_quantity() );
+
+		$lines = array();
+		foreach ( $checkout->get_items() as $item ) {
+			$lines[] = array( $item->get_id(), (float) $item->get_price(), $item->get_quantity() );
+		}
+		$this->assertSame(
+			array(
+				array( $kept->get_id(), 8.0, 1 ),
+			),
+			$lines
+		);
+	}
+
+	/**
 	 * A hook fire for a product that no longer exists (deleted between the add
 	 * and the hook, or a stale variation) must bail rather than call methods on
 	 * false.
