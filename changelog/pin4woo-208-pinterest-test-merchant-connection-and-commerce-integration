@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Preserved merchant connection data when OAuth callbacks or commerce integration responses are malformed.
