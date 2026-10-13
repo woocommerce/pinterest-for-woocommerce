@@ -789,24 +789,19 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 		$xml     = $sale_price_method( $product );
 		$this->assertEquals( '<sale_price>5.00USD</sale_price>', $xml );
 
+		// Prices are entered without tax and a 20% rate applies everywhere.
+		// The test transaction rolls the tax options and the rate back.
+		update_option( 'woocommerce_calc_taxes', 'yes' );
+		update_option( 'woocommerce_prices_include_tax', 'no' );
+		ShippingHelpers::addTaxRate( '', '', '20.0000' );
+
+		// Test if the price includes taxes: 5 + 20%.
+		update_option( 'woocommerce_tax_display_shop', 'incl' );
+		$this->assertEquals( '<sale_price>6.00USD</sale_price>', $sale_price_method( $product ) );
+
 		// Test if the price excludes taxes.
-		$old_tax_display_option = get_option( 'woocommerce_tax_display_shop' );
 		update_option( 'woocommerce_tax_display_shop', 'excl' );
-
-		$price_decimals_method = ( new ReflectionClass( ProductsXmlFeed::class ) )->getMethod( 'get_currency_decimals' );
-		$price_decimals_method->setAccessible( true );
-		$price_decimals = $price_decimals_method->invoke( null );
-
-		$product_price   = wc_get_price_excluding_tax(
-			$product,
-			array(
-				'price' => $product->get_sale_price(),
-			)
-		);
-		$formatted_price = wc_format_decimal( $product_price, $price_decimals );
-		$this->assertEquals( '<sale_price>' . $formatted_price . get_woocommerce_currency() . '</sale_price>', $xml );
-
-		update_option( 'woocommerce_tax_display_shop', $old_tax_display_option );
+		$this->assertEquals( '<sale_price>5.00USD</sale_price>', $sale_price_method( $product ) );
 	}
 
 	/**
