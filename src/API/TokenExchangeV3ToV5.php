@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @class   TokenExchangeV3ToV5
  * @since   1.4.0
- * @version 1.4.4
+ * @version x.x.x
  */
 class TokenExchangeV3ToV5 extends APIV5 {
 
@@ -43,7 +43,11 @@ class TokenExchangeV3ToV5 extends APIV5 {
 
 		// Try to exchange the token.
 		try {
-			$response = APIV5::exchange_token();
+			/*
+			 * Called through this class, not APIV5: the request must go to the V3 API domain
+			 * with the V3 token, and both are resolved from the class the call starts on.
+			 */
+			$response = self::exchange_token();
 			if ( 'success' !== $response['status'] ) {
 				throw new Exception(
 					sprintf(
