@@ -11,6 +11,8 @@ Automattic = "Automattic"
 writeable = "writeable"
 # public API: merchant-facing text in FeedStatusService::ERROR_MESSAGES.
 paramaters = "paramaters"
+# WP Consent API consent-type value used by its browser integration.
+optin = "optin"
 
 [default.extend-identifiers]
 # Base64 fixture in tests/E2e/PinterestConnectE2eTest.php.

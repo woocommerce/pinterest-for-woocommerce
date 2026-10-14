@@ -12,7 +12,7 @@ use Pinterest_For_Woocommerce as Plugin;
 /**
  * Expose a small set of named operations to the Playwright data adapter.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class StoreFixture {
 
@@ -312,7 +312,7 @@ class StoreFixture {
 		Plugin::save_settings(
 			array(
 				'tracking_advertiser'    => 'merchant-advertiser',
-				'tracking_tag'           => '1234567890123',
+				'tracking_tag'           => empty( $options['without_tag'] ) ? '1234567890123' : '',
 				'track_conversions'      => true,
 				'track_conversions_capi' => true,
 			)

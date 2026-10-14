@@ -14,6 +14,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\User;
 use Automattic\WooCommerce\Pinterest\Utilities\CrawlerDetector;
+use Automattic\WooCommerce\Pinterest\WPConsentAPI;
 use Throwable;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -62,12 +63,14 @@ class PageVisit {
 		$event_data = wp_json_encode( (object) $data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES );
 		$event_data = $event_data ? $event_data : '{}';
 
-		return sprintf(
-			'(function(){%1$svar eventData=%2$s;eventData.event_id=eventId;pintrk("track","%3$s",eventData);%4$s}());',
-			self::get_event_id_code(),
-			$event_data,
-			Tracking::EVENT_PAGE_VISIT,
-			self::get_beacon_code()
+		return self::wrap_event_code(
+			sprintf(
+				'%1$svar eventData=%2$s;eventData.event_id=eventId;pintrk("track","%3$s",eventData);%4$s',
+				self::get_event_id_code(),
+				$event_data,
+				Tracking::EVENT_PAGE_VISIT,
+				self::get_beacon_code()
+			)
 		);
 	}
 
@@ -86,7 +89,62 @@ class PageVisit {
 			return;
 		}
 
-		wp_print_inline_script_tag( '(function(){' . self::get_event_id_code() . $beacon_code . '}());' );
+		wp_print_inline_script_tag( self::wrap_event_code( self::get_event_id_code() . $beacon_code ) );
+	}
+
+	/**
+	 * Check the current visitor's consent after footer scripts have loaded.
+	 *
+	 * @since x.x.x
+	 * @param string $code PageVisit dispatch code.
+	 * @return string Cache-safe JavaScript event code.
+	 */
+	private static function wrap_event_code( $code ) {
+		$legacy_code = '(function(){' . $code . '}());';
+		if (
+			! function_exists( 'wp_has_consent' )
+			|| has_filter( 'wp_has_consent' )
+			|| has_filter( 'woocommerce_pinterest_disable_tracking' )
+		) {
+			return $legacy_code;
+		}
+
+		// Preserve customized PHP tracking profiles; arbitrary callbacks cannot be translated to JavaScript.
+		$consent_filter = $GLOBALS['wp_filter']['woocommerce_pinterest_disable_tracking_user_consent'] ?? null;
+		if ( ! $consent_filter instanceof \WP_Hook ) {
+			return $legacy_code;
+		}
+		$native_callback = false;
+		foreach ( $consent_filter->callbacks as $callbacks ) {
+			foreach ( $callbacks as $callback ) {
+				$function = $callback['function'] ?? null;
+				if (
+					! is_array( $function ) || ! isset( $function[0], $function[1] )
+					|| ! is_object( $function[0] )
+					|| WPConsentAPI::class !== get_class( $function[0] )
+					|| 'should_disable_tracking_for_user_consent' !== $function[1]
+				) {
+					return $legacy_code;
+				}
+				$native_callback = true;
+			}
+		}
+		if ( ! $native_callback ) {
+			return $legacy_code;
+		}
+
+		// Footer scripts and delayed script optimizers can supply the consent API after our output executes.
+		return '(function(){var attempts=0,sent=false;function dispatch(){if(sent){return;}'
+			. 'if(typeof window.wp_has_consent!=="function"'
+			. '||(window.waitfor_consent_hook&&typeof window.wp_consent_type==="undefined")){'
+			. 'if(attempts++<40){window.setTimeout(dispatch,250);}return;}'
+			. 'if(window.wp_has_consent("marketing")!==true){return;}sent=true;'
+			. $code . '}'
+			. 'if(document.readyState==="loading"){'
+			. 'document.addEventListener("DOMContentLoaded",dispatch,{once:true});'
+			. '}else{dispatch();}'
+			. 'window.addEventListener("load",dispatch,{once:true});'
+			. 'document.addEventListener("wp_consent_type_defined",dispatch,{once:true});}());';
 	}
 
 	/**
