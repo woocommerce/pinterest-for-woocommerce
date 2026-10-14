@@ -10,9 +10,9 @@ import { fireEvent, render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
+import '.~/tests/custom-matchers';
+import { expectKnownReactDeprecations } from '.~/tests/known-react-deprecations';
 import LandingPageApp from './LandingPageApp';
-import '../../../tests/custom-matchers';
-import { expectKnownReactDeprecations } from '../../../tests/known-react-deprecations';
 
 recordEvent.mockName( 'recordEvent' );
 vi.mock( '@woocommerce/settings', () => ( {
@@ -77,9 +77,11 @@ describe( 'LandingPageApp component', () => {
 				} );
 
 				it( 'should not call `wcadmin_pfw_setup` track event', () => {
-					expect( recordEvent ).not.toHaveBeenCalledWith(
-						'pfw_setup'
+					const eventNames = recordEvent.mock.calls.map(
+						( [ name ] ) => name
 					);
+
+					expect( eventNames ).not.toContain( 'pfw_setup' );
 				} );
 
 				it( 'should navigate to `/pinterest/catalog`', () => {

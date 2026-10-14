@@ -7,9 +7,9 @@ import { apiFetch } from '@wordpress/data-controls';
 /**
  * Internal dependencies
  */
+import { REPORTS_STORE_NAME } from '.~/catalog-sync/data';
 import TYPES from './action-types';
 import { STORE_NAME, API_ENDPOINT, OPTIONS_NAME } from './constants';
-import { REPORTS_STORE_NAME } from '../../../../catalog-sync/data';
 
 export function receiveSettings( settings ) {
 	return {

@@ -15,7 +15,7 @@ use WP_UnitTestCase;
 /**
  * Tests the Feeds class.
  *
- * @version x.x.x
+ * @version 1.5.4
  */
 class FeedsTest extends WP_UnitTestCase {
 

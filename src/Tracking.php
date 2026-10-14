@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Tracker responsible for hooking into system events.
  *
  * @class   Tracking
- * @version 1.5.2
+ * @version 1.5.4
  */
 class Tracking {
 
@@ -463,16 +463,23 @@ class Tracking {
 
 			$product = $order_item->get_product();
 
-			$items[] = new Product(
-				uniqid( 'product' ),
-				$product->get_id(),
-				$order_item->get_name(),
-				wc_get_product_category_list( $product->get_id() ),
-				'brand',
-				$order->get_item_total( $order_item, false, true ),
-				get_woocommerce_currency(),
-				$order_item->get_quantity()
-			);
+			/*
+			 * A product deleted since the purchase no longer loads, and WooCommerce clears its ID
+			 * on the order line. The line has no product left to report, but it was paid for, so
+			 * it still counts towards the order's value and quantity below.
+			 */
+			if ( $product instanceof \WC_Product ) {
+				$items[] = new Product(
+					uniqid( 'product' ),
+					$product->get_id(),
+					$order_item->get_name(),
+					wc_get_product_category_list( $product->get_id() ),
+					'brand',
+					$order->get_item_total( $order_item, false, true ),
+					get_woocommerce_currency(),
+					$order_item->get_quantity()
+				);
+			}
 
 			$total_quantity += $order_item->get_quantity();
 			$checkout_value += (float) $order_item->get_total();

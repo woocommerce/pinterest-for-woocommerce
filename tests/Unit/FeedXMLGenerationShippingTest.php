@@ -15,7 +15,7 @@ use Exception;
 /**
  * Feed XML file shipping column generation test class.
  *
- * @version 1.5.2
+ * @version 1.5.4
  */
 class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 
@@ -28,6 +28,11 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 	 * @return void
 	 */
 	public function setUp(): void {
+		parent::setUp();
+
+		// Feed tests that ran earlier may have left the plugin's shipping zones cache filled.
+		ShippingHelpers::cleanup();
+
 		$this->products[] = WC_Helper_Product::create_simple_product(  true, array( "regular_price" => 15 ) );
 	}
 
@@ -42,6 +47,12 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 		}
 		ShippingHelpers::cleanup();
 		remove_action( 'woocommerce_flat_rate_shipping_add_rate', array( static::class, 'throwExceptionDuringAddRate' ), 10 );
+
+		// testCatchException replaces the logger.
+		Logger::$logger = null;
+
+		// Rolls back the options, settings and products the tests saved.
+		parent::tearDown();
 	}
 
 	/**

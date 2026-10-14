@@ -8,6 +8,7 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import NavigationClassic from '.~/components/navigation-classic';
 import SetupAccount from '../steps/SetupAccount';
 import BillingStatus from '../steps/BillingStatus';
 import ClaimWebsite from '../steps/ClaimWebsite';
@@ -20,7 +21,6 @@ import {
 	useCreateNotice,
 } from '../helpers/effects';
 import { SETTINGS_VIEW } from '../helpers/views';
-import NavigationClassic from '../../../components/navigation-classic';
 
 const SettingsApp = () => {
 	const appSettings = useSettingsSelect();

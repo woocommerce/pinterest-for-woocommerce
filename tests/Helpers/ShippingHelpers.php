@@ -7,7 +7,7 @@ use Automattic\WooCommerce\Pinterest\Shipping;
  *
  * Utility class with tools that help in setting up the tests environment.
  *
- * @version 1.0.5
+ * @version 1.5.4
  */
 class ShippingHelpers {
 
@@ -210,11 +210,12 @@ class ShippingHelpers {
 	 */
 	public static function cleanup() {
 		// Reset WooCommerce shipping data and cache.
+		// DELETE, not TRUNCATE: TRUNCATE commits the transaction the test case rolls back in tearDown.
 		global $wpdb;
-		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}woocommerce_shipping_zone_methods;" );
-		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}woocommerce_shipping_zone_locations;" );
-		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}woocommerce_shipping_zones;" );
-		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}woocommerce_tax_rates;" );
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}woocommerce_shipping_zone_methods;" );
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}woocommerce_shipping_zone_locations;" );
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}woocommerce_shipping_zones;" );
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}woocommerce_tax_rates;" );
 		WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' );
 
 		// Reset plugin shipping cache.
@@ -225,6 +226,10 @@ class ShippingHelpers {
 		foreach ( static::$shipping_classes_ids as $id ) {
 			wp_delete_term( $id, 'product_shipping_class' );
 		}
+		static::$shipping_classes_ids      = array();
 		WC()->shipping()->shipping_classes = array();;
+
+		// Set by the add*Shipping* helpers to pass for a shipping method save request.
+		unset( $_REQUEST['instance_id'] );
 	}
 }

@@ -14,7 +14,7 @@ use WP_UnitTestCase;
 /**
  * Tests the minimum WordPress and WooCommerce versions at the runtime gate.
  *
- * @version 1.5.2
+ * @version 1.5.4
  */
 class PluginRequirementsTest extends WP_UnitTestCase {
 
@@ -45,8 +45,8 @@ class PluginRequirementsTest extends WP_UnitTestCase {
 	 */
 	public function wordpress_version_provider() {
 		return array(
-			'below minimum' => array( '6.8.99', false ),
-			'minimum'       => array( '6.9', true ),
+			'below minimum' => array( '6.9.99', false ),
+			'minimum'       => array( '7.0', true ),
 		);
 	}
 
@@ -65,7 +65,7 @@ class PluginRequirementsTest extends WP_UnitTestCase {
 			define( 'ABSPATH', %s );
 			define( 'WC_VERSION', %s );
 			define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', %s );
-			$wp_version = '6.9';
+			$wp_version = '7.0';
 			$plugin_dir = %s;
 			function esc_html__( $text, $domain ) { return $text; }
 			function apply_filters( $hook, $value ) { return $value; }
@@ -95,8 +95,8 @@ class PluginRequirementsTest extends WP_UnitTestCase {
 	 */
 	public function woocommerce_version_provider() {
 		return array(
-			'below minimum' => array( '10.8.99', false ),
-			'minimum'       => array( '10.9.0', true ),
+			'below minimum' => array( '11.0.99', false ),
+			'minimum'       => array( '11.1.0', true ),
 		);
 	}
 }

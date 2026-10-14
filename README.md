@@ -17,7 +17,7 @@ This repository is not suitable for support. Please don't use our issue tracker 
 
 ### Requirements
 
-Pinterest for WooCommerce requires PHP 7.4 or newer, WordPress 6.9 or newer, and WooCommerce 10.9 or newer.
+Pinterest for WooCommerce requires PHP 7.4 or newer, WordPress 7.0 or newer, and WooCommerce 11.1 or newer.
 
 See [pinterest-for-woocommerce.php](https://github.com/woocommerce/pinterest-for-woocommerce/blob/trunk/pinterest-for-woocommerce.php) for current required versions.
 
@@ -188,7 +188,7 @@ Example:
 To test the minimum supported versions, use a fresh test directory and a dedicated database:
 
 ```bash
-WC_VERSION=10.9.0 ./bin/install-wp-tests.sh wordpress_tests root root localhost 6.9.0
+WC_VERSION=11.1.0 ./bin/install-wp-tests.sh wordpress_tests root root localhost 7.0.0
 ```
 
 `WC_VERSION` accepts a release tag; `latest` (the default) and the legacy `trunk` alias select the latest stable release. The script reuses an existing WooCommerce directory, so use a fresh `TMPDIR` and `WP_CORE_DIR` when switching versions.
@@ -245,7 +245,7 @@ Create a separate database and install directory for each dependency combination
 pinterest_test_root="$(mktemp -d /tmp/pinterest-tests.XXXXXX)"
 export WP_CORE_DIR="$pinterest_test_root/wordpress"
 export WP_TESTS_DIR="$pinterest_test_root/wordpress-tests-lib"
-TMPDIR="$pinterest_test_root" WC_VERSION=10.9.0 ./bin/install-wp-tests.sh pinterest_regression_test root "$PINTEREST_TEST_DB_PASSWORD" 127.0.0.1 6.9.0
+TMPDIR="$pinterest_test_root" WC_VERSION=11.1.0 ./bin/install-wp-tests.sh pinterest_regression_test root "$PINTEREST_TEST_DB_PASSWORD" 127.0.0.1 7.0.0
 composer test-unit -- --filter SavedDataTest
 ```
 

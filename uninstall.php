@@ -18,7 +18,8 @@ Pinterest_For_Woocommerce::disconnect();
 
 $plugin_settings = get_option( 'pinterest_for_woocommerce' );
 
-if ( $plugin_settings['erase_plugin_data'] ) {
+// A store that never saved its settings has no such key, or no settings at all.
+if ( ! empty( $plugin_settings['erase_plugin_data'] ) ) {
 	delete_option( 'pinterest_for_woocommerce' );
 	delete_option( 'pinterest_for_woocommerce_data' );
 	delete_option( 'pinterest_for_woocommerce_owned_feeds' );

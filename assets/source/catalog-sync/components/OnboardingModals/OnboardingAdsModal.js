@@ -14,7 +14,7 @@ import {
 /**
  * Internal dependencies
  */
-import { useSettingsSelect } from '../../../setup-guide/app/helpers/effects';
+import { useSettingsSelect } from '.~/setup-guide/app/helpers/effects';
 import { useBillingSetupFlowEntered } from '../../helpers/effects';
 
 const OnboardingModalText = ( { isBillingSetup } ) => {
