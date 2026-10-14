@@ -19,7 +19,7 @@ use WP_UnitTestCase;
  * The token exchange itself talks to the Pinterest API, which is not stood in for here: only a
  * store that must never reach it is covered. Any request it makes is refused and fails the test.
  *
- * @version x.x.x
+ * @version 1.5.4
  */
 class TokenMigrationTest extends WP_UnitTestCase {
 

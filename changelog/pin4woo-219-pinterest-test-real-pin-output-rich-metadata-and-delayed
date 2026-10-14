@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Fix the Save to Pinterest button losing part of the product name, the product link or the image when the name contains "&" or the store uses plain permalinks.

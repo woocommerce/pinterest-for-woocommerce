@@ -24,7 +24,7 @@ use WP_UnitTestCase;
 /**
  * Real migrations, save hooks and conversion payloads after database reload.
  *
- * @version x.x.x
+ * @version 1.5.4
  */
 class SavedDataTest extends WP_UnitTestCase {
 	/**

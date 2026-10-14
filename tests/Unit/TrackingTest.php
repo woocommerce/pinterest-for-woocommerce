@@ -16,7 +16,7 @@ use WC_Helper_Product;
 /**
  * Tests the Tracking class.
  *
- * @version x.x.x
+ * @version 1.5.4
  */
 class TrackingTest extends \WP_UnitTestCase {
 
@@ -378,7 +378,7 @@ class TrackingTest extends \WP_UnitTestCase {
 		/**
 		 * Renders the storefront footer, where the trackers print their output.
 		 *
-		 * @since x.x.x
+		 * @since 1.5.4
 		 */
 		do_action( 'wp_footer' );
 		$output = ob_get_clean();

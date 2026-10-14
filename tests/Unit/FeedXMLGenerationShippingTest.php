@@ -15,7 +15,7 @@ use Exception;
 /**
  * Feed XML file shipping column generation test class.
  *
- * @version x.x.x
+ * @version 1.5.4
  */
 class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 
