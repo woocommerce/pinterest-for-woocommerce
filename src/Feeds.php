@@ -24,7 +24,7 @@ use Throwable;
  * Class handling fetch methods for feed profiles.
  *
  * @class   Feeds
- * @version 1.5.4
+ * @version x.x.x
  */
 class Feeds {
 
