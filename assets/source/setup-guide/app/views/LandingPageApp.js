@@ -118,7 +118,7 @@ const WelcomeSection = () => {
 					<img
 						src={
 							wcSettings.pinterest_for_woocommerce.pluginUrl +
-							'/assets/images/landing_welcome.png'
+							'/assets/images/landing_welcome.svg'
 						}
 						alt=""
 					/>
