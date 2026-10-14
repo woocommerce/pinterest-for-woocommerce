@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Respect current visitor consent for PageVisit events served from cached pages.
