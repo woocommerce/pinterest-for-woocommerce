@@ -21,7 +21,7 @@ use WP_UnitTestCase;
  *
  * The test bootstrap already defines WP_UNINSTALL_PLUGIN, which the file requires.
  *
- * @version x.x.x
+ * @version 1.5.4
  */
 class UninstallTest extends WP_UnitTestCase {
 

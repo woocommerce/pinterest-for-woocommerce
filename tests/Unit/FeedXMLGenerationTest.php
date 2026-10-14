@@ -20,7 +20,7 @@ use WC_Unit_Test_Case;
 /**
  * Feed file generation testing class.
  *
- * @version x.x.x
+ * @version 1.5.4
  */
 class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 

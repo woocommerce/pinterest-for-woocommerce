@@ -22,7 +22,7 @@ use WP_UnitTestCase;
  * that decodes back to the product's name, address and image. How Pinterest's own script reads
  * the link is not simulated here.
  *
- * @version x.x.x
+ * @version 1.5.4
  */
 class SaveToPinterestTest extends WP_UnitTestCase {
 

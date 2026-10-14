@@ -7,7 +7,7 @@ use Pinterest_For_Woocommerce;
 /**
  * Tests the Tag tracker class.
  *
- * @version x.x.x
+ * @version 1.5.4
  */
 class TagTest extends \WP_UnitTestCase {
 
@@ -71,7 +71,7 @@ class TagTest extends \WP_UnitTestCase {
 		/**
 		 * Applies the native cart fragment hooks for an AJAX response.
 		 *
-		 * @since x.x.x
+		 * @since 1.5.4
 		 */
 		$fragments = apply_filters( 'woocommerce_add_to_cart_fragments', array() );
 		$script    = $fragments['script#pinterest-tag-placeholder'];

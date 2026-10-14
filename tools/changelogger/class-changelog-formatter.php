@@ -3,7 +3,7 @@
  * Changelog_Formatter class
  *
  * @package  Pinterest for WooCommerce
- * @since    x.x.x
+ * @since    1.5.4
  */
 
 namespace SomewhereWarm\Changelogger;
@@ -38,7 +38,7 @@ use InvalidArgumentException;
  * no longer issue (such as `Feature` and `Update`), and rewriting them would turn every
  * release into a changelog-wide diff.
  *
- * @version x.x.x
+ * @version 1.5.4
  */
 class Changelog_Formatter extends Parser implements FormatterPlugin {
 

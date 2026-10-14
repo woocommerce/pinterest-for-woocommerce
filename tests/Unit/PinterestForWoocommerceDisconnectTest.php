@@ -16,7 +16,7 @@ use WP_UnitTestCase;
  * the full disconnect, whose remote cleanup requests got the same 401 and re-entered it
  * without bound until PHP's execution time ran out, which made wp-admin unreachable.
  *
- * @version x.x.x
+ * @version 1.5.4
  */
 class PinterestForWoocommerceDisconnectTest extends WP_UnitTestCase {
 

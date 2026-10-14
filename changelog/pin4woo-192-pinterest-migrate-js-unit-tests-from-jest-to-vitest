@@ -1,4 +1,0 @@
-Significance: patch
-Type: dev
-
-Migrated the JavaScript unit tests from Jest to Vitest.

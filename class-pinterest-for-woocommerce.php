@@ -41,7 +41,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 	 * Base Plugin class holding generic functionality
 	 *
 	 * @class   Pinterest_For_Woocommerce
-	 * @version x.x.x
+	 * @version 1.5.4
 	 */
 	final class Pinterest_For_Woocommerce {
 
@@ -132,7 +132,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * cannot start another disconnect.
 		 *
 		 * @var bool
-		 * @since x.x.x
+		 * @since 1.5.4
 		 */
 		private static $disconnecting = false;
 
@@ -894,7 +894,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * remote cleanup would make fails with another 401, which fires this handler again.
 		 *
 		 * @since 1.4.4
-		 * @since x.x.x No longer calls the Pinterest API.
+		 * @since 1.5.4 No longer calls the Pinterest API.
 		 *
 		 * @return void
 		 * @throws \Automattic\WooCommerce\Admin\Notes\NotesUnavailableException If the notes API is not available.
@@ -921,7 +921,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Clears every local trace of the connection: feed telemetry, scheduled retries,
 		 * stored data and the connection settings.
 		 *
-		 * @since x.x.x
+		 * @since 1.5.4
 		 *
 		 * @return void
 		 */
