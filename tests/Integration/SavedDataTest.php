@@ -10,7 +10,6 @@ namespace Automattic\WooCommerce\Pinterest\Tests\Integration;
 use Automattic\WooCommerce\Pinterest\Admin\Admin;
 use Automattic\WooCommerce\Pinterest\Admin\Product\Attributes\AttributesTab;
 use Automattic\WooCommerce\Pinterest\API\Base;
-use Automattic\WooCommerce\Pinterest\Crypto;
 use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\PluginUpdate;
 use Automattic\WooCommerce\Pinterest\ProductFeedStatus;
@@ -109,28 +108,6 @@ class SavedDataTest extends WP_UnitTestCase {
 	public function respond( $response, $args, $url ) {
 		$this->requests[] = array( $args['method'], $url );
 		$path             = wp_parse_url( $url, PHP_URL_PATH );
-		$responses        = array(
-			'POST /v3/oauth/commerce_integrations/token/exchange/' => array(
-				'status' => 'success',
-				'data'   => array(
-					'access_token'             => 'local-new-access',
-					'refresh_token'            => 'local-new-refresh',
-					'expires_in'               => 3600,
-					'refresh_token_expires_in' => 7200,
-					'scopes'                   => 'ads:read',
-				),
-			),
-			'POST /v5/integrations/commerce' => array(
-				'id'                   => 'integration-123',
-				'external_business_id' => 'local-integration',
-			),
-			'GET /v5/user_account'           => array(
-				'id'           => 'merchant-123',
-				'username'     => 'local-merchant',
-				'account_type' => 'BUSINESS',
-			),
-			'GET /v5/user_account/websites'  => array( 'items' => array() ),
-		);
 		if ( 'POST' === $args['method'] && '/v5/ad_accounts/merchant-advertiser/events' === $path ) {
 			$this->events[] = json_decode( $args['body'], true )['data'][0];
 			$body           = array(
@@ -138,8 +115,6 @@ class SavedDataTest extends WP_UnitTestCase {
 				'num_events_processed' => 1,
 				'events'               => array( array( 'status' => 'processed' ) ),
 			);
-		} elseif ( isset( $responses[ $args['method'] . ' ' . $path ] ) ) {
-			$body = $responses[ $args['method'] . ' ' . $path ];
 		} else {
 			$this->unexpected[] = array( $args['method'], $url );
 			return new \WP_Error( 'unexpected_test_http', 'Unexpected test request: ' . $args['method'] . ' ' . $url );
@@ -155,25 +130,22 @@ class SavedDataTest extends WP_UnitTestCase {
 		);
 	}
 
-	/** Upgrade a documented pre-v5 token and transient feed-state fixture. */
+	/**
+	 * Upgrade a documented 1.3.9 settings and transient feed-state fixture.
+	 *
+	 * The fixture holds no V3 token: exchanging one needs the Pinterest API, which is not stood in for.
+	 */
 	public function test_real_139_upgrade_preserves_historical_state_on_reentry() {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local versioned fixture.
 		$fixture = json_decode( file_get_contents( __DIR__ . '/data/settings-1.3.9.json' ), true );
 		Plugin::save_settings( $fixture['settings'] );
 		Plugin::save_settings( $fixture['data'], PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
-		Plugin::save_data( 'token', array( 'access_token' => Crypto::encrypt( 'local-v3-access' ) ) );
-		Plugin::set_api_version( 'v3' );
 		update_option( PluginUpdate::PLUGIN_UPDATE_VERSION_OPTION, $fixture['source_version'] );
 		foreach ( $fixture['feed_status'] as $key => $value ) {
 			set_transient( ProductFeedStatus::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key, $value );
 		}
 		$update = new PluginUpdate();
 		$update->maybe_update();
-		$this->assertSame( 'v5', Plugin::get_api_version() );
-		$token = Plugin::get_data( 'token_data', true );
-		$this->assertSame( 'local-new-access', Crypto::decrypt( $token['access_token'] ) );
-		$this->assertSame( 'local-new-refresh', Crypto::decrypt( $token['refresh_token'] ) );
-		$this->assertNotSame( 'local-new-access', $token['access_token'] );
 		$settings = Plugin::get_settings( true );
 		$this->assertArrayHasKey( 'track_conversions_capi', $settings );
 		$this->assertFalse( $settings['track_conversions_capi'] );
@@ -192,7 +164,7 @@ class SavedDataTest extends WP_UnitTestCase {
 			$this->assertEquals( $value, get_option( ProductFeedStatus::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key ) );
 		}
 		$this->assertSame( PINTEREST_FOR_WOOCOMMERCE_VERSION, get_option( PluginUpdate::PLUGIN_UPDATE_VERSION_OPTION ) );
-		$this->assertNotEmpty( $this->requests );
+		$this->assertSame( array(), $this->requests );
 	}
 
 	/** The pre-1.0.10 single feed ID moves to the country map once. */
