@@ -94,19 +94,20 @@ Release and roadmap notes available on the [WooCommerce Developers Blog](https:/
 == Changelog ==
 
 = 1.5.4 - 2026-10-14 =
-* Fix - Avoid loading the Pinterest Tag script when no Tag is active.
-* Fix - Send the automatic token exchange for stores upgrading from a version before 1.4.0 to the Pinterest V3 API with the V3 token.
-* Fix - Fix a fatal error on the order received page when a purchased product was deleted, and a PHP warning when uninstalling a store that never saved its settings.
-* Fix - Fix the Save to Pinterest button losing part of the product name, the product link or the image when the name contains "&" or the store uses plain permalinks.
+* Fix - Stopped loading the Pinterest Tag script when no Tag is active.
+* Fix - Sent the automatic token exchange to the Pinterest V3 API with the V3 token for stores upgrading from a version before 1.4.0.
+* Fix - Prevented a fatal error on the order received page when a purchased product was deleted.
+* Fix - Prevented a PHP warning when uninstalling from a store that never saved its settings.
+* Fix - Kept the full product name, product link and image in the Save to Pinterest button when the name contains "&" or the store uses plain permalinks.
 * Tweak - Raised minimum requirements to WordPress 7.0 and WooCommerce 11.1.
-* Tweak - Warn developers when using the deprecated feed status check.
-* Tweak - Route Pinterest tracking output through WordPress script helpers.
-* Dev - Use the WordPress compose runtime in Pinterest admin screens.
+* Tweak - Warned developers when the deprecated feed status check is used.
+* Tweak - Routed Pinterest tracking output through WordPress script helpers.
+* Dev - Used the WordPress compose runtime in Pinterest admin screens.
 * Dev - Updated @wordpress/scripts to 36.1.
 * Dev - Updated the development and test dependencies to React 18.
 * Dev - Migrated the JavaScript unit tests from Jest to Vitest.
 * Dev - Updated development dependencies to address security advisories.
-* Dev - Simplify JavaScript imports with a source root alias.
+* Dev - Simplified JavaScript imports with a source root alias.
 
 = 1.5.3 - 2026-10-09 =
 * Fix - Position the onboarding wizard header correctly instead of rendering it inset and below an empty band on WooCommerce 11.2, whose admin header is no longer fixed.
