@@ -31,6 +31,11 @@ jobs:
                   path: node_modules
                   key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
+            # Release CI can only read the cache, so the setup job cannot save node_modules for a new package-lock.json.
+            - name: Install Node dependencies
+              if: steps.cache-node-modules.outputs.cache-hit != 'true'
+              run: npm ci --no-optional --ignore-scripts
+
             - name: Install WP-CLI
               run: |
                   mkdir -p tools
