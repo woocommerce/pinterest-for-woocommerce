@@ -135,6 +135,22 @@ class FeedsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Registration matching reads every feed page, so an existing plugin feed on a later page is
+	 * found instead of a duplicate being created.
+	 *
+	 * @return void
+	 */
+	public function test_registered_feed_match_reads_every_feed_page() {
+		Pinterest_For_Woocommerce::save_data(
+			'local_feed_ids',
+			array( Pinterest_For_Woocommerce::get_base_country() => 'fIOasjj' )
+		);
+		add_filter( 'pre_http_request', array( self::class, 'matching_feed_on_page_two' ), 10, 3 );
+
+		$this->assertSame( 'second-page-feed-id', Feeds::match_local_feed_configuration_to_registered_feeds() );
+	}
+
+	/**
 	 * A feed Pinterest reports as DELETED must not be matched as the registered feed,
 	 * otherwise a force-deleted feed would be picked again instead of creating a new one.
 	 *
@@ -163,6 +179,48 @@ class FeedsTest extends WP_UnitTestCase {
 
 		$this->assertSame( '', Feeds::match_local_feed_configuration_to_registered_feeds( array( $feed ) ) );
 		$this->assertSame( 'active-feed-id', Feeds::match_local_feed_configuration_to_registered_feeds( array( $feed, $active ) ) );
+	}
+
+	/**
+	 * Fakes a two-page feeds endpoint whose matching plugin feed is only on the second page.
+	 *
+	 * @param false|array $response    Preempted response.
+	 * @param array       $parsed_args Request arguments.
+	 * @param string      $url         Request URL.
+	 * @return false|array
+	 */
+	public static function matching_feed_on_page_two( $response, $parsed_args, $url ) {
+		if ( 'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=114141241212' === $url ) {
+			return self::response(
+				array(
+					'items'    => array(
+						array(
+							'id'       => 'first-page-feed-id',
+							'location' => 'https://feeds.example.com/manual-feed.xml',
+						),
+					),
+					'bookmark' => 'page-2',
+				)
+			);
+		}
+
+		if ( 'https://api.pinterest.com/v5/catalogs/feeds?ad_account_id=114141241212&bookmark=page-2' === $url ) {
+			return self::response(
+				array(
+					'items' => array(
+						array(
+							'id'              => 'second-page-feed-id',
+							'status'          => Feeds::FEED_STATUS_ACTIVE,
+							'location'        => wp_get_upload_dir()['baseurl'] . '/pinterest-for-woocommerce-fIOasjj.xml',
+							'default_locale'  => LocaleMapper::get_locale_for_api(),
+							'default_country' => Pinterest_For_Woocommerce::get_base_country(),
+						),
+					),
+				)
+			);
+		}
+
+		return $response;
 	}
 
 	/**

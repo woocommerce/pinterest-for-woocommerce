@@ -342,12 +342,17 @@ class Feeds {
 	 * Verify if the local feed is already registered to the merchant.
 	 * Return its ID if it is.
 	 *
-	 * @param array $feeds The list of feeds to check against. If not set, the list will be fetched from the API.
+	 * @since x.x.x Reads every feed page when no list is given, and lets API errors through
+	 *              instead of treating them as "no feeds", which would create a duplicate feed.
+	 *
+	 * @param array $feeds The list of feeds to check against. If not set, every page is fetched from the API.
 	 * @return string Returns the ID of the feed if properly registered or an empty string otherwise.
+	 *
+	 * @throws PinterestApiException When the feed list cannot be fetched completely.
 	 */
 	public static function match_local_feed_configuration_to_registered_feeds( array $feeds = array() ): string {
 		if ( empty( $feeds ) ) {
-			$feeds = static::get_feeds();
+			$feeds = static::get_all_feeds();
 		}
 
 		$configs = LocalFeedConfigs::get_instance()->get_configurations();
