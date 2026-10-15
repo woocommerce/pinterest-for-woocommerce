@@ -13,9 +13,82 @@ use WP_UnitTestCase;
 /**
  * Tests the Pinterest_For_Woocommerce main plugin class.
  *
- * @version 1.4.13
+ * @version x.x.x
  */
 class PinterestForWoocommerceTest extends WP_UnitTestCase {
+
+	/**
+	 * Account refresh failures only disconnect rejected credentials.
+	 *
+	 * @dataProvider account_refresh_failures
+	 * @param int    $code     HTTP status, or zero for a transport failure.
+	 * @param string $endpoint Failing account endpoint.
+	 * @param bool   $connected Whether account data was previously saved.
+	 */
+	public function test_account_refresh_failure_preserves_connection( $code, $endpoint, $connected = true ) {
+		Pinterest_For_Woocommerce::save_token_data( array( 'access_token' => 'account-refresh-token' ) );
+		Pinterest_For_Woocommerce::save_setting( 'tracking_advertiser', 'advertiser-before' );
+		Pinterest_For_Woocommerce::save_setting( 'tracking_tag', 'tag-before' );
+		Pinterest_For_Woocommerce::save_setting( 'account_data', $connected ? array( 'id' => 'account-before' ) : null );
+		Pinterest_For_Woocommerce::add_currency_credits_info_to_account_data();
+		$settings = get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME );
+		$data     = get_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+		add_filter(
+			'pre_http_request',
+			function ( $response, $args, $url ) use ( $code, $endpoint ) {
+				if ( 'https://api.pinterest.com/v5/' . $endpoint === $url ) {
+					return 0 === $code ? new \WP_Error( 'http_request_failed', 'Connection timed out.' ) : array(
+						'headers'  => array(),
+						'cookies'  => array(),
+						'response' => array(
+							'code'    => $code,
+							'message' => '',
+						),
+						'body'     => '{"code":8,"message":"Account request failed."}',
+					);
+				}
+				return array(
+					'headers'  => array(),
+					'cookies'  => array(),
+					'response' => array(
+						'code'    => 200,
+						'message' => 'OK',
+					),
+					'body'     => '{"id":"account-after","username":"merchant","account_type":"BUSINESS"}',
+				);
+			},
+			10,
+			3
+		);
+		$exception = null;
+		try {
+			Pinterest_For_Woocommerce::update_account_data();
+		} catch ( \Exception $error ) {
+			$exception = $error;
+		}
+		$this->assertInstanceOf( \Exception::class, $exception );
+		$this->assertSame( 'There was an error getting the account data.', $exception->getMessage() );
+		if ( ! $connected || 401 === $code ) {
+			$this->assertFalse( Pinterest_For_Woocommerce::is_connected() );
+			$this->assertFalse( Pinterest_For_Woocommerce::get_setting( 'tracking_advertiser' ) );
+			$this->assertFalse( Pinterest_For_Woocommerce::get_setting( 'tracking_tag' ) );
+		} else {
+			$this->assertSame( $settings, get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ) );
+			$this->assertSame( $data, get_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME ) );
+		}
+	}
+
+	/** @return array Account and website failures. */
+	public function account_refresh_failures() {
+		$cases = array();
+		foreach ( array( 'user_account', 'user_account/websites' ) as $endpoint ) {
+			foreach ( array( 0, 429, 500, 401 ) as $code ) {
+				$cases[ $endpoint . ':' . $code ]                    = array( $code, $endpoint );
+				$cases[ 'first connect:' . $endpoint . ':' . $code ] = array( $code, $endpoint, false );
+			}
+		}
+		return $cases;
+	}
 
 	public function tearDown(): void {
 		parent::tearDown();
