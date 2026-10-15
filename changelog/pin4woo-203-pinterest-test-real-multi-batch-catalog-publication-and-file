@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Removed permanently deleted products and variations from the catalog feed without waiting for the daily regeneration.
