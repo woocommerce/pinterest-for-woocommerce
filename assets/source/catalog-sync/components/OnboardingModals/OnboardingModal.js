@@ -27,7 +27,7 @@ const OnboardingModal = ( { onCloseModal, children } ) => {
 						wcSettings.pinterest_for_woocommerce.pluginUrl +
 						'/assets/images/modal_onboarding_success_header.svg'
 					}
-					alt="Gift banner"
+					alt=""
 				/>
 			}
 			onRequestClose={ onCloseModal }
