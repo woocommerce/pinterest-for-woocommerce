@@ -85,10 +85,7 @@ const CapiEnablementModal = ( { onCloseModal, onDismiss } ) => {
 			>
 				<img
 					src={ capiEnablementImage }
-					alt={ __(
-						'Pinterest connection illustration',
-						'pinterest-for-woocommerce'
-					) }
+					alt=""
 					style={ {
 						maxWidth: '200px',
 						height: 'auto',

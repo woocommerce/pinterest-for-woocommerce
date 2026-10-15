@@ -91,7 +91,7 @@ const OnboardingAdsModal = ( { onCloseModal } ) => {
 				<img
 					src={
 						wcSettings.pinterest_for_woocommerce.pluginUrl +
-						'/assets/images/gift_banner.svg'
+						'/assets/images/modal_ads_credit_header.svg'
 					}
 					alt="Gift banner"
 				/>
