@@ -43,3 +43,5 @@ After a wp-env run, use `npm run wp-env -- destroy`, then remove only the `.wp-e
 The merchant case rejects the first token response, displays the plugin's retry message, reconnects, saves a setting, verifies it after reload, then disconnects. It checks cleared connection state alongside retained merchant settings and the remote feed.
 
 Eight checkout cases compare local CAPI requests and the browser tag queue with the saved order: two units at EUR24 each minus a EUR9 coupon, plus 10% tax. The physical-product guest classic checkout adds EUR7 shipping. Both trackers must report EUR39, excluding tax and shipping and retaining the discount. Consent is allowed or denied through a local cookie. Pinterest's remote tag script is blocked; only the plugin's queued calls are inspected. Undeclared Pinterest API requests fail the test; other outbound PHP HTTP and browser requests outside the local store are blocked.
+
+Each checkout case also reloads the order-received page. Allowed consent must re-send the same `checkout_<order ID>` event ID and paid values to both trackers, so Pinterest can deduplicate them; denied consent stays silent.

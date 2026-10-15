@@ -1,6 +1,14 @@
 const { test, expect } = require( '../fixtures' );
 const login = require( '../utils/login' );
 
+const checkoutTags = ( page ) =>
+	page.evaluate(
+		() =>
+			window.pintrk?.queue?.filter(
+				( event ) => event[ 0 ] === 'track' && event[ 1 ] === 'Checkout'
+			) || []
+	);
+
 for ( const [ role, mode, consent ] of [
 	[ 'guest', 'classic', 'allow' ],
 	[ 'guest', 'classic', 'deny' ],
@@ -42,21 +50,28 @@ for ( const [ role, mode, consent ] of [
 		const events = recordedEvents.filter(
 			( event ) => event.event_name === 'checkout'
 		);
-		const tag = await page.evaluate(
-			() =>
-				window.pintrk?.queue?.filter(
-					( event ) =>
-						event[ 0 ] === 'track' && event[ 1 ] === 'Checkout'
-				) || []
-		);
+		const tag = await checkoutTags( page );
 		if ( consent === 'deny' ) {
 			expect( recordedEvents ).toEqual( [] );
 			expect( await page.evaluate( () => typeof window.pintrk ) ).toBe(
 				'undefined'
 			);
 			expect( tag ).toEqual( [] );
+			await page.reload();
+			await expect(
+				page.getByRole( 'heading', {
+					name: 'Order received',
+					exact: true,
+				} )
+			).toBeVisible();
+			expect( await store.events() ).toEqual( [] );
+			expect( await page.evaluate( () => typeof window.pintrk ) ).toBe(
+				'undefined'
+			);
 		} else {
 			expect( events ).toHaveLength( 1 );
+			const eventId = `checkout_${ order[ 0 ].id }`;
+			expect( events[ 0 ].event_id ).toBe( eventId );
 			expect( events[ 0 ].custom_data ).toEqual( {
 				order_id: String( order[ 0 ].id ),
 				currency: 'EUR',
@@ -73,6 +88,7 @@ for ( const [ role, mode, consent ] of [
 			} );
 			expect( tag ).toHaveLength( 1 );
 			expect( tag[ 0 ][ 2 ] ).toMatchObject( {
+				event_id: eventId,
 				order_id: String( order[ 0 ].id ),
 				currency: order[ 0 ].currency,
 				order_quantity: 2,
@@ -88,6 +104,26 @@ for ( const [ role, mode, consent ] of [
 			expect( Number( tag[ 0 ][ 2 ].value ) ).toBe(
 				Number( order[ 0 ].items[ 0 ].total )
 			);
+			// A reload re-sends the same identity so Pinterest can deduplicate it.
+			await page.reload();
+			await expect(
+				page.getByRole( 'heading', {
+					name: 'Order received',
+					exact: true,
+				} )
+			).toBeVisible();
+			const replay = ( await store.events() ).filter(
+				( event ) => event.event_name === 'checkout'
+			);
+			expect( replay.map( ( event ) => event.event_id ) ).toEqual( [
+				eventId,
+				eventId,
+			] );
+			expect( replay[ 1 ].custom_data ).toEqual(
+				events[ 0 ].custom_data
+			);
+			expect( await checkoutTags( page ) ).toEqual( tag );
 		}
+		expect( await store.orders() ).toEqual( order );
 	} );
 }
