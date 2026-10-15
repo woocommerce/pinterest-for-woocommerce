@@ -19,7 +19,7 @@ use WC_Product;
  * Class Handling registration & generation of the XML product feed.
  *
  * @class   ProductSync
- * @version 1.5.2
+ * @version x.x.x
  */
 class ProductSync {
 
@@ -114,6 +114,7 @@ class ProductSync {
 		 * regeneration. Creates never reach edit_post, hence woocommerce_new_product.
 		 */
 		add_action( 'edit_post', array( __CLASS__, 'mark_feed_dirty' ), 10, 1 );
+		add_action( 'after_delete_post', array( __CLASS__, 'mark_feed_dirty_on_deleted_post' ), 10, 2 );
 		add_action( 'woocommerce_new_product', array( __CLASS__, 'mark_feed_dirty_on_new_product' ), 10, 1 );
 		add_action( 'woocommerce_product_object_updated_props', array( __CLASS__, 'mark_feed_dirty_on_updated_props' ), 10, 2 );
 
@@ -324,6 +325,30 @@ class ProductSync {
 		}
 
 		self::$flagged_product_ids[ $key ] = true;
+
+		self::$feed_generator->mark_feed_dirty();
+	}
+
+	/**
+	 * Flag product deletion after its row and caches are gone.
+	 *
+	 * The supplied snapshot remains available after deletion. Excluded product states
+	 * cannot change the feed, so routine trash and auto-draft cleanup leaves it alone.
+	 *
+	 * @param int      $post_id Deleted post ID.
+	 * @param \WP_Post $post    Deleted post snapshot.
+	 * @return void
+	 */
+	public static function mark_feed_dirty_on_deleted_post( $post_id, $post ) {
+		if ( ! $post instanceof \WP_Post || ! in_array( $post->post_type, array( 'product', 'product_variation' ), true ) || in_array( $post->post_status, array( 'trash', 'auto-draft' ), true ) ) {
+			return;
+		}
+		if ( 'product' === $post->post_type && 'publish' !== $post->post_status ) {
+			return;
+		}
+		if ( 'product_variation' === $post->post_type && 'publish' !== get_post_status( $post->post_parent ) ) {
+			return;
+		}
 
 		self::$feed_generator->mark_feed_dirty();
 	}
