@@ -16,7 +16,7 @@ use WP_UnitTestCase;
 /**
  * Pinterest for WooCommerce API v5 base class tests.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class APIV5Test extends WP_UnitTestCase {
 
@@ -172,19 +172,32 @@ class APIV5Test extends WP_UnitTestCase {
 		APIV5::create_tag( 'aai-1234567890' );
 	}
 
+	/**
+	 * A failed API call still triggers one reset and persists the disconnected state.
+	 */
 	public function test_any_api_call_401_response_calls_disconnect_action() {
-		$this->expectException( PinterestApiException::class );
-		$this->expectExceptionCode( 401 );
-		$this->expectExceptionMessage( 'Authentication failed.' );
-
+		Pinterest_For_Woocommerce::set_default_settings();
+		Pinterest_For_Woocommerce::save_token_data( array( 'access_token' => 'rejected-access-token' ) );
+		Pinterest_For_Woocommerce::save_setting( 'tracking_advertiser', 'aai-1234567890' );
+		Pinterest_For_Woocommerce::save_setting( 'tracking_tag', 'rejected-account-tag' );
+		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', true );
+		Pinterest_For_Woocommerce::save_setting(
+			'account_data',
+			array(
+				'id'         => '123456789',
+				'is_partner' => true,
+			)
+		);
+		$this->assertTrue( Pinterest_For_Woocommerce::is_business_connected() );
+		$before   = did_action( 'pinterest_for_woocommerce_disconnect' );
+		$requests = array();
 		add_filter(
 			'pre_http_request',
-			function ( $response, $parsed_args, $url ) {
+			function ( $response, $parsed_args, $url ) use ( &$requests ) {
+				$requests[] = array( $parsed_args['method'], $url );
 				return array(
-					'headers'  => array(
-						'content-type' => 'application/json',
-					),
-					'body'     => json_encode(
+					'headers'  => array( 'content-type' => 'application/json' ),
+					'body'     => wp_json_encode(
 						array(
 							'code'    => 2,
 							'message' => 'Authentication failed.',
@@ -192,7 +205,7 @@ class APIV5Test extends WP_UnitTestCase {
 					),
 					'response' => array(
 						'code'    => 401,
-						'message' => 'Unexpected error',
+						'message' => 'Unauthorized',
 					),
 					'cookies'  => array(),
 					'filename' => '',
@@ -201,9 +214,22 @@ class APIV5Test extends WP_UnitTestCase {
 			10,
 			3
 		);
-
-		APIV5::create_tag( 'aai-1234567890' );
-
-		$this->assertEquals( 1, did_action( 'pinterest_for_woocommerce_disconnect' ) );
+		$exception = null;
+		try {
+			APIV5::create_tag( 'aai-1234567890' );
+		} catch ( PinterestApiException $error ) {
+			$exception = $error;
+		}
+		$this->assertInstanceOf( PinterestApiException::class, $exception );
+		$this->assertSame( 401, $exception->getCode() );
+		$this->assertSame( 'Authentication failed.', $exception->getMessage() );
+		$this->assertSame( array( array( 'POST', 'https://api.pinterest.com/v5/ad_accounts/aai-1234567890/conversion_tags' ) ), $requests );
+		$this->assertSame( $before + 1, did_action( 'pinterest_for_woocommerce_disconnect' ) );
+		$this->assertFalse( get_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME ) );
+		$this->assertFalse( Pinterest_For_Woocommerce::is_business_connected() );
+		$this->assertFalse( Pinterest_For_Woocommerce::get_setting( 'tracking_advertiser', true ) );
+		$this->assertFalse( Pinterest_For_Woocommerce::get_setting( 'tracking_tag', true ) );
+		$this->assertSame( array( 'currency_credit_info' ), array_keys( Pinterest_For_Woocommerce::get_setting( 'account_data', true ) ) );
+		$this->assertTrue( Pinterest_For_Woocommerce::get_setting( 'enable_debug_logging', true ) );
 	}
 }

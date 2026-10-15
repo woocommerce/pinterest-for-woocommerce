@@ -2,16 +2,19 @@
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
+use Automattic\WooCommerce\Pinterest\API\APIV5;
 use Automattic\WooCommerce\Pinterest\FeedFileOperations;
 use Automattic\WooCommerce\Pinterest\FeedOwnership;
 use Automattic\WooCommerce\Pinterest\FeedRegistration;
+use Automattic\WooCommerce\Pinterest\Feeds;
 use Automattic\WooCommerce\Pinterest\LocaleMapper;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
+use Automattic\WooCommerce\Pinterest\PinterestApiException;
 use Pinterest_For_Woocommerce;
 use WP_UnitTestCase;
 
 /**
- * Tests for the stale feed cleanup performed after feed registration.
+ * Tests native registration, recovery and stale feed cleanup.
  *
  * @version x.x.x
  */
@@ -218,6 +221,351 @@ class FeedRegistrationTest extends WP_UnitTestCase {
 			array(),
 			self::$deleted_feed_ids,
 			'Feeds without an ID must not trigger a DELETE request.'
+		);
+	}
+
+	/**
+	 * A real temporary file cannot register; publication can reuse, create, or recover a feed.
+	 *
+	 * @dataProvider registration_workflows
+	 * @param string $mode Workflow mode.
+	 * @param array  $expected_requests Literal expected remote request sequence.
+	 * @param int    $next_delay Expected next retry backoff.
+	 * @param int    $ttl Expected error-cache lifetime.
+	 * @return void
+	 */
+	public function test_registration_workflow_preserves_manual_feeds_and_invalidates_cached_lists(
+		$mode,
+		$expected_requests,
+		$next_delay = 120,
+		$ttl = 60
+	) {
+		$original_settings = get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME );
+		$original_data     = get_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+		$original_country  = get_option( 'woocommerce_default_country' );
+		$original_currency = get_option( 'woocommerce_currency' );
+		$token_cache       = new \ReflectionProperty( \Automattic\WooCommerce\Pinterest\API\Base::class, 'token' );
+		$token_cache->setAccessible( true );
+		$original_token = $token_cache->getValue();
+		$token_cache->setValue( null, null );
+		$this->connect_business_account();
+		$directory = wp_tempnam( 'pinterest-registration' );
+		wp_delete_file( $directory );
+		wp_mkdir_p( $directory );
+		$uploads = function ( $data ) use ( $directory ) {
+			$data['basedir'] = $directory;
+			$data['path']    = $directory;
+			$data['baseurl'] = 'https://shop.example/wp-content/uploads';
+			$data['url']     = $data['baseurl'];
+			$data['subdir']  = '';
+			$data['error']   = false;
+			return $data;
+		};
+		$name    = function () {
+			return 'Coverage feed';
+		};
+		add_filter( 'upload_dir', $uploads );
+		add_filter( 'pinterest_for_woocommerce_unique_feed_name', $name );
+		update_option( 'woocommerce_default_country', 'US:CA' );
+		update_option( 'woocommerce_currency', 'USD' );
+		Pinterest_For_Woocommerce::save_data( 'local_feed_ids', array( 'US' => 'Rc7Ab3' ) );
+		Pinterest_For_Woocommerce::save_data( 'feed_registered', false );
+		if ( 'recover_after_success' === $mode ) {
+			// This is the persisted value written by a previous successful Feeds::create_feed().
+			Pinterest_For_Woocommerce::save_data( 'create_feed_delay', false );
+		}
+		Pinterest_For_Woocommerce::save_data( 'merchant_locale_not_valid', true );
+		Pinterest_For_Woocommerce::save_data( 'merchant_connected_diff_platform', true );
+		$location = 'https://shop.example/wp-content/uploads/pinterest-for-woocommerce-Rc7Ab3.xml';
+		$owned    = array(
+			'id'              => 'owned-current',
+			'location'        => $location,
+			'default_country' => 'US',
+			'default_locale'  => 'en-US',
+		);
+		$created  = array_merge( $owned, array( 'id' => 'created-current' ) );
+		$remote   = array(
+			array(
+				'id'       => 'owned-stale',
+				'location' => 'https://shop.example/wp-content/uploads/pinterest-for-woocommerce-Ab1cD2.xml',
+			),
+			array(
+				'id'       => 'manual-local',
+				'location' => 'https://shop.example/wp-content/uploads/catalogs/manual.xml',
+			),
+			array(
+				'id'       => 'manual-external',
+				'location' => 'https://feeds.example/manual.xml',
+			),
+		);
+		if ( 'reuse' === $mode ) {
+			$remote[] = $owned;
+		}
+		$requests       = array();
+		$posts          = array();
+		$legacy         = in_array( $mode, array( 'recover_legacy', 'recover_legacy_positive' ), true );
+		$recovery       = $legacy || in_array( $mode, array( 'recover', 'recover_after_success' ), true );
+		$upstream_fails = $recovery;
+		$error_caches   = array();
+		$observe_cache  = function ( $key, $value, $expiration ) use ( &$error_caches ) {
+			if ( '47 - Upstream unavailable.' === $value ) {
+				$error_caches[] = array(
+					'key'        => $key,
+					'expiration' => $expiration,
+				);
+			}
+		};
+		add_action( 'set_transient', $observe_cache, 10, 3 );
+		$transport = function (
+			$response,
+			$args,
+			$url
+		) use (
+			&$requests,
+			&$posts,
+			&$remote,
+			&$upstream_fails,
+			$created
+		) {
+			$request    = $args['method'] . ' ' . substr( $url, strlen( APIV5::API_DOMAIN ) );
+			$requests[] = $request;
+			if ( 'GET /catalogs/feeds?ad_account_id=114141241212' === $request ) {
+				return self::response( array( 'items' => $remote ) );
+			}
+			if ( 'POST /catalogs/feeds?ad_account_id=114141241212' === $request ) {
+				$posts[] = json_decode( $args['body'], true );
+				if ( $upstream_fails ) {
+					return self::response(
+						array(
+							'code'    => 47,
+							'message' => 'Upstream unavailable.',
+						),
+						500
+					);
+				}
+				$remote[] = $created;
+				return self::response( $created, 201 );
+			}
+			if ( 'DELETE /catalogs/feeds/owned-stale?ad_account_id=114141241212' === $request ) {
+				$remote = array_values(
+					array_filter(
+						$remote,
+						function ( $feed ) {
+							return 'owned-stale' !== $feed['id'];
+						}
+					)
+				);
+				return self::response( array(), 204 );
+			}
+			if ( in_array(
+				$request,
+				array(
+					'GET /catalogs/feeds/owned-current/processing_results?ad_account_id=114141241212&page_size=1',
+					'GET /catalogs/feeds/created-current/processing_results?ad_account_id=114141241212&page_size=1',
+				),
+				true
+			) ) {
+				return self::response( array( 'items' => array() ) );
+			}
+			return new \WP_Error( 'unexpected-request', 'Unexpected registration request.' );
+		};
+		add_filter( 'pre_http_request', $transport, 10, 3 );
+		try {
+			$configs      = LocalFeedConfigs::get_instance();
+			$files        = new FeedFileOperations( $configs );
+			$registration = new FeedRegistration( $configs, $files );
+			$this->assertTrue( $registration->handle_feed_registration() );
+			$files->prepare_temporary_files();
+			$this->assertTrue( $registration->handle_feed_registration() );
+			$this->assertSame( array(), $requests );
+			$this->assertFalse( FeedRegistration::get_locally_stored_registered_feed_id() );
+			$this->assertFalse( Pinterest_For_Woocommerce::get_data( 'merchant_locale_not_valid' ) );
+			$this->assertFalse( Pinterest_For_Woocommerce::get_data( 'merchant_connected_diff_platform' ) );
+			$files->add_footer_to_temporary_feed_files();
+			$files->rename_temporary_feed_files_to_final();
+			$expected_post = array(
+				'name'                 => 'Coverage feed',
+				'format'               => 'XML',
+				'location'             => $location,
+				'catalog_type'         => 'RETAIL',
+				'default_currency'     => 'USD',
+				'default_locale'       => 'en-US',
+				'default_country'      => 'US',
+				'default_availability' => 'IN_STOCK',
+			);
+			$start         = time();
+			if ( $legacy ) {
+				// Historical key for this literal fixture: test an existing zero-delay permanent error.
+				set_transient(
+					'pinterest-for-woocommerce_request_e454216a4215c3bf0515acc24f1b4cb2',
+					'47 - Upstream unavailable.',
+					0
+				);
+				Pinterest_For_Woocommerce::save_data(
+					'create_feed_delay',
+					'recover_legacy_positive' === $mode ? 120 : 0
+				);
+			}
+			if ( $recovery ) {
+				foreach ( array( 500, 425 ) as $code ) {
+					$exception = null;
+					try {
+						$registration->handle_feed_registration();
+					} catch ( PinterestApiException $error ) {
+						$exception = $error;
+					}
+					$this->assertInstanceOf( PinterestApiException::class, $exception );
+					$this->assertSame( $code, $exception->getCode() );
+					$this->assertFalse( FeedRegistration::get_locally_stored_registered_feed_id() );
+					$this->assertSame( $next_delay, Pinterest_For_Woocommerce::get_data( 'create_feed_delay' ) );
+					$this->assertTrue( Pinterest_For_Woocommerce::is_business_connected() );
+					$this->assertSame(
+						'114141241212',
+						Pinterest_For_Woocommerce::get_setting( 'tracking_advertiser' )
+					);
+					$this->assertFalse( Pinterest_For_Woocommerce::get_data( 'merchant_locale_not_valid' ) );
+					$this->assertFalse( Pinterest_For_Woocommerce::get_data( 'merchant_connected_diff_platform' ) );
+					$this->assertCount( 2, $requests );
+				}
+				$this->assertCount( $legacy ? 2 : 1, $error_caches );
+				$error_cache = end( $error_caches );
+				$this->assertSame( $ttl, $error_cache['expiration'] );
+				$error_key = $error_cache['key'];
+				$this->assertSame( '47 - Upstream unavailable.', get_transient( $error_key ) );
+				// Simulate the observed TTL having elapsed, using the same boundary with any cache backend.
+				delete_transient( $error_key );
+				$upstream_fails = false;
+			}
+			$this->assertTrue( $registration->handle_feed_registration() );
+			$end = time();
+			$this->assertSame(
+				'reuse' === $mode ? 'owned-current' : 'created-current',
+				FeedRegistration::get_locally_stored_registered_feed_id()
+			);
+			$this->assertTrue( Pinterest_For_Woocommerce::is_business_connected() );
+			foreach ( $posts as $post ) {
+				$schedule = $post['preferred_processing_schedule'];
+				unset( $post['preferred_processing_schedule'] );
+				$this->assertSame( $expected_post, $post );
+				$this->assertSame( 'Etc/UTC', $schedule['timezone'] );
+				$this->assertContains(
+					$schedule['time'],
+					array( gmdate( 'H:i', $start + 300 ), gmdate( 'H:i', $end + 300 ) )
+				);
+			}
+			if ( 'reuse' !== $mode ) {
+				$this->assertFalse( Pinterest_For_Woocommerce::get_data( 'create_feed_delay' ) );
+			}
+			$this->assertFalse(
+				APIV5::get_cached_response( 'catalogs/feeds?ad_account_id=114141241212', 'GET', array(), '' )
+			);
+			$remote[]  = array(
+				'id'       => 'manual-later',
+				'location' => 'https://feeds.example/later.xml',
+			);
+			$remaining = array_column( Feeds::get_feeds(), 'id' );
+			sort( $remaining );
+			$this->assertSame(
+				'reuse' === $mode
+					? array( 'manual-external', 'manual-later', 'manual-local', 'owned-current' )
+					: array( 'created-current', 'manual-external', 'manual-later', 'manual-local' ),
+				$remaining
+			);
+			$this->assertSame( $expected_requests, $requests );
+		} finally {
+			remove_action( 'set_transient', $observe_cache, 10 );
+			remove_filter( 'pre_http_request', $transport, 10 );
+			remove_filter( 'pinterest_for_woocommerce_unique_feed_name', $name );
+			remove_filter( 'upload_dir', $uploads );
+			// Upstream failure also writes WooCommerce logs inside this test's uploads directory.
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+			$filesystem = new \WP_Filesystem_Direct( null );
+			$filesystem->delete( $directory, true );
+			Pinterest_For_Woocommerce::save_settings( $original_settings );
+			Pinterest_For_Woocommerce::save_settings( $original_data, PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
+			update_option( 'woocommerce_default_country', $original_country );
+			update_option( 'woocommerce_currency', $original_currency );
+			$token_cache->setValue( null, $original_token );
+		}
+	}
+
+	/** @return array Native registration workflow paths and independent expected requests. */
+	public function registration_workflows() {
+		$list   = 'GET /catalogs/feeds?ad_account_id=114141241212';
+		$create = 'POST /catalogs/feeds?ad_account_id=114141241212';
+		$remove = 'DELETE /catalogs/feeds/owned-stale?ad_account_id=114141241212';
+		return array(
+			'reuse'                                        => array(
+				'reuse',
+				array(
+					$list,
+					$remove,
+					'GET /catalogs/feeds/owned-current/processing_results?ad_account_id=114141241212&page_size=1',
+					$list,
+				),
+			),
+			'create'                                       => array(
+				'create',
+				array(
+					$list,
+					$create,
+					$list,
+					$remove,
+					'GET /catalogs/feeds/created-current/processing_results?ad_account_id=114141241212&page_size=1',
+					$list,
+				),
+			),
+			'recover'                                      => array(
+				'recover',
+				array(
+					$list,
+					$create,
+					$create,
+					$list,
+					$remove,
+					'GET /catalogs/feeds/created-current/processing_results?ad_account_id=114141241212&page_size=1',
+					$list,
+				),
+			),
+			'recover after success'                        => array(
+				'recover_after_success',
+				array(
+					$list,
+					$create,
+					$create,
+					$list,
+					$remove,
+					'GET /catalogs/feeds/created-current/processing_results?ad_account_id=114141241212&page_size=1',
+					$list,
+				),
+			),
+			'recover permanent legacy cache'               => array(
+				'recover_legacy',
+				array(
+					$list,
+					$create,
+					$create,
+					$list,
+					$remove,
+					'GET /catalogs/feeds/created-current/processing_results?ad_account_id=114141241212&page_size=1',
+					$list,
+				),
+			),
+			'legacy cache after another payload recovered' => array(
+				'recover_legacy_positive',
+				array(
+					$list,
+					$create,
+					$create,
+					$list,
+					$remove,
+					'GET /catalogs/feeds/created-current/processing_results?ad_account_id=114141241212&page_size=1',
+					$list,
+				),
+				240,
+				120,
+			),
 		);
 	}
 

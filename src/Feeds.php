@@ -143,8 +143,11 @@ class Feeds {
 			'default_availability' => 'IN_STOCK',
 		);
 
-		$cache_key    = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_request_' . md5( wp_json_encode( $data ) . (string) $ad_account_id );
+		// Ignore every legacy error key: earlier zero-delay failures could leave multiple permanent entries.
+		$cache_key    = PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_create_feed_error_v2_'
+			. md5( wp_json_encode( $data ) . (string) $ad_account_id );
 		$cached_error = get_transient( $cache_key );
+		$stored_delay = Pinterest_For_Woocommerce()::get_data( 'create_feed_delay' );
 
 		if ( false !== $cached_error ) {
 			// Faking Pinterest API response to 425 Too early.
@@ -170,7 +173,9 @@ class Feeds {
 		try {
 			$feed = APIV5::create_feed( $data, $ad_account_id );
 		} catch ( PinterestApiException $e ) {
-			$delay   = Pinterest_For_Woocommerce()::get_data( 'create_feed_delay' ) ?? MINUTE_IN_SECONDS;
+			$delay   = is_numeric( $stored_delay ) && (int) $stored_delay > 0
+				? (int) $stored_delay
+				: MINUTE_IN_SECONDS;
 			$message = sprintf( '%1$s - %2$s', esc_html( $e->get_pinterest_code() ), esc_html( $e->getMessage() ) );
 			set_transient( $cache_key, $message, $delay );
 			// Double the delay.
