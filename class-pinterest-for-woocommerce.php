@@ -41,7 +41,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 	 * Base Plugin class holding generic functionality
 	 *
 	 * @class   Pinterest_For_Woocommerce
-	 * @version 1.5.4
+	 * @version x.x.x
 	 */
 	final class Pinterest_For_Woocommerce {
 
@@ -1207,7 +1207,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		public static function get_billing_setup_info_from_account_data() {
 			$account_data = self::get_setting( 'account_data' );
 
-			return (bool) $account_data['is_billing_setup'];
+			return is_array( $account_data ) && ! empty( $account_data['is_billing_setup'] );
 		}
 
 		/**
@@ -1219,13 +1219,18 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @return void
 		 */
 		public static function add_redeem_credits_info_to_account_data() {
-			$account_data = self::get_setting( 'account_data' );
-			$offer_code   = AdCreditsCoupons::get_coupon_for_merchant();
+			$offer_code = AdCreditsCoupons::get_coupon_for_merchant();
 
 			// Redeem the coupon.
 			$error_code    = false;
 			$error_message = '';
 			$redeem_status = AdCredits::redeem_credits( $offer_code, $error_code, $error_message );
+
+			// Redeeming can invalidate billing or disconnect the merchant; save on top of the stored data.
+			$account_data = self::get_setting( 'account_data', true );
+			if ( ! is_array( $account_data ) || empty( $account_data['id'] ) ) {
+				return;
+			}
 
 			$redeem_information = array(
 				'redeem_status' => $redeem_status,
