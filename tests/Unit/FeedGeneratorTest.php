@@ -22,7 +22,7 @@ use WC_Product_Variable;
 /**
  * Test helper class that wraps real Action Scheduler functions.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class TestActionSchedulerProxy implements ActionSchedulerInterface {
 	/**
@@ -810,6 +810,81 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 		$this->assertEquals( $product_b->get_id(), $products[1]->get_id() );
 		$this->assertEquals( 'Product on backorder', $products[1]->get_name() );
 		$this->assertEquals( 'onbackorder', $products[1]->get_stock_status() );
+	}
+
+	/**
+	 * Category inclusion preserves the default feed and includes descendants and variations.
+	 *
+	 * @return void
+	 */
+	public function test_get_feed_products_filters_selected_category_trees() {
+		$parent = wp_insert_term( 'Clothing', 'product_cat' )['term_id'];
+		$child  = wp_insert_term( 'Shirts', 'product_cat', array( 'parent' => $parent ) )['term_id'];
+		$other  = wp_insert_term( 'Books', 'product_cat' )['term_id'];
+		$first  = WC_Helper_Product::create_simple_product();
+		$second = WC_Helper_Product::create_simple_product();
+		$third  = WC_Helper_Product::create_simple_product();
+		wp_set_object_terms( $first->get_id(), $parent, 'product_cat' );
+		wp_set_object_terms( $second->get_id(), $child, 'product_cat' );
+		wp_set_object_terms( $third->get_id(), $other, 'product_cat' );
+		$variable = new WC_Product_Variable();
+		$variable->set_name( 'Variable shirt' );
+		$variable->set_status( 'publish' );
+		$variable->set_category_ids( array( $child ) );
+		$variable->save();
+		$variation = new \WC_Product_Variation();
+		$variation->set_parent_id( $variable->get_id() );
+		$variation->set_regular_price( 10 );
+		$variation->set_status( 'publish' );
+		$variation->save();
+		$ids     = array( $first->get_id(), $second->get_id(), $third->get_id(), $variation->get_id() );
+		$get_ids = function () use ( $ids ) {
+			return array_map(
+				function ( $product ) {
+					return $product->get_id();
+				},
+				$this->feed_generator->get_feed_products( $ids )
+			);
+		};
+
+		$this->assertEqualsCanonicalizing( $ids, $get_ids() );
+		Pinterest_For_Woocommerce::save_setting(
+			'product_sync_categories',
+			array(
+				array(
+					'key'   => $parent,
+					'label' => 'Clothing',
+				),
+			)
+		);
+		$this->assertEqualsCanonicalizing( array( $first->get_id(), $second->get_id(), $variation->get_id() ), $get_ids() );
+		Pinterest_For_Woocommerce::save_setting( 'product_sync_categories', array() );
+		$this->assertEqualsCanonicalizing( $ids, $get_ids() );
+	}
+
+	/**
+	 * A fully excluded batch still advances and reaches the end of the catalog.
+	 */
+	public function test_category_exclusion_does_not_stall_batches() {
+		$category = wp_insert_term( 'Empty category', 'product_cat' )['term_id'];
+		$product  = WC_Helper_Product::create_simple_product();
+		Pinterest_For_Woocommerce::save_setting(
+			'product_sync_categories',
+			array(
+				array(
+					'key'   => $category,
+					'label' => 'Empty category',
+				),
+			)
+		);
+		$this->action_scheduler->expects( $this->exactly( 2 ) )->method( 'schedule_immediate' )->withConsecutive(
+			array( 'pinterest/jobs/generate_feed/chain_batch', array( 2, array() ), PINTEREST_FOR_WOOCOMMERCE_PREFIX ),
+			array( 'pinterest/jobs/generate_feed/chain_end', array( array() ), PINTEREST_FOR_WOOCOMMERCE_PREFIX )
+		);
+		$this->feed_generator->handle_batch_action( 1, array() );
+		$this->assertSame( 0, ProductFeedStatus::get()['product_count'] );
+		$this->assertSame( $product->get_id(), $this->invoke_protected( $this->feed_generator, 'get_last_batch_id', array( 2 ) ) );
+		$this->feed_generator->handle_batch_action( 2, array() );
 	}
 
 	/**
