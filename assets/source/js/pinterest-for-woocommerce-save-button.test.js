@@ -85,6 +85,106 @@ describe( 'Save to Pinterest button', () => {
 		delete window.PinUtils;
 	} );
 
+	it.each( [
+		'<img class="wp-post-image" />',
+		'<a class="woocommerce-LoopProduct-link"><img /></a>',
+		'<div class="wc-block-grid__product-image"><img /></div>',
+	] )(
+		'aligns a Save button after layout changes: %s',
+		async ( imageMarkup ) => {
+			document.body.innerHTML = `<div class="product">${ unbuiltWrapper(
+				'Sale product'
+			) }${ imageMarkup }</div>`;
+			const product = document.querySelector( '.product' );
+			const wrapper = product.querySelector(
+				'.pinterest-for-woocommerce-image-wrapper'
+			);
+			const image = product.querySelector( 'img' );
+			markAsBuilt( wrapper );
+			Object.defineProperty( wrapper, 'offsetParent', {
+				value: product,
+			} );
+			product.getBoundingClientRect = () => ( { left: 20, top: 100 } );
+			image.getBoundingClientRect = () => ( { left: 80, top: 144 } );
+
+			await flush();
+
+			expect(
+				wrapper.style.getPropertyValue( '--pinterest-image-offset-x' )
+			).toBe( '60px' );
+			expect(
+				wrapper.style.getPropertyValue( '--pinterest-image-offset-y' )
+			).toBe( '44px' );
+
+			// Already-labeled buttons still follow the image on resize and load.
+			image.getBoundingClientRect = () => ( { left: 20, top: 100 } );
+			window.dispatchEvent( new window.Event( 'resize' ) );
+			await flush();
+			expect(
+				wrapper.style.getPropertyValue( '--pinterest-image-offset-x' )
+			).toBe( '0px' );
+			expect(
+				wrapper.style.getPropertyValue( '--pinterest-image-offset-y' )
+			).toBe( '0px' );
+
+			image.getBoundingClientRect = () => ( { left: 30, top: 120 } );
+			image.dispatchEvent( new window.Event( 'load' ) );
+			await flush();
+			expect(
+				wrapper.style.getPropertyValue( '--pinterest-image-offset-y' )
+			).toBe( '20px' );
+		}
+	);
+
+	it( 'measures the product gallery instead of a slide the slider has moved', async () => {
+		document.body.innerHTML = `<div class="product">${ unbuiltWrapper(
+			'Gallery product'
+		) }<div class="woocommerce-product-gallery"><img class="wp-post-image" /></div></div>`;
+		const product = document.querySelector( '.product' );
+		const wrapper = product.querySelector(
+			'.pinterest-for-woocommerce-image-wrapper'
+		);
+		markAsBuilt( wrapper );
+		Object.defineProperty( wrapper, 'offsetParent', {
+			value: product,
+		} );
+		product.getBoundingClientRect = () => ( { left: 20, top: 100 } );
+		product.querySelector(
+			'.woocommerce-product-gallery'
+		).getBoundingClientRect = () => ( { left: 20, top: 144 } );
+		// Second slide showing: the first image is one gallery width to the left.
+		product.querySelector( 'img' ).getBoundingClientRect = () => ( {
+			left: -355,
+			top: 144,
+		} );
+
+		await flush();
+
+		expect(
+			wrapper.style.getPropertyValue( '--pinterest-image-offset-x' )
+		).toBe( '0px' );
+		expect(
+			wrapper.style.getPropertyValue( '--pinterest-image-offset-y' )
+		).toBe( '44px' );
+	} );
+
+	it( 'does not position a button against a nested related product image', async () => {
+		document.body.innerHTML = `<div class="product">${ unbuiltWrapper(
+			'No image'
+		) }<div class="product"><img class="wp-post-image" /></div></div>`;
+		const wrapper = document.querySelector(
+			'.pinterest-for-woocommerce-image-wrapper'
+		);
+		markAsBuilt( wrapper );
+		Object.defineProperty( wrapper, 'offsetParent', {
+			value: wrapper.parentElement,
+		} );
+		await flush();
+		expect(
+			wrapper.style.getPropertyValue( '--pinterest-image-offset-x' )
+		).toBe( '' );
+	} );
+
 	/**
 	 * Stand in for the stylesheet pinit.js injects into the head at runtime.
 	 *

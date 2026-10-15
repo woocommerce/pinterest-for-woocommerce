@@ -1,7 +1,7 @@
 .pinterest-for-woocommerce-image-wrapper {
-	left: 10px;
+	left: calc(10px + var(--pinterest-image-offset-x, 0px));
 	position: absolute;
-	top: 10px;
+	top: calc(10px + var(--pinterest-image-offset-y, 0px));
 	z-index: 50;
 	opacity: 0;
 	pointer-events: none;
