@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Kept a billing rejection or disconnect that happens during ad-credit redemption from being overwritten.
