@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Retry Pinterest commerce setup and avoid creating a conversion tag when Pinterest returns an empty response.
