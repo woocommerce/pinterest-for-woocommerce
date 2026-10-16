@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * API V5 Methods
  *
  * @class   APIV5
- * @version 1.5.0
+ * @version x.x.x
  */
 class APIV5 extends Base {
 
@@ -577,8 +577,10 @@ class APIV5 extends Base {
 	 * Get merchant's feeds.
 	 *
 	 * @since 1.4.0
+	 * @since x.x.x Added the $bookmark parameter. Only the first page is cached.
 	 *
 	 * @param string $ad_account_id Pinterest Ad Account ID.
+	 * @param string $bookmark      Cursor of the page to fetch, from the previous page's bookmark. Empty for the first page.
 	 *
 	 * @return array {
 	 *      List of feeds.
@@ -613,13 +615,18 @@ class APIV5 extends Base {
 	 * }
 	 * @throws PinterestApiException If the request fails with 2xx status.
 	 */
-	public static function get_feeds( string $ad_account_id ): array {
+	public static function get_feeds( string $ad_account_id, string $bookmark = '' ): array {
+		$endpoint = "catalogs/feeds?ad_account_id={$ad_account_id}";
+		if ( '' !== $bookmark ) {
+			$endpoint .= '&bookmark=' . rawurlencode( $bookmark );
+		}
+
 		return self::make_request(
-			"catalogs/feeds?ad_account_id={$ad_account_id}",
+			$endpoint,
 			'GET',
 			array(),
 			'',
-			MINUTE_IN_SECONDS
+			'' === $bookmark ? MINUTE_IN_SECONDS : false
 		);
 	}
 
