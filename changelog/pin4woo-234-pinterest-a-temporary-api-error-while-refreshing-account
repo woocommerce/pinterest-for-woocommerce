@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Preserve the store connection when refreshing Pinterest account data fails temporarily.

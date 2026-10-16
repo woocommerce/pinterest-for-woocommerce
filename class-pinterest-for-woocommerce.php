@@ -1148,7 +1148,10 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 				Pinterest_For_Woocommerce()::save_setting( 'account_data', $data );
 				return $data;
 			} catch ( Throwable $th ) {
-				self::disconnect();
+				$saved_account_data = self::get_setting( 'account_data' );
+				if ( empty( $saved_account_data['id'] ) || ( $th instanceof PinterestApiException && 401 === $th->getCode() ) ) {
+					self::disconnect();
+				}
 				throw new Exception( esc_html__( 'There was an error getting the account data.', 'pinterest-for-woocommerce' ) );
 			}
 		}
