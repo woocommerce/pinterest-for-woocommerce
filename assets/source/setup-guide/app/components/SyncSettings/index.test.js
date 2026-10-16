@@ -28,9 +28,6 @@ const SYNC_LABEL = 'Sync to get latest settings from Pinterest Ads Manager';
  * The sync action reaches the REST API through the `@wordpress/data-controls`
  * control, which bundles its own `@wordpress/api-fetch`. Faking `window.fetch`
  * keeps the store, the control and the request handling real.
- *
- * The success notice is left out on purpose: the component removes that notice
- * on every render, so whether it is still there depends on render timing.
  */
 const originalFetch = window.fetch;
 
@@ -224,4 +221,50 @@ it( 'reports a sync that the server answers with success: false as failed', asyn
 		status: 'error',
 		content: 'Failed to sync settings with Pinterest Ads Manager.',
 	} );
+} );
+
+it( 'keeps one sync notice across retries and the success notice across re-renders', async () => {
+	const failure = () =>
+		jsonResponse( { code: 'error', message: 'Server error.' }, 500 );
+	const retriedSync = deferred();
+	window.fetch
+		.mockResolvedValueOnce( failure() )
+		.mockReturnValueOnce( retriedSync.promise )
+		.mockResolvedValueOnce(
+			jsonResponse( { success: true, synced_settings: {} } )
+		);
+
+	const { ui, rerender, getNotices } = mount();
+
+	await waitFor( () => expect( getNotices() ).toHaveLength( 1 ) );
+
+	await act( async () => {
+		getNotices()[ 0 ].actions[ 0 ].onClick();
+	} );
+	expectSyncRequests( 2 );
+	// The previous notice is cleared as soon as the new sync starts.
+	expect( getNotices() ).toHaveLength( 0 );
+
+	await act( async () => {
+		retriedSync.resolve( failure() );
+	} );
+	await waitFor( () =>
+		expect( getNotices() ).toMatchObject( [ { status: 'error' } ] )
+	);
+
+	await act( async () => {
+		getNotices()[ 0 ].actions[ 0 ].onClick();
+	} );
+	await waitFor( () =>
+		expect( getNotices() ).toMatchObject( [
+			{
+				status: 'success',
+				content:
+					'Settings successfully synced with Pinterest Ads Manager.',
+			},
+		] )
+	);
+
+	rerender( ui );
+	expect( getNotices() ).toHaveLength( 1 );
 } );

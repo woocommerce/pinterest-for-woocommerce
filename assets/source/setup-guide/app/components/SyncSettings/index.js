@@ -34,6 +34,8 @@ const SyncSettings = () => {
 		useState( false );
 
 	const syncSettings = async () => {
+		removeNotice( 'pinterest-for-woocommerce-settings-synced' );
+
 		try {
 			const result = await syncAppSettings();
 
@@ -66,8 +68,6 @@ const SyncSettings = () => {
 							onClick: syncSettings,
 						},
 					],
-				},
-				{
 					id: 'pinterest-for-woocommerce-settings-synced',
 				}
 			);
@@ -78,8 +78,6 @@ const SyncSettings = () => {
 		syncSettings();
 		setTriggeredSyncSettings( true );
 	}
-
-	removeNotice( 'pinterest-for-woocommerce-settings-synced' );
 
 	const lastSyncedTime = appSettings.last_synced_settings
 		? appSettings.last_synced_settings
