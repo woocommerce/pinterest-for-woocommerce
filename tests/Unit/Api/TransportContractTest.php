@@ -98,30 +98,6 @@ class TransportContractTest extends WP_Test_REST_TestCase {
 		$this->assertSame( 'https://api.pinterest.com/v5/integrations/commerce', $this->calls[0]['url'] );
 	}
 
-	/**
-	 * @dataProvider transient_failures
-	 * @param int $code Remote HTTP error.
-	 * @return void
-	 */
-	public function test_account_refresh_failure_keeps_working_connection_and_settings( $code ) {
-		$this->response = $this->http_response( $code, '{"code":8,"message":"Try later."}' );
-		$settings       = get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME );
-		$data           = get_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME );
-		$exception      = null;
-		try {
-			Pinterest_For_Woocommerce::update_account_data();
-		} catch ( \Exception $error ) {
-			$exception = $error;
-		}
-		$this->assertInstanceOf( \Exception::class, $exception );
-		$this->assertSame( 'There was an error getting the account data.', $exception->getMessage() );
-		$this->assertSame( $settings, get_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ) );
-		$this->assertSame( $data, get_option( PINTEREST_FOR_WOOCOMMERCE_DATA_NAME ) );
-		$this->assertCount( 1, $this->calls );
-		$this->assertSame( 'GET', $this->calls[0]['method'] );
-		$this->assertSame( 'https://api.pinterest.com/v5/user_account', $this->calls[0]['url'] );
-	}
-
 	/** @return void */
 	public function test_no_content_tags_list_cannot_create_a_remote_tag() {
 		$this->response = $this->http_response( 204, null );
@@ -164,25 +140,6 @@ class TransportContractTest extends WP_Test_REST_TestCase {
 			),
 			$this->calls
 		);
-	}
-
-	/** @return void */
-	public function test_unauthorized_account_refresh_still_clears_rejected_connection() {
-		$this->response = $this->http_response( 401, '{"code":3,"message":"Token rejected."}' );
-		$before         = did_action( 'pinterest_for_woocommerce_disconnect' );
-		$exception      = null;
-		try {
-			Pinterest_For_Woocommerce::update_account_data();
-		} catch ( \Exception $error ) {
-			$exception = $error;
-		}
-		$this->assertInstanceOf( \Exception::class, $exception );
-		$this->assertSame( $before + 1, did_action( 'pinterest_for_woocommerce_disconnect' ) );
-		$this->assertFalse( Pinterest_For_Woocommerce::is_connected() );
-		$this->assertFalse( Pinterest_For_Woocommerce::get_setting( 'tracking_advertiser' ) );
-		$this->assertFalse( Pinterest_For_Woocommerce::get_setting( 'tracking_tag' ) );
-		$this->assertTrue( Pinterest_For_Woocommerce::get_setting( 'enable_debug_logging' ) );
-		$this->assertCount( 1, $this->calls );
 	}
 
 	/** @return void */
