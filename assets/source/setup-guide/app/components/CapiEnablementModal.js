@@ -14,7 +14,7 @@ import {
  * Internal dependencies
  */
 import { useSettingsDispatch, useCreateNotice } from '../helpers/effects';
-import landingConnectImage from '../../../../images/landing_connect.svg';
+import capiEnablementImage from '../../../../images/capi_enablement.svg';
 
 /**
  * Modal to encourage merchants to enable Conversions API for better tracking.
@@ -84,11 +84,8 @@ const CapiEnablementModal = ( { onCloseModal, onDismiss } ) => {
 				} }
 			>
 				<img
-					src={ landingConnectImage }
-					alt={ __(
-						'Pinterest connection illustration',
-						'pinterest-for-woocommerce'
-					) }
+					src={ capiEnablementImage }
+					alt=""
 					style={ {
 						maxWidth: '200px',
 						height: 'auto',

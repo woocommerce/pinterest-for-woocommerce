@@ -118,7 +118,7 @@ const WelcomeSection = () => {
 					<img
 						src={
 							wcSettings.pinterest_for_woocommerce.pluginUrl +
-							'/assets/images/landing_welcome.png'
+							'/assets/images/landing_welcome.svg'
 						}
 						alt=""
 					/>
@@ -167,7 +167,7 @@ const AdsCreditSection = () => {
 					<img
 						src={
 							wcSettings.pinterest_for_woocommerce.pluginUrl +
-							'/assets/images/landing_credit.svg'
+							'/assets/images/landing_ads_credit.svg'
 						}
 						alt=""
 					/>
@@ -224,7 +224,7 @@ const FeaturesSection = () => {
 				<Feature
 					imageUrl={
 						wcSettings.pinterest_for_woocommerce.pluginUrl +
-						'/assets/images/landing_connect.svg'
+						'/assets/images/landing_feature_sync.svg'
 					}
 					title={ __(
 						'Sync your catalog',
@@ -238,7 +238,7 @@ const FeaturesSection = () => {
 				<Feature
 					imageUrl={
 						wcSettings.pinterest_for_woocommerce.pluginUrl +
-						'/assets/images/landing_organic.svg'
+						'/assets/images/landing_feature_organic_reach.svg'
 					}
 					title={ __(
 						'Increase organic reach',
@@ -252,7 +252,7 @@ const FeaturesSection = () => {
 				<Feature
 					imageUrl={
 						wcSettings.pinterest_for_woocommerce.pluginUrl +
-						'/assets/images/landing_catalog.svg'
+						'/assets/images/landing_feature_storefront.svg'
 					}
 					title={ __(
 						'Create a storefront on Pinterest',
