@@ -35,7 +35,12 @@ const SyncSettings = () => {
 
 	const syncSettings = async () => {
 		try {
-			await syncAppSettings();
+			const result = await syncAppSettings();
+
+			// The server reports a failed sync as `success: false` with HTTP 200.
+			if ( ! result?.success ) {
+				throw new Error( 'Settings sync failed.' );
+			}
 
 			createNotice(
 				'success',
