@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * API V5 Methods
  *
  * @class   APIV5
- * @version 1.5.0
+ * @version x.x.x
  */
 class APIV5 extends Base {
 
@@ -411,11 +411,18 @@ class APIV5 extends Base {
 	 * @since 1.4.0
 	 */
 	public static function create_commerce_integration( array $integration_data ): array {
-		return self::make_request(
+		$response = self::make_request(
 			'integrations/commerce',
 			'POST',
 			$integration_data
 		);
+
+		// A 204 or other empty success has no integration to save; fail like an API error so the caller retries.
+		if ( ! is_array( $response ) ) {
+			throw new PinterestApiException( esc_html__( 'Empty commerce integration response.', 'pinterest-for-woocommerce' ), 204 );
+		}
+
+		return $response;
 	}
 
 	/**

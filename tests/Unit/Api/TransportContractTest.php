@@ -208,10 +208,8 @@ class TransportContractTest extends WP_Test_REST_TestCase {
 				'message' => '',
 			),
 			'cookies'  => array(),
+			'body'     => (string) $body,
 		);
-		if ( null !== $body ) {
-			$response['body'] = $body;
-		}
 		return $response;
 	}
 }
