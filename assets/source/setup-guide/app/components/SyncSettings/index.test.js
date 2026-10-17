@@ -213,3 +213,15 @@ it( 'reports a failed sync, keeps the sync time and recovers through the Retry a
 	).toBeTruthy();
 	expect( screen.getByRole( 'button', { name: SYNC_LABEL } ) ).toBeTruthy();
 } );
+
+it( 'reports a sync that the server answers with success: false as failed', async () => {
+	window.fetch.mockResolvedValueOnce( jsonResponse( { success: false } ) );
+
+	const { getNotices } = mount();
+
+	await waitFor( () => expect( getNotices() ).toHaveLength( 1 ) );
+	expect( getNotices()[ 0 ] ).toMatchObject( {
+		status: 'error',
+		content: 'Failed to sync settings with Pinterest Ads Manager.',
+	} );
+} );
