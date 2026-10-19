@@ -19,10 +19,58 @@ parameters:
 			path: class-pinterest-for-woocommerce.php
 
 		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Call to function is_null\(\) with Pinterest_For_Woocommerce will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Negated boolean expression is always true\.$#'
+			identifier: booleanNot.alwaysTrue
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Property WP\:\:\$request \(string\) on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.property
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Result of \|\| is always true\.$#'
+			identifier: booleanOr.alwaysTrue
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
 			message: '#^Variable \$errors in empty\(\) always exists and is not falsy\.$#'
 			identifier: empty.variable
 			count: 1
 			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''Automattic\\\\WooCommerce\\\\Admin\\\\Features\\\\Features'' and ''is_enabled'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: includes/admin/class-pinterest-for-woocommerce-admin.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''Automattic\\\\WooCommerce\\\\Admin\\\\Features\\\\Navigation\\\\Menu'' and ''add_plugin_item'' will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: includes/admin/class-pinterest-for-woocommerce-admin.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''Automattic\\\\WooCommerce\\\\Admin\\\\Features\\\\Navigation\\\\Screen'' and ''register_post_type'' will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: includes/admin/class-pinterest-for-woocommerce-admin.php
 
 		-
 			message: '#^Class Automattic\\WooCommerce\\Admin\\Features\\Navigation\\Menu not found\.$#'
@@ -43,10 +91,82 @@ parameters:
 			path: includes/admin/class-pinterest-for-woocommerce-admin.php
 
 		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/API/APIV5.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: src/API/AdvertiserConnect.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: src/API/Auth.php
+
+		-
+			message: '#^Call to function is_null\(\) with Automattic\\WooCommerce\\Pinterest\\API\\Base will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: src/API/Base.php
+
+		-
+			message: '#^Call to function is_null\(\) with array will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: src/API/Base.php
+
+		-
+			message: '#^Call to function is_wp_error\(\) with WP_Error will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/API/Base.php
+
+		-
+			message: '#^Call to function method_exists\(\) with Automattic\\WooCommerce\\Pinterest\\PinterestApiException and ''get_pinterest_code'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/API/DomainVerification.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: src/API/FeedState.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/API/Settings.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/API/Tags.php
+
+		-
 			message: '#^Action callback returns mixed but should not return anything\.$#'
 			identifier: return.void
 			count: 1
 			path: src/AdCredits.php
+
+		-
+			message: '#^Call to function is_wp_error\(\) with array\{headers\: WpOrg\\Requests\\Utility\\CaseInsensitiveDictionary, body\: string, response\: array\{code\: int, message\: string\}, cookies\: array\<int, WP_Http_Cookie\>, filename\: string\|null, http_response\: WP_HTTP_Requests_Response\} will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: src/AdCredits.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 1
+			path: src/Admin/ActivationRedirect.php
 
 		-
 			message: '#^Action callback returns mixed but should not return anything\.$#'
@@ -61,10 +181,40 @@ parameters:
 			path: src/CommerceIntegration.php
 
 		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: src/Exception/ValidateInterface.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between false and int will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: src/FeedFileOperations.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: src/FeedGenerator.php
+
+		-
 			message: '#^Action callback returns bool but should not return anything\.$#'
 			identifier: return.void
 			count: 1
 			path: src/FeedRegistration.php
+
+		-
+			message: '#^Property Automattic\\WooCommerce\\Pinterest\\FeedRegistration\:\:\$configurations is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/FeedRegistration.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: src/FeedStatusService.php
 
 		-
 			message: '#^Call to an undefined method WC_Data_Store\:\:get_notes_with_name\(\)\.$#'
@@ -79,15 +229,159 @@ parameters:
 			path: src/Notes/MarketingNotifications.php
 
 		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: src/PinterestApiException.php
+
+		-
 			message: '#^Access to an undefined property WC_Shipping_Method\:\:\$requires\.$#'
 			identifier: property.notFound
 			count: 1
 			path: src/PinterestShippingZone.php
 
 		-
+			message: '#^Call to function is_null\(\) with Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: src/Product/Attributes/AttributeManager.php
+
+		-
+			message: '#^Property Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:\$attribute_types_map \(array\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/Product/Attributes/AttributeManager.php
+
+		-
+			message: '#^Offset ''label'' on non\-empty\-array\<literal\-string&non\-falsy\-string, \(array\<int, literal\-string&non\-falsy\-string\>\)\|literal\-string\> in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: src/Product/GoogleCategorySearch.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between null and mixed will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: src/ProductFeedStatus.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: src/ProductSync.php
+
+		-
+			message: '#^Instanceof between WP_Post and WP_Post will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/ProductSync.php
+
+		-
 			message: '#^Call to an undefined method WC_Product\:\:get_variation_regular_price\(\)\.$#'
 			identifier: method.notFound
 			count: 2
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Call to function is_wp_error\(\) with non\-empty\-array will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Instanceof between WC_Product and WC_Product will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_description\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_g_additional_image_link\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_g_availability\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_g_brand\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_g_id\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_g_image_link\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_g_mpn\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_g_price\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_g_product_type\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_g_shipping\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_item_group_id\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_link\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_sale_price\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_sale_price_effective_date\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_title\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
 			path: src/ProductsXmlFeed.php
 
 		-
@@ -109,10 +403,112 @@ parameters:
 			path: src/Shipping.php
 
 		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: src/TrackerSnapshot.php
+
+		-
 			message: '#^Call to an undefined method WC_Order_Item\:\:get_total\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Tracking.php
+
+		-
+			message: '#^Property WooCommerce\:\:\$cart \(WC_Cart\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 3
+			path: src/Tracking.php
+
+		-
+			message: '#^Property WooCommerce\:\:\$session \(WC_Session\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 2
+			path: src/Tracking.php
+
+		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\\Conversions\:\:get_add_to_cart_data\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/Tracking/Conversions.php
+
+		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\\Conversions\:\:get_checkout_data\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/Tracking/Conversions.php
+
+		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\\Conversions\:\:get_page_visit_data\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/Tracking/Conversions.php
+
+		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\\Conversions\:\:get_search_data\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/Tracking/Conversions.php
+
+		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\\Conversions\:\:get_view_category_data\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/Tracking/Conversions.php
+
+		-
+			message: '#^Property WooCommerce\:\:\$session \(WC_Session\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 2
+			path: src/Tracking/Conversions.php
+
+		-
+			message: '#^Call to function is_object\(\) with WC_Session will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:get_add_to_cart_data\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:get_checkout_data\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:get_page_visit_data\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:get_search_data\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:get_view_category_data\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Property WooCommerce\:\:\$session \(WC_Session\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Tracking/Tag.php
 
 		-
 			message: '#^Function wp_has_consent not found\.$#'
