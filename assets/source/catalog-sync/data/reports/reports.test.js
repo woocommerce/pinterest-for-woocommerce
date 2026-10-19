@@ -175,4 +175,78 @@ describe( 'reports store', () => {
 		expect( await resolveReports().getFeedState() ).toEqual( feedState );
 		expect( reports().isRequesting() ).toBe( false );
 	} );
+	it.each( [ 'getFeedState', 'getFeedIssues' ] )(
+		'settles failed %s requests and retries after invalidation',
+		async ( selector ) => {
+			const name =
+				selector === 'getFeedState' ? 'feed_state' : 'feed_issues';
+			const error = { message: 'Offline' };
+			apiFetch.mockRejectedValueOnce( error );
+			reports()[ selector ]();
+			await vi.waitFor(
+				() =>
+					expect(
+						reports().getReportsRequestingError( name )
+					).toEqual( error ),
+				{ timeout: 250 }
+			);
+			expect( reports().isRequesting() ).toBe( false );
+			apiFetch.mockResolvedValue(
+				selector === 'getFeedState' ? feedState : firstPage
+			);
+			dispatchReports().invalidateResolution( selector, [] );
+			expect( await resolveReports()[ selector ]() ).toEqual(
+				selector === 'getFeedState' ? feedState : firstPage
+			);
+			expect( reports().getReportsRequestingError( name ) ).toBe( false );
+		}
+	);
+	it.each( [ 'success', 'failure' ] )(
+		'ignores a late page-2 %s after page 3 loads',
+		async ( outcome ) => {
+			const pending = [];
+			apiFetch.mockImplementation(
+				() =>
+					new Promise( ( resolve, reject ) =>
+						pending.push( { resolve, reject } )
+					)
+			);
+			const old = resolveReports().getFeedIssues( { paged: 2 } );
+			const current = resolveReports().getFeedIssues( { paged: 3 } );
+			await vi.waitFor( () => expect( pending ).toHaveLength( 2 ) );
+			pending[ 1 ].resolve( refreshedPage );
+			await current;
+			if ( outcome === 'success' ) {
+				pending[ 0 ].resolve( firstPage );
+			} else {
+				pending[ 0 ].reject( { message: 'Old failure' } );
+			}
+			await old;
+			expect( reports().getFeedIssues( { paged: 3 } ) ).toEqual(
+				refreshedPage
+			);
+			expect( reports().getReportsRequestingError( 'feed_issues' ) ).toBe(
+				false
+			);
+		}
+	);
+
+	it( 'keeps loading the latest page when an older request fails first', async () => {
+		const pending = [];
+		apiFetch.mockImplementation(
+			() =>
+				new Promise( ( resolve, reject ) =>
+					pending.push( { resolve, reject } )
+				)
+		);
+		const old = resolveReports().getFeedIssues( { paged: 2 } );
+		const current = resolveReports().getFeedIssues( { paged: 3 } );
+		await vi.waitFor( () => expect( pending ).toHaveLength( 2 ) );
+		pending[ 0 ].reject( { message: 'Old failure' } );
+		await old;
+		expect( reports().isRequesting() ).toBe( true );
+		pending[ 1 ].resolve( refreshedPage );
+		await current;
+		expect( reports().isRequesting() ).toBe( false );
+	} );
 } );
