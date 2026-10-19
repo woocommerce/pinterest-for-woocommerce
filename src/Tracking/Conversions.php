@@ -234,11 +234,13 @@ class Conversions extends Tracker {
 	 * The landing-page `epik` parameter is the freshest source. Beacon requests
 	 * carry the landing page as the event source URL, so its query string is
 	 * checked before the current request. AJAX and form add-to-cart requests
-	 * do not carry it themselves, so the same-site referer, usually the landing
-	 * page, is checked next. Pinterest's `_epik` cookie and the WooCommerce
+	 * do not carry it themselves, so the referer is checked next when it is on
+	 * this site or another allowed redirect host; for add-to-cart requests that
+	 * is usually the landing page, as long as the browser's referrer policy
+	 * keeps the query string. Pinterest's `_epik` cookie and the WooCommerce
 	 * session retain the click ID for later events.
 	 *
-	 * @since x.x.x Reads the click ID from the same-site referer.
+	 * @since x.x.x Reads the click ID from the referer.
 	 *
 	 * @param string $event_source_url Optional URL where the event occurred.
 	 *

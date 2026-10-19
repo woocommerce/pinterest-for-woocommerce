@@ -510,6 +510,20 @@ class ConversionsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that an `epik` on the current request wins over one in the referer.
+	 *
+	 * @return void
+	 */
+	public function test_add_to_cart_prefers_request_epik_over_referer() {
+		$_GET['epik']            = 'request-click-id';
+		$_SERVER['HTTP_REFERER'] = home_url( '/product/beanie/?epik=referer-click-id' );
+
+		$data = $this->prepare_add_to_cart_data();
+
+		$this->assertSame( 'request-click-id', $data['user_data']['click_id'] );
+	}
+
+	/**
 	 * Tests that a referer without a click ID falls through to the cookie.
 	 *
 	 * @return void
