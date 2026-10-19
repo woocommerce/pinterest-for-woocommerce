@@ -127,12 +127,6 @@ parameters:
 			path: src/Tracking.php
 
 		-
-			message: '#^Property Automattic\\WooCommerce\\Pinterest\\Tracking\\Data\\Checkout\:\:\$quantity \(int\) does not accept string\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Tracking/Data/Checkout.php
-
-		-
 			message: '#^Function wp_has_consent not found\.$#'
 			identifier: function.notFound
 			count: 1
