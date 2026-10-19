@@ -49,12 +49,6 @@ parameters:
 			path: src/AdCredits.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\GoogleCategory\:\:set_options\(\) should return Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\Select but returns \$this\(Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\GoogleCategory\)\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Admin/Input/GoogleCategory.php
-
-		-
 			message: '#^Action callback returns mixed but should not return anything\.$#'
 			identifier: return.void
 			count: 1
@@ -101,12 +95,6 @@ parameters:
 			identifier: return.void
 			count: 1
 			path: src/RefreshToken.php
-
-		-
-			message: '#^Filter callback return statement is missing\.$#'
-			identifier: return.missing
-			count: 1
-			path: src/SaveToPinterest.php
 
 		-
 			message: '#^Variable \$product in empty\(\) always exists and is not falsy\.$#'
