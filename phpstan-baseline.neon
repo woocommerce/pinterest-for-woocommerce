@@ -307,12 +307,6 @@ parameters:
 			path: src/RefreshToken.php
 
 		-
-			message: '#^Parameter \#1 \$user_id of function get_userdata expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/RichPins.php
-
-		-
 			message: '#^Variable \$product in empty\(\) always exists and is not falsy\.$#'
 			identifier: empty.variable
 			count: 1
