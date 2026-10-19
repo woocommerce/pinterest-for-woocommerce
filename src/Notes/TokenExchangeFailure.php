@@ -19,7 +19,7 @@ use Automattic\WooCommerce\Admin\Notes\NoteTraits;
  * Add_First_Product.
  *
  * @class   TokenExchangeFailure
- * @version 1.4.0
+ * @version x.x.x
  */
 class TokenExchangeFailure {
 	/**
@@ -67,7 +67,7 @@ class TokenExchangeFailure {
 	/**
 	 * Add the note if it passes predefined conditions.
 	 *
-	 * @return false|Note False if the note already exists, otherwise the Note object.
+	 * @return bool False if the note already exists, true once the note is saved.
 	 */
 	public static function possibly_add_note() {
 		if ( self::note_exists() ) {

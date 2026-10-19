@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Handling Token Refresh.
  *
  * @class   RefreshToken
- * @version 1.5.2
+ * @version x.x.x
  */
 class RefreshToken {
 
@@ -44,7 +44,7 @@ class RefreshToken {
 	 *
 	 * @since 1.4.0
 	 *
-	 * @return true
+	 * @return bool
 	 */
 	public static function handle_refresh(): bool {
 		$token_data   = Pinterest_For_Woocommerce::get_data( 'token_data', true );

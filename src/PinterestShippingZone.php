@@ -20,7 +20,7 @@ use \WC_Shipping_Zone;
  *
  * @class   PinterestShippingZone
  * @since   1.0.5
- * @version 1.5.2
+ * @version x.x.x
  */
 class PinterestShippingZone extends WC_Shipping_Zone {
 
@@ -161,7 +161,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	 *
 	 * @since 1.0.5
 	 *
-	 * @return array Array with locations and allowed shipping methods.
+	 * @return array|null Array with locations and allowed shipping methods, or null if either is empty.
 	 */
 	public function get_locations_with_shipping() {
 		$countries_with_states = $this->get_countries_with_states();

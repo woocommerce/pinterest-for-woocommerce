@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adding Save Pin support.
  *
  * @class   ProductsXmlFeed
- * @version 1.5.2
+ * @version x.x.x
  */
 class ProductsXmlFeed {
 
@@ -241,7 +241,7 @@ class ProductsXmlFeed {
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
 	 *
-	 * @return string
+	 * @return string|void
 	 */
 	private static function get_property_item_group_id( $product, $property ) {
 
@@ -361,7 +361,7 @@ class ProductsXmlFeed {
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
 	 *
-	 * @return string
+	 * @return string|void
 	 */
 	private static function get_property_g_product_type( $product, $property ) {
 
@@ -450,7 +450,7 @@ class ProductsXmlFeed {
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
 	 *
-	 * @return string
+	 * @return string|void
 	 */
 	private static function get_property_g_image_link( $product, $property ) {
 
@@ -507,7 +507,7 @@ class ProductsXmlFeed {
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
 	 *
-	 * @return string
+	 * @return string|void
 	 */
 	private static function get_property_g_price( $product, $property ) {
 
@@ -526,7 +526,7 @@ class ProductsXmlFeed {
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
 	 *
-	 * @return string
+	 * @return string|void
 	 */
 	private static function get_property_sale_price( $product, $property ) {
 		if ( ! $product->is_on_sale() ) {
@@ -561,7 +561,7 @@ class ProductsXmlFeed {
 	 * @param WC_Product $product  The product.
 	 * @param string     $property The name of the property.
 	 *
-	 * @return string
+	 * @return string|void
 	 */
 	private static function get_property_sale_price_effective_date( $product, $property ) {
 		if ( ! $product->is_on_sale() ) {
@@ -638,7 +638,7 @@ class ProductsXmlFeed {
 	 * @param WC_Product $product the product.
 	 * @param string     $property The name of the property.
 	 *
-	 * @return string
+	 * @return string|void
 	 */
 	private static function get_property_g_additional_image_link( $product, $property ) {
 
