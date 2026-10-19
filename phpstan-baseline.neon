@@ -19,6 +19,18 @@ parameters:
 			path: class-pinterest-for-woocommerce.php
 
 		-
+			message: '#^Parameter \#1 \$default_country of static method Pinterest_For_Woocommerce\:\:get_base_country\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Parameter \#2 \$error_code of static method Automattic\\WooCommerce\\Pinterest\\AdCredits\:\:redeem_credits\(\) expects int\|null, false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
 			message: '#^Property WP\:\:\$request \(string\) on left side of \?\? is not nullable\.$#'
 			identifier: nullCoalesce.property
 			count: 1
@@ -79,6 +91,24 @@ parameters:
 			path: src/API/Base.php
 
 		-
+			message: '#^Parameter \#2 \$args of static method Automattic\\WooCommerce\\Pinterest\\Logger\:\:log_request\(\) expects array\<string\>, array\<string, mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/API/Base.php
+
+		-
+			message: '#^Parameter \#2 \$value of method WP_HTTP_Response\:\:header\(\) expects string, float given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/API/FeedIssues.php
+
+		-
+			message: '#^Parameter \#2 \$value of method WP_HTTP_Response\:\:header\(\) expects string, int\<0, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/API/FeedIssues.php
+
+		-
 			message: '#^Expression on left side of \?\? is not nullable\.$#'
 			identifier: nullCoalesce.expr
 			count: 1
@@ -109,6 +139,18 @@ parameters:
 			path: src/CommerceIntegration.php
 
 		-
+			message: '#^Parameter \#1 \$text of function esc_html expects string, int given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/CommerceIntegration.php
+
+		-
+			message: '#^Parameter \#1 \$retry of static method Automattic\\WooCommerce\\Pinterest\\Crypto\:\:get_key\(\) expects string\|null, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Crypto.php
+
+		-
 			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 2
@@ -137,6 +179,12 @@ parameters:
 			identifier: nullCoalesce.expr
 			count: 1
 			path: src/FeedStatusService.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_html expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Feeds.php
 
 		-
 			message: '#^Call to an undefined method WC_Data_Store\:\:get_notes_with_name\(\)\.$#'
@@ -189,6 +237,12 @@ parameters:
 		-
 			message: '#^Instanceof between WC_Product and WC_Product will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Parameter \#1 \$attachment_id of function wp_get_attachment_image_src expects int, string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/ProductsXmlFeed.php
 
@@ -289,6 +343,12 @@ parameters:
 			path: src/RefreshToken.php
 
 		-
+			message: '#^Parameter \#1 \$user_id of function get_userdata expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/RichPins.php
+
+		-
 			message: '#^Variable \$product in empty\(\) always exists and is not falsy\.$#'
 			identifier: empty.variable
 			count: 1
@@ -310,6 +370,30 @@ parameters:
 			message: '#^Call to an undefined method WC_Order_Item\:\:get_total\(\)\.$#'
 			identifier: method.notFound
 			count: 1
+			path: src/Tracking.php
+
+		-
+			message: '#^Parameter \#2 \$id of class Automattic\\WooCommerce\\Pinterest\\Tracking\\Data\\Category constructor expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Tracking.php
+
+		-
+			message: '#^Parameter \#2 \$id of class Automattic\\WooCommerce\\Pinterest\\Tracking\\Data\\Product constructor expects string, int given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Tracking.php
+
+		-
+			message: '#^Parameter \#6 \$price of class Automattic\\WooCommerce\\Pinterest\\Tracking\\Data\\Product constructor expects string, float given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Tracking.php
+
+		-
+			message: '#^Parameter \#8 \$quantity of class Automattic\\WooCommerce\\Pinterest\\Tracking\\Data\\Product constructor expects string, int given\.$#'
+			identifier: argument.type
+			count: 2
 			path: src/Tracking.php
 
 		-
@@ -359,6 +443,24 @@ parameters:
 			identifier: isset.property
 			count: 2
 			path: src/Tracking/Conversions.php
+
+		-
+			message: '#^Parameter \#2 \$id of class Automattic\\WooCommerce\\Pinterest\\Tracking\\Data\\Product constructor expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Tracking/PageVisit.php
+
+		-
+			message: '#^Parameter \#6 \$price of class Automattic\\WooCommerce\\Pinterest\\Tracking\\Data\\Product constructor expects string, float given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Tracking/PageVisit.php
+
+		-
+			message: '#^Parameter \#8 \$quantity of class Automattic\\WooCommerce\\Pinterest\\Tracking\\Data\\Product constructor expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Tracking/PageVisit.php
 
 		-
 			message: '#^Call to function is_object\(\) with WC_Session will always evaluate to true\.$#'
