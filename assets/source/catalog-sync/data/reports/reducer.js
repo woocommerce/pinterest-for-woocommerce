@@ -12,6 +12,15 @@ const reportsReducer = (
 	},
 	action
 ) => {
+	// Only the latest issues request may update its rows, error or loading state.
+	if (
+		action.requestId &&
+		! ( action.type === TYPES.SET_IS_REQUESTING && action.isRequesting ) &&
+		action.requestId !== state.requestId
+	) {
+		return state;
+	}
+
 	switch ( action.type ) {
 		case TYPES.RECEIVE_FEEDISSUES:
 			state = {
@@ -29,6 +38,8 @@ const reportsReducer = (
 			state = {
 				...state,
 				feedIssues: {},
+				requestId: null,
+				isRequesting: false,
 				feedState: {},
 			};
 			break;
@@ -36,12 +47,16 @@ const reportsReducer = (
 			state = {
 				...state,
 				isRequesting: action.isRequesting,
+				...( action.isRequesting
+					? { requestId: action.requestId }
+					: {} ),
 			};
 			break;
 		case TYPES.SET_REQUESTING_ERROR:
 			state = {
 				...state,
 				requestingErrors: {
+					...state.requestingErrors,
 					[ action.name ]: action.error,
 				},
 			};

@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { createInterpolateElement, useState } from '@wordpress/element';
 import { getHistory, getQuery, onQueryChange } from '@woocommerce/navigation';
 import {
 	ExternalLink,
+	Notice,
 	__experimentalText as Text, // eslint-disable-line @wordpress/no-unsafe-wp-apis --- _experimentalText unlikely to change/disappear and also used by WC Core
 } from '@wordpress/components';
 
@@ -27,6 +28,11 @@ const SyncIssues = () => {
 		select( REPORTS_STORE_NAME ).isRequesting()
 	);
 
+	const error = useSelect( ( select ) =>
+		select( REPORTS_STORE_NAME ).getReportsRequestingError( 'feed_issues' )
+	);
+	const { invalidateResolution } = useDispatch( REPORTS_STORE_NAME );
+
 	const appSettings = useSettingsSelect();
 	const trackingAdvertiser = appSettings?.tracking_advertiser;
 
@@ -36,6 +42,27 @@ const SyncIssues = () => {
 		marginTop: '40px',
 		textAlign: 'right',
 	};
+
+	if ( error ) {
+		return (
+			<Notice
+				status="error"
+				isDismissible={ false }
+				actions={ [
+					{
+						label: __( 'Try again', 'pinterest-for-woocommerce' ),
+						onClick: () =>
+							invalidateResolution( 'getFeedIssues', [ query ] ),
+					},
+				] }
+			>
+				{ __(
+					'Unable to load catalog issues.',
+					'pinterest-for-woocommerce'
+				) }
+			</Notice>
+		);
+	}
 
 	if ( ! feedIssues?.lines?.length ) {
 		return null;

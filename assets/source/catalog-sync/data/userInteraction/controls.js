@@ -21,12 +21,7 @@ export const fetch = ( endpoint, data = {} ) => {
 export const controls = {
 	...dataControls,
 	FETCH( { data = {}, method = 'GET' } ) {
-		return new Promise( ( resolve ) => {
-			const url = addQueryArgs( `${ API_ROUTE }`, data );
-
-			apiFetch( { path: url, method } ).then( ( result ) =>
-				resolve( result )
-			);
-		} );
+		const url = addQueryArgs( `${ API_ROUTE }`, data );
+		return apiFetch( { path: url, method } );
 	},
 };

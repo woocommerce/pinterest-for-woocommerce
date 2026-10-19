@@ -13,11 +13,13 @@ import { fetch } from './controls';
  */
 export function* getUserInteractions() {
 	try {
+		yield setRequestingError( false, 'user_interaction' );
 		yield setIsRequesting( true );
 		const result = yield fetch( 'user_interaction' );
 		yield receiveUserInteractions( result );
-		yield setIsRequesting( false );
 	} catch ( error ) {
 		yield setRequestingError( error, 'user_interaction' );
+	} finally {
+		yield setIsRequesting( false );
 	}
 }

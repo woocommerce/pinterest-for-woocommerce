@@ -3,12 +3,13 @@
  */
 import { recordEvent } from '@woocommerce/tracks';
 import { __, sprintf } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { Icon, trendingUp as trendingUpIcon } from '@wordpress/icons';
 import {
 	Card,
 	CardHeader,
+	Notice,
 	CardFooter,
 	ExternalLink,
 	Flex,
@@ -41,6 +42,11 @@ const SyncState = () => {
 		select( REPORTS_STORE_NAME ).getFeedState()
 	);
 
+	const error = useSelect( ( select ) =>
+		select( REPORTS_STORE_NAME ).getReportsRequestingError( 'feed_state' )
+	);
+	const { invalidateResolution } = useDispatch( REPORTS_STORE_NAME );
+
 	const hasAvailableCredits =
 		useSettingsSelect()?.account_data?.available_discounts?.marketing_offer
 			?.remaining_discount;
@@ -64,8 +70,32 @@ const SyncState = () => {
 					{ __( 'Overview', 'pinterest-for-woocommerce' ) }
 				</Text>
 			</CardHeader>
-			<SyncStateSummary overview={ feedState?.overview } />
-			<SyncStateTable workflow={ feedState?.workflow } />
+			{ error ? (
+				<Notice
+					status="error"
+					isDismissible={ false }
+					actions={ [
+						{
+							label: __(
+								'Try again',
+								'pinterest-for-woocommerce'
+							),
+							onClick: () =>
+								invalidateResolution( 'getFeedState', [] ),
+						},
+					] }
+				>
+					{ __(
+						'Unable to load the catalog overview.',
+						'pinterest-for-woocommerce'
+					) }
+				</Notice>
+			) : (
+				<>
+					<SyncStateSummary overview={ feedState?.overview } />
+					<SyncStateTable workflow={ feedState?.workflow } />
+				</>
+			) }
 			<CardFooter justify="flex-start">
 				<Icon icon={ trendingUpIcon } />
 				<Flex
