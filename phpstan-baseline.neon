@@ -139,12 +139,6 @@ parameters:
 			path: src/CommerceIntegration.php
 
 		-
-			message: '#^Parameter \#1 \$text of function esc_html expects string, int given\.$#'
-			identifier: argument.type
-			count: 3
-			path: src/CommerceIntegration.php
-
-		-
 			message: '#^Parameter \#1 \$retry of static method Automattic\\WooCommerce\\Pinterest\\Crypto\:\:get_key\(\) expects string\|null, int given\.$#'
 			identifier: argument.type
 			count: 1
@@ -179,12 +173,6 @@ parameters:
 			identifier: nullCoalesce.expr
 			count: 1
 			path: src/FeedStatusService.php
-
-		-
-			message: '#^Parameter \#1 \$text of function esc_html expects string, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Feeds.php
 
 		-
 			message: '#^Call to an undefined method WC_Data_Store\:\:get_notes_with_name\(\)\.$#'

@@ -176,7 +176,7 @@ class Feeds {
 			$delay   = is_numeric( $stored_delay ) && (int) $stored_delay > 0
 				? (int) $stored_delay
 				: MINUTE_IN_SECONDS;
-			$message = sprintf( '%1$s - %2$s', esc_html( $e->get_pinterest_code() ), esc_html( $e->getMessage() ) );
+			$message = sprintf( '%1$s - %2$s', esc_html( (string) $e->get_pinterest_code() ), esc_html( $e->getMessage() ) );
 			set_transient( $cache_key, $message, $delay );
 			// Double the delay.
 			Pinterest_For_Woocommerce()::save_data(
