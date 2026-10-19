@@ -19,26 +19,8 @@ parameters:
 			path: class-pinterest-for-woocommerce.php
 
 		-
-			message: '#^Negated boolean expression is always true\.$#'
-			identifier: booleanNot.alwaysTrue
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
 			message: '#^Property WP\:\:\$request \(string\) on left side of \?\? is not nullable\.$#'
 			identifier: nullCoalesce.property
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Result of \|\| is always true\.$#'
-			identifier: booleanOr.alwaysTrue
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Variable \$errors in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
 			count: 1
 			path: class-pinterest-for-woocommerce.php
 

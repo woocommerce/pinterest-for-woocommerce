@@ -7,6 +7,8 @@ parameters:
     phpVersion: 70400
     bootstrapFiles:
         - phpstan-bootstrap.php
+    dynamicConstantNames:
+        - WC_VERSION
     parallel:
         maximumNumberOfProcesses: 2
     paths:
