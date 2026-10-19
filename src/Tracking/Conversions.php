@@ -233,8 +233,12 @@ class Conversions extends Tracker {
 	 *
 	 * The landing-page `epik` parameter is the freshest source. Beacon requests
 	 * carry the landing page as the event source URL, so its query string is
-	 * checked before the current request. Pinterest's `_epik` cookie and the
-	 * WooCommerce session retain the click ID for later events.
+	 * checked before the current request. AJAX and form add-to-cart requests
+	 * do not carry it themselves, so the same-site referer, usually the landing
+	 * page, is checked next. Pinterest's `_epik` cookie and the WooCommerce
+	 * session retain the click ID for later events.
+	 *
+	 * @since x.x.x Reads the click ID from the same-site referer.
 	 *
 	 * @param string $event_source_url Optional URL where the event occurred.
 	 *
@@ -248,6 +252,10 @@ class Conversions extends Tracker {
 			$click_id = self::normalize_click_id( wp_unslash( $_GET['epik'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in normalize_click_id().
 		}
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		if ( false === $click_id ) {
+			$click_id = self::get_click_id_from_url( (string) wp_get_referer() );
+		}
 
 		if ( false === $click_id && isset( $_COOKIE['_epik'] ) && is_string( $_COOKIE['_epik'] ) ) {
 			$click_id = self::normalize_click_id( wp_unslash( $_COOKIE['_epik'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in normalize_click_id().
