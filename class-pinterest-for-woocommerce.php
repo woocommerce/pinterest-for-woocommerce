@@ -105,7 +105,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * The initialized state of the class.
 		 *
-		 * @var Pinterest_For_Woocommerce
+		 * @var bool
 		 * @since 1.0.0
 		 */
 		protected static $initialized = false;
@@ -122,7 +122,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * When set to true, the settings have been
 		 * changed and the runtime cached must be flushed
 		 *
-		 * @var Pinterest_For_Woocommerce
+		 * @var array<string, bool>
 		 * @since 1.0.0
 		 */
 		protected static $dirty_settings = array();

@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adding Save Pin support.
  *
  * @class   SaveToPinterest
- * @version 1.5.4
+ * @version x.x.x
  */
 class SaveToPinterest {
 
@@ -138,7 +138,7 @@ class SaveToPinterest {
 	 * @param Object      $data Data passed to the filter.
 	 * @param \WC_Product $product The product object.
 	 *
-	 * @return bool
+	 * @return string|void
 	 */
 	public static function add_to_wc_blocks( $html, $data, $product ) {
 

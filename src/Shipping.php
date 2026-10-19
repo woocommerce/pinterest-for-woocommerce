@@ -29,7 +29,7 @@ use \WC_Data_Store;
  *
  * @class   Shipping
  * @since   1.0.5
- * @version 1.5.2
+ * @version x.x.x
  */
 class Shipping {
 
@@ -190,7 +190,7 @@ class Shipping {
 	 * @since 1.0.5
 	 *
 	 * @param  array $rates List of shipping rates.
-	 * @return array        Name and cost for the best found rate or null in case nothing was found.
+	 * @return array|null   Name and cost for the best found rate or null in case nothing was found.
 	 */
 	private static function calculate_best_rate( $rates ) {
 		$best_cost = INF;

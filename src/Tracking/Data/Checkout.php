@@ -14,7 +14,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
  * Holds Checkout event related data to pass it into trackers.
  *
  * @class   Checkout
- * @version 1.4.0
+ * @version x.x.x
  */
 class Checkout extends Data {
 
@@ -57,7 +57,7 @@ class Checkout extends Data {
 	 * @param string    $event_id  A unique event id as a requirement by Pinterest for deduplication purposes.
 	 * @param string    $order_id  WooCommerce Order ID.
 	 * @param string    $price     WooCommerce total order amount.
-	 * @param string    $quantity  Number of items.
+	 * @param int       $quantity  Number of items.
 	 * @param string    $currency  Order currency.
 	 * @param Product[] $items     An array of ordered items.
 	 */

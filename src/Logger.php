@@ -18,14 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class responsible for logging stuff
  *
  * @class   Logger
- * @version 1.5.2
+ * @version x.x.x
  */
 class Logger {
 
 	/**
 	 * The single instance of the class.
 	 *
-	 * @var \WC_Logger
+	 * @var \WC_Logger_Interface|null
 	 * @since 1.0.0
 	 */
 	public static $logger;
