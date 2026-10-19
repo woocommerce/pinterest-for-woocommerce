@@ -235,9 +235,8 @@ class Conversions extends Tracker {
 	 * carry the landing page as the event source URL, so its query string is
 	 * checked before the current request. AJAX and form add-to-cart requests
 	 * do not carry it themselves, so the referer is checked next when it is on
-	 * this site or another allowed redirect host; for add-to-cart requests that
-	 * is usually the landing page, as long as the browser's referrer policy
-	 * keeps the query string. Pinterest's `_epik` cookie and the WooCommerce
+	 * this site; for add-to-cart requests that is usually the landing page, as
+	 * long as the browser's referrer policy keeps the query string. Pinterest's `_epik` cookie and the WooCommerce
 	 * session retain the click ID for later events.
 	 *
 	 * @since x.x.x Reads the click ID from the referer.
@@ -256,7 +255,11 @@ class Conversions extends Tracker {
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		if ( false === $click_id ) {
-			$click_id = self::get_click_id_from_url( (string) wp_get_referer() );
+			$referer = (string) wp_get_referer();
+			// wp_get_referer() also accepts other allowed redirect hosts; only this site's pages count.
+			if ( wp_parse_url( $referer, PHP_URL_HOST ) === strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) ) ) {
+				$click_id = self::get_click_id_from_url( $referer );
+			}
 		}
 
 		if ( false === $click_id && isset( $_COOKIE['_epik'] ) && is_string( $_COOKIE['_epik'] ) ) {

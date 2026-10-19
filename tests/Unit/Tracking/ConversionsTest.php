@@ -496,6 +496,28 @@ class ConversionsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that an allowed redirect host does not count as this site.
+	 *
+	 * @return void
+	 */
+	public function test_add_to_cart_ignores_epik_from_allowed_redirect_host_referer() {
+		add_filter(
+			'allowed_redirect_hosts',
+			function ( $hosts ) {
+				$hosts[] = 'partner.test';
+				return $hosts;
+			}
+		);
+		$_SERVER['HTTP_REFERER'] = 'https://partner.test/?epik=partner-click-id';
+		$_COOKIE['_epik']        = 'cookie-click-id';
+
+		$data = $this->prepare_add_to_cart_data();
+
+		$this->assertSame( 'cookie-click-id', $data['user_data']['click_id'] );
+		$this->assertSame( 'cookie-click-id', WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
 	 * Tests that the referer click ID, from the current visit, wins over the cookie.
 	 *
 	 * @return void
