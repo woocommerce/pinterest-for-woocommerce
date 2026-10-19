@@ -23,6 +23,7 @@ import NavigationClassic from '../components/navigation-classic';
 import OnboardingModals from './components/OnboardingModals';
 import { USER_INTERACTION_STORE_NAME } from './data';
 import { useSettingsSelect } from '../setup-guide/app/helpers/effects';
+import { SETTINGS_STORE_NAME } from '../setup-guide/app/data';
 
 /**
  * Opening a modal.
@@ -57,8 +58,6 @@ const CatalogSyncApp = () => {
 	useCreateNotice( wcSettings.pinterest_for_woocommerce.error );
 	const [ isOnboardingModalOpen, setIsOnboardingModalOpen ] =
 		useState( false );
-	const [ isAdCreditsNoticeOpen, setIsAdCreditsNoticeOpen ] =
-		useState( false );
 	const [ isCapiModalOpen, setIsCapiModalOpen ] = useState( false );
 	const hasClosedCapiModal = useRef( false );
 
@@ -70,8 +69,19 @@ const CatalogSyncApp = () => {
 		select( USER_INTERACTION_STORE_NAME ).areInteractionsLoaded()
 	);
 
+	const settingsLoaded = useSelect( ( select ) =>
+		select( SETTINGS_STORE_NAME ).hasFinishedResolution( 'getSettings', [] )
+	);
+	const isAdCreditsNoticeOpen =
+		settingsLoaded &&
+		userInteractionsLoaded &&
+		! userInteractions?.ads_notice_dismissed &&
+		// Successful redemptions store a false error ID.
+		( ! couponRedeemErrorID || couponRedeemErrorID === 2322 );
+
 	const openOnboardingModal = useCallback( () => {
 		if (
+			! settingsLoaded ||
 			userInteractionsLoaded === false ||
 			userInteractions?.ads_modal_dismissed
 		) {
@@ -83,32 +93,15 @@ const CatalogSyncApp = () => {
 			context: 'catalog-sync',
 			name: 'ads-credits-onboarding',
 		} );
-	}, [ userInteractions?.ads_modal_dismissed, userInteractionsLoaded ] );
-
-	const openAdsCreditsNotice = useCallback( () => {
-		if (
-			userInteractionsLoaded === false ||
-			userInteractions?.ads_notice_dismissed
-		) {
-			return;
-		}
-
-		if (
-			couponRedeemErrorID !== undefined &&
-			couponRedeemErrorID !== 2322
-		) {
-			return;
-		}
-
-		setIsAdCreditsNoticeOpen( true );
 	}, [
-		userInteractions?.ads_notice_dismissed,
+		settingsLoaded,
+		userInteractions?.ads_modal_dismissed,
 		userInteractionsLoaded,
-		couponRedeemErrorID,
 	] );
 
 	const openCapiModal = useCallback( () => {
 		if (
+			! settingsLoaded ||
 			userInteractionsLoaded === false ||
 			userInteractions?.capi_modal_dismissed ||
 			! userInteractions?.ads_modal_dismissed ||
@@ -127,6 +120,7 @@ const CatalogSyncApp = () => {
 
 		setIsCapiModalOpen( true );
 	}, [
+		settingsLoaded,
 		userInteractionsLoaded,
 		userInteractions?.capi_modal_dismissed,
 		userInteractions?.ads_modal_dismissed,
@@ -159,9 +153,11 @@ const CatalogSyncApp = () => {
 
 	useEffect( () => {
 		openOnboardingModal();
-		openAdsCreditsNotice();
+	}, [ openOnboardingModal ] );
+
+	useEffect( () => {
 		openCapiModal();
-	}, [ openOnboardingModal, openAdsCreditsNotice, openCapiModal ] );
+	}, [ openCapiModal ] );
 
 	return (
 		<div className="pinterest-for-woocommerce-catalog-sync">

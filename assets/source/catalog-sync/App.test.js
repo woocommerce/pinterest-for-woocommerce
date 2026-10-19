@@ -4,7 +4,13 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+	act,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from '@testing-library/react';
 import apiFetch from '@wordpress/api-fetch';
 import { recordEvent } from '@woocommerce/tracks';
 
@@ -45,7 +51,7 @@ vi.mock( './sections/SyncIssues', () => ( { default: () => null } ) );
 const SETTINGS_PATH = '/pinterest/v1/settings';
 const INTERACTIONS_PATH = '/pinterest/v1/user_interaction';
 
-// Holds the saved dismissals back until the settings are in: see `openCatalog()`.
+// Holds saved dismissals until the test answers them.
 let settingsLoaded;
 
 // A merchant in the ad credits campaign, tracking with the Tag only.
@@ -65,12 +71,17 @@ const SETTINGS = {
  * the way `UserInteraction::set_user_interaction()` does, so a fresh mount
  * reads back only what a request actually saved.
  *
- * @param {Object} options
- * @param {Object} [options.settings]  Plugin settings to serve.
- * @param {Object} [options.dismissed] Dismissals saved before the visit.
+ * @param {Object}  options
+ * @param {Object}  [options.settings]     Plugin settings to serve.
+ * @param {Object}  [options.dismissed]    Dismissals saved before the visit.
+ * @param {Promise} [options.settingsGate] Holds the settings response.
  * @return {Object} The saved dismissals, updated by the requests.
  */
-function serve( { settings = SETTINGS, dismissed = {} } ) {
+function serve( {
+	settings = SETTINGS,
+	dismissed = {},
+	settingsGate = Promise.resolve(),
+} ) {
 	const saved = {
 		ads_modal_dismissed: false,
 		ads_notice_dismissed: false,
@@ -80,6 +91,7 @@ function serve( { settings = SETTINGS, dismissed = {} } ) {
 
 	apiFetch.mockImplementation( async ( { path, method = 'GET', data } ) => {
 		if ( path === SETTINGS_PATH && method === 'GET' ) {
+			await settingsGate;
 			return { [ OPTIONS_NAME ]: settings };
 		}
 		if ( path === INTERACTIONS_PATH && method === 'GET' ) {
@@ -101,14 +113,17 @@ function serve( { settings = SETTINGS, dismissed = {} } ) {
 /**
  * Opens the Catalog tab as a page load does: with empty stores.
  *
- * The two requests of a page load are answered in a fixed order, settings
- * first, so that no test depends on which one happens to win.
+ * Settings resolve first by default; race tests can answer dismissals first.
  *
  * @param {Object}  [options]
- * @param {boolean} [options.holdDismissals=false] Whether to leave the saved dismissals unanswered.
+ * @param {boolean} [options.holdDismissals=false]    Whether to leave the saved dismissals unanswered.
+ * @param {boolean} [options.interactionsFirst=false] Answer dismissals before settings.
  * @return {Promise<Object>} The registry, `unmount`, and `answerDismissals` to answer a held request.
  */
-async function openCatalog( { holdDismissals = false } = {} ) {
+async function openCatalog( {
+	holdDismissals = false,
+	interactionsFirst = false,
+} = {} ) {
 	let answerDismissals;
 	settingsLoaded = new Promise( ( resolve ) => {
 		answerDismissals = resolve;
@@ -137,13 +152,15 @@ async function openCatalog( { holdDismissals = false } = {} ) {
 		</RegistryProvider>
 	);
 
-	await waitFor( () =>
-		expect(
-			registry
-				.select( SETTINGS_STORE )
-				.hasFinishedResolution( 'getSettings', [] )
-		).toBe( true )
-	);
+	if ( ! interactionsFirst ) {
+		await waitFor( () =>
+			expect(
+				registry
+					.select( SETTINGS_STORE )
+					.hasFinishedResolution( 'getSettings', [] )
+			).toBe( true )
+		);
+	}
 
 	if ( ! holdDismissals ) {
 		answerDismissals();
@@ -416,4 +433,49 @@ describe( 'Catalog tab prompts', () => {
 			{ ads_notice_dismissed: true },
 		] );
 	} );
+
+	test.each( [ undefined, false, 2322, 2319 ] )(
+		'late settings with coupon %s decide prompts once',
+		async ( errorId ) => {
+			let answerSettings;
+			const settingsGate = new Promise( ( resolve ) => {
+				answerSettings = resolve;
+			} );
+			serve( {
+				settingsGate,
+				settings: {
+					...SETTINGS,
+					account_data: {
+						...SETTINGS.account_data,
+						coupon_redeem_info: { error_id: errorId },
+					},
+				},
+				dismissed: { capi_modal_dismissed: true },
+			} );
+			const { registry } = await openCatalog( {
+				interactionsFirst: true,
+			} );
+			expect(
+				recordEvent.mock.calls.filter(
+					( [ event ] ) => event === 'pfw_modal_open'
+				)
+			).toHaveLength( 0 );
+			await act( async () => answerSettings() );
+			await waitFor( () =>
+				expect(
+					registry
+						.select( SETTINGS_STORE )
+						.hasFinishedResolution( 'getSettings', [] )
+				).toBe( true )
+			);
+			expect(
+				recordEvent.mock.calls.filter(
+					( [ event ] ) => event === 'pfw_modal_open'
+				)
+			).toHaveLength( 1 );
+			expect( adCreditsNotice() !== null ).toBe(
+				! errorId || errorId === 2322
+			);
+		}
+	);
 } );
