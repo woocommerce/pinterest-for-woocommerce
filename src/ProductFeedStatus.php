@@ -61,7 +61,7 @@ class ProductFeedStatus {
 
 		foreach ( self::STATE_PROPS as $key => $default_value ) {
 
-			if ( ! isset( self::$state[ $key ] ) || null === self::$state[ $key ] ) {
+			if ( ! isset( self::$state[ $key ] ) ) {
 				self::$state[ $key ] = get_option( self::PINTEREST_FOR_WOOCOMMERCE_FEEDS_DATA_PREFIX . $key, $default_value );
 			}
 

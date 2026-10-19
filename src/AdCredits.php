@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Handling ad credits.
  *
  * @class   AdCredits
- * @version 1.5.2
+ * @version x.x.x
  */
 class AdCredits {
 
@@ -235,7 +235,7 @@ class AdCredits {
 			);
 		}
 
-		if ( ! is_wp_error( $request ) && 200 === $request['response']['code'] ) {
+		if ( 200 === $request['response']['code'] ) {
 			$recommendations = json_decode( $request['body'], true );
 		}
 

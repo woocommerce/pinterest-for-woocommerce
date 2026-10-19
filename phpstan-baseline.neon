@@ -79,12 +79,6 @@ parameters:
 			path: src/API/Base.php
 
 		-
-			message: '#^Call to function method_exists\(\) with Automattic\\WooCommerce\\Pinterest\\PinterestApiException and ''get_pinterest_code'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/API/DomainVerification.php
-
-		-
 			message: '#^Expression on left side of \?\? is not nullable\.$#'
 			identifier: nullCoalesce.expr
 			count: 1
@@ -93,12 +87,6 @@ parameters:
 		-
 			message: '#^Action callback returns mixed but should not return anything\.$#'
 			identifier: return.void
-			count: 1
-			path: src/AdCredits.php
-
-		-
-			message: '#^Call to function is_wp_error\(\) with array\{headers\: WpOrg\\Requests\\Utility\\CaseInsensitiveDictionary, body\: string, response\: array\{code\: int, message\: string\}, cookies\: array\<int, WP_Http_Cookie\>, filename\: string\|null, http_response\: WP_HTTP_Requests_Response\} will always evaluate to false\.$#'
-			identifier: function.impossibleType
 			count: 1
 			path: src/AdCredits.php
 
@@ -163,12 +151,6 @@ parameters:
 			path: src/Notes/MarketingNotifications.php
 
 		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
-			count: 1
-			path: src/PinterestApiException.php
-
-		-
 			message: '#^Access to an undefined property WC_Shipping_Method\:\:\$requires\.$#'
 			identifier: property.notFound
 			count: 1
@@ -179,12 +161,6 @@ parameters:
 			identifier: isset.offset
 			count: 1
 			path: src/Product/GoogleCategorySearch.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between null and mixed will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: src/ProductFeedStatus.php
 
 		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
