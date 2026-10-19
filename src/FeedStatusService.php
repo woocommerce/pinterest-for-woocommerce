@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
  * Class handling methods to return Pinterest Feed Status.
  *
  * @class   FeedStatusService
- * @version 1.4.27
+ * @version x.x.x
  */
 class FeedStatusService {
 
@@ -225,7 +225,7 @@ class FeedStatusService {
 			return static::FEED_STATUS_NOT_REGISTERED;
 		}
 
-		return strtolower( $feed['status'] ) ?? static::FEED_STATUS_NOT_REGISTERED;
+		return strtolower( $feed['status'] ?? static::FEED_STATUS_NOT_REGISTERED );
 	}
 
 	/**
