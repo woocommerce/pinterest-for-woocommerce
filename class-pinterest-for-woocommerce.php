@@ -1462,7 +1462,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Helper function to return the country set in WC's settings using wc_get_base_location().
 		 *
-		 * @param string $default_country Default country code to return if no country is set.
+		 * @param string|null $default_country Default country code to return if no country is set.
 		 *
 		 * @return mixed|string|null
 		 */

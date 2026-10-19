@@ -74,9 +74,9 @@ class Logger {
 	/**
 	 * Helper for Logging API requests.
 	 *
-	 * @param string   $url   The URL of the request.
-	 * @param string[] $args  The Arguments of the request.
-	 * @param string   $level The default level/context of the message to be logged.
+	 * @param string               $url   The URL of the request.
+	 * @param array<string, mixed> $args  The Arguments of the request.
+	 * @param string               $level The default level/context of the message to be logged.
 	 *
 	 * @return void
 	 */

@@ -126,9 +126,9 @@ class AdCredits {
 	 *
 	 * @since 1.2.5
 	 *
-	 * @param string  $offer_code Coupon string.
-	 * @param integer $error_code Reference parameter for error number.
-	 * @param string  $error_message Reference parameter for error message.
+	 * @param string         $offer_code Coupon string.
+	 * @param int|false|null $error_code Reference parameter for error number.
+	 * @param string         $error_message Reference parameter for error message.
 	 *
 	 * @return bool Weather the coupon was successfully redeemed or not.
 	 */
