@@ -61,18 +61,6 @@ parameters:
 			path: includes/admin/class-pinterest-for-woocommerce-admin.php
 
 		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
-			count: 1
-			path: src/API/AdvertiserConnect.php
-
-		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
-			count: 1
-			path: src/API/Auth.php
-
-		-
 			message: '#^Call to function is_wp_error\(\) with WP_Error will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -89,12 +77,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: src/API/FeedIssues.php
-
-		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
-			count: 1
-			path: src/API/FeedState.php
 
 		-
 			message: '#^Action callback returns mixed but should not return anything\.$#'
@@ -125,12 +107,6 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			count: 2
 			path: src/Exception/ValidateInterface.php
-
-		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
-			count: 1
-			path: src/FeedGenerator.php
 
 		-
 			message: '#^Action callback returns bool but should not return anything\.$#'
@@ -317,12 +293,6 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: src/Shipping.php
-
-		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
-			count: 1
-			path: src/TrackerSnapshot.php
 
 		-
 			message: '#^Call to an undefined method WC_Order_Item\:\:get_total\(\)\.$#'

@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Endpoint returning the current state of the XML feed.
  *
  * @class   FeedState
- * @version 1.5.2
+ * @version x.x.x
  */
 class FeedState extends VendorAPI {
 
@@ -448,7 +448,7 @@ class FeedState extends VendorAPI {
 	 */
 	private static function map_status_into_extra_info( array $processing_results ): string {
 		$status                  = $processing_results['status'] ?? '';
-		$original_products_count = (int) $processing_results['product_counts']['original'] ?? 0;
+		$original_products_count = (int) ( $processing_results['product_counts']['original'] ?? 0 );
 		$processing_date         = date_create_from_format(
 			'Y-m-d\TH:i:s',
 			$processing_results['created_at'] ?? gmdate( 'Y-m-d\TH:i:s' )

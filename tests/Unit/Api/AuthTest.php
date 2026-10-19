@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit\Api;
 
+use Pinterest_For_Woocommerce;
 use RuntimeException;
 use WP_REST_Request;
 use WP_Test_REST_TestCase;
@@ -16,7 +17,7 @@ use WP_Test_REST_TestCase;
 /**
  * Tests for the OAuth callback endpoint.
  *
- * @version 1.5.0
+ * @version x.x.x
  */
 class AuthTest extends WP_Test_REST_TestCase {
 
@@ -166,6 +167,26 @@ class AuthTest extends WP_Test_REST_TestCase {
 
 		$this->assertTrue( $this->dispatch_until_redirect( $this->request( 'issued-state' ) ) );
 		$this->assertFalse( has_filter( 'rest_pre_serve_request', array( $this->auth(), 'redirect_to_settings_page' ) ) );
+	}
+
+	/**
+	 * Tests a connection without feature flags saves the account and turns the OAuth features off.
+	 *
+	 * @return void
+	 */
+	public function test_callback_without_feature_flags_saves_the_account_and_disables_the_features() {
+		// Keep the post-connection API calls out of the test; only the callback's own work is under test.
+		remove_all_actions( 'pinterest_for_woocommerce_token_saved' );
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions', true );
+		$this->issue_state();
+
+		$request = $this->request( 'issued-state' );
+		$request->set_param( 'token_data', base64_encode( rawurlencode( wp_json_encode( array( 'expires_in' => HOUR_IN_SECONDS ) ) ) ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Encodes the payload the way the connect server sends it.
+		$request->set_param( 'info', base64_encode( rawurlencode( wp_json_encode( array( 'advertiser_id' => 'ai-1234567890' ) ) ) ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Encodes the payload the way the connect server sends it.
+
+		$this->assertTrue( $this->dispatch_until_redirect( $request ) );
+		$this->assertSame( 'ai-1234567890', Pinterest_For_Woocommerce::get_setting( 'tracking_advertiser', true ) );
+		$this->assertFalse( Pinterest_For_Woocommerce::get_setting( 'track_conversions', true ) );
 	}
 
 	/**

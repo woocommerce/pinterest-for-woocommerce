@@ -11,7 +11,7 @@ use WP_UnitTestCase;
 /**
  * Feed diagnostics preserve text without interpreting status markup.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class FeedStateTest extends WP_UnitTestCase {
 
@@ -39,6 +39,22 @@ class FeedStateTest extends WP_UnitTestCase {
 			$this->assertStringContainsString( $expected, $info );
 		}
 		$this->assertStringNotContainsString( '<', $info );
+	}
+
+	/**
+	 * A completed result without product counts reports zero products.
+	 */
+	public function test_processing_status_diagnostics_without_product_counts_reports_zero_products() {
+		$method = new ReflectionMethod( FeedState::class, 'map_status_into_extra_info' );
+		$method->setAccessible( true );
+		$info = $method->invoke(
+			null,
+			array(
+				'status'     => 'COMPLETED',
+				'created_at' => gmdate( 'Y-m-d\TH:i:s', time() - HOUR_IN_SECONDS ),
+			)
+		);
+		$this->assertStringContainsString( 'containing 0 products', $info );
 	}
 
 	/**

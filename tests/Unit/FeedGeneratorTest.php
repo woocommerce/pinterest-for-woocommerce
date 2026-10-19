@@ -247,6 +247,19 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * An error without a type is not treated as an execution timeout.
+	 *
+	 * @return void
+	 */
+	public function test_is_timeout_error_returns_false_for_an_error_without_a_type() {
+		$error = array(
+			'message' => 'Maximum execution time of 30 seconds exceeded',
+		);
+
+		$this->assertFalse( $this->invoke_protected( $this->feed_generator, 'is_timeout_error', array( $error ) ) );
+	}
+
+	/**
 	 * A timeout on another Action Scheduler hook must not change feed state or jobs.
 	 *
 	 * @return void
