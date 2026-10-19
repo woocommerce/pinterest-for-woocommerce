@@ -380,4 +380,40 @@ describe( 'Catalog tab prompts', () => {
 
 		expect( capiModal() ).not.toBeNull();
 	} );
+	test( 'shows onboarding before CAPI and never saves an automatic dismissal', async () => {
+		const saved = serve( {} );
+		await openCatalog();
+		expect( dialogs() ).toHaveLength( 1 );
+		expect( screen.queryByText( /^You are one step away/ ) ).not.toBeNull();
+		expect( capiModal() ).toBeNull();
+		expect( saved.ads_modal_dismissed ).toBe( false );
+		expect( requests( 'POST' ) ).toHaveLength( 0 );
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Do this later' } )
+		);
+		await waitFor( () => expect( capiModal() ).not.toBeNull() );
+		expect( dialogs() ).toHaveLength( 1 );
+		expect( saved.ads_modal_dismissed ).toBe( true );
+	} );
+
+	test( 'closing CAPI keeps it closed after dismissing the ad credits notice', async () => {
+		serve( { dismissed: { ads_modal_dismissed: true } } );
+		const { registry } = await openCatalog();
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Close dialog' } )
+		);
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Dismiss this notice' } )
+		);
+		await waitFor( () =>
+			expect(
+				registry.select( INTERACTIONS_STORE ).getUserInteractions()
+					.ads_notice_dismissed
+			).toBe( true )
+		);
+		expect( capiModal() ).toBeNull();
+		expect( requests( 'POST' ).map( ( { data } ) => data ) ).toEqual( [
+			{ ads_notice_dismissed: true },
+		] );
+	} );
 } );

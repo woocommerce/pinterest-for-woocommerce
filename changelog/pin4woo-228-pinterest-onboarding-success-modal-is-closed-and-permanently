@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Showed catalog onboarding before the Conversions API prompt and kept a closed Conversions API prompt hidden for the rest of the visit.

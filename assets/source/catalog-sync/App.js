@@ -3,7 +3,7 @@
  */
 import '@wordpress/notices';
 import { useSelect } from '@wordpress/data';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { recordEvent } from '@woocommerce/tracks';
 
 /**
@@ -28,14 +28,14 @@ import { useSettingsSelect } from '../setup-guide/app/helpers/effects';
  * Opening a modal.
  *
  * @event wcadmin_pfw_modal_open
- * @property {string} name Ads Onboarding Modal.
+ * @property {string} name    Ads Onboarding Modal.
  * @property {string} context catalog-sync
  */
 /**
  * Closing a modal.
  *
  * @event wcadmin_pfw_modal_closed
- * @property {string} name Ads Onboarding Modal.
+ * @property {string} name    Ads Onboarding Modal.
  * @property {string} context catalog-sync
  */
 
@@ -60,6 +60,7 @@ const CatalogSyncApp = () => {
 	const [ isAdCreditsNoticeOpen, setIsAdCreditsNoticeOpen ] =
 		useState( false );
 	const [ isCapiModalOpen, setIsCapiModalOpen ] = useState( false );
+	const hasClosedCapiModal = useRef( false );
 
 	const userInteractions = useSelect( ( select ) =>
 		select( USER_INTERACTION_STORE_NAME ).getUserInteractions()
@@ -109,7 +110,9 @@ const CatalogSyncApp = () => {
 	const openCapiModal = useCallback( () => {
 		if (
 			userInteractionsLoaded === false ||
-			userInteractions?.capi_modal_dismissed
+			userInteractions?.capi_modal_dismissed ||
+			! userInteractions?.ads_modal_dismissed ||
+			hasClosedCapiModal.current
 		) {
 			return;
 		}
@@ -126,6 +129,7 @@ const CatalogSyncApp = () => {
 	}, [
 		userInteractionsLoaded,
 		userInteractions?.capi_modal_dismissed,
+		userInteractions?.ads_modal_dismissed,
 		appSettings?.track_conversions,
 		appSettings?.track_conversions_capi,
 	] );
@@ -176,7 +180,10 @@ const CatalogSyncApp = () => {
 			) }
 			{ isCapiModalOpen && (
 				<CapiEnablementModal
-					onCloseModal={ () => setIsCapiModalOpen( false ) }
+					onCloseModal={ () => {
+						hasClosedCapiModal.current = true;
+						setIsCapiModalOpen( false );
+					} }
 					onDismiss={ handleSetDismissCapiModal }
 				/>
 			) }
