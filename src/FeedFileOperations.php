@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class which handles all feed file filesystem operations.
  *
  * @class   FeedFileOperations
- * @version 1.5.0
+ * @version x.x.x
  */
 class FeedFileOperations {
 
@@ -107,8 +107,8 @@ class FeedFileOperations {
 	 * Utility function for functions using file_put_contents.
 	 *
 	 * @since 1.2.9
-	 * @param integer $bytes_written How much data was written to the file.
-	 * @param string  $file          File location.
+	 * @param int|false $bytes_written How much data was written to the file, or false on failure.
+	 * @param string    $file          File location.
 	 *
 	 * @throws FeedFileOperationsException Can't open or write to the file.
 	 */

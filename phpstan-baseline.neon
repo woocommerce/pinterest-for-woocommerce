@@ -19,18 +19,6 @@ parameters:
 			path: class-pinterest-for-woocommerce.php
 
 		-
-			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 2
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Call to function is_null\(\) with Pinterest_For_Woocommerce will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
 			message: '#^Negated boolean expression is always true\.$#'
 			identifier: booleanNot.alwaysTrue
 			count: 1
@@ -91,12 +79,6 @@ parameters:
 			path: includes/admin/class-pinterest-for-woocommerce-admin.php
 
 		-
-			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/API/APIV5.php
-
-		-
 			message: '#^Expression on left side of \?\? is not nullable\.$#'
 			identifier: nullCoalesce.expr
 			count: 1
@@ -107,18 +89,6 @@ parameters:
 			identifier: nullCoalesce.expr
 			count: 1
 			path: src/API/Auth.php
-
-		-
-			message: '#^Call to function is_null\(\) with Automattic\\WooCommerce\\Pinterest\\API\\Base will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: src/API/Base.php
-
-		-
-			message: '#^Call to function is_null\(\) with array will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: src/API/Base.php
 
 		-
 			message: '#^Call to function is_wp_error\(\) with WP_Error will always evaluate to true\.$#'
@@ -137,18 +107,6 @@ parameters:
 			identifier: nullCoalesce.expr
 			count: 1
 			path: src/API/FeedState.php
-
-		-
-			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/API/Settings.php
-
-		-
-			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/API/Tags.php
 
 		-
 			message: '#^Action callback returns mixed but should not return anything\.$#'
@@ -185,12 +143,6 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			count: 2
 			path: src/Exception/ValidateInterface.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between false and int will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: src/FeedFileOperations.php
 
 		-
 			message: '#^Expression on left side of \?\? is not nullable\.$#'
@@ -241,18 +193,6 @@ parameters:
 			path: src/PinterestShippingZone.php
 
 		-
-			message: '#^Call to function is_null\(\) with Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: src/Product/Attributes/AttributeManager.php
-
-		-
-			message: '#^Property Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:\$attribute_types_map \(array\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: src/Product/Attributes/AttributeManager.php
-
-		-
 			message: '#^Offset ''label'' on non\-empty\-array\<literal\-string&non\-falsy\-string, \(array\<int, literal\-string&non\-falsy\-string\>\)\|literal\-string\> in isset\(\) always exists and is not nullable\.$#'
 			identifier: isset.offset
 			count: 1
@@ -267,7 +207,7 @@ parameters:
 		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
-			count: 2
+			count: 1
 			path: src/ProductSync.php
 
 		-

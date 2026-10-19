@@ -155,8 +155,8 @@ class ProductSync {
 	 *
 	 * @since 1.0.10
 	 *
-	 * @param array $old_value Option old value.
-	 * @param array $value     Option new value.
+	 * @param mixed $old_value Option old value.
+	 * @param mixed $value     Option new value.
 	 */
 	public static function maybe_deregister( $old_value, $value ) {
 		if ( ! is_array( $value ) ) {
