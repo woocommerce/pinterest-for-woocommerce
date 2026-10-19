@@ -138,12 +138,12 @@ class SaveToPinterest {
 	 * @param Object      $data Data passed to the filter.
 	 * @param \WC_Product $product The product object.
 	 *
-	 * @return string|void
+	 * @return string
 	 */
 	public static function add_to_wc_blocks( $html, $data, $product ) {
 
 		if ( empty( $product ) ) {
-			return;
+			return $html;
 		}
 
 		return str_replace( '</li>', self::render_pin( $product->get_id() ) . '</li>', $html );

@@ -22,7 +22,7 @@ use WP_UnitTestCase;
  * that decodes back to the product's name, address and image. How Pinterest's own script reads
  * the link is not simulated here.
  *
- * @version 1.5.4
+ * @version x.x.x
  */
 class SaveToPinterestTest extends WP_UnitTestCase {
 
@@ -192,6 +192,29 @@ class SaveToPinterestTest extends WP_UnitTestCase {
 			),
 			$this->decoded_query( $this->pin_link( $this->parse( $html ) ) )
 		);
+	}
+
+	/**
+	 * A product grid item without a product keeps its markup instead of being blanked.
+	 *
+	 * @return void
+	 */
+	public function test_product_grid_block_item_without_a_product_is_passed_through() {
+		SaveToPinterest::maybe_init();
+
+		/**
+		 * The filter WooCommerce Blocks passes each product grid item through.
+		 *
+		 * @since 1.0.0
+		 */
+		$html = apply_filters(
+			'woocommerce_blocks_product_grid_item_html',
+			'<li class="wc-block-grid__product"></li>',
+			(object) array(),
+			null
+		);
+
+		$this->assertSame( '<li class="wc-block-grid__product"></li>', $html );
 	}
 
 	/**
