@@ -34,8 +34,15 @@ const SyncSettings = () => {
 		useState( false );
 
 	const syncSettings = async () => {
+		removeNotice( 'pinterest-for-woocommerce-settings-synced' );
+
 		try {
-			await syncAppSettings();
+			const result = await syncAppSettings();
+
+			// The server reports a failed sync as `success: false` with HTTP 200.
+			if ( ! result?.success ) {
+				throw new Error( 'Settings sync failed.' );
+			}
 
 			createNotice(
 				'success',
@@ -61,8 +68,6 @@ const SyncSettings = () => {
 							onClick: syncSettings,
 						},
 					],
-				},
-				{
 					id: 'pinterest-for-woocommerce-settings-synced',
 				}
 			);
@@ -73,8 +78,6 @@ const SyncSettings = () => {
 		syncSettings();
 		setTriggeredSyncSettings( true );
 	}
-
-	removeNotice( 'pinterest-for-woocommerce-settings-synced' );
 
 	const lastSyncedTime = appSettings.last_synced_settings
 		? appSettings.last_synced_settings
