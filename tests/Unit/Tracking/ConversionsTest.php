@@ -11,7 +11,7 @@ use WP_UnitTestCase;
 /**
  * Tests the Conversions tracker class.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class ConversionsTest extends WP_UnitTestCase {
 
