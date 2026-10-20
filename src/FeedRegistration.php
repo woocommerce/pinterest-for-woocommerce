@@ -250,7 +250,7 @@ class FeedRegistration {
 	 * If everything is configured correctly, this feed profile id will match
 	 * the setup that the merchant has in Pinterest.
 	 *
-	 * @return string|boolean
+	 * @return string|false
 	 */
 	public static function get_locally_stored_registered_feed_id() {
 		return Pinterest_For_Woocommerce()::get_data( 'feed_registered' ) ?? false;

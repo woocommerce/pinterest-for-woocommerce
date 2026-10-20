@@ -553,12 +553,6 @@ parameters:
 			path: src/API/FeedIssues.php
 
 		-
-			message: '#^Parameter \#1 \$feed_id of static method Automattic\\WooCommerce\\Pinterest\\Feeds\:\:get_feed_recent_processing_results\(\) expects string, string\|true given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/API/FeedIssues.php
-
-		-
 			message: '#^Parameter \#2 \$value of method WP_HTTP_Response\:\:header\(\) expects string, float given\.$#'
 			identifier: argument.type
 			count: 1
@@ -645,12 +639,6 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\FeedState\:\:map_status_into_extra_info\(\) has parameter \$processing_results with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/API/FeedState.php
-
-		-
-			message: '#^Parameter \#1 \$feed_id of static method Automattic\\WooCommerce\\Pinterest\\Feeds\:\:get_feed_recent_processing_results\(\) expects string, string\|true given\.$#'
-			identifier: argument.type
 			count: 1
 			path: src/API/FeedState.php
 
@@ -1147,12 +1135,6 @@ parameters:
 			path: src/FeedRegistration.php
 
 		-
-			message: '#^Parameter \#1 \$feed_id of static method Automattic\\WooCommerce\\Pinterest\\FeedRegistration\:\:maybe_log_failed_processing_result\(\) expects string, string\|true given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/FeedRegistration.php
-
-		-
 			message: '#^Property Automattic\\WooCommerce\\Pinterest\\FeedRegistration\:\:\$configurations is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -1186,12 +1168,6 @@ parameters:
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedStatusService\:\:maybe_retry_on_fetch_error\(\) has parameter \$processing_results with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
-			path: src/FeedStatusService.php
-
-		-
-			message: '#^Parameter \#1 \$feed_id of static method Automattic\\WooCommerce\\Pinterest\\Feeds\:\:get_feed_recent_processing_results\(\) expects string, string\|true given\.$#'
-			identifier: argument.type
-			count: 2
 			path: src/FeedStatusService.php
 
 		-
@@ -1309,22 +1285,10 @@ parameters:
 			path: src/Merchants.php
 
 		-
-			message: '#^Parameter \#1 \$feed_id of static method Automattic\\WooCommerce\\Pinterest\\Feeds\:\:get_feed_recent_processing_results\(\) expects string, string\|true given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/MultichannelMarketing/PinterestChannel.php
-
-		-
 			message: '#^Parameter \#1 \$var of function count expects array\|Countable, array\<WC_Order\>\|stdClass given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/Notes/Collection/AbstractCompleteOnboarding.php
-
-		-
-			message: '#^Parameter \#1 \$feed_id of static method Automattic\\WooCommerce\\Pinterest\\Feeds\:\:get_feed_recent_processing_results\(\) expects string, string\|true given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Notes/Collection/CatalogSyncErrors.php
 
 		-
 			message: '#^Call to an undefined method WC_Data_Store\:\:get_notes_with_name\(\)\.$#'
