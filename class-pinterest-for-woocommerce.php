@@ -8,6 +8,7 @@
 
 use Automattic\WooCommerce\Grow\Tools\CompatChecker\v0_0_1\Checker;
 use Automattic\WooCommerce\Admin\Features\OnboardingTasks\TaskLists;
+use Automattic\WooCommerce\Admin\Marketing\MarketingChannels;
 use Automattic\WooCommerce\Admin\Notes\NotesUnavailableException;
 use Automattic\WooCommerce\Pinterest;
 use Automattic\WooCommerce\Pinterest\AdCredits;
@@ -306,8 +307,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 			add_action( 'init', array( Pinterest\RefreshToken::class, 'schedule_event' ) );
 			add_action( 'init', array( Pinterest\CommerceIntegration::class, 'init' ) );
 
-			// Register the marketing channel if the feature is included.
-			if ( defined( 'WC_MCM_EXISTS' ) ) {
+			// Register the marketing channel if WooCommerce provides the marketing channels API.
+			if ( class_exists( MarketingChannels::class ) ) {
 				add_action(
 					'init',
 					array( Pinterest\MultichannelMarketing\MarketingChannelRegistrar::class, 'register' )
