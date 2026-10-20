@@ -11,7 +11,7 @@ use WP_UnitTestCase;
 /**
  * Tests the Conversions tracker class.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class ConversionsTest extends WP_UnitTestCase {
 
@@ -35,9 +35,11 @@ class ConversionsTest extends WP_UnitTestCase {
 			)
 		);
 
+		$requests = 0;
 		add_filter(
 			'pre_http_request',
-			function ( $response, $parsed_args, $url ) {
+			function ( $response, $parsed_args, $url ) use ( &$requests ) {
+				++$requests;
 				$this->assertEquals(
 					"https://api.pinterest.com/v5/ad_accounts/PFW-123456789/events",
 					$url
@@ -99,6 +101,8 @@ class ConversionsTest extends WP_UnitTestCase {
 		$user        = new User( 'Some IP address.', 'Some user agent string.' );
 		$conversions = new Conversions( $user );
 		$conversions->track_event( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertSame( 1, $requests );
 	}
 
 	/**
