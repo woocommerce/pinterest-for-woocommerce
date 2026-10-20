@@ -72,9 +72,14 @@ describe( 'Save to Pinterest button', () => {
 	// Load the script once: its DOMContentLoaded listener registers a
 	// MutationObserver on the body, and loading it per test would stack one
 	// observer per copy and inflate build() call counts.
+	// The page a single product renders before the script loads.
+	let singleProduct;
+
 	beforeAll( async () => {
+		document.body.innerHTML = `<div class="product"><span class="onsale">Sale!</span><div class="pinterest-for-woocommerce-image-wrapper"></div><div class="woocommerce-product-gallery"><img /></div></div>`;
 		await import( './pinterest-for-woocommerce-save-button' );
 		document.dispatchEvent( new window.Event( 'DOMContentLoaded' ) );
+		singleProduct = document.querySelector( '.product' );
 	} );
 
 	beforeEach( () => {
@@ -83,6 +88,17 @@ describe( 'Save to Pinterest button', () => {
 			.querySelectorAll( 'style' )
 			.forEach( ( s ) => s.remove() );
 		delete window.PinUtils;
+	} );
+
+	it( 'moves the single product button into the image gallery, clear of the sale badge', () => {
+		const wrapper = singleProduct.querySelector(
+			'.pinterest-for-woocommerce-image-wrapper'
+		);
+
+		expect( wrapper.parentElement.className ).toBe(
+			'woocommerce-product-gallery'
+		);
+		expect( wrapper.nextElementSibling.tagName ).toBe( 'IMG' );
 	} );
 
 	/**
