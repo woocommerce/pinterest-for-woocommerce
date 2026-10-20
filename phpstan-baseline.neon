@@ -1333,12 +1333,6 @@ parameters:
 			path: src/PinterestShippingZone.php
 
 		-
-			message: '#^Access to an undefined property object\:\:\$type\.$#'
-			identifier: property.notFound
-			count: 4
-			path: src/PinterestShippingZone.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\PinterestShippingZone\:\:filter_out_not_allowed_countries\(\) has parameter \$locations with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1

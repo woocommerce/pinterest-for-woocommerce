@@ -223,7 +223,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	/**
 	 * Location type detection.
 	 *
-	 * @param  object $location Location to check.
+	 * @param  \stdClass $location Location to check.
 	 * @return boolean
 	 */
 	private function location_is_continent( $location ) {
@@ -233,7 +233,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	/**
 	 * Location type detection.
 	 *
-	 * @param  object $location Location to check.
+	 * @param  \stdClass $location Location to check.
 	 * @return boolean
 	 */
 	private function location_is_country( $location ) {
@@ -243,7 +243,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	/**
 	 * Location type detection.
 	 *
-	 * @param  object $location Location to check.
+	 * @param  \stdClass $location Location to check.
 	 * @return boolean
 	 */
 	private function location_is_state( $location ) {
@@ -253,7 +253,7 @@ class PinterestShippingZone extends WC_Shipping_Zone {
 	/**
 	 * Location type detection.
 	 *
-	 * @param  object $location Location to check.
+	 * @param  \stdClass $location Location to check.
 	 * @return boolean
 	 */
 	private function location_is_postcode( $location ) {
