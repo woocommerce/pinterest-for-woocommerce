@@ -1273,12 +1273,6 @@ parameters:
 			path: src/Notes/FeedDeletionFailure.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Notes\\FeedDeletionFailure\:\:get_note\(\) should return Automattic\\WooCommerce\\Admin\\Notes\\Note but returns Automattic\\WooCommerce\\Admin\\Notes\\Note\|bool\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Notes/FeedDeletionFailure.php
-
-		-
 			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\Notes\\Collection\\AbstractNote\:\:should_be_added\(\) invoked with 1 parameter, 0 required\.$#'
 			identifier: arguments.count
 			count: 1
