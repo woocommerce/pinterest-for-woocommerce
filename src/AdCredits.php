@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Handling ad credits.
  *
  * @class   AdCredits
- * @version 1.5.2
+ * @version x.x.x
  */
 class AdCredits {
 
@@ -126,9 +126,9 @@ class AdCredits {
 	 *
 	 * @since 1.2.5
 	 *
-	 * @param string  $offer_code Coupon string.
-	 * @param integer $error_code Reference parameter for error number.
-	 * @param string  $error_message Reference parameter for error message.
+	 * @param string         $offer_code Coupon string.
+	 * @param int|false|null $error_code Reference parameter for error number.
+	 * @param string         $error_message Reference parameter for error message.
 	 *
 	 * @return bool Weather the coupon was successfully redeemed or not.
 	 */
@@ -235,7 +235,7 @@ class AdCredits {
 			);
 		}
 
-		if ( ! is_wp_error( $request ) && 200 === $request['response']['code'] ) {
+		if ( 200 === $request['response']['code'] ) {
 			$recommendations = json_decode( $request['body'], true );
 		}
 

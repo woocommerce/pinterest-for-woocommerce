@@ -29,7 +29,7 @@ use Throwable;
  * Class Handling feed files generation.
  *
  * @class   FeedGenerator
- * @version 1.5.1
+ * @version x.x.x
  */
 class FeedGenerator extends AbstractChainedJob {
 
@@ -1370,7 +1370,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since 1.2.14
 	 */
 	protected function is_timeout_error( array $error ): bool {
-		$is_error              = E_ERROR === $error['type'] ?? 0;
+		$is_error              = E_ERROR === ( $error['type'] ?? 0 );
 		$is_max_execution_time = strpos( $error['message'] ?? '', 'Maximum execution time' ) !== false;
 		return $is_error && $is_max_execution_time;
 	}

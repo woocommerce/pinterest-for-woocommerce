@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adding RichPins support.
  *
  * @class   RichPins
- * @version 1.5.2
+ * @version x.x.x
  */
 class RichPins {
 
@@ -270,7 +270,7 @@ class RichPins {
 			$tags['article:published_time'] = get_the_date( 'c' );
 		}
 
-		$author = get_userdata( get_queried_object()->post_author );
+		$author = get_userdata( (int) get_queried_object()->post_author );
 		if ( ! empty( $args['posts']['enable_author'] ) && ! empty( $author->display_name ) ) {
 			$tags['article:author'] = $author->display_name;
 		}

@@ -98,7 +98,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * The single instance of the class.
 		 *
-		 * @var Pinterest_For_Woocommerce
+		 * @var Pinterest_For_Woocommerce|null
 		 * @since 1.0.0
 		 */
 		protected static $instance = null;
@@ -578,7 +578,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * @param boolean $force  Controls whether to force getting a fresh value instead of one from the runtime cache.
 		 * @param string  $option Controls which option to read/write to.
 		 *
-		 * @return array
+		 * @return mixed The stored option value: usually an array, false when the option is not stored.
 		 */
 		public static function get_settings( $force = false, $option = PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME ) {
 
@@ -1463,7 +1463,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Helper function to return the country set in WC's settings using wc_get_base_location().
 		 *
-		 * @param string $default_country Default country code to return if no country is set.
+		 * @param string|null $default_country Default country code to return if no country is set.
 		 *
 		 * @return mixed|string|null
 		 */

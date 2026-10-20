@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Base API Methods
  *
  * @class   Base
- * @version 1.5.2
+ * @version x.x.x
  */
 class Base {
 
@@ -33,7 +33,7 @@ class Base {
 	/**
 	 * Holds the instance of the class.
 	 *
-	 * @var Base
+	 * @var Base|null
 	 */
 	protected static $instance = null;
 
@@ -41,7 +41,7 @@ class Base {
 	/**
 	 * The token as saved in the settings.
 	 *
-	 * @var array
+	 * @var array|null
 	 */
 	protected static $token = null;
 
@@ -77,7 +77,7 @@ class Base {
 	 * @param string    $api             The specific Endpoints subset.
 	 * @param int|false $cache_expiry    When set, enables caching on the request and the value is used as the cache's TTL (in seconds).
 	 *
-	 * @return array
+	 * @return mixed Decoded JSON response body: usually an array, null when the body is empty or is not valid JSON.
 	 *
 	 * @throws PinterestApiException Pinterest API exception in case of API error in response.
 	 */
@@ -258,7 +258,7 @@ class Base {
 	 *
 	 * @param array $request (See above).
 	 *
-	 * @return array
+	 * @return mixed Decoded JSON response body: usually an array, null when the body is empty or is not valid JSON.
 	 *
 	 * @throws PinterestApiException Pinterest API exception in case of API error during response or problems with request.
 	 */
@@ -345,7 +345,7 @@ class Base {
 	 *
 	 * @param mixed $response The response to parse.
 	 *
-	 * @return array
+	 * @return mixed Decoded JSON response body: usually an array, null when the body is empty or is not valid JSON.
 	 *
 	 * @throws Exception PHP exception.
 	 */

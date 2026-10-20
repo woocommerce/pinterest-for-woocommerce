@@ -14,14 +14,14 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
  * Category data class to hold category name and id data.
  *
  * @class   Category
- * @version 1.4.0
+ * @version x.x.x
  */
 class Category extends Data {
 
 	/**
 	 * WooCommerce category id.
 	 *
-	 * @var string
+	 * @var int|string
 	 */
 	private $id;
 
@@ -33,9 +33,9 @@ class Category extends Data {
 	private $name;
 
 	/**
-	 * @param string $event_id  A unique event id.
-	 * @param string $id        Product category id.
-	 * @param string $name      Product category name.
+	 * @param string     $event_id  A unique event id.
+	 * @param int|string $id        Product category id.
+	 * @param string     $name      Product category name.
 	 */
 	public function __construct( $event_id, $id, $name ) {
 		parent::__construct( $event_id );

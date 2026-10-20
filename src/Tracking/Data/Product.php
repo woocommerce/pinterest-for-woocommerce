@@ -15,14 +15,14 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
  *
  * @class   Product
  * @since   1.4.0
- * @version 1.4.0
+ * @version x.x.x
  */
 class Product extends Data {
 
 	/**
 	 * Product WooCommerce id.
 	 *
-	 * @var string
+	 * @var int|string
 	 */
 	private $id;
 
@@ -50,7 +50,7 @@ class Product extends Data {
 	/**
 	 * Product price.
 	 *
-	 * @var string
+	 * @var float|int|string
 	 */
 	private $price;
 
@@ -64,19 +64,19 @@ class Product extends Data {
 	/**
 	 * Number of products.
 	 *
-	 * @var string
+	 * @var float|int|string
 	 */
 	private $quantity;
 
 	/**
-	 * @param string $event_id  A unique event ID.
-	 * @param string $id        Product ID.
-	 * @param string $name      Product name.
-	 * @param string $category  Product categories.
-	 * @param string $brand     Product brand.
-	 * @param string $price     Product price.
-	 * @param string $currency  Product currency.
-	 * @param string $quantity  Product quantity.
+	 * @param string           $event_id  A unique event ID.
+	 * @param int|string       $id        Product ID.
+	 * @param string           $name      Product name.
+	 * @param string           $category  Product categories.
+	 * @param string           $brand     Product brand.
+	 * @param float|int|string $price     Product price.
+	 * @param string           $currency  Product currency.
+	 * @param float|int|string $quantity  Product quantity.
 	 */
 	public function __construct( $event_id, $id, $name, $category, $brand, $price, $currency, $quantity ) {
 		parent::__construct( $event_id );

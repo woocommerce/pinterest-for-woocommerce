@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class handling encryption and decryption of sensitive data.
  *
  * @class   Crypto
- * @version 1.0.0
+ * @version x.x.x
  */
 class Crypto {
 
@@ -64,7 +64,7 @@ class Crypto {
 	/**
 	 * Get the encoded user key.
 	 *
-	 * @param string $retry The retry attempt #.
+	 * @param int|null $retry The retry attempt #.
 	 */
 	private static function get_key( $retry = null ) {
 

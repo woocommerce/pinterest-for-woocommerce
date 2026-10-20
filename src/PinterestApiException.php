@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class PinterestApiException
  *
  * @class   PinterestApiException
- * @version 1.4.27
+ * @version x.x.x
  */
 class PinterestApiException extends \Exception {
 
@@ -106,7 +106,7 @@ class PinterestApiException extends \Exception {
 	 */
 	public function __construct( $error, $response_code ) {
 		$message              = $error['message'] ?? $error;
-		$this->pinterest_code = (int) ( $error['response_body']['code'] ?? $response_code ) ?? 0;
+		$this->pinterest_code = (int) ( $error['response_body']['code'] ?? $response_code );
 
 		parent::__construct( $message, $response_code );
 	}

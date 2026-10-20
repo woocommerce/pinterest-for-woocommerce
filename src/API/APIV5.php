@@ -156,8 +156,8 @@ class APIV5 extends Base {
 	 *
 	 * @param string $ad_account_id the advertiser_id to request the tags for.
 	 *
-	 * @return array {
-	 *      Tag objects list.
+	 * @return array|null {
+	 *      Tag objects list; null when the response body is empty.
 	 *
 	 *      @type array[] $items {
 	 *         Tag object.

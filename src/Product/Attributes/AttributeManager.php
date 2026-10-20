@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
  * Class AttributeManager
  *
  * @class   AttributeManager
- * @version 1.3.10
+ * @version x.x.x
  */
 class AttributeManager {
 
@@ -31,7 +31,7 @@ class AttributeManager {
 	/**
 	 * The single instance of the class.
 	 *
-	 * @var AttributeManager
+	 * @var AttributeManager|null
 	 */
 	protected static $instance = null;
 
@@ -43,7 +43,7 @@ class AttributeManager {
 	/**
 	 * Attribute types mapped to product types.
 	 *
-	 * @var array
+	 * @var array|null
 	 */
 	protected $attribute_types_map;
 

@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Endpoint handing Pinterest advertiser.
  *
  * @class   AdvertiserConnect
- * @version 1.4.1
+ * @version x.x.x
  */
 class AdvertiserConnect extends VendorAPI {
 
@@ -62,7 +62,7 @@ class AdvertiserConnect extends VendorAPI {
 			}
 
 			$integration_data = Pinterest_For_Woocommerce::get_data( 'integration_data' );
-			if ( $advertiser_id === $integration_data['connected_advertiser_id'] ?? '' ) {
+			if ( ( $integration_data['connected_advertiser_id'] ?? '' ) === $advertiser_id ) {
 				return array(
 					'connected'   => $advertiser_id,
 					'reconnected' => false,

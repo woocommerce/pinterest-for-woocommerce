@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Registers the endpoint to which we are returned to, after being authorized by Pinterest.
  *
  * @class   Auth
- * @version 1.5.0
+ * @version x.x.x
  */
 class Auth extends VendorAPI {
 
@@ -127,7 +127,7 @@ class Auth extends VendorAPI {
 
 		$info_string = base64_decode( $info ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 		$info_data   = (array) json_decode( urldecode( $info_string ) );
-		$features    = (array) $info_data['feature_flags'] ?? array();
+		$features    = (array) ( $info_data['feature_flags'] ?? array() );
 
 		$this->apply_oauth_flow_features( $features );
 
