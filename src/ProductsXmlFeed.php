@@ -729,6 +729,8 @@ class ProductsXmlFeed {
 
 	/**
 	 * Get locale currency decimals
+	 *
+	 * @return mixed
 	 */
 	private static function get_currency_decimals() {
 		$currencies = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_currencies_list' );

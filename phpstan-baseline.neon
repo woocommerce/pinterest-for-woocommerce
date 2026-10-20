@@ -199,12 +199,6 @@ parameters:
 			path: includes/admin/class-pinterest-for-woocommerce-admin.php
 
 		-
-			message: '#^Method Pinterest_For_Woocommerce_Frontend_Assets\:\:maybe_defer_scripts\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: includes/class-pinterest-for-woocommerce-frontend-assets.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\APIV5\:\:create_commerce_integration\(\) has parameter \$integration_data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -441,12 +435,6 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\Base\:\:handle_request\(\) has parameter \$request with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/API/Base.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\Base\:\:instance\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/API/Base.php
 
@@ -919,12 +907,6 @@ parameters:
 			path: src/CommerceIntegration.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Crypto\:\:get_key\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Crypto.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Exception\\InvalidValue\:\:not_in_allowed_list\(\) has parameter \$allowed_values with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1231,12 +1213,6 @@ parameters:
 			path: src/Merchants.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Notes\\Collection\\AbstractNote\:\:note_exists\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Notes/Collection/AbstractNote.php
-
-		-
 			message: '#^Call to an undefined method WC_Data_Store\:\:get_notes_with_name\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -1329,12 +1305,6 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\PinterestSyncSettings\:\:get_synced_settings\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/PinterestSyncSettings.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\PinterestSyncSettings\:\:sync_settings\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/PinterestSyncSettings.php
 
@@ -1473,12 +1443,6 @@ parameters:
 		-
 			message: '#^Instanceof between WC_Product and WC_Product will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
-			count: 1
-			path: src/ProductsXmlFeed.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_currency_decimals\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/ProductsXmlFeed.php
 
@@ -2031,12 +1995,6 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:render_partial\(\) has parameter \$context with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/View/PHPView.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:sanitize_context_variable\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/View/PHPView.php
 

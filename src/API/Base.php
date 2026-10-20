@@ -54,6 +54,8 @@ class Base {
 
 	/**
 	 * Initialize and/or return the instance
+	 *
+	 * @return Base
 	 */
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {

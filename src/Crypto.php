@@ -65,6 +65,7 @@ class Crypto {
 	 * Get the encoded user key.
 	 *
 	 * @param int|null $retry The retry attempt #.
+	 * @return string|false
 	 */
 	private static function get_key( $retry = null ) {
 

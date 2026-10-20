@@ -25,7 +25,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @class   AbstractNote
  * @since   1.1.0
- * @version 1.1.0
+ * @version x.x.x
  */
 abstract class AbstractNote {
 
@@ -33,6 +33,8 @@ abstract class AbstractNote {
 
 	/**
 	 * Check if the note has been previously added.
+	 *
+	 * @return bool
 	 *
 	 * @throws NotesUnavailableException Throws exception when notes are unavailable.
 	 */

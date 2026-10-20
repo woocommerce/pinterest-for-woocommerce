@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class to handle PinterestSyncSettings.
  *
  * @class   PinterestSyncSettings
- * @version 1.4.2
+ * @version x.x.x
  */
 class PinterestSyncSettings {
 
@@ -41,6 +41,8 @@ class PinterestSyncSettings {
 
 	/**
 	 * Sync settings.
+	 *
+	 * @return array{success: true, synced_settings: array<string, mixed>}|array{success: false, message: string}
 	 */
 	public static function sync_settings() {
 
