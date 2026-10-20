@@ -91,6 +91,18 @@ parameters:
 			path: class-pinterest-for-woocommerce.php
 
 		-
+			message: '#^Offset ''business_id'' might not exist on array\|string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
+			message: '#^Parameter \#1 \$offer_code of static method Automattic\\WooCommerce\\Pinterest\\AdCredits\:\:redeem_credits\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class-pinterest-for-woocommerce.php
+
+		-
 			message: '#^Property WP\:\:\$request \(string\) on left side of \?\? is not nullable\.$#'
 			identifier: nullCoalesce.property
 			count: 1
@@ -185,6 +197,12 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: includes/admin/class-pinterest-for-woocommerce-admin.php
+
+		-
+			message: '#^Argument of an invalid type array\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: includes/class-pinterest-for-woocommerce-frontend-assets.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\APIV5\:\:create_commerce_integration\(\) has parameter \$integration_data with no value type specified in iterable type array\.$#'
@@ -379,6 +397,12 @@ parameters:
 			path: src/API/Auth.php
 
 		-
+			message: '#^Parameter \#1 \$message of static method Automattic\\WooCommerce\\Pinterest\\Logger\:\:log\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/API/Auth.php
+
+		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\AuthDisconnect\:\:handle_disconnect\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -387,6 +411,12 @@ parameters:
 		-
 			message: '#^Call to function is_wp_error\(\) with WP_Error will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/API/Base.php
+
+		-
+			message: '#^Cannot access offset ''host'' on array\{scheme\?\: string, host\?\: string, port\?\: int\<0, 65535\>, user\?\: string, pass\?\: string, path\?\: string, query\?\: string, fragment\?\: string\}\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
 			count: 1
 			path: src/API/Base.php
 
@@ -481,6 +511,12 @@ parameters:
 			path: src/API/Base.php
 
 		-
+			message: '#^Parameter \#6 \$cache_expiry of static method Automattic\\WooCommerce\\Pinterest\\API\\Base\:\:maybe_cache_api_response\(\) expects int, int\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/API/Base.php
+
+		-
 			message: '#^Property Automattic\\WooCommerce\\Pinterest\\API\\Base\:\:\$token type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -491,6 +527,12 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/API/Businesses.php
+
+		-
+			message: '#^Cannot access offset ''host'' on array\{scheme\?\: string, host\?\: string, port\?\: int\<0, 65535\>, user\?\: string, pass\?\: string, path\?\: string, query\?\: string, fragment\?\: string\}\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/API/DomainVerification.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\FeedIssues\:\:get_feed_issues\(\) return type has no value type specified in iterable type array\.$#'
@@ -517,6 +559,12 @@ parameters:
 			path: src/API/FeedIssues.php
 
 		-
+			message: '#^Parameter \#1 \$feed_id of static method Automattic\\WooCommerce\\Pinterest\\Feeds\:\:get_feed_recent_processing_results\(\) expects string, string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/API/FeedIssues.php
+
+		-
 			message: '#^Parameter \#2 \$value of method WP_HTTP_Response\:\:header\(\) expects string, float given\.$#'
 			identifier: argument.type
 			count: 1
@@ -527,6 +575,12 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: src/API/FeedIssues.php
+
+		-
+			message: '#^Cannot call method getTimestamp\(\) on DateTime\|false\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/API/FeedState.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\FeedState\:\:add_feed_status\(\) has parameter \$result with no value type specified in iterable type array\.$#'
@@ -601,6 +655,12 @@ parameters:
 			path: src/API/FeedState.php
 
 		-
+			message: '#^Parameter \#1 \$feed_id of static method Automattic\\WooCommerce\\Pinterest\\Feeds\:\:get_feed_recent_processing_results\(\) expects string, string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/API/FeedState.php
+
+		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\Health\:\:health_check\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -635,6 +695,12 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/API/UserInteraction.php
+
+		-
+			message: '#^Parameter \#1 \$route_namespace of function register_rest_route expects non\-falsy\-string, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/API/VendorAPI.php
 
 		-
 			message: '#^Property Automattic\\WooCommerce\\Pinterest\\API\\VendorAPI\:\:\$endpoint_callbacks_map type has no value type specified in iterable type array\.$#'
@@ -681,6 +747,12 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\Form\:\:submit\(\) has parameter \$submitted_data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: src/Admin/Input/Form.php
+
+		-
+			message: '#^Parameter \#2 \$search of function array_key_exists expects array, array\<string, class\-string\>\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Admin/Input/Form.php
 
@@ -763,6 +835,42 @@ parameters:
 			path: src/Admin/Product/Attributes/AttributesForm.php
 
 		-
+			message: '#^Parameter \#1 \$function of function call_user_func expects callable\(\)\: mixed, array\{string, ''get_applicable…''\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Admin/Product/Attributes/AttributesForm.php
+
+		-
+			message: '#^Parameter \#1 \$function of function call_user_func expects callable\(\)\: mixed, array\{string, ''get_id''\} given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Admin/Product/Attributes/AttributesForm.php
+
+		-
+			message: '#^Parameter \#1 \$function of function call_user_func expects callable\(\)\: mixed, array\{string, ''get_input_type''\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Admin/Product/Attributes/AttributesForm.php
+
+		-
+			message: '#^Parameter \#1 \$input of method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\AttributesForm\:\:init_input\(\) expects Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\InputInterface, object given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Admin/Product/Attributes/AttributesForm.php
+
+		-
+			message: '#^Parameter \#2 \$attribute of method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\AttributesForm\:\:init_input\(\) expects Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeInterface, object given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Admin/Product/Attributes/AttributesForm.php
+
+		-
+			message: '#^Parameter \#2 \$search of function array_key_exists expects array, array\<string, class\-string\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Admin/Product/Attributes/AttributesForm.php
+
+		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\AttributesTab\:\:add_tab\(\) has parameter \$tabs with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -793,8 +901,26 @@ parameters:
 			path: src/Admin/Product/Attributes/AttributesTab.php
 
 		-
+			message: '#^Parameter \#1 \$product of method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\AttributesTab\:\:get_form\(\) expects WC_Product, WC_Product\|false\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Admin/Product/Attributes/AttributesTab.php
+
+		-
+			message: '#^Parameter \#2 \$attribute of method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:update\(\) expects Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeInterface, object given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Admin/Product/Attributes/AttributesTab.php
+
+		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\VariationsAttributes\:\:update_data\(\) has parameter \$data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: src/Admin/Product/Attributes/VariationsAttributes.php
+
+		-
+			message: '#^Parameter \#2 \$attribute of method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:update\(\) expects Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeInterface, object given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Admin/Product/Attributes/VariationsAttributes.php
 
@@ -871,6 +997,18 @@ parameters:
 			path: src/CommerceIntegration.php
 
 		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Crypto\:\:decrypt\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Crypto.php
+
+		-
+			message: '#^Parameter \#1 \$saved_key_string of static method Defuse\\Crypto\\Key\:\:loadFromAsciiSafeString\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Crypto.php
+
+		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Exception\\InvalidValue\:\:not_in_allowed_list\(\) has parameter \$allowed_values with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -881,6 +1019,12 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			count: 2
 			path: src/Exception/ValidateInterface.php
+
+		-
+			message: '#^Argument of an invalid type array\|stdClass supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: src/FeedGenerator.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:get_excluded_product_types\(\) return type has no value type specified in iterable type array\.$#'
@@ -1015,6 +1159,12 @@ parameters:
 			path: src/FeedRegistration.php
 
 		-
+			message: '#^Parameter \#1 \$feed_id of static method Automattic\\WooCommerce\\Pinterest\\FeedRegistration\:\:maybe_log_failed_processing_result\(\) expects string, string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/FeedRegistration.php
+
+		-
 			message: '#^Property Automattic\\WooCommerce\\Pinterest\\FeedRegistration\:\:\$configurations is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -1048,6 +1198,12 @@ parameters:
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedStatusService\:\:maybe_retry_on_fetch_error\(\) has parameter \$processing_results with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
+			path: src/FeedStatusService.php
+
+		-
+			message: '#^Parameter \#1 \$feed_id of static method Automattic\\WooCommerce\\Pinterest\\Feeds\:\:get_feed_recent_processing_results\(\) expects string, string\|true given\.$#'
+			identifier: argument.type
+			count: 2
 			path: src/FeedStatusService.php
 
 		-
@@ -1141,6 +1297,12 @@ parameters:
 			path: src/Logger.php
 
 		-
+			message: '#^Cannot access offset ''path'' on array\{scheme\?\: string, host\?\: string, port\?\: int\<0, 65535\>, user\?\: string, pass\?\: string, path\?\: string, query\?\: string, fragment\?\: string\}\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Merchants.php
+
+		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Merchants\:\:get_merchant\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1153,8 +1315,38 @@ parameters:
 			path: src/Merchants.php
 
 		-
+			message: '#^Parameter \#1 \$str of function md5 expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Merchants.php
+
+		-
+			message: '#^Parameter \#1 \$feed_id of static method Automattic\\WooCommerce\\Pinterest\\Feeds\:\:get_feed_recent_processing_results\(\) expects string, string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/MultichannelMarketing/PinterestChannel.php
+
+		-
+			message: '#^Parameter \#1 \$var of function count expects array\|Countable, array\<WC_Order\>\|stdClass given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Notes/Collection/AbstractCompleteOnboarding.php
+
+		-
+			message: '#^Parameter \#1 \$feed_id of static method Automattic\\WooCommerce\\Pinterest\\Feeds\:\:get_feed_recent_processing_results\(\) expects string, string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Notes/Collection/CatalogSyncErrors.php
+
+		-
 			message: '#^Call to an undefined method WC_Data_Store\:\:get_notes_with_name\(\)\.$#'
 			identifier: method.notFound
+			count: 1
+			path: src/Notes/FeedDeletionFailure.php
+
+		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Notes\\FeedDeletionFailure\:\:get_note\(\) should return Automattic\\WooCommerce\\Admin\\Notes\\Note but returns Automattic\\WooCommerce\\Admin\\Notes\\Note\|bool\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Notes/FeedDeletionFailure.php
 
@@ -1177,9 +1369,21 @@ parameters:
 			path: src/PinterestApiException.php
 
 		-
+			message: '#^Parameter \#2 \$code of method Exception\:\:__construct\(\) expects int, array\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/PinterestApiException.php
+
+		-
 			message: '#^Access to an undefined property WC_Shipping_Method\:\:\$requires\.$#'
 			identifier: property.notFound
 			count: 1
+			path: src/PinterestShippingZone.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 4
 			path: src/PinterestShippingZone.php
 
 		-
@@ -1243,6 +1447,12 @@ parameters:
 			path: src/PinterestShippingZone.php
 
 		-
+			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:get\(\) should return Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeInterface\|null but returns object\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Product/Attributes/AttributeManager.php
+
+		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:get_all_values\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1251,6 +1461,24 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:get_available_attribute_ids\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: src/Product/Attributes/AttributeManager.php
+
+		-
+			message: '#^Parameter \#1 \$function of function call_user_func expects callable\(\)\: mixed, array\{string, ''get_applicable…''\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Product/Attributes/AttributeManager.php
+
+		-
+			message: '#^Parameter \#1 \$function of function call_user_func expects callable\(\)\: mixed, array\{string, ''get_id''\} given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Product/Attributes/AttributeManager.php
+
+		-
+			message: '#^Parameter \#2 \$search of function array_key_exists expects array, array\<string, class\-string\>\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Product/Attributes/AttributeManager.php
 
@@ -1269,6 +1497,12 @@ parameters:
 		-
 			message: '#^Offset ''label'' on non\-empty\-array\<literal\-string&non\-falsy\-string, \(array\<int, literal\-string&non\-falsy\-string\>\)\|literal\-string\> in isset\(\) always exists and is not nullable\.$#'
 			identifier: isset.offset
+			count: 1
+			path: src/Product/GoogleCategorySearch.php
+
+		-
+			message: '#^Parameter \#1 \$search_text of method Automattic\\WooCommerce\\Pinterest\\Product\\GoogleCategorySearch\:\:matching_categories\(\) expects string, array\|string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Product/GoogleCategorySearch.php
 
@@ -1309,6 +1543,12 @@ parameters:
 			path: src/ProductSync.php
 
 		-
+			message: '#^@param WC_Product\|null \$parent does not accept actual type of parameter\: WC_Product\|false\|null\.$#'
+			identifier: parameter.phpDocType
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
 			message: '#^Call to an undefined method WC_Product\:\:get_variation_regular_price\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -1334,6 +1574,12 @@ parameters:
 
 		-
 			message: '#^Parameter \#1 \$attachment_id of function wp_get_attachment_image_src expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
+			message: '#^Parameter \#1 \$function of function call_user_func_array expects callable\(\)\: mixed, array\{''Automattic\\\\WooCommerce\\\\Pinterest\\\\ProductsXmlFeed'', non\-falsy\-string\} given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/ProductsXmlFeed.php
@@ -1447,6 +1693,24 @@ parameters:
 			path: src/RefreshToken.php
 
 		-
+			message: '#^@param int \$post_id does not accept actual type of parameter\: int\|false\.$#'
+			identifier: parameter.phpDocType
+			count: 1
+			path: src/RichPins.php
+
+		-
+			message: '#^Access to an undefined property WP_Post\|WP_Post_Type\|WP_Term\|WP_User\:\:\$ID\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/RichPins.php
+
+		-
+			message: '#^Access to an undefined property WP_Post\|WP_Post_Type\|WP_Term\|WP_User\:\:\$post_author\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/RichPins.php
+
+		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\RichPins\:\:add_post_opengraph_tags\(\) has parameter \$args with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1493,6 +1757,24 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/RichPins.php
+
+		-
+			message: '#^Parameter \#1 \$attachment_id of function wp_get_attachment_image_src expects int, int\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/RichPins.php
+
+		-
+			message: '#^Parameter \#1 \$url of function esc_url expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/RichPins.php
+
+		-
+			message: '#^Parameter \#1 \$attachment_id of function wp_get_attachment_image_src expects int, int\|string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/SaveToPinterest.php
 
 		-
 			message: '#^Variable \$product in empty\(\) always exists and is not falsy\.$#'
@@ -1583,6 +1865,18 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/TrackerSnapshot.php
+
+		-
+			message: '#^Access to an undefined property WP_Post\|WP_Post_Type\|WP_Term\|WP_User\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Tracking.php
+
+		-
+			message: '#^Access to an undefined property WP_Post\|WP_Post_Type\|WP_Term\|WP_User\:\:\$term_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Tracking.php
 
 		-
 			message: '#^Call to an undefined method WC_Order_Item\:\:get_total\(\)\.$#'
@@ -1677,6 +1971,12 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\\Conversions\:\:send_request\(\) has parameter \$data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: src/Tracking/Conversions.php
+
+		-
+			message: '#^Parameter \#1 \$function of function call_user_func expects callable\(\)\: mixed, array\{\$this\(Automattic\\WooCommerce\\Pinterest\\Tracking\\Conversions\), non\-falsy\-string\} given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Tracking/Conversions.php
 
@@ -1795,6 +2095,18 @@ parameters:
 			path: src/Tracking/Tag.php
 
 		-
+			message: '#^Parameter \#1 \$function of function call_user_func expects callable\(\)\: mixed, array\{\$this\(Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\), non\-falsy\-string\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Parameter \#2 \$replace of function str_replace expects array\<string\>\|string, array\<int, string\|false\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Tracking/Tag.php
+
+		-
 			message: '#^Property Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:\$deferred_events type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1821,6 +2133,12 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:render_partial\(\) has parameter \$context with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: src/View/PHPView.php
+
+		-
+			message: '#^Parameter \#1 \$str of function sanitize_text_field expects string, float\|int\|string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/View/PHPView.php
 
