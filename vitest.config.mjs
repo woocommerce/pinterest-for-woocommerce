@@ -30,6 +30,8 @@ export default defineConfig( {
 	test: {
 		environment: 'jsdom',
 		globals: false,
+		// Fail a test that finishes without running an assertion.
+		expect: { requireAssertions: true },
 		restoreMocks: true,
 		include: [ 'assets/source/**/*.test.js' ],
 		// The console check comes first: Vitest runs `afterEach` hooks in reverse and stops
