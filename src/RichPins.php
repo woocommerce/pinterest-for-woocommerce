@@ -254,8 +254,8 @@ class RichPins {
 		/**
 		 * Filters whether the shortcodes should be applied for product descriptions on the rich pins or be stripped out.
 		 *
-		 * @param bool $apply_shortcodes Shortcodes are applied if set to `true` and stripped out if set to `false`.
-		 * @param int  $post_id          The post id.
+		 * @param bool      $apply_shortcodes Shortcodes are applied if set to `true` and stripped out if set to `false`.
+		 * @param int|false $post_id          The post id, or false if there is no current post.
 		 *
 		 * phpcs:disable WooCommerce.Commenting.CommentHooks.MissingSinceComment
 		 */

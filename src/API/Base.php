@@ -213,12 +213,12 @@ class Base {
 	 * Caches the API response if cache expiry is set.
 	 *
 	 * @since 1.3.8
-	 * @param string $endpoint     The API endpoint.
-	 * @param string $method       The HTTP method.
-	 * @param array  $payload      The API request payload.
-	 * @param string $api          The API version.
-	 * @param mixed  $response     The API response.
-	 * @param int    $cache_expiry The cache expiry in seconds.
+	 * @param string    $endpoint     The API endpoint.
+	 * @param string    $method       The HTTP method.
+	 * @param array     $payload      The API request payload.
+	 * @param string    $api          The API version.
+	 * @param mixed     $response     The API response.
+	 * @param int|false $cache_expiry The cache expiry in seconds, or false to skip caching.
 	 *
 	 * @return void
 	 */

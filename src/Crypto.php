@@ -126,7 +126,7 @@ class Crypto {
 	 *
 	 * @param string $encrypted_value the value to decrypt.
 	 *
-	 * @return string
+	 * @return string|false The decrypted value, or false if it could not be decrypted.
 	 */
 	public static function decrypt( $encrypted_value ) {
 
