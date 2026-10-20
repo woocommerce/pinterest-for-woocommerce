@@ -15,14 +15,14 @@ defined( 'ABSPATH' ) || exit;
  * Class Input
  *
  * @class   Input
- * @version 1.0.2
+ * @version x.x.x
  */
 class Input extends Form implements InputInterface {
 
 	/**
 	 * Input ID.
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	protected $id;
 
@@ -36,14 +36,14 @@ class Input extends Form implements InputInterface {
 	/**
 	 * Input label.
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	protected $label;
 
 	/**
 	 * Input description.
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	protected $description;
 

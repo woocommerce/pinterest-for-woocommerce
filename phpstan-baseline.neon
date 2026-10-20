@@ -733,12 +733,6 @@ parameters:
 			path: src/Admin/Input/Form.php
 
 		-
-			message: '#^Property Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\Form\:\:\$parent \(Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\FormInterface\) does not accept Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\FormInterface\|null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Admin/Input/Form.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\FormInterface\:\:get_view_data\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -777,24 +771,6 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\Input\:\:get_view_data\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/Admin/Input/Input.php
-
-		-
-			message: '#^Property Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\Input\:\:\$description \(string\) does not accept string\|null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Admin/Input/Input.php
-
-		-
-			message: '#^Property Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\Input\:\:\$id \(string\) does not accept string\|null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Admin/Input/Input.php
-
-		-
-			message: '#^Property Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\Input\:\:\$label \(string\) does not accept string\|null\.$#'
-			identifier: assign.propertyType
 			count: 1
 			path: src/Admin/Input/Input.php
 
