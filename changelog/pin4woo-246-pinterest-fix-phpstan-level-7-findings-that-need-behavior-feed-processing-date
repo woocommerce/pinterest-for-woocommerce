@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Showed the remote sync status in the catalog overview when Pinterest reports the feed processing time with a timezone suffix, instead of a fatal error.
