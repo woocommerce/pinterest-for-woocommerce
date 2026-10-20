@@ -51,6 +51,7 @@ class AdCredits {
 	 * Initialize Ad Credits actions and Action Scheduler hooks.
 	 *
 	 * @since 1.2.5
+	 * @return void
 	 */
 	public static function schedule_event() {
 		if ( ! Pinterest_For_Woocommerce::is_connected() ) {

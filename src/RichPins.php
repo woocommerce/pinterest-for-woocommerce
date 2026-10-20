@@ -43,6 +43,7 @@ class RichPins {
 	 * Since WooCommerce is already adding Schema.org markup, this method inject OpenGraph metatag for Products and Posts based on site's setup.
 	 *
 	 * @since 1.0.0
+	 * @return void
 	 */
 	public static function maybe_inject_rich_pins_opengraph_tags() {
 

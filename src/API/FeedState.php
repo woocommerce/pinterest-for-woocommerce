@@ -47,6 +47,8 @@ class FeedState extends VendorAPI {
 
 	/**
 	 * Add feed state hooks.
+	 *
+	 * @return void
 	 */
 	private function hooks() {
 		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_local_feed_status' ) );

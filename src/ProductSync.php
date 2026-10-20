@@ -94,6 +94,8 @@ class ProductSync {
 
 	/**
 	 * Initiate class.
+	 *
+	 * @return void
 	 */
 	public static function maybe_init() {
 
@@ -157,6 +159,7 @@ class ProductSync {
 	 *
 	 * @param mixed $old_value Option old value.
 	 * @param mixed $value     Option new value.
+	 * @return void
 	 */
 	public static function maybe_deregister( $old_value, $value ) {
 		if ( ! is_array( $value ) ) {
@@ -175,6 +178,7 @@ class ProductSync {
 	 * Initialize components of the synchronization process.
 	 *
 	 * @since 1.0.10
+	 * @return void
 	 */
 	private static function initialize_feed_components() {
 		self::$configurations    = LocalFeedConfigs::get_instance();
@@ -272,6 +276,8 @@ class ProductSync {
 
 	/**
 	 * Stop jobs on deactivation.
+	 *
+	 * @return void
 	 */
 	public static function cancel_jobs() {
 		if ( ! function_exists( 'as_unschedule_all_actions' ) ) {

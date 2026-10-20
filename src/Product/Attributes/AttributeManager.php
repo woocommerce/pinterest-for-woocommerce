@@ -64,6 +64,7 @@ class AttributeManager {
 	 *
 	 * @param WC_Product         $product   WooCommerce product.
 	 * @param AttributeInterface $attribute Attribute to update.
+	 * @return void
 	 *
 	 * @throws InvalidValue If the attribute is invalid for the given product.
 	 */
@@ -167,6 +168,7 @@ class AttributeManager {
 	 *
 	 * @param WC_Product $product      WooCommerce Product.
 	 * @param string     $attribute_id Attribute ID.
+	 * @return void
 	 *
 	 * @throws InvalidValue If the attribute ID is invalid for the given product.
 	 */
@@ -277,6 +279,7 @@ class AttributeManager {
 	 *
 	 * @param WC_Product $product      WooCommerce product.
 	 * @param string     $attribute_id Attribute ID.
+	 * @return void
 	 *
 	 * @throws InvalidValue If the attribute type is invalid for the given product.
 	 */

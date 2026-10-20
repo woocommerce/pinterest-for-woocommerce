@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class ActivationRedirect
  *
  * @class   ActivationRedirect
- * @version 1.1.0
+ * @version x.x.x
  */
 class ActivationRedirect {
 
@@ -35,6 +35,7 @@ class ActivationRedirect {
 	 * Initiate class.
 	 *
 	 * @since  1.1.0
+	 * @return void
 	 */
 	public function register() {
 		add_action(
@@ -49,6 +50,7 @@ class ActivationRedirect {
 	 * Checks if merchant should be redirected to the onboarding page.
 	 *
 	 * @since  1.1.0
+	 * @return void
 	 */
 	protected function maybe_redirect_to_onboarding() {
 		if ( wp_doing_ajax() ) {

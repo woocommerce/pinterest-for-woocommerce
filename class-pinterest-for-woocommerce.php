@@ -195,6 +195,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Pinterest_For_Woocommerce Initializer.
+		 *
+		 * @return void
 		 */
 		public function maybe_init_plugin() {
 			if ( self::$initialized ) {
@@ -218,6 +220,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Define Pinterest_For_Woocommerce Constants.
+		 *
+		 * @return void
 		 */
 		private function define_constants() {
 			define( 'PINTEREST_FOR_WOOCOMMERCE_PREFIX', 'pinterest-for-woocommerce' );
@@ -259,6 +263,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Include required core files used in admin and on the frontend.
+		 *
+		 * @return void
 		 */
 		private function includes() {
 
@@ -277,6 +283,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Include plugins files and hook into actions and filters.
 		 *
 		 * @since  1.0.0
+		 * @return void
 		 */
 		public function init_plugin() {
 
@@ -392,6 +399,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Init Pinterest_For_Woocommerce when WordPress initializes.
+		 *
+		 * @return void
 		 */
 		public function init() {
 			/**
@@ -412,6 +421,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Init classes for admin interface.
+		 *
+		 * @return void
 		 */
 		public function admin_init() {
 			$view_factory         = new Pinterest\View\PHPViewFactory();
@@ -430,6 +441,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Init marketing notifications.
 		 *
 		 * @since 1.1.0
+		 * @return void
 		 */
 		public function init_marketing_notifications() {
 			$notifications = new MarketingNotifications();
@@ -517,6 +529,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Locales found in:
 		 *      - WP_LANG_DIR/pinterest-for-woocommerce/pinterest-for-woocommerce-LOCALE.mo
 		 *      - WP_LANG_DIR/plugins/pinterest-for-woocommerce-LOCALE.mo
+		 *
+		 * @return void
 		 */
 		private function load_plugin_textdomain() {
 			/**
@@ -731,6 +745,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Add API endpoints
 		 *
 		 * @since 1.0.0
+		 * @return void
 		 */
 		public function init_api_endpoints() {
 			new Pinterest\API\Advertisers();
@@ -1025,6 +1040,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Injects needed meta tags to the site's header
 		 *
 		 * @since 1.0.0
+		 * @return void
 		 */
 		public function maybe_inject_verification_code() {
 
@@ -1364,6 +1380,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Hook the parse_request action and serve the html
 		 *
 		 * @param WP $wp Current WordPress environment instance.
+		 * @return void
 		 */
 		public function verification_request( $wp ) {
 			$verification_data = self::get_data( 'verification_data' );
@@ -1481,6 +1498,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * Adds the onboarding task to the Tasklists.
 		 *
 		 * @since 1.2.11
+		 * @return void
 		 */
 		public function add_onboarding_task() {
 			if ( class_exists( TaskLists::class ) ) {

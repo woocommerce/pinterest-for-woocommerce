@@ -143,6 +143,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Initialize FeedGenerator actions and Action Scheduler hooks.
 	 *
 	 * @since 1.0.10
+	 * @return void
 	 */
 	public function init() {
 		// Initialize the action handlers.
@@ -331,6 +332,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @since 1.0.10
 	 * @param integer $timestamp Next feed generator timestamp.
+	 * @return void
 	 */
 	public function schedule_next_generator_start( $timestamp ) {
 		as_unschedule_all_actions( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
@@ -341,6 +343,8 @@ class FeedGenerator extends AbstractChainedJob {
 
 	/**
 	 * Stop feed generator jobs.
+	 *
+	 * @return void
 	 */
 	public static function cancel_jobs() {
 		as_unschedule_all_actions( self::ACTION_START_FEED_GENERATOR, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
@@ -353,6 +357,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * action from a superseded cycle must not prevent a new cycle from starting.
 	 *
 	 * @since 1.0.10
+	 * @return void
 	 */
 	private function start_generation() {
 		if ( $this->is_generation_active() ) {
@@ -369,6 +374,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Runs as the first step of the generation process.
 	 *
 	 * @since 1.0.10
+	 * @return void
 	 *
 	 * @throws Throwable Related to creating an empty feed temp file and populating the header possible issues.
 	 */
@@ -399,6 +405,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since 1.5.0
 	 *
 	 * @param array $args The args for the job.
+	 * @return void
 	 *
 	 * @throws Throwable Related to creating an empty feed temp file and populating the header possible issues.
 	 */
@@ -450,6 +457,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @param int   $batch_number The batch number for the new batch.
 	 * @param array $args         The args for the job.
+	 * @return void
 	 *
 	 * @throws Throwable Related to issue possible when creating an empty feed temp file and populating the header.
 	 */
@@ -486,6 +494,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @since 1.5.0
 	 *
 	 * @param array $args The args for the job.
+	 * @return void
 	 *
 	 * @throws Throwable Related to adding the footer or renaming the files possible issues.
 	 */
@@ -503,6 +512,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Add XML footer to the feed files and copy the move the files from tmp to the final destination.
 	 *
 	 * @since 1.0.10
+	 * @return void
 	 *
 	 * @throws Throwable Related to adding the footer or renaming the files possible issues.
 	 */
@@ -614,6 +624,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @param array $items The items of the current batch.
 	 * @param array $args  The args for the job.
+	 * @return void
 	 *
 	 * @throws FeedFileOperationsException In case there was an exception thrown when writing to a feed file.
 	 */
@@ -1265,6 +1276,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 *
 	 * @param string|int|array $item A single item from the get_items_for_batch() method.
 	 * @param array            $args The args for the job.
+	 * @return void
 	 *
 	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
 	 */
@@ -1382,6 +1394,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * @deprecated 1.3.1
 	 *
 	 * @param int $action_id The ID of the action marked as failed.
+	 * @return void
 	 *
 	 * @throws Exception Related to max retries reached or missing arguments on the action.
 	 */

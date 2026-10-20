@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Endpoint handling Options.
  *
  * @class   UserInteraction
- * @version 1.4.19
+ * @version x.x.x
  */
 class UserInteraction extends VendorAPI {
 
@@ -107,6 +107,8 @@ class UserInteraction extends VendorAPI {
 
 	/**
 	 * Flush options.
+	 *
+	 * @return void
 	 */
 	public static function flush_options() {
 		delete_option( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME . '_' . self::ADS_MODAL_DISMISSED );

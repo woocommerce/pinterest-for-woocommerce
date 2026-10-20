@@ -19,26 +19,8 @@ parameters:
 			path: class-pinterest-for-woocommerce.php
 
 		-
-			message: '#^Method Pinterest_For_Woocommerce\:\:add_onboarding_task\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Method Pinterest_For_Woocommerce\:\:admin_init\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
 			message: '#^Method Pinterest_For_Woocommerce\:\:create_commerce_integration\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Method Pinterest_For_Woocommerce\:\:define_constants\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: class-pinterest-for-woocommerce.php
 
@@ -63,54 +45,6 @@ parameters:
 		-
 			message: '#^Method Pinterest_For_Woocommerce\:\:get_middleware_url\(\) has parameter \$args with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Method Pinterest_For_Woocommerce\:\:includes\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Method Pinterest_For_Woocommerce\:\:init\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Method Pinterest_For_Woocommerce\:\:init_api_endpoints\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Method Pinterest_For_Woocommerce\:\:init_marketing_notifications\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Method Pinterest_For_Woocommerce\:\:init_plugin\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Method Pinterest_For_Woocommerce\:\:load_plugin_textdomain\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Method Pinterest_For_Woocommerce\:\:maybe_init_plugin\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Method Pinterest_For_Woocommerce\:\:maybe_inject_verification_code\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: class-pinterest-for-woocommerce.php
 
@@ -159,12 +93,6 @@ parameters:
 		-
 			message: '#^Method Pinterest_For_Woocommerce\:\:update_commerce_integration\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Method Pinterest_For_Woocommerce\:\:verification_request\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: class-pinterest-for-woocommerce.php
 
@@ -247,18 +175,6 @@ parameters:
 			path: includes/admin/class-pinterest-for-woocommerce-admin.php
 
 		-
-			message: '#^Method Pinterest_For_Woocommerce_Admin\:\:load_setup_guide_scripts\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: includes/admin/class-pinterest-for-woocommerce-admin.php
-
-		-
-			message: '#^Method Pinterest_For_Woocommerce_Admin\:\:maybe_redirect_to_middleware\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: includes/admin/class-pinterest-for-woocommerce-admin.php
-
-		-
 			message: '#^Method Pinterest_For_Woocommerce_Admin\:\:plugin_action_links\(\) has parameter \$links with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -287,12 +203,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: includes/class-pinterest-for-woocommerce-frontend-assets.php
-
-		-
-			message: '#^Function pinterest_for_woocommerce_deregister\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: pinterest-for-woocommerce.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\APIV5\:\:create_commerce_integration\(\) has parameter \$integration_data with no value type specified in iterable type array\.$#'
@@ -475,18 +385,6 @@ parameters:
 			path: src/API/AdvertiserConnect.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\AdvertiserConnect\:\:disconnect_advertiser\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/API/AdvertiserConnect.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\AdvertiserConnect\:\:enable_aem_tag\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/API/AdvertiserConnect.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\Advertisers\:\:get_advertisers\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -495,18 +393,6 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\Auth\:\:apply_oauth_flow_features\(\) has parameter \$features with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/API/Auth.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\Auth\:\:connect_callback\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/API/Auth.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\Auth\:\:log_error_and_redirect\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/API/Auth.php
 
@@ -733,12 +619,6 @@ parameters:
 			path: src/API/FeedState.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\FeedState\:\:hooks\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/API/FeedState.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\FeedState\:\:map_status_into_extra_info\(\) has parameter \$processing_results with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -769,12 +649,6 @@ parameters:
 			path: src/API/SyncSettings.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\UserInteraction\:\:flush_options\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/API/UserInteraction.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\UserInteraction\:\:get_user_interaction\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -785,24 +659,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/API/UserInteraction.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\VendorAPI\:\:register_router_multiple_methods\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/API/VendorAPI.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\VendorAPI\:\:register_router_single_method\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/API/VendorAPI.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\API\\VendorAPI\:\:register_routes\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/API/VendorAPI.php
 
 		-
 			message: '#^Property Automattic\\WooCommerce\\Pinterest\\API\\VendorAPI\:\:\$endpoint_callbacks_map type has no value type specified in iterable type array\.$#'
@@ -817,22 +673,10 @@ parameters:
 			path: src/AdCredits.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\AdCredits\:\:schedule_event\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/AdCredits.php
-
-		-
 			message: '#^Property Automattic\\WooCommerce\\Pinterest\\AdCreditsCoupons\:\:\$allowed_currencies type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/AdCreditsCoupons.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\ActivationRedirect\:\:maybe_redirect_to_onboarding\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/ActivationRedirect.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\ActivationRedirect\:\:onboarding_page_parameters\(\) return type has no value type specified in iterable type array\.$#'
@@ -841,22 +685,10 @@ parameters:
 			path: src/Admin/ActivationRedirect.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\ActivationRedirect\:\:register\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/ActivationRedirect.php
-
-		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
 			count: 1
 			path: src/Admin/ActivationRedirect.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Admin\:\:enqueue_assets\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/Admin.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Admin\:\:get_view\(\) has parameter \$context_variables with no value type specified in iterable type array\.$#'
@@ -885,24 +717,6 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\Form\:\:submit\(\) has parameter \$submitted_data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/Admin/Input/Form.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\Form\:\:validate_instanceof\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/Input/Form.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\Form\:\:validate_interface\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/Input/Form.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\Form\:\:validate_not_instanceof\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/Admin/Input/Form.php
 
@@ -985,24 +799,6 @@ parameters:
 			path: src/Admin/Product/Attributes/AttributesForm.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\AttributesForm\:\:validate_instanceof\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/Product/Attributes/AttributesForm.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\AttributesForm\:\:validate_interface\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/Product/Attributes/AttributesForm.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\AttributesForm\:\:validate_not_instanceof\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/Product/Attributes/AttributesForm.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\AttributesTab\:\:add_tab\(\) has parameter \$tabs with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1027,34 +823,10 @@ parameters:
 			path: src/Admin/Product/Attributes/AttributesTab.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\AttributesTab\:\:handle_update_product\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/Product/Attributes/AttributesTab.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\AttributesTab\:\:render_panel\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/Product/Attributes/AttributesTab.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\AttributesTab\:\:update_data\(\) has parameter \$data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Admin/Product/Attributes/AttributesTab.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\VariationsAttributes\:\:handle_save_variation\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/Product/Attributes/VariationsAttributes.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\VariationsAttributes\:\:render_attributes_form\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/Product/Attributes/VariationsAttributes.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Product\\Attributes\\VariationsAttributes\:\:update_data\(\) has parameter \$data with no value type specified in iterable type array\.$#'
@@ -1077,12 +849,6 @@ parameters:
 		-
 			message: '#^Action callback returns mixed but should not return anything\.$#'
 			identifier: return.void
-			count: 1
-			path: src/Billing.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Billing\:\:schedule_event\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/Billing.php
 
@@ -1177,12 +943,6 @@ parameters:
 			path: src/FeedFileOperations.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:cancel_jobs\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/FeedGenerator.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:get_excluded_product_types\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1225,44 +985,14 @@ parameters:
 			path: src/FeedGenerator.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:handle_batch_action\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/FeedGenerator.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:handle_batch_action\(\) has parameter \$args with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/FeedGenerator.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:handle_end\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/FeedGenerator.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:handle_end_action\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/FeedGenerator.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:handle_end_action\(\) has parameter \$args with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/FeedGenerator.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:handle_start\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/FeedGenerator.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:handle_start_action\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/FeedGenerator.php
 
@@ -1275,12 +1005,6 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:handle_unexpected_shutdown\(\) has parameter \$error with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/FeedGenerator.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:init\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/FeedGenerator.php
 
@@ -1303,18 +1027,6 @@ parameters:
 			path: src/FeedGenerator.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:maybe_handle_error_on_timeout\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/FeedGenerator.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:process_item\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/FeedGenerator.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:process_item\(\) has parameter \$args with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1323,12 +1035,6 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:process_item\(\) has parameter \$item with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/FeedGenerator.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:process_items\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/FeedGenerator.php
 
@@ -1345,12 +1051,6 @@ parameters:
 			path: src/FeedGenerator.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:schedule_next_generator_start\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/FeedGenerator.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:set_store_address_as_taxable_location\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -1359,12 +1059,6 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:set_store_address_as_taxable_location\(\) has parameter \$taxable_location with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/FeedGenerator.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:start_generation\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/FeedGenerator.php
 
@@ -1383,24 +1077,6 @@ parameters:
 		-
 			message: '#^Action callback returns bool but should not return anything\.$#'
 			identifier: return.void
-			count: 1
-			path: src/FeedRegistration.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedRegistration\:\:cancel_jobs\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/FeedRegistration.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedRegistration\:\:deregister\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/FeedRegistration.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedRegistration\:\:init\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/FeedRegistration.php
 
@@ -1513,25 +1189,7 @@ parameters:
 			path: src/Feeds.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Heartbeat\:\:schedule_events\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Heartbeat.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\LocalFeedConfigs\:\:deregister\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/LocalFeedConfigs.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\LocalFeedConfigs\:\:get_configurations\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/LocalFeedConfigs.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\LocalFeedConfigs\:\:initialize_local_feeds_config\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: src/LocalFeedConfigs.php
@@ -1699,12 +1357,6 @@ parameters:
 			path: src/Product/Attributes/AttributeInterface.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:delete\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Product/Attributes/AttributeManager.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:get_all_values\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1719,36 +1371,6 @@ parameters:
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:onboarding_page_parameters\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/Product/Attributes/AttributeManager.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:update\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Product/Attributes/AttributeManager.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:validate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Product/Attributes/AttributeManager.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:validate_instanceof\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Product/Attributes/AttributeManager.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:validate_interface\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Product/Attributes/AttributeManager.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:validate_not_instanceof\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/Product/Attributes/AttributeManager.php
 
@@ -1831,32 +1453,8 @@ parameters:
 			path: src/ProductSync.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\ProductSync\:\:cancel_jobs\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/ProductSync.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\ProductSync\:\:initialize_feed_components\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/ProductSync.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\ProductSync\:\:mark_feed_dirty_on_updated_props\(\) has parameter \$updated_props with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/ProductSync.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\ProductSync\:\:maybe_deregister\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/ProductSync.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\ProductSync\:\:maybe_init\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/ProductSync.php
 
@@ -2017,12 +1615,6 @@ parameters:
 			path: src/RefreshToken.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\RefreshToken\:\:schedule_event\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/RefreshToken.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\RichPins\:\:add_post_opengraph_tags\(\) has parameter \$args with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -2077,28 +1669,10 @@ parameters:
 			path: src/RichPins.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\RichPins\:\:maybe_inject_rich_pins_opengraph_tags\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/RichPins.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\RichPins\:\:onboarding_page_parameters\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/RichPins.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\SaveToPinterest\:\:maybe_init\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/SaveToPinterest.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\SaveToPinterest\:\:render_product_pin\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/SaveToPinterest.php
 
 		-
 			message: '#^Variable \$product in empty\(\) always exists and is not falsy\.$#'
@@ -2441,12 +2015,6 @@ parameters:
 			identifier: deadCode.unreachable
 			count: 1
 			path: src/Tracking/Tag.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Utilities\\Utilities\:\:set_account_connection_timestamp\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Utilities/Utilities.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:onboarding_page_parameters\(\) return type has no value type specified in iterable type array\.$#'
