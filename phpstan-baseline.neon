@@ -961,12 +961,6 @@ parameters:
 			path: src/CommerceIntegration.php
 
 		-
-			message: '#^Parameter \#1 \$saved_key_string of static method Defuse\\Crypto\\Key\:\:loadFromAsciiSafeString\(\) expects string, string\|false given\.$#'
-			identifier: argument.type
-			count: 2
-			path: src/Crypto.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Exception\\InvalidValue\:\:not_in_allowed_list\(\) has parameter \$allowed_values with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
