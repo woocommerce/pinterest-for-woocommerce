@@ -1411,12 +1411,6 @@ parameters:
 			path: src/Product/Attributes/AttributeManager.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:get_attribute_types_map\(\) should return array\<array\<string\>\> but returns array\<array\<string\>\>\|null\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Product/Attributes/AttributeManager.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:get_available_attribute_ids\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
