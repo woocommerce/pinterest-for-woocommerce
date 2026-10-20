@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
  * Interface WithValueOptionsInterface
  *
  * @class   WithValueOptionsInterface
- * @version 1.0.2
+ * @version x.x.x
  */
 interface WithValueOptionsInterface {
 	/**
@@ -23,7 +23,7 @@ interface WithValueOptionsInterface {
 	 *
 	 * Note: array key is used as the option key.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public static function get_value_options(): array;
 }

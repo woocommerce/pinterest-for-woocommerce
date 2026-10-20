@@ -332,7 +332,7 @@ class RichPins {
 	 *
 	 * @since 1.2.7
 	 *
-	 * @return array The list of installed plugins.
+	 * @return array<string, string> The list of installed plugins.
 	 */
 	public static function get_third_party_conflicting_plugins() {
 

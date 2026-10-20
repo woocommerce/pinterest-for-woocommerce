@@ -79,7 +79,7 @@ class TrackerSnapshot {
 	/**
 	 * Parse general extension and settings data in the required format.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	protected static function parse_settings(): array {
 		$settings = Pinterest_For_Woocommerce()::get_settings( true );

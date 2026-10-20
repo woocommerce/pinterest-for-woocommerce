@@ -31,12 +31,6 @@ parameters:
 			path: class-pinterest-for-woocommerce.php
 
 		-
-			message: '#^Method Pinterest_For_Woocommerce\:\:get_applicable_tos\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
 			message: '#^Method Pinterest_For_Woocommerce\:\:get_linked_businesses\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -92,12 +86,6 @@ parameters:
 
 		-
 			message: '#^Method Pinterest_For_Woocommerce\:\:update_commerce_integration\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: class-pinterest-for-woocommerce.php
-
-		-
-			message: '#^Property Pinterest_For_Woocommerce\:\:\$default_settings type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: class-pinterest-for-woocommerce.php
@@ -661,18 +649,6 @@ parameters:
 			path: src/AdCredits.php
 
 		-
-			message: '#^Property Automattic\\WooCommerce\\Pinterest\\AdCreditsCoupons\:\:\$allowed_currencies type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/AdCreditsCoupons.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\ActivationRedirect\:\:onboarding_page_parameters\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Admin/ActivationRedirect.php
-
-		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
 			count: 1
@@ -823,18 +799,6 @@ parameters:
 			path: src/Admin/Product/Attributes/VariationsAttributes.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\AdsCreditCurrency\:\:get_currency_credits\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/AdsCreditCurrency.php
-
-		-
-			message: '#^Property Automattic\\WooCommerce\\Pinterest\\AdsCreditCurrency\:\:\$currency_credits_map type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/AdsCreditCurrency.php
-
-		-
 			message: '#^Action callback returns mixed but should not return anything\.$#'
 			identifier: return.void
 			count: 1
@@ -917,12 +881,6 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			count: 2
 			path: src/Exception/ValidateInterface.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedFileOperations\:\:write_buffers_to_temp_files\(\) has parameter \$buffers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/FeedFileOperations.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:get_excluded_product_types\(\) return type has no value type specified in iterable type array\.$#'
@@ -1045,12 +1003,6 @@ parameters:
 			path: src/FeedGenerator.php
 
 		-
-			message: '#^Property Automattic\\WooCommerce\\Pinterest\\FeedGenerator\:\:\$buffers type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/FeedGenerator.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedOwnership\:\:get_option\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1067,18 +1019,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: src/FeedRegistration.php
-
-		-
-			message: '#^Constant Automattic\\WooCommerce\\Pinterest\\FeedStatusService\:\:ERROR_CONTEXTS type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/FeedStatusService.php
-
-		-
-			message: '#^Constant Automattic\\WooCommerce\\Pinterest\\FeedStatusService\:\:GLOBAL_ERROR_CODES type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/FeedStatusService.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedStatusService\:\:get_processing_result_overview_stats\(\) has parameter \$processing_results with no value type specified in iterable type array\.$#'
@@ -1303,30 +1243,6 @@ parameters:
 			path: src/PinterestShippingZone.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\PinterestSyncSettings\:\:get_synced_settings\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/PinterestSyncSettings.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\PluginUpdate\:\:update_procedures\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/PluginUpdate.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AbstractAttribute\:\:get_applicable_product_types\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Product/Attributes/AbstractAttribute.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeInterface\:\:get_applicable_product_types\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Product/Attributes/AttributeInterface.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:get_all_values\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1337,42 +1253,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Product/Attributes/AttributeManager.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:onboarding_page_parameters\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Product/Attributes/AttributeManager.php
-
-		-
-			message: '#^Property Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\AttributeManager\:\:\$attribute_types_map type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Product/Attributes/AttributeManager.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\Condition\:\:get_applicable_product_types\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Product/Attributes/Condition.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\Condition\:\:get_value_options\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Product/Attributes/Condition.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\GoogleCategory\:\:get_applicable_product_types\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Product/Attributes/GoogleCategory.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\Attributes\\WithValueOptionsInterface\:\:get_value_options\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Product/Attributes/WithValueOptionsInterface.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Product\\GoogleCategorySearch\:\:full_category_name\(\) has parameter \$category with no value type specified in iterable type array\.$#'
@@ -1453,20 +1333,8 @@ parameters:
 			path: src/ProductsXmlFeed.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:onboarding_page_parameters\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/ProductsXmlFeed.php
-
-		-
 			message: '#^Parameter \#1 \$attachment_id of function wp_get_attachment_image_src expects int, string given\.$#'
 			identifier: argument.type
-			count: 1
-			path: src/ProductsXmlFeed.php
-
-		-
-			message: '#^Property Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:\$feed_item_structure type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: src/ProductsXmlFeed.php
 
@@ -1627,18 +1495,6 @@ parameters:
 			path: src/RichPins.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\RichPins\:\:get_third_party_conflicting_plugins\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/RichPins.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\RichPins\:\:onboarding_page_parameters\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/RichPins.php
-
-		-
 			message: '#^Variable \$product in empty\(\) always exists and is not falsy\.$#'
 			identifier: empty.variable
 			count: 1
@@ -1729,20 +1585,8 @@ parameters:
 			path: src/TrackerSnapshot.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\TrackerSnapshot\:\:parse_settings\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/TrackerSnapshot.php
-
-		-
 			message: '#^Call to an undefined method WC_Order_Item\:\:get_total\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: src/Tracking.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\:\:__construct\(\) has parameter \$trackers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: src/Tracking.php
 
@@ -1921,12 +1765,6 @@ parameters:
 			path: src/Tracking/Tag.php
 
 		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:get_third_party_installed_tags\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Tracking/Tag.php
-
-		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:get_view_category_data\(\) is unused\.$#'
 			identifier: method.unused
 			count: 1
@@ -1963,12 +1801,6 @@ parameters:
 			path: src/Tracking/Tag.php
 
 		-
-			message: '#^Property Automattic\\WooCommerce\\Pinterest\\Tracking\\Tag\:\:\$events type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Tracking/Tag.php
-
-		-
 			message: '#^Property WooCommerce\:\:\$session \(WC_Session\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
 			count: 1
@@ -1979,12 +1811,6 @@ parameters:
 			identifier: deadCode.unreachable
 			count: 1
 			path: src/Tracking/Tag.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:onboarding_page_parameters\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/View/PHPView.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:render\(\) has parameter \$context with no value type specified in iterable type array\.$#'

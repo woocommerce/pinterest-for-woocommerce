@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
  * Class GoogleCategory
  *
  * @class   GoogleCategory
- * @version 1.0.2
+ * @version x.x.x
  */
 class GoogleCategory extends AbstractAttribute {
 
@@ -33,7 +33,7 @@ class GoogleCategory extends AbstractAttribute {
 	/**
 	 * Return an array of WooCommerce product types that this attribute can be applied to.
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public static function get_applicable_product_types(): array {
 		return array( 'simple', 'variable' );

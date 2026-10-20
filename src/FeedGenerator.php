@@ -113,7 +113,7 @@ class FeedGenerator extends AbstractChainedJob {
 	 * Location buffers. On buffer for each local feed configuration.
 	 * We write to a buffer to limit the number disk writes.
 	 *
-	 * @var array $buffers Array of feed buffers.
+	 * @var string[] $buffers Array of feed buffers.
 	 */
 	private $buffers = array();
 

@@ -16,12 +16,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class handling ad credits based on currency.
  *
  * @class   AdsCreditCurrency
- * @version 1.4.18
+ * @version x.x.x
  */
 class AdsCreditCurrency {
 
 	/**
-	 * @var array $currency_credits_map Mapping of currency to spend requirement and credit given.
+	 * @var array<string, int[]> $currency_credits_map Mapping of currency to spend requirement and credit given.
 	 */
 	public static $currency_credits_map = array(
 		'USD' => array( 15, 125 ),
@@ -49,7 +49,7 @@ class AdsCreditCurrency {
 	 *
 	 * @since 1.3.9
 	 *
-	 * @return array $result Amount to be spent, credits given and currency symbol.
+	 * @return array{spendRequire: string, creditsGiven: string} $result Amount to be spent, credits given and currency symbol.
 	 */
 	public static function get_currency_credits() {
 

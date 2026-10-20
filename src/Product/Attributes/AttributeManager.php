@@ -43,7 +43,7 @@ class AttributeManager {
 	/**
 	 * Attribute types mapped to product types.
 	 *
-	 * @var array|null
+	 * @var string[][]|null
 	 */
 	protected $attribute_types_map;
 

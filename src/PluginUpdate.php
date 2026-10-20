@@ -29,7 +29,7 @@ use Throwable;
  * 3. Bump update version string.
  *
  * @class   PluginUpdate
- * @version 1.5.2
+ * @version x.x.x
  */
 class PluginUpdate {
 
@@ -121,7 +121,7 @@ class PluginUpdate {
 	 * @since 1.0.10
 	 * @since 1.2.7 Updates procedures organized in an array by plugin version.
 	 * @since 1.4.0 Added token_update procedure.
-	 * @return array List of update procedures names.
+	 * @return array<string, string[]> List of update procedures names.
 	 */
 	private function update_procedures() {
 		return array(

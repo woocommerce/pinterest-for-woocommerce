@@ -32,7 +32,7 @@ class ProductsXmlFeed {
 	/**
 	 * The default data structure of the Item to be printed in the XML feed.
 	 *
-	 * @var array
+	 * @var string[]
 	 */
 	private static $feed_item_structure = array(
 		'g:id',

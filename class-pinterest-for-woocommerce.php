@@ -141,7 +141,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 * The default settings that will be created
 		 * with the given values, if they don't exist.
 		 *
-		 * @var array
+		 * @var array<string, bool>
 		 * @since 1.0.0
 		 */
 		protected static $default_settings = array(
@@ -1468,7 +1468,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Returns the Terms object for the currently configured base country.
 		 *
-		 * @return array
+		 * @return array{tos_id: int, terms_url: string}
 		 */
 		public static function get_applicable_tos() {
 

@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
  * Class Condition
  *
  * @class   Condition
- * @version 1.0.2
+ * @version x.x.x
  */
 class Condition extends AbstractAttribute implements WithValueOptionsInterface {
 
@@ -33,7 +33,7 @@ class Condition extends AbstractAttribute implements WithValueOptionsInterface {
 	/**
 	 * Return an array of WooCommerce product types that this attribute can be applied to.
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public static function get_applicable_product_types(): array {
 		return array( 'simple', 'variation' );
@@ -44,7 +44,7 @@ class Condition extends AbstractAttribute implements WithValueOptionsInterface {
 	 *
 	 * Note: array key is used as the option key.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public static function get_value_options(): array {
 		return array(

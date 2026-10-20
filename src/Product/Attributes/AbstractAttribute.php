@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
  * Class AbstractAttribute
  *
  * @class   AbstractAttribute
- * @version 1.0.2
+ * @version x.x.x
  */
 abstract class AbstractAttribute implements AttributeInterface {
 
@@ -97,7 +97,7 @@ abstract class AbstractAttribute implements AttributeInterface {
 	/**
 	 * Return an array of WooCommerce product types that this attribute can be applied to.
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public static function get_applicable_product_types(): array {
 		return array( 'simple', 'variable', 'variation' );

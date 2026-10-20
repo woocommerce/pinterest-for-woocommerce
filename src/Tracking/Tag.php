@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adds PinterestTag tracker support.
  *
  * @class   Tag
- * @version 1.5.4
+ * @version x.x.x
  */
 class Tag extends Tracker {
 
@@ -49,7 +49,7 @@ class Tag extends Tracker {
 	/**
 	 * A list of events that are to be printed out.
 	 *
-	 * @var array
+	 * @var string[]
 	 */
 	private static $events = array();
 
@@ -448,7 +448,7 @@ class Tag extends Tracker {
 	 *
 	 * @since 1.4.0
 	 *
-	 * @return array The list of installed tags.
+	 * @return array<string, string> The list of installed tags.
 	 */
 	public static function get_third_party_installed_tags() {
 

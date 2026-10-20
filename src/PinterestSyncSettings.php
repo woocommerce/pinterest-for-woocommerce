@@ -31,7 +31,7 @@ class PinterestSyncSettings {
 	/**
 	 * Get the list of synced settings.
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public static function get_synced_settings() {
 

@@ -164,7 +164,7 @@ class FeedFileOperations {
 	/**
 	 * Write pre-populated buffers to feed files.
 	 *
-	 * @param array $buffers an array of (locale => content) elements.
+	 * @param string[] $buffers an array of (locale => content) elements.
 	 * @since 1.2.9
 	 * @throws FeedFileOperationsException Can't open or write to the file.
 	 */
