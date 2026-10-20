@@ -24,11 +24,11 @@ trait ValidateInterface {
 	 * @param string $interface The interface name.
 	 * @return void
 	 *
-	 * @throws InvalidClass When the given class does not implement the interface.
+	 * @throws InvalidClass When the given class does not implement the interface or does not exist.
 	 */
 	protected function validate_interface( string $class, string $interface ) {
 		$implements = class_implements( $class );
-		if ( ! array_key_exists( $interface, $implements ) ) {
+		if ( false === $implements || ! array_key_exists( $interface, $implements ) ) {
 			throw InvalidClass::should_implement( $class, $interface );
 		}
 	}
