@@ -35,7 +35,7 @@ jobs:
         # The single HPOS row overrides this value, so GitHub adds it as a separate job.
         order-storage: [cpt]
         # Minimum-version rows pin their own WooCommerce, so they run only when no wc-version is requested.
-        include: ${{ fromJSON(inputs.wc-version == '' && '[{"php":7.4,"wp-version":"7.0.0","wc-version":"11.1.0"},{"php":"8.4","wp-version":"latest","wc-version":"latest","order-storage":"hpos"}]' || format('[{{"php":"8.4","wp-version":"latest","wc-version":"{0}","order-storage":"hpos"}}]', inputs.wc-version)) }}
+        include: ${{ fromJSON(inputs.wc-version == '' && '[{"php":7.4,"wp-version":"7.0.0","wc-version":"11.1.0"},{"php":"8.4","wp-version":"latest","wc-version":"latest","order-storage":"hpos","coverage":"pcov"}]' || format('[{{"php":"8.4","wp-version":"latest","wc-version":"{0}","order-storage":"hpos","coverage":"pcov"}}]', inputs.wc-version)) }}
 
     steps:
       - name: Checkout repository
@@ -45,6 +45,12 @@ jobs:
         uses: woocommerce/grow/prepare-php@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           php-version: "${{ matrix.php }}"
+          coverage: ${{ matrix.coverage || 'none' }}
+
+      - name: Instrument the whole plugin with pcov
+        if: ${{ matrix.coverage }}
+        # Without it, pcov only instruments src/, lib/ or app/ when one of them exists.
+        run: echo 'pcov.directory=.' | sudo tee -a "$(php -r 'echo php_ini_loaded_file();')"
 
       - name: Prepare MySQL
         uses: woocommerce/grow/prepare-mysql@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1
@@ -63,4 +69,4 @@ jobs:
           php -r '$plugin = file_get_contents(getenv("WP_CORE_DIR") . "/wp-content/plugins/woocommerce/woocommerce.php"); preg_match("/Version:\s*(\S+)/", $plugin, $version) || exit(1); echo "WooCommerce: {$version[1]}\n";'
 
       - name: Run PHP unit tests
-        run: composer test-unit
+        run: composer test-unit ${{ matrix.coverage && '-- --coverage-clover coverage/clover.xml' || '' }}
