@@ -16,4 +16,4 @@ export WP_CORE_DIR="${WP_CORE_DIR:-/var/www/html}"
 
 cd "${PINTEREST_FOR_WOOCOMMERCE_DIR:-/var/www/html/wp-content/plugins/pinterest-for-woocommerce}"
 
-exec vendor/bin/phpunit "$@"
+exec vendor/bin/phpunit --fail-on-empty-test-suite "$@"
