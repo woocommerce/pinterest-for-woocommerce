@@ -1,4 +1,5 @@
 const vitest = require( '@vitest/eslint-plugin' );
+const playwright = require( 'eslint-plugin-playwright' );
 const woocommerce = require( '@woocommerce/eslint-plugin' );
 
 const jsdocTypes = woocommerce.configs.recommended.find(
@@ -79,6 +80,21 @@ module.exports = [
 					.filter( ( rule ) => rule.startsWith( 'jest/' ) )
 			),
 			...vitest.configs.recommended.rules,
+		},
+	},
+
+	// Every Playwright test asserts, and no assertion depends on a branch.
+	{
+		files: [ 'tests/browser/**/*.js' ],
+		// Reuse the instance that shared presets register: ESLint rejects a second one.
+		plugins: playwright.configs[ 'flat/recommended' ].plugins,
+		rules: {
+			'playwright/expect-expect': [
+				'error',
+				{ assertFunctionNames: [] },
+			],
+			'playwright/no-conditional-expect': 'error',
+			'playwright/valid-expect': 'error',
 		},
 	},
 	{
