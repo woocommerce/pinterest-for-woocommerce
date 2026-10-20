@@ -380,6 +380,27 @@ jobs:
               fi
               exit ${{ steps.run-woo-e2e-tests.outputs.exitcode || '1' }}
 
+          # Keep each run's server-side record (named failed tests, resolved WP/WC/PHP);
+          # the hosted report expires after 7 days. Public repos drop the signed report URLs.
+          - name: Retain QIT run records
+            if: ${{ !cancelled() && steps.prepare-environment.outcome == 'success' }}
+            shell: bash
+            env:
+              PUBLIC_REPO: ${{ github.event.repository.private == false }}
+            run: |
+              cd "$GITHUB_WORKSPACE/qit-results"
+              for f in qit-*-results.txt; do
+                check=${f#qit-}
+                check=${check%-results.txt}
+                id=$(grep -m1 -oE 'Test ID: [0-9]+|qit_results=[0-9]+' "$f" | grep -oE '[0-9]+$' | head -n1) || continue
+                # `qit get` exits nonzero for a failed run but still prints its record.
+                record=$("$GITHUB_WORKSPACE/vendor/bin/qit" get "$id" --json -n) || true
+                if [ "$PUBLIC_REPO" = 'true' ]; then
+                  record=$(jq 'del(.test_results_manager_url, .test_result_aws_url)' <<< "$record") || record=''
+                fi
+                printf '%s\n' "$record" > "$check.record.json"
+              done
+
           - name: Summarize QIT results
             if: ${{ always() }}
             env:
