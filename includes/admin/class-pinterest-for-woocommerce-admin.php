@@ -26,7 +26,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 	 * Class handling the settings page and onboarding Wizard registration and rendering.
 	 *
 	 * @class   Pinterest_For_Woocommerce_Admin
-	 * @version 1.5.2
+	 * @version x.x.x
 	 */
 	class Pinterest_For_Woocommerce_Admin {
 
@@ -267,6 +267,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 		/**
 		 * Load the scripts needed for the setup guide / settings page.
+		 *
+		 * @return void
 		 */
 		public function load_setup_guide_scripts() {
 
@@ -502,6 +504,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce_Admin' ) ) :
 
 		/**
 		 * Handles redirection to the Middleware App (Woo Connect Bridge).
+		 *
+		 * @return void
 		 */
 		public function maybe_redirect_to_middleware() {
 

@@ -32,7 +32,7 @@ class ProductsXmlFeed {
 	/**
 	 * The default data structure of the Item to be printed in the XML feed.
 	 *
-	 * @var array
+	 * @var string[]
 	 */
 	private static $feed_item_structure = array(
 		'g:id',
@@ -316,9 +316,9 @@ class ProductsXmlFeed {
 			 *
 			 * @since 1.4.27
 			 *
-			 * @param string          $description Resolved description after the variation→parent fallback.
-			 * @param WC_Product      $product     Variation product.
-			 * @param WC_Product|null $parent      Parent product, or null when not loaded (variation had its own description, or the parent post was deleted).
+			 * @param string                $description Resolved description after the variation→parent fallback.
+			 * @param WC_Product            $product     Variation product.
+			 * @param WC_Product|false|null $parent      Parent product, null when not loaded (variation had its own description), or false when the parent post was deleted.
 			 */
 			$description = apply_filters( 'pinterest_for_woocommerce_variation_description', $description, $product, $parent );
 		} else {
@@ -729,6 +729,8 @@ class ProductsXmlFeed {
 
 	/**
 	 * Get locale currency decimals
+	 *
+	 * @return mixed
 	 */
 	private static function get_currency_decimals() {
 		$currencies = get_transient( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_currencies_list' );

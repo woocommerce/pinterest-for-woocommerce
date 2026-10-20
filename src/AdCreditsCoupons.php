@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Handling ad credits.
  *
  * @class   AdCreditsCoupons
- * @version 1.5.2
+ * @version x.x.x
  */
 class AdCreditsCoupons {
 
@@ -28,7 +28,7 @@ class AdCreditsCoupons {
 	 *
 	 * @since 1.3.17
 	 *
-	 * @var array
+	 * @var string[]
 	 */
 	public static $allowed_currencies = array(
 		'USD',

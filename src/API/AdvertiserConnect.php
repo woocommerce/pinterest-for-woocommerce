@@ -150,6 +150,7 @@ class AdvertiserConnect extends VendorAPI {
 	 *
 	 * @param string $connected_advertiser The ID of the connected advertiser.
 	 * @param string $connected_tag        The ID of the connected tag.
+	 * @return void
 	 *
 	 * @throws \Exception PHP Exception.
 	 */
@@ -181,6 +182,7 @@ class AdvertiserConnect extends VendorAPI {
 	 * Enable AEM during the onboarding process.
 	 *
 	 * @param string $tag_id The tracking tag identifier.
+	 * @return void
 	 */
 	protected static function enable_aem_tag( $tag_id ) {
 		Base::update_tag(

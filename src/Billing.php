@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Helper class with functions for billing endpoint.
  *
  * @class   Billing
- * @version 1.5.2
+ * @version x.x.x
  */
 class Billing {
 
@@ -30,6 +30,7 @@ class Billing {
 	 * Initialize Billing actions and Action Scheduler hooks.
 	 *
 	 * @since 1.2.5
+	 * @return void
 	 */
 	public static function schedule_event() {
 		if ( ! Pinterest_For_Woocommerce::is_connected() ) {

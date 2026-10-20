@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Tracker responsible for hooking into system events.
  *
  * @class   Tracking
- * @version 1.5.4
+ * @version x.x.x
  */
 class Tracking {
 
@@ -83,7 +83,7 @@ class Tracking {
 	 *
 	 * @since 1.4.0
 	 *
-	 * @param array $trackers A list of trackers to track events with.
+	 * @param Tracker[] $trackers A list of trackers to track events with.
 	 */
 	public function __construct( array $trackers = array() ) {
 		$this->trackers = $trackers;

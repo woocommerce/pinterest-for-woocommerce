@@ -24,6 +24,8 @@ class SaveToPinterest {
 
 	/**
 	 * Initiate class.
+	 *
+	 * @return void
 	 */
 	public static function maybe_init() {
 
@@ -44,6 +46,7 @@ class SaveToPinterest {
 	 * Show Product Pin HTML.
 	 *
 	 * @since 1.0.0
+	 * @return void
 	 */
 	public static function render_product_pin() {
 

@@ -22,7 +22,7 @@ use Automattic\WooCommerce\Pinterest\PinterestApiException;
  * Pinterest Feed Deletion Error Admin Note Class
  *
  * @class   FeedDeletionFailure
- * @version 1.4.10
+ * @version x.x.x
  */
 class FeedDeletionFailure {
 
@@ -70,11 +70,15 @@ class FeedDeletionFailure {
 			$message
 		);
 
+		$note = false;
 		if ( self::note_exists() ) {
 			$data_store = Notes::load_data_store();
 			$note_ids   = $data_store->get_notes_with_name( self::NOTE_NAME );
 			$note       = Notes::get_note( current( $note_ids ) );
-		} else {
+		}
+
+		// Build a new note when none exists or the stored one can't be loaded.
+		if ( ! $note instanceof Note ) {
 			$additional_data = array(
 				'role' => 'administrator',
 			);

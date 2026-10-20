@@ -95,6 +95,7 @@ class Auth extends VendorAPI {
 	 * @since 1.0.0
 	 *
 	 * @param WP_REST_Request $request The request.
+	 * @return void
 	 */
 	public function connect_callback( WP_REST_Request $request ) {
 
@@ -176,6 +177,7 @@ class Auth extends VendorAPI {
 	 *
 	 * @param WP_REST_Request $request The request.
 	 * @param string          $error   The error message.
+	 * @return void
 	 */
 	public function log_error_and_redirect( WP_REST_Request $request, $error ) {
 		$error_args = '&error=' . $error;

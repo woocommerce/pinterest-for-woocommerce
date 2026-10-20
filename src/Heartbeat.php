@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @class   Heartbeat
  * @since   1.1.0
- * @version 1.4.11
+ * @version x.x.x
  */
 class Heartbeat {
 
@@ -36,6 +36,7 @@ class Heartbeat {
 	 * Schedule heartbeat events.
 	 *
 	 * @since 1.1.0
+	 * @return void
 	 */
 	public static function schedule_events() {
 		if ( ! Pinterest_For_Woocommerce::is_connected() ) {

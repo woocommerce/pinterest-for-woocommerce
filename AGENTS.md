@@ -184,7 +184,7 @@ npm run test:js:watch
 
 #### QIT
 
-QIT runs twice a week: four tests on the stable versions in Cron CI on Mondays, and the full set on the pre-release versions in Cron QIT on Wednesdays. QIT PHPStan stays off because the repo's own PHPStan (level 5) is the gate.
+QIT runs twice a week: four tests on the stable versions in Cron CI on Mondays, and the full set on the pre-release versions in Cron QIT on Wednesdays. QIT PHPStan stays off because the repo's own PHPStan (level 7) is the gate.
 
 ### Internationalization
 

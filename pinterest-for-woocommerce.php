@@ -135,6 +135,8 @@ register_activation_hook(
 
 /**
  * Handle plugin deregistration.
+ *
+ * @return void
  */
 function pinterest_for_woocommerce_deregister() {
 	Automattic\WooCommerce\Pinterest\ProductSync::deregister();

@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
  * Class AttributesTab
  *
  * @class   AttributesTab
- * @version 1.5.2
+ * @version x.x.x
  */
 class AttributesTab {
 
@@ -109,6 +109,8 @@ class AttributesTab {
 
 	/**
 	 * Render the product attributes tab.
+	 *
+	 * @return void
 	 */
 	private function render_panel() {
 		$product = wc_get_product( get_the_ID() );
@@ -126,6 +128,7 @@ class AttributesTab {
 	 * Handle form submission and update the product attributes.
 	 *
 	 * @param WC_Product $product WooCommerce product.
+	 * @return void
 	 */
 	private function handle_update_product( WC_Product $product ) {
 		if ( ! isset( $_POST['woocommerce_meta_nonce'] ) || ! is_string( $_POST['woocommerce_meta_nonce'] )

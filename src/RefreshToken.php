@@ -28,6 +28,7 @@ class RefreshToken {
 	 * Initialize Refresh Token actions and Action Scheduler hooks.
 	 *
 	 * @since 1.4.0
+	 * @return void
 	 */
 	public static function schedule_event() {
 		if ( ! Pinterest_For_Woocommerce::is_connected() ) {

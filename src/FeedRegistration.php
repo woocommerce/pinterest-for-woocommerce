@@ -60,6 +60,7 @@ class FeedRegistration {
 	 * Initialize FeedRegistration actions and Action Scheduler hooks.
 	 *
 	 * @since 1.0.10
+	 * @return void
 	 */
 	public function init() {
 		add_action( self::ACTION_HANDLE_FEED_REGISTRATION, array( $this, 'handle_feed_registration' ) );
@@ -249,7 +250,7 @@ class FeedRegistration {
 	 * If everything is configured correctly, this feed profile id will match
 	 * the setup that the merchant has in Pinterest.
 	 *
-	 * @return string|boolean
+	 * @return string|false
 	 */
 	public static function get_locally_stored_registered_feed_id() {
 		return Pinterest_For_Woocommerce()::get_data( 'feed_registered' ) ?? false;
@@ -257,6 +258,8 @@ class FeedRegistration {
 
 	/**
 	 * Stop feed generator jobs.
+	 *
+	 * @return void
 	 */
 	public static function cancel_jobs() {
 		as_unschedule_all_actions( self::ACTION_HANDLE_FEED_REGISTRATION, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
@@ -264,6 +267,8 @@ class FeedRegistration {
 
 	/**
 	 * Cleanup registration data.
+	 *
+	 * @return void
 	 */
 	public static function deregister() {
 		Pinterest_For_Woocommerce()::save_data( 'feed_registered', false );

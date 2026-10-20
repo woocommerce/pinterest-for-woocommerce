@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
  * Class VariationsAttributes
  *
  * @class   VariationsAttributes
- * @version 1.5.2
+ * @version x.x.x
  */
 class VariationsAttributes {
 
@@ -81,6 +81,7 @@ class VariationsAttributes {
 	 *
 	 * @param int     $variation_index Position in the loop.
 	 * @param WP_Post $variation       Post data.
+	 * @return void
 	 */
 	private function render_attributes_form( int $variation_index, WP_Post $variation ) {
 		/**
@@ -107,6 +108,7 @@ class VariationsAttributes {
 	 *
 	 * @param int $variation_id    Variation ID.
 	 * @param int $variation_index Variation index.
+	 * @return void
 	 */
 	private function handle_save_variation( int $variation_id, int $variation_index ) {
 		/**

@@ -47,6 +47,8 @@ class FeedState extends VendorAPI {
 
 	/**
 	 * Add feed state hooks.
+	 *
+	 * @return void
 	 */
 	private function hooks() {
 		add_filter( 'pinterest_for_woocommerce_feed_state', array( $this, 'add_local_feed_status' ) );
@@ -449,10 +451,14 @@ class FeedState extends VendorAPI {
 	private static function map_status_into_extra_info( array $processing_results ): string {
 		$status                  = $processing_results['status'] ?? '';
 		$original_products_count = (int) ( $processing_results['product_counts']['original'] ?? 0 );
-		$processing_date         = date_create_from_format(
-			'Y-m-d\TH:i:s',
-			$processing_results['created_at'] ?? gmdate( 'Y-m-d\TH:i:s' )
-		);
+		$created_at              = $processing_results['created_at'] ?? gmdate( 'Y-m-d\TH:i:s' );
+		$processing_date         = date_create_from_format( 'Y-m-d\TH:i:s', $created_at );
+		if ( false === $processing_date ) {
+			// Pinterest documents ISO 8601 timestamps with a timezone suffix, e.g. 2022-03-14T15:15:22Z.
+			$processing_date = date_create( $created_at );
+		}
+		// Use the current time for an unparsable date, as for a missing one.
+		$processing_timestamp = $processing_date ? $processing_date->getTimestamp() : time();
 
 		switch ( $status ) {
 			case 'COMPLETED':
@@ -460,14 +466,14 @@ class FeedState extends VendorAPI {
 				return sprintf(
 					/* Translators: %1$s Time difference string, %2$s number of products */
 					esc_html__( '%1$s ago, containing %2$d products', 'pinterest-for-woocommerce' ),
-					human_time_diff( $processing_date->getTimestamp() ),
+					human_time_diff( $processing_timestamp ),
 					$original_products_count
 				);
 			case 'FAILED':
 				$info = sprintf(
 					/* Translators: %1$s Time difference string */
 					esc_html__( '%1$s ago', 'pinterest-for-woocommerce' ),
-					human_time_diff( $processing_date->getTimestamp() )
+					human_time_diff( $processing_timestamp )
 				);
 				$global_error = Pinterest\FeedStatusService::get_processing_results_global_error( $processing_results );
 				return $info . ( $global_error ? ' - ' . $global_error : '' );
