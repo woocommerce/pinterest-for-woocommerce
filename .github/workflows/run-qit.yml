@@ -408,6 +408,7 @@ jobs:
               QIT_STEPS: ${{ toJSON(steps) }}
             run: |
               python3 - <<'PYTHON'
+              import glob
               import json
               import os
 
@@ -447,6 +448,26 @@ jobs:
                           result = 'failed (exit ' + code + ')'
                           failed = True
                       summary.write('| ' + check + ' | ' + result + ' |\n')
+                  records = sorted(glob.glob(os.path.join(os.environ['GITHUB_WORKSPACE'], 'qit-results', '*.record.json')))
+                  if records:
+                      summary.write('\n| QIT record | ID | Status | WordPress | WooCommerce | PHP | Failed tests |\n| --- | --- | --- | --- | --- | --- | --- |\n')
+                  for path in records:
+                      try:
+                          with open(path) as f:
+                              record = json.load(f)
+                          cells = [str(record[key]) for key in ('test_run_id', 'status', 'wordpress_version', 'woocommerce_version', 'php_version')]
+                      except Exception:
+                          # An unreadable record must not change the QIT verdict.
+                          record, cells = {}, ['record unavailable', '', '', '', '']
+                      try:
+                          ctrf = record.get('ctrf_json') or {}
+                          tests = ctrf['results']['tests'] if ctrf else []
+                          names = [t.get('suite', '') + ' › ' + t.get('name', '') for t in tests if t.get('status') == 'failed']
+                      except Exception:
+                          # A malformed CTRF report only blanks the failed-test column.
+                          names = ['failed-test list unavailable']
+                      failed_tests = '<br>'.join(names).replace('|', '\\|') or '-'
+                      summary.write('| ' + ' | '.join([os.path.basename(path)[:-len('.record.json')]] + cells + [failed_tests]) + ' |\n')
               raise SystemExit(1 if failed else 0)
               PYTHON
 
