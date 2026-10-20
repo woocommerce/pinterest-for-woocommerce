@@ -51,6 +51,7 @@ for ( const [ role, mode, consent ] of [
 			( event ) => event.event_name === 'checkout'
 		);
 		const tag = await checkoutTags( page );
+		/* eslint-disable playwright/no-conditional-expect -- Each consent case runs exactly one branch. */
 		if ( consent === 'deny' ) {
 			expect( recordedEvents ).toEqual( [] );
 			expect( await page.evaluate( () => typeof window.pintrk ) ).toBe(
@@ -124,6 +125,7 @@ for ( const [ role, mode, consent ] of [
 			);
 			expect( await checkoutTags( page ) ).toEqual( tag );
 		}
+		/* eslint-enable playwright/no-conditional-expect */
 		expect( await store.orders() ).toEqual( order );
 	} );
 }
