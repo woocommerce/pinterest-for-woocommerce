@@ -30,7 +30,7 @@ For an existing **dedicated test store** with only WooCommerce and Pinterest act
 
 1. Set `PINTEREST_E2E` and `DISABLE_WP_CRON` to `true` in `wp-config.php`.
 2. Map this checkout to `wp-content/plugins/pinterest-for-woocommerce` and build its assets with `npm run dev`.
-3. Copy `tests/browser/fixture.php` to `wp-content/mu-plugins/pinterest-e2e.php`. It loads the PHP fixtures from the mapped plugin directory; copy it again if the bootstrap changes.
+3. Copy `tests/browser/fixture.php` to `wp-content/mu-plugins/pinterest-e2e.php`. It loads the PHP fixtures from the mapped plugin directory; copy it again if the bootstrap changes. The `warnings` check, which runs last, also needs `WP_DEBUG` and `WP_DEBUG_LOG` set to `true`, `WP_DEBUG_DISPLAY` set to `false`, and `tests/browser/mu-plugins/e2e-log-marker.php` copied into that site's `wp-content/mu-plugins/`.
 4. For native WordPress, set `PINTEREST_E2E_WP_PATH=/absolute/path/to/wordpress` and `PINTEREST_E2E_URL=http://localhost:9010` to select the WP-CLI store and its browser URL.
 5. Run `npm run test:browser`. Merchant credentials default to wp-env's `admin/password`; override them with `PINTEREST_E2E_ADMIN` and `PINTEREST_E2E_PASSWORD` if needed.
 
