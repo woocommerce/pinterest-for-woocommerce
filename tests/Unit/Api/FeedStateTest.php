@@ -58,6 +58,39 @@ class FeedStateTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A processing date with a timezone suffix, as Pinterest documents it, is shown as a time difference.
+	 */
+	public function test_processing_status_diagnostics_accepts_created_at_with_timezone_suffix() {
+		$method = new ReflectionMethod( FeedState::class, 'map_status_into_extra_info' );
+		$method->setAccessible( true );
+		$info = $method->invoke(
+			null,
+			array(
+				'status'         => 'COMPLETED',
+				'created_at'     => gmdate( 'Y-m-d\TH:i:s\Z', time() - HOUR_IN_SECONDS ),
+				'product_counts' => array( 'original' => 3 ),
+			)
+		);
+		$this->assertSame( '1 hour ago, containing 3 products', $info );
+	}
+
+	/**
+	 * An unparsable processing date falls back to the current time instead of a fatal error.
+	 */
+	public function test_processing_status_diagnostics_with_unparsable_created_at_uses_current_time() {
+		$method = new ReflectionMethod( FeedState::class, 'map_status_into_extra_info' );
+		$method->setAccessible( true );
+		$info = $method->invoke(
+			null,
+			array(
+				'status'     => 'COMPLETED',
+				'created_at' => 'not a date',
+			)
+		);
+		$this->assertMatchesRegularExpression( '/^\d+ seconds? ago, containing 0 products$/', $info );
+	}
+
+	/**
 	 * Sanitize every workflow producer while retaining safe formatting and links.
 	 */
 	public function test_workflow_html_uses_wordpress_allowlist() {
