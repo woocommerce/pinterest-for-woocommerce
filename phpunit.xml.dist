@@ -27,8 +27,12 @@
 		<include>
 			<directory suffix=".php">src</directory>
 			<directory suffix=".php">includes</directory>
+			<directory suffix=".php">views</directory>
+			<file>assets/index.php</file>
 			<file>class-pinterest-for-woocommerce.php</file>
+			<file>index.php</file>
 			<file>pinterest-for-woocommerce.php</file>
+			<file>uninstall.php</file>
 		</include>
 	</coverage>
 </phpunit>
