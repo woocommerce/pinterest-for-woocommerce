@@ -38,6 +38,7 @@ on:
           - 'PHP Compatibility'
           - 'WooCommerce E2E and API tests'
           - 'Plugin Checks (for dotOrg metadata)'
+          - 'REST fuzzing'
           - 'None'
       qit-wait:
         description: 'Wait for QIT? Requires additional time for the QIT tests to complete within GHA.'
@@ -91,6 +92,7 @@ jobs:
       test-malware: ${{ contains(inputs.qit-tests, 'Malware') && 'true' || 'false' }}
       test-validation: ${{ contains(inputs.qit-tests, 'Validation') && 'true' || 'false' }}
       test-plugin-check: ${{ contains(inputs.qit-tests, 'dotOrg') && 'true' || 'false' }}
+      test-api-fuzz: ${{ contains(inputs.qit-tests, 'fuzzing') && 'true' || 'false' }}
       options: ${{ inputs.options }}
       wait: ${{ inputs.qit-wait }}
     secrets: inherit
