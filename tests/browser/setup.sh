@@ -58,5 +58,6 @@ fi
 
 npx wp-env run tests-cli mkdir -p /var/www/html/wp-content/mu-plugins
 npx wp-env run tests-cli cp /var/www/html/wp-content/plugins/pinterest-for-woocommerce/tests/browser/fixture.php /var/www/html/wp-content/mu-plugins/pinterest-e2e.php
+npx wp-env run tests-cli cp /var/www/html/wp-content/plugins/pinterest-for-woocommerce/tests/browser/mu-plugins/e2e-log-marker.php /var/www/html/wp-content/mu-plugins/e2e-log-marker.php
 npm run test:browser:reset
 PLAYWRIGHT_SKIP_BROWSER_GC=1 npx playwright install chromium
