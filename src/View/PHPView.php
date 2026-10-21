@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
  * Class PHPView
  *
  * @class   PHPView
- * @version 1.6.0
+ * @version x.x.x
  */
 class PHPView implements View {
 
@@ -26,6 +26,8 @@ class PHPView implements View {
 
 	/**
 	 * Extension to use for view files.
+	 *
+	 * @var string
 	 */
 	protected const VIEW_EXTENSION = 'php';
 
