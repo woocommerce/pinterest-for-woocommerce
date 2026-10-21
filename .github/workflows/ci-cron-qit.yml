@@ -37,6 +37,7 @@ jobs:
           test-woo-api: ${{ 'true' }}
           test-woo-e2e: ${{ 'true' }}
           test-malware: ${{ 'true' }}
+          test-api-fuzz: ${{ 'true' }}
 
     handle-success:
         if: ${{ success() }}

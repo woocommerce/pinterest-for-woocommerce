@@ -52,6 +52,9 @@ on:
       test-validation:
         type: string
         default: 'false'
+      test-api-fuzz:
+        type: string
+        default: 'false'
       options:
         type: string
         default: ''
@@ -80,7 +83,8 @@ jobs:
 
         name: Run QIT Tests
         runs-on: ubuntu-latest
-        timeout-minutes: 55
+        # The API fuzz campaign alone can take up to 45 minutes.
+        timeout-minutes: 100
         steps:
 
           - name: Install QIT via composer
@@ -380,6 +384,32 @@ jobs:
               fi
               exit ${{ steps.run-woo-e2e-tests.outputs.exitcode || '1' }}
 
+          ##############################
+          # REST API fuzzing.
+          ##############################
+          # QIT fuzzes the REST routes the plugin adds or changes, on stable WordPress and WooCommerce
+          # (the command takes no version options), and confirms each finding twice from a clean state.
+          # It always waits and takes no `options`: an `--async` run would exit 0 before any result, and the
+          # other test types' options (e.g. --optional_features) are not valid for it.
+          - name: Run API fuzz test
+            id: run-api-fuzz-test
+            if: ${{ !cancelled() && steps.prepare-environment.outcome == 'success' && steps.download-zip.outcome == 'success' && inputs.test-api-fuzz == 'true' }}
+            # Do not fail when the `qit` fails, so we can annotate the results.
+            shell: bash --noprofile --norc {0}
+            run: |
+              ./vendor/bin/qit run:api-fuzz \
+                "$EXTENSION_SLUG" \
+                --zip="$ZIP_FILE_PATH" \
+                -n \
+                > ${{ github.workspace }}/qit-results/qit-api-fuzz-results.txt
+              echo "exitcode=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+          - name: Echo API fuzz results
+            if: ${{ !cancelled() && inputs.test-api-fuzz == 'true' && steps.run-api-fuzz-test.outputs.exitcode != '' }}
+            run: |
+              cat ${{ github.workspace }}/qit-results/qit-api-fuzz-results.txt
+              exit ${{ steps.run-api-fuzz-test.outputs.exitcode || '1' }}
+
           # Keep each run's server-side record (named failed tests, resolved WP/WC/PHP);
           # the hosted report expires after 7 days. Public repos drop the signed report URLs.
           - name: Retain QIT run records
@@ -424,6 +454,7 @@ jobs:
                   'validation': 'run-validation-tests',
                   'woo-api': 'run-woo-api-tests',
                   'woo-e2e': 'run-woo-e2e-tests',
+                  'api-fuzz': 'run-api-fuzz-test',
               }
               failed = False
               with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
@@ -463,6 +494,11 @@ jobs:
                           ctrf = record.get('ctrf_json') or {}
                           tests = ctrf['results']['tests'] if ctrf else []
                           names = [t.get('suite', '') + ' › ' + t.get('name', '') for t in tests if t.get('status') == 'failed']
+                          # API fuzz findings are not tests; list each one as its request and error.
+                          # Other checks (e.g. malware) store a list here, so only read a mapping.
+                          result = record.get('test_result_json')
+                          findings = (result.get('findings') or []) if isinstance(result, dict) else []
+                          names += [f.get('method', '') + ' ' + f.get('route', '') + ' › ' + str(f.get('error_message') or 'HTTP ' + str(f.get('response_status', ''))).replace('\n', ' ') for f in findings if not f.get('suppressed')]
                       except Exception:
                           # A malformed CTRF report only blanks the failed-test column.
                           names = ['failed-test list unavailable']
