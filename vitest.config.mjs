@@ -44,7 +44,7 @@ export default defineConfig( {
 			provider: 'v8',
 			include: [ 'assets/source/**/*.js' ],
 			exclude: [ 'assets/source/**/*.test.js', 'assets/source/tests/**' ],
-			reporter: [ 'text', 'html', 'json-summary' ],
+			reporter: [ 'text', 'html', 'json-summary', 'clover' ],
 		},
 	},
 } );
