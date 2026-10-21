@@ -15,7 +15,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
  *
  * @class   Product
  * @since   1.4.0
- * @version 1.6.0
+ * @version x.x.x
  */
 class Product extends Data {
 
@@ -90,14 +90,14 @@ class Product extends Data {
 	}
 
 	/**
-	 * @return mixed Get Product ID.
+	 * @return int|string Get Product ID.
 	 */
 	public function get_id() {
 		return $this->id;
 	}
 
 	/**
-	 * @return mixed Get Product name.
+	 * @return string Get Product name.
 	 */
 	public function get_name() {
 		return $this->name;
@@ -111,7 +111,7 @@ class Product extends Data {
 	}
 
 	/**
-	 * @return mixed Product brand.
+	 * @return string Product brand.
 	 */
 	public function get_brand() {
 		return $this->brand;
@@ -125,7 +125,7 @@ class Product extends Data {
 	}
 
 	/**
-	 * @return mixed Get Product currency code.
+	 * @return string Get Product currency code.
 	 */
 	public function get_currency() {
 		return $this->currency;

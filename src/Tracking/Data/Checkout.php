@@ -14,7 +14,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
  * Holds Checkout event related data to pass it into trackers.
  *
  * @class   Checkout
- * @version 1.6.0
+ * @version x.x.x
  */
 class Checkout extends Data {
 
@@ -71,28 +71,28 @@ class Checkout extends Data {
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	public function get_order_id() {
 		return $this->order_id;
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	public function get_price() {
 		return $this->price;
 	}
 
 	/**
-	 * @return mixed
+	 * @return int
 	 */
 	public function get_quantity() {
 		return $this->quantity;
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	public function get_currency() {
 		return $this->currency;
