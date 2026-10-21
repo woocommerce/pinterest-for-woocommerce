@@ -19,7 +19,7 @@ class ConversionsTest extends WP_UnitTestCase {
 		remove_all_filters( 'pre_http_request' );
 		Logger::$logger = null;
 		wp_set_current_user( 0 );
-		unset( $_GET['epik'], $_COOKIE['_epik'] );
+		unset( $_GET['epik'], $_COOKIE['_epik'], $_SERVER['HTTP_REFERER'] );
 
 		if ( function_exists( 'WC' ) && isset( WC()->session ) ) {
 			WC()->session->__unset( 'pinterest_for_woocommerce_click_id' );
@@ -473,6 +473,97 @@ class ConversionsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that an add to cart request reads the click ID from the landing page referer.
+	 *
+	 * @return void
+	 */
+	public function test_add_to_cart_uses_and_persists_epik_from_same_site_referer() {
+		$_SERVER['HTTP_REFERER'] = home_url( '/product/beanie/?epik=referer-click-id' );
+
+		$data = $this->prepare_add_to_cart_data();
+
+		$this->assertSame( 'referer-click-id', $data['user_data']['click_id'] );
+		$this->assertSame( 'referer-click-id', WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that a referer on another site is not trusted as a click ID source.
+	 *
+	 * @return void
+	 */
+	public function test_add_to_cart_ignores_epik_from_off_site_referer() {
+		$_SERVER['HTTP_REFERER'] = 'https://pinterest-attacker.test/?epik=foreign-click-id';
+
+		$data = $this->prepare_add_to_cart_data();
+
+		$this->assertArrayNotHasKey( 'click_id', $data['user_data'] );
+	}
+
+	/**
+	 * Tests that an allowed redirect host does not count as this site.
+	 *
+	 * @return void
+	 */
+	public function test_add_to_cart_ignores_epik_from_allowed_redirect_host_referer() {
+		add_filter(
+			'allowed_redirect_hosts',
+			function ( $hosts ) {
+				$hosts[] = 'partner.test';
+				return $hosts;
+			}
+		);
+		$_SERVER['HTTP_REFERER'] = 'https://partner.test/?epik=partner-click-id';
+		$_COOKIE['_epik']        = 'cookie-click-id';
+
+		$data = $this->prepare_add_to_cart_data();
+
+		$this->assertSame( 'cookie-click-id', $data['user_data']['click_id'] );
+		$this->assertSame( 'cookie-click-id', WC()->session->get( 'pinterest_for_woocommerce_click_id' ) );
+	}
+
+	/**
+	 * Tests that the referer click ID, from the current visit, wins over the cookie.
+	 *
+	 * @return void
+	 */
+	public function test_add_to_cart_prefers_referer_epik_over_cookie() {
+		$_SERVER['HTTP_REFERER'] = home_url( '/product/beanie/?epik=referer-click-id' );
+		$_COOKIE['_epik']        = 'cookie-click-id';
+
+		$data = $this->prepare_add_to_cart_data();
+
+		$this->assertSame( 'referer-click-id', $data['user_data']['click_id'] );
+	}
+
+	/**
+	 * Tests that an `epik` on the current request wins over one in the referer.
+	 *
+	 * @return void
+	 */
+	public function test_add_to_cart_prefers_request_epik_over_referer() {
+		$_GET['epik']            = 'request-click-id';
+		$_SERVER['HTTP_REFERER'] = home_url( '/product/beanie/?epik=referer-click-id' );
+
+		$data = $this->prepare_add_to_cart_data();
+
+		$this->assertSame( 'request-click-id', $data['user_data']['click_id'] );
+	}
+
+	/**
+	 * Tests that a referer without a click ID falls through to the cookie.
+	 *
+	 * @return void
+	 */
+	public function test_add_to_cart_uses_cookie_when_referer_has_no_epik() {
+		$_SERVER['HTTP_REFERER'] = home_url( '/product/beanie/' );
+		$_COOKIE['_epik']        = 'cookie-click-id';
+
+		$data = $this->prepare_add_to_cart_data();
+
+		$this->assertSame( 'cookie-click-id', $data['user_data']['click_id'] );
+	}
+
+	/**
 	 * The PageVisit beacon can preserve the URL of the cached storefront page.
 	 */
 	public function test_uses_explicit_event_source_url() {
@@ -801,6 +892,19 @@ class ConversionsTest extends WP_UnitTestCase {
 		$conversions = new Conversions( $user, $event_source_url );
 
 		return $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+	}
+
+	/**
+	 * Prepares add to cart request data for a fresh Conversions tracker.
+	 *
+	 * @return array Prepared request data.
+	 */
+	private function prepare_add_to_cart_data() {
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user );
+		$product     = new Tracking\Data\Product( 'event-id-321', 1, 'Name 1', 'Furniture', 'Brand', '9.99', 'USD', 1 );
+
+		return $conversions->prepare_request_data( Tracking::EVENT_ADD_TO_CART, $product );
 	}
 
 	/**
