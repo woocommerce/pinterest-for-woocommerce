@@ -29,9 +29,14 @@ jobs:
         needs: [php-lint, js-lint]
         uses: ./.github/workflows/php-unit-tests.yml
 
+    js-tests:
+        name: JavaScript
+        needs: [php-lint, js-lint]
+        uses: ./.github/workflows/js-unit-tests.yml
+
     build_project:
         name: Package
-        needs: php-tests
+        needs: [php-tests, js-tests]
         uses: ./.github/workflows/build-upload-zip.yml
 
     e2e-tests:
