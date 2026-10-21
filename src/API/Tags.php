@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Endpoint handing Pinterest Tags.
  *
  * @class   Tags
- * @version x.x.x
+ * @version 1.6.0
  */
 class Tags extends VendorAPI {
 

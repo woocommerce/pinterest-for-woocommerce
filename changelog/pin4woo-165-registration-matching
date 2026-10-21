@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Skip feeds Pinterest reports as deleted and read every feed page when matching the registered feed, so registration no longer re-attaches to a dead feed or creates a duplicate of one beyond the first page.

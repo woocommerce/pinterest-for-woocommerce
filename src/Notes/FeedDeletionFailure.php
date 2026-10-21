@@ -22,7 +22,7 @@ use Automattic\WooCommerce\Pinterest\PinterestApiException;
  * Pinterest Feed Deletion Error Admin Note Class
  *
  * @class   FeedDeletionFailure
- * @version x.x.x
+ * @version 1.6.0
  */
 class FeedDeletionFailure {
 

@@ -10,7 +10,7 @@ use WP_UnitTestCase;
 /**
  * Tests that Pinterest registers itself as a WooCommerce marketing channel.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class MarketingChannelRegistrarTest extends WP_UnitTestCase {
 

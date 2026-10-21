@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Endpoint returning the current state of the XML feed.
  *
  * @class   FeedState
- * @version x.x.x
+ * @version 1.6.0
  */
 class FeedState extends VendorAPI {
 

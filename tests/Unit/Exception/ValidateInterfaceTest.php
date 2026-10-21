@@ -11,7 +11,7 @@ use WP_UnitTestCase;
 /**
  * Class validation reports invalid classes with InvalidClass.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class ValidateInterfaceTest extends WP_UnitTestCase {
 

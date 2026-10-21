@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Waited for settings and saved dismissals before opening catalog prompts, avoiding duplicate analytics and ineligible ad-credit notices.

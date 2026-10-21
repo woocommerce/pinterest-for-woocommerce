@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adding Save Pin support.
  *
  * @class   ProductsXmlFeed
- * @version x.x.x
+ * @version 1.6.0
  */
 class ProductsXmlFeed {
 

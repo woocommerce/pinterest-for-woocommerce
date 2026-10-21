@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Showed a failure notice instead of a success notice when the settings sync with Pinterest Ads Manager fails.

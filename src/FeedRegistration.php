@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Handling feed files registration.
  *
  * @class   FeedRegistration
- * @version x.x.x
+ * @version 1.6.0
  */
 class FeedRegistration {
 

@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Helper class with functions for billing endpoint.
  *
  * @class   Billing
- * @version x.x.x
+ * @version 1.6.0
  */
 class Billing {
 

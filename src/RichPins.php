@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adding RichPins support.
  *
  * @class   RichPins
- * @version x.x.x
+ * @version 1.6.0
  */
 class RichPins {
 

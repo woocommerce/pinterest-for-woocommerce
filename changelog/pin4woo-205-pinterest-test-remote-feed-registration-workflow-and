@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Fixed feed registration retries after a previous successful registration.

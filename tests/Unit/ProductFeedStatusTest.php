@@ -7,7 +7,7 @@ use Pinterest_For_Woocommerce;
 /**
  * Tests the ProductFeedStatus class.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class ProductFeedStatusTest extends \WP_UnitTestCase {
 

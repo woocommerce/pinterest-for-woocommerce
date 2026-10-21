@@ -29,7 +29,7 @@ use Throwable;
  * 3. Bump update version string.
  *
  * @class   PluginUpdate
- * @version x.x.x
+ * @version 1.6.0
  */
 class PluginUpdate {
 

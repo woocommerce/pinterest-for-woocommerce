@@ -16,7 +16,7 @@ use WP_UnitTestCase;
 /**
  * Tests native registration, recovery and stale feed cleanup.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class FeedRegistrationTest extends WP_UnitTestCase {
 

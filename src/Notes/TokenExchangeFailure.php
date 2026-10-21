@@ -19,7 +19,7 @@ use Automattic\WooCommerce\Admin\Notes\NoteTraits;
  * Add_First_Product.
  *
  * @class   TokenExchangeFailure
- * @version x.x.x
+ * @version 1.6.0
  */
 class TokenExchangeFailure {
 	/**

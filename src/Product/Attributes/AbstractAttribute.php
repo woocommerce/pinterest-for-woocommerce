@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
  * Class AbstractAttribute
  *
  * @class   AbstractAttribute
- * @version x.x.x
+ * @version 1.6.0
  */
 abstract class AbstractAttribute implements AttributeInterface {
 

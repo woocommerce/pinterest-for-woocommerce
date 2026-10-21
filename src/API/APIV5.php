@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * API V5 Methods
  *
  * @class   APIV5
- * @version x.x.x
+ * @version 1.6.0
  */
 class APIV5 extends Base {
 
@@ -584,7 +584,7 @@ class APIV5 extends Base {
 	 * Get merchant's feeds.
 	 *
 	 * @since 1.4.0
-	 * @since x.x.x Added the $bookmark parameter. Only the first page is cached.
+	 * @since 1.6.0 Added the $bookmark parameter. Only the first page is cached.
 	 *
 	 * @param string $ad_account_id Pinterest Ad Account ID.
 	 * @param string $bookmark      Cursor of the page to fetch, from the previous page's bookmark. Empty for the first page.

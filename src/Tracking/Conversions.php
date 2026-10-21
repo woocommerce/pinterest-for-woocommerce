@@ -23,7 +23,7 @@ use Throwable;
  * Pinterest Conversions API support.
  *
  * @class   Conversions
- * @version x.x.x
+ * @version 1.6.0
  */
 class Conversions extends Tracker {
 
@@ -239,7 +239,7 @@ class Conversions extends Tracker {
 	 * long as the browser's referrer policy keeps the query string. Pinterest's `_epik` cookie and the WooCommerce
 	 * session retain the click ID for later events.
 	 *
-	 * @since x.x.x Reads the click ID from the referer.
+	 * @since 1.6.0 Reads the click ID from the referer.
 	 *
 	 * @param string $event_source_url Optional URL where the event occurred.
 	 *

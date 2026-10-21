@@ -24,7 +24,7 @@ use Pinterest_For_Woocommerce as Plugin;
 /**
  * Exercise real products, saved configurations, scheduler actions and files together.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class CatalogPublicationTest extends \WP_UnitTestCase {
 

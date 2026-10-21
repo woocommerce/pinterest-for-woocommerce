@@ -17,7 +17,7 @@ use WP_Test_REST_TestCase;
 /**
  * Tests for the OAuth callback endpoint.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class AuthTest extends WP_Test_REST_TestCase {
 
