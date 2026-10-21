@@ -655,17 +655,22 @@ class FeedGeneratorTest extends \WP_UnitTestCase {
 			->method( 'add_footer_to_temporary_feed_files' )
 			->willThrowException( new Exception() );
 
+		$exception = null;
 		try {
 			$this->feed_generator->handle_end_action( array() );
 		} catch ( Exception $e ) {
-			$feed_generation_status        = ProductFeedStatus::get()['status'];
-			$feed_generation_wall_time     = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
-			$feed_generation_product_count = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT ];
-
-			$this->assertEquals( 'error', $feed_generation_status );
-			$this->assertEquals( 0, $feed_generation_product_count );
-			$this->assertEquals( -1, $feed_generation_wall_time );
+			$exception = $e;
 		}
+
+		$this->assertInstanceOf( Exception::class, $exception );
+
+		$feed_generation_status        = ProductFeedStatus::get()['status'];
+		$feed_generation_wall_time     = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_WALL_TIME ];
+		$feed_generation_product_count = ProductFeedStatus::get()[ ProductFeedStatus::PROP_FEED_GENERATION_RECENT_PRODUCT_COUNT ];
+
+		$this->assertEquals( 'error', $feed_generation_status );
+		$this->assertEquals( 0, $feed_generation_product_count );
+		$this->assertEquals( -1, $feed_generation_wall_time );
 	}
 
 	public function test_while_feed_generator_is_in_progress_previous_wall_time_and_recent_product_count_are_not_overwritten() {
