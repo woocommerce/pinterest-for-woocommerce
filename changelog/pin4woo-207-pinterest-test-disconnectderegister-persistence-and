@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Clear saved feed status when deregistering or disconnecting Pinterest.

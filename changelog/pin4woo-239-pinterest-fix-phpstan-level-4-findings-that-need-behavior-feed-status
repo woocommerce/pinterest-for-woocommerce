@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Marked a registered feed whose Pinterest processing result has no status as pending in the catalog overview.

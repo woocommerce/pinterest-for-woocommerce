@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Prevented PHP warnings when Pinterest connection data, feed processing results or shutdown errors lack an optional field.

@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce record of the feeds this plugin owns on Pinterest.
  *
  * @package     Pinterest_For_WooCommerce/Classes/
- * @version     x.x.x
+ * @version     1.6.0
  */
 
 declare( strict_types=1 );
@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * reconnect, when the location heuristic can no longer identify it.
  *
  * @class   FeedOwnership
- * @version x.x.x
+ * @version 1.6.0
  */
 class FeedOwnership {
 
@@ -42,7 +42,7 @@ class FeedOwnership {
 	 *
 	 * Idempotent: a feed already on record keeps its original timestamp.
 	 *
-	 * @since x.x.x
+	 * @since 1.6.0
 	 *
 	 * @param string $feed_id       Pinterest feed ID.
 	 * @param string $ad_account_id Pinterest ad account ID. Defaults to the connected one.
@@ -66,7 +66,7 @@ class FeedOwnership {
 	/**
 	 * Removes a feed from the record, for example after Pinterest confirmed its deletion.
 	 *
-	 * @since x.x.x
+	 * @since 1.6.0
 	 *
 	 * @param string $feed_id       Pinterest feed ID.
 	 * @param string $ad_account_id Pinterest ad account ID. Defaults to the connected one.
@@ -89,7 +89,7 @@ class FeedOwnership {
 	/**
 	 * Tells whether a feed is on record as owned by this plugin.
 	 *
-	 * @since x.x.x
+	 * @since 1.6.0
 	 *
 	 * @param string $feed_id       Pinterest feed ID.
 	 * @param string $ad_account_id Pinterest ad account ID. Defaults to the connected one.
@@ -102,7 +102,7 @@ class FeedOwnership {
 	/**
 	 * Returns the recorded feeds of an ad account.
 	 *
-	 * @since x.x.x
+	 * @since 1.6.0
 	 *
 	 * @param string $ad_account_id Pinterest ad account ID. Defaults to the connected one.
 	 * @return array<string, int> Feed ID => Unix timestamp of when the feed was recorded.

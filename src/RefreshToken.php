@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Handling Token Refresh.
  *
  * @class   RefreshToken
- * @version x.x.x
+ * @version 1.6.0
  */
 class RefreshToken {
 

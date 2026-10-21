@@ -24,7 +24,7 @@ use Throwable;
  * Class handling fetch methods for feed profiles.
  *
  * @class   Feeds
- * @version x.x.x
+ * @version 1.6.0
  */
 class Feeds {
 
@@ -295,7 +295,7 @@ class Feeds {
 	 *
 	 * Unlike get_feeds(), this reads all pages and lets API errors reach the caller.
 	 *
-	 * @since x.x.x
+	 * @since 1.6.0
 	 *
 	 * @return array The feed profile objects of every page.
 	 *
@@ -342,7 +342,7 @@ class Feeds {
 	 * Verify if the local feed is already registered to the merchant.
 	 * Return its ID if it is.
 	 *
-	 * @since x.x.x Reads every feed page when no list is given, and lets API errors through
+	 * @since 1.6.0 Reads every feed page when no list is given, and lets API errors through
 	 *              instead of treating them as "no feeds", which would create a duplicate feed.
 	 *
 	 * @param array $feeds The list of feeds to check against. If not set, every page is fetched from the API.

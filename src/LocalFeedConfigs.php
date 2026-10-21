@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @phpstan-consistent-constructor
  * @class   LocalFeedConfigs
- * @version x.x.x
+ * @version 1.6.0
  */
 class LocalFeedConfigs {
 

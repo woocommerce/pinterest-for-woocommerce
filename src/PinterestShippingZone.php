@@ -20,7 +20,7 @@ use \WC_Shipping_Zone;
  *
  * @class   PinterestShippingZone
  * @since   1.0.5
- * @version x.x.x
+ * @version 1.6.0
  */
 class PinterestShippingZone extends WC_Shipping_Zone {
 

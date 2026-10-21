@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Stopped settings sync error notices from stacking on every retry, and kept the sync success notice visible until the next sync.

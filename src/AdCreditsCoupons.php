@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Handling ad credits.
  *
  * @class   AdCreditsCoupons
- * @version x.x.x
+ * @version 1.6.0
  */
 class AdCreditsCoupons {
 

@@ -15,7 +15,7 @@ use Automattic\WooCommerce\Pinterest\Tracking\Data;
  *
  * @class   Product
  * @since   1.4.0
- * @version x.x.x
+ * @version 1.6.0
  */
 class Product extends Data {
 

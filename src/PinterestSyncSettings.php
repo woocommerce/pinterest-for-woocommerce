@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class to handle PinterestSyncSettings.
  *
  * @class   PinterestSyncSettings
- * @version x.x.x
+ * @version 1.6.0
  */
 class PinterestSyncSettings {
 

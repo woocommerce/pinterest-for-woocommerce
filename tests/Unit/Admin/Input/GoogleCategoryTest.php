@@ -13,7 +13,7 @@ use WP_UnitTestCase;
 /**
  * Setting the input's options.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class GoogleCategoryTest extends WP_UnitTestCase {
 

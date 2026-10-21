@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class which handles all feed file filesystem operations.
  *
  * @class   FeedFileOperations
- * @version x.x.x
+ * @version 1.6.0
  */
 class FeedFileOperations {
 

@@ -1,4 +1,0 @@
-Significance: patch
-Type: dev
-
-Fixed PHPStan level 7 findings that needed behavior changes.

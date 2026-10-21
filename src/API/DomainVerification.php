@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Endpoint handing Domain verification.
  *
  * @class   DomainVerification
- * @version x.x.x
+ * @version 1.6.0
  */
 class DomainVerification extends VendorAPI {
 

@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Displayed errors and retry actions for failed catalog reports and kept newer report pages from being replaced by late responses.

@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class handling ad credits based on currency.
  *
  * @class   AdsCreditCurrency
- * @version x.x.x
+ * @version 1.6.0
  */
 class AdsCreditCurrency {
 

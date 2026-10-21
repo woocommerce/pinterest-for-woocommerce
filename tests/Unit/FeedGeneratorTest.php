@@ -22,7 +22,7 @@ use WC_Product_Variable;
 /**
  * Test helper class that wraps real Action Scheduler functions.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class TestActionSchedulerProxy implements ActionSchedulerInterface {
 	/**
@@ -100,7 +100,7 @@ class TestActionSchedulerProxy implements ActionSchedulerInterface {
 /**
  * Native feed lifecycle, scheduling and failure contracts.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class FeedGeneratorTest extends \WP_UnitTestCase {
 

@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class responsible for logging stuff
  *
  * @class   Logger
- * @version x.x.x
+ * @version 1.6.0
  */
 class Logger {
 

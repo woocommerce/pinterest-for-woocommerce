@@ -16,7 +16,7 @@ use WP_UnitTestCase;
 /**
  * Pinterest for WooCommerce API v5 base class tests.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class APIV5Test extends WP_UnitTestCase {
 

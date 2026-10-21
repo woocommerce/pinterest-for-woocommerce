@@ -10,7 +10,7 @@ use WP_UnitTestCase;
 /**
  * Tests the rows the `wp wc pinterest feed list` command builds from the Pinterest feed list.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class FeedCommandTest extends WP_UnitTestCase {
 

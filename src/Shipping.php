@@ -29,7 +29,7 @@ use \WC_Data_Store;
  *
  * @class   Shipping
  * @since   1.0.5
- * @version x.x.x
+ * @version 1.6.0
  */
 class Shipping {
 

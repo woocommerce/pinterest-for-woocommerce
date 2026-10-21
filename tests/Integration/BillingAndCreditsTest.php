@@ -15,7 +15,7 @@ use Pinterest_For_Woocommerce as Plugin;
 /**
  * Exercise saved merchant state through the native redemption path.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class BillingAndCreditsTest extends \WP_UnitTestCase {
 

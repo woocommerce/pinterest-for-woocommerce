@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Send the Pinterest click ID with Conversions API add-to-cart events when the visitor adds to cart from the page they landed on.

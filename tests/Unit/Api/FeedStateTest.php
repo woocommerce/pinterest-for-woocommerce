@@ -11,7 +11,7 @@ use WP_UnitTestCase;
 /**
  * Feed diagnostics preserve text without interpreting status markup.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class FeedStateTest extends WP_UnitTestCase {
 

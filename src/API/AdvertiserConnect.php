@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Endpoint handing Pinterest advertiser.
  *
  * @class   AdvertiserConnect
- * @version x.x.x
+ * @version 1.6.0
  */
 class AdvertiserConnect extends VendorAPI {
 

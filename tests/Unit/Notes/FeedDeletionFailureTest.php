@@ -9,7 +9,7 @@ use Automattic\WooCommerce\Pinterest\Notes\FeedDeletionFailure;
 /**
  * FeedDeletionFailureTest class.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class FeedDeletionFailureTest extends \WP_UnitTestCase {
 

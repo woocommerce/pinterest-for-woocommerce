@@ -9,7 +9,7 @@ use WP_UnitTestCase;
 /**
  * Tests the record of the feeds the plugin owns on Pinterest.
  *
- * @version x.x.x
+ * @version 1.6.0
  */
 class FeedOwnershipTest extends WP_UnitTestCase {
 

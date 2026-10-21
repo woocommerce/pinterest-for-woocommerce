@@ -3,7 +3,7 @@
  * Pinterest for WooCommerce WP-CLI command for the catalog feeds of the connected ad account.
  *
  * @package     Pinterest_For_WooCommerce/CLI
- * @version     x.x.x
+ * @version     1.6.0
  */
 
 declare( strict_types=1 );
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * inspect every feed on the ad account and delete one by ID without touching the others.
  *
  * @class   FeedCommand
- * @version x.x.x
+ * @version 1.6.0
  */
 class FeedCommand {
 
@@ -174,7 +174,7 @@ class FeedCommand {
 	 *
 	 * Public so that the row logic can be tested without a WP-CLI runtime.
 	 *
-	 * @since x.x.x
+	 * @since 1.6.0
 	 *
 	 * @param array $feeds Feed objects as returned by the Pinterest feeds endpoint.
 	 * @return array[] One row per feed, keyed by the FIELDS names.
