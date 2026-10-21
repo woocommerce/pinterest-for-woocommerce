@@ -703,6 +703,12 @@ parameters:
 			path: src/Admin/Admin.php
 
 		-
+			message: '#^Cannot call method get_view_name\(\) on Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\FormInterface\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Admin/Input/Form.php
+
+		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\Admin\\Input\\Form\:\:get_view_data\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1099,6 +1105,12 @@ parameters:
 			path: src/FeedGenerator.php
 
 		-
+			message: '#^Parameter \#1 \$data of function maybe_unserialize expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/FeedGenerator.php
+
+		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\FeedOwnership\:\:get_option\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1489,6 +1501,12 @@ parameters:
 			path: src/ProductsXmlFeed.php
 
 		-
+			message: '#^Parameter \#1 \$text of function esc_xml expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/ProductsXmlFeed.php
+
+		-
 			message: '#^Static method Automattic\\WooCommerce\\Pinterest\\ProductsXmlFeed\:\:get_property_description\(\) is unused\.$#'
 			identifier: method.unused
 			count: 1
@@ -1597,14 +1615,14 @@ parameters:
 			path: src/RefreshToken.php
 
 		-
-			message: '#^Access to an undefined property WP_Post\|WP_Post_Type\|WP_Term\|WP_User\:\:\$ID\.$#'
-			identifier: property.notFound
+			message: '#^Cannot access property \$ID on WP_Post\|WP_Post_Type\|WP_Term\|WP_User\|null\.$#'
+			identifier: property.nonObject
 			count: 2
 			path: src/RichPins.php
 
 		-
-			message: '#^Access to an undefined property WP_Post\|WP_Post_Type\|WP_Term\|WP_User\:\:\$post_author\.$#'
-			identifier: property.notFound
+			message: '#^Cannot access property \$post_author on WP_Post\|WP_Post_Type\|WP_Term\|WP_User\|null\.$#'
+			identifier: property.nonObject
 			count: 1
 			path: src/RichPins.php
 
@@ -1765,20 +1783,20 @@ parameters:
 			path: src/TrackerSnapshot.php
 
 		-
-			message: '#^Access to an undefined property WP_Post\|WP_Post_Type\|WP_Term\|WP_User\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Tracking.php
-
-		-
-			message: '#^Access to an undefined property WP_Post\|WP_Post_Type\|WP_Term\|WP_User\:\:\$term_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Tracking.php
-
-		-
 			message: '#^Call to an undefined method WC_Order_Item\:\:get_total\(\)\.$#'
 			identifier: method.notFound
+			count: 1
+			path: src/Tracking.php
+
+		-
+			message: '#^Cannot access property \$name on WP_Post\|WP_Post_Type\|WP_Term\|WP_User\|null\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: src/Tracking.php
+
+		-
+			message: '#^Cannot access property \$term_id on WP_Post\|WP_Post_Type\|WP_Term\|WP_User\|null\.$#'
+			identifier: property.nonObject
 			count: 1
 			path: src/Tracking.php
 

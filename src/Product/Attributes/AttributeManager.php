@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
  * Class AttributeManager
  *
  * @class   AttributeManager
- * @version 1.6.0
+ * @version x.x.x
  */
 class AttributeManager {
 
@@ -301,6 +301,8 @@ class AttributeManager {
 
 	/**
 	 * Map attribute types.
+	 *
+	 * @phpstan-assert string[][] $this->attribute_types_map
 	 *
 	 * @throws InvalidClass If any of the given attribute classes do not implement the AttributeInterface.
 	 */
