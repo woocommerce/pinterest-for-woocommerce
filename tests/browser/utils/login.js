@@ -5,6 +5,8 @@ async function login( page, username, password ) {
 	await page.locator( '#user_login' ).fill( username );
 	await page.locator( '#user_pass' ).fill( password );
 	await page.locator( '#wp-submit' ).click();
+	// Leaving wp-login.php means the login response, and its auth cookies, landed.
+	await expect( page ).not.toHaveURL( /wp-login\.php/ );
 	await page.goto( '/my-account/' );
 	await expect(
 		page.locator(
