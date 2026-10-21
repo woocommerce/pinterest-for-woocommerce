@@ -19,7 +19,7 @@ use Pinterest_For_Woocommerce;
  * Class Handling Commerce Integration operations.
  *
  * @class   CommerceIntegration
- * @version 1.6.0
+ * @version x.x.x
  */
 class CommerceIntegration {
 
@@ -188,6 +188,11 @@ class CommerceIntegration {
 	 */
 	public static function get_integration_data( $external_business_id = '' ): array {
 		global $wp_version;
+		/**
+		 * The WordPress version string.
+		 *
+		 * @var string $wp_version
+		 */
 
 		if ( empty( $external_business_id ) ) {
 			$external_business_id = self::generate_external_business_id();

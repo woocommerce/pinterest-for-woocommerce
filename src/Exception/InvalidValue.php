@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @phpstan-consistent-constructor
  * @class   InvalidValue
- * @version 1.5.2
+ * @version x.x.x
  */
 class InvalidValue extends LogicException implements PinterestException {
 
@@ -83,8 +83,8 @@ class InvalidValue extends LogicException implements PinterestException {
 	/**
 	 * Create a new instance of the exception when a value is not from a predefined list of allowed values.
 	 *
-	 * @param mixed $key            The name of the value.
-	 * @param array $allowed_values The list of allowed values.
+	 * @param string $key            The name of the value.
+	 * @param array  $allowed_values The list of allowed values.
 	 *
 	 * @return static
 	 */

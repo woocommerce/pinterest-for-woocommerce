@@ -42,7 +42,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 	 * Base Plugin class holding generic functionality
 	 *
 	 * @class   Pinterest_For_Woocommerce
-	 * @version 1.6.0
+	 * @version x.x.x
 	 */
 	final class Pinterest_For_Woocommerce {
 
@@ -457,6 +457,11 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			$errors = array();
 			global $wp_version;
+			/**
+			 * The WordPress version string.
+			 *
+			 * @var string $wp_version
+			 */
 
 			if ( ! version_compare( PHP_VERSION, self::PLUGIN_REQUIREMENTS['php_version'], '>=' ) ) {
 				/* Translators: The minimum PHP version */
@@ -680,7 +685,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 *
 		 * @since 1.4.0
 		 *
-		 * @return string The API version.
+		 * @return mixed The stored API version ('v3' or 'v5'), or '' when none is stored.
 		 */
 		public static function get_api_version() {
 			return get_option( PINTEREST_FOR_WOOCOMMERCE_PINTEREST_API_VERSION, '' );
