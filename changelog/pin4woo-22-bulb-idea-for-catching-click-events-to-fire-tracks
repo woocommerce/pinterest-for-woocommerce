@@ -1,0 +1,4 @@
+Significance: patch
+Type: dev
+
+Tracked documentation link clicks with a single delegated listener so link click handlers cannot be overwritten.

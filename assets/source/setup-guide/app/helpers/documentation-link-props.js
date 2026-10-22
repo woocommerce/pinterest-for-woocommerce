@@ -3,6 +3,22 @@
  */
 import { recordEvent } from '@woocommerce/tracks';
 
+// One delegated listener tracks every marked link, so links need no `onClick` prop that could be overwritten.
+document.addEventListener(
+	'click',
+	( event ) => {
+		const link = event.target.closest?.( '[data-pfw-doc-event]' );
+		if ( link ) {
+			recordEvent( link.dataset.pfwDocEvent, {
+				link_id: link.dataset.pfwDocLinkId,
+				context: link.dataset.pfwDocContext,
+				href: link.getAttribute( 'href' ),
+			} );
+		}
+	},
+	true
+);
+
 /**
  * Clicking on an external documentation link.
  *
@@ -29,9 +45,7 @@ import { recordEvent } from '@woocommerce/tracks';
  * Creates properties for an external documentation link.
  * May take any other props to be extended and forwarded to a link element (`<a>`, `<Button isLink>`).
  *
- * Sets `target="_blank" rel="noopener"` and `onClick` handler that fires track event.
- *
- * Please be careful not to overwrite the `onClick` handler coincidently.
+ * Sets `target="_blank" rel="noopener"` and data attributes that make a click fire the track event.
  *
  *
  * @fires wcadmin_pfw_documentation_link_click on click, with given `linkId` and `context`.
@@ -41,10 +55,9 @@ import { recordEvent } from '@woocommerce/tracks';
  * @param {string} props.context Forwarded to {@link wcadmin_pfw_documentation_link_click}
  * @param {string} [props.target='_blank']
  * @param {string} [props.rel='noopener']
- * @param {Function} [props.onClick] onClick event handler to be decorated with firing Track event.
  * @param {string} [props.eventName='pfw_documentation_link_click'] The name of the event to be recorded
  * @param {...import('react').AnchorHTMLAttributes} props.props
- * @return {{href: string, target: string, rel: string, onClick: Function, props}} Documentation link props.
+ * @return {Object} Documentation link props.
  */
 function documentationLinkProps( {
 	href,
@@ -52,7 +65,6 @@ function documentationLinkProps( {
 	context,
 	target = '_blank',
 	rel = 'noopener',
-	onClick,
 	eventName = 'pfw_documentation_link_click',
 	...props
 } ) {
@@ -61,18 +73,9 @@ function documentationLinkProps( {
 		target,
 		rel,
 		...props,
-		onClick: ( event ) => {
-			if ( onClick ) {
-				onClick( event );
-			}
-			if ( ! event.defaultPrevented ) {
-				recordEvent( eventName, {
-					link_id: linkId,
-					context,
-					href,
-				} );
-			}
-		},
+		'data-pfw-doc-event': eventName,
+		'data-pfw-doc-link-id': linkId,
+		'data-pfw-doc-context': context,
 	};
 }
 export default documentationLinkProps;
