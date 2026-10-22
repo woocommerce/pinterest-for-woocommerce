@@ -10,7 +10,13 @@ import '@testing-library/jest-dom/vitest';
 import '@wordpress/notices';
 import apiFetch from '@wordpress/api-fetch';
 import { dispatch, select } from '@wordpress/data';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+	act,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -56,9 +62,10 @@ describe( 'SetupAccount', () => {
 	} );
 
 	it( 'refreshes missing businesses on focus and stops once one is found', async () => {
-		apiFetch.mockResolvedValue( [
+		const response = Promise.resolve( [
 			{ value: '456', label: 'Test business' },
 		] );
+		apiFetch.mockReturnValue( response );
 		render(
 			<SetupAccount
 				view="settings"
@@ -71,9 +78,14 @@ describe( 'SetupAccount', () => {
 			screen.getByText( 'No business account detected' )
 		).toBeInTheDocument();
 		fireEvent.focus( window );
+		// Flush the response and the effect that drops the focus listener, so the
+		// next focus cannot land in between on a busy runner.
+		await act( async () => {
+			await response;
+		} );
 
 		expect(
-			await screen.findByRole( 'option', { name: 'Test business' } )
+			screen.getByRole( 'option', { name: 'Test business' } )
 		).toBeInTheDocument();
 		expect( apiFetch ).toHaveBeenCalledWith( {
 			path: '/pinterest/v1/businesses/',
