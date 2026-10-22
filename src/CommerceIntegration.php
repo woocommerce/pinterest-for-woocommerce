@@ -58,7 +58,7 @@ class CommerceIntegration {
 	 * Attempts to create Commerce Integration with Pinterest and schedules a retry in case of a failure.
 	 *
 	 * @param int $attempt Create Commerce Integration attempt number.
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function handle_create( $attempt = 0 ): array {
 		try {
@@ -184,7 +184,7 @@ class CommerceIntegration {
 	 *
 	 * @since 1.4.11
 	 * @param string $external_business_id External Business ID.
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function get_integration_data( $external_business_id = '' ): array {
 		global $wp_version;

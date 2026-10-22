@@ -949,20 +949,8 @@ parameters:
 			path: src/CLI/FeedCommand.php
 
 		-
-			message: '#^Action callback returns array but should not return anything\.$#'
+			message: '#^Action callback returns array\<string, mixed\> but should not return anything\.$#'
 			identifier: return.void
-			count: 1
-			path: src/CommerceIntegration.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\CommerceIntegration\:\:get_integration_data\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/CommerceIntegration.php
-
-		-
-			message: '#^Method Automattic\\WooCommerce\\Pinterest\\CommerceIntegration\:\:handle_create\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: src/CommerceIntegration.php
 
