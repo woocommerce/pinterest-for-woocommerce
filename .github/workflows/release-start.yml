@@ -134,6 +134,10 @@ jobs:
             - name: Sync readme.txt changelog
               run: bash bin/sync_readme_changelog.sh "$VERSION"
 
+            # An external translation job reads the committed POT, see i18n/languages/README.md.
+            - name: Regenerate POT
+              run: npm run i18n
+
             - name: Commit and push release branch
               run: |
                 git config user.name "github-actions[bot]"
