@@ -12,8 +12,10 @@
 	}
 
 	.product:hover > &,
+	.product:hover > .woocommerce-product-gallery > &,
 	.wc-block-grid__product:hover > &,
 	.product:focus-within > &,
+	.product:focus-within > .woocommerce-product-gallery > &,
 	.wc-block-grid__product:focus-within > & {
 		opacity: 1;
 		pointer-events: auto;
