@@ -6,6 +6,16 @@
 	opacity: 0;
 	pointer-events: none;
 
+	.product > .woocommerce-product-gallery > & {
+		left: auto;
+		inset-inline-start: 10px;
+	}
+
+	// WooCommerce's default sale badge shares the gallery's top corner.
+	.product > .onsale ~ .woocommerce-product-gallery > & {
+		top: 4em;
+	}
+
 	@media (hover: none) {
 		opacity: 1;
 		pointer-events: auto;

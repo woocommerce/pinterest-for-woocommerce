@@ -101,6 +101,118 @@ describe( 'Save to Pinterest button', () => {
 		expect( wrapper.nextElementSibling.tagName ).toBe( 'IMG' );
 	} );
 
+	it( 'keeps the same built button visible when variation galleries are selected and reset', async () => {
+		const product = singleProduct.cloneNode( true );
+		const originalGallery = product.querySelector(
+			'.woocommerce-product-gallery'
+		);
+		const wrapper = product.querySelector(
+			'.pinterest-for-woocommerce-image-wrapper'
+		);
+		wrapper.dataset.srLabeled = 'true';
+		document.body.appendChild( product );
+
+		// Additional Variation Images hides the original and inserts its gallery.
+		const variationGallery = document.createElement( 'div' );
+		variationGallery.className =
+			'woocommerce-product-gallery woocommerce-product-gallery--wcavi';
+		originalGallery.style.display = 'none';
+		originalGallery.after( variationGallery );
+		await flush();
+
+		expect( wrapper.parentElement ).toBe( variationGallery );
+
+		// Reset and select again: the extension reuses both existing galleries.
+		variationGallery.style.display = 'none';
+		originalGallery.style.display = '';
+		await flush();
+		expect( wrapper.parentElement ).toBe( originalGallery );
+
+		originalGallery.style.display = 'none';
+		variationGallery.style.display = '';
+		await flush();
+		expect( wrapper.parentElement ).toBe( variationGallery );
+		expect(
+			product.querySelectorAll(
+				'.pinterest-for-woocommerce-image-wrapper'
+			)
+		).toHaveLength( 1 );
+	} );
+
+	it( 'leaves related-product and custom-positioned buttons outside the main gallery', async () => {
+		const product = singleProduct.cloneNode( true );
+		const related = document.createElement( 'ul' );
+		related.className = 'products';
+		related.innerHTML = `<li class="product">${ unbuiltWrapper(
+			'Save Related product to Pinterest'
+		) }</li>`;
+		const summary = document.createElement( 'div' );
+		summary.className = 'summary';
+		summary.innerHTML = unbuiltWrapper( 'Save Main product to Pinterest' );
+		markAsBuilt(
+			related.querySelector( '.pinterest-for-woocommerce-image-wrapper' )
+		);
+		markAsBuilt(
+			summary.querySelector( '.pinterest-for-woocommerce-image-wrapper' )
+		);
+		product.append( related, summary );
+		const customButton = document.createElement( 'div' );
+		customButton.className = 'pinterest-for-woocommerce-image-wrapper';
+		product.appendChild( customButton );
+		document.body.appendChild( product );
+		await flush();
+
+		expect(
+			related.querySelector( '.pinterest-for-woocommerce-image-wrapper' )
+		).not.toBeNull();
+		expect(
+			summary.querySelector( '.pinterest-for-woocommerce-image-wrapper' )
+		).not.toBeNull();
+		expect( customButton.parentElement ).toBe( product );
+		expect(
+			product
+				.querySelector( '.woocommerce-product-gallery' )
+				.querySelectorAll( '.pinterest-for-woocommerce-image-wrapper' )
+		).toHaveLength( 1 );
+	} );
+
+	it( 'preserves the built button when WooCommerce replaces and resets the gallery', async () => {
+		const product = singleProduct.cloneNode( true );
+		const originalGallery = product.querySelector(
+			'.woocommerce-product-gallery'
+		);
+		const wrapper = product.querySelector(
+			'.pinterest-for-woocommerce-image-wrapper'
+		);
+		wrapper.dataset.srLabeled = 'true';
+		document.body.appendChild( product );
+
+		// A preceding grid mutation must not stop gallery recovery in the same batch.
+		const grid = document.createElement( 'div' );
+		grid.innerHTML = unbuiltWrapper( 'Save Related product to Pinterest' );
+		window.PinUtils = {
+			build: () => markAsBuilt( grid.firstElementChild ),
+		};
+		document.body.appendChild( grid );
+
+		const variationGallery = document.createElement( 'div' );
+		variationGallery.className = 'woocommerce-product-gallery';
+		originalGallery.replaceWith( variationGallery );
+		await flush();
+		expect( wrapper.parentElement ).toBe( variationGallery );
+
+		const resetGallery = document.createElement( 'div' );
+		resetGallery.className = 'woocommerce-product-gallery';
+		variationGallery.replaceWith( resetGallery );
+		await flush();
+		expect( wrapper.parentElement ).toBe( resetGallery );
+		expect(
+			product.querySelectorAll(
+				'.pinterest-for-woocommerce-image-wrapper'
+			)
+		).toHaveLength( 1 );
+	} );
+
 	/**
 	 * Stand in for the stylesheet pinit.js injects into the head at runtime.
 	 *
