@@ -63,7 +63,7 @@ Clicking on "Create business account" button.
 #### Emitters
 - [`BusinessAccountSelection`](assets/source/setup-guide/app/components/Account/BusinessAccountSelection.js#L40)
 
-### [`wcadmin_pfw_documentation_link_click`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L6)
+### [`wcadmin_pfw_documentation_link_click`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L22)
 Clicking on an external documentation link.
 #### Properties
 | name | type | description |
@@ -72,7 +72,7 @@ Clicking on an external documentation link.
 `context` | `string` | `'settings' \| 'welcome-section' \| 'wizard' \| 'ads-credits-terms-and-conditions'` In which context the link was placed?
 `href` | `string` | Href to which the user was navigated to.
 #### Emitters
-- [`documentationLinkProps`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L49) on click, with given `linkId` and `context`.
+- [`documentationLinkProps`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L62) on click, with given `linkId` and `context`.
 - [`ClaimWebsite`](assets/source/setup-guide/app/steps/ClaimWebsite.js#L99) with `{ link_id: 'claim-website', context: props.view }`
 - [`SetupAccount`](assets/source/setup-guide/app/steps/SetupAccount.js#L56)
 	- with `{ link_id: 'ad-guidelines', context: props.view }`
@@ -117,7 +117,7 @@ Clicking on getting started page faq item to collapse or expand it.
 #### Emitters
 - [`FaqQuestion`](assets/source/setup-guide/app/views/LandingPageApp.js#326) whenever the FAQ is toggled.
 
-### [`wcadmin_pfw_get_started_notice_link_click`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L16)
+### [`wcadmin_pfw_get_started_notice_link_click`](assets/source/setup-guide/app/helpers/documentation-link-props.js#L32)
 Clicking on the link inside the notice.
 #### Properties
 | name | type | description |
