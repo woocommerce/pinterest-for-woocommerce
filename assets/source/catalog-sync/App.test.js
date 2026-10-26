@@ -270,9 +270,12 @@ describe( 'Catalog tab prompts', () => {
 
 			await openCatalog();
 
-			expect( dialogs() ).toHaveLength( 1 );
-			expect( screen.queryByText( modal ) ).not.toBeNull();
-			expect( adCreditsNotice() !== null ).toBe( notice );
+			// The modal opens from an effect, a render after the dismissals load.
+			await waitFor( () => {
+				expect( dialogs() ).toHaveLength( 1 );
+				expect( screen.queryByText( modal ) ).not.toBeNull();
+				expect( adCreditsNotice() !== null ).toBe( notice );
+			} );
 		}
 	);
 
@@ -294,8 +297,10 @@ describe( 'Catalog tab prompts', () => {
 
 			await openCatalog();
 
-			expect( dialogs() ).toHaveLength( shown ? 1 : 0 );
-			expect( capiModal() !== null ).toBe( shown );
+			await waitFor( () => {
+				expect( dialogs() ).toHaveLength( shown ? 1 : 0 );
+				expect( capiModal() !== null ).toBe( shown );
+			} );
 		}
 	);
 
