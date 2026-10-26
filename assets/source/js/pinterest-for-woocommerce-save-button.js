@@ -42,6 +42,16 @@ document.addEventListener( 'keydown', ( event ) => {
 } );
 
 document.addEventListener( 'DOMContentLoaded', function () {
+	// On single product pages, anchor the button to the image gallery: themes
+	// such as Storefront print the sale badge above it, under the button.
+	document
+		.querySelectorAll(
+			'div.product > .pinterest-for-woocommerce-image-wrapper + .woocommerce-product-gallery'
+		)
+		.forEach( ( gallery ) =>
+			gallery.prepend( gallery.previousElementSibling )
+		);
+
 	// Placeholder markup that pinit.js has not turned into a button yet.
 	const UNBUILT_PIN_SELECTOR =
 		'.pinterest-for-woocommerce-image-wrapper a[data-pin-do]:not([data-pin-log])';
