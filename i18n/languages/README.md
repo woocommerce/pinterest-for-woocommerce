@@ -9,4 +9,6 @@ The `pinterest-for-woocommerce.pot` file is intentionally tracked in version con
 - **Manual submission process**: Translated files are manually submitted to the WordPress website periodically
 - **Latest labels requirement**: Having the latest translatable strings in version control ensures the internal translation job has access to them
 
-The POT file should be updated whenever translatable strings change in the codebase. Older versions don't need to be maintained - only the latest version is required for the internal translation pipeline.
+The translation job reads this file from the default branch, `trunk`. Keep its path and name, and check with Pinterest before moving it or changing the branch it lives on.
+
+The release workflow (`.github/workflows/release-start.yml`) regenerates it with `npm run i18n` for every release. Run the same command and commit the result to refresh it between releases. Older versions don't need to be maintained, only the latest one.
