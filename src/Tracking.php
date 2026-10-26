@@ -558,7 +558,8 @@ class Tracking {
 	 * @return void
 	 */
 	public function track_event( string $event_name, Data $data ) {
-		$is_crawler = CrawlerDetector::is_crawler_request();
+		$skip_conversions = CrawlerDetector::is_crawler_request()
+			|| ( static::EVENT_ADD_TO_CART === $event_name && CrawlerDetector::is_speculative_request() );
 
 		foreach ( $this->get_trackers() as $tracker ) {
 			// Skip Pinterest tag tracking if tag is not active.
@@ -566,9 +567,9 @@ class Tracking {
 				continue;
 			}
 
-			// Skip server-side CAPI dispatch for crawler requests so bot
-			// traffic does not inflate CAPI counts vs Tag counts.
-			if ( $is_crawler && $tracker instanceof Conversions ) {
+			// Skip CAPI for crawlers and speculative cart additions, which do
+			// not represent a shopper choosing to add a product.
+			if ( $skip_conversions && $tracker instanceof Conversions ) {
 				continue;
 			}
 
