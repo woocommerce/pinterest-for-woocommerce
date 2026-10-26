@@ -11,7 +11,7 @@ use WP_UnitTestCase;
 /**
  * Tests for cache-safe PageVisit tracking.
  *
- * @version 1.5.4
+ * @version x.x.x
  */
 class PageVisitTest extends WP_UnitTestCase {
 
@@ -124,6 +124,8 @@ class PageVisitTest extends WP_UnitTestCase {
 
 	/**
 	 * The standalone beacon generates the event ID in the browser and never calls pintrk.
+	 *
+	 * @return void
 	 */
 	public function test_print_beacon_script_omits_pintrk() {
 		ob_start();
@@ -136,6 +138,9 @@ class PageVisitTest extends WP_UnitTestCase {
 		$this->assertStringEndsWith( "</script>\n", $code );
 		$this->assertStringContainsString( 'requestData.append("action","' . PageVisit::AJAX_ACTION . '")', $code );
 		$this->assertStringContainsString( 'sendBeacon', $code );
+		$this->assertMatchesRegularExpression( '/function sendPageVisit\(\)\{.*sendBeacon.*window\.fetch.*\}\}if\(document\.prerendering\)/', $code );
+		$this->assertStringContainsString( '"prerenderingchange",sendPageVisit,{once:true}', $code );
+		$this->assertStringContainsString( '}else{sendPageVisit();}', $code );
 		$this->assertStringNotContainsString( 'pintrk', $code );
 	}
 
