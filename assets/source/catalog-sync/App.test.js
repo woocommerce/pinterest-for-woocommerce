@@ -270,7 +270,7 @@ describe( 'Catalog tab prompts', () => {
 
 			await openCatalog();
 
-			// The modal opens from an effect, a render after the dismissals load.
+			// Prompts render after the stores load; the modals need an extra effect pass.
 			await waitFor( () => {
 				expect( dialogs() ).toHaveLength( 1 );
 				expect( screen.queryByText( modal ) ).not.toBeNull();
@@ -350,7 +350,7 @@ describe( 'Catalog tab prompts', () => {
 		async ( { flag, dismissed, find, close, events } ) => {
 			const saved = serve( { dismissed } );
 			const { registry, unmount } = await openCatalog();
-			expect( find() ).not.toBeNull();
+			await waitFor( () => expect( find() ).not.toBeNull() );
 
 			fireEvent.click( close() );
 
@@ -391,7 +391,7 @@ describe( 'Catalog tab prompts', () => {
 		const { unmount } = await openCatalog();
 
 		fireEvent.click(
-			screen.getByRole( 'button', { name: 'Close dialog' } )
+			await screen.findByRole( 'button', { name: 'Close dialog' } )
 		);
 
 		expect( capiModal() ).toBeNull();
@@ -400,13 +400,17 @@ describe( 'Catalog tab prompts', () => {
 		unmount();
 		await openCatalog();
 
-		expect( capiModal() ).not.toBeNull();
+		await waitFor( () => expect( capiModal() ).not.toBeNull() );
 	} );
 	test( 'shows onboarding before CAPI and never saves an automatic dismissal', async () => {
 		const saved = serve( {} );
 		await openCatalog();
-		expect( dialogs() ).toHaveLength( 1 );
-		expect( screen.queryByText( /^You are one step away/ ) ).not.toBeNull();
+		await waitFor( () => {
+			expect( dialogs() ).toHaveLength( 1 );
+			expect(
+				screen.queryByText( /^You are one step away/ )
+			).not.toBeNull();
+		} );
 		expect( capiModal() ).toBeNull();
 		expect( saved.ads_modal_dismissed ).toBe( false );
 		expect( requests( 'POST' ) ).toHaveLength( 0 );
@@ -422,10 +426,10 @@ describe( 'Catalog tab prompts', () => {
 		serve( { dismissed: { ads_modal_dismissed: true } } );
 		const { registry } = await openCatalog();
 		fireEvent.click(
-			screen.getByRole( 'button', { name: 'Close dialog' } )
+			await screen.findByRole( 'button', { name: 'Close dialog' } )
 		);
 		fireEvent.click(
-			screen.getByRole( 'button', { name: 'Dismiss this notice' } )
+			await screen.findByRole( 'button', { name: 'Dismiss this notice' } )
 		);
 		await waitFor( () =>
 			expect(
@@ -473,14 +477,16 @@ describe( 'Catalog tab prompts', () => {
 						.hasFinishedResolution( 'getSettings', [] )
 				).toBe( true )
 			);
-			expect(
-				recordEvent.mock.calls.filter(
-					( [ event ] ) => event === 'pfw_modal_open'
-				)
-			).toHaveLength( 1 );
-			expect( adCreditsNotice() !== null ).toBe(
-				! errorId || errorId === 2322
-			);
+			await waitFor( () => {
+				expect(
+					recordEvent.mock.calls.filter(
+						( [ event ] ) => event === 'pfw_modal_open'
+					)
+				).toHaveLength( 1 );
+				expect( adCreditsNotice() !== null ).toBe(
+					! errorId || errorId === 2322
+				);
+			} );
 		}
 	);
 } );
