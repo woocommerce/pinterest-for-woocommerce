@@ -29,7 +29,7 @@ use Throwable;
  * Class Handling feed files generation.
  *
  * @class   FeedGenerator
- * @version 1.6.0
+ * @version x.x.x
  */
 class FeedGenerator extends AbstractChainedJob {
 
@@ -668,6 +668,8 @@ class FeedGenerator extends AbstractChainedJob {
 
 	/**
 	 * Returns WC products by product ids. Products returned are of either `in stock` or `on backorder` statuses.
+	 * A saved category selection limits the result to those categories and their descendants;
+	 * variations use their parent's categories.
 	 *
 	 * @since 1.2.19
 	 *
@@ -698,7 +700,26 @@ class FeedGenerator extends AbstractChainedJob {
 			$products_query_args['stock_status'] = array( 'instock', 'onbackorder' );
 		}
 
-		return wc_get_products( $products_query_args );
+		$products   = wc_get_products( $products_query_args );
+		$categories = Pinterest_For_Woocommerce()::get_setting( 'product_sync_categories' );
+		if ( ! is_array( $products ) || ! is_array( $categories ) || empty( $categories ) ) {
+			return $products;
+		}
+
+		$category_ids = array_filter( array_map( 'absint', array_filter( array_column( $categories, 'key' ), 'is_numeric' ) ) );
+		if ( empty( $category_ids ) ) {
+			return $products;
+		}
+
+		return array_values(
+			array_filter(
+				$products,
+				function ( $product ) use ( $category_ids ) {
+					$product_id = $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id();
+					return (bool) array_intersect( $category_ids, wc_get_product_cat_ids( $product_id ) );
+				}
+			)
+		);
 	}
 
 	/**
