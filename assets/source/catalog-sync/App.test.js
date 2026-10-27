@@ -297,6 +297,9 @@ describe( 'Catalog tab prompts', () => {
 
 			await openCatalog();
 
+			// The notice shares the CAPI modal's gate, so once it shows, a
+			// missing modal means the effect decided against it.
+			await waitFor( () => expect( adCreditsNotice() ).not.toBeNull() );
 			await waitFor( () => {
 				expect( dialogs() ).toHaveLength( shown ? 1 : 0 );
 				expect( capiModal() !== null ).toBe( shown );
