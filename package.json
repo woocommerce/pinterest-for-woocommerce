@@ -193,7 +193,7 @@
       }
     },
     "copy-webpack-plugin": {
-      "serialize-javascript": "^7.0.3"
+      "serialize-javascript": "^7.1.3"
     },
     "@woocommerce/number@^2.0.0": "^2.6.0",
     "@wp-g2/create-styles": {
