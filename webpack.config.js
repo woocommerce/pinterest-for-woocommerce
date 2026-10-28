@@ -46,6 +46,8 @@ const webpackConfig = {
 	},
 	plugins: ourPlugins,
 	entry: {
+		'all-products-pin':
+			__dirname + '/assets/source/all-products-pin/index.js',
 		'setup-guide': __dirname + '/assets/source/setup-guide/index.js',
 		'product-attributes':
 			__dirname + '/assets/source/product-attributes/index.js',

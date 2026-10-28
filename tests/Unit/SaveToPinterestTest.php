@@ -22,7 +22,7 @@ use WP_UnitTestCase;
  * that decodes back to the product's name, address and image. How Pinterest's own script reads
  * the link is not simulated here.
  *
- * @version 1.6.0
+ * @version x.x.x
  */
 class SaveToPinterestTest extends WP_UnitTestCase {
 
@@ -191,6 +191,71 @@ class SaveToPinterestTest extends WP_UnitTestCase {
 				'url'         => get_permalink( $product->get_id() ),
 			),
 			$this->decoded_query( $this->pin_link( $this->parse( $html ) ) )
+		);
+	}
+
+	/**
+	 * The client-rendered All Products grid needs a registered product-card child.
+	 *
+	 * @return void
+	 */
+	public function test_all_products_layout_gets_one_pin_child() {
+		SaveToPinterest::maybe_init();
+		$attributes = array( 'layoutConfig' => array( array( 'woocommerce/product-image', array() ), array( 'woocommerce/product-title', array() ) ) );
+		$html       = '<div class="wp-block-woocommerce-all-products" data-attributes="' . esc_attr( wp_json_encode( $attributes ) ) . '"></div>';
+		$filtered   = $this->render_all_products( $html );
+		$processor  = new \WP_HTML_Tag_Processor( $filtered );
+		$this->assertTrue( $processor->next_tag( array( 'tag_name' => 'DIV' ) ) );
+		$actual = json_decode( $processor->get_attribute( 'data-attributes' ), true );
+		$this->assertSame( array_merge( $attributes['layoutConfig'], array( array( 'pinterest-for-woocommerce/product-pin', array() ) ) ), $actual['layoutConfig'] );
+		$this->assertSame( $filtered, $this->render_all_products( $filtered ) );
+		$this->assertTrue( wp_script_is( 'pinterest-for-woocommerce-all-products-pin', 'enqueued' ) );
+	}
+
+	/**
+	 * Wrapping plugins must not hide the All Products element from the integration.
+	 *
+	 * @return void
+	 */
+	public function test_all_products_layout_survives_wrapping_plugins() {
+		SaveToPinterest::maybe_init();
+		$html      = '<div class="animation"><div class="wp-block-woocommerce-all-products" data-attributes="{&quot;layoutConfig&quot;:[]}"></div></div>';
+		$processor = new \WP_HTML_Tag_Processor( $this->render_all_products( $html ) );
+		$this->assertTrue( $processor->next_tag( array( 'class_name' => 'wp-block-woocommerce-all-products' ) ) );
+		$attributes = json_decode( $processor->get_attribute( 'data-attributes' ), true );
+		$this->assertSame( array( array( 'pinterest-for-woocommerce/product-pin', array() ) ), $attributes['layoutConfig'] );
+	}
+
+	/**
+	 * A disabled setting or unusable client layout must retain its original markup.
+	 *
+	 * @return void
+	 */
+	public function test_all_products_ignores_disabled_or_invalid_layouts() {
+		SaveToPinterest::maybe_init();
+		foreach ( array( null, false, array(), '<div class="wp-block-woocommerce-all-products"></div>', '<div class="wp-block-woocommerce-all-products" data-attributes="invalid"></div>', '<div class="wp-block-woocommerce-all-products" data-attributes="{&quot;layoutConfig&quot;:false}"></div>' ) as $html ) {
+			$this->assertSame( $html, SaveToPinterest::add_to_all_products( $html ) );
+		}
+		Pinterest_For_Woocommerce::save_settings( array( 'save_to_pinterest' => false ) );
+		$html = '<div class="wp-block-woocommerce-all-products" data-attributes="{&quot;layoutConfig&quot;:[]}"></div>';
+		$this->assertSame( $html, SaveToPinterest::add_to_all_products( $html ) );
+	}
+
+	/**
+	 * Render the real block so WordPress invokes its block-specific filter.
+	 *
+	 * @param string $html Saved All Products markup.
+	 * @return string
+	 */
+	private function render_all_products( $html ) {
+		return render_block(
+			array(
+				'blockName'    => 'woocommerce/all-products',
+				'attrs'        => array(),
+				'innerBlocks'  => array(),
+				'innerHTML'    => $html,
+				'innerContent' => array( $html ),
+			)
 		);
 	}
 
