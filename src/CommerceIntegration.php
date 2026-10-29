@@ -19,7 +19,7 @@ use Pinterest_For_Woocommerce;
  * Class Handling Commerce Integration operations.
  *
  * @class   CommerceIntegration
- * @version x.x.x
+ * @version 1.6.1
  */
 class CommerceIntegration {
 

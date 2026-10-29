@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
  * Class Form
  *
  * @class   Form
- * @version x.x.x
+ * @version 1.6.1
  */
 class Form implements FormInterface {
 

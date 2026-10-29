@@ -10,7 +10,7 @@ use WP_UnitTestCase;
 /**
  * Merchant registration retry tests.
  *
- * @version x.x.x
+ * @version 1.6.1
  */
 class MerchantsTest extends WP_UnitTestCase {
 

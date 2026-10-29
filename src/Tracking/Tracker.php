@@ -15,7 +15,7 @@ use Throwable;
  * Interface for Pinterest tracker implementations.
  *
  * @class   Tracker
- * @version x.x.x
+ * @version 1.6.1
  */
 abstract class Tracker {
 

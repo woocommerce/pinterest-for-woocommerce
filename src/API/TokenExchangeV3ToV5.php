@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @class   TokenExchangeV3ToV5
  * @since   1.4.0
- * @version x.x.x
+ * @version 1.6.1
  */
 class TokenExchangeV3ToV5 extends APIV5 {
 
