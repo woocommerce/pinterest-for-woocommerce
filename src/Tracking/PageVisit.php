@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Generates browser PageVisit events and handles their CAPI beacons.
  *
  * @class   PageVisit
- * @version x.x.x
+ * @version 1.6.1
  */
 class PageVisit {
 

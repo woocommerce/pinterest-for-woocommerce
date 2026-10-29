@@ -2,14 +2,14 @@
 # This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: Pinterest for WooCommerce 1.6.0\n"
+"Project-Id-Version: Pinterest for WooCommerce 1.6.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/pinterest-for-woocommerce\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-22T18:48:07+00:00\n"
+"POT-Creation-Date: 2026-10-29T07:59:22+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: pinterest-for-woocommerce\n"
@@ -672,7 +672,7 @@ msgid "There was an error trying to get the merchant object."
 msgstr ""
 
 #: src/Merchants.php:88
-#: src/Merchants.php:186
+#: src/Merchants.php:187
 msgid "Response error when trying to create a merchant or update the existing one."
 msgstr ""
 
@@ -684,7 +684,7 @@ msgstr ""
 msgid "No merchant returned in the advertiser's response."
 msgstr ""
 
-#: src/Merchants.php:169
+#: src/Merchants.php:170
 msgid "There was a previous error trying to create or update merchant."
 msgstr ""
 

@@ -6,7 +6,7 @@ Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 11.1
 WC tested up to: 11.2
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -92,6 +92,17 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.6.1 - 2026-10-29 =
+* Fix - Fixed merchant registration retries getting stuck after a successful registration or an older permanent error cache.
+* Fix - Keep the Save to Pinterest button inside the product image on single product pages instead of over the sale badge.
+* Dev - Add the security contact email to SECURITY.md.
+* Dev - Tracked documentation link clicks with a single delegated listener so link click handlers cannot be overwritten.
+* Dev - Raised the PHPStan analysis level to 8.
+* Dev - Corrected docblock types reported by PHPStan level 9.
+* Dev - Corrected docblock types reported by PHPStan level 10.
+* Dev - Resolved PHPStan baseline entries without changing behavior.
+* Dev - Updated QIT CLI to 1.3.3.
 
 = 1.6.0 - 2026-10-21 =
 * Add - Record the IDs of the Pinterest feeds the plugin creates and add the `wp wc pinterest feed list` and `wp wc pinterest feed delete` WP-CLI commands to inspect the connected ad account's feeds and delete one by ID.

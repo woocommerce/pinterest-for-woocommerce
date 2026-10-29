@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Fixed merchant registration retries getting stuck after a successful registration or an older permanent error cache.

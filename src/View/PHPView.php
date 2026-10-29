@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
  * Class PHPView
  *
  * @class   PHPView
- * @version x.x.x
+ * @version 1.6.1
  */
 class PHPView implements View {
 

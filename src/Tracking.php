@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Tracker responsible for hooking into system events.
  *
  * @class   Tracking
- * @version x.x.x
+ * @version 1.6.1
  */
 class Tracking {
 
