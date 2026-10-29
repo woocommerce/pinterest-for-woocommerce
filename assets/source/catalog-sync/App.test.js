@@ -167,8 +167,9 @@ async function openCatalog( {
 	if ( ! holdDismissals ) {
 		// Answer inside act() so the renders and effects the answer causes
 		// (the prompts open from effects) are flushed before a test asserts.
-		// Holds after the settings waitFor above: the resolver's start timer
-		// has fired by then, so only promises remain in the chain.
+		// Holds after the settings waitFor above: the interactions resolver's
+		// start timer (queued with the settings one, same delay) has fired by
+		// then, so only promises remain in the chain.
 		await act( async () => answerDismissals() );
 		await waitFor( () =>
 			expect(
@@ -276,8 +277,7 @@ describe( 'Catalog tab prompts', () => {
 
 			await openCatalog();
 
-			// openCatalog() flushed the prompt effects. Presence checks still
-			// wait as a second guard; absence checks assert synchronously.
+			// openCatalog() flushed the prompt effects; waitFor() is a second guard.
 			await waitFor( () => {
 				expect( dialogs() ).toHaveLength( 1 );
 				expect( screen.queryByText( modal ) ).not.toBeNull();
