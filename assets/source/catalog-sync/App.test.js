@@ -114,6 +114,8 @@ function serve( {
  * Opens the Catalog tab as a page load does: with empty stores.
  *
  * Settings resolve first by default; race tests can answer dismissals first.
+ * Unless held, the dismissals are answered inside act(), so on return the
+ * prompts the stores allow have rendered (default order).
  *
  * @param {Object}  [options]
  * @param {boolean} [options.holdDismissals=false]    Whether to leave the saved dismissals unanswered.
@@ -165,6 +167,8 @@ async function openCatalog( {
 	if ( ! holdDismissals ) {
 		// Answer inside act() so the renders and effects the answer causes
 		// (the prompts open from effects) are flushed before a test asserts.
+		// Holds after the settings waitFor above: the resolver's start timer
+		// has fired by then, so only promises remain in the chain.
 		await act( async () => answerDismissals() );
 		await waitFor( () =>
 			expect(
@@ -272,8 +276,8 @@ describe( 'Catalog tab prompts', () => {
 
 			await openCatalog();
 
-			// openCatalog() flushes the prompt effects; waitFor() keeps the
-			// check robust to a later render pass.
+			// openCatalog() flushed the prompt effects. Presence checks still
+			// wait as a second guard; absence checks assert synchronously.
 			await waitFor( () => {
 				expect( dialogs() ).toHaveLength( 1 );
 				expect( screen.queryByText( modal ) ).not.toBeNull();
