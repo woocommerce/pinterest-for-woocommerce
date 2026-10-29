@@ -163,7 +163,9 @@ async function openCatalog( {
 	}
 
 	if ( ! holdDismissals ) {
-		answerDismissals();
+		// Answer inside act() so the renders and effects the answer causes
+		// (the prompts open from effects) are flushed before a test asserts.
+		await act( async () => answerDismissals() );
 		await waitFor( () =>
 			expect(
 				registry.select( INTERACTIONS_STORE ).areInteractionsLoaded()
@@ -270,7 +272,8 @@ describe( 'Catalog tab prompts', () => {
 
 			await openCatalog();
 
-			// Prompts render after the stores load; the modals need an extra effect pass.
+			// openCatalog() flushes the prompt effects; waitFor() keeps the
+			// check robust to a later render pass.
 			await waitFor( () => {
 				expect( dialogs() ).toHaveLength( 1 );
 				expect( screen.queryByText( modal ) ).not.toBeNull();
@@ -297,13 +300,10 @@ describe( 'Catalog tab prompts', () => {
 
 			await openCatalog();
 
-			// The notice shares the CAPI modal's gate, so once it shows, a
-			// missing modal means the effect decided against it.
-			await waitFor( () => expect( adCreditsNotice() ).not.toBeNull() );
-			await waitFor( () => {
-				expect( dialogs() ).toHaveLength( shown ? 1 : 0 );
-				expect( capiModal() !== null ).toBe( shown );
-			} );
+			// openCatalog() flushed the prompt effects, so a missing modal
+			// here is the effect's decision, not a render still pending.
+			expect( dialogs() ).toHaveLength( shown ? 1 : 0 );
+			expect( capiModal() !== null ).toBe( shown );
 		}
 	);
 
