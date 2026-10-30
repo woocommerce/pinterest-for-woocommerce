@@ -12,6 +12,7 @@ use Automattic\WooCommerce\Pinterest\FeedFileOperations;
 use Automattic\WooCommerce\Pinterest\FeedGenerator;
 use Automattic\WooCommerce\Pinterest\LocalFeedConfigs;
 use Automattic\WooCommerce\Pinterest\ProductSync;
+use Pinterest_For_Woocommerce;
 use ReflectionProperty;
 use WC_Helper_Product;
 use WC_Product_Simple;
@@ -19,7 +20,7 @@ use WC_Product_Simple;
 /**
  * Covers the hooks that flag the feed for regeneration when a product changes.
  *
- * @version 1.5.1
+ * @version x.x.x
  */
 class ProductSyncTest extends \WP_UnitTestCase {
 
@@ -48,6 +49,7 @@ class ProductSyncTest extends \WP_UnitTestCase {
 
 		add_action( 'woocommerce_new_product', array( ProductSync::class, 'mark_feed_dirty_on_new_product' ), 10, 1 );
 		add_action( 'woocommerce_product_object_updated_props', array( ProductSync::class, 'mark_feed_dirty_on_updated_props' ), 10, 2 );
+		add_action( 'update_option_' . PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME, array( ProductSync::class, 'mark_feed_dirty_on_category_settings_change' ), 10, 2 );
 	}
 
 	/**
@@ -58,6 +60,7 @@ class ProductSyncTest extends \WP_UnitTestCase {
 	public function tearDown(): void {
 		remove_action( 'woocommerce_new_product', array( ProductSync::class, 'mark_feed_dirty_on_new_product' ), 10 );
 		remove_action( 'woocommerce_product_object_updated_props', array( ProductSync::class, 'mark_feed_dirty_on_updated_props' ), 10 );
+		remove_action( 'update_option_' . PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME, array( ProductSync::class, 'mark_feed_dirty_on_category_settings_change' ), 10 );
 
 		as_unschedule_all_actions( 'pinterest-for-woocommerce-start-feed-generation', null, 'pinterest-for-woocommerce' );
 		delete_option( FeedGenerator::OPTION_FEED_DIRTY );
@@ -133,6 +136,39 @@ class ProductSyncTest extends \WP_UnitTestCase {
 		$this->set_static_property( 'flagged_product_ids', array() );
 
 		return $product;
+	}
+
+	/**
+	 * Changing the category selection regenerates the feed, unrelated settings do not.
+	 */
+	public function test_category_selection_change_marks_feed_dirty() {
+		$selection = array(
+			array(
+				'key'   => 12,
+				'label' => 'Clothing',
+			),
+		);
+		Pinterest_For_Woocommerce::save_setting( 'product_sync_enabled', true );
+		$this->feed_generator->mark_feed_clean();
+
+		Pinterest_For_Woocommerce::save_setting( 'track_conversions', false );
+		$this->assertFalse( $this->feed_generator->feed_is_dirty() );
+
+		Pinterest_For_Woocommerce::save_setting( 'product_sync_categories', $selection );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty() );
+		$this->feed_generator->mark_feed_clean();
+
+		Pinterest_For_Woocommerce::save_setting( 'product_sync_categories', array() );
+		$this->assertTrue( $this->feed_generator->feed_is_dirty(), 'Clearing the selection must restore the all-products feed.' );
+		$this->feed_generator->mark_feed_clean();
+
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'product_sync_enabled'    => false,
+				'product_sync_categories' => $selection,
+			)
+		);
+		$this->assertFalse( $this->feed_generator->feed_is_dirty(), 'Disabling sync must not schedule a replacement feed.' );
 	}
 
 	/**
