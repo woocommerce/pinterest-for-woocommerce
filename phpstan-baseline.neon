@@ -1405,12 +1405,6 @@ parameters:
 			path: src/Product/GoogleCategorySearch.php
 
 		-
-			message: '#^Offset ''label'' on non\-empty\-array\<literal\-string&non\-falsy\-string, \(array\<int, literal\-string&non\-falsy\-string\>\)\|literal\-string\> in isset\(\) always exists and is not nullable\.$#'
-			identifier: isset.offset
-			count: 1
-			path: src/Product/GoogleCategorySearch.php
-
-		-
 			message: '#^Parameter \#1 \$search_text of method Automattic\\WooCommerce\\Pinterest\\Product\\GoogleCategorySearch\:\:matching_categories\(\) expects string, array\|string given\.$#'
 			identifier: argument.type
 			count: 1
