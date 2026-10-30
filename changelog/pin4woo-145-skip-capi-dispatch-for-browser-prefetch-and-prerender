@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Skip Conversions API AddToCart events for browser prefetch and prerender requests.

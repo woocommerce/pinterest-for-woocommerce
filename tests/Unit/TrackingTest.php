@@ -16,7 +16,7 @@ use WC_Helper_Product;
 /**
  * Tests the Tracking class.
  *
- * @version 1.5.4
+ * @version x.x.x
  */
 class TrackingTest extends \WP_UnitTestCase {
 
@@ -237,6 +237,51 @@ class TrackingTest extends \WP_UnitTestCase {
 			->method( 'track_event' );
 
 		$tracking->track_event( 'test', $data );
+	}
+
+	/**
+	 * Only speculative AddToCart events skip CAPI; Tag dispatch stays unchanged.
+	 *
+	 * @dataProvider speculative_tracking_events
+	 * @param string $purpose     Speculation header value.
+	 * @param string $event_name  Tracking event name.
+	 * @param bool   $expect_capi Whether CAPI should receive the event.
+	 */
+	public function test_speculative_request_tracking( $purpose, $event_name, $expect_capi ) {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$original                    = $_SERVER['HTTP_SEC_PURPOSE'] ?? null;
+		$_SERVER['HTTP_SEC_PURPOSE'] = $purpose;
+		try {
+			Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'WD7AFW51GS' ) );
+			$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 Chrome/140.0.0.0';
+			$tag                        = $this->createMock( Tag::class );
+			$conversions                = $this->createMock( Conversions::class );
+			$data                       = new None( 'speculative-event' );
+			$tag->expects( $this->once() )->method( 'track_event' )->with( $event_name, $data );
+			$conversions->expects( $expect_capi ? $this->once() : $this->never() )->method( 'track_event' )->with( $event_name, $data );
+			$tracking = new Tracking( array( $tag, $conversions ) );
+			$tracking->track_event( $event_name, $data );
+		} finally {
+			if ( null === $original ) {
+				unset( $_SERVER['HTTP_SEC_PURPOSE'] );
+			} else {
+				$_SERVER['HTTP_SEC_PURPOSE'] = $original;
+			}
+		}
+	}
+
+	/** @return array Speculative and ordinary event dispatch expectations. */
+	public function speculative_tracking_events() {
+		return array(
+			array( 'prefetch', Tracking::EVENT_ADD_TO_CART, false ),
+			array( 'prefetch;prerender', Tracking::EVENT_ADD_TO_CART, false ),
+			array( 'navigate', Tracking::EVENT_ADD_TO_CART, true ),
+			array( '', Tracking::EVENT_ADD_TO_CART, true ),
+			array( 'prefetch;prerender', Tracking::EVENT_VIEW_CATEGORY, true ),
+			array( 'prefetch;prerender', Tracking::EVENT_SEARCH, true ),
+			array( 'prefetch;prerender', Tracking::EVENT_CHECKOUT, true ),
+			array( 'prefetch;prerender', Tracking::EVENT_PAGE_VISIT, false ),
+		);
 	}
 
 	/**
