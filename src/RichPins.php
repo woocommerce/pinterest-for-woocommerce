@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adding RichPins support.
  *
  * @class   RichPins
- * @version 1.6.0
+ * @version x.x.x
  */
 class RichPins {
 
@@ -95,7 +95,7 @@ class RichPins {
 			}
 		}
 
-		if ( empty( $tags ) || $disable_rich_pins ) {
+		if ( empty( $tags ) ) {
 			echo '<meta name="pinterest-rich-pin" content="false" />';
 			return;
 		}

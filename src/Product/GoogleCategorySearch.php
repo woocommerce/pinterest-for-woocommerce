@@ -13,7 +13,7 @@ namespace Automattic\WooCommerce\Pinterest\Product;
  * Class GoogleCategorySearch
  *
  * @class   GoogleCategorySearch
- * @version 1.0.2
+ * @version x.x.x
  */
 class GoogleCategorySearch {
 
@@ -62,7 +62,7 @@ class GoogleCategorySearch {
 		$matching = array_filter(
 			GoogleProductTaxonomy::TAXONOMY,
 			function( $category ) use ( $search_text ) {
-				return isset( $category['label'] ) && false !== stripos( $category['label'], $search_text );
+				return false !== stripos( $category['label'], $search_text );
 			}
 		);
 
