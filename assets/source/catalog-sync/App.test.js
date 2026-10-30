@@ -114,6 +114,8 @@ function serve( {
  * Opens the Catalog tab as a page load does: with empty stores.
  *
  * Settings resolve first by default; race tests can answer dismissals first.
+ * Unless held, the dismissals are answered inside act(), so on return the
+ * prompts the stores allow have rendered (default order).
  *
  * @param {Object}  [options]
  * @param {boolean} [options.holdDismissals=false]    Whether to leave the saved dismissals unanswered.
@@ -163,7 +165,12 @@ async function openCatalog( {
 	}
 
 	if ( ! holdDismissals ) {
-		answerDismissals();
+		// Answer inside act() so the renders and effects the answer causes
+		// (the prompts open from effects) are flushed before a test asserts.
+		// Holds after the settings waitFor above: the interactions resolver's
+		// start timer (queued with the settings one, same delay) has fired by
+		// then, so only promises remain in the chain.
+		await act( async () => answerDismissals() );
 		await waitFor( () =>
 			expect(
 				registry.select( INTERACTIONS_STORE ).areInteractionsLoaded()
@@ -270,9 +277,12 @@ describe( 'Catalog tab prompts', () => {
 
 			await openCatalog();
 
-			expect( dialogs() ).toHaveLength( 1 );
-			expect( screen.queryByText( modal ) ).not.toBeNull();
-			expect( adCreditsNotice() !== null ).toBe( notice );
+			// openCatalog() flushed the prompt effects; waitFor() is a second guard.
+			await waitFor( () => {
+				expect( dialogs() ).toHaveLength( 1 );
+				expect( screen.queryByText( modal ) ).not.toBeNull();
+				expect( adCreditsNotice() !== null ).toBe( notice );
+			} );
 		}
 	);
 
@@ -294,6 +304,8 @@ describe( 'Catalog tab prompts', () => {
 
 			await openCatalog();
 
+			// openCatalog() flushed the prompt effects, so a missing modal
+			// here is the effect's decision, not a render still pending.
 			expect( dialogs() ).toHaveLength( shown ? 1 : 0 );
 			expect( capiModal() !== null ).toBe( shown );
 		}
@@ -345,7 +357,7 @@ describe( 'Catalog tab prompts', () => {
 		async ( { flag, dismissed, find, close, events } ) => {
 			const saved = serve( { dismissed } );
 			const { registry, unmount } = await openCatalog();
-			expect( find() ).not.toBeNull();
+			await waitFor( () => expect( find() ).not.toBeNull() );
 
 			fireEvent.click( close() );
 
@@ -386,7 +398,7 @@ describe( 'Catalog tab prompts', () => {
 		const { unmount } = await openCatalog();
 
 		fireEvent.click(
-			screen.getByRole( 'button', { name: 'Close dialog' } )
+			await screen.findByRole( 'button', { name: 'Close dialog' } )
 		);
 
 		expect( capiModal() ).toBeNull();
@@ -395,13 +407,17 @@ describe( 'Catalog tab prompts', () => {
 		unmount();
 		await openCatalog();
 
-		expect( capiModal() ).not.toBeNull();
+		await waitFor( () => expect( capiModal() ).not.toBeNull() );
 	} );
 	test( 'shows onboarding before CAPI and never saves an automatic dismissal', async () => {
 		const saved = serve( {} );
 		await openCatalog();
-		expect( dialogs() ).toHaveLength( 1 );
-		expect( screen.queryByText( /^You are one step away/ ) ).not.toBeNull();
+		await waitFor( () => {
+			expect( dialogs() ).toHaveLength( 1 );
+			expect(
+				screen.queryByText( /^You are one step away/ )
+			).not.toBeNull();
+		} );
 		expect( capiModal() ).toBeNull();
 		expect( saved.ads_modal_dismissed ).toBe( false );
 		expect( requests( 'POST' ) ).toHaveLength( 0 );
@@ -417,10 +433,10 @@ describe( 'Catalog tab prompts', () => {
 		serve( { dismissed: { ads_modal_dismissed: true } } );
 		const { registry } = await openCatalog();
 		fireEvent.click(
-			screen.getByRole( 'button', { name: 'Close dialog' } )
+			await screen.findByRole( 'button', { name: 'Close dialog' } )
 		);
 		fireEvent.click(
-			screen.getByRole( 'button', { name: 'Dismiss this notice' } )
+			await screen.findByRole( 'button', { name: 'Dismiss this notice' } )
 		);
 		await waitFor( () =>
 			expect(
@@ -468,14 +484,16 @@ describe( 'Catalog tab prompts', () => {
 						.hasFinishedResolution( 'getSettings', [] )
 				).toBe( true )
 			);
-			expect(
-				recordEvent.mock.calls.filter(
-					( [ event ] ) => event === 'pfw_modal_open'
-				)
-			).toHaveLength( 1 );
-			expect( adCreditsNotice() !== null ).toBe(
-				! errorId || errorId === 2322
-			);
+			await waitFor( () => {
+				expect(
+					recordEvent.mock.calls.filter(
+						( [ event ] ) => event === 'pfw_modal_open'
+					)
+				).toHaveLength( 1 );
+				expect( adCreditsNotice() !== null ).toBe(
+					! errorId || errorId === 2322
+				);
+			} );
 		}
 	);
 } );
