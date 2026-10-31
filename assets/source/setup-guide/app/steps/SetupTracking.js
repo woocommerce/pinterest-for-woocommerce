@@ -508,7 +508,7 @@ const SetupTracking = ( { view = 'settings' } ) => {
 																} )
 															) }
 															help={ __(
-																'Select the tracking tag to use.',
+																'When Track conversions is enabled, saving this Tag starts browser tracking using your Enhanced Match settings.',
 																'pinterest-for-woocommerce'
 															) }
 														/>

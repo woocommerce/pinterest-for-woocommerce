@@ -48,6 +48,7 @@ const SetupPins = ( {} ) => {
 	const appSettings = useSettingsSelect();
 	const setAppSettings = useSettingsDispatch( false );
 	const createNotice = useCreateNotice();
+	const hasTag = !! appSettings?.tracking_tag;
 
 	const handleOptionChange = async ( name, value ) => {
 		try {
@@ -118,6 +119,17 @@ const SetupPins = ( {} ) => {
 											)
 										}
 									/>
+									{ ! hasTag && (
+										<Text
+											variant="caption"
+											className="woocommerce-setup-guide__help-description"
+										>
+											{ __(
+												'Select a Tag in the Connection tab and save changes to enable browser tracking. Conversions API can run without a Tag. Your saved Enhanced Match preference takes effect when browser tracking starts.',
+												'pinterest-for-woocommerce'
+											) }
+										</Text>
+									) }
 									<CheckboxControl
 										label={ __(
 											'Conversions API',
@@ -191,11 +203,13 @@ const SetupPins = ( {} ) => {
 											'woocommerce-setup-guide__checkbox-group',
 											{
 												'pinterest-for-woocommerce-settings-checkbox-disabled':
-													! appSettings.track_conversions,
+													! appSettings.track_conversions ||
+													! hasTag,
 											}
 										) }
 										disabled={
-											! appSettings.track_conversions
+											! appSettings.track_conversions ||
+											! hasTag
 										}
 										onChange={ () =>
 											handleOptionChange(
