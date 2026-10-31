@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adding Save Pin support.
  *
  * @class   SaveToPinterest
- * @version 1.6.0
+ * @version x.x.x
  */
 class SaveToPinterest {
 
@@ -36,6 +36,7 @@ class SaveToPinterest {
 		add_action( 'woocommerce_before_single_product_summary', array( __CLASS__, 'render_product_pin' ) );
 		add_action( 'woocommerce_before_shop_loop_item', array( __CLASS__, 'render_product_pin' ), 1 );
 		add_filter( 'woocommerce_blocks_product_grid_item_html', array( __CLASS__, 'add_to_wc_blocks' ), 10, 3 );
+		add_filter( 'render_block_woocommerce/all-products', array( __CLASS__, 'add_to_all_products' ) );
 
 		// Enqueue our JS files.
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
@@ -150,6 +151,51 @@ class SaveToPinterest {
 		}
 
 		return str_replace( '</li>', self::render_pin( $product->get_id() ) . '</li>', $html );
+	}
+
+	/**
+	 * Add a client-rendered child to the All Products card layout.
+	 *
+	 * @param mixed $html Rendered block markup.
+	 * @return mixed
+	 */
+	public static function add_to_all_products( $html ) {
+		if ( ! is_string( $html ) || ! self::show_pin_button() ) {
+			return $html;
+		}
+
+		$processor = new \WP_HTML_Tag_Processor( $html );
+		if ( ! $processor->next_tag( array( 'class_name' => 'wp-block-woocommerce-all-products' ) ) ) {
+			return $html;
+		}
+		$encoded_attributes = $processor->get_attribute( 'data-attributes' );
+		$attributes         = is_string( $encoded_attributes ) ? json_decode( $encoded_attributes, true ) : null;
+		if ( ! is_array( $attributes ) || ! isset( $attributes['layoutConfig'] ) || ! is_array( $attributes['layoutConfig'] ) ) {
+			return $html;
+		}
+
+		$asset_path = Pinterest_For_Woocommerce()->plugin_path() . '/assets/build/all-products-pin.asset.php';
+		$asset      = file_exists( $asset_path ) ? include $asset_path : array(
+			'dependencies' => array( 'wc-blocks-registry', 'react-jsx-runtime', 'wp-html-entities', 'wp-i18n' ),
+			'version'      => PINTEREST_FOR_WOOCOMMERCE_VERSION,
+		);
+		wp_enqueue_script(
+			PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-all-products-pin',
+			Pinterest_For_Woocommerce()->plugin_url() . '/assets/build/all-products-pin.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
+		wp_set_script_translations( PINTEREST_FOR_WOOCOMMERCE_PREFIX . '-all-products-pin', 'pinterest-for-woocommerce' );
+		foreach ( $attributes['layoutConfig'] as $child ) {
+			if ( is_array( $child ) && 'pinterest-for-woocommerce/product-pin' === ( $child[0] ?? '' ) ) {
+				return $html;
+			}
+		}
+		$attributes['layoutConfig'][] = array( 'pinterest-for-woocommerce/product-pin', array() );
+		$processor->set_attribute( 'data-attributes', wp_json_encode( $attributes ) );
+
+		return $processor->get_updated_html();
 	}
 
 
