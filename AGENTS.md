@@ -306,7 +306,7 @@ npm install
 composer install
 ```
 
-For a Docker environment, use `npm run wp-env -- start` from this worktree. Give each concurrent environment unique development and test ports in its gitignored `.wp-env.override.json`; keep that configuration for every wp-env command. The local PHP test command is `npm run test:php:wp-env` after the environment starts. That script expects `/var/www/html/wp-content/plugins/pinterest-for-woocommerce`; map the worktree to `wp-content/plugins/pinterest-for-woocommerce` in the override before using it.
+For a Docker environment, use `npm run wp-env -- start` from this worktree. Give each concurrent environment unique development and test ports in its gitignored `.wp-env.override.json`; keep that configuration for every wp-env command. The local PHP test command is `npm run test:php:wp-env` after the environment starts.
 
 Destroy the environment before removing the worktree:
 
