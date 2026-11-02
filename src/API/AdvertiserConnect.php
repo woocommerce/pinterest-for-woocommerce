@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Endpoint handing Pinterest advertiser.
  *
  * @class   AdvertiserConnect
- * @version 1.6.0
+ * @version x.x.x
  */
 class AdvertiserConnect extends VendorAPI {
 
@@ -62,7 +62,7 @@ class AdvertiserConnect extends VendorAPI {
 			}
 
 			$integration_data = Pinterest_For_Woocommerce::get_data( 'integration_data' );
-			if ( ( $integration_data['connected_advertiser_id'] ?? '' ) === $advertiser_id ) {
+			if ( ( $integration_data['connected_advertiser_id'] ?? '' ) === $advertiser_id && ( $integration_data['connected_tag_id'] ?? '' ) === $tag_id ) {
 				return array(
 					'connected'   => $advertiser_id,
 					'reconnected' => false,
@@ -105,6 +105,10 @@ class AdvertiserConnect extends VendorAPI {
 
 		try {
 			$response = Pinterest_For_Woocommerce::update_commerce_integration( $external_business_id, $data );
+			if ( ( $response['connected_advertiser_id'] ?? null ) !== $advertiser_id || ( $response['connected_tag_id'] ?? null ) !== $tag_id ) {
+				throw new Exception( esc_html__( 'Commerce integration did not confirm the selected advertiser and Tag.', 'pinterest-for-woocommerce' ) );
+			}
+			Pinterest_For_Woocommerce::save_integration_data( array_merge( is_array( $integration_data ) ? $integration_data : array(), $response ) );
 		} catch ( Throwable $th ) {
 			throw new Exception(
 				sprintf(
