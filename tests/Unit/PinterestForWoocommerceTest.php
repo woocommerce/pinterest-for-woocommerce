@@ -13,7 +13,7 @@ use WP_UnitTestCase;
 /**
  * Tests the Pinterest_For_Woocommerce main plugin class.
  *
- * @version 1.6.0
+ * @version x.x.x
  */
 class PinterestForWoocommerceTest extends WP_UnitTestCase {
 
@@ -383,27 +383,14 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tracking must evaluate user consent only after consent-management plugins
-	 * have registered their consent type. They do so on `init` (priority 20) - the
-	 * same hook WooCommerce core uses for its consent integration. Reading consent
-	 * on `init` (priority 10) returns the WP Consent API permissive default before
-	 * the consent manager can say "deny", so tracking is hooked on `wp_loaded`
-	 * (after every `init` callback has run) instead of on `init`.
-	 *
-	 * @return void
+	 * Consent managers finish init before tracking reads their decision.
 	 */
 	public function test_init_tracking_is_hooked_after_init_for_consent() {
 		Pinterest_For_Woocommerce();
+		$callback = array( Pinterest_For_Woocommerce::class, 'init_tracking' );
 
-		$this->assertFalse(
-			has_action( 'init', array( Pinterest_For_Woocommerce::class, 'init_tracking' ) ),
-			'init_tracking must not run on init, where consent is read before consent managers register.'
-		);
-		$this->assertSame(
-			10,
-			has_action( 'wp_loaded', array( Pinterest_For_Woocommerce::class, 'init_tracking' ) ),
-			'init_tracking should run on wp_loaded, after all init callbacks have registered consent.'
-		);
+		$this->assertFalse( has_action( 'init', $callback ) );
+		$this->assertSame( 10, has_action( 'wp_loaded', $callback ) );
 	}
 
 	public function test_init_tracking_inits_if_at_least_one_tracker() {
