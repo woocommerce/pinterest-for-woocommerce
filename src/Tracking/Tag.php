@@ -127,7 +127,8 @@ class Tag extends Tracker {
 			static::load_deferred_events()
 		);
 		if ( ! empty( $events ) ) {
-			wp_print_inline_script_tag( implode( PHP_EOL, $events ) );
+			// Consent plugins block the base tag by its pinimg.com URL, which this script does not contain.
+			wp_print_inline_script_tag( self::guard_event_code( implode( PHP_EOL, $events ) ) );
 		}
 
 		wp_print_inline_script_tag( '', array( 'id' => 'pinterest-tag-placeholder' ) );
@@ -500,6 +501,20 @@ class Tag extends Tracker {
 	}
 
 	/**
+	 * Runs event code only when the Pinterest base tag has defined `pintrk`.
+	 *
+	 * A consent plugin can block the base tag while still letting event scripts run.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $code Event JavaScript.
+	 * @return string Guarded event JavaScript.
+	 */
+	private static function guard_event_code( string $code ) {
+		return sprintf( "if ( typeof window.pintrk === 'function' ) {\n\t%s\n}", $code );
+	}
+
+	/**
 	 * Adds a fragment to trigger Pinterest Tag event on add to cart event.
 	 *
 	 * The call is guarded because WooCommerce injects fragments with jQuery, which runs the script
@@ -513,10 +528,7 @@ class Tag extends Tracker {
 	 */
 	private static function maybe_add_fragment( string $event_name, array $data ) {
 		if ( Tracking::EVENT_ADD_TO_CART === $event_name ) {
-			$event = sprintf(
-				"if ( typeof window.pintrk === 'function' ) {\n\t%s\n}",
-				self::get_event_code( $event_name, $data )
-			);
+			$event = self::guard_event_code( self::get_event_code( $event_name, $data ) );
 			add_filter(
 				'woocommerce_add_to_cart_fragments',
 				function ( $fragments ) use ( $event ) {
