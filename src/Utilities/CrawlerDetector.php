@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @class   CrawlerDetector
  * @since   1.4.27
- * @version 1.4.27
+ * @version x.x.x
  */
 class CrawlerDetector {
 
@@ -94,5 +94,26 @@ class CrawlerDetector {
 			$is_crawler,
 			$raw_user_agent
 		);
+	}
+
+	/**
+	 * Detects browser prefetch, prerender and preview requests.
+	 *
+	 * @since x.x.x
+	 * @return bool Whether the browser explicitly marked a speculative request.
+	 */
+	public static function is_speculative_request(): bool {
+		foreach ( array( 'HTTP_SEC_PURPOSE', 'HTTP_PURPOSE', 'HTTP_X_PURPOSE', 'HTTP_X_MOZ' ) as $header ) {
+			if ( ! isset( $_SERVER[ $header ] ) || ! is_string( $_SERVER[ $header ] ) ) {
+				continue;
+			}
+
+			$purpose = sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) );
+			if ( 1 === preg_match( '/(?:^|[\s,;])(?:prefetch|prerender|preview)(?:$|[\s,;])/i', $purpose ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

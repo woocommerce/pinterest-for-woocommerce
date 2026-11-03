@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Generates browser PageVisit events and handles their CAPI beacons.
  *
  * @class   PageVisit
- * @version 1.6.1
+ * @version x.x.x
  */
 class PageVisit {
 
@@ -114,8 +114,9 @@ class PageVisit {
 			return '';
 		}
 
+		// A prerender may never be viewed; send its beacon only after activation.
 		return sprintf(
-			'var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);var beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}',
+			'function sendPageVisit(){var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);var beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}}if(document.prerendering){document.addEventListener("prerenderingchange",sendPageVisit,{once:true});}else{sendPageVisit();}',
 			wp_json_encode( static::AJAX_ACTION, JSON_HEX_TAG ),
 			wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 		);
