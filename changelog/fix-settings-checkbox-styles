@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Fixed checkbox styles on the Settings and onboarding screens so checked boxes show a white check and disabled boxes look disabled.
