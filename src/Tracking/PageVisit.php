@@ -154,6 +154,18 @@ class PageVisit {
 			return;
 		}
 
+		/**
+		 * Filters whether to skip Conversions API events based on user consent.
+		 *
+		 * @since x.x.x
+		 *
+		 * @param bool $disable_conversions_api Whether to skip Conversions API events due to user consent.
+		 */
+		if ( apply_filters( 'woocommerce_pinterest_disable_conversions_api_user_consent', false ) ) {
+			self::reject( 'marketing consent for the Conversions API is not given' );
+			return;
+		}
+
 		if ( CrawlerDetector::is_crawler_request() ) {
 			self::reject( 'the request comes from a crawler' );
 			return;

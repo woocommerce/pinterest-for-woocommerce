@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Stop sending Conversions API events for visitors who refused marketing consent through the WP Consent API when the Tag is printed for every visitor on cached pages.

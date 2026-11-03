@@ -4,10 +4,12 @@ namespace Automattic\WooCommerce\Pinterest;
 
 use WP_UnitTestCase;
 
+require_once dirname( __DIR__ ) . '/Helpers/WPConsentAPIStub.php';
+
 /**
  * Class WPConsentAPITest.
  *
- * @version 1.4.21
+ * @version x.x.x
  */
 class WPConsentAPITest extends WP_UnitTestCase {
 
@@ -22,7 +24,13 @@ class WPConsentAPITest extends WP_UnitTestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->wp_consent_api = $this->getMockBuilder( WPConsentAPI::class )
-			->onlyMethods( array( 'is_wp_consent_api_active', 'should_disable_tracking_for_user_consent' ) )
+			->onlyMethods(
+				array(
+					'is_wp_consent_api_active',
+					'should_disable_tracking_for_user_consent',
+					'should_disable_conversions_api_for_user_consent',
+				)
+			)
 			->getMock();
 	}
 
@@ -33,6 +41,8 @@ class WPConsentAPITest extends WP_UnitTestCase {
 		parent::tearDown();
 		unset( $this->wp_consent_api );
 		remove_all_filters( 'woocommerce_pinterest_disable_tracking_user_consent' );
+		remove_all_filters( 'woocommerce_pinterest_disable_conversions_api_user_consent' );
+		unset( $GLOBALS['pinterest_test_marketing_consent'] );
 		remove_all_filters( 'wp_consent_api_registered_' . PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME );
 	}
 
@@ -50,6 +60,7 @@ class WPConsentAPITest extends WP_UnitTestCase {
 		// When API is not available, no filters should be registered.
 		$this->assertFalse( has_filter( 'wp_consent_api_registered_' . PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME ) );
 		$this->assertFalse( has_filter( 'woocommerce_pinterest_disable_tracking_user_consent' ) );
+		$this->assertFalse( has_filter( 'woocommerce_pinterest_disable_conversions_api_user_consent' ) );
 	}
 
 	/**
@@ -134,5 +145,62 @@ class WPConsentAPITest extends WP_UnitTestCase {
 			'User consent tracking should be disabled when filter returns true'
 		);
 		remove_filter( 'woocommerce_pinterest_disable_tracking_user_consent', '__return_true' );
+	}
+
+	/**
+	 * The Conversions API consent filter is routed to its own callback, not the
+	 * Tag consent callback a cached store may override.
+	 *
+	 * @return void
+	 */
+	public function test_conversions_api_consent_filter_uses_its_own_callback(): void {
+		$this->wp_consent_api->method( 'is_wp_consent_api_active' )->willReturn( true );
+		$this->wp_consent_api->expects( $this->never() )
+			->method( 'should_disable_tracking_for_user_consent' );
+		$this->wp_consent_api->expects( $this->once() )
+			->method( 'should_disable_conversions_api_for_user_consent' )
+			->willReturn( true );
+
+		$this->wp_consent_api->__construct();
+
+		$this->assertTrue( has_filter( 'woocommerce_pinterest_disable_conversions_api_user_consent' ) );
+		// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment
+		$this->assertTrue( apply_filters( 'woocommerce_pinterest_disable_conversions_api_user_consent', false ) );
+	}
+
+	/**
+	 * Conversions API events are skipped only when marketing consent is refused.
+	 *
+	 * @dataProvider marketing_consent_states
+	 *
+	 * @param bool $consent_given Whether the visitor gave marketing consent.
+	 * @return void
+	 */
+	public function test_conversions_api_consent_callback_follows_marketing_consent( bool $consent_given ): void {
+		$GLOBALS['pinterest_test_marketing_consent'] = $consent_given;
+
+		$this->assertSame( ! $consent_given, ( new WPConsentAPI() )->should_disable_conversions_api_for_user_consent( false ) );
+	}
+
+	/**
+	 * @return array Marketing consent states.
+	 */
+	public function marketing_consent_states(): array {
+		return array(
+			'consent given'   => array( true ),
+			'consent refused' => array( false ),
+		);
+	}
+
+	/**
+	 * Granted marketing consent does not override an earlier callback that skips
+	 * Conversions API events.
+	 *
+	 * @return void
+	 */
+	public function test_conversions_api_consent_callback_keeps_earlier_skip(): void {
+		$GLOBALS['pinterest_test_marketing_consent'] = true;
+
+		$this->assertTrue( ( new WPConsentAPI() )->should_disable_conversions_api_for_user_consent( true ) );
 	}
 }
