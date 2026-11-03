@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Skip the AddToCart cart fragment event when a consent plugin has blocked the Pinterest tag, avoiding a pintrk is not defined error.

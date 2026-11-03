@@ -54,7 +54,7 @@ class TagTest extends \WP_UnitTestCase {
 		$this->assertStringContainsString( '"event_id":"unchanged-id"', $output );
 	}
 
-	/** AJAX cart fragments retain the public selector and use WordPress script attributes. */
+	/** AJAX cart fragments retain the public selector, use WordPress script attributes and guard the pintrk() call. */
 	public function test_cart_fragment_uses_wordpress_script_attributes() {
 		$attributes = static function ( $attributes ) {
 			$attributes['nonce'] = 'pinterest-cart-test';
@@ -80,6 +80,11 @@ class TagTest extends \WP_UnitTestCase {
 		$this->assertStringContainsString( "pintrk( 'track', 'AddToCart'", $script );
 		$this->assertStringContainsString( '"event_id":"cart-event"', $script );
 		$this->assertStringContainsString( '"value":20', $script );
+		$this->assertMatchesRegularExpression(
+			"/if \( typeof window\.pintrk === 'function' \) \{\s*pintrk\( 'track', 'AddToCart' .*\);\s*\}/s",
+			$script,
+			'The fragment must not call pintrk() when a consent plugin blocked the base tag.'
+		);
 	}
 
 	public function test_print_script_prints_tag() {

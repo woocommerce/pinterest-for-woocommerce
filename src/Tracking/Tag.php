@@ -502,6 +502,9 @@ class Tag extends Tracker {
 	/**
 	 * Adds a fragment to trigger Pinterest Tag event on add to cart event.
 	 *
+	 * The call is guarded because WooCommerce injects fragments with jQuery, which runs the script
+	 * even when a consent plugin has blocked the base tag and `pintrk` is undefined.
+	 *
 	 * @since 1.4.0
 	 *
 	 * @param string $event_name Event name.
@@ -510,7 +513,10 @@ class Tag extends Tracker {
 	 */
 	private static function maybe_add_fragment( string $event_name, array $data ) {
 		if ( Tracking::EVENT_ADD_TO_CART === $event_name ) {
-			$event = self::get_event_code( $event_name, $data );
+			$event = sprintf(
+				"if ( typeof window.pintrk === 'function' ) {\n\t%s\n}",
+				self::get_event_code( $event_name, $data )
+			);
 			add_filter(
 				'woocommerce_add_to_cart_fragments',
 				function ( $fragments ) use ( $event ) {
