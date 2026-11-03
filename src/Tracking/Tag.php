@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adds PinterestTag tracker support.
  *
  * @class   Tag
- * @version 1.6.0
+ * @version x.x.x
  */
 class Tag extends Tracker {
 

@@ -7,7 +7,7 @@ use Pinterest_For_Woocommerce;
 /**
  * Tests the Tag tracker class.
  *
- * @version 1.5.4
+ * @version x.x.x
  */
 class TagTest extends \WP_UnitTestCase {
 
