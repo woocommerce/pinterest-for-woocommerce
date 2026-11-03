@@ -13,7 +13,7 @@ use WP_UnitTestCase;
 /**
  * Tests the Pinterest_For_Woocommerce main plugin class.
  *
- * @version 1.6.0
+ * @version x.x.x
  */
 class PinterestForWoocommerceTest extends WP_UnitTestCase {
 
@@ -380,6 +380,17 @@ class PinterestForWoocommerceTest extends WP_UnitTestCase {
 		Pinterest_For_Woocommerce::disconnect();
 		$this->assertFalse( as_has_scheduled_action( Heartbeat::HOURLY, array(), 'pinterest-for-woocommerce' ) );
 		$this->assertFalse( as_has_scheduled_action( Heartbeat::DAILY, array(), 'pinterest-for-woocommerce' ) );
+	}
+
+	/**
+	 * Consent managers finish init before tracking reads their decision.
+	 */
+	public function test_init_tracking_is_hooked_after_init_for_consent() {
+		Pinterest_For_Woocommerce();
+		$callback = array( Pinterest_For_Woocommerce::class, 'init_tracking' );
+
+		$this->assertFalse( has_action( 'init', $callback ) );
+		$this->assertSame( 10, has_action( 'wp_loaded', $callback ) );
 	}
 
 	public function test_init_tracking_inits_if_at_least_one_tracker() {

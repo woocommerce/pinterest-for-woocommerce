@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Delayed tracking initialization until consent managers finish their init callbacks.
