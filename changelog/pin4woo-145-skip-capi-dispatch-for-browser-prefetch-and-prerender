@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Skip speculative AddToCart CAPI events and defer prerendered PageVisit beacons until activation.

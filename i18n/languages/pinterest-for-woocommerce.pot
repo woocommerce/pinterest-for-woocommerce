@@ -2,14 +2,14 @@
 # This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: Pinterest for WooCommerce 1.6.1\n"
+"Project-Id-Version: Pinterest for WooCommerce 1.6.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/pinterest-for-woocommerce\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-29T07:59:22+00:00\n"
+"POT-Creation-Date: 2026-11-04T08:49:13+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: pinterest-for-woocommerce\n"
@@ -54,49 +54,49 @@ msgid "Only a single instance of this class is allowed. Use singleton."
 msgstr ""
 
 #. Translators: The minimum PHP version
-#: class-pinterest-for-woocommerce.php:468
+#: class-pinterest-for-woocommerce.php:469
 #, php-format
 msgid "Pinterest for WooCommerce requires a minimum PHP version of %s."
 msgstr ""
 
 #. Translators: The minimum WP version
-#: class-pinterest-for-woocommerce.php:473
+#: class-pinterest-for-woocommerce.php:474
 #, php-format
 msgid "Pinterest for WooCommerce requires a minimum WordPress version of %s."
 msgstr ""
 
 #. Translators: The minimum WC version
-#: class-pinterest-for-woocommerce.php:478
+#: class-pinterest-for-woocommerce.php:479
 #, php-format
 msgid "Pinterest for WooCommerce requires a minimum WooCommerce version of %s."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:486
+#: class-pinterest-for-woocommerce.php:487
 msgid "Pinterest for WooCommerce requires WooCommerce Admin to be enabled."
 msgstr ""
 
 #. Translators: The minimum Action Scheduler version
-#: class-pinterest-for-woocommerce.php:491
+#: class-pinterest-for-woocommerce.php:492
 #, php-format
 msgid "Pinterest for WooCommerce requires a minimum Action Scheduler package of %s. It can be caused by old version of the WooCommerce extensions."
 msgstr ""
 
 #. Translators: The error description
-#: class-pinterest-for-woocommerce.php:801
+#: class-pinterest-for-woocommerce.php:802
 #: src/API/TokenExchangeV3ToV5.php:128
 #, php-format
 msgid "Could not decrypt the Pinterest API access token. Try reconnecting to Pinterest. [%s]"
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:1074
+#: class-pinterest-for-woocommerce.php:1075
 msgid "Commerce Integration cannot be created: Advertiser ID is missing."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:1181
+#: class-pinterest-for-woocommerce.php:1182
 msgid "There was an error getting the account data."
 msgstr ""
 
-#: class-pinterest-for-woocommerce.php:1408
+#: class-pinterest-for-woocommerce.php:1409
 msgid "Pinterest for WooCommerce verification page"
 msgstr ""
 
@@ -201,14 +201,18 @@ msgstr ""
 msgid "Could not connect advertiser with Pinterest. [%s]"
 msgstr ""
 
+#: src/API/AdvertiserConnect.php:109
+msgid "Commerce integration did not confirm the selected advertiser and Tag."
+msgstr ""
+
 #. translators: 1. the error message as returned by the Pinterest API
-#: src/API/AdvertiserConnect.php:112
+#: src/API/AdvertiserConnect.php:116
 #, php-format
 msgid "Commerce integration update error: $1%s"
 msgstr ""
 
-#: src/API/AdvertiserConnect.php:164
-#: src/API/AdvertiserConnect.php:176
+#: src/API/AdvertiserConnect.php:168
+#: src/API/AdvertiserConnect.php:180
 msgid "The advertiser could not be disconnected from Pinterest."
 msgstr ""
 
@@ -1254,7 +1258,7 @@ msgstr ""
 
 #: assets/source/setup-guide/app/components/SaveSettingsButton.js:101
 #: assets/source/setup-guide/app/steps/AdvancedSettings.js:36
-#: assets/source/setup-guide/app/steps/SetupPins.js:60
+#: assets/source/setup-guide/app/steps/SetupPins.js:61
 #: assets/source/setup-guide/app/steps/SetupProductSync.js:36
 #: assets/source/setup-guide/app/steps/SetupTracking.js:88
 msgid "There was a problem saving your settings."
@@ -1634,80 +1638,84 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:73
+#: assets/source/setup-guide/app/steps/SetupPins.js:74
 msgid "Publish Pins and Rich Pins"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:77
+#: assets/source/setup-guide/app/steps/SetupPins.js:78
 msgid "Rich Pins are a type of organic Pin that automatically sync information from your website to your Pins. You can identify Rich Pins by the extra information above and below the image on closeup and the bold title in your feed. If something changes on the original website, the Rich Pin updates to reflect that change."
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:93
+#: assets/source/setup-guide/app/steps/SetupPins.js:94
 msgid "Tracking"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:99
+#: assets/source/setup-guide/app/steps/SetupPins.js:100
 msgid "Track conversions"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:105
+#: assets/source/setup-guide/app/steps/SetupPins.js:106
 msgid "Gather analytics for Pins you publish and Pins users create from your site."
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:122
+#: assets/source/setup-guide/app/steps/SetupPins.js:127
+msgid "Select a Tag in the Connection tab and save changes to enable browser tracking. Conversions API can run without a Tag. Your saved Enhanced Match preference takes effect when browser tracking starts."
+msgstr ""
+
+#: assets/source/setup-guide/app/steps/SetupPins.js:134
 msgid "Conversions API"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:128
+#: assets/source/setup-guide/app/steps/SetupPins.js:140
 msgid "Enable server-side tracking for more reliable conversion data."
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:154
+#: assets/source/setup-guide/app/steps/SetupPins.js:166
 msgid "Enhanced Match support"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:161
+#: assets/source/setup-guide/app/steps/SetupPins.js:173
 msgid "Matches conversion data with the person responsible for the conversion and lets you track cross-device checkouts. Requires Track Conversion option to be enabled. <link>See more</link>"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:207
+#: assets/source/setup-guide/app/steps/SetupPins.js:221
 msgid "Automatic Enhanced Match support"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:213
+#: assets/source/setup-guide/app/steps/SetupPins.js:227
 msgid "Uses hashed information that your customers have already provided to your business to help match more of your website visitors and conversions to people on Pinterest. Enabling it may improve the performance of your campaigns and can help increase the size of your Pinterest tag audiences."
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:237
+#: assets/source/setup-guide/app/steps/SetupPins.js:251
 msgid "Manage information shared on <linkAdsManager>Pinterest Ads Manager </linkAdsManager>"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:264
+#: assets/source/setup-guide/app/steps/SetupPins.js:278
 msgid "Rich Pins"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:270
+#: assets/source/setup-guide/app/steps/SetupPins.js:284
 msgid "Add Rich Pins for Products"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:276
+#: assets/source/setup-guide/app/steps/SetupPins.js:290
 msgid "Automatically create and update rich pins on Pinterest for all synced products."
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:293
+#: assets/source/setup-guide/app/steps/SetupPins.js:307
 msgid "Add Rich Pins for Posts"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:299
+#: assets/source/setup-guide/app/steps/SetupPins.js:313
 msgid "Automatically create and update rich pins on Pinterest for posts."
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:319
-#: assets/source/setup-guide/app/steps/SetupPins.js:325
+#: assets/source/setup-guide/app/steps/SetupPins.js:333
+#: assets/source/setup-guide/app/steps/SetupPins.js:339
 msgid "Save to Pinterest"
 msgstr ""
 
-#: assets/source/setup-guide/app/steps/SetupPins.js:331
+#: assets/source/setup-guide/app/steps/SetupPins.js:345
 msgid "Adds a ‘Save’ button on images allowing customers to save things straight from your website to Pinterest."
 msgstr ""
 

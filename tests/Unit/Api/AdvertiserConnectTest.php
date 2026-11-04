@@ -16,7 +16,7 @@ use WP_REST_Request;
 /**
  * Tests connecting an advertiser and tag through the AdvertiserConnect API class.
  *
- * @version x.x.x
+ * @version 1.6.2
  */
 class AdvertiserConnectTest extends \WP_UnitTestCase {
 

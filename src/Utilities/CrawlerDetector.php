@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @class   CrawlerDetector
  * @since   1.4.27
- * @version x.x.x
+ * @version 1.6.2
  */
 class CrawlerDetector {
 
@@ -99,7 +99,7 @@ class CrawlerDetector {
 	/**
 	 * Detects browser prefetch, prerender and preview requests.
 	 *
-	 * @since x.x.x
+	 * @since 1.6.2
 	 * @return bool Whether the browser explicitly marked a speculative request.
 	 */
 	public static function is_speculative_request(): bool {
