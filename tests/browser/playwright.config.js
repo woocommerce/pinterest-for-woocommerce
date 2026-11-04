@@ -12,7 +12,9 @@ module.exports = defineConfig( {
 	expect: { timeout: 15000 },
 	use: {
 		...devices[ 'Desktop Chrome' ],
-		baseURL: process.env.PINTEREST_E2E_URL || 'http://localhost:9011',
+		baseURL:
+			process.env.PINTEREST_E2E_URL ||
+			`http://localhost:${ process.env.WP_ENV_TESTS_PORT || 8889 }`,
 		screenshot: 'only-on-failure',
 		trace: 'retain-on-failure',
 	},

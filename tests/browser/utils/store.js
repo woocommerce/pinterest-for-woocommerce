@@ -50,14 +50,16 @@ class Store {
 			JSON.stringify( options ),
 		];
 		const { stdout } = await execute(
-			native ? 'wp' : 'npx',
+			native ? 'wp' : 'npm',
 			native
 				? [ `--path=${ native }`, ...args ]
 				: [
-						'--no-install',
-						'wp-env',
 						'run',
-						'tests-cli',
+						'--silent',
+						'wp-env:test',
+						'--',
+						'run',
+						'cli',
 						'wp',
 						...args,
 					],

@@ -84,7 +84,7 @@ jobs:
               - '!tests/bootstrap.php'
               - '!phpunit.xml*'
               - '!bin/install-wp-tests.sh'
-              - '!bin/phpunit-wp-env.sh'
+              - '!bin/phpunit.sh'
               - '!assets/source/**/*.test.js'
               - '!assets/source/tests/**'
               - '!vitest.config.mjs'

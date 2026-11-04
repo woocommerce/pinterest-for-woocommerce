@@ -205,35 +205,18 @@ You can also specify the path to their directories by setting the following envi
 
 ### PHP Tests in wp-env
 
-`npm run test:php:wp-env` runs the PHPUnit suite inside [`@wordpress/env`](https://www.npmjs.com/package/@wordpress/env)'s `tests-cli` container. Compared to `./bin/install-wp-tests.sh`, this path needs no host MySQL or `svn`, and wp-env scopes its containers by working-directory hash so concurrent runs from separate worktrees stay isolated.
-
-#### wp-env prerequisites
-
--   Docker (Docker Desktop on macOS/Windows is enough).
--   A local development checkout of WooCommerce. The plugin's `tests/bootstrap.php` requires WooCommerce's `tests/legacy/bootstrap.php`, which ships only in the WooCommerce source repo — not in the WordPress.org zip the base `.wp-env.json` downloads.
-
-#### One-time setup
-
-Create `.wp-env.override.json` alongside `.wp-env.json` to swap the base WooCommerce zip for your local checkout (adjust the path to wherever you cloned WooCommerce):
-
-```json
-{
-	"plugins": ["../woocommerce/plugins/woocommerce", "."]
-}
-```
-
-`plugins` in the override file _replaces_ the base list, so include both WooCommerce and `.` (this plugin). If `vendor/` is missing inside your WooCommerce checkout, run `composer install` in that directory before starting wp-env.
-
-#### Running tests
+`npm run env:test:unit` runs the PHPUnit suite inside the `cli` container of the [`@wordpress/env`](https://www.npmjs.com/package/@wordpress/env) tests site (`.wp-env.test.json`). Compared to `./bin/install-wp-tests.sh` on the host, this path needs only Docker: on first run, `bin/phpunit.sh` runs the same installer in the container, against its own `wordpress_test` database, and installs WooCommerce from source, which the bootstrap needs for WooCommerce's `tests/legacy/bootstrap.php`.
 
 ```bash
-npx wp-env start                         # ~30–90s first run, faster afterwards
-npm run test:php:wp-env                  # run the full PHPUnit suite
-npm run test:php:wp-env -- --filter ProductSyncTest --testsuite=unit
-npx wp-env stop                          # tear down when finished
+npm run env:test:start                   # ~30–90s first run, faster afterwards
+npm run env:test:unit                    # run the full PHPUnit suite (installs WP + WC on first run)
+npm run env:test:unit -- --filter ProductSyncTest --testsuite=unit
+WC_ORDER_DATASTORE=hpos npm run env:test:unit
+UNIT_WC_VERSION=11.1.0 UNIT_WP_VERSION=7.0.0 npm run env:test:unit:setup   # reinstall other versions
+npm run env:test:stop                    # stop when finished
 ```
 
-Anything after `--` is forwarded to `phpunit`, so PHPUnit flags such as `--filter`, `--testsuite`, and `--group` work as usual.
+Anything after `--` is forwarded to `phpunit`, so PHPUnit flags such as `--filter`, `--testsuite`, and `--group` work as usual. In a git worktree, export `WP_ENV_PORT` and `WP_ENV_TESTS_PORT` first (see `AGENTS.md`).
 
 ### Saved-data regression tests
 
@@ -249,7 +232,7 @@ TMPDIR="$pinterest_test_root" WC_VERSION=11.1.0 ./bin/install-wp-tests.sh pinter
 composer test-unit -- --filter SavedDataTest
 ```
 
-Use a dedicated empty test database: the WordPress bootstrap replaces its test prefix tables on each run. Test cases roll back their fixtures, so rerunning the command resets products, orders and options. To change supported WordPress or WooCommerce versions, choose the matching installer arguments and a new directory and database; the installer reuses existing downloads. Missing dependencies are reported by the bootstrap before PHPUnit runs. The existing wp-env runner accepts the same `--filter` and `--testsuite` arguments.
+Use a dedicated empty test database: the WordPress bootstrap replaces its test prefix tables on each run. Test cases roll back their fixtures, so rerunning the command resets products, orders and options. To change supported WordPress or WooCommerce versions, choose the matching installer arguments and a new directory and database; the installer reuses existing downloads. Missing dependencies are reported by the bootstrap before PHPUnit runs. `npm run env:test:unit` accepts the same `--filter` and `--testsuite` arguments.
 
 ### Order storage
 
@@ -271,8 +254,7 @@ newer-PHP lane locally, put PHP 8.4 on your PATH, install the locked Composer
 dependencies, and prepare the isolated WordPress/WooCommerce test environment
 above. Run `composer test-unit`, the same command used in CI. The bootstrap prints
 the actual PHP, WordPress and WooCommerce versions, so a configured version can be
-checked against the installed version. For wp-env, set `"phpVersion": "8.4"` in
-your local `.wp-env.override.json` before starting the environment.
+checked against the installed version. The wp-env sites already run PHP 8.4.
 
 Change to the plugin root directory and type:
 
