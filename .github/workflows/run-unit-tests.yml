@@ -36,8 +36,10 @@ jobs:
         with:
           php-version: "${{ matrix.php }}"
 
-      - name: Prepare MySQL
-        uses: woocommerce/grow/prepare-mysql@f1a6c217ba3b49c18029ebe7761f7be4abe992d7 # actions-v1
+      - name: Start MySQL
+        run: |
+          sudo systemctl start mysql.service
+          mysql --version
 
       - name: Install WP tests
         shell: bash
