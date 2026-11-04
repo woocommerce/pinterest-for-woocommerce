@@ -16,7 +16,7 @@ use WC_Helper_Product;
 /**
  * Tests the Tracking class.
  *
- * @version 1.6.2
+ * @version x.x.x
  */
 class TrackingTest extends \WP_UnitTestCase {
 
