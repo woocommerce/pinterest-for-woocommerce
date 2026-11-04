@@ -169,26 +169,33 @@ class WPConsentAPITest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Conversions API events are skipped only when marketing consent is refused.
+	 * Both consent callbacks skip tracking unless marketing consent is given,
+	 * including when a filtered wp_has_consent() does not return a boolean.
 	 *
 	 * @dataProvider marketing_consent_states
 	 *
-	 * @param bool $consent_given Whether the visitor gave marketing consent.
+	 * @param mixed $consent     Value returned by wp_has_consent().
+	 * @param bool  $should_skip   Whether tracking should be skipped.
 	 * @return void
 	 */
-	public function test_conversions_api_consent_callback_follows_marketing_consent( bool $consent_given ): void {
-		$GLOBALS['pinterest_test_marketing_consent'] = $consent_given;
+	public function test_consent_callbacks_follow_marketing_consent( $consent, bool $should_skip ): void {
+		$GLOBALS['pinterest_test_marketing_consent'] = $consent;
 
-		$this->assertSame( ! $consent_given, ( new WPConsentAPI() )->should_disable_conversions_api_for_user_consent( false ) );
+		$consent_api = new WPConsentAPI();
+
+		$this->assertSame( $should_skip, $consent_api->should_disable_tracking_for_user_consent() );
+		$this->assertSame( $should_skip, $consent_api->should_disable_conversions_api_for_user_consent( false ) );
 	}
 
 	/**
-	 * @return array Marketing consent states.
+	 * @return array Values returned by wp_has_consent() and the expected outcome.
 	 */
 	public function marketing_consent_states(): array {
 		return array(
-			'consent given'   => array( true ),
-			'consent refused' => array( false ),
+			'consent given'        => array( true, false ),
+			'consent refused'      => array( false, true ),
+			'filtered to null'     => array( null, true ),
+			'filtered to a string' => array( '1', false ),
 		);
 	}
 

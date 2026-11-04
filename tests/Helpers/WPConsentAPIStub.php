@@ -14,9 +14,12 @@ namespace Automattic\WooCommerce\Pinterest;
 /**
  * Reports marketing consent from $GLOBALS['pinterest_test_marketing_consent'].
  *
+ * Returns the value unchanged because the real function is filterable and is
+ * not guaranteed to return a boolean.
+ *
  * @param string $category Consent category.
- * @return bool
+ * @return mixed
  */
 function wp_has_consent( $category ) {
-	return 'marketing' !== $category || ! empty( $GLOBALS['pinterest_test_marketing_consent'] );
+	return 'marketing' === $category ? ( $GLOBALS['pinterest_test_marketing_consent'] ?? null ) : true;
 }

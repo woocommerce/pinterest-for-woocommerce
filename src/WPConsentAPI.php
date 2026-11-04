@@ -52,7 +52,7 @@ class WPConsentAPI {
 	 * @return bool
 	 */
 	public function should_disable_tracking_for_user_consent(): bool {
-		return ! wp_has_consent( 'marketing' );
+		return ! $this->has_marketing_consent();
 	}
 
 	/**
@@ -68,6 +68,15 @@ class WPConsentAPI {
 	 * @return bool
 	 */
 	public function should_disable_conversions_api_for_user_consent( $disable_conversions_api = false ) {
-		return (bool) $disable_conversions_api || ! wp_has_consent( 'marketing' );
+		return (bool) $disable_conversions_api || ! $this->has_marketing_consent();
+	}
+
+	/**
+	 * Check if the current visitor has given marketing consent.
+	 *
+	 * @return bool
+	 */
+	private function has_marketing_consent(): bool {
+		return (bool) wp_has_consent( 'marketing' );
 	}
 }
