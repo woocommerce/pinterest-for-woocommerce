@@ -13,7 +13,7 @@ use WP_UnitTestCase;
 /**
  * Tests the Pinterest_For_Woocommerce main plugin class.
  *
- * @version x.x.x
+ * @version 1.6.2
  */
 class PinterestForWoocommerceTest extends WP_UnitTestCase {
 

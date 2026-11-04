@@ -1,5 +1,10 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.6.2 - 2026-11-04 =
+* Fix - Delayed tracking initialization until consent managers finish their init callbacks.
+* Fix - Skip speculative AddToCart CAPI events and defer prerendered PageVisit beacons until activation.
+* Fix - Fixed Pinterest Tag connection updates and clarified when saved matching preferences apply.
+
 = 1.6.1 - 2026-10-29 =
 * Fix - Fixed merchant registration retries getting stuck after a successful registration or an older permanent error cache.
 * Fix - Keep the Save to Pinterest button inside the product image on single product pages instead of over the sale badge.

@@ -11,7 +11,7 @@ use WP_UnitTestCase;
 /**
  * Tests for cache-safe PageVisit tracking.
  *
- * @version x.x.x
+ * @version 1.6.2
  */
 class PageVisitTest extends WP_UnitTestCase {
 

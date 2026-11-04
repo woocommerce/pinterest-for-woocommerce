@@ -8,7 +8,7 @@ use WP_UnitTestCase;
 /**
  * Unit tests for CrawlerDetector.
  *
- * @version x.x.x
+ * @version 1.6.2
  */
 class CrawlerDetectorTest extends WP_UnitTestCase {
 
