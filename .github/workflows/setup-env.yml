@@ -5,9 +5,16 @@ on: workflow_call
 jobs:
   setup-node:
     name: Setup NodeJS and Dependencies
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     steps:
+      - name: Verify Ubuntu 26.04 runner
+        shell: bash
+        run: |
+          . /etc/os-release
+          printf "Runner OS: %s %s\n" "$ID" "$VERSION_ID"
+          test "$ID" = ubuntu
+          test "$VERSION_ID" = 26.04
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Cache node_modules
@@ -17,7 +24,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ubuntu-26.04-${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Setup node version and npm cache
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -31,9 +38,16 @@ jobs:
 
   setup-php:
     name: Setup PHP and Dependencies
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     steps:
+      - name: Verify Ubuntu 26.04 runner
+        shell: bash
+        run: |
+          . /etc/os-release
+          printf "Runner OS: %s %s\n" "$ID" "$VERSION_ID"
+          test "$ID" = ubuntu
+          test "$VERSION_ID" = 26.04
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -52,8 +66,8 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
+          key: ubuntu-26.04-${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ubuntu-26.04-${{ runner.os }}-composer-
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-ansi --no-interaction --optimize-autoloader

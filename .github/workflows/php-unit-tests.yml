@@ -20,13 +20,14 @@ on:
 jobs:
   UnitTests:
     name: PHP unit tests - PHP ${{ matrix.php }}, WP ${{ matrix.wp-version }}, WC ${{ matrix.wc-version }}, ${{ matrix.order-storage || 'cpt' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     env:
       WP_CORE_DIR: "/tmp/wordpress/src"
       WP_TESTS_DIR: "/tmp/wordpress/tests/phpunit"
       PINTEREST_FOR_WOOCOMMERCE_TEST_ORDER_STORAGE: ${{ matrix.order-storage || 'cpt' }}
     strategy:
+      fail-fast: false
       matrix:
         php: ['7.4', '8.3', '8.4']
         wp-version: [latest]
@@ -38,6 +39,13 @@ jobs:
         include: ${{ fromJSON(inputs.wc-version == '' && '[{"php":7.4,"wp-version":"7.0.0","wc-version":"11.1.0"},{"php":"8.4","wp-version":"latest","wc-version":"latest","order-storage":"hpos","coverage":"pcov"}]' || format('[{{"php":"8.4","wp-version":"latest","wc-version":"{0}","order-storage":"hpos","coverage":"pcov"}}]', inputs.wc-version)) }}
 
     steps:
+      - name: Verify Ubuntu 26.04 runner
+        shell: bash
+        run: |
+          . /etc/os-release
+          printf "Runner OS: %s %s\n" "$ID" "$VERSION_ID"
+          test "$ID" = ubuntu
+          test "$VERSION_ID" = 26.04
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
