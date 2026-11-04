@@ -41,7 +41,6 @@ class WPConsentAPITest extends WP_UnitTestCase {
 		parent::tearDown();
 		unset( $this->wp_consent_api );
 		remove_all_filters( 'woocommerce_pinterest_disable_tracking_user_consent' );
-		remove_all_filters( 'woocommerce_pinterest_disable_conversions_api_user_consent' );
 		unset( $GLOBALS['pinterest_test_marketing_consent'] );
 		remove_all_filters( 'wp_consent_api_registered_' . PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME );
 	}

@@ -118,7 +118,6 @@ class TrackingTest extends \WP_UnitTestCase {
 		}
 
 		remove_all_filters( 'pinterest_for_woocommerce_is_crawler_request' );
-		remove_all_filters( 'woocommerce_pinterest_disable_conversions_api_user_consent' );
 		$this->reset_cart_state();
 		$this->reset_tag_events();
 
