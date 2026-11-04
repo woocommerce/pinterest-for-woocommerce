@@ -205,7 +205,7 @@ You can also specify the path to their directories by setting the following envi
 
 ### PHP Tests in wp-env
 
-`npm run env:test:unit` runs the PHPUnit suite inside the `cli` container of the [`@wordpress/env`](https://www.npmjs.com/package/@wordpress/env) tests site (`.wp-env.test.json`). Compared to `./bin/install-wp-tests.sh` on the host, this path needs only Docker: on first run, `bin/phpunit.sh` runs the same installer in the container, against its own `wordpress_test` database, and installs WooCommerce from source, which the bootstrap needs for WooCommerce's `tests/legacy/bootstrap.php`.
+`npm run env:test:unit` runs the PHPUnit suite inside the `cli` container of the [`@wordpress/env`](https://www.npmjs.com/package/@wordpress/env) tests site (`.wp-env.test.json`). Unlike `./bin/install-wp-tests.sh` on the host, it needs only Docker: on first run, `bin/phpunit.sh` runs the same installer in the container against its own `wordpress_test` database, and installs WooCommerce from source, since the bootstrap needs WooCommerce's `tests/legacy/bootstrap.php`.
 
 ```bash
 npm run env:test:start                   # ~30–90s first run, faster afterwards
