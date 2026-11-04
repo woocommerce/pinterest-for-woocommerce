@@ -42,16 +42,6 @@ document.addEventListener( 'keydown', ( event ) => {
 } );
 
 document.addEventListener( 'DOMContentLoaded', function () {
-	// On single product pages, anchor the button to the image gallery: themes
-	// such as Storefront print the sale badge above it, under the button.
-	document
-		.querySelectorAll(
-			'div.product > .pinterest-for-woocommerce-image-wrapper + .woocommerce-product-gallery'
-		)
-		.forEach( ( gallery ) =>
-			gallery.prepend( gallery.previousElementSibling )
-		);
-
 	// Placeholder markup that pinit.js has not turned into a button yet.
 	const UNBUILT_PIN_SELECTOR =
 		'.pinterest-for-woocommerce-image-wrapper a[data-pin-do]:not([data-pin-log])';
@@ -72,6 +62,27 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		document
 			.querySelectorAll( '.pinterest-for-woocommerce-image-wrapper' )
 			.forEach( function ( wrapper ) {
+				const product = wrapper.closest( 'div.product' );
+				const parent = wrapper.parentElement;
+				const gallery =
+					product &&
+					( ( parent === product &&
+						wrapper.nextElementSibling?.matches(
+							'.woocommerce-product-gallery'
+						) ) ||
+						( parent.matches( '.woocommerce-product-gallery' ) &&
+							parent.parentElement === product ) ) &&
+					Array.from( product.children ).find(
+						( child ) =>
+							child.matches( '.woocommerce-product-gallery' ) &&
+							child.style.display !== 'none'
+					);
+
+				// Variation galleries can hide and reuse the original gallery.
+				if ( gallery && wrapper.parentElement !== gallery ) {
+					gallery.prepend( wrapper );
+				}
+
 				// Skip if already processed.
 				if ( wrapper.dataset.srLabeled ) return;
 
@@ -129,6 +140,14 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	function isPinterestRelatedMutation( mutation ) {
 		if (
 			mutation.type === 'attributes' &&
+			mutation.attributeName === 'style' &&
+			mutation.target.matches( '.woocommerce-product-gallery' )
+		) {
+			return true;
+		}
+
+		if (
+			mutation.type === 'attributes' &&
 			mutation.attributeName === 'data-pin-log' &&
 			mutation.target &&
 			typeof mutation.target.closest === 'function' &&
@@ -164,9 +183,11 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			}
 
 			if (
-				node.matches( '.pinterest-for-woocommerce-image-wrapper' ) ||
+				node.matches(
+					'.pinterest-for-woocommerce-image-wrapper, .woocommerce-product-gallery'
+				) ||
 				node.querySelector(
-					'.pinterest-for-woocommerce-image-wrapper'
+					'.pinterest-for-woocommerce-image-wrapper, .woocommerce-product-gallery'
 				) ||
 				node.matches( 'a[data-pin-do], a[data-pin-log]' ) ||
 				node.querySelector( 'a[data-pin-do], a[data-pin-log]' )
@@ -320,6 +341,33 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		let needsBuild = false;
 
 		for ( const mutation of mutations ) {
+			// WooCommerce replaces the whole gallery when a variation has its own images.
+			if (
+				mutation.type === 'childList' &&
+				mutation.target.nodeType === 1 &&
+				mutation.target.matches( 'div.product' )
+			) {
+				const gallery = Array.from( mutation.addedNodes ).find(
+					( node ) =>
+						node.nodeType === 1 &&
+						node.matches( '.woocommerce-product-gallery' )
+				);
+				if ( gallery ) {
+					for ( const node of mutation.removedNodes ) {
+						if (
+							node.nodeType !== 1 ||
+							! node.matches( '.woocommerce-product-gallery' )
+						) {
+							continue;
+						}
+						const wrapper = node.querySelector(
+							':scope > .pinterest-for-woocommerce-image-wrapper'
+						);
+						if ( wrapper ) gallery.prepend( wrapper );
+					}
+				}
+			}
+
 			if ( ! needsProcess && isPinterestRelatedMutation( mutation ) ) {
 				needsProcess = true;
 			}
@@ -331,10 +379,6 @@ document.addEventListener( 'DOMContentLoaded', function () {
 						break;
 					}
 				}
-			}
-
-			if ( needsProcess && needsBuild ) {
-				break;
 			}
 		}
 
@@ -359,6 +403,6 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		childList: true,
 		subtree: true,
 		attributes: true,
-		attributeFilter: [ 'data-pin-log' ],
+		attributeFilter: [ 'data-pin-log', 'style' ],
 	} );
 } );
