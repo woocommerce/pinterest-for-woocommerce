@@ -6,7 +6,7 @@ Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 11.1
 WC tested up to: 11.2
-Stable tag: 1.6.1
+Stable tag: 1.6.2
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -92,6 +92,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.6.2 - 2026-11-04 =
+* Fix - Delayed tracking initialization until consent managers finish their init callbacks.
+* Fix - Skip speculative AddToCart CAPI events and defer prerendered PageVisit beacons until activation.
+* Fix - Fixed Pinterest Tag connection updates and clarified when saved matching preferences apply.
 
 = 1.6.1 - 2026-10-29 =
 * Fix - Fixed merchant registration retries getting stuck after a successful registration or an older permanent error cache.
