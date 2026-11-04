@@ -10,6 +10,9 @@ coverage
 phplint.cache
 .phpunit.result.cache
 .wp-env.override.json
+.wp-env.test.override.json
+/tests/_output/*
+!/tests/_output/.gitkeep
 
 # Ignore assets except source files
 assets/*

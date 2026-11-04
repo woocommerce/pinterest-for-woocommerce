@@ -1,0 +1,25 @@
+{
+	"core": null,
+	"plugins": [],
+	"themes": [ "https://downloads.wordpress.org/theme/storefront.zip" ],
+	"mappings": {
+		"./wp-content/bin": "./tests/_support/docker/bin",
+		"./wp-content/plugins/woocommerce": "https://downloads.wordpress.org/plugin/woocommerce.zip",
+		"./wp-content/plugins/pinterest-for-woocommerce": ".",
+		"./wp-content/mu-plugins/pinterest-e2e.php": "./tests/browser/fixture.php",
+		"./wp-content/mu-plugins/e2e-log-marker.php": "./tests/browser/mu-plugins/e2e-log-marker.php"
+	},
+	"config": {
+		"JETPACK_AUTOLOAD_DEV": true,
+		"WP_DEBUG": true,
+		"WP_DEBUG_LOG": true,
+		"WP_DEBUG_DISPLAY": false,
+		"SCRIPT_DEBUG": false,
+		"WP_PHP_BINARY": "php",
+		"PINTEREST_E2E": true,
+		"DISABLE_WP_CRON": true
+	},
+	"phpVersion": "8.4",
+	"port": 8889,
+	"testsEnvironment": false
+}
