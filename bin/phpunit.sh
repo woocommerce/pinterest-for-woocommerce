@@ -6,7 +6,7 @@
 # bin/install-wp-tests.sh (see .github/workflows/run-unit-tests.yml).
 #
 # USAGE
-#   npm run env:test:unit [-- phpunit args]   Run PHPUnit (installs WP + WooCommerce first if missing)
+#   npm run env:test:unit [-- phpunit args]   Run PHPUnit; installs WP + WooCommerce on first run
 #   npm run env:test:unit:setup               Reinstall WP + WooCommerce (e.g. after changing a version)
 #   npm run env:test:unit:help                Show this message
 #
