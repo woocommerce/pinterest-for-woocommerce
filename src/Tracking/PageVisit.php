@@ -203,9 +203,9 @@ class PageVisit {
 			$product_id = url_to_postid( $source_url );
 		}
 
-		$data       = self::get_event_data( $event_id, $product_id );
-		$user       = new User( \WC_Geolocation::get_ip_address(), wc_get_user_agent() );
-		$tracker    = new Conversions( $user, $source_url );
+		$data    = self::get_event_data( $event_id, $product_id );
+		$user    = new User( \WC_Geolocation::get_ip_address(), wc_get_user_agent() );
+		$tracker = new Conversions( $user, $source_url );
 
 		try {
 			$tracker->track_event( Tracking::EVENT_PAGE_VISIT, $data );
@@ -243,7 +243,7 @@ class PageVisit {
 		$parts = wp_parse_url( $url );
 		// A cached page can be served with a new Pinterest click ID.
 		$query = preg_replace( '/(^|&)epik(?:=[^&]*)?(?=&|$)/', '', $parts['query'] ?? '' );
-		$route = ( $parts['path'] ?? '/' ) . '?' . ltrim( $query, '&' );
+		$route = ( $parts['path'] ?? '/' ) . '?' . ltrim( $query ?? '', '&' );
 		return hash_hmac( 'sha256', 'pfw_page_visit|' . $product_id . '|' . $route, wp_salt() );
 	}
 

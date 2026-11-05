@@ -227,7 +227,13 @@ class PageVisitTest extends WP_UnitTestCase {
 	public function test_signed_beacon_keeps_product_attribution_for_query_route() {
 		$product   = WC_Helper_Product::create_simple_product();
 		$another   = WC_Helper_Product::create_simple_product();
-		$source    = add_query_arg( array( 'post_type' => 'product', 'name' => $product->get_slug() ), home_url( '/' ) );
+		$source    = add_query_arg(
+			array(
+				'post_type' => 'product',
+				'name'      => $product->get_slug(),
+			),
+			home_url( '/' )
+		);
 		$other     = add_query_arg( 'name', $another->get_slug(), $source );
 		$events    = array();
 		$http_mock = static function ( $response, $args ) use ( &$events ) {
