@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Generates browser PageVisit events and handles their CAPI beacons.
  *
  * @class   PageVisit
- * @version 1.6.2
+ * @version x.x.x
  */
 class PageVisit {
 
@@ -114,11 +114,25 @@ class PageVisit {
 			return '';
 		}
 
+		$product_code = '';
+		$product_id   = is_product() ? get_queried_object_id() : 0;
+		$request_uri  = isset( $_SERVER['REQUEST_URI'] ) && is_string( $_SERVER['REQUEST_URI'] )
+			? wp_unslash( $_SERVER['REQUEST_URI'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- Used only to compute the signature.
+			: '';
+		if ( $product_id && $request_uri ) {
+			$product_code = sprintf(
+				'requestData.append("product_id",%1$s);requestData.append("product_token",%2$s);',
+				wp_json_encode( (string) $product_id ),
+				wp_json_encode( self::get_product_token( $product_id, $request_uri ) )
+			);
+		}
+
 		// A prerender may never be viewed; send its beacon only after activation.
 		return sprintf(
-			'function sendPageVisit(){var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);var beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}}if(document.prerendering){document.addEventListener("prerenderingchange",sendPageVisit,{once:true});}else{sendPageVisit();}',
+			'function sendPageVisit(){var requestData=new FormData();requestData.append("action",%1$s);requestData.append("event_id",eventId);requestData.append("event_source_url",window.location.href);%3$svar beaconSent=navigator.sendBeacon&&navigator.sendBeacon(%2$s,requestData);if(!beaconSent&&window.fetch){window.fetch(%2$s,{method:"POST",body:requestData,credentials:"same-origin",keepalive:true});}}if(document.prerendering){document.addEventListener("prerenderingchange",sendPageVisit,{once:true});}else{sendPageVisit();}',
 			wp_json_encode( static::AJAX_ACTION, JSON_HEX_TAG ),
-			wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
+			wp_json_encode( admin_url( 'admin-ajax.php' ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
+			$product_code
 		);
 	}
 
@@ -181,7 +195,14 @@ class PageVisit {
 			return;
 		}
 
-		$product_id = url_to_postid( $source_url );
+		$product_id    = $_POST['product_id'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
+		$product_token = $_POST['product_token'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput
+		$product_id    = is_string( $product_id ) && ctype_digit( $product_id ) ? absint( $product_id ) : 0;
+
+		if ( ! $product_id || ! is_string( $product_token ) || ! hash_equals( self::get_product_token( $product_id, $source_url ), $product_token ) ) {
+			$product_id = url_to_postid( $source_url );
+		}
+
 		$data       = self::get_event_data( $event_id, $product_id );
 		$user       = new User( \WC_Geolocation::get_ip_address(), wc_get_user_agent() );
 		$tracker    = new Conversions( $user, $source_url );
@@ -206,6 +227,24 @@ class PageVisit {
 	 */
 	private static function reject( string $reason ) {
 		Logger::log( 'PageVisit beacon rejected: ' . $reason . '.', 'debug', 'conversions' );
+	}
+
+	/**
+	 * Sign the product and its route. Include the query because products can share a path.
+	 *
+	 * The salt-bound token does not expire, so cached pages can keep sending it.
+	 *
+	 * @since x.x.x
+	 * @param int    $product_id Rendered product ID.
+	 * @param string $url        Rendered request URI or validated beacon URL.
+	 * @return string
+	 */
+	private static function get_product_token( int $product_id, string $url ) {
+		$parts = wp_parse_url( $url );
+		// A cached page can be served with a new Pinterest click ID.
+		$query = preg_replace( '/(^|&)epik(?:=[^&]*)?(?=&|$)/', '', $parts['query'] ?? '' );
+		$route = ( $parts['path'] ?? '/' ) . '?' . ltrim( $query, '&' );
+		return hash_hmac( 'sha256', 'pfw_page_visit|' . $product_id . '|' . $route, wp_salt() );
 	}
 
 	/**
