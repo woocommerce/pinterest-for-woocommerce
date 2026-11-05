@@ -11,7 +11,7 @@ use WP_UnitTestCase;
 /**
  * Tests for cache-safe PageVisit tracking.
  *
- * @version 1.6.2
+ * @version x.x.x
  */
 class PageVisitTest extends WP_UnitTestCase {
 
@@ -219,6 +219,115 @@ class PageVisitTest extends WP_UnitTestCase {
 		PageVisit::handle_request();
 
 		$this->assertSame( 1, $requests );
+	}
+
+	/**
+	 * A product rendered through a query route keeps attribution when the URL lookup fails.
+	 */
+	public function test_signed_beacon_keeps_product_attribution_for_query_route() {
+		$product   = WC_Helper_Product::create_simple_product();
+		$another   = WC_Helper_Product::create_simple_product();
+		$source    = add_query_arg(
+			array(
+				'post_type' => 'product',
+				'name'      => $product->get_slug(),
+			),
+			home_url( '/' )
+		);
+		$other     = add_query_arg( 'name', $another->get_slug(), $source );
+		$events    = array();
+		$http_mock = static function ( $response, $args ) use ( &$events ) {
+			$events[] = json_decode( $args['body'], true )['data'][0];
+			return array(
+				'body'     => wp_json_encode( array( 'events' => array( array( 'status' => 'processed' ) ) ) ),
+				'response' => array( 'code' => 200 ),
+			);
+		};
+
+		$this->go_to( $source );
+		$this->assertSame( $product->get_id(), get_queried_object_id() );
+		$this->assertSame( 0, url_to_postid( $source ) );
+
+		ob_start();
+		PageVisit::print_beacon_script();
+		$script = ob_get_clean();
+		$this->assertSame( 1, preg_match( '/requestData.append\("product_token","([a-f0-9]{64})"\)/', $script, $matches ) );
+
+		add_filter( 'pre_http_request', $http_mock, 10, 2 );
+		try {
+			$_POST = array(
+				'event_id'         => 'page_1234567890abcdef',
+				'event_source_url' => add_query_arg( 'epik', 'click-id-on-cached-page', $source ),
+				'product_id'       => (string) $product->get_id(),
+				'product_token'    => $matches[1],
+			);
+			PageVisit::handle_request();
+
+			$_POST['event_id']         = 'page_1234567890abcdeg';
+			$_POST['event_source_url'] = $other;
+			PageVisit::handle_request();
+		} finally {
+			remove_filter( 'pre_http_request', $http_mock );
+		}
+
+		$this->assertCount( 2, $events );
+		$this->assertSame( array( (string) $product->get_id() ), $events[0]['custom_data']['content_ids'] );
+		$this->assertArrayNotHasKey( 'custom_data', $events[1] );
+	}
+
+	/**
+	 * A tampered token or a malformed product ID does not attribute the visit.
+	 */
+	public function test_signed_beacon_rejects_tampered_product_reference() {
+		$product   = WC_Helper_Product::create_simple_product();
+		$source    = add_query_arg(
+			array(
+				'post_type' => 'product',
+				'name'      => $product->get_slug(),
+			),
+			home_url( '/' )
+		);
+		$events    = array();
+		$http_mock = static function ( $response, $args ) use ( &$events ) {
+			$events[] = json_decode( $args['body'], true )['data'][0];
+			return array(
+				'body'     => wp_json_encode( array( 'events' => array( array( 'status' => 'processed' ) ) ) ),
+				'response' => array( 'code' => 200 ),
+			);
+		};
+
+		$this->go_to( $source );
+
+		ob_start();
+		PageVisit::print_beacon_script();
+		$script = ob_get_clean();
+		$this->assertSame( 1, preg_match( '/requestData.append\("product_token","([a-f0-9]{64})"\)/', $script, $matches ) );
+
+		$token    = $matches[1];
+		$tampered = substr( $token, 0, -1 ) . ( 'a' === substr( $token, -1 ) ? 'b' : 'a' );
+		$cases    = array(
+			'tampered token'      => array( (string) $product->get_id(), $tampered ),
+			'exponent product ID' => array( $product->get_id() . 'e0', $token ),
+			'array product ID'    => array( array( (string) $product->get_id() ), $token ),
+		);
+
+		add_filter( 'pre_http_request', $http_mock, 10, 2 );
+		try {
+			foreach ( $cases as $case => list( $product_id, $product_token ) ) {
+				$_POST = array(
+					'event_id'         => 'page_1234567890abcdef',
+					'event_source_url' => $source,
+					'product_id'       => $product_id,
+					'product_token'    => $product_token,
+				);
+				PageVisit::handle_request();
+				$this->assertArrayNotHasKey( 'custom_data', end( $events ), $case );
+			}
+		} finally {
+			remove_filter( 'pre_http_request', $http_mock );
+		}
+
+		$this->assertCount( 3, $events );
 	}
 
 	/**
