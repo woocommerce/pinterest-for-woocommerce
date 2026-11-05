@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @class   Heartbeat
  * @since   1.1.0
- * @version 1.6.0
+ * @version x.x.x
  */
 class Heartbeat {
 
@@ -43,16 +43,38 @@ class Heartbeat {
 			return;
 		}
 
-		if ( ! as_has_scheduled_action( self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			as_schedule_recurring_action( time(), DAY_IN_SECONDS, self::DAILY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		}
+		$intervals = array(
+			self::DAILY  => DAY_IN_SECONDS,
+			self::HOURLY => HOUR_IN_SECONDS,
+			self::WEEKLY => WEEK_IN_SECONDS,
+		);
 
-		if ( ! as_has_scheduled_action( self::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			as_schedule_recurring_action( time(), HOUR_IN_SECONDS, self::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
-		}
+		foreach ( $intervals as $hook => $interval ) {
+			if ( as_has_scheduled_action( $hook, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
+				continue;
+			}
 
-		if ( ! as_has_scheduled_action( self::WEEKLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) ) {
-			as_schedule_recurring_action( time(), WEEK_IN_SECONDS, self::WEEKLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX );
+			$failed_actions = as_get_scheduled_actions(
+				array(
+					'hook'             => $hook,
+					'group'            => PINTEREST_FOR_WOOCOMMERCE_PREFIX,
+					'status'           => \ActionScheduler_Store::STATUS_FAILED,
+					'modified'         => as_get_datetime_object( time() - $interval ),
+					'modified_compare' => '>=',
+					'per_page'         => 1,
+					'orderby'          => 'modified',
+					'order'            => 'DESC',
+				),
+				'ids'
+			);
+
+			// Retry a recent failure one interval after its last attempt, not after this request.
+			$start = time();
+			if ( $failed_actions ) {
+				$failed_at = \ActionScheduler_Store::instance()->get_date( reset( $failed_actions ) )->getTimestamp();
+				$start     = max( $start, $failed_at + $interval );
+			}
+			as_schedule_recurring_action( $start, $interval, $hook, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX, true );
 		}
 	}
 
