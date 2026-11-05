@@ -15,6 +15,9 @@ class HeartbeatTest extends \WP_UnitTestCase {
 	/** @var Heartbeat */
 	private $heartbeat;
 
+	/**
+	 * Set up the heartbeat with WooCommerce's queue.
+	 */
 	public function setUp(): void {
 		parent::setUp();
 		$this->heartbeat = new Heartbeat( WC()->queue() );
