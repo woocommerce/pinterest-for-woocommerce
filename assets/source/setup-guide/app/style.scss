@@ -33,6 +33,24 @@ $root: ".woocommerce-setup-guide";
 	--checkbox-input-margin: #{$grid-unit-10};
 }
 
+// The bundled @wordpress/components 12 checkbox has no `.components-checkbox-control` wrapper and its check
+// icon has no `fill`, so Gutenberg 24+ styles (WP.com, WP 7.2) leave the check black and skip the disabled state.
+#{$root}__container {
+
+	svg.components-checkbox-control__checked {
+		fill: $white;
+	}
+
+	.components-checkbox-control__input[type="checkbox"]:disabled {
+		background: $gray-100;
+		border-color: $gray-300;
+
+		+ svg.components-checkbox-control__checked {
+			fill: $gray-600;
+		}
+	}
+}
+
 #{$root} {
 
 	&__body {
