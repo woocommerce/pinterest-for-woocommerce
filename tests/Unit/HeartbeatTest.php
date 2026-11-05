@@ -8,13 +8,16 @@ use Pinterest_For_Woocommerce;
 /**
  * Tests the Heartbeat class.
  *
- * @version 1.4.11
+ * @version x.x.x
  */
 class HeartbeatTest extends \WP_UnitTestCase {
 
 	/** @var Heartbeat */
 	private $heartbeat;
 
+	/**
+	 * Set up the heartbeat with WooCommerce's queue.
+	 */
 	public function setUp(): void {
 		parent::setUp();
 		$this->heartbeat = new Heartbeat( WC()->queue() );
@@ -39,5 +42,46 @@ class HeartbeatTest extends \WP_UnitTestCase {
 
 		$this->assertFalse( as_has_scheduled_action( Heartbeat::HOURLY, array(), 'pinterest-for-woocommerce' ) );
 		$this->assertFalse( as_has_scheduled_action( Heartbeat::DAILY, array(), 'pinterest-for-woocommerce' ) );
+	}
+
+	/**
+	 * The first heartbeat runs immediately; a failed heartbeat waits before retrying.
+	 */
+	public function test_failed_heartbeat_is_recreated_at_its_normal_interval() {
+		Pinterest_For_Woocommerce::save_token_data( array( 'access_token' => 'test-token' ) );
+		Heartbeat::cancel_jobs();
+		Heartbeat::schedule_events();
+
+		$query = array(
+			'hook'   => Heartbeat::HOURLY,
+			'group'  => PINTEREST_FOR_WOOCOMMERCE_PREFIX,
+			'status' => \ActionScheduler_Store::STATUS_PENDING,
+		);
+
+		try {
+			$actions = as_get_scheduled_actions( $query, 'ids' );
+			$this->assertCount( 1, $actions );
+			$this->assertLessThanOrEqual( time(), as_next_scheduled_action( Heartbeat::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) );
+			$failed_id = (int) reset( $actions );
+			\ActionScheduler_Store::instance()->mark_failure( $failed_id );
+
+			// The retry counts from the failure, even when the next request comes later.
+			global $wpdb;
+			$failed_at = time() - 30 * MINUTE_IN_SECONDS;
+			$wpdb->update( $wpdb->actionscheduler_actions, array( 'last_attempt_gmt' => gmdate( 'Y-m-d H:i:s', $failed_at ) ), array( 'action_id' => $failed_id ) );
+			Heartbeat::schedule_events();
+			Heartbeat::schedule_events();
+
+			$this->assertSame( $failed_at + HOUR_IN_SECONDS, as_next_scheduled_action( Heartbeat::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) );
+			$this->assertCount( 1, as_get_scheduled_actions( $query, 'ids' ) );
+
+			// A stale failure must not delay the first heartbeat after reconnecting.
+			Heartbeat::cancel_jobs();
+			$wpdb->update( $wpdb->actionscheduler_actions, array( 'last_attempt_gmt' => gmdate( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ) ), array( 'action_id' => $failed_id ) );
+			Heartbeat::schedule_events();
+			$this->assertLessThanOrEqual( time(), as_next_scheduled_action( Heartbeat::HOURLY, array(), PINTEREST_FOR_WOOCOMMERCE_PREFIX ) );
+		} finally {
+			Heartbeat::cancel_jobs();
+		}
 	}
 }

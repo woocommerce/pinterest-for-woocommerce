@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Prevented failed Pinterest heartbeats from retrying on every request.
