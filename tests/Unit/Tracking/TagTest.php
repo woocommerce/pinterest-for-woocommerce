@@ -7,7 +7,7 @@ use Pinterest_For_Woocommerce;
 /**
  * Tests the Tag tracker class.
  *
- * @version 1.5.4
+ * @version x.x.x
  */
 class TagTest extends \WP_UnitTestCase {
 
@@ -31,7 +31,7 @@ class TagTest extends \WP_UnitTestCase {
 		$this->assertFalse( has_action( 'shutdown', array( $tag, 'save_deferred_events' ) ) );
 	}
 
-	/** WordPress script attributes apply without changing base/event/placeholder order. */
+	/** WordPress script attributes apply without changing base/event/placeholder order, and events guard pintrk(). */
 	public function test_tracking_scripts_use_wordpress_attributes() {
 		Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'inline-test' ) );
 		$events = new \ReflectionProperty( Tag::class, 'events' );
@@ -52,9 +52,14 @@ class TagTest extends \WP_UnitTestCase {
 		$this->assertLessThan( strpos( $output, "pintrk( 'track'" ), strpos( $output, "pintrk('load'" ) );
 		$this->assertLessThan( strpos( $output, 'pinterest-tag-placeholder' ), strpos( $output, "pintrk( 'track'" ) );
 		$this->assertStringContainsString( '"event_id":"unchanged-id"', $output );
+		$this->assertMatchesRegularExpression(
+			"/if \( typeof window\.pintrk === 'function' \) \{\s*pintrk\( 'track', 'test-event' .*\);\s*\}/s",
+			$output,
+			'Inline events must not call pintrk() when a consent plugin blocked the base tag.'
+		);
 	}
 
-	/** AJAX cart fragments retain the public selector and use WordPress script attributes. */
+	/** AJAX cart fragments retain the public selector, use WordPress script attributes and guard the pintrk() call. */
 	public function test_cart_fragment_uses_wordpress_script_attributes() {
 		$attributes = static function ( $attributes ) {
 			$attributes['nonce'] = 'pinterest-cart-test';
@@ -80,6 +85,11 @@ class TagTest extends \WP_UnitTestCase {
 		$this->assertStringContainsString( "pintrk( 'track', 'AddToCart'", $script );
 		$this->assertStringContainsString( '"event_id":"cart-event"', $script );
 		$this->assertStringContainsString( '"value":20', $script );
+		$this->assertMatchesRegularExpression(
+			"/if \( typeof window\.pintrk === 'function' \) \{\s*pintrk\( 'track', 'AddToCart' .*\);\s*\}/s",
+			$script,
+			'The fragment must not call pintrk() when a consent plugin blocked the base tag.'
+		);
 	}
 
 	public function test_print_script_prints_tag() {
