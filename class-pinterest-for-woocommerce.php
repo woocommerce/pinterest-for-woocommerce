@@ -42,7 +42,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 	 * Base Plugin class holding generic functionality
 	 *
 	 * @class   Pinterest_For_Woocommerce
-	 * @version 1.6.2
+	 * @version x.x.x
 	 */
 	final class Pinterest_For_Woocommerce {
 
@@ -1015,7 +1015,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public static function get_middleware_url( $context = 'login', $args = array() ) {
 
-			$nonce = wp_create_nonce( PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE );
+			// A fresh state per attempt stops an older callback from consuming a newer one.
+			$nonce = wp_generate_password( 32, false );
 			set_transient( PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE, $nonce, 10 * MINUTE_IN_SECONDS );
 
 			$rest_url = get_rest_url( null, PINTEREST_FOR_WOOCOMMERCE_API_NAMESPACE . '/v' . PINTEREST_FOR_WOOCOMMERCE_API_VERSION . '/' . PINTEREST_FOR_WOOCOMMERCE_API_AUTH_ENDPOINT );

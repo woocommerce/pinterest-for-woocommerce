@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Prevent an older Pinterest callback from invalidating a newer connection attempt.
