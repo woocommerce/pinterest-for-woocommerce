@@ -92,11 +92,23 @@ class Base {
 			}
 		}
 
-		$request = static::prepare_request( $endpoint, $method, $payload, $api );
+		$request  = static::prepare_request( $endpoint, $method, $payload, $api );
+		$response = self::send_prepared_request( $request, $method );
+		self::maybe_cache_api_response( $endpoint, $method, $payload, $api, $response, $cache_expiry );
+		return $response;
+	}
+
+	/**
+	 * Send a prepared request and handle Pinterest API errors.
+	 *
+	 * @param array<string, mixed> $request Prepared request.
+	 * @param string               $method  Requested HTTP method.
+	 * @return mixed Decoded response body.
+	 * @throws PinterestApiException Pinterest API exception in case of API error in response.
+	 */
+	protected static function send_prepared_request( $request, $method ) {
 		try {
-			$response = static::handle_request( $request );
-			self::maybe_cache_api_response( $endpoint, $method, $payload, $api, $response, $cache_expiry );
-			return $response;
+			return static::handle_request( $request );
 		} catch ( PinterestApiException $e ) {
 			Logger::log(
 				sprintf(
@@ -296,6 +308,14 @@ class Base {
 			throw new PinterestApiException( esc_html( $error_message ), 1 );
 		}
 
+		$response_code = absint( wp_remote_retrieve_response_code( $response ) );
+		$is_successful = in_array( $response_code, array( 200, 201, 204 ), true );
+
+		// Associative decoding would turn both an empty object and an empty list into an empty array.
+		if ( $is_successful && ! empty( $request['require_items_list'] ) && ! is_array( json_decode( wp_remote_retrieve_body( $response ) )->items ?? null ) ) {
+			return null;
+		}
+
 		try {
 			$body = self::parse_response( $response );
 		} catch ( Exception $e ) {
@@ -309,9 +329,7 @@ class Base {
 			);
 		}
 
-		$response_code = absint( wp_remote_retrieve_response_code( $response ) );
-
-		if ( ! in_array( absint( $response_code ), array( 200, 201, 204 ), true ) ) {
+		if ( ! $is_successful ) {
 			$message = $body['message'] ?? $body['error_description'] ?? '';
 			/* translators: Additional message */
 			throw new PinterestApiException(

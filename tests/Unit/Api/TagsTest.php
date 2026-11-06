@@ -200,6 +200,43 @@ class TagsTest extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Malformed successful tag lists must not trigger a create request.
+	 */
+	public function test_tags_endpoint_does_not_create_from_malformed_lists() {
+		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+
+		$methods = array();
+		$body    = '';
+		$mock    = static function ( $response, $args ) use ( &$methods, &$body ) {
+			$methods[] = $args['method'];
+			return array(
+				'body'     => $body,
+				'response' => array(
+					'code'    => 200,
+					'message' => 'OK',
+				),
+			);
+		};
+		add_filter( 'pre_http_request', $mock, 10, 2 );
+
+		try {
+			foreach ( array( '{}', '{"items":null}', '{"items":0}', '{"items":{}}', '{"items":{"tag":{"id":"123","name":"Test"}}}' ) as $body ) {
+				$methods = array();
+				$request = new WP_REST_Request( 'GET', '/pinterest/v1/tags' );
+				$request->set_query_params( array( 'advrtsr_id' => 'ai-123456789' ) );
+				$response = rest_get_server()->dispatch( $request );
+
+				$this->assertSame( array( 'GET' ), $methods, $body );
+				$this->assertSame( 400, $response->get_status(), $body );
+				$this->assertSame( 'pinterest-for-woocommerce_tags_error', $response->get_data()['code'], $body );
+				$this->assertSame( 'No tracking tag available. [Response error]', $response->get_data()['message'], $body );
+			}
+		} finally {
+			remove_filter( 'pre_http_request', $mock, 10 );
+		}
+	}
+
+	/**
 	 * Tests if the tags endpoint returns a newly created tag.
 	 *
 	 * @return void

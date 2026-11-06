@@ -60,11 +60,11 @@ class Tags extends VendorAPI {
 			}
 
 			// Without a readable list, creating a tag could duplicate one the advertiser already has.
-			if ( ! is_array( $tags ) ) {
+			if ( ! is_array( $tags['items'] ?? null ) ) {
 				throw new Exception( esc_html__( 'Response error', 'pinterest-for-woocommerce' ), 400 );
 			}
 
-			$tags = $tags['items'] ?? array();
+			$tags = $tags['items'];
 			if ( empty( $tags ) ) {
 				try {
 					$tag  = APIV5::create_tag( $ad_account_id );
