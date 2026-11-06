@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * API V5 Methods
  *
  * @class   APIV5
- * @version 1.6.0
+ * @version x.x.x
  */
 class APIV5 extends Base {
 
@@ -189,7 +189,9 @@ class APIV5 extends Base {
 	 * @throws PinterestApiException|Exception Throws 500 exception.
 	 */
 	public static function get_advertiser_tags( $ad_account_id ) {
-		return self::make_request( "ad_accounts/{$ad_account_id}/conversion_tags", 'GET' );
+		$request                       = static::prepare_request( "ad_accounts/{$ad_account_id}/conversion_tags", 'GET', array(), '' );
+		$request['require_items_list'] = true;
+		return self::send_prepared_request( $request, 'GET' );
 	}
 
 	/**
