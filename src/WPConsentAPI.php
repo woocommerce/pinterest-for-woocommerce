@@ -72,11 +72,15 @@ class WPConsentAPI {
 	}
 
 	/**
-	 * Check if the current visitor has given marketing consent.
+	 * Follow the API's marketing consent decision, allowing tracking when the API is unavailable.
 	 *
 	 * @return bool
 	 */
 	private function has_marketing_consent(): bool {
-		return (bool) wp_has_consent( 'marketing' );
+		if ( $this->is_wp_consent_api_active() ) {
+			return (bool) wp_has_consent( 'marketing' );
+		}
+
+		return true;
 	}
 }

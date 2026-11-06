@@ -168,33 +168,38 @@ class WPConsentAPITest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Both consent callbacks skip tracking unless marketing consent is given,
-	 * including when a filtered wp_has_consent() does not return a boolean.
+	 * Both consent callbacks follow the API when available and allow tracking without it.
 	 *
 	 * @dataProvider marketing_consent_states
 	 *
-	 * @param mixed $consent     Value returned by wp_has_consent().
+	 * @param mixed $consent       Value returned by wp_has_consent().
 	 * @param bool  $should_skip   Whether tracking should be skipped.
+	 * @param bool  $api_available Whether WP Consent API is available.
 	 * @return void
 	 */
-	public function test_consent_callbacks_follow_marketing_consent( $consent, bool $should_skip ): void {
+	public function test_consent_callbacks_follow_marketing_consent( $consent, bool $should_skip, bool $api_available ): void {
 		$GLOBALS['pinterest_test_marketing_consent'] = $consent;
 
-		$consent_api = new WPConsentAPI();
+		$consent_api = $this->getMockBuilder( WPConsentAPI::class )
+			->disableOriginalConstructor()
+			->onlyMethods( array( 'is_wp_consent_api_active' ) )
+			->getMock();
+		$consent_api->method( 'is_wp_consent_api_active' )->willReturn( $api_available );
 
 		$this->assertSame( $should_skip, $consent_api->should_disable_tracking_for_user_consent() );
 		$this->assertSame( $should_skip, $consent_api->should_disable_conversions_api_for_user_consent( false ) );
 	}
 
 	/**
-	 * @return array Values returned by wp_has_consent() and the expected outcome.
+	 * @return array Consent results, expected outcomes, and API availability.
 	 */
 	public function marketing_consent_states(): array {
 		return array(
-			'consent given'        => array( true, false ),
-			'consent refused'      => array( false, true ),
-			'filtered to null'     => array( null, true ),
-			'filtered to a string' => array( '1', false ),
+			'consent given'        => array( true, false, true ),
+			'consent refused'      => array( false, true, true ),
+			'filtered to null'     => array( null, true, true ),
+			'filtered to a string' => array( '1', false, true ),
+			'API unavailable'      => array( false, false, false ),
 		);
 	}
 
