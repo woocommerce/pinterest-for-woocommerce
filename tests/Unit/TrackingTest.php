@@ -16,7 +16,7 @@ use WC_Helper_Product;
 /**
  * Tests the Tracking class.
  *
- * @version 1.6.2
+ * @version x.x.x
  */
 class TrackingTest extends \WP_UnitTestCase {
 
@@ -315,6 +315,34 @@ class TrackingTest extends \WP_UnitTestCase {
 			->with( 'test', $data );
 
 		$tracking->track_event( 'test', $data );
+	}
+
+	/**
+	 * A cached store prints the Tag for every visitor and leaves blocking it to
+	 * the consent plugin, so refused marketing consent must still stop the
+	 * server-side Conversions API dispatch for the current request.
+	 *
+	 * @return void
+	 */
+	public function test_conversions_api_consent_refusal_skips_conversions_tracker_only() {
+		Pinterest_For_Woocommerce::save_settings( array( 'tracking_tag' => 'WD7AFW51GS' ) );
+
+		$_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+		add_filter( 'woocommerce_pinterest_disable_conversions_api_user_consent', '__return_true' );
+
+		$tag         = $this->createMock( Tag::class );
+		$conversions = $this->createMock( Conversions::class );
+		$tracking    = new Tracking( array( $tag, $conversions ) );
+		$data        = new None( 'event_id' );
+
+		$tag->expects( $this->once() )
+			->method( 'track_event' )
+			->with( Tracking::EVENT_SEARCH, $data );
+		$conversions->expects( $this->never() )
+			->method( 'track_event' );
+
+		$tracking->track_event( Tracking::EVENT_SEARCH, $data );
 	}
 
 	/**

@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Tracker responsible for hooking into system events.
  *
  * @class   Tracking
- * @version 1.6.2
+ * @version x.x.x
  */
 class Tracking {
 
@@ -545,7 +545,8 @@ class Tracking {
 	/**
 	 * Method which iterates over all the attached trackers and delegates the event to them.
 	 *
-	 * Server-side trackers (Conversions API) are skipped for crawler/bot requests.
+	 * Server-side trackers (Conversions API) are skipped for crawler/bot requests
+	 * and when the current visitor has not given marketing consent.
 	 * Browser-side rendering (Tag JS) is intentionally NOT skipped, so full-page
 	 * caches that omit `Vary: User-Agent` do not serve bot-rendered HTML missing
 	 * Tag JS to real users on a subsequent cache hit. See CrawlerDetector.
@@ -558,7 +559,20 @@ class Tracking {
 	 * @return void
 	 */
 	public function track_event( string $event_name, Data $data ) {
-		$skip_conversions = CrawlerDetector::is_crawler_request()
+		/**
+		 * Filters whether to skip Conversions API events based on user consent.
+		 *
+		 * Evaluated for every event, so it follows the consent of the current
+		 * request even when the Tag is printed for every visitor on cached pages.
+		 *
+		 * @since x.x.x
+		 *
+		 * @param bool $disable_conversions_api Whether to skip Conversions API events due to user consent.
+		 */
+		$is_conversions_api_disabled_user_consent = apply_filters( 'woocommerce_pinterest_disable_conversions_api_user_consent', false );
+
+		$skip_conversions = $is_conversions_api_disabled_user_consent
+			|| CrawlerDetector::is_crawler_request()
 			|| ( static::EVENT_ADD_TO_CART === $event_name && CrawlerDetector::is_speculative_request() );
 
 		foreach ( $this->get_trackers() as $tracker ) {
@@ -567,8 +581,8 @@ class Tracking {
 				continue;
 			}
 
-			// Skip CAPI for crawlers and speculative cart additions, which do
-			// not represent a shopper choosing to add a product.
+			// Skip CAPI without marketing consent, for crawlers, and for speculative
+			// cart additions, which do not represent a shopper choosing to add a product.
 			if ( $skip_conversions && $tracker instanceof Conversions ) {
 				continue;
 			}

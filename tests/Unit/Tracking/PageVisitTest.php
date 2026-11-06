@@ -448,6 +448,44 @@ class PageVisitTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A beacon from a visitor who refused marketing consent for the Conversions API is dropped.
+	 *
+	 * @return void
+	 */
+	public function test_beacon_rejected_when_conversions_api_consent_refused() {
+		Pinterest_For_Woocommerce::save_setting( 'enable_debug_logging', true );
+		add_filter( 'woocommerce_pinterest_disable_conversions_api_user_consent', '__return_true' );
+
+		$requests = 0;
+		add_filter(
+			'pre_http_request',
+			function () use ( &$requests ) {
+				++$requests;
+				return new \WP_Error( 'pfw_test_blocked', 'Unexpected HTTP request in test.' );
+			}
+		);
+
+		$logger = $this->createMock( \WC_Logger_Interface::class );
+		$logger->expects( $this->once() )
+			->method( 'log' )
+			->with(
+				'debug',
+				'PageVisit beacon rejected: marketing consent for the Conversions API is not given.',
+				array( 'source' => 'pinterest-for-woocommerce-conversions' )
+			);
+		Logger::$logger = $logger;
+
+		$_POST = array(
+			'event_id'         => 'page_1234567890abcdef',
+			'event_source_url' => home_url( '/shop/' ),
+		);
+
+		PageVisit::handle_request();
+
+		$this->assertSame( 0, $requests );
+	}
+
+	/**
 	 * Dropped beacons leave a debug log entry in the conversions log.
 	 */
 	public function test_rejected_beacon_is_logged() {
