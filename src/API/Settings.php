@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Endpoint handling settings updates.
  *
  * @class   Settings
- * @version 1.5.2
+ * @version x.x.x
  */
 class Settings extends VendorAPI {
 
@@ -72,6 +72,31 @@ class Settings extends VendorAPI {
 		}
 
 		$new_settings = $request->get_param( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME );
+		if ( array_key_exists( 'product_sync_categories', $new_settings ) ) {
+			$schema = array(
+				'type'  => 'array',
+				'items' => array(
+					'type'       => 'object',
+					'required'   => array( 'key' ),
+					'properties' => array(
+						'key' => array(
+							'type'    => 'integer',
+							'minimum' => 1,
+							'maximum' => PHP_INT_MAX,
+						),
+					),
+				),
+			);
+			$valid  = rest_validate_value_from_schema(
+				$new_settings['product_sync_categories'],
+				$schema,
+				'product_sync_categories'
+			);
+			if ( ! is_array( $new_settings['product_sync_categories'] ) || is_wp_error( $valid ) ) {
+				return new WP_Error( \PINTEREST_FOR_WOOCOMMERCE_PREFIX . '_options_error', esc_html__( 'Invalid product category selection.', 'pinterest-for-woocommerce' ), array( 'status' => 400 ) );
+			}
+			$new_settings['product_sync_categories'] = rest_sanitize_value_from_schema( $new_settings['product_sync_categories'], $schema );
+		}
 		// Keep merchant-editable Pinterest_For_Woocommerce::$default_settings and tracking selections here.
 		// Derived account data must remain server-owned.
 		$editable_settings = array_fill_keys(
@@ -84,6 +109,7 @@ class Settings extends VendorAPI {
 				'rich_pins_on_posts',
 				'rich_pins_on_products',
 				'product_sync_enabled',
+				'product_sync_categories',
 				'enable_debug_logging',
 				'erase_plugin_data',
 				'tracking_advertiser',

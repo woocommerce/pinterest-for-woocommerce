@@ -15,7 +15,7 @@ use WP_Test_REST_TestCase;
 /**
  * Tests the settings REST API endpoint.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class SettingsTest extends WP_Test_REST_TestCase {
 
@@ -64,6 +64,39 @@ class SettingsTest extends WP_Test_REST_TestCase {
 		$request->set_body_params( array( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => array() ) );
 		$this->assertSame( 200, rest_get_server()->dispatch( $request )->get_status() );
 		$this->assertSame( $saved, Pinterest_For_Woocommerce::get_settings( true ) );
+	}
+
+	/**
+	 * Category selections survive merchant saves and can be cleared.
+	 *
+	 * @return void
+	 */
+	public function test_selected_categories_can_be_saved_and_cleared() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'shop_manager' ) ) );
+		$term_id = self::factory()->term->create( array( 'taxonomy' => 'product_cat' ) );
+		$request = new WP_REST_Request( 'POST', '/pinterest/v1/settings' );
+
+		$selection = array(
+			array(
+				'key'   => $term_id,
+				'label' => 'Clothing',
+			),
+		);
+		foreach ( array( $selection, array( array( 'key' => (string) $term_id ) ), array( array( 'key' => (float) $term_id ) ), array( array( 'key' => $term_id . '.0' ) ), array( array( 'key' => $term_id . 'e0' ) ), array() ) as $categories ) {
+			$request->set_body_params( array( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => array( 'product_sync_categories' => $categories ) ) );
+			$this->assertSame( 200, rest_get_server()->dispatch( $request )->get_status() );
+			$expected = $categories;
+			if ( $expected ) {
+				$expected[0]['key'] = $term_id;
+			}
+			$this->assertSame( $expected, Pinterest_For_Woocommerce::get_settings( true )['product_sync_categories'], 'Accepted IDs must be stored as integers for the feed.' );
+		}
+		Pinterest_For_Woocommerce::save_setting( 'product_sync_categories', $selection );
+		foreach ( array( null, false, 'invalid', array( $term_id ), array( array() ), array( array( 'key' => -$term_id ) ), array( array( 'key' => 0 ) ), array( array( 'key' => 1.5 ) ), array( array( 'key' => '1e309' ) ), array( array( 'key' => array( $term_id ) ) ) ) as $categories ) {
+			$request->set_body_params( array( PINTEREST_FOR_WOOCOMMERCE_OPTION_NAME => array( 'product_sync_categories' => $categories ) ) );
+			$this->assertSame( 400, rest_get_server()->dispatch( $request )->get_status(), 'Malformed selections must be rejected: ' . wp_json_encode( $categories ) );
+			$this->assertSame( $selection, Pinterest_For_Woocommerce::get_settings( true )['product_sync_categories'], 'A rejected save must preserve the existing selection.' );
+		}
 	}
 
 	/**
