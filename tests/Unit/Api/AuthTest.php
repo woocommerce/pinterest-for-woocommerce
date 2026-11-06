@@ -17,7 +17,7 @@ use WP_Test_REST_TestCase;
 /**
  * Tests for the OAuth callback endpoint.
  *
- * @version 1.6.0
+ * @version x.x.x
  */
 class AuthTest extends WP_Test_REST_TestCase {
 
@@ -147,6 +147,20 @@ class AuthTest extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Tests an older callback cannot consume the state of a newer attempt from the same session.
+	 *
+	 * @return void
+	 */
+	public function test_older_attempt_cannot_consume_newer_state() {
+		$older = $this->start_connection();
+		$newer = $this->start_connection();
+
+		$this->assertNotSame( $older, $newer );
+		$this->assertEquals( 401, rest_get_server()->dispatch( $this->request( $older ) )->get_status() );
+		$this->assertTrue( $this->dispatch_until_redirect( $this->request( $newer ) ) );
+	}
+
+	/**
 	 * Tests a rejected request is sent back to the settings page rather than served as a raw error.
 	 *
 	 * @return void
@@ -222,6 +236,16 @@ class AuthTest extends WP_Test_REST_TestCase {
 	 */
 	private function issue_state( int $expiration = MINUTE_IN_SECONDS ): void {
 		set_transient( PINTEREST_FOR_WOOCOMMERCE_CONNECT_NONCE, 'issued-state', $expiration );
+	}
+
+	/**
+	 * Starts the connect flow and returns the state sent to Woo Connect.
+	 *
+	 * @return string
+	 */
+	private function start_connection(): string {
+		parse_str( (string) wp_parse_url( Pinterest_For_Woocommerce::get_middleware_url(), PHP_URL_QUERY ), $query );
+		return $query['nonce'];
 	}
 
 	/**
