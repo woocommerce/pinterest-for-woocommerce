@@ -17,14 +17,24 @@ Fixtures create data before each test and remove it during teardown, including a
 With Node 24, PHP/Composer, Docker and the locked dependencies installed:
 
 ```bash
-npm run test:browser:setup
-npm run test:browser
-npm run test:browser -- --grep 'merchant connection'
-npm run test:browser -- --grep 'guest classic'
+npm run dev
+npx playwright install chromium
+npm run env:test:e2e:setup
+npm run env:test:e2e:run
+E2E_FILTER='merchant connection' npm run env:test:e2e:run
+E2E_FILTER='guest classic' npm run env:test:e2e:run
 npm run test:browser:reset
 ```
 
-Setup builds the plugin, starts wp-env on ports 9010/9011 and installs the MU bootstrap in the tests environment. It refuses to overwrite an existing `.wp-env.override.json`. If setup fails, remove only the override it created and rerun after resolving the error. The wp-env recipe uses current WordPress and WooCommerce on PHP 8.4. To test other versions, set `E2E_WP_VERSION`, `E2E_WC_VERSION` (each `latest`, `nightly` or an exact version) and `E2E_PHP_VERSION` before setup; it fails if the store runs different versions.
+The suite runs against the wp-env tests site (`.wp-env.test.json`, port 8889 unless `WP_ENV_TESTS_PORT` is set), which maps the plugin to `wp-content/plugins/pinterest-for-woocommerce` and the MU bootstrap to `wp-content/mu-plugins`, and sets `PINTEREST_E2E` and `DISABLE_WP_CRON`. Setup starts it, resets its database and seeds it (`npm run env:test:e2e:seed` activates WooCommerce and the plugin and runs the cleanup). `npm run env:test:e2e:help` lists every subcommand and knob. The store uses current WordPress and WooCommerce on PHP 8.4. To test other versions, set `E2E_WP_VERSION`, `E2E_WC_VERSION` (each `latest`, `nightly` or an exact version) and `E2E_PHP_VERSION`, then:
+
+```bash
+bash tests/browser/versions.sh         # writes .wp-env.test.override.json
+npm run env:test:e2e:setup
+bash tests/browser/versions.sh check   # fails if the store runs different versions
+```
+
+Delete `.wp-env.test.override.json` and run setup again to go back to the current versions.
 
 For an existing **dedicated test store** with only WooCommerce and Pinterest active:
 
@@ -32,11 +42,11 @@ For an existing **dedicated test store** with only WooCommerce and Pinterest act
 2. Map this checkout to `wp-content/plugins/pinterest-for-woocommerce` and build its assets with `npm run dev`.
 3. Copy `tests/browser/fixture.php` to `wp-content/mu-plugins/pinterest-e2e.php`. It loads the PHP fixtures from the mapped plugin directory; copy it again if the bootstrap changes. The `warnings` check, which runs last, also needs `WP_DEBUG` and `WP_DEBUG_LOG` set to `true`, `WP_DEBUG_DISPLAY` set to `false`, and `tests/browser/mu-plugins/e2e-log-marker.php` copied into that site's `wp-content/mu-plugins/`.
 4. For native WordPress, set `PINTEREST_E2E_WP_PATH=/absolute/path/to/wordpress` and `PINTEREST_E2E_URL=http://localhost:9010` to select the WP-CLI store and its browser URL.
-5. Run `npm run test:browser`. Merchant credentials default to wp-env's `admin/password`; override them with `PINTEREST_E2E_ADMIN` and `PINTEREST_E2E_PASSWORD` if needed.
+5. Run `npx playwright test --config tests/browser/playwright.config.js`. Merchant credentials default to wp-env's `admin/password`; override them with `PINTEREST_E2E_ADMIN` and `PINTEREST_E2E_PASSWORD` if needed.
 
 The MU fixture supplies the WP Consent API function; do not activate the WP Consent API plugin in this store. Use a separate WordPress directory and database from the PHP suite. Never enable the test flag or install the MU fixture on a live store.
 
-After a wp-env run, use `npm run wp-env -- destroy`, then remove only the `.wp-env.override.json` created by setup. Browser screenshots and traces for failed tests are written to the ignored `test-results/browser` directory.
+After a wp-env run, use `npm run env:test:stop`, or `npm run env:test:destroy` to remove the store. Browser screenshots and traces for failed tests are written to the ignored `test-results/browser` directory.
 
 ## Assertions
 

@@ -24,6 +24,10 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      E2E_WP_VERSION: ${{ inputs.wp-version }}
+      E2E_WC_VERSION: ${{ inputs.wc-version }}
+      E2E_PHP_VERSION: ${{ inputs.php-version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -45,17 +49,22 @@ jobs:
           composer install --no-interaction --prefer-dist --no-progress
           npm ci
 
-      # Builds the plugin, starts wp-env and installs the test-only MU plugin
-      # that answers Pinterest API requests locally, so no secrets are needed.
+      - name: Build the plugin
+        run: npm run dev
+
+      - name: Install the browser
+        run: PLAYWRIGHT_SKIP_BROWSER_GC=1 npx playwright install chromium
+
+      # Starts the wp-env tests site, which mounts the test-only MU plugin that
+      # answers Pinterest API requests locally, so no secrets are needed.
       - name: Set up the browser test store
-        env:
-          E2E_WP_VERSION: ${{ inputs.wp-version }}
-          E2E_WC_VERSION: ${{ inputs.wc-version }}
-          E2E_PHP_VERSION: ${{ inputs.php-version }}
-        run: npm run test:browser:setup
+        run: |
+          bash tests/browser/versions.sh
+          npm run env:test:e2e:setup
+          bash tests/browser/versions.sh check
 
       - name: Run E2E tests
-        run: npm run test:browser
+        run: npm run env:test:e2e:run
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ failure() }}

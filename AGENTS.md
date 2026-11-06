@@ -152,9 +152,49 @@ npm run lint:css
 npm run lint:css:fix
 ```
 
+### wp-env
+
+wp-env (requires Docker) runs two sites, each from its own config: the **development** site (`.wp-env.json`, `http://localhost:$WP_ENV_PORT/`, default 8888) for manual testing, and the **tests** site (`.wp-env.test.json`, `http://localhost:$WP_ENV_TESTS_PORT/`, default 8889) for PHPUnit and the browser tests. Every `env:*` script follows these variables; in a git worktree, export other ports before any `env:*` command (see [Branching and worktrees](#branching-and-worktrees)). PHPUnit runs in the tests site's `cli` container against its own `wordpress_test` database and WordPress install. The browser test MU plugins and the `PINTEREST_E2E` flag are on the tests site only.
+
+A `.wp-env.override.json` left by an older wp-env or browser test run merges into the development site; delete it if you didn't write it.
+
+`npm run wp-env:test -- <command>` runs a raw wp-env command against the tests site (`--config .wp-env.test.json` plus the tests port), for example `npm run wp-env:test -- run cli wp plugin list`. Plain `npx wp-env` targets the development site.
+
+```bash
+npm run env:start          # Start the development site
+npm run env:stop           # Stop its containers (preserves data)
+npm run env:destroy        # Remove its containers and data
+npm run env:test:start     # Start the tests site (PHPUnit and browser tests)
+npm run env:test:stop      # Stop its containers (preserves data)
+npm run env:test:destroy   # Remove its containers and data, including the PHPUnit install
+```
+
+### Development Site
+
+Requires a running development site (`npm run env:start`).
+
+```bash
+npm run env:dev:seed    # Seed a browsable store (runs once)
+npm run env:dev:reset   # Wipe the development site and seed it again
+```
+
+- Logins: `admin` / `password`, `customer` / `password`.
+- Seeds store settings, Dummy payments, shipping, tax and WooCommerce sample products. Connect a Pinterest account from Marketing > Pinterest; there is no plugin data to seed.
+
 ### Testing
 
 #### PHPUnit Tests
+
+In wp-env, PHPUnit needs a running tests site (`npm run env:test:start`; in a worktree, export the ports first). The first run installs WordPress, the test library and WooCommerce (from source, with `bin/install-wp-tests.sh`) in the tests site's `cli` container.
+
+```bash
+npm run env:test:unit -- --filter ProductSyncTest   # One test class (extra args go to PHPUnit)
+npm run env:test:unit                               # Whole suite (latest WP + WC, as CI)
+WC_ORDER_DATASTORE=hpos npm run env:test:unit       # HPOS run (default: cpt)
+npm run env:test:unit:help                          # All options: UNIT_WC_VERSION / UNIT_WP_VERSION pins, env:test:unit:setup
+```
+
+Without Docker, run the suite on the host as CI does:
 
 ```bash
 # Install WordPress test environment
@@ -181,6 +221,25 @@ npm run test:js
 # Run tests in watch mode
 npm run test:js:watch
 ```
+
+#### Browser Tests
+
+The Playwright suite in `tests/browser/` runs against the tests site; admin login `admin` / `password`. First build the plugin (`npm run dev`) and install the browser (`npx playwright install chromium`).
+
+```bash
+npm run env:test:e2e:setup                                 # Once: start, reset and seed the tests site (leaves it up)
+E2E_TARGET=merchant npm run env:test:e2e:run               # Inner loop: spec files matching a path or name
+E2E_FILTER='guest classic' npm run env:test:e2e:run        # Tests whose title matches (--grep)
+npm run env:test:e2e:run:ui                                # Same, with the browser visible
+npm run env:test:e2e:reset                                 # Reset and re-seed just the DB
+npm run env:test:e2e                                       # Full pipeline (setup, whole suite, stop)
+npm run env:test:e2e:help                                  # All subcommands, E2E_* knobs and examples
+```
+
+- `bin/acceptance.sh` exports the tests site URL as `PINTEREST_E2E_URL` for `tests/browser/playwright.config.js`; arguments after `run` go to `playwright test`.
+- `npm run env:test:e2e:seed` seeds the tests site: it activates WooCommerce and the plugin, then runs `tests/browser/reset.js`.
+- `test:browser` and `test:browser:setup` are aliases of `env:test:e2e:run` and `env:test:e2e:setup`; `test:browser:reset` repeats the fixture cleanup.
+- Other WordPress, WooCommerce or PHP versions: see `tests/browser/README.md`.
 
 #### QIT
 
@@ -306,12 +365,23 @@ npm install
 composer install
 ```
 
-For a Docker environment, use `npm run wp-env -- start` from this worktree. Give each concurrent environment unique development and test ports in its gitignored `.wp-env.override.json`; keep that configuration for every wp-env command. The local PHP test command is `npm run test:php:wp-env` after the environment starts. That script expects `/var/www/html/wp-content/plugins/pinterest-for-woocommerce`; map the worktree to `wp-content/plugins/pinterest-for-woocommerce` in the override before using it.
-
-Destroy the environment before removing the worktree:
+Each concurrently running worktree needs a unique port pair, or its wp-env containers collide
+with the main checkout or another worktree. Export them once per shell, before any `env:*` command:
 
 ```bash
-npm run wp-env -- destroy
+export WP_ENV_PORT=8890 WP_ENV_TESTS_PORT=8891
+npm run env:start
+npm run env:test:start
+```
+
+Site URLs follow the ports. `bin/acceptance.sh` reads the tests site's port from wp-env and exports it
+as `PINTEREST_E2E_URL`, so worktrees can run the browser tests side by side. Re-export the ports in every
+new shell: `env:test:e2e:run` and `env:test:e2e:reset` find the running port by themselves, but
+`env:test:start` and `env:test:e2e:setup` without them move the tests site to port 8889. Destroy both
+sites before removing the worktree (the semicolon is deliberate: a site that was never started exits 1):
+
+```bash
+npm run env:destroy -- --force; npm run env:test:destroy -- --force    # with the same ports exported
 cd "$main_checkout"
 git worktree remove "$worktree_path"
 ```
