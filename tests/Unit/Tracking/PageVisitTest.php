@@ -276,6 +276,140 @@ class PageVisitTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * PageVisit tracks the initial selection in the Tag and signed CAPI beacon.
+	 *
+	 * @dataProvider initial_variation_cases
+	 * @param array       $defaults  Default product attributes.
+	 * @param array       $query     Variation attributes in the landing URL.
+	 * @param string|null $selection Expected variation color, or null for the parent.
+	 * @param bool        $tag_active Whether to enable the browser Tag.
+	 * @param bool        $submitted Whether the page was rendered after a form submission.
+	 */
+	public function test_page_visit_tracks_initial_variation( array $defaults, array $query, $selection, bool $tag_active, bool $submitted = false ) {
+		$product = new \WC_Product_Variable();
+		$product->set_name( 'Shirt' );
+		$product->set_attributes(
+			array(
+				WC_Helper_Product::create_product_attribute_object( 'color', array( 'red', 'blue' ) ),
+				WC_Helper_Product::create_product_attribute_object( 'size', array( 'm' ) ),
+			)
+		);
+		$product->set_default_attributes( $defaults );
+		$product->save();
+		$variations = array(
+			'red'  => WC_Helper_Product::create_product_variation_object(
+				$product->get_id(),
+				'red-shirt',
+				10,
+				array(
+					'pa_color' => 'red',
+					'pa_size'  => 'm',
+				)
+			),
+			'blue' => WC_Helper_Product::create_product_variation_object(
+				$product->get_id(),
+				'blue-shirt',
+				20,
+				array(
+					'pa_color' => 'blue',
+					'pa_size'  => '',
+				)
+			),
+		);
+		$expected   = null === $selection ? $product : $variations[ $selection ];
+		$source     = add_query_arg( $query, $product->get_permalink() );
+		$this->go_to( $source );
+		if ( $submitted ) {
+			$_POST = array(
+				'attribute_pa_color' => 'blue',
+				'attribute_pa_size'  => 'm',
+			);
+		}
+
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'track_conversions'      => true,
+				'track_conversions_capi' => true,
+				'tracking_advertiser'    => 'PFW-123456789',
+				'tracking_tag'           => $tag_active ? 'test-tag' : '',
+			)
+		);
+		$tag        = new Tag();
+		$tracking   = new Tracking( array( $tag, new Conversions( new Data\User( '127.0.0.1', 'test' ) ) ) );
+		$tag_events = new \ReflectionProperty( Tag::class, 'events' );
+		$tag_events->setAccessible( true );
+		$saved_events = $tag_events->getValue();
+		$tag_events->setValue( null, array() );
+
+		ob_start();
+		try {
+			$tracking->handle_page_visit();
+			if ( $tag_active ) {
+				$tag->print_script();
+			}
+		} finally {
+			$script = ob_get_clean();
+			$tag_events->setValue( null, $saved_events );
+		}
+
+		if ( $tag_active ) {
+			$this->assertSame( 1, substr_count( $script, 'pintrk("track","PageVisit",eventData)' ) );
+			$this->assertStringContainsString( '"product_id":' . $expected->get_id() . ',', $script );
+			$this->assertStringContainsString( 'eventData.event_id=eventId', $script );
+		}
+		$this->assertSame( 1, preg_match( '/requestData.append\("product_id","(\d+)"\)/', $script, $id ) );
+		$this->assertSame( (string) $expected->get_id(), $id[1] );
+		$this->assertSame( 1, preg_match( '/requestData.append\("product_token","([a-f0-9]{64})"\)/', $script, $token ) );
+		$this->assertStringContainsString( 'requestData.append("event_id",eventId)', $script );
+
+		$events = array();
+		add_filter(
+			'pre_http_request',
+			static function ( $response, $args ) use ( &$events ) {
+				$events[] = json_decode( $args['body'], true )['data'][0];
+				return array(
+					'body'     => wp_json_encode( array( 'events' => array( array( 'status' => 'processed' ) ) ) ),
+					'response' => array( 'code' => 200 ),
+				);
+			},
+			10,
+			2
+		);
+		$_POST = array(
+			'event_id'         => 'page_1234567890abcdef',
+			'event_source_url' => add_query_arg( 'epik', 'cached-visit', $source ),
+			'product_id'       => $id[1],
+			'product_token'    => $token[1],
+		);
+		PageVisit::handle_request();
+
+		$this->assertCount( 1, $events );
+		$this->assertSame( 'page_1234567890abcdef', $events[0]['event_id'] );
+		$this->assertSame( array( (string) $expected->get_id() ), $events[0]['custom_data']['content_ids'] );
+	}
+
+	/** @return array Initial variation selection cases. */
+	public function initial_variation_cases() {
+		$defaults  = array(
+			'pa_color' => 'red',
+			'pa_size'  => 'm',
+		);
+		$blue_link = array(
+			'attribute_pa_color' => 'blue',
+			'attribute_pa_size'  => 'm',
+		);
+		return array(
+			'variation link overrides default' => array( $defaults, $blue_link, 'blue', true ),
+			'default selection'                => array( $defaults, array(), 'red', true ),
+			'CAPI only'                        => array( array(), $blue_link, 'blue', false ),
+			'no selection'                     => array( array(), array(), null, true ),
+			'partial wildcard selection'       => array( array(), array( 'attribute_pa_color' => 'blue' ), null, true ),
+			'invalid selection'                => array( $defaults, array( 'attribute_pa_color' => 'green' ), null, true ),
+			'form submission'                  => array( $defaults, array(), null, true, true ),
+		);
+	}
+
+	/**
 	 * A tampered token or a malformed product ID does not attribute the visit.
 	 */
 	public function test_signed_beacon_rejects_tampered_product_reference() {
