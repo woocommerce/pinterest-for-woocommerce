@@ -12,7 +12,6 @@ use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
 use Automattic\WooCommerce\Pinterest\Tracking\Data;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Category;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Checkout;
-use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Search;
 use Automattic\WooCommerce\Pinterest\Tracking\PageVisit;
@@ -156,28 +155,13 @@ class Tracking {
 
 		// The PageVisit event ID is generated in the browser so full-page caches
 		// cannot reuse a PHP-generated ID across multiple visitors.
-		$data    = new None( '' );
-		$product = is_product() ? wc_get_product() : false;
-
-		if ( $product instanceof \WC_Product ) {
-			$data = new Product(
-				'',
-				$product->get_id(),
-				$product->get_name(),
-				wc_get_product_category_list( $product->get_id() ),
-				'brand',
-				wc_get_price_to_display( $product ),
-				get_woocommerce_currency(),
-				1
-			);
-		}
-
-		$this->track_event( static::EVENT_PAGE_VISIT, $data );
+		$product = PageVisit::get_page_product();
+		$this->track_event( static::EVENT_PAGE_VISIT, PageVisit::get_product_event_data( '', $product ) );
 
 		// The Tag tracker prints the beacon together with its PageVisit call, but it
 		// is skipped without an active Tag, so print the beacon here for CAPI-only stores.
 		if ( ! Tag::get_active_tag() && $this->has_tracker( Conversions::class ) ) {
-			PageVisit::print_beacon_script();
+			PageVisit::print_beacon_for_product( $product instanceof \WC_Product ? $product->get_id() : null );
 		}
 	}
 

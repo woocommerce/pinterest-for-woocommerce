@@ -52,6 +52,70 @@ class PageVisit {
 	}
 
 	/**
+	 * Resolve the product shown on arrival, including a complete variation selection.
+	 *
+	 * @return \WC_Product|false|null Product to report for the visit.
+	 */
+	public static function get_page_product() {
+		$product = is_product() ? wc_get_product() : false;
+		// A form submission can render a different selection from the landing URL or defaults.
+		$submitted = ! empty( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Only checks whether form data was sent.
+		if ( ! $product instanceof \WC_Product_Variable || $submitted || post_password_required( $product->get_id() ) ) {
+			return $product;
+		}
+
+		$defaults   = (array) $product->get_default_attributes();
+		$attributes = array();
+		foreach ( $product->get_variation_attributes() as $name => $options ) {
+			$key   = wc_variation_attribute_name( $name );
+			$value = $defaults[ sanitize_title( $name ) ] ?? '';
+			// Use the landing URL's selection in preference to the product default.
+			if ( isset( $_GET[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only storefront selection.
+				$value = is_string( $_GET[ $key ] ) ? wp_unslash( $_GET[ $key ] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Checked below against the sanitized value and variation options.
+				// Classic and block selectors can normalize noncanonical URL values differently.
+				if ( sanitize_text_field( $value ) !== $value ) {
+					return $product;
+				}
+			}
+			if ( ! is_string( $value ) || '' === $value || ! is_array( $options ) ) {
+				return $product;
+			}
+
+			if ( taxonomy_exists( $name ) ) {
+				$value = sanitize_title( $value );
+			} elseif ( sanitize_title( $value ) === $value ) {
+				// Classic dropdowns can render a custom attribute selected by its slug.
+				$matches = array_keys( array_map( 'sanitize_title', $options ), $value, true );
+				$value   = 1 === count( $matches ) ? $options[ $matches[0] ] : '';
+			}
+			if ( '' === $value || ! in_array( $value, $options, true ) ) {
+				return $product;
+			}
+			$attributes[ $key ] = $value;
+		}
+
+		if ( ! $attributes ) {
+			return $product;
+		}
+
+		$store = \WC_Data_Store::load( 'product' );
+		if ( ! $store->has_callable( 'find_matching_product_variation' ) ) {
+			return $product;
+		}
+		// @phpstan-ignore-next-line method.notFound (WC_Data_Store forwards this to the product data store.)
+		$variation_id = $store->find_matching_product_variation( $product, $attributes );
+		$variation    = is_numeric( $variation_id ) && $variation_id > 0 ? wc_get_product( $variation_id ) : false;
+		if ( ! $variation instanceof \WC_Product_Variation || $product->get_id() !== $variation->get_parent_id() || true !== $variation->variation_is_visible() ) {
+			return $product;
+		}
+		if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) && true !== $variation->is_in_stock() ) {
+			return $product;
+		}
+
+		return $variation;
+	}
+
+	/**
 	 * Builds a cache-safe Pinterest Tag call and optional CAPI beacon.
 	 *
 	 * @param array $data Prepared Pinterest Tag PageVisit data.
@@ -69,7 +133,7 @@ class PageVisit {
 			self::get_event_id_code(),
 			$event_data,
 			Tracking::EVENT_PAGE_VISIT,
-			self::get_beacon_code()
+			self::get_beacon_code( $data['product_id'] ?? null )
 		);
 	}
 
@@ -83,7 +147,17 @@ class PageVisit {
 	 * @return void
 	 */
 	public static function print_beacon_script() {
-		$beacon_code = self::get_beacon_code();
+		self::print_beacon_for_product( null );
+	}
+
+	/**
+	 * Prints the standalone CAPI beacon with the resolved product ID.
+	 *
+	 * @param int|null $product_id Product ID resolved for the visit.
+	 * @return void
+	 */
+	public static function print_beacon_for_product( $product_id ) {
+		$beacon_code = self::get_beacon_code( $product_id );
 		if ( ! $beacon_code ) {
 			return;
 		}
@@ -107,16 +181,23 @@ class PageVisit {
 	 *
 	 * @since 1.5.1
 	 *
+	 * @param mixed $event_product_id Product ID from the storefront event data, if provided.
 	 * @return string JavaScript using `eventId`, or an empty string when the Conversions API is disabled.
 	 */
-	private static function get_beacon_code() {
+	private static function get_beacon_code( $event_product_id ) {
 		if ( ! Pinterest_For_Woocommerce()::get_setting( 'track_conversions_capi' ) ) {
 			return '';
 		}
 
 		$product_code = '';
 		$product_id   = is_product() ? get_queried_object_id() : 0;
-		$request_uri  = isset( $_SERVER['REQUEST_URI'] ) && is_string( $_SERVER['REQUEST_URI'] )
+		if ( $product_id && is_int( $event_product_id ) && $event_product_id > 0 && $event_product_id !== $product_id ) {
+			$variation = wc_get_product( $event_product_id );
+			if ( $variation instanceof \WC_Product_Variation && $product_id === $variation->get_parent_id() ) {
+				$product_id = $event_product_id;
+			}
+		}
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) && is_string( $_SERVER['REQUEST_URI'] )
 			? wp_unslash( $_SERVER['REQUEST_URI'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- Used only to compute the signature.
 			: '';
 		if ( $product_id && $request_uri ) {
@@ -215,7 +296,7 @@ class PageVisit {
 			$product_id = url_to_postid( $source_url );
 		}
 
-		$data    = self::get_event_data( $event_id, $product_id );
+		$data    = self::get_product_event_data( $event_id, $product_id ? wc_get_product( $product_id ) : false );
 		$user    = new User( \WC_Geolocation::get_ip_address(), wc_get_user_agent() );
 		$tracker = new Conversions( $user, $source_url );
 
@@ -289,15 +370,14 @@ class PageVisit {
 	}
 
 	/**
-	 * Builds PageVisit data from the constrained beacon payload.
+	 * Builds the common product data for Tag and CAPI PageVisit events.
 	 *
-	 * @param string $event_id  Browser-generated event ID.
-	 * @param int    $product_id Optional product ID.
+	 * @param string                 $event_id Browser-generated event ID, if available.
+	 * @param \WC_Product|false|null $product  Visited product, if available.
 	 *
 	 * @return Product|None PageVisit event data.
 	 */
-	private static function get_event_data( string $event_id, int $product_id ) {
-		$product = $product_id ? wc_get_product( $product_id ) : false;
+	public static function get_product_event_data( string $event_id, $product ) {
 		if ( ! $product instanceof \WC_Product ) {
 			return new None( $event_id );
 		}
@@ -306,7 +386,7 @@ class PageVisit {
 			$event_id,
 			$product->get_id(),
 			$product->get_name(),
-			wc_get_product_category_list( $product->get_id() ),
+			wc_get_product_category_list( $product instanceof \WC_Product_Variation ? $product->get_parent_id() : $product->get_id() ),
 			'brand',
 			wc_get_price_to_display( $product ),
 			get_woocommerce_currency(),

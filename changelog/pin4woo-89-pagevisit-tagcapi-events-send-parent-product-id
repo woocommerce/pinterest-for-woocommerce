@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Match Pinterest PageVisit events to the variation selected when a product page opens.
