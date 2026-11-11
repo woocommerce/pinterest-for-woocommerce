@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adds PinterestTag tracker support.
  *
  * @class   Tag
- * @version x.x.x
+ * @version 1.6.3
  */
 class Tag extends Tracker {
 
@@ -505,7 +505,7 @@ class Tag extends Tracker {
 	 *
 	 * A consent plugin can block the base tag while still letting event scripts run.
 	 *
-	 * @since x.x.x
+	 * @since 1.6.3
 	 *
 	 * @param string $code Event JavaScript.
 	 * @return string Guarded event JavaScript.

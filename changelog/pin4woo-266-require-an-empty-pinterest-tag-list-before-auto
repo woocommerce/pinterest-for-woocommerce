@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Prevented automatic tag creation when Pinterest returns a malformed tag list.

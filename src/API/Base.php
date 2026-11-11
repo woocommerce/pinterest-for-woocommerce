@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Base API Methods
  *
  * @class   Base
- * @version x.x.x
+ * @version 1.6.3
  */
 class Base {
 
@@ -101,7 +101,7 @@ class Base {
 	/**
 	 * Send a prepared request and handle Pinterest API errors.
 	 *
-	 * @since x.x.x
+	 * @since 1.6.3
 	 * @param array<string, mixed> $request Prepared request.
 	 * @param string               $method  Requested HTTP method.
 	 * @return mixed Decoded response body.

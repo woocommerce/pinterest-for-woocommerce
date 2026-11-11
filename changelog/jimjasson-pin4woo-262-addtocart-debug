@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Skip Pinterest Tag events on page load and in AJAX cart fragments when a consent plugin has blocked the tag, avoiding a pintrk is not defined error.

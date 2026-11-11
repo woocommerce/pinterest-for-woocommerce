@@ -14,7 +14,7 @@ use WP_Test_REST_TestCase;
 /**
  * Tests the tags REST API endpoint.
  *
- * @version x.x.x
+ * @version 1.6.3
  */
 class TagsTest extends WP_Test_REST_TestCase {
 

@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Generates browser PageVisit events and handles their CAPI beacons.
  *
  * @class   PageVisit
- * @version x.x.x
+ * @version 1.6.3
  */
 class PageVisit {
 
@@ -252,7 +252,7 @@ class PageVisit {
 		/**
 		 * Filters whether to skip Conversions API events based on user consent.
 		 *
-		 * @since x.x.x
+		 * @since 1.6.3
 		 *
 		 * @param bool $disable_conversions_api Whether to skip Conversions API events due to user consent.
 		 */
@@ -327,7 +327,7 @@ class PageVisit {
 	 *
 	 * The salt-bound token does not expire, so cached pages can keep sending it.
 	 *
-	 * @since x.x.x
+	 * @since 1.6.3
 	 * @param int    $product_id Rendered product ID.
 	 * @param string $url        Rendered request URI or validated beacon URL.
 	 * @return string

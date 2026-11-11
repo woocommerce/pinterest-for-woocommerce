@@ -1,5 +1,16 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.6.3 - 2026-11-11 =
+* Fix - Fixed checkbox styles on the Settings screen so checked boxes show a white check and disabled boxes look disabled.
+* Fix - Skip Pinterest Tag events on page load and in AJAX cart fragments when a consent plugin has blocked the tag, avoiding a pintrk is not defined error.
+* Fix - Restored product attribution for PageVisit events when WordPress cannot look up the product URL.
+* Fix - Stop sending Conversions API events for visitors who refused marketing consent through the WP Consent API when the Tag is printed for every visitor on cached pages.
+* Fix - Prevented automatic tag creation when Pinterest returns a malformed tag list.
+* Fix - Prevent an older Pinterest callback from invalidating a newer connection attempt.
+* Fix - Match Pinterest PageVisit events to the variation selected when a product page opens.
+* Fix - Prevented failed Pinterest heartbeats from retrying on every request.
+* Dev - Updated CI setup for Ubuntu 26.04 runners.
+
 = 1.6.2 - 2026-11-04 =
 * Fix - Delayed tracking initialization until consent managers finish their init callbacks.
 * Fix - Skip speculative AddToCart CAPI events and defer prerendered PageVisit beacons until activation.
