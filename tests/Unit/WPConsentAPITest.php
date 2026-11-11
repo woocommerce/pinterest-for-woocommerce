@@ -9,7 +9,7 @@ require_once dirname( __DIR__ ) . '/Helpers/WPConsentAPIStub.php';
 /**
  * Class WPConsentAPITest.
  *
- * @version x.x.x
+ * @version 1.6.3
  */
 class WPConsentAPITest extends WP_UnitTestCase {
 

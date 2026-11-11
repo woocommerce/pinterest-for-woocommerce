@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * API V5 Methods
  *
  * @class   APIV5
- * @version x.x.x
+ * @version 1.6.3
  */
 class APIV5 extends Base {
 

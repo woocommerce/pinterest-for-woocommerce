@@ -1,4 +1,0 @@
-Significance: patch
-Type: fix
-
-Restored product attribution for PageVisit events when WordPress cannot look up the product URL.

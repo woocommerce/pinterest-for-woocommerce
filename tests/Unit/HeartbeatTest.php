@@ -8,7 +8,7 @@ use Pinterest_For_Woocommerce;
 /**
  * Tests the Heartbeat class.
  *
- * @version x.x.x
+ * @version 1.6.3
  */
 class HeartbeatTest extends \WP_UnitTestCase {
 

@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Tracker responsible for hooking into system events.
  *
  * @class   Tracking
- * @version x.x.x
+ * @version 1.6.3
  */
 class Tracking {
 
@@ -549,7 +549,7 @@ class Tracking {
 		 * Evaluated for every event, so it follows the consent of the current
 		 * request even when the Tag is printed for every visitor on cached pages.
 		 *
-		 * @since x.x.x
+		 * @since 1.6.3
 		 *
 		 * @param bool $disable_conversions_api Whether to skip Conversions API events due to user consent.
 		 */

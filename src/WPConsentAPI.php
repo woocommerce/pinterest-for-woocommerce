@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @class   WPConsentAPI
  * @since   1.4.17
- * @version x.x.x
+ * @version 1.6.3
  */
 class WPConsentAPI {
 
@@ -62,7 +62,7 @@ class WPConsentAPI {
 	 * the consent plugin block it in the browser. Server-side events still follow
 	 * the marketing consent of the current request.
 	 *
-	 * @since x.x.x
+	 * @since 1.6.3
 	 *
 	 * @param bool $disable_conversions_api Whether an earlier callback already skips Conversions API events.
 	 * @return bool
