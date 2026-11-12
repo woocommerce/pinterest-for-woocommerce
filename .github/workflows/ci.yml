@@ -150,6 +150,13 @@ jobs:
       - name: Lint workflows
         run: '"$RUNNER_TEMP/actionlint" -shellcheck= -pyflakes='
 
+  # Runs on drafts too: the "Test the build" comment needs its ZIP.
+  production-zip:
+    name: Production package
+    needs: changes
+    if: ${{ needs.changes.outputs.product == 'true' }}
+    uses: ./.github/workflows/production-zip.yml
+
   # The jobs below run only for ready-for-review PRs.
 
   php-unit:
@@ -157,12 +164,6 @@ jobs:
     needs: changes
     if: ${{ github.event.pull_request.draft == false && needs.changes.outputs.php == 'true' }}
     uses: ./.github/workflows/php-unit-tests.yml
-
-  production-zip:
-    name: Production package
-    needs: changes
-    if: ${{ github.event.pull_request.draft == false && needs.changes.outputs.product == 'true' }}
-    uses: ./.github/workflows/production-zip.yml
 
   plugin-check:
     name: Plugin Check
@@ -175,6 +176,14 @@ jobs:
     needs: changes
     if: ${{ github.event.pull_request.draft == false && needs.changes.outputs.product == 'true' }}
     uses: ./.github/workflows/run-e2e.yml
+
+  # Not a required check: it only tells reviewers how to try the build.
+  test-the-build:
+    name: Test the build
+    needs: production-zip
+    permissions:
+      pull-requests: write # Creates or updates the "Test the build" comment.
+    uses: ./.github/workflows/test-the-build.yml
 
   # The single status that branch protection requires. It fails when any
   # applicable check failed, was cancelled, is missing or was skipped
@@ -200,7 +209,7 @@ jobs:
           "js-unit": ${{ needs.changes.outputs.frontend == 'true' }},
           "actionlint": ${{ needs.changes.outputs.workflows == 'true' }},
           "php-unit": ${{ github.event.pull_request.draft == false && needs.changes.outputs.php == 'true' }},
-          "production-zip": ${{ github.event.pull_request.draft == false && needs.changes.outputs.product == 'true' }},
+          "production-zip": ${{ needs.changes.outputs.product == 'true' }},
           "plugin-check": ${{ github.event.pull_request.draft == false && needs.changes.outputs.product == 'true' }},
           "e2e": ${{ github.event.pull_request.draft == false && needs.changes.outputs.product == 'true' }}
         }
@@ -219,7 +228,7 @@ jobs:
             failed ||= !passed;
           }
           if (process.env.CI_DRAFT === 'true') {
-            console.log('::error::Draft PR: PHP unit tests, the production package, Plugin Check and E2E tests run once the PR is ready for review.');
+            console.log('::error::Draft PR: PHP unit tests, Plugin Check and E2E tests run once the PR is ready for review.');
             failed = true;
           }
           process.exitCode = failed ? 1 : 0;

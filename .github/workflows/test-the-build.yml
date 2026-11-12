@@ -1,0 +1,147 @@
+name: Test the build
+
+# Posts a "Test the build" comment on the pull request, with a WordPress Playground link that opens
+# the ZIP built by the "Production package" job of the calling workflow. This job runs no code from
+# the pull request: it only uploads the ZIP again.
+
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  comment:
+    name: Comment on the pull request
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pull-requests: write # Creates or updates the "Test the build" comment.
+    env:
+      PLUGIN_SLUG: pinterest-for-woocommerce
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
+    steps:
+
+      - name: Download the production ZIP
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: pinterest-production-zip
+          path: build
+
+      # The Playground link downloads this artifact on every click, so it is kept for longer than a
+      # build artifact needs. The run ID in the name ties the link in the comment to this run's build.
+      - name: Keep the ZIP for the WordPress Playground link
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playground-preview-${{ github.run_id }}
+          path: build/${{ env.PLUGIN_SLUG }}.zip
+          if-no-files-found: error
+          retention-days: 14
+
+      # WordPress Playground runs in the visitor's browser and can only fetch public URLs. Its
+      # artifact proxy serves this run's artifact for the pull request. It finds the workflow by
+      # name, hence GITHUB_WORKFLOW (the calling workflow) and not a literal that a rename would
+      # break. The artifact wraps the plugin ZIP, so the Blueprint unzips it before installing.
+      #
+      # The link must never ask for credentials or carry a secret: the proxy picks the build by
+      # branch name, so a pull request from a fork with the same branch name could be served.
+      #
+      # To show UI that sits behind an option, set the option in STORE_SETUP in the same pull request.
+      - name: Build the WordPress Playground link
+        id: playground
+        run: |
+          read -r -d '' STORE_SETUP <<'PHP' || true
+          <?php
+          require '/wordpress/wp-load.php';
+
+          // Skip the WooCommerce setup wizard and its redirect.
+          delete_transient( '_wc_activation_redirect' );
+          update_option( 'woocommerce_onboarding_profile', array( 'skipped' => true ) );
+
+          // Show the storefront, not the "coming soon" page.
+          update_option( 'woocommerce_coming_soon', 'no' );
+
+          // Store orders in the High-Performance Order Storage tables, as new stores do.
+          update_option( 'woocommerce_custom_orders_table_enabled', 'yes' );
+
+          $product = new WC_Product_Simple();
+          $product->set_name( 'Sample T-Shirt' );
+          $product->set_regular_price( '20' );
+          $product->set_short_description( 'A sample product to try Pinterest for WooCommerce with.' );
+          $product->set_status( 'publish' );
+          $product->save();
+          PHP
+
+          ARTIFACT_URL=$( jq -rn \
+            --arg org "$GITHUB_REPOSITORY_OWNER" \
+            --arg repo "${GITHUB_REPOSITORY#*/}" \
+            --arg workflow "$GITHUB_WORKFLOW" \
+            --arg pr "$PR_NUMBER" \
+            --arg artifact "playground-preview-$GITHUB_RUN_ID" \
+            '"https://playground.wordpress.net/plugin-proxy.php?org=\($org|@uri)&repo=\($repo|@uri)&workflow=\($workflow|@uri)&pr=\($pr|@uri)&artifact=\($artifact|@uri)"' )
+
+          BLUEPRINT=$( jq -cn \
+            --arg artifact_url "$ARTIFACT_URL" \
+            --arg slug "$PLUGIN_SLUG" \
+            --arg store_setup "$STORE_SETUP" \
+            '{
+              "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+              landingPage: "/wp-admin/admin.php?page=wc-admin&path=/pinterest/landing",
+              preferredVersions: { php: "8.3", wp: "latest" },
+              features: { networking: true },
+              steps: [
+                { step: "login", username: "admin" },
+                { step: "installPlugin", pluginData: { resource: "wordpress.org/plugins", slug: "woocommerce" }, options: { activate: true } },
+                { step: "runPHP", code: $store_setup },
+                { step: "unzip", zipFile: { resource: "url", url: $artifact_url, caption: "Downloading the Pinterest for WooCommerce build of this pull request" }, extractToPath: "/tmp/pr" },
+                { step: "installPlugin", pluginData: { resource: "vfs", path: ( "/tmp/pr/" + $slug + ".zip" ) }, options: { activate: true } }
+              ]
+            }' )
+
+          echo "url=https://playground.wordpress.net/#$( jq -rn --argjson blueprint "$BLUEPRINT" '$blueprint|tojson|@uri' )" >> "$GITHUB_OUTPUT"
+
+      # A pull request from a fork gets a read-only token, so its comment text goes to the run summary only.
+      - name: Create or update the comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IS_FORK: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+          PLAYGROUND_URL: ${{ steps.playground.outputs.url }}
+        run: |
+          BODY="### Test the build
+
+          #### WordPress Playground - runs in your browser
+
+          :test_tube: [Open this build in WordPress Playground]($PLAYGROUND_URL): a fresh store with WooCommerce set up, a sample product and this build, on the Pinterest \"Get started\" screen.
+
+          :information_source: The preview cannot connect a Pinterest account. Connecting sends you to Pinterest and back to the site, and a site that runs in your browser tab has no public address to come back to. So it shows what a merchant sees before connecting: the \"Get started\" screen and the first step of the setup. Nothing that needs a Pinterest account works: catalog sync, the Pinterest tag, conversions and ads. The link stops working 14 days after the last build.
+
+          ---
+
+          Build info:
+
+          - Latest commit: $PR_HEAD_SHA
+          - Build time: $( date -u '+%Y-%m-%d %H:%M:%S UTC' )
+
+          _Note: the build is updated when a new commit is pushed to this PR._"
+
+          # The lines above are indented to fit this file; a comment must start at the margin.
+          BODY=$( sed -E 's/^ {10}//' <<< "$BODY" )
+
+          echo "$BODY" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$IS_FORK" = 'true' ]; then
+            echo "Pull request from a fork: the comment text is in the run summary."
+            exit 0
+          fi
+
+          COMMENT_ID=$( gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" \
+            --jq '.[] | select( .user.login == "github-actions[bot]" and ( .body | startswith( "### Test the build" ) ) ) | .id' | head -n 1 )
+
+          if [ -n "$COMMENT_ID" ]; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$COMMENT_ID" -f body="$BODY" > /dev/null
+            echo "Updated comment $COMMENT_ID."
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" -f body="$BODY" > /dev/null
+            echo "Created the comment."
+          fi
