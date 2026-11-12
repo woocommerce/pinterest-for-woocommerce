@@ -63,6 +63,7 @@ jobs:
           .phplint.yml
           .stylelintignore
           .wp-env.json
+          .wp-env.test.json
           eslint.config.cjs
           gulpfile.js
           vitest.config.mjs

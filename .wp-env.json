@@ -1,20 +1,24 @@
 {
-	"core": "https://wordpress.org/wordpress-latest.zip",
-	"phpVersion": "7.4",
-	"plugins": ["https://downloads.wordpress.org/plugin/woocommerce.zip", "."],
+	"core": null,
+	"plugins": [
+		"https://downloads.wordpress.org/plugin/woocommerce.zip",
+		"https://github.com/woocommerce/woocommerce-gateway-dummy/releases/latest/download/woocommerce-gateway-dummy.zip",
+		"."
+	],
+	"themes": [ "https://downloads.wordpress.org/theme/storefront.zip" ],
+	"mappings": {
+		"./wp-content/bin": "./tests/_support/docker/bin"
+	},
 	"config": {
 		"JETPACK_AUTOLOAD_DEV": true,
+		"WP_DEBUG": true,
 		"WP_DEBUG_LOG": true,
-		"WP_DEBUG_DISPLAY": true,
+		"WP_DEBUG_DISPLAY": false,
+		"SCRIPT_DEBUG": false,
+		"WP_PHP_BINARY": "php",
 		"ALTERNATE_WP_CRON": true
 	},
-	"env": {
-		"tests": {
-			"config": {
-				"WP_DEBUG": true,
-				"WP_DEBUG_LOG": true,
-				"WP_DEBUG_DISPLAY": false
-			}
-		}
-	}
+	"phpVersion": "8.4",
+	"port": 8888,
+	"testsEnvironment": false
 }

@@ -94,6 +94,7 @@ function configure_order_storage() {
 	add_filter( 'woocommerce_enable_hpos_by_default_for_new_shops', '__return_false' );
 
 	$storage = getenv( 'PINTEREST_FOR_WOOCOMMERCE_TEST_ORDER_STORAGE' );
+	$storage = false === $storage || '' === $storage ? getenv( 'WC_ORDER_DATASTORE' ) : $storage; // Set by bin/phpunit.sh.
 	$storage = false === $storage || '' === $storage ? 'cpt' : $storage;
 
 	if ( ! in_array( $storage, array( 'cpt', 'hpos' ), true ) ) {
