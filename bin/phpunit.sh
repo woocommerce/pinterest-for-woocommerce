@@ -12,13 +12,13 @@
 #
 # OPTIONS (env vars)
 #   WC_ORDER_DATASTORE=hpos   Order storage: cpt (default) or hpos; CI runs both
-#   UNIT_WC_VERSION=trunk     WooCommerce: latest (default, as CI), nightly, trunk, or X.Y.Z  (setup only)
+#   UNIT_WC_VERSION=10.3.0    WooCommerce: latest (default, as CI) or X.Y.Z; trunk also means latest  (setup only)
 #   UNIT_WP_VERSION=7.0       WordPress:   latest (default, as CI), nightly, or X.Y[.Z] (setup only)
 #
 # EXAMPLES
 #   npm run env:test:unit -- --filter <TestClassName>
 #   WC_ORDER_DATASTORE=hpos npm run env:test:unit
-#   UNIT_WC_VERSION=trunk npm run env:test:unit:setup && npm run env:test:unit
+#   UNIT_WC_VERSION=10.3.0 npm run env:test:unit:setup && npm run env:test:unit
 #
 # Worktrees: export WP_ENV_PORT / WP_ENV_TESTS_PORT first (see AGENTS.md).
 set -euo pipefail
