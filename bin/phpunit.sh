@@ -64,7 +64,8 @@ run() {
 		exit 1
 	fi
 	# install.sh empties each directory before refilling it, so any missing file means a failed or interrupted setup.
-	if ! compose exec -T cli test -f /tmp/wordpress/wp-settings.php -a -f "${TESTS_DIR}/includes/functions.php" -a -f /tmp/wordpress/wp-content/plugins/woocommerce/woocommerce.php; then
+	# wp-tests-config.php is the last file the test library step writes, so it catches a setup that stopped partway through it.
+	if ! compose exec -T cli test -f /tmp/wordpress/wp-settings.php -a -f "${TESTS_DIR}/includes/functions.php" -a -f "${TESTS_DIR}/wp-tests-config.php" -a -f /tmp/wordpress/wp-content/plugins/woocommerce/woocommerce.php; then
 		echo "Test suite missing or incomplete in the tests site; running setup first."
 		setup
 	fi
