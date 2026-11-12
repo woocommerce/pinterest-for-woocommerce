@@ -139,7 +139,7 @@
     "env:test:e2e:run:ui": "E2E_SHOW_UI=1 bash ./bin/acceptance.sh run",
     "env:test:e2e:seed": "npm run wp-env:test -- run cli wp plugin activate woocommerce pinterest-for-woocommerce && node tests/browser/reset.js",
     "env:dev:seed": "wp-env run cli bash wp-content/bin/seed_dev.sh",
-    "env:dev:reset": "wp-env reset && npm run env:dev:seed",
+    "env:dev:reset": "bash ./bin/env-dev-reset.sh",
     "env:start": "wp-env start",
     "env:stop": "wp-env stop",
     "env:destroy": "wp-env destroy",
