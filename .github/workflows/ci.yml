@@ -176,6 +176,16 @@ jobs:
     if: ${{ github.event.pull_request.draft == false && needs.changes.outputs.product == 'true' }}
     uses: ./.github/workflows/run-e2e.yml
 
+  # Not a required check: it only tells reviewers how to try the build.
+  test-the-build:
+    name: Test the build
+    needs: production-zip
+    permissions:
+      pull-requests: write # Creates or updates the "Test the build" comment.
+    uses: ./.github/workflows/test-the-build.yml
+    secrets:
+      beta-builder-secret: ${{ secrets.JETPACK_BETA_BUILDER_SECRET }}
+
   # The single status that branch protection requires. It fails when any
   # applicable check failed, was cancelled, is missing or was skipped
   # unexpectedly, and always fails on drafts so a draft-era result can never

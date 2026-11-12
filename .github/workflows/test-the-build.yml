@@ -1,0 +1,261 @@
+name: Test the build
+
+# Posts a "Test the build" comment on the pull request, with three ways to try the ZIP that the
+# "Production package" job of the calling workflow built: Jetpack Beta, Jurassic Ninja and
+# WordPress Playground. This job runs no code from the pull request: it only repackages the ZIP.
+
+on:
+  workflow_call:
+    secrets:
+      beta-builder-secret:
+        description: Webhook secret of this plugin's Jetpack Beta Builder registration. Without it, the comment says that Jetpack Beta and Jurassic Ninja are not available.
+        required: false
+
+permissions: {}
+
+jobs:
+  comment:
+    name: Comment on the pull request
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pull-requests: write # Creates or updates the "Test the build" comment.
+    env:
+      PLUGIN_SLUG: pinterest-for-woocommerce
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
+    steps:
+
+      - name: Download the production ZIP
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: pinterest-production-zip
+          path: build
+
+      # The Playground link downloads this artifact on every click, so it is kept for longer than a
+      # build artifact needs. The run ID in the name ties the link in the comment to this run's build.
+      - name: Keep the ZIP for the WordPress Playground link
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playground-preview-${{ github.run_id }}
+          path: build/${{ env.PLUGIN_SLUG }}.zip
+          if-no-files-found: error
+          retention-days: 14
+
+      # Jetpack Beta and Jurassic Ninja only serve builds that the Jetpack Beta Builder has received.
+      # That needs the plugin registered there and the webhook secret of that registration. Pull
+      # requests from forks and from Dependabot never get the secret.
+      - name: Check for the Jetpack Beta Builder secret
+        id: beta-secret
+        env:
+          SECRET: ${{ secrets.beta-builder-secret }}
+        run: |
+          if [ -n "$SECRET" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "No Jetpack Beta Builder secret: this build is not sent to the Jetpack Beta Builder." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # The Jetpack Beta Builder expects <slug>-dev.zip holding a <slug>-dev folder, with a version
+      # that names the pull request and the commit.
+      - name: Repackage the ZIP for the Jetpack Beta Builder
+        id: dev-build
+        if: steps.beta-secret.outputs.available == 'true'
+        run: |
+          mkdir beta
+          unzip -q "build/$PLUGIN_SLUG.zip" -d beta
+          cd beta
+
+          VERSION=$( sed -nE 's/^ \* Version:[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+).*$/\1/p' "$PLUGIN_SLUG/$PLUGIN_SLUG.php" )
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Could not read the plugin version from the ZIP."
+            exit 1
+          fi
+          NEXT_VERSION=$( awk -F. '{ print $1 "." $2 "." ( $3 + 1 ) }' <<< "$VERSION" )
+          DEV_VERSION="${NEXT_VERSION}-dev_PR-${PR_NUMBER}_commit-${PR_HEAD_SHA:0:7}"
+
+          sed -i -E "s/^( \* Version:[[:space:]]+).*$/\1${DEV_VERSION}/" "$PLUGIN_SLUG/$PLUGIN_SLUG.php"
+          sed -i -E "s/^(define\( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', ')[^']*'/\1${DEV_VERSION}'/" "$PLUGIN_SLUG/$PLUGIN_SLUG.php"
+          sed -i -E "s/^(Stable tag:[[:space:]]*).*$/\1${DEV_VERSION}/" "$PLUGIN_SLUG/readme.txt"
+          if [ "$( grep -cF "$DEV_VERSION" "$PLUGIN_SLUG/$PLUGIN_SLUG.php" )" != 2 ] || ! grep -qF "Stable tag: $DEV_VERSION" "$PLUGIN_SLUG/readme.txt"; then
+            echo "::error::Could not set the version $DEV_VERSION in the plugin header, the version constant and the readme."
+            exit 1
+          fi
+
+          mv "$PLUGIN_SLUG" "$PLUGIN_SLUG-dev"
+          mkdir ../plugins
+          zip -q -r "../plugins/$PLUGIN_SLUG-dev.zip" "$PLUGIN_SLUG-dev"
+
+          echo "version=$DEV_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Jetpack Beta version: $DEV_VERSION" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the ZIP for the Jetpack Beta Builder
+        if: steps.beta-secret.outputs.available == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: plugins # The name the Jetpack Beta Builder looks for.
+          path: plugins
+          if-no-files-found: error
+          # The Jetpack Beta Builder copies it right away.
+          retention-days: 1
+
+      # A refused build must not fail the job: the comment then says that the options are not available.
+      - name: Send the build to the Jetpack Beta Builder
+        id: beta
+        if: steps.beta-secret.outputs.available == 'true'
+        env:
+          SECRET: ${{ secrets.beta-builder-secret }}
+          DEV_VERSION: ${{ steps.dev-build.outputs.version }}
+        run: |
+          PLUGIN_DATA=$( jq -cn --arg slug "$PLUGIN_SLUG" --arg version "$DEV_VERSION" '{ ( $slug ): { version: $version } }' )
+          if curl --fail --silent --show-error --location \
+            --url "https://betadownload.jetpack.me/gh-action.php?run_id=$GITHUB_RUN_ID&pr=$PR_NUMBER&commit=$PR_HEAD_SHA" \
+            --form-string "repo=$GITHUB_REPOSITORY" \
+            --form-string "branch=$PR_HEAD_REF" \
+            --form-string "plugins=$PLUGIN_DATA" \
+            --form-string "secret=$SECRET"; then
+            echo "accepted=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "accepted=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::The Jetpack Beta Builder did not accept this build."
+          fi
+
+      # WordPress Playground runs in the visitor's browser and can only fetch public URLs. Its
+      # artifact proxy serves this run's artifact for the pull request. It finds the workflow by
+      # name, hence GITHUB_WORKFLOW (the calling workflow) and not a literal that a rename would
+      # break. The artifact wraps the plugin ZIP, so the Blueprint unzips it before installing.
+      #
+      # The link must never ask for credentials or carry a secret: the proxy picks the build by
+      # branch name, so a pull request from a fork with the same branch name could be served.
+      #
+      # To show UI that sits behind an option, set the option in STORE_SETUP in the same pull request.
+      - name: Build the WordPress Playground link
+        id: playground
+        run: |
+          read -r -d '' STORE_SETUP <<'PHP' || true
+          <?php
+          require '/wordpress/wp-load.php';
+
+          // Skip the WooCommerce setup wizard and its redirect.
+          delete_transient( '_wc_activation_redirect' );
+          update_option( 'woocommerce_onboarding_profile', array( 'skipped' => true ) );
+
+          // Show the storefront, not the "coming soon" page.
+          update_option( 'woocommerce_coming_soon', 'no' );
+
+          // Store orders in the High-Performance Order Storage tables, as new stores do.
+          update_option( 'woocommerce_custom_orders_table_enabled', 'yes' );
+
+          $product = new WC_Product_Simple();
+          $product->set_name( 'Sample T-Shirt' );
+          $product->set_regular_price( '20' );
+          $product->set_short_description( 'A sample product to try Pinterest for WooCommerce with.' );
+          $product->set_status( 'publish' );
+          $product->save();
+          PHP
+
+          ARTIFACT_URL=$( jq -rn \
+            --arg org "$GITHUB_REPOSITORY_OWNER" \
+            --arg repo "${GITHUB_REPOSITORY#*/}" \
+            --arg workflow "$GITHUB_WORKFLOW" \
+            --arg pr "$PR_NUMBER" \
+            --arg artifact "playground-preview-$GITHUB_RUN_ID" \
+            '"https://playground.wordpress.net/plugin-proxy.php?org=\($org|@uri)&repo=\($repo|@uri)&workflow=\($workflow|@uri)&pr=\($pr|@uri)&artifact=\($artifact|@uri)"' )
+
+          BLUEPRINT=$( jq -cn \
+            --arg artifact_url "$ARTIFACT_URL" \
+            --arg slug "$PLUGIN_SLUG" \
+            --arg store_setup "$STORE_SETUP" \
+            '{
+              "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+              landingPage: "/wp-admin/admin.php?page=wc-admin&path=/pinterest/landing",
+              preferredVersions: { php: "8.3", wp: "latest" },
+              features: { networking: true },
+              steps: [
+                { step: "login", username: "admin" },
+                { step: "installPlugin", pluginData: { resource: "wordpress.org/plugins", slug: "woocommerce" }, options: { activate: true } },
+                { step: "runPHP", code: $store_setup },
+                { step: "unzip", zipFile: { resource: "url", url: $artifact_url, caption: "Downloading the Pinterest for WooCommerce build of this pull request" }, extractToPath: "/tmp/pr" },
+                { step: "installPlugin", pluginData: { resource: "vfs", path: ( "/tmp/pr/" + $slug + ".zip" ) }, options: { activate: true } }
+              ]
+            }' )
+
+          echo "url=https://playground.wordpress.net/#$( jq -rn --argjson blueprint "$BLUEPRINT" '$blueprint|tojson|@uri' )" >> "$GITHUB_OUTPUT"
+
+      # A pull request from a fork gets a read-only token, so its comment text goes to the run summary only.
+      - name: Create or update the comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IS_FORK: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+          BETA_SECRET: ${{ steps.beta-secret.outputs.available }}
+          BETA_ACCEPTED: ${{ steps.beta.outputs.accepted }}
+          PLAYGROUND_URL: ${{ steps.playground.outputs.url }}
+        run: |
+          if [ "$BETA_ACCEPTED" = 'true' ]; then
+            JN_URL="https://jurassic.ninja/create/?jetpack-beta&nojetpack&woocommerce&woocommerce-import-sample-data&branches.$PLUGIN_SLUG=$( jq -rn --arg ref "$PR_HEAD_REF" '$ref|@uri' )"
+            OPTION_1="- Install and activate [Jetpack Beta](https://jetpack.com/beta/#download-and-install).
+          - Use this build by searching for PR number \`$PR_NUMBER\` or branch name \`$PR_HEAD_REF\` in your-test.site/wp-admin/admin.php?page=jetpack-beta&plugin=$PLUGIN_SLUG
+
+          :information_source: Use a test site that has a public address. Connecting verifies the site's address in your Pinterest account, and Pinterest fetches the product feed from the site, so a local site cannot finish the setup."
+            OPTION_2=":warning: Log in at [jurassic.ninja](https://jurassic.ninja/) first. Without a login, the link below takes you to the Jurassic Ninja homepage and no site is created.
+
+          :rocket: [Launch a JN site with this branch and sample products]($JN_URL) :rocket:
+
+          :information_source: The site starts without a Pinterest connection. To connect it, use a Pinterest business account that you keep for testing: connecting verifies the address of this temporary site in that account."
+          else
+            if [ "$BETA_SECRET" = 'true' ]; then
+              OPTION_1=":construction: Not available for this build. The Jetpack Beta Builder did not accept it; the run of the \"Test the build\" job has the details."
+            else
+              OPTION_1=":construction: Not available yet. Jetpack Beta only offers builds that were sent to the Jetpack Beta Builder, and this one was not. That needs the plugin registered with the Jetpack Beta Builder and the webhook secret of that registration saved as \`JETPACK_BETA_BUILDER_SECRET\` in this repository's Actions secrets. Pull requests from forks never get the secret."
+            fi
+            OPTION_2=":construction: Not available yet. Jurassic Ninja installs the build of a pull request through Jetpack Beta, so it needs the same setup as Option 1."
+          fi
+
+          BODY="### Test the build
+
+          #### Option 1. Jetpack Beta
+
+          $OPTION_1
+
+          #### Option 2. Jurassic Ninja - available for logged-in A12s
+
+          $OPTION_2
+
+          #### Option 3. WordPress Playground - runs in your browser
+
+          :test_tube: [Open this build in WordPress Playground]($PLAYGROUND_URL): a fresh store with WooCommerce set up, a sample product and this build, on the Pinterest \"Get started\" screen.
+
+          :information_source: The preview cannot connect a Pinterest account. Connecting sends you to Pinterest and back to the site, and a site that runs in your browser tab has no public address to come back to. So it shows what a merchant sees before connecting: the \"Get started\" screen and the first step of the setup. Nothing that needs a Pinterest account works: catalog sync, the Pinterest tag, conversions and ads. The link stops working 14 days after the last build.
+
+          ---
+
+          Build info:
+
+          - Latest commit: $PR_HEAD_SHA
+          - Build time: $( date -u '+%Y-%m-%d %H:%M:%S UTC' )
+
+          _Note: the build is updated when a new commit is pushed to this PR._"
+
+          # The lines above are indented to fit this file; a comment must start at the margin.
+          BODY=$( sed -E 's/^ {10}//' <<< "$BODY" )
+
+          echo "$BODY" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$IS_FORK" = 'true' ]; then
+            echo "Pull request from a fork: the comment text is in the run summary."
+            exit 0
+          fi
+
+          COMMENT_ID=$( gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" \
+            --jq '.[] | select( .user.login == "github-actions[bot]" and ( .body | startswith( "### Test the build" ) ) ) | .id' | head -n 1 )
+
+          if [ -n "$COMMENT_ID" ]; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$COMMENT_ID" -f body="$BODY" > /dev/null
+            echo "Updated comment $COMMENT_ID."
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" -f body="$BODY" > /dev/null
+            echo "Created the comment."
+          fi
