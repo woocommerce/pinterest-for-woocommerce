@@ -358,6 +358,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Suppress only Pinterest's untested WooCommerce notice, preserving all other decisions.
 		 *
+		 * @since x.x.x
+		 *
 		 * @param mixed  $show Whether the compatibility notice should be shown.
 		 * @param string $slug Plugin-specific compatibility notice slug.
 		 * @return mixed
@@ -368,6 +370,8 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 		/**
 		 * Remove warnings stored by earlier versions before WooCommerce renders them.
+		 *
+		 * @since x.x.x
 		 *
 		 * @return void
 		 */
