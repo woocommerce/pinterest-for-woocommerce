@@ -47,7 +47,7 @@ jobs:
             with:
                 status: success
                 message: "<{{{workflowUrl}}}|_{{workflow}}_> for ${{ github.repository }} *v${{ env.RELEASE_VERSION }}* completed."
-                channel: '#team-somewherewarm-releases'
+                channel: 'C0000000000' # Placeholder until the team channel ID is known (PIN4WOO-271).
 
     handle-cancelled:
         if: ${{ cancelled() }}
@@ -64,7 +64,7 @@ jobs:
             with:
                 status: cancelled
                 message: "<{{{workflowUrl}}}|_{{workflow}}_> for ${{ github.repository }} *v${{ env.RELEASE_VERSION }}* cancelled."
-                channel: '#team-somewherewarm-releases'
+                channel: 'C0000000000' # Placeholder until the team channel ID is known (PIN4WOO-271).
 
     handle-error:
         if: ${{ failure() }}
@@ -81,4 +81,4 @@ jobs:
             with:
                 status: failure
                 message: "<{{{workflowUrl}}}|_{{workflow}}_> for ${{ github.repository }} *v${{ env.RELEASE_VERSION }}* failed."
-                channel: '#team-somewherewarm-releases'
+                channel: 'C0000000000' # Placeholder until the team channel ID is known (PIN4WOO-271).
