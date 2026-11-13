@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Remove the untested WooCommerce version warning for Pinterest while preserving required compatibility checks.
