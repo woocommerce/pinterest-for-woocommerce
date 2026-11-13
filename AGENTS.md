@@ -710,7 +710,7 @@ Per WordPress Core Handbook, we support:
 
 ## Shared implementation safeguards
 
-These safeguards complement the repository-specific guidance. In the SWW workspace, the parent `AGENTS.md` remains authoritative for approvals, GitHub writes, and Linear workflow. Local instructions do not relax it.
+These safeguards complement the repository-specific guidance. When this repository is checked out in a workspace with a parent `AGENTS.md`, that file remains authoritative for approvals, GitHub writes, and Linear workflow. Local instructions do not relax it.
 
 ### Compatibility and extension contracts
 
