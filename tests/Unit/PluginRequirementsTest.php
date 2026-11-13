@@ -7,16 +7,141 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Grow\Tools\CompatChecker\v0_0_1\Checker;
+use Automattic\WooCommerce\Grow\Tools\CompatChecker\v0_0_1\Checks\WCCompatibility;
+use Automattic\WooCommerce\Grow\Tools\CompatChecker\v0_0_1\Checks\WPCompatibility;
 use Pinterest_For_Woocommerce;
 use PHPUnit\Util\PHP\AbstractPhpProcess;
+use WC_Admin_Notices;
 use WP_UnitTestCase;
 
 /**
- * Tests the minimum WordPress and WooCommerce versions at the runtime gate.
+ * Tests plugin requirements and compatibility notices.
  *
- * @version 1.5.4
+ * @version x.x.x
  */
 class PluginRequirementsTest extends WP_UnitTestCase {
+
+	/** @var string[] Notices present before the test. */
+	private $original_notices;
+
+	/** Capture notice state and avoid remote version lookups. */
+	public function setUp(): void {
+		parent::setUp();
+		$this->original_notices = WC_Admin_Notices::get_notices();
+		set_transient( 'compat_checker_wc_versions', array( WC_VERSION ) );
+	}
+
+	/** Restore WooCommerce's static notice cache and the current screen. */
+	public function tearDown(): void {
+		foreach ( array_diff( WC_Admin_Notices::get_notices(), $this->original_notices ) as $notice ) {
+			WC_Admin_Notices::remove_notice( $notice );
+		}
+		foreach ( $this->original_notices as $notice ) {
+			WC_Admin_Notices::add_notice( $notice );
+		}
+		set_current_screen( 'front' );
+		parent::tearDown();
+	}
+
+	/**
+	 * Newer WooCommerce versions must not produce Pinterest's untested warning.
+	 */
+	public function test_untested_woocommerce_notice_is_suppressed() {
+		set_current_screen( 'plugins' );
+		$data             = Checker::instance()->get_plugin_data( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE, PINTEREST_FOR_WOOCOMMERCE_VERSION );
+		$data['TestedWC'] = '1.0';
+		$check            = new WCCompatibility();
+
+		$this->assertTrue( $check->is_compatible( $data ) );
+		$this->assertSame( 10, has_action( 'admin_notices', array( $check, 'wc_untested' ) ) );
+		$check->wc_untested();
+
+		$this->assertFalse( WC_Admin_Notices::has_notice( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME . '-woocommerce-untested' ) );
+	}
+
+	/**
+	 * Previously stored warnings must disappear without clearing other notices.
+	 */
+	public function test_stored_untested_woocommerce_notice_is_removed() {
+		$slug  = PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME . '-woocommerce-untested';
+		$other = 'compatibility-fixture/fixture.php-woocommerce-untested';
+		WC_Admin_Notices::add_custom_notice( $slug, 'Stored Pinterest warning.' );
+		WC_Admin_Notices::add_custom_notice( $other, 'Other plugin warning.' );
+
+		// Run only the registered cleanup, without unrelated admin_init side effects.
+		$callback = array( Pinterest_For_Woocommerce::instance(), 'remove_untested_woocommerce_notice' );
+		$this->assertSame( 10, has_action( 'admin_init', $callback ) );
+		call_user_func( $callback );
+
+		$this->assertFalse( WC_Admin_Notices::has_notice( $slug ) );
+		$this->assertTrue( WC_Admin_Notices::has_notice( $other ) );
+		ob_start();
+		WC_Admin_Notices::output_custom_notices();
+		$output = ob_get_clean();
+		$this->assertStringNotContainsString( 'Stored Pinterest warning.', $output );
+		$this->assertStringContainsString( 'Other plugin warning.', $output );
+	}
+
+	/**
+	 * Other plugins' WooCommerce warnings and Pinterest's WordPress warnings remain.
+	 */
+	public function test_other_compatibility_notices_are_preserved() {
+		set_current_screen( 'plugins' );
+		$data             = Checker::instance()->get_plugin_data( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE, PINTEREST_FOR_WOOCOMMERCE_VERSION );
+		$data['File']     = WP_PLUGIN_DIR . '/compatibility-fixture/fixture.php';
+		$data['TestedWC'] = '1.0';
+		$check            = new WCCompatibility();
+		$this->assertTrue( $check->is_compatible( $data ) );
+		$check->wc_untested();
+		$this->assertTrue( WC_Admin_Notices::has_notice( 'compatibility-fixture/fixture.php-woocommerce-untested' ) );
+
+		$data['File']     = PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE;
+		$data['TestedWP'] = '1.0';
+		$check            = new WPCompatibility();
+		$this->assertTrue( $check->is_compatible( $data ) );
+		$check->wp_not_tested();
+		$this->assertTrue( WC_Admin_Notices::has_notice( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME . '-wordpress-untested' ) );
+	}
+
+	/**
+	 * The checker must still reject WooCommerce below the required version.
+	 */
+	public function test_checker_still_rejects_incompatible_woocommerce() {
+		$data               = Checker::instance()->get_plugin_data( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE, PINTEREST_FOR_WOOCOMMERCE_VERSION );
+		$data['RequiresWC'] = '999.0';
+		$check              = new WCCompatibility();
+
+		$this->assertFalse( $check->is_compatible( $data ) );
+		$this->assertSame( 10, has_action( 'admin_notices', array( $check, 'wc_out_of_date' ) ) );
+		// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment -- Exercise the dependency's filter.
+		$this->assertTrue( apply_filters( 'wc_grow_compat_check_show_admin_notice', true, PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME . '-woocommerce-out-of-date' ) );
+	}
+
+	/**
+	 * Preserve prior filter decisions and unexpected values for every other slug.
+	 *
+	 * @dataProvider compatibility_notice_values
+	 * @param mixed $show Previous filter value.
+	 */
+	public function test_other_notice_filter_values_are_preserved( $show ) {
+		foreach ( array( 'woocommerce-not-installed', 'woocommerce-not-activated', 'woocommerce-out-of-date', 'woocommerce-upgrade-recommendation', 'wordpress-untested' ) as $notice ) {
+			// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment -- Exercise the dependency's filter.
+			$this->assertSame( $show, apply_filters( 'wc_grow_compat_check_show_admin_notice', $show, PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME . '-' . $notice ) );
+		}
+		// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment -- Exercise the dependency's filter.
+		$this->assertSame( $show, apply_filters( 'wc_grow_compat_check_show_admin_notice', $show, 'compatibility-fixture/fixture.php-woocommerce-untested' ) );
+	}
+
+	/** @return array Previous filter values, including unexpected customizations. */
+	public function compatibility_notice_values() {
+		return array_map(
+			static function ( $value ) {
+				return array( $value );
+			},
+			array( true, false, null, '', 'custom-value', array() )
+		);
+	}
 
 	/**
 	 * Checks the supported WordPress version boundary.
@@ -54,8 +179,8 @@ class PluginRequirementsTest extends WP_UnitTestCase {
 	 * Checks the supported WooCommerce version boundary.
 	 *
 	 * @dataProvider woocommerce_version_provider
-	 * @param string $version WooCommerce version to check.
-	 * @param bool   $expected Whether the version is supported.
+	 * @param string|null $version WooCommerce version to check, or null when missing.
+	 * @param bool        $expected Whether the version is supported.
 	 */
 	public function test_woocommerce_version_requirement( $version, $expected ) {
 		// A fresh process can define WC_VERSION without the bootstrap's immutable constant.
@@ -63,7 +188,10 @@ class PluginRequirementsTest extends WP_UnitTestCase {
 			<<<'PHP'
 			<?php
 			define( 'ABSPATH', %s );
-			define( 'WC_VERSION', %s );
+			$wc_version = %s;
+			if ( null !== $wc_version ) {
+				define( 'WC_VERSION', $wc_version );
+			}
 			define( 'PINTEREST_FOR_WOOCOMMERCE_VERSION', %s );
 			$wp_version = '7.0';
 			$plugin_dir = %s;
@@ -95,6 +223,7 @@ class PluginRequirementsTest extends WP_UnitTestCase {
 	 */
 	public function woocommerce_version_provider() {
 		return array(
+			'missing'       => array( null, false ),
 			'below minimum' => array( '11.0.99', false ),
 			'minimum'       => array( '11.1.0', true ),
 		);

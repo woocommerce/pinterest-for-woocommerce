@@ -42,7 +42,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 	 * Base Plugin class holding generic functionality
 	 *
 	 * @class   Pinterest_For_Woocommerce
-	 * @version 1.6.3
+	 * @version x.x.x
 	 */
 	final class Pinterest_For_Woocommerce {
 
@@ -287,6 +287,9 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		 */
 		public function init_plugin() {
 
+			add_filter( 'wc_grow_compat_check_show_admin_notice', array( $this, 'should_show_compatibility_notice' ), 10, 2 );
+			add_action( 'admin_init', array( $this, 'remove_untested_woocommerce_notice' ) );
+
 			if ( ! Checker::instance()->is_compatible( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_FILE, PINTEREST_FOR_WOOCOMMERCE_VERSION ) || ! $this->check_plugin_requirements() ) {
 				return;
 			}
@@ -349,6 +352,32 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 
 			if ( defined( 'WP_CLI' ) && WP_CLI ) {
 				WP_CLI::add_command( 'wc pinterest feed', Pinterest\CLI\FeedCommand::class );
+			}
+		}
+
+		/**
+		 * Suppress only Pinterest's untested WooCommerce notice, preserving all other decisions.
+		 *
+		 * @since x.x.x
+		 *
+		 * @param mixed  $show Whether the compatibility notice should be shown.
+		 * @param string $slug Plugin-specific compatibility notice slug.
+		 * @return mixed
+		 */
+		public function should_show_compatibility_notice( $show, $slug ) {
+			return PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME . '-woocommerce-untested' === $slug ? false : $show;
+		}
+
+		/**
+		 * Remove warnings stored by earlier versions before WooCommerce renders them.
+		 *
+		 * @since x.x.x
+		 *
+		 * @return void
+		 */
+		public function remove_untested_woocommerce_notice() {
+			if ( class_exists( 'WC_Admin_Notices' ) ) {
+				WC_Admin_Notices::remove_notice( PINTEREST_FOR_WOOCOMMERCE_PLUGIN_BASENAME . '-woocommerce-untested' );
 			}
 		}
 
