@@ -78,6 +78,7 @@ const mount = ( settings = {} ) => {
 		ui,
 		...render( ui ),
 		getNotices: () => registry.select( noticesStore ).getNotices(),
+		getSettings: () => registry.select( STORE_NAME ).getSettings(),
 	};
 };
 
@@ -89,54 +90,63 @@ const deferred = () => {
 	return { promise, resolve };
 };
 
-it( 'syncs once on mount, stays busy until the response and shows the refreshed sync time', async () => {
-	const initialSync = deferred();
-	const manualSync = deferred();
-	window.fetch
-		.mockReturnValueOnce( initialSync.promise )
-		.mockReturnValueOnce( manualSync.promise );
+it( 'does not sync or announce a save when opening or revisiting settings', async () => {
+	window.fetch.mockResolvedValue(
+		jsonResponse( { success: true, synced_settings: {} } )
+	);
+	const settings = {
+		automatic_enhanced_match_support: true,
+		last_synced_settings: '12 Oct 2026, 09:00:00 am',
+	};
+	const { ui, rerender, unmount, getNotices, getSettings } =
+		mount( settings );
 
-	const { ui, rerender } = mount();
+	expect(
+		await screen.findByRole( 'button', { name: SYNC_LABEL } )
+	).toBeTruthy();
+	expect( window.fetch ).not.toHaveBeenCalled();
+	expect( getNotices() ).toHaveLength( 0 );
+	expect( getSettings() ).toEqual( settings );
+	expect(
+		screen.getByText( /Settings last updated: 12 Oct 2026, 09:00:00 am •/ )
+	).toBeTruthy();
+	expect( screen.getByRole( 'button', { name: SYNC_LABEL } ) ).toBeTruthy();
+
+	rerender( ui );
+	unmount();
+	render( ui );
+	expect(
+		await screen.findByRole( 'button', { name: SYNC_LABEL } )
+	).toBeTruthy();
+
+	expect( window.fetch ).not.toHaveBeenCalled();
+	expect( getNotices() ).toHaveLength( 0 );
+	expect( getSettings() ).toEqual( settings );
+} );
+
+it( 'syncs on request, stays busy until the response and shows the refreshed sync time', async () => {
+	const manualSync = deferred();
+	window.fetch.mockReturnValueOnce( manualSync.promise );
+
+	const { ui, rerender, getNotices } = mount();
+
+	fireEvent.click( screen.getByRole( 'button', { name: SYNC_LABEL } ) );
 
 	expectSyncRequests( 1 );
 	expect( screen.getByText( /Syncing settings/ ) ).toBeTruthy();
 	expect( screen.queryByRole( 'button', { name: SYNC_LABEL } ) ).toBeNull();
 	expect( screen.getByText( /Settings last updated: - •/ ) ).toBeTruthy();
+	expect( getNotices() ).toHaveLength( 0 );
 
 	rerender( ui );
 	expect( window.fetch ).toHaveBeenCalledTimes( 1 );
-
-	await act( async () => {
-		initialSync.resolve(
-			jsonResponse( {
-				success: true,
-				synced_settings: {
-					automatic_enhanced_match_support: true,
-					last_synced_settings: '13 Oct 2026, 10:00:00 am',
-				},
-			} )
-		);
-	} );
-
-	expect(
-		await screen.findByText(
-			/Settings last updated: 13 Oct 2026, 10:00:00 am •/
-		)
-	).toBeTruthy();
-	expect( screen.queryByText( /Syncing settings/ ) ).toBeNull();
-	// Leaving the busy state and receiving the settings re-rendered the component.
-	expect( window.fetch ).toHaveBeenCalledTimes( 1 );
-
-	fireEvent.click( screen.getByRole( 'button', { name: SYNC_LABEL } ) );
-
-	expectSyncRequests( 2 );
-	expect( screen.getByText( /Syncing settings/ ) ).toBeTruthy();
 
 	await act( async () => {
 		manualSync.resolve(
 			jsonResponse( {
 				success: true,
 				synced_settings: {
+					automatic_enhanced_match_support: true,
 					last_synced_settings: '13 Oct 2026, 11:30:00 am',
 				},
 			} )
@@ -148,7 +158,15 @@ it( 'syncs once on mount, stays busy until the response and shows the refreshed 
 			/Settings last updated: 13 Oct 2026, 11:30:00 am •/
 		)
 	).toBeTruthy();
+	expect( screen.queryByText( /Syncing settings/ ) ).toBeNull();
 	expect( screen.getByRole( 'button', { name: SYNC_LABEL } ) ).toBeTruthy();
+	expect( window.fetch ).toHaveBeenCalledTimes( 1 );
+	expect( getNotices() ).toMatchObject( [
+		{
+			status: 'success',
+			content: 'Settings successfully synced with Pinterest Ads Manager.',
+		},
+	] );
 } );
 
 it( 'reports a failed sync, keeps the sync time and recovers through the Retry action', async () => {
@@ -165,6 +183,8 @@ it( 'reports a failed sync, keeps the sync time and recovers through the Retry a
 	const { getNotices } = mount( {
 		last_synced_settings: '12 Oct 2026, 09:00:00 am',
 	} );
+
+	fireEvent.click( screen.getByRole( 'button', { name: SYNC_LABEL } ) );
 
 	// The sync link comes back, so the merchant is not left on a spinner.
 	expect(
@@ -216,6 +236,8 @@ it( 'reports a sync that the server answers with success: false as failed', asyn
 
 	const { getNotices } = mount();
 
+	fireEvent.click( screen.getByRole( 'button', { name: SYNC_LABEL } ) );
+
 	await waitFor( () => expect( getNotices() ).toHaveLength( 1 ) );
 	expect( getNotices()[ 0 ] ).toMatchObject( {
 		status: 'error',
@@ -235,6 +257,8 @@ it( 'keeps one sync notice across retries and the success notice across re-rende
 		);
 
 	const { ui, rerender, getNotices } = mount();
+
+	fireEvent.click( screen.getByRole( 'button', { name: SYNC_LABEL } ) );
 
 	await waitFor( () => expect( getNotices() ).toHaveLength( 1 ) );
 

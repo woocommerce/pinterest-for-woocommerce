@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Only sync settings with Pinterest Ads Manager when the Sync action is requested, avoiding a success notice when opening Settings.

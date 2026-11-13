@@ -4,7 +4,6 @@
 import { sprintf, __ } from '@wordpress/i18n';
 import { Spinner } from '@woocommerce/components';
 import { useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
 import {
 	Button,
 	Flex,
@@ -30,8 +29,6 @@ const SyncSettings = () => {
 	const syncAppSettings = useSyncSettingsDispatch();
 	const createNotice = useCreateNotice();
 	const { removeNotice } = useDispatch( 'core/notices' );
-	const [ triggeredSyncSettings, setTriggeredSyncSettings ] =
-		useState( false );
 
 	const syncSettings = async () => {
 		removeNotice( 'pinterest-for-woocommerce-settings-synced' );
@@ -73,11 +70,6 @@ const SyncSettings = () => {
 			);
 		}
 	};
-
-	if ( ! triggeredSyncSettings ) {
-		syncSettings();
-		setTriggeredSyncSettings( true );
-	}
 
 	const lastSyncedTime = appSettings.last_synced_settings
 		? appSettings.last_synced_settings
