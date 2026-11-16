@@ -5,8 +5,8 @@ Requires at least: 7.0
 Tested up to: 7.1
 Requires PHP: 7.4
 WC requires at least: 11.1
-WC tested up to: 11.2
-Stable tag: 1.6.3
+WC tested up to: 11.3
+Stable tag: 1.6.4
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -92,6 +92,10 @@ Yes you can! Join in on our [GitHub repository](https://github.com/woocommerce/p
 Release and roadmap notes available on the [WooCommerce Developers Blog](https://developer.woocommerce.com/)
 
 == Changelog ==
+
+= 1.6.4 - 2026-11-16 =
+* Fix - Remove the untested WooCommerce version warning for Pinterest while preserving required compatibility checks.
+* Tweak - Declared compatibility with WooCommerce 11.3.
 
 = 1.6.3 - 2026-11-11 =
 * Fix - Fixed checkbox styles on the Settings screen so checked boxes show a white check and disabled boxes look disabled.

@@ -42,7 +42,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 	 * Base Plugin class holding generic functionality
 	 *
 	 * @class   Pinterest_For_Woocommerce
-	 * @version x.x.x
+	 * @version 1.6.4
 	 */
 	final class Pinterest_For_Woocommerce {
 
@@ -358,7 +358,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Suppress only Pinterest's untested WooCommerce notice, preserving all other decisions.
 		 *
-		 * @since x.x.x
+		 * @since 1.6.4
 		 *
 		 * @param mixed  $show Whether the compatibility notice should be shown.
 		 * @param string $slug Plugin-specific compatibility notice slug.
@@ -371,7 +371,7 @@ if ( ! class_exists( 'Pinterest_For_Woocommerce' ) ) :
 		/**
 		 * Remove warnings stored by earlier versions before WooCommerce renders them.
 		 *
-		 * @since x.x.x
+		 * @since 1.6.4
 		 *
 		 * @return void
 		 */

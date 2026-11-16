@@ -18,7 +18,7 @@ use WP_UnitTestCase;
 /**
  * Tests plugin requirements and compatibility notices.
  *
- * @version x.x.x
+ * @version 1.6.4
  */
 class PluginRequirementsTest extends WP_UnitTestCase {
 
