@@ -1,5 +1,8 @@
 *** Pinterest for WooCommerce Changelog ***
 
+= 1.6.4 - 2026-11-16 =
+* Fix - Remove the untested WooCommerce version warning for Pinterest while preserving required compatibility checks.
+
 = 1.6.3 - 2026-11-11 =
 * Fix - Fixed checkbox styles on the Settings screen so checked boxes show a white check and disabled boxes look disabled.
 * Fix - Skip Pinterest Tag events on page load and in AJAX cart fragments when a consent plugin has blocked the tag, avoiding a pintrk is not defined error.
