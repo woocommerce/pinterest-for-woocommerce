@@ -2,6 +2,7 @@
 
 = 1.6.4 - 2026-11-16 =
 * Fix - Remove the untested WooCommerce version warning for Pinterest while preserving required compatibility checks.
+* Tweak - Declared compatibility with WooCommerce 11.3.
 
 = 1.6.3 - 2026-11-11 =
 * Fix - Fixed checkbox styles on the Settings screen so checked boxes show a white check and disabled boxes look disabled.
