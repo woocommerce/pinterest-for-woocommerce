@@ -128,6 +128,34 @@ class ProductPrice {
 	}
 
 	/**
+	 * Returns a composite's regular and sale prices when its cheapest
+	 * configuration costs less than its regular price.
+	 *
+	 * Composite Products' own is_on_sale() ignores sales on component products,
+	 * so the sale is decided by comparing the composite prices.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param WC_Product $product Composite product.
+	 * @param string     $context Where the prices are used, one of the CONTEXT_* constants.
+	 *
+	 * @return array{regular: mixed, sale: mixed}|null Regular and sale prices, or null when not on sale.
+	 */
+	public static function get_composite_sale_prices( WC_Product $product, string $context ) {
+		$regular_price = self::get_regular_price( $product, $context );
+		$sale_price    = self::get_price( $product, $context );
+
+		if ( ! is_numeric( $regular_price ) || ! is_numeric( $sale_price ) || (float) $sale_price >= (float) $regular_price ) {
+			return null;
+		}
+
+		return array(
+			'regular' => $regular_price,
+			'sale'    => $sale_price,
+		);
+	}
+
+	/**
 	 * Returns the price of one unit of a product added to the customer's cart.
 	 *
 	 * A composite container in the cart is priced as its own display price plus

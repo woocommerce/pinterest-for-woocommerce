@@ -190,10 +190,9 @@ class RichPins {
 
 		// tags enabled by setup.
 		if ( ProductPrice::is_composite( $product ) ) {
-			// A composite is on sale when its cheapest configuration costs less than its regular price.
-			$regular_price = ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_RICH_PINS );
-			if ( is_numeric( $regular_price ) && is_numeric( $tags['product:price:amount'] ) && (float) $tags['product:price:amount'] < (float) $regular_price ) {
-				$tags['og:price:standard_amount'] = $regular_price;
+			$prices = ProductPrice::get_composite_sale_prices( $product, ProductPrice::CONTEXT_RICH_PINS );
+			if ( $prices ) {
+				$tags['og:price:standard_amount'] = $prices['regular'];
 			}
 		} elseif ( $product->is_on_sale() ) {
 			$tags['og:price:standard_amount'] = ProductPrice::filter_regular_price( $product->get_regular_price(), $product, ProductPrice::CONTEXT_RICH_PINS );

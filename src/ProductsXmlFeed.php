@@ -531,30 +531,27 @@ class ProductsXmlFeed {
 	 */
 	private static function get_property_sale_price( $product, $property ) {
 		if ( ProductPrice::is_composite( $product ) ) {
-			// A composite is on sale when its cheapest configuration costs less than its regular price.
-			$regular_price = self::get_product_regular_price( $product );
-			$sale_price    = ProductPrice::get_price( $product, ProductPrice::CONTEXT_FEED );
-			$price         = is_numeric( $sale_price ) && is_numeric( $regular_price ) && (float) $sale_price < (float) $regular_price ? $sale_price : '';
+			$prices = ProductPrice::get_composite_sale_prices( $product, ProductPrice::CONTEXT_FEED );
+			$price  = $prices ? $prices['sale'] : '';
 		} elseif ( ! $product->is_on_sale() ) {
 			return;
 		} elseif ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_sale_price' ) ) {
 			$regular_price = $product->get_variation_regular_price( 'min', true );
 			$sale_price    = $product->get_variation_sale_price( 'min', true );
-			$price         = $regular_price > $sale_price ? $sale_price : false;
+			$price         = $regular_price > $sale_price ? ProductPrice::filter_price( $sale_price, $product, ProductPrice::CONTEXT_FEED ) : false;
 		} else {
 			$sale_price = $product->get_sale_price();
 
-			$price = $sale_price ? wc_get_price_to_display(
+			$price = $sale_price ? ProductPrice::filter_price(
+				wc_get_price_to_display(
+					$product,
+					array(
+						'price' => $sale_price,
+					)
+				),
 				$product,
-				array(
-					'price' => $sale_price,
-				)
+				ProductPrice::CONTEXT_FEED
 			) : '';
-		}
-
-		// The composite branch already applied the price filter.
-		if ( ! empty( $price ) && ! ProductPrice::is_composite( $product ) ) {
-			$price = ProductPrice::filter_price( $price, $product, ProductPrice::CONTEXT_FEED );
 		}
 
 		if ( empty( $price ) ) {
