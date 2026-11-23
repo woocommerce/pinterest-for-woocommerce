@@ -154,6 +154,33 @@ class RichPinsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A composite without a composite price gets no amount tag, while a free one keeps its zero amount.
+	 */
+	public function test_composite_amount_tag_is_omitted_only_without_a_price() {
+		$unpriced = CompositeProductStub::create( '', '' );
+		$this->assertArrayNotHasKey( 'product:price:amount', $this->get_product_tags( $unpriced ) );
+
+		$free = CompositeProductStub::create( '0', '0' );
+		$this->assertSame( '0', $this->get_product_tags( $free )['product:price:amount'] );
+	}
+
+	/**
+	 * An empty filtered regular price leaves out the standard amount of a product on sale.
+	 */
+	public function test_empty_regular_price_filter_omits_standard_amount() {
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'regular_price' => '15',
+				'sale_price'    => '10',
+			)
+		);
+		add_filter( 'pinterest_for_woocommerce_product_regular_price', fn() => '' );
+
+		$this->assertArrayNotHasKey( 'og:price:standard_amount', $this->get_product_tags( $product ) );
+	}
+
+	/**
 	 * The price filter sets the Rich Pins amount.
 	 */
 	public function test_price_filter_sets_amount() {

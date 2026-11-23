@@ -184,9 +184,12 @@ class RichPins {
 			return $tags;
 		}
 
-		// mandatory tags.
+		// mandatory tags. A product without a price gets no amount tag.
 		$tags['product:price:currency'] = get_woocommerce_currency();
-		$tags['product:price:amount']   = ProductPrice::get_price( $product, ProductPrice::CONTEXT_RICH_PINS );
+		$price                          = ProductPrice::get_price( $product, ProductPrice::CONTEXT_RICH_PINS );
+		if ( '' !== $price ) {
+			$tags['product:price:amount'] = $price;
+		}
 
 		// tags enabled by setup.
 		if ( ProductPrice::is_composite( $product ) ) {
@@ -195,7 +198,14 @@ class RichPins {
 				$tags['og:price:standard_amount'] = $prices['regular'];
 			}
 		} elseif ( $product->is_on_sale() ) {
-			$tags['og:price:standard_amount'] = ProductPrice::filter_regular_price( $product->get_regular_price(), $product, ProductPrice::CONTEXT_RICH_PINS );
+			$regular_price = ProductPrice::filter_regular_price(
+				$product->get_regular_price(),
+				$product,
+				ProductPrice::CONTEXT_RICH_PINS
+			);
+			if ( '' !== $regular_price ) {
+				$tags['og:price:standard_amount'] = $regular_price;
+			}
 		}
 
 		if ( ! empty( $args['products']['enable_description'] ) ) {
