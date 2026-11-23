@@ -165,6 +165,27 @@ class TagTest extends \WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that Enhanced Match sends no `em` when the guest's session email is only whitespace.
+	 */
+	public function test_print_script_omits_email_when_session_email_is_blank() {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_tag'           => 'JU9RAG86Q',
+				'enhanced_match_support' => true,
+			)
+		);
+		WC()->session->set( 'customer', array( 'email' => '   ' ) );
+
+		$tag = new Tag();
+
+		ob_start();
+		$tag->print_script();
+		$script = ob_get_clean();
+
+		$this->assert_tag_script( $script, 'ju9rag86q', '{"np":"woocommerce"}' );
+	}
+
+	/**
 	 * Compare the pixel output using the current WordPress script-tag format.
 	 *
 	 * @param string $script Printed HTML.
