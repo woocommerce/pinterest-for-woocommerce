@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Lowercase and trim customer emails before hashing them for the Pinterest Conversions API.

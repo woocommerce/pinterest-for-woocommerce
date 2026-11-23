@@ -11,7 +11,7 @@ use WP_UnitTestCase;
 /**
  * Tests the Conversions tracker class.
  *
- * @version 1.6.0
+ * @version x.x.x
  */
 class ConversionsTest extends WP_UnitTestCase {
 
@@ -214,6 +214,26 @@ class ConversionsTest extends WP_UnitTestCase {
 			),
 			$data['user_data']
 		);
+	}
+
+	/**
+	 * Tests that the email is trimmed and lowercased before hashing, for both
+	 * logged-in customers and guests whose email is in the WooCommerce session.
+	 */
+	public function test_default_data_hashes_normalized_customer_email() {
+		$expected    = array( hash( 'sha256', 'customer@example.com' ) );
+		$conversions = new Conversions( new User( 'ip', 'ua' ) );
+
+		wp_set_current_user( self::factory()->user->create( array( 'user_email' => 'Customer@Example.COM' ) ) );
+		$data = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+		$this->assertSame( $expected, $data['user_data']['em'] );
+
+		wp_set_current_user( 0 );
+		$customer = WC()->session->get( 'customer' );
+		WC()->session->set( 'customer', array( 'email' => ' Customer@Example.COM ' ) );
+		$data = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+		WC()->session->set( 'customer', $customer );
+		$this->assertSame( $expected, $data['user_data']['em'] );
 	}
 
 	/**

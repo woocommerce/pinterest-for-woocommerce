@@ -23,7 +23,7 @@ use Throwable;
  * Pinterest Conversions API support.
  *
  * @class   Conversions
- * @version 1.6.0
+ * @version x.x.x
  */
 class Conversions extends Tracker {
 
@@ -213,6 +213,10 @@ class Conversions extends Tracker {
 	/**
 	 * Returns the hashed email of the current user if any.
 	 *
+	 * Pinterest expects the SHA-256 hash of the trimmed, lowercase email.
+	 *
+	 * @since x.x.x Normalizes the email before hashing.
+	 *
 	 * @return string|false Hashed email or false if not available.
 	 */
 	private static function maybe_get_hashed_customer_email() {
@@ -225,7 +229,8 @@ class Conversions extends Tracker {
 			$session_customer = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session->get( 'customer' ) : false;
 			$user_email       = $session_customer ? $session_customer['email'] : '';
 		}
-		return $user_email ? hash( 'sha256', $user_email ) : false;
+		$user_email = strtolower( trim( (string) $user_email ) );
+		return '' !== $user_email ? hash( 'sha256', $user_email ) : false;
 	}
 
 	/**
