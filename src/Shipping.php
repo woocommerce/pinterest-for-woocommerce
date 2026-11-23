@@ -11,6 +11,7 @@ namespace Automattic\WooCommerce\Pinterest;
 defined( 'ABSPATH' ) || exit;
 
 use \WC_Data_Store;
+use Automattic\WooCommerce\Pinterest\Product\ProductPrice;
 
 /**
  * Shipping class.
@@ -26,10 +27,11 @@ use \WC_Data_Store;
  * - Filtering of not supported countries.
  * - Simple products.
  * - Variable products.
+ * - Composite products, priced at their minimum composite price.
  *
  * @class   Shipping
  * @since   1.0.5
- * @version 1.6.0
+ * @version x.x.x
  */
 class Shipping {
 
@@ -225,6 +227,7 @@ class Shipping {
 	 * @return array               Product packed into a package for use by shipping methods.
 	 */
 	public static function put_product_into_a_shipping_package( $product, $location ) {
+		$price     = ProductPrice::get_shipping_price( $product );
 		$cart_item = array(
 			'key'          => 0,
 			'product_id'   => $product->get_id(),
@@ -233,12 +236,12 @@ class Shipping {
 			'quantity'     => 1,
 			'data'         => $product,
 			'data_hash'    => wc_get_cart_item_data_hash( $product ),
-			'line_total'   => wc_remove_number_precision( (float) $product->get_price() ),
+			'line_total'   => wc_remove_number_precision( $price ),
 		);
 
 		return array(
 			'contents'        => array( $cart_item ),
-			'contents_cost'   => (float) $product->get_price(),
+			'contents_cost'   => $price,
 			'applied_coupons' => array(),
 			'user'            => array(
 				'ID' => get_current_user_id(),
@@ -252,7 +255,7 @@ class Shipping {
 				'address_1' => '',
 				'address_2' => '',
 			),
-			'cart_subtotal'   => (float) $product->get_price(),
+			'cart_subtotal'   => $price,
 		);
 	}
 

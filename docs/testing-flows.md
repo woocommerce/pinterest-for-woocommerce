@@ -66,6 +66,8 @@ These flows can be used when testing PRs or releases, and as a basis for documen
     - Grouped products
     - Subscription products
 - The product types included/excluded in the feed can be modified by the `pinterest_for_woocommerce_included_product_types` and `pinterest_for_woocommerce_excluded_product_types` filters. The filter to exclude product types takes precedence over the include filter (since `1.2.9`).
+- WooCommerce Composite Products composites are not in the feed by default. Adding `composite` through `pinterest_for_woocommerce_included_product_types` includes them, priced at their minimum composite price, with a sale price when the cheapest configuration costs less than its regular price. Composites without a computed composite price (no purchasable configuration, catalog price hidden, or prices still being calculated) stay out of the feed (since `x.x.x`).
+- The `pinterest_for_woocommerce_product_regular_price` and `pinterest_for_woocommerce_product_price` filters change the regular and sale prices in the feed (since `x.x.x`).
 
 ## Connection page
 

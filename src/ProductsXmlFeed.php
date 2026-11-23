@@ -10,6 +10,7 @@ namespace Automattic\WooCommerce\Pinterest;
 
 use Automattic\WooCommerce\Pinterest\Logger;
 use Automattic\WooCommerce\Pinterest\Product\Attributes\AttributeManager;
+use Automattic\WooCommerce\Pinterest\Product\ProductPrice;
 
 use WC_Product;
 use WC_Product_Variable;
@@ -23,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adding Save Pin support.
  *
  * @class   ProductsXmlFeed
- * @version 1.6.0
+ * @version x.x.x
  */
 class ProductsXmlFeed {
 
@@ -529,11 +530,14 @@ class ProductsXmlFeed {
 	 * @return string|void
 	 */
 	private static function get_property_sale_price( $product, $property ) {
-		if ( ! $product->is_on_sale() ) {
+		if ( ProductPrice::is_composite( $product ) ) {
+			// A composite is on sale when its cheapest configuration costs less than its regular price.
+			$regular_price = self::get_product_regular_price( $product );
+			$sale_price    = ProductPrice::get_price( $product, ProductPrice::CONTEXT_FEED );
+			$price         = is_numeric( $sale_price ) && is_numeric( $regular_price ) && (float) $sale_price < (float) $regular_price ? $sale_price : '';
+		} elseif ( ! $product->is_on_sale() ) {
 			return;
-		}
-
-		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_sale_price' ) ) {
+		} elseif ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_sale_price' ) ) {
 			$regular_price = $product->get_variation_regular_price( 'min', true );
 			$sale_price    = $product->get_variation_sale_price( 'min', true );
 			$price         = $regular_price > $sale_price ? $sale_price : false;
@@ -546,6 +550,11 @@ class ProductsXmlFeed {
 					'price' => $sale_price,
 				)
 			) : '';
+		}
+
+		// The composite branch already applied the price filter.
+		if ( ! empty( $price ) && ! ProductPrice::is_composite( $product ) ) {
+			$price = ProductPrice::filter_price( $price, $product, ProductPrice::CONTEXT_FEED );
 		}
 
 		if ( empty( $price ) ) {
@@ -771,19 +780,7 @@ class ProductsXmlFeed {
 	 * @return string
 	 */
 	private static function get_product_regular_price( $product ) {
-
-		if ( ! $product->get_parent_id() && method_exists( $product, 'get_variation_price' ) ) {
-			$price = $product->get_variation_regular_price( 'min', true );
-		} else {
-			$price = wc_get_price_to_display(
-				$product,
-				array(
-					'price' => $product->get_regular_price(),
-				)
-			);
-		}
-
-		return $price;
+		return ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED );
 	}
 
 

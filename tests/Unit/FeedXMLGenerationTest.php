@@ -20,7 +20,7 @@ use WC_Unit_Test_Case;
 /**
  * Feed file generation testing class.
  *
- * @version 1.5.4
+ * @version x.x.x
  */
 class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
@@ -1113,6 +1113,66 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 			break;
 		}
+	}
+
+	/**
+	 * A composite with an empty container price is priced at its minimum regular composite price.
+	 *
+	 * @group feed
+	 */
+	public function testCompositeIsPricedAtMinimumCompositePrice() {
+		$product = \CompositeProductStub::create( '25', '25' );
+
+		$xml = ProductsXmlFeed::get_xml_item( $product, 'US' );
+
+		$this->assertStringContainsString( '<g:price>25.00USD</g:price>', $xml );
+		$this->assertStringNotContainsString( '<sale_price>', $xml );
+	}
+
+	/**
+	 * A composite whose minimum active price is below its minimum regular price gets a sale price,
+	 * also when a component sale leaves the composite's own is_on_sale() false.
+	 *
+	 * @group feed
+	 */
+	public function testCompositeSalePriceComesFromCompositePrices() {
+		$product = \CompositeProductStub::create( '20', '25' );
+		$this->assertFalse( $product->is_on_sale() );
+
+		$xml = ProductsXmlFeed::get_xml_item( $product, 'US' );
+
+		$this->assertStringContainsString( '<g:price>25.00USD</g:price>', $xml );
+		$this->assertStringContainsString( '<sale_price>20.00USD</sale_price>', $xml );
+	}
+
+	/**
+	 * A composite without a composite price is still skipped.
+	 *
+	 * @group feed
+	 */
+	public function testCompositeWithoutCompositePriceIsSkipped() {
+		$product = \CompositeProductStub::create( '', '' );
+
+		$this->assertSame( '', ProductsXmlFeed::get_xml_item( $product, 'US' ) );
+	}
+
+	/**
+	 * The regular price filter sets the feed price.
+	 *
+	 * @group feed
+	 */
+	public function testRegularPriceFilterSetsFeedPrice() {
+		$product = \CompositeProductStub::create( '25', '25' );
+		add_filter(
+			'pinterest_for_woocommerce_product_regular_price',
+			function ( $price, $filtered_product, $context ) {
+				return 'feed' === $context ? '30' : $price;
+			},
+			10,
+			3
+		);
+
+		$this->assertStringContainsString( '<g:price>30.00USD</g:price>', ProductsXmlFeed::get_xml_item( $product, 'US' ) );
 	}
 
 	/**
