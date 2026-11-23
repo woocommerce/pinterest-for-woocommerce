@@ -301,7 +301,9 @@ class ProductPrice {
 	 *
 	 * Composite Products adds the component cart items before the
 	 * woocommerce_add_to_cart callbacks at the default priority run, and lists
-	 * their keys in the container's composite_children.
+	 * their keys in the container's composite_children. A Product Bundles bundle
+	 * used as a component lists its own items in bundled_items, so those are
+	 * counted too.
 	 *
 	 * @param string $cart_item_key Cart item key.
 	 *
@@ -329,13 +331,25 @@ class ProductPrice {
 		$container_quantity = (float) $container['quantity'];
 		$price              = (float) wc_get_price_to_display( $container['data'] );
 
-		foreach ( $container['composite_children'] as $child_key ) {
+		$child_keys = array_values( $container['composite_children'] );
+		$counted    = array( $cart_item_key => true );
+		while ( $child_keys ) {
+			$child_key = (string) array_shift( $child_keys );
+			if ( isset( $counted[ $child_key ] ) ) {
+				continue;
+			}
+			$counted[ $child_key ] = true;
+
 			$child = $cart->get_cart_item( $child_key );
 			if ( empty( $child['quantity'] ) || ! isset( $child['data'] ) || ! $child['data'] instanceof WC_Product ) {
 				continue;
 			}
 
 			$price += (float) wc_get_price_to_display( $child['data'] ) * ( (float) $child['quantity'] / $container_quantity );
+
+			if ( isset( $child['bundled_items'] ) && is_array( $child['bundled_items'] ) ) {
+				$child_keys = array_merge( $child_keys, array_values( $child['bundled_items'] ) );
+			}
 		}
 
 		return round( $price, wc_get_price_decimals() );

@@ -210,6 +210,22 @@ class ProductPriceTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The items of a bundle used as a component count towards the composite price.
+	 */
+	public function test_add_to_cart_price_includes_items_of_a_bundle_component() {
+		$container_key = CompositeProductStub::add_to_cart( '150', 1, array( array( '100', 1 ) ) );
+		$bundle_key    = WC()->cart->cart_contents[ $container_key ]['composite_children'][0];
+		$bundled_item  = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => '10' ) );
+		$bundled_key   = WC()->cart->add_to_cart( $bundled_item->get_id(), 1 );
+
+		WC()->cart->cart_contents[ $bundle_key ]['bundled_items'] = array( $bundled_key );
+		$container = WC()->cart->get_cart_item( $container_key )['data'];
+
+		// 150 + 100 + 10.
+		$this->assertEquals( 260, ProductPrice::get_add_to_cart_price( $container, $container_key ) );
+	}
+
+	/**
 	 * A component listed by the container but no longer in the cart is skipped.
 	 */
 	public function test_add_to_cart_price_skips_missing_component() {
