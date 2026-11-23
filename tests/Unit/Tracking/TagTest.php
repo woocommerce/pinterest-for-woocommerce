@@ -11,6 +11,14 @@ use Pinterest_For_Woocommerce;
  */
 class TagTest extends \WP_UnitTestCase {
 
+	public function tearDown(): void {
+		if ( function_exists( 'WC' ) && isset( WC()->session ) ) {
+			WC()->session->__unset( 'customer' );
+		}
+
+		parent::tearDown();
+	}
+
 	public function test_adds_hooks() {
 		$tag = new Tag();
 		$tag->init_hooks();
@@ -146,8 +154,6 @@ class TagTest extends \WP_UnitTestCase {
 		ob_start();
 		$tag->print_script();
 		$script = ob_get_clean();
-
-		WC()->session->__unset( 'customer' );
 
 		$expected_user_data = wp_json_encode(
 			array(

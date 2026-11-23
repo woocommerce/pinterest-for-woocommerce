@@ -196,7 +196,7 @@ class ConversionsTest extends WP_UnitTestCase {
 	public function test_default_data_keeps_ip_user_agent_with_logged_in_customer_identifiers() {
 		$user_id = self::factory()->user->create(
 			array(
-				'user_email' => 'customer@example.com',
+				'user_email' => 'Customer@Example.com',
 			)
 		);
 		wp_set_current_user( $user_id );
@@ -233,21 +233,6 @@ class ConversionsTest extends WP_UnitTestCase {
 			array( '855a2d09df7c8557215e266c54f88677308cabf433ee824c71a362dc4664247a' ),
 			$data['user_data']['em']
 		);
-	}
-
-	/**
-	 * Tests that a logged-in customer's account email is lowercased before hashing.
-	 */
-	public function test_default_data_hashes_lowercase_logged_in_customer_email() {
-		$user_id = self::factory()->user->create( array( 'user_email' => 'Customer.Mixed@Example.com' ) );
-		wp_set_current_user( $user_id );
-
-		$user        = new User( 'Some IP address.', 'Some user agent string.' );
-		$conversions = new Conversions( $user );
-
-		$data = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
-
-		$this->assertSame( array( hash( 'sha256', 'customer.mixed@example.com' ) ), $data['user_data']['em'] );
 	}
 
 	/**
