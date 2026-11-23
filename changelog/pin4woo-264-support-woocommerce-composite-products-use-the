@@ -2,4 +2,4 @@ Significance: minor
 Type: add
 Comment: Stores that filtered woocommerce_product_get_price around the tracking callbacks to work around a zero composite price should remove that workaround, or AddToCart counts the container price twice.
 
-Use the WooCommerce Composite Products price in the product feed, Rich Pins and tracking events, and add price filters for the values sent to Pinterest.
+Support WooCommerce Composite Products prices in the feed, Rich Pins and tracking.
