@@ -155,13 +155,32 @@ class RichPinsTest extends WP_UnitTestCase {
 
 	/**
 	 * A composite without a composite price gets no amount tag, while a free one keeps its zero amount.
+	 *
+	 * @dataProvider composite_amount_tag_cases
+	 *
+	 * @param string      $min_price Minimum composite price, '' for none.
+	 * @param string|null $amount    Expected product:price:amount, null when absent.
 	 */
-	public function test_composite_amount_tag_is_omitted_only_without_a_price() {
-		$unpriced = CompositeProductStub::create( '', '' );
-		$this->assertArrayNotHasKey( 'product:price:amount', $this->get_product_tags( $unpriced ) );
+	public function test_composite_amount_tag_is_omitted_only_without_a_price( $min_price, $amount ) {
+		$tags = $this->get_product_tags( CompositeProductStub::create( $min_price, $min_price ) );
 
-		$free = CompositeProductStub::create( '0', '0' );
-		$this->assertSame( '0', $this->get_product_tags( $free )['product:price:amount'] );
+		if ( null === $amount ) {
+			$this->assertArrayNotHasKey( 'product:price:amount', $tags );
+		} else {
+			$this->assertSame( $amount, $tags['product:price:amount'] );
+		}
+	}
+
+	/**
+	 * Composite prices and the expected amount tag.
+	 *
+	 * @return array
+	 */
+	public function composite_amount_tag_cases() {
+		return array(
+			'no composite price' => array( '', null ),
+			'free composite'     => array( '0', '0' ),
+		);
 	}
 
 	/**

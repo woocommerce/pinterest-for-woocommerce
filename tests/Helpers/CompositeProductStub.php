@@ -9,8 +9,9 @@
  * A product of type 'composite' with the composite price methods.
  *
  * Its minimum composite prices are read from product meta, so an instance
- * loaded again through wc_get_product() keeps them. The container price stays
- * empty, as on a composite priced by its components.
+ * loaded again through wc_get_product() keeps them. Its maximum prices are ten
+ * times the minimum, so a test fails when code reads the maximum instead. The
+ * container price stays empty, as on a composite priced by its components.
  *
  * @version x.x.x
  */
@@ -48,7 +49,7 @@ class CompositeProductStub extends WC_Product_Simple {
 	 * @return string
 	 */
 	public function get_composite_price( $min_or_max = 'min', $display = false ) {
-		return $this->get_stored_composite_price( self::MIN_PRICE_META, $display );
+		return $this->get_stored_composite_price( self::MIN_PRICE_META, $min_or_max, $display );
 	}
 
 	/**
@@ -60,19 +61,24 @@ class CompositeProductStub extends WC_Product_Simple {
 	 * @return string
 	 */
 	public function get_composite_regular_price( $min_or_max = 'min', $display = false ) {
-		return $this->get_stored_composite_price( self::MIN_REGULAR_PRICE_META, $display );
+		return $this->get_stored_composite_price( self::MIN_REGULAR_PRICE_META, $min_or_max, $display );
 	}
 
 	/**
-	 * Reads a stored composite price, adjusted for display like Composite Products does.
+	 * Reads a stored minimum composite price, or ten times it for the maximum,
+	 * adjusted for display like Composite Products does.
 	 *
-	 * @param string $meta_key Meta key holding the price.
-	 * @param bool   $display  Whether to adjust the price for display.
+	 * @param string $meta_key   Meta key holding the minimum price.
+	 * @param string $min_or_max 'min' or 'max'.
+	 * @param bool   $display    Whether to adjust the price for display.
 	 *
 	 * @return string
 	 */
-	private function get_stored_composite_price( $meta_key, $display ) {
+	private function get_stored_composite_price( $meta_key, $min_or_max, $display ) {
 		$price = (string) $this->get_meta( $meta_key );
+		if ( '' !== $price && 'min' !== $min_or_max ) {
+			$price = (string) ( (float) $price * 10 );
+		}
 		if ( ! $display || '' === $price ) {
 			return $price;
 		}

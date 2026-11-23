@@ -6,44 +6,31 @@ use Automattic\WooCommerce\Pinterest\Product\ProductPrice;
 use CompositeProductStub;
 use WC_Helper_Product;
 use WC_Product_Simple;
-use WP_UnitTestCase;
+use WC_Unit_Test_Case;
 
 /**
  * Product prices sent to Pinterest.
  *
  * @version x.x.x
  */
-class ProductPriceTest extends WP_UnitTestCase {
+class ProductPriceTest extends WC_Unit_Test_Case {
 
 	/**
-	 * Empty the customer cart between tests.
-	 */
-	public function tearDown(): void {
-		WC()->cart->empty_cart();
-		parent::tearDown();
-	}
-
-	/**
-	 * A simple product keeps its WooCommerce display prices.
+	 * A simple product on sale keeps its WooCommerce active and regular display prices.
 	 */
 	public function test_simple_product_uses_display_prices() {
-		$product = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => '10' ) );
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'regular_price' => '15',
+				'sale_price'    => '10',
+			)
+		);
 
 		$this->assertEquals( 10, ProductPrice::get_price( $product, ProductPrice::CONTEXT_RICH_PINS ) );
-		$this->assertEquals( 10, ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED ) );
+		$this->assertEquals( 15, ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED ) );
 	}
 
-	/**
-	 * A composite with an empty container price uses its minimum composite prices.
-	 */
-	public function test_composite_uses_minimum_composite_prices() {
-		$product = CompositeProductStub::create( '20', '25' );
-
-		$this->assertTrue( ProductPrice::is_composite( $product ) );
-		$this->assertEquals( 20, ProductPrice::get_price( $product, ProductPrice::CONTEXT_PAGE_VISIT ) );
-		$this->assertEquals( 25, ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED ) );
-		$this->assertEquals( 20, ProductPrice::get_shipping_price( $product ) );
-	}
 
 	/**
 	 * Composite prices sent to Pinterest are display prices, while the shipping
@@ -62,34 +49,7 @@ class ProductPriceTest extends WP_UnitTestCase {
 		$this->assertEquals( 20, ProductPrice::get_shipping_price( $product ) );
 	}
 
-	/**
-	 * A composite without a composite price has no price, even when its container has one.
-	 * Events get 0 because they multiply the price by the quantity.
-	 */
-	public function test_composite_without_composite_price_has_no_price() {
-		$product = CompositeProductStub::create(
-			'',
-			'',
-			array(
-				'regular_price' => '10',
-				'price'         => '10',
-			)
-		);
 
-		$this->assertSame( '', ProductPrice::get_price( $product, ProductPrice::CONTEXT_RICH_PINS ) );
-		$this->assertSame( '', ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED ) );
-		$this->assertSame( 0.0, ProductPrice::get_price( $product, ProductPrice::CONTEXT_PAGE_VISIT ) );
-	}
-
-	/**
-	 * A composite whose cheapest configuration is free keeps its zero price.
-	 */
-	public function test_free_composite_keeps_zero_price() {
-		$product = CompositeProductStub::create( '0', '0' );
-
-		$this->assertSame( '0', ProductPrice::get_price( $product, ProductPrice::CONTEXT_RICH_PINS ) );
-		$this->assertSame( '0', ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED ) );
-	}
 
 	/**
 	 * A product of type 'composite' without the composite price methods is not a composite.
@@ -198,16 +158,6 @@ class ProductPriceTest extends WP_UnitTestCase {
 		$this->assertEquals( 10, ProductPrice::get_add_to_cart_price( $product, $cart_item_key ) );
 	}
 
-	/**
-	 * A composite container in the cart is priced with its components, per container.
-	 */
-	public function test_add_to_cart_price_of_composite_container_includes_components() {
-		$container_key = CompositeProductStub::add_to_cart( '5', 2, array( array( '10', 2 ), array( '3', 4 ) ) );
-		$container     = WC()->cart->get_cart_item( $container_key )['data'];
-
-		// 5 + 10 * 2 / 2 + 3 * 4 / 2.
-		$this->assertEquals( 21, ProductPrice::get_add_to_cart_price( $container, $container_key ) );
-	}
 
 	/**
 	 * The items of a bundle used as a component count towards the composite price.

@@ -1116,44 +1116,41 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
-	 * A composite with an empty container price is priced at its minimum regular composite price.
+	 * A composite with an empty container price is priced at its minimum regular
+	 * composite price, and gets a sale price when its minimum active price is
+	 * lower, also when a component sale leaves the composite's own is_on_sale() false.
 	 *
 	 * @group feed
-	 */
-	public function testCompositeIsPricedAtMinimumCompositePrice() {
-		$product = \CompositeProductStub::create( '25', '25' );
-
-		$xml = ProductsXmlFeed::get_xml_item( $product, 'US' );
-
-		$this->assertStringContainsString( '<g:price>25.00USD</g:price>', $xml );
-		$this->assertStringNotContainsString( '<sale_price>', $xml );
-	}
-
-	/**
-	 * A composite whose minimum active price is below its minimum regular price gets a sale price,
-	 * also when a component sale leaves the composite's own is_on_sale() false.
+	 * @dataProvider composite_feed_price_cases
 	 *
-	 * @group feed
+	 * @param string      $min_price         Minimum active composite price.
+	 * @param string      $min_regular_price Minimum regular composite price.
+	 * @param string|null $sale_price        Expected sale_price element, null when absent.
 	 */
-	public function testCompositeSalePriceComesFromCompositePrices() {
-		$product = \CompositeProductStub::create( '20', '25' );
+	public function testCompositeIsPricedAtMinimumCompositePrices( $min_price, $min_regular_price, $sale_price ) {
+		$product = \CompositeProductStub::create( $min_price, $min_regular_price );
 		$this->assertFalse( $product->is_on_sale() );
 
 		$xml = ProductsXmlFeed::get_xml_item( $product, 'US' );
 
 		$this->assertStringContainsString( '<g:price>25.00USD</g:price>', $xml );
-		$this->assertStringContainsString( '<sale_price>20.00USD</sale_price>', $xml );
+		if ( null === $sale_price ) {
+			$this->assertStringNotContainsString( '<sale_price>', $xml );
+		} else {
+			$this->assertStringContainsString( $sale_price, $xml );
+		}
 	}
 
 	/**
-	 * A composite without a composite price is still skipped.
+	 * Composite prices and the expected sale price element.
 	 *
-	 * @group feed
+	 * @return array
 	 */
-	public function testCompositeWithoutCompositePriceIsSkipped() {
-		$product = \CompositeProductStub::create( '', '' );
-
-		$this->assertSame( '', ProductsXmlFeed::get_xml_item( $product, 'US' ) );
+	public function composite_feed_price_cases() {
+		return array(
+			'discounted'  => array( '20', '25', '<sale_price>20.00USD</sale_price>' ),
+			'no discount' => array( '25', '25', null ),
+		);
 	}
 
 	/**

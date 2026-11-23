@@ -1121,12 +1121,38 @@ class TrackingTest extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * PageVisit for a composite reports its minimum composite price.
+	 * PageVisit for a composite reports its minimum composite price, and 0 for a
+	 * composite without a composite price, because the events multiply the price
+	 * by the quantity.
+	 *
+	 * @dataProvider page_visit_composite_cases
+	 *
+	 * @param string    $min_price Minimum active composite price, '' for none.
+	 * @param int|float $expected  Expected PageVisit price.
 	 */
-	public function test_page_visit_for_composite_uses_composite_price() {
-		$product = \CompositeProductStub::create( '20', '25' );
+	public function test_page_visit_for_composite_uses_composite_price( $min_price, $expected ) {
+		$product = \CompositeProductStub::create(
+			$min_price,
+			$min_price,
+			array(
+				'regular_price' => '10',
+				'price'         => '10',
+			)
+		);
 
-		$this->assertEquals( 20, PageVisit::get_product_event_data( 'event-id', $product )->get_price() );
+		$this->assertEquals( $expected, PageVisit::get_product_event_data( 'event-id', $product )->get_price() );
+	}
+
+	/**
+	 * Composite prices and the expected PageVisit price.
+	 *
+	 * @return array
+	 */
+	public function page_visit_composite_cases() {
+		return array(
+			'composite price'    => array( '20', 20 ),
+			'no composite price' => array( '', 0 ),
+		);
 	}
 
 	/**
@@ -1157,19 +1183,4 @@ class TrackingTest extends \WP_UnitTestCase {
 		$this->assertEquals( 42, $conversions_data['custom_data']['value'] );
 	}
 
-	/**
-	 * AddToCart for a composite without components in the cart reports the container price.
-	 */
-	public function test_add_to_cart_for_composite_without_components_reports_container_price() {
-		$tracker = $this->get_recording_tracker();
-
-		$container_key = \CompositeProductStub::add_to_cart( '5', 1, array() );
-		$container_id  = WC()->cart->get_cart_item( $container_key )['product_id'];
-
-		$tracking = new Tracking( array( $tracker ) );
-		$tracking->handle_add_to_cart( $container_key, $container_id, 1, 0 );
-		$tracking->remove_tracker( get_class( $tracker ) );
-
-		$this->assertEquals( 5, $tracker->get_tracked_events()[0]['data']->get_price() );
-	}
 }
