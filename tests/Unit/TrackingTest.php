@@ -16,7 +16,7 @@ use WC_Helper_Product;
 /**
  * Tests the Tracking class.
  *
- * @version 1.6.3
+ * @version x.x.x
  */
 class TrackingTest extends \WP_UnitTestCase {
 
@@ -1118,5 +1118,83 @@ class TrackingTest extends \WP_UnitTestCase {
 		$tracking->remove_tracker( get_class( $tracker ) );
 
 		$this->assertCount( 0, $tracker->get_tracked_events() );
+	}
+
+	/**
+	 * PageVisit for a composite reports its minimum composite price.
+	 */
+	public function test_page_visit_for_composite_uses_composite_price() {
+		$product = \CompositeProductStub::create( '20', '25' );
+
+		$this->assertEquals( 20, PageVisit::get_product_event_data( 'event-id', $product )->get_price() );
+	}
+
+	/**
+	 * AddToCart for a composite reports the configured price of the container
+	 * and its components, and the Tag and the Conversions API send the same value.
+	 */
+	public function test_add_to_cart_for_composite_reports_configured_price() {
+		$tracker = $this->get_recording_tracker();
+
+		$container_key = $this->add_composite_to_cart( '5', 2, array( array( '10', 2 ), array( '3', 4 ) ) );
+		$container_id  = WC()->cart->get_cart_item( $container_key )['product_id'];
+
+		$tracking = new Tracking( array( $tracker ) );
+		$tracking->handle_add_to_cart( $container_key, $container_id, 2, 0 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$tracked_events = $tracker->get_tracked_events();
+		$this->assertCount( 1, $tracked_events );
+
+		$data = $tracked_events[0]['data'];
+		// 5 + 10 * 2 / 2 + 3 * 4 / 2.
+		$this->assertEquals( 21, $data->get_price() );
+
+		$tag_data         = ( new Tag() )->prepare_request_data( Tracking::EVENT_ADD_TO_CART, $data );
+		$conversions_data = ( new Conversions( new User( '127.0.0.1', 'test-agent' ) ) )->prepare_request_data( Tracking::EVENT_ADD_TO_CART, $data );
+
+		$this->assertEquals( 42, $tag_data['value'] );
+		$this->assertEquals( 42, $conversions_data['custom_data']['value'] );
+	}
+
+	/**
+	 * AddToCart for a composite without components in the cart reports the container price.
+	 */
+	public function test_add_to_cart_for_composite_without_components_reports_container_price() {
+		$tracker = $this->get_recording_tracker();
+
+		$container_key = $this->add_composite_to_cart( '5', 1, array() );
+		$container_id  = WC()->cart->get_cart_item( $container_key )['product_id'];
+
+		$tracking = new Tracking( array( $tracker ) );
+		$tracking->handle_add_to_cart( $container_key, $container_id, 1, 0 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$this->assertEquals( 5, $tracker->get_tracked_events()[0]['data']->get_price() );
+	}
+
+	/**
+	 * Adds a container and its components to the cart, linked the way Composite Products links them.
+	 *
+	 * @param string $container_price    Container price.
+	 * @param int    $container_quantity Container quantity.
+	 * @param array  $components         List of [ price, quantity ] for each component.
+	 *
+	 * @return string Container cart item key.
+	 */
+	private function add_composite_to_cart( $container_price, $container_quantity, array $components ) {
+		$container     = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => $container_price ) );
+		$container_key = WC()->cart->add_to_cart( $container->get_id(), $container_quantity );
+
+		$children = array();
+		foreach ( $components as list( $price, $quantity ) ) {
+			$component  = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => $price ) );
+			$children[] = WC()->cart->add_to_cart( $component->get_id(), $quantity );
+		}
+
+		WC()->cart->cart_contents[ $container_key ]['composite_data']     = array( 'component' => array() );
+		WC()->cart->cart_contents[ $container_key ]['composite_children'] = $children;
+
+		return $container_key;
 	}
 }
