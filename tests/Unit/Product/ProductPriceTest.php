@@ -46,6 +46,23 @@ class ProductPriceTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Composite prices sent to Pinterest are display prices, while the shipping
+	 * estimate uses the price as entered.
+	 */
+	public function test_composite_prices_use_display_prices_and_shipping_uses_entered_price() {
+		update_option( 'woocommerce_calc_taxes', 'yes' );
+		update_option( 'woocommerce_prices_include_tax', 'no' );
+		update_option( 'woocommerce_tax_display_shop', 'incl' );
+		\ShippingHelpers::addTaxRate( '', '', '20.0000' );
+
+		$product = CompositeProductStub::create( '20', '25' );
+
+		$this->assertEquals( 24, ProductPrice::get_price( $product, ProductPrice::CONTEXT_PAGE_VISIT ) );
+		$this->assertEquals( 30, ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED ) );
+		$this->assertEquals( 20, ProductPrice::get_shipping_price( $product ) );
+	}
+
+	/**
 	 * A composite without a composite price falls back to its empty container price.
 	 */
 	public function test_composite_without_composite_price_uses_container_price() {
@@ -141,7 +158,7 @@ class ProductPriceTest extends WP_UnitTestCase {
 	 * A composite container in the cart is priced with its components, per container.
 	 */
 	public function test_add_to_cart_price_of_composite_container_includes_components() {
-		$container_key = $this->add_composite_to_cart( '5', 2, array( array( '10', 2 ), array( '3', 4 ) ) );
+		$container_key = CompositeProductStub::add_to_cart( '5', 2, array( array( '10', 2 ), array( '3', 4 ) ) );
 		$container     = WC()->cart->get_cart_item( $container_key )['data'];
 
 		// 5 + 10 * 2 / 2 + 3 * 4 / 2.
@@ -152,7 +169,7 @@ class ProductPriceTest extends WP_UnitTestCase {
 	 * A component listed by the container but no longer in the cart is skipped.
 	 */
 	public function test_add_to_cart_price_skips_missing_component() {
-		$container_key = $this->add_composite_to_cart( '5', 1, array( array( '10', 1 ) ) );
+		$container_key = CompositeProductStub::add_to_cart( '5', 1, array( array( '10', 1 ) ) );
 		WC()->cart->cart_contents[ $container_key ]['composite_children'][] = 'missing-key';
 		$container = WC()->cart->get_cart_item( $container_key )['data'];
 
@@ -167,30 +184,5 @@ class ProductPriceTest extends WP_UnitTestCase {
 		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 3 );
 
 		$this->assertEquals( 10, ProductPrice::get_add_to_cart_price( $product, $cart_item_key ) );
-	}
-
-	/**
-	 * Adds a container and its components to the cart, linked the way Composite Products links them.
-	 *
-	 * @param string $container_price    Container price.
-	 * @param int    $container_quantity Container quantity.
-	 * @param array  $components         List of [ price, quantity ] for each component.
-	 *
-	 * @return string Container cart item key.
-	 */
-	private function add_composite_to_cart( $container_price, $container_quantity, array $components ) {
-		$container     = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => $container_price ) );
-		$container_key = WC()->cart->add_to_cart( $container->get_id(), $container_quantity );
-
-		$children = array();
-		foreach ( $components as list( $price, $quantity ) ) {
-			$component  = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => $price ) );
-			$children[] = WC()->cart->add_to_cart( $component->get_id(), $quantity );
-		}
-
-		WC()->cart->cart_contents[ $container_key ]['composite_data']     = array( 'component' => array() );
-		WC()->cart->cart_contents[ $container_key ]['composite_children'] = $children;
-
-		return $container_key;
 	}
 }

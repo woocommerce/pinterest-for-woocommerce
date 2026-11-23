@@ -1136,7 +1136,7 @@ class TrackingTest extends \WP_UnitTestCase {
 	public function test_add_to_cart_for_composite_reports_configured_price() {
 		$tracker = $this->get_recording_tracker();
 
-		$container_key = $this->add_composite_to_cart( '5', 2, array( array( '10', 2 ), array( '3', 4 ) ) );
+		$container_key = \CompositeProductStub::add_to_cart( '5', 2, array( array( '10', 2 ), array( '3', 4 ) ) );
 		$container_id  = WC()->cart->get_cart_item( $container_key )['product_id'];
 
 		$tracking = new Tracking( array( $tracker ) );
@@ -1163,7 +1163,7 @@ class TrackingTest extends \WP_UnitTestCase {
 	public function test_add_to_cart_for_composite_without_components_reports_container_price() {
 		$tracker = $this->get_recording_tracker();
 
-		$container_key = $this->add_composite_to_cart( '5', 1, array() );
+		$container_key = \CompositeProductStub::add_to_cart( '5', 1, array() );
 		$container_id  = WC()->cart->get_cart_item( $container_key )['product_id'];
 
 		$tracking = new Tracking( array( $tracker ) );
@@ -1171,30 +1171,5 @@ class TrackingTest extends \WP_UnitTestCase {
 		$tracking->remove_tracker( get_class( $tracker ) );
 
 		$this->assertEquals( 5, $tracker->get_tracked_events()[0]['data']->get_price() );
-	}
-
-	/**
-	 * Adds a container and its components to the cart, linked the way Composite Products links them.
-	 *
-	 * @param string $container_price    Container price.
-	 * @param int    $container_quantity Container quantity.
-	 * @param array  $components         List of [ price, quantity ] for each component.
-	 *
-	 * @return string Container cart item key.
-	 */
-	private function add_composite_to_cart( $container_price, $container_quantity, array $components ) {
-		$container     = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => $container_price ) );
-		$container_key = WC()->cart->add_to_cart( $container->get_id(), $container_quantity );
-
-		$children = array();
-		foreach ( $components as list( $price, $quantity ) ) {
-			$component  = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => $price ) );
-			$children[] = WC()->cart->add_to_cart( $component->get_id(), $quantity );
-		}
-
-		WC()->cart->cart_contents[ $container_key ]['composite_data']     = array( 'component' => array() );
-		WC()->cart->cart_contents[ $container_key ]['composite_children'] = $children;
-
-		return $container_key;
 	}
 }

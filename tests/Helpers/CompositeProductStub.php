@@ -48,7 +48,7 @@ class CompositeProductStub extends WC_Product_Simple {
 	 * @return string
 	 */
 	public function get_composite_price( $min_or_max = 'min', $display = false ) {
-		return (string) $this->get_meta( self::MIN_PRICE_META );
+		return $this->get_stored_composite_price( self::MIN_PRICE_META, $display );
 	}
 
 	/**
@@ -60,7 +60,24 @@ class CompositeProductStub extends WC_Product_Simple {
 	 * @return string
 	 */
 	public function get_composite_regular_price( $min_or_max = 'min', $display = false ) {
-		return (string) $this->get_meta( self::MIN_REGULAR_PRICE_META );
+		return $this->get_stored_composite_price( self::MIN_REGULAR_PRICE_META, $display );
+	}
+
+	/**
+	 * Reads a stored composite price, adjusted for display like Composite Products does.
+	 *
+	 * @param string $meta_key Meta key holding the price.
+	 * @param bool   $display  Whether to adjust the price for display.
+	 *
+	 * @return string
+	 */
+	private function get_stored_composite_price( $meta_key, $display ) {
+		$price = (string) $this->get_meta( $meta_key );
+		if ( ! $display || '' === $price ) {
+			return $price;
+		}
+
+		return (string) wc_get_price_to_display( $this, array( 'price' => $price ) );
 	}
 
 	/**
@@ -109,9 +126,35 @@ class CompositeProductStub extends WC_Product_Simple {
 		);
 		$product->update_meta_data( self::MIN_PRICE_META, $min_price );
 		$product->update_meta_data( self::MIN_REGULAR_PRICE_META, $min_regular_price );
-		// Saving stores the 'composite' product_type term from get_type().
 		$product->save();
 
 		return $product;
+	}
+
+	/**
+	 * Adds a container and its components to the customer cart, linked the way
+	 * Composite Products links them: the container lists its components' cart
+	 * item keys in composite_children.
+	 *
+	 * @param string $container_price    Container price.
+	 * @param int    $container_quantity Container quantity.
+	 * @param array  $components         List of [ price, quantity ] for each component.
+	 *
+	 * @return string Container cart item key.
+	 */
+	public static function add_to_cart( $container_price, $container_quantity, array $components ) {
+		$container     = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => $container_price ) );
+		$container_key = WC()->cart->add_to_cart( $container->get_id(), $container_quantity );
+
+		$children = array();
+		foreach ( $components as list( $price, $quantity ) ) {
+			$component  = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => $price ) );
+			$children[] = WC()->cart->add_to_cart( $component->get_id(), $quantity );
+		}
+
+		WC()->cart->cart_contents[ $container_key ]['composite_data']     = array( 'component' => array() );
+		WC()->cart->cart_contents[ $container_key ]['composite_children'] = $children;
+
+		return $container_key;
 	}
 }
