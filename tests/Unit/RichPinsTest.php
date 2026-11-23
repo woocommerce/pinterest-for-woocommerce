@@ -158,8 +158,8 @@ class RichPinsTest extends WP_UnitTestCase {
 	 *
 	 * @dataProvider composite_amount_tag_cases
 	 *
-	 * @param string      $min_price Minimum composite price, '' for none.
-	 * @param string|null $amount    Expected product:price:amount, null when absent.
+	 * @param string   $min_price Minimum composite price, '' for none.
+	 * @param int|null $amount    Expected product:price:amount, null when absent.
 	 */
 	public function test_composite_amount_tag_is_omitted_only_without_a_price( $min_price, $amount ) {
 		$tags = $this->get_product_tags( CompositeProductStub::create( $min_price, $min_price ) );
@@ -167,7 +167,8 @@ class RichPinsTest extends WP_UnitTestCase {
 		if ( null === $amount ) {
 			$this->assertArrayNotHasKey( 'product:price:amount', $tags );
 		} else {
-			$this->assertSame( $amount, $tags['product:price:amount'] );
+			$this->assertArrayHasKey( 'product:price:amount', $tags );
+			$this->assertEquals( $amount, $tags['product:price:amount'] );
 		}
 	}
 
@@ -179,7 +180,7 @@ class RichPinsTest extends WP_UnitTestCase {
 	public function composite_amount_tag_cases() {
 		return array(
 			'no composite price' => array( '', null ),
-			'free composite'     => array( '0', '0' ),
+			'free composite'     => array( '0.00', 0 ),
 		);
 	}
 

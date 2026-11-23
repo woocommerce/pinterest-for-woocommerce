@@ -1191,6 +1191,49 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * The price filter sets the feed sale price in its 'feed' context, for a
+	 * simple product on sale and for a discounted composite.
+	 *
+	 * @group feed
+	 * @dataProvider feed_sale_price_filter_cases
+	 *
+	 * @param string $product_type 'simple' or 'composite'.
+	 */
+	public function testPriceFilterSetsFeedSalePrice( $product_type ) {
+		$product = 'composite' === $product_type
+			? \CompositeProductStub::create( '20', '25' )
+			: WC_Helper_Product::create_simple_product(
+				true,
+				array(
+					'regular_price' => '25',
+					'sale_price'    => '20',
+				)
+			);
+		add_filter(
+			'pinterest_for_woocommerce_product_price',
+			function ( $price, $filtered_product, $context ) {
+				return 'feed' === $context ? '8' : $price;
+			},
+			10,
+			3
+		);
+
+		$this->assertStringContainsString( '<sale_price>8.00USD</sale_price>', ProductsXmlFeed::get_xml_item( $product, 'US' ) );
+	}
+
+	/**
+	 * Products whose feed sale price goes through the price filter.
+	 *
+	 * @return array
+	 */
+	public function feed_sale_price_filter_cases() {
+		return array(
+			'simple product on sale' => array( 'simple' ),
+			'discounted composite'   => array( 'composite' ),
+		);
+	}
+
+	/**
 	 * Helper function for extracting the static private members of the ProductsXmlFeed class.
 	 * Gets the property method then just pass the product and voila.
 	 *

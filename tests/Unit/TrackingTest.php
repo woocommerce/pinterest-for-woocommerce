@@ -1182,5 +1182,4 @@ class TrackingTest extends \WP_UnitTestCase {
 		$this->assertEquals( 42, $tag_data['value'] );
 		$this->assertEquals( 42, $conversions_data['custom_data']['value'] );
 	}
-
 }

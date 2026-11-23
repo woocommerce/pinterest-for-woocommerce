@@ -31,7 +31,6 @@ class ProductPriceTest extends WC_Unit_Test_Case {
 		$this->assertEquals( 15, ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED ) );
 	}
 
-
 	/**
 	 * Composite prices sent to Pinterest are display prices, while the shipping
 	 * estimate uses the price as entered.
@@ -48,8 +47,6 @@ class ProductPriceTest extends WC_Unit_Test_Case {
 		$this->assertEquals( 30, ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED ) );
 		$this->assertEquals( 20, ProductPrice::get_shipping_price( $product ) );
 	}
-
-
 
 	/**
 	 * A product of type 'composite' without the composite price methods is not a composite.
@@ -158,7 +155,6 @@ class ProductPriceTest extends WC_Unit_Test_Case {
 		$this->assertEquals( 10, ProductPrice::get_add_to_cart_price( $product, $cart_item_key ) );
 	}
 
-
 	/**
 	 * The items of a bundle used as a component count towards the composite price.
 	 */
@@ -173,6 +169,39 @@ class ProductPriceTest extends WC_Unit_Test_Case {
 
 		// 150 + 100 + 10.
 		$this->assertEquals( 260, ProductPrice::get_add_to_cart_price( $container, $container_key ) );
+	}
+
+	/**
+	 * The composite cart price is rounded to the store's price decimals, as the
+	 * per-item display prices are not rounded when prices are entered including
+	 * tax and displayed excluding tax.
+	 */
+	public function test_add_to_cart_price_of_composite_is_rounded_to_price_decimals() {
+		update_option( 'woocommerce_calc_taxes', 'yes' );
+		update_option( 'woocommerce_prices_include_tax', 'yes' );
+		update_option( 'woocommerce_tax_display_shop', 'excl' );
+		\ShippingHelpers::addTaxRate( '', '', '20.0000' );
+
+		$container_key = CompositeProductStub::add_to_cart( '10', 1, array( array( '10', 1 ) ) );
+		$container     = WC()->cart->get_cart_item( $container_key )['data'];
+
+		// 10 / 1.2 + 10 / 1.2 = 16.666…
+		$this->assertSame( 16.67, ProductPrice::get_add_to_cart_price( $container, $container_key ) );
+	}
+
+	/**
+	 * A component key listed twice, or the container's own key among its
+	 * components, is counted once.
+	 */
+	public function test_add_to_cart_price_counts_each_cart_item_once() {
+		$container_key = CompositeProductStub::add_to_cart( '5', 1, array( array( '10', 1 ) ) );
+		$child_key     = WC()->cart->cart_contents[ $container_key ]['composite_children'][0];
+
+		WC()->cart->cart_contents[ $container_key ]['composite_children'][] = $child_key;
+		WC()->cart->cart_contents[ $container_key ]['composite_children'][] = $container_key;
+		$container = WC()->cart->get_cart_item( $container_key )['data'];
+
+		$this->assertEquals( 15, ProductPrice::get_add_to_cart_price( $container, $container_key ) );
 	}
 
 	/**

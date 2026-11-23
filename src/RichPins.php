@@ -184,7 +184,7 @@ class RichPins {
 			return $tags;
 		}
 
-		// mandatory tags. A product without a price gets no amount tag.
+		// mandatory tags. A composite without a composite price, or a price filtered to '', gets no amount tag.
 		$tags['product:price:currency'] = get_woocommerce_currency();
 		$price                          = ProductPrice::get_price( $product, ProductPrice::CONTEXT_RICH_PINS );
 		if ( '' !== $price ) {
