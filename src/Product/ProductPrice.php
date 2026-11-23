@@ -7,6 +7,7 @@
 
 namespace Automattic\WooCommerce\Pinterest\Product;
 
+use WC_Cart;
 use WC_Product;
 
 defined( 'ABSPATH' ) || exit;
@@ -266,11 +267,13 @@ class ProductPrice {
 	 * @return float|null Price, or null.
 	 */
 	private static function get_composite_cart_item_price( string $cart_item_key ) {
-		if ( ! function_exists( 'WC' ) || ! isset( WC()->cart ) ) {
+		// The cart is null until WooCommerce loads it for the request.
+		$cart = function_exists( 'WC' ) ? WC()->cart : null;
+		if ( ! $cart instanceof WC_Cart ) {
 			return null;
 		}
 
-		$container = WC()->cart->get_cart_item( $cart_item_key );
+		$container = $cart->get_cart_item( $cart_item_key );
 		if (
 			empty( $container['composite_data'] )
 			|| ! isset( $container['composite_children'] )
@@ -286,7 +289,7 @@ class ProductPrice {
 		$price              = (float) wc_get_price_to_display( $container['data'] );
 
 		foreach ( $container['composite_children'] as $child_key ) {
-			$child = WC()->cart->get_cart_item( $child_key );
+			$child = $cart->get_cart_item( $child_key );
 			if ( empty( $child['quantity'] ) || ! isset( $child['data'] ) || ! $child['data'] instanceof WC_Product ) {
 				continue;
 			}
