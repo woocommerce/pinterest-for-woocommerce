@@ -63,13 +63,32 @@ class ProductPriceTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A composite without a composite price falls back to its empty container price.
+	 * A composite without a composite price has no price, even when its container has one.
+	 * Events get 0 because they multiply the price by the quantity.
 	 */
-	public function test_composite_without_composite_price_uses_container_price() {
-		$product = CompositeProductStub::create( '', '' );
+	public function test_composite_without_composite_price_has_no_price() {
+		$product = CompositeProductStub::create(
+			'',
+			'',
+			array(
+				'regular_price' => '10',
+				'price'         => '10',
+			)
+		);
 
-		$this->assertEmpty( (float) ProductPrice::get_price( $product, ProductPrice::CONTEXT_RICH_PINS ) );
-		$this->assertEmpty( (float) ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED ) );
+		$this->assertSame( '', ProductPrice::get_price( $product, ProductPrice::CONTEXT_RICH_PINS ) );
+		$this->assertSame( '', ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED ) );
+		$this->assertSame( 0.0, ProductPrice::get_price( $product, ProductPrice::CONTEXT_PAGE_VISIT ) );
+	}
+
+	/**
+	 * A composite whose cheapest configuration is free keeps its zero price.
+	 */
+	public function test_free_composite_keeps_zero_price() {
+		$product = CompositeProductStub::create( '0', '0' );
+
+		$this->assertSame( '0', ProductPrice::get_price( $product, ProductPrice::CONTEXT_RICH_PINS ) );
+		$this->assertSame( '0', ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED ) );
 	}
 
 	/**
@@ -152,6 +171,31 @@ class ProductPriceTest extends WP_UnitTestCase {
 
 		$this->assertEquals( 10, ProductPrice::get_price( $product, ProductPrice::CONTEXT_RICH_PINS ) );
 		$this->assertEquals( 10, ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED ) );
+	}
+
+	/**
+	 * A filtered price in exponent notation is returned as a plain number.
+	 */
+	public function test_filtered_price_in_exponent_notation_is_a_number() {
+		$product = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => '10' ) );
+		add_filter( 'pinterest_for_woocommerce_product_price', fn() => '1.5e2' );
+		add_filter( 'pinterest_for_woocommerce_product_regular_price', fn() => '1e2' );
+
+		$this->assertSame( 150.0, ProductPrice::get_price( $product, ProductPrice::CONTEXT_RICH_PINS ) );
+		$this->assertSame( 100.0, ProductPrice::get_regular_price( $product, ProductPrice::CONTEXT_FEED ) );
+	}
+
+	/**
+	 * An empty filtered price leaves the price out of Rich Pins but is ignored by events.
+	 */
+	public function test_empty_filtered_price_is_ignored_by_events() {
+		$product       = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => '10' ) );
+		$cart_item_key = WC()->cart->add_to_cart( $product->get_id(), 1 );
+		add_filter( 'pinterest_for_woocommerce_product_price', fn() => '' );
+
+		$this->assertSame( '', ProductPrice::get_price( $product, ProductPrice::CONTEXT_RICH_PINS ) );
+		$this->assertEquals( 10, ProductPrice::get_price( $product, ProductPrice::CONTEXT_PAGE_VISIT ) );
+		$this->assertEquals( 10, ProductPrice::get_add_to_cart_price( $product, $cart_item_key ) );
 	}
 
 	/**

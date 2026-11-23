@@ -76,8 +76,10 @@ class ProductPrice {
 	/**
 	 * Returns the active display price of a product.
 	 *
-	 * Composites use their minimum composite price. Other products use
-	 * wc_get_price_to_display().
+	 * Composites use their minimum composite price, or '' when Composite
+	 * Products has no price for them. Other products use
+	 * wc_get_price_to_display(). The page_visit and add_to_cart contexts always
+	 * get a number.
 	 *
 	 * @since x.x.x
 	 *
@@ -99,8 +101,9 @@ class ProductPrice {
 	 * Returns the regular display price of a product.
 	 *
 	 * Variable products use their minimum variation regular price and composites
-	 * their minimum composite regular price. Other products use their regular
-	 * price, adjusted for display.
+	 * their minimum composite regular price, or '' when Composite Products has no
+	 * price for them. Other products use their regular price, adjusted for
+	 * display.
 	 *
 	 * @since x.x.x
 	 *
@@ -194,11 +197,18 @@ class ProductPrice {
 	public static function get_shipping_price( WC_Product $product ): float {
 		$price = self::get_composite_min_price( $product, 'get_composite_price', false );
 
-		return (float) ( null === $price ? $product->get_price() : $price );
+		if ( null === $price ) {
+			$price = $product->get_price();
+		}
+
+		return (float) $price;
 	}
 
 	/**
 	 * Applies the active price filter, keeping the price when the filtered value is invalid.
+	 *
+	 * The page_visit and add_to_cart contexts always return a number, because
+	 * the events multiply the price by the quantity.
 	 *
 	 * @since x.x.x
 	 *
@@ -215,7 +225,8 @@ class ProductPrice {
 		 *
 		 * Used by the product feed sale price, Rich Pins, and the PageVisit and
 		 * AddToCart events. A value that is neither numeric nor an empty string is
-		 * ignored.
+		 * ignored. An empty string leaves the price out of the feed and Rich Pins,
+		 * and is ignored for 'page_visit' and 'add_to_cart'.
 		 *
 		 * @since x.x.x
 		 *
@@ -226,7 +237,7 @@ class ProductPrice {
 		 */
 		$filtered = apply_filters( 'pinterest_for_woocommerce_product_price', $price, $product, $context, $cart_item_key );
 
-		return self::is_valid_price( $filtered ) ? $filtered : $price;
+		return self::accept_filtered_price( $filtered, $price, $context );
 	}
 
 	/**
@@ -245,7 +256,8 @@ class ProductPrice {
 		 * Filters the regular price of a product sent to Pinterest.
 		 *
 		 * Used by the product feed price and the Rich Pins standard price. A value
-		 * that is neither numeric nor an empty string is ignored.
+		 * that is neither numeric nor an empty string is ignored. An empty string
+		 * leaves the price out.
 		 *
 		 * @since x.x.x
 		 *
@@ -255,22 +267,23 @@ class ProductPrice {
 		 */
 		$filtered = apply_filters( 'pinterest_for_woocommerce_product_regular_price', $price, $product, $context );
 
-		return self::is_valid_price( $filtered ) ? $filtered : $price;
+		return self::accept_filtered_price( $filtered, $price, $context );
 	}
 
 	/**
-	 * Returns a composite's minimum price, or null when the product is not a
-	 * composite or Composite Products has no price for it.
+	 * Returns a composite's minimum price, '' when Composite Products has no
+	 * price for it, or null when the product is not a composite.
 	 *
 	 * Composite Products returns an empty price when no configuration is
 	 * purchasable, when the catalog price is hidden, or while its prices are
-	 * still being calculated.
+	 * still being calculated. The container price would understate such a
+	 * composite, so it is not used in its place.
 	 *
 	 * @param WC_Product $product Product.
 	 * @param string     $method  Composite price method.
 	 * @param bool       $display Whether to adjust the price for display.
 	 *
-	 * @return mixed|null Price, or null.
+	 * @return mixed|null Price, '' or null.
 	 */
 	private static function get_composite_min_price( WC_Product $product, string $method, bool $display ) {
 		if ( ! self::is_composite( $product ) ) {
@@ -279,7 +292,7 @@ class ProductPrice {
 
 		$price = $product->$method( 'min', $display );
 
-		return is_numeric( $price ) ? $price : null;
+		return is_numeric( $price ) ? $price : '';
 	}
 
 	/**
@@ -329,13 +342,35 @@ class ProductPrice {
 	}
 
 	/**
-	 * Returns true for a value accepted from a price filter.
+	 * Returns the filtered price when it is valid for the context, otherwise the
+	 * unfiltered price.
 	 *
-	 * @param mixed $price Filtered price.
+	 * A numeric string in exponent notation, such as '1e2', is returned as a
+	 * float, because wc_format_decimal() would drop its exponent. The page_visit
+	 * and add_to_cart contexts accept only numbers, and get 0 when there is no
+	 * price, as they did before composites had one.
 	 *
-	 * @return bool
+	 * @param mixed  $filtered Filtered price.
+	 * @param mixed  $price    Unfiltered price.
+	 * @param string $context  Where the price is used, one of the CONTEXT_* constants.
+	 *
+	 * @return mixed Price.
 	 */
-	private static function is_valid_price( $price ): bool {
-		return '' === $price || is_numeric( $price );
+	private static function accept_filtered_price( $filtered, $price, string $context ) {
+		$is_event = in_array( $context, array( self::CONTEXT_PAGE_VISIT, self::CONTEXT_ADD_TO_CART ), true );
+
+		if ( is_numeric( $filtered ) || ( '' === $filtered && ! $is_event ) ) {
+			$price = $filtered;
+		}
+
+		if ( is_string( $price ) && is_numeric( $price ) && false !== stripos( $price, 'e' ) ) {
+			$price = (float) $price;
+		}
+
+		if ( $is_event && ! is_numeric( $price ) ) {
+			return 0.0;
+		}
+
+		return $price;
 	}
 }

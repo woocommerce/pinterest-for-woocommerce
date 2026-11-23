@@ -1157,6 +1157,24 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 	}
 
 	/**
+	 * A composite without a composite price is skipped even when its container has a price.
+	 *
+	 * @group feed
+	 */
+	public function testCompositeWithoutCompositePriceIgnoresContainerPrice() {
+		$product = \CompositeProductStub::create(
+			'',
+			'',
+			array(
+				'regular_price' => '10',
+				'price'         => '10',
+			)
+		);
+
+		$this->assertSame( '', ProductsXmlFeed::get_xml_item( $product, 'US' ) );
+	}
+
+	/**
 	 * The regular price filter sets the feed price.
 	 *
 	 * @group feed
