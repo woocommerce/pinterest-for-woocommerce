@@ -3,6 +3,7 @@
 namespace Automattic\WooCommerce\Pinterest\Tests\Unit;
 
 use Automattic\WooCommerce\Pinterest\RichPins;
+use CompositeProductStub;
 use Pinterest_For_Woocommerce;
 use WC_Helper_Product;
 use WP_UnitTestCase;
@@ -10,7 +11,7 @@ use WP_UnitTestCase;
 /**
  * Rich Pins product-password access tests.
  *
- * @version 1.5.2
+ * @version x.x.x
  */
 class RichPinsTest extends WP_UnitTestCase {
 
@@ -99,6 +100,94 @@ class RichPinsTest extends WP_UnitTestCase {
 			$this->assertStringContainsString( 'content="Local product description."', $output );
 			$this->assertStringContainsString( 'property="product:price:amount"', $output );
 		}
+	}
+
+	/**
+	 * A composite page advertises the composite prices.
+	 *
+	 * @dataProvider composite_price_cases
+	 * @param string      $min_price         Minimum active composite price.
+	 * @param string      $min_regular_price Minimum regular composite price.
+	 * @param string|null $standard_amount   Expected og:price:standard_amount, null when absent.
+	 */
+	public function test_composite_page_uses_composite_prices( $min_price, $min_regular_price, $standard_amount ) {
+		$product = CompositeProductStub::create( $min_price, $min_regular_price );
+
+		$tags = $this->get_product_tags( $product );
+
+		$this->assertEquals( $min_price, $tags['product:price:amount'] );
+		if ( null === $standard_amount ) {
+			$this->assertArrayNotHasKey( 'og:price:standard_amount', $tags );
+		} else {
+			$this->assertEquals( $standard_amount, $tags['og:price:standard_amount'] );
+		}
+	}
+
+	/**
+	 * Composite prices and the expected standard amount.
+	 *
+	 * @return array
+	 */
+	public function composite_price_cases() {
+		return array(
+			'cheapest configuration discounted' => array( '20', '25', '25' ),
+			'no discount'                       => array( '25', '25', null ),
+		);
+	}
+
+	/**
+	 * A simple product keeps its prices.
+	 */
+	public function test_simple_product_prices_are_unchanged() {
+		$product = WC_Helper_Product::create_simple_product(
+			true,
+			array(
+				'regular_price' => '15',
+				'sale_price'    => '10',
+			)
+		);
+
+		$tags = $this->get_product_tags( $product );
+
+		$this->assertEquals( 10, $tags['product:price:amount'] );
+		$this->assertEquals( '15', $tags['og:price:standard_amount'] );
+	}
+
+	/**
+	 * The price filter sets the Rich Pins amount.
+	 */
+	public function test_price_filter_sets_amount() {
+		$product = WC_Helper_Product::create_simple_product( true, array( 'regular_price' => '15' ) );
+		add_filter(
+			'pinterest_for_woocommerce_product_price',
+			function ( $price, $filtered_product, $context ) {
+				return 'rich_pins' === $context ? 50 : $price;
+			},
+			10,
+			3
+		);
+
+		$this->assertEquals( 50, $this->get_product_tags( $product )['product:price:amount'] );
+	}
+
+	/**
+	 * Returns the Rich Pins tags of a product page.
+	 *
+	 * @param \WC_Product $product Product.
+	 *
+	 * @return array
+	 */
+	private function get_product_tags( $product ) {
+		$this->go_to( get_permalink( $product->get_id() ) );
+
+		return RichPins::add_product_opengraph_tags(
+			array(),
+			array(
+				'products' => array(
+					'enabled' => true,
+				),
+			)
+		);
 	}
 
 	/**
