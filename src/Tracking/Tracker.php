@@ -72,7 +72,12 @@ abstract class Tracker {
 			$user_email       = is_array( $session_customer ) ? ( $session_customer['email'] ?? '' ) : '';
 		}
 
-		return is_string( $user_email ) ? strtolower( trim( $user_email ) ) : '';
+		if ( ! is_string( $user_email ) ) {
+			return '';
+		}
+
+		// strtolower() follows the server locale before PHP 8.2 (for example `I` becomes a dotless `ı` under tr_TR).
+		return strtr( trim( $user_email ), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz' );
 	}
 
 	/**
