@@ -58,8 +58,7 @@ abstract class Tracker {
 	 * Returns the current customer's email, trimmed and lowercased for hashing.
 	 *
 	 * Pinterest matches `em` against hashes of the lowercase email, so an email
-	 * hashed as typed (for example `Jane@Example.com`) never matches. Reads the
-	 * logged-in user's email first, then the WooCommerce session customer's.
+	 * hashed as typed (for example `Jane@Example.com`) never matches.
 	 *
 	 * @return string Normalized email, or an empty string when none is available.
 	 */
