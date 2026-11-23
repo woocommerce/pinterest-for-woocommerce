@@ -11,6 +11,11 @@ use Pinterest_For_Woocommerce;
  */
 class TagTest extends \WP_UnitTestCase {
 
+	/**
+	 * Clears the WooCommerce session customer so its email does not leak into later tests.
+	 *
+	 * @return void
+	 */
 	public function tearDown(): void {
 		if ( function_exists( 'WC' ) && isset( WC()->session ) ) {
 			WC()->session->__unset( 'customer' );
