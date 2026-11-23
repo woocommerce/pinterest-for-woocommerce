@@ -1881,7 +1881,7 @@ parameters:
 		-
 			message: '#^Property WooCommerce\:\:\$session \(WC_Session\) in isset\(\) is not nullable\.$#'
 			identifier: isset.property
-			count: 2
+			count: 1
 			path: src/Tracking/Conversions.php
 
 		-
@@ -2011,16 +2011,16 @@ parameters:
 			path: src/Tracking/Tag.php
 
 		-
-			message: '#^Property WooCommerce\:\:\$session \(WC_Session\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: src/Tracking/Tag.php
-
-		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
 			path: src/Tracking/Tag.php
+
+		-
+			message: '#^Property WooCommerce\:\:\$session \(WC_Session\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/Tracking/Tracker.php
 
 		-
 			message: '#^Method Automattic\\WooCommerce\\Pinterest\\View\\PHPView\:\:render\(\) has parameter \$context with no value type specified in iterable type array\.$#'
