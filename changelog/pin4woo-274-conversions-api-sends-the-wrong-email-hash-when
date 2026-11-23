@@ -1,0 +1,4 @@
+Significance: patch
+Type: fix
+
+Hash the lowercase customer email for the Conversions API and Pinterest tag Enhanced Match, so emails typed with capital letters still match.

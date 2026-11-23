@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adds PinterestTag tracker support.
  *
  * @class   Tag
- * @version 1.6.3
+ * @version x.x.x
  */
 class Tag extends Tracker {
 
@@ -471,21 +471,13 @@ class Tag extends Tracker {
 	}
 
 	/**
-	 * Returns the hashed email of the current user if any.
+	 * Returns the MD5 hash of the current customer's lowercase email, if any.
 	 *
-	 * @return string
+	 * @return string Hashed email, or an empty string if not available.
 	 */
 	private static function maybe_get_hashed_customer_email() {
-		$user_email = '';
-		if ( is_user_logged_in() ) {
-			$user       = wp_get_current_user();
-			$user_email = $user->user_email;
-		}
-		if ( empty( $user_email ) ) {
-			$session_customer = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session->get( 'customer' ) : false;
-			$user_email       = $session_customer ? $session_customer['email'] : '';
-		}
-		return $user_email ? md5( $user_email ) : '';
+		$user_email = static::get_normalized_customer_email();
+		return '' !== $user_email ? md5( $user_email ) : '';
 	}
 
 	/**

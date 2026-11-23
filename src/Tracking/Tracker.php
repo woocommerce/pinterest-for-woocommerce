@@ -15,7 +15,7 @@ use Throwable;
  * Interface for Pinterest tracker implementations.
  *
  * @class   Tracker
- * @version 1.6.1
+ * @version x.x.x
  */
 abstract class Tracker {
 
@@ -52,6 +52,28 @@ abstract class Tracker {
 	 * @return void
 	 */
 	public function disable_hooks() {
+	}
+
+	/**
+	 * Returns the current customer's email, trimmed and lowercased for hashing.
+	 *
+	 * Pinterest matches `em` against hashes of the lowercase email, so an email
+	 * hashed as typed (for example `Jane@Example.com`) never matches. Reads the
+	 * logged-in user's email first, then the WooCommerce session customer's.
+	 *
+	 * @return string Normalized email, or an empty string when none is available.
+	 */
+	protected static function get_normalized_customer_email(): string {
+		$user_email = '';
+		if ( is_user_logged_in() ) {
+			$user_email = wp_get_current_user()->user_email;
+		}
+		if ( empty( $user_email ) ) {
+			$session_customer = function_exists( 'WC' ) && isset( WC()->session ) ? WC()->session->get( 'customer' ) : false;
+			$user_email       = is_array( $session_customer ) ? ( $session_customer['email'] ?? '' ) : '';
+		}
+
+		return is_string( $user_email ) ? strtolower( trim( $user_email ) ) : '';
 	}
 
 	/**

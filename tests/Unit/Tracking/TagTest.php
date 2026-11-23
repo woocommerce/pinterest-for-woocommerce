@@ -7,7 +7,7 @@ use Pinterest_For_Woocommerce;
 /**
  * Tests the Tag tracker class.
  *
- * @version 1.6.3
+ * @version x.x.x
  */
 class TagTest extends \WP_UnitTestCase {
 
@@ -124,6 +124,35 @@ class TagTest extends \WP_UnitTestCase {
 				'np'          => 'woocommerce',
 				'em'          => '122dc8b4cb47fa7179db75f0c04b28dd',
 				'external_id' => hash( 'sha256', (string) $user_id ),
+			)
+		);
+		$this->assert_tag_script( $script, 'ju9rag86q', $expected_user_data );
+	}
+
+	/**
+	 * Tests that Enhanced Match hashes the guest's session email in lowercase, without surrounding whitespace.
+	 */
+	public function test_print_script_hashes_lowercase_guest_email_with_enhanced_match_support() {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_tag'           => 'JU9RAG86Q',
+				'enhanced_match_support' => true,
+			)
+		);
+		WC()->session->set( 'customer', array( 'email' => ' Pin.GuestTest@Example.com ' ) );
+
+		$tag = new Tag();
+
+		ob_start();
+		$tag->print_script();
+		$script = ob_get_clean();
+
+		WC()->session->__unset( 'customer' );
+
+		$expected_user_data = wp_json_encode(
+			array(
+				'np' => 'woocommerce',
+				'em' => md5( 'pin.guesttest@example.com' ),
 			)
 		);
 		$this->assert_tag_script( $script, 'ju9rag86q', $expected_user_data );
