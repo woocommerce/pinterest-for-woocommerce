@@ -11,7 +11,7 @@ use WP_UnitTestCase;
 /**
  * Tests the Conversions tracker class.
  *
- * @version 1.6.0
+ * @version x.x.x
  */
 class ConversionsTest extends WP_UnitTestCase {
 
@@ -23,6 +23,7 @@ class ConversionsTest extends WP_UnitTestCase {
 
 		if ( function_exists( 'WC' ) && isset( WC()->session ) ) {
 			WC()->session->__unset( 'pinterest_for_woocommerce_click_id' );
+			WC()->session->__unset( 'customer' );
 		}
 
 		parent::tearDown();
@@ -195,7 +196,7 @@ class ConversionsTest extends WP_UnitTestCase {
 	public function test_default_data_keeps_ip_user_agent_with_logged_in_customer_identifiers() {
 		$user_id = self::factory()->user->create(
 			array(
-				'user_email' => 'customer@example.com',
+				'user_email' => 'Customer@Example.com',
 			)
 		);
 		wp_set_current_user( $user_id );
@@ -214,6 +215,38 @@ class ConversionsTest extends WP_UnitTestCase {
 			),
 			$data['user_data']
 		);
+	}
+
+	/**
+	 * Tests that a guest's checkout email is trimmed and lowercased before hashing, as Pinterest's `em` field expects.
+	 */
+	public function test_default_data_hashes_lowercase_guest_session_email() {
+		WC()->session->set( 'customer', array( 'email' => ' Pin.GuestTest@Example.com ' ) );
+
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user );
+
+		$data = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		// SHA-256 of `pin.guesttest@example.com`.
+		$this->assertSame(
+			array( '855a2d09df7c8557215e266c54f88677308cabf433ee824c71a362dc4664247a' ),
+			$data['user_data']['em']
+		);
+	}
+
+	/**
+	 * Tests that a whitespace-only session email sends no `em` field.
+	 */
+	public function test_default_data_omits_email_when_session_email_is_blank() {
+		WC()->session->set( 'customer', array( 'email' => '   ' ) );
+
+		$user        = new User( 'Some IP address.', 'Some user agent string.' );
+		$conversions = new Conversions( $user );
+
+		$data = $conversions->prepare_request_data( Tracking::EVENT_PAGE_VISIT, new Data\None( 'event-id-123' ) );
+
+		$this->assertArrayNotHasKey( 'em', $data['user_data'] );
 	}
 
 	/**

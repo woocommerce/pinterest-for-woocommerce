@@ -7,9 +7,22 @@ use Pinterest_For_Woocommerce;
 /**
  * Tests the Tag tracker class.
  *
- * @version 1.6.3
+ * @version x.x.x
  */
 class TagTest extends \WP_UnitTestCase {
+
+	/**
+	 * Clears the WooCommerce session customer so its email does not leak into later tests.
+	 *
+	 * @return void
+	 */
+	public function tearDown(): void {
+		if ( function_exists( 'WC' ) && isset( WC()->session ) ) {
+			WC()->session->__unset( 'customer' );
+		}
+
+		parent::tearDown();
+	}
 
 	public function test_adds_hooks() {
 		$tag = new Tag();
@@ -127,6 +140,54 @@ class TagTest extends \WP_UnitTestCase {
 			)
 		);
 		$this->assert_tag_script( $script, 'ju9rag86q', $expected_user_data );
+	}
+
+	/**
+	 * Tests that Enhanced Match hashes the guest's session email in lowercase, without surrounding whitespace.
+	 */
+	public function test_print_script_hashes_lowercase_guest_email_with_enhanced_match_support() {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_tag'           => 'JU9RAG86Q',
+				'enhanced_match_support' => true,
+			)
+		);
+		WC()->session->set( 'customer', array( 'email' => ' Pin.GuestTest@Example.com ' ) );
+
+		$tag = new Tag();
+
+		ob_start();
+		$tag->print_script();
+		$script = ob_get_clean();
+
+		$expected_user_data = wp_json_encode(
+			array(
+				'np' => 'woocommerce',
+				'em' => md5( 'pin.guesttest@example.com' ),
+			)
+		);
+		$this->assert_tag_script( $script, 'ju9rag86q', $expected_user_data );
+	}
+
+	/**
+	 * Tests that Enhanced Match sends no `em` when the guest's session email is only whitespace.
+	 */
+	public function test_print_script_omits_email_when_session_email_is_blank() {
+		Pinterest_For_Woocommerce::save_settings(
+			array(
+				'tracking_tag'           => 'JU9RAG86Q',
+				'enhanced_match_support' => true,
+			)
+		);
+		WC()->session->set( 'customer', array( 'email' => '   ' ) );
+
+		$tag = new Tag();
+
+		ob_start();
+		$tag->print_script();
+		$script = ob_get_clean();
+
+		$this->assert_tag_script( $script, 'ju9rag86q', '{"np":"woocommerce"}' );
 	}
 
 	/**
