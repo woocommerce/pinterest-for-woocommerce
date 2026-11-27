@@ -9,6 +9,7 @@
 namespace Automattic\WooCommerce\Pinterest\Tracking;
 
 use Automattic\WooCommerce\Pinterest\Logger;
+use Automattic\WooCommerce\Pinterest\Product\ProductPrice;
 use Automattic\WooCommerce\Pinterest\Tracking;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\None;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Product;
@@ -24,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Generates browser PageVisit events and handles their CAPI beacons.
  *
  * @class   PageVisit
- * @version 1.6.3
+ * @version x.x.x
  */
 class PageVisit {
 
@@ -388,7 +389,7 @@ class PageVisit {
 			$product->get_name(),
 			wc_get_product_category_list( $product instanceof \WC_Product_Variation ? $product->get_parent_id() : $product->get_id() ),
 			'brand',
-			wc_get_price_to_display( $product ),
+			ProductPrice::get_price( $product, ProductPrice::CONTEXT_PAGE_VISIT ),
 			get_woocommerce_currency(),
 			1
 		);

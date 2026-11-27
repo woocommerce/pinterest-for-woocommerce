@@ -8,6 +8,8 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Product\ProductPrice;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -16,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class adding RichPins support.
  *
  * @class   RichPins
- * @version 1.6.2
+ * @version x.x.x
  */
 class RichPins {
 
@@ -182,13 +184,28 @@ class RichPins {
 			return $tags;
 		}
 
-		// mandatory tags.
+		// mandatory tags. A composite without a composite price, or a price filtered to '', gets no amount tag.
 		$tags['product:price:currency'] = get_woocommerce_currency();
-		$tags['product:price:amount']   = wc_get_price_to_display( $product );
+		$price                          = ProductPrice::get_price( $product, ProductPrice::CONTEXT_RICH_PINS );
+		if ( '' !== $price ) {
+			$tags['product:price:amount'] = $price;
+		}
 
 		// tags enabled by setup.
-		if ( $product->is_on_sale() ) {
-			$tags['og:price:standard_amount'] = $product->get_regular_price();
+		if ( ProductPrice::is_composite( $product ) ) {
+			$prices = ProductPrice::get_composite_sale_prices( $product, ProductPrice::CONTEXT_RICH_PINS );
+			if ( $prices ) {
+				$tags['og:price:standard_amount'] = $prices['regular'];
+			}
+		} elseif ( $product->is_on_sale() ) {
+			$regular_price = ProductPrice::filter_regular_price(
+				$product->get_regular_price(),
+				$product,
+				ProductPrice::CONTEXT_RICH_PINS
+			);
+			if ( '' !== $regular_price ) {
+				$tags['og:price:standard_amount'] = $regular_price;
+			}
 		}
 
 		if ( ! empty( $args['products']['enable_description'] ) ) {

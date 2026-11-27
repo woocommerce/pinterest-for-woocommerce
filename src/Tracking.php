@@ -8,6 +8,7 @@
 
 namespace Automattic\WooCommerce\Pinterest;
 
+use Automattic\WooCommerce\Pinterest\Product\ProductPrice;
 use Automattic\WooCommerce\Pinterest\Tracking\Conversions;
 use Automattic\WooCommerce\Pinterest\Tracking\Data;
 use Automattic\WooCommerce\Pinterest\Tracking\Data\Category;
@@ -28,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class Tracker responsible for hooking into system events.
  *
  * @class   Tracking
- * @version 1.6.3
+ * @version x.x.x
  */
 class Tracking {
 
@@ -214,7 +215,7 @@ class Tracking {
 			$product->get_name(),
 			wc_get_product_category_list( $product->get_id() ),
 			'brand',
-			wc_get_price_to_display( $product ),
+			ProductPrice::get_add_to_cart_price( $product, (string) $cart_item_key ),
 			get_woocommerce_currency(),
 			$quantity
 		);

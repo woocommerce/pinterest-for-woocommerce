@@ -61,6 +61,8 @@ printf( "Testing PHP %s, WordPress %s, WooCommerce %s.\n", PHP_VERSION, $GLOBALS
 // Add helpers for shipping tests.
 require_once PLUGIN_TESTS_DIR . '/Helpers/ShippingHelpers.php';
 
+require_once PLUGIN_TESTS_DIR . '/Helpers/CompositeProductStub.php';
+
 /**
  * Load WooCommerce for testing
  *

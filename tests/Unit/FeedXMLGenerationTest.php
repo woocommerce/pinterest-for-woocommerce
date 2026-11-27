@@ -20,7 +20,7 @@ use WC_Unit_Test_Case;
 /**
  * Feed file generation testing class.
  *
- * @version 1.5.4
+ * @version x.x.x
  */
 class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
@@ -1113,6 +1113,124 @@ class Pinterest_Test_Feed extends WC_Unit_Test_Case {
 
 			break;
 		}
+	}
+
+	/**
+	 * A composite with an empty container price is priced at its minimum regular
+	 * composite price, and gets a sale price when its minimum active price is
+	 * lower, also when a component sale leaves the composite's own is_on_sale() false.
+	 *
+	 * @group feed
+	 * @dataProvider composite_feed_price_cases
+	 *
+	 * @param string      $min_price         Minimum active composite price.
+	 * @param string      $min_regular_price Minimum regular composite price.
+	 * @param string|null $sale_price        Expected sale_price element, null when absent.
+	 */
+	public function testCompositeIsPricedAtMinimumCompositePrices( $min_price, $min_regular_price, $sale_price ) {
+		$product = \CompositeProductStub::create( $min_price, $min_regular_price );
+		$this->assertFalse( $product->is_on_sale() );
+
+		$xml = ProductsXmlFeed::get_xml_item( $product, 'US' );
+
+		$this->assertStringContainsString( '<g:price>25.00USD</g:price>', $xml );
+		if ( null === $sale_price ) {
+			$this->assertStringNotContainsString( '<sale_price>', $xml );
+		} else {
+			$this->assertStringContainsString( $sale_price, $xml );
+		}
+	}
+
+	/**
+	 * Composite prices and the expected sale price element.
+	 *
+	 * @return array
+	 */
+	public function composite_feed_price_cases() {
+		return array(
+			'discounted'  => array( '20', '25', '<sale_price>20.00USD</sale_price>' ),
+			'no discount' => array( '25', '25', null ),
+		);
+	}
+
+	/**
+	 * A composite without a composite price is skipped even when its container has a price.
+	 *
+	 * @group feed
+	 */
+	public function testCompositeWithoutCompositePriceIgnoresContainerPrice() {
+		$product = \CompositeProductStub::create(
+			'',
+			'',
+			array(
+				'regular_price' => '10',
+				'price'         => '10',
+			)
+		);
+
+		$this->assertSame( '', ProductsXmlFeed::get_xml_item( $product, 'US' ) );
+	}
+
+	/**
+	 * The regular price filter sets the feed price.
+	 *
+	 * @group feed
+	 */
+	public function testRegularPriceFilterSetsFeedPrice() {
+		$product = \CompositeProductStub::create( '25', '25' );
+		add_filter(
+			'pinterest_for_woocommerce_product_regular_price',
+			function ( $price, $filtered_product, $context ) {
+				return 'feed' === $context ? '30' : $price;
+			},
+			10,
+			3
+		);
+
+		$this->assertStringContainsString( '<g:price>30.00USD</g:price>', ProductsXmlFeed::get_xml_item( $product, 'US' ) );
+	}
+
+	/**
+	 * The price filter sets the feed sale price in its 'feed' context, for a
+	 * simple product on sale and for a discounted composite.
+	 *
+	 * @group feed
+	 * @dataProvider feed_sale_price_filter_cases
+	 *
+	 * @param string $product_type 'simple' or 'composite'.
+	 */
+	public function testPriceFilterSetsFeedSalePrice( $product_type ) {
+		$product = 'composite' === $product_type
+			? \CompositeProductStub::create( '20', '25' )
+			: WC_Helper_Product::create_simple_product(
+				true,
+				array(
+					'regular_price' => '25',
+					'sale_price'    => '20',
+				)
+			);
+		add_filter(
+			'pinterest_for_woocommerce_product_price',
+			function ( $price, $filtered_product, $context ) {
+				return 'feed' === $context ? '8' : $price;
+			},
+			10,
+			3
+		);
+
+		$this->assertStringContainsString( '<sale_price>8.00USD</sale_price>', ProductsXmlFeed::get_xml_item( $product, 'US' ) );
+	}
+
+	/**
+	 * Products whose feed sale price goes through the price filter.
+	 *
+	 * @return array
+	 */
+	public function feed_sale_price_filter_cases() {
+		return array(
+			'simple product on sale' => array( 'simple' ),
+			'discounted composite'   => array( 'composite' ),
+		);
 	}
 
 	/**

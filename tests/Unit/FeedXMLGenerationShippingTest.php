@@ -15,7 +15,7 @@ use Exception;
 /**
  * Feed XML file shipping column generation test class.
  *
- * @version 1.5.4
+ * @version x.x.x
  */
 class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 
@@ -264,6 +264,32 @@ class Pinterest_Test_Shipping_Feed extends WC_Unit_Test_Case {
 				<g:service>Free shipping</g:service>
 				<g:price>0.00 USD</g:price>
 			</g:shipping>";
+
+		$this->assertEquals( $expected, $xml );
+	}
+
+	/**
+	 * A composite with an empty container price meets a free shipping minimum through its composite price.
+	 *
+	 * @group feed
+	 * @group shipping
+	 */
+	public function testCompositeMeetsFreeShippingMinimumWithCompositePrice() {
+		$zone = ShippingHelpers::createZoneWithLocations(
+			array(
+				array( 'US', 'country' ),
+			)
+		);
+		ShippingHelpers::addFreeShippingWithMinimumOrderAmount( $zone, 50 );
+
+		$this->products[] = \CompositeProductStub::create( '60', '60' );
+
+		$xml      = $this->ProductsXmlFeed__get_property_g_shipping( end( $this->products ) );
+		$expected = '<g:shipping>
+				<g:country>US</g:country>
+				<g:service>Free shipping</g:service>
+				<g:price>0.00 USD</g:price>
+			</g:shipping>';
 
 		$this->assertEquals( $expected, $xml );
 	}

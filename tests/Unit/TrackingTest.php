@@ -16,7 +16,7 @@ use WC_Helper_Product;
 /**
  * Tests the Tracking class.
  *
- * @version 1.6.3
+ * @version x.x.x
  */
 class TrackingTest extends \WP_UnitTestCase {
 
@@ -1118,5 +1118,68 @@ class TrackingTest extends \WP_UnitTestCase {
 		$tracking->remove_tracker( get_class( $tracker ) );
 
 		$this->assertCount( 0, $tracker->get_tracked_events() );
+	}
+
+	/**
+	 * PageVisit for a composite reports its minimum composite price, and 0 for a
+	 * composite without a composite price, because the events multiply the price
+	 * by the quantity.
+	 *
+	 * @dataProvider page_visit_composite_cases
+	 *
+	 * @param string    $min_price Minimum active composite price, '' for none.
+	 * @param int|float $expected  Expected PageVisit price.
+	 */
+	public function test_page_visit_for_composite_uses_composite_price( $min_price, $expected ) {
+		$product = \CompositeProductStub::create(
+			$min_price,
+			$min_price,
+			array(
+				'regular_price' => '10',
+				'price'         => '10',
+			)
+		);
+
+		$this->assertEquals( $expected, PageVisit::get_product_event_data( 'event-id', $product )->get_price() );
+	}
+
+	/**
+	 * Composite prices and the expected PageVisit price.
+	 *
+	 * @return array
+	 */
+	public function page_visit_composite_cases() {
+		return array(
+			'composite price'    => array( '20', 20 ),
+			'no composite price' => array( '', 0 ),
+		);
+	}
+
+	/**
+	 * AddToCart for a composite reports the configured price of the container
+	 * and its components, and the Tag and the Conversions API send the same value.
+	 */
+	public function test_add_to_cart_for_composite_reports_configured_price() {
+		$tracker = $this->get_recording_tracker();
+
+		$container_key = \CompositeProductStub::add_to_cart( '5', 2, array( array( '10', 2 ), array( '3', 4 ) ) );
+		$container_id  = WC()->cart->get_cart_item( $container_key )['product_id'];
+
+		$tracking = new Tracking( array( $tracker ) );
+		$tracking->handle_add_to_cart( $container_key, $container_id, 2, 0 );
+		$tracking->remove_tracker( get_class( $tracker ) );
+
+		$tracked_events = $tracker->get_tracked_events();
+		$this->assertCount( 1, $tracked_events );
+
+		$data = $tracked_events[0]['data'];
+		// 5 + 10 * 2 / 2 + 3 * 4 / 2.
+		$this->assertEquals( 21, $data->get_price() );
+
+		$tag_data         = ( new Tag() )->prepare_request_data( Tracking::EVENT_ADD_TO_CART, $data );
+		$conversions_data = ( new Conversions( new User( '127.0.0.1', 'test-agent' ) ) )->prepare_request_data( Tracking::EVENT_ADD_TO_CART, $data );
+
+		$this->assertEquals( 42, $tag_data['value'] );
+		$this->assertEquals( 42, $conversions_data['custom_data']['value'] );
 	}
 }

@@ -1449,7 +1449,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method WC_Product\:\:get_variation_regular_price\(\)\.$#'
 			identifier: method.notFound
-			count: 2
+			count: 1
 			path: src/ProductsXmlFeed.php
 
 		-
