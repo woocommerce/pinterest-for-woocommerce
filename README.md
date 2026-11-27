@@ -81,7 +81,7 @@ While the release PR is open, `trunk` is under code freeze: the required `Check 
 
 A smoke test workflow runs on the release branch ([ci-release-smoke-test.yml](https://github.com/woocommerce/pinterest-for-woocommerce/blob/trunk/.github/workflows/ci-release-smoke-test.yml)), and the release PR goes through the regular PR CI and review like any other PR.
 
-Merging the release PR into `trunk` triggers the release workflow ([ci-release.yml](https://github.com/woocommerce/pinterest-for-woocommerce/blob/trunk/.github/workflows/ci-release.yml)), which builds the zip, creates the GitHub release and tag, and deploys that zip to WordPress.org under the slug set by `config.wp_org_slug` in `package.json`. Progress is posted in the `#team-somewherewarm-releases` Slack channel.
+Merging the release PR into `trunk` triggers the release workflow ([ci-release.yml](https://github.com/woocommerce/pinterest-for-woocommerce/blob/trunk/.github/workflows/ci-release.yml)), which builds the zip, creates the GitHub release and tag, and deploys that zip to WordPress.org under the slug set by `config.wp_org_slug` in `package.json`. Progress is posted to the team's Slack channel, set by `channel:` on the workflow's Slack notification steps.
 
 After a successful release, the workflow closes the released milestone and creates one for the next patch version (rename it if the next release will be a minor/major). What's left for you: post-release tasks like documentation and stakeholder notifications.
 

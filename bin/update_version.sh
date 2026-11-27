@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# SomewhereWarm Version Update Script
+# Version Update Script
 # This script updates version numbers across plugin files
 
 set -e  # Exit on any error
@@ -220,7 +220,7 @@ parse_args() {
 main() {
     # Get main plugin file for display
     local main_plugin_file=$(get_main_plugin_file)
-    print_status "SomewhereWarm Version Update Script - $main_plugin_file"
+    print_status "Version Update Script - $main_plugin_file"
     echo
 
     # Get current version
